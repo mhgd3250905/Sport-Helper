@@ -1,0 +1,90 @@
+id|name|category|position|equipment|scenes|level|unilateral|mode|sets|amount|rest|cue1|cue2|caution
+h-squat|徒手深蹲|strength|standing||home,office,outdoor|1|0|reps|3|12|45|脚略宽于髋，脚尖微外|臀部向后下坐，膝盖跟脚尖同向|膝
+h-bulgarian|椅子保加利亚分腿蹲|strength|standing|chair|home|2|1|reps|3|8|60|后脚背搭椅面，前脚站稳|身体下沉到前腿大腿接近水平|膝
+h-chair-step-up|椅子上步|strength|standing|chair|home|1|1|reps|3|10|45|整只脚踩上椅面再发力|用前腿蹬起，不靠后脚弹|膝
+h-good-morning|徒手早安式|strength|standing||home,office,outdoor|1|0|reps|3|12|45|微屈膝，臀部向后推|背部保持平直，感觉大腿后侧拉长|腰
+h-db-rdl|哑铃罗马尼亚硬拉|strength|standing|dumbbell|home|2|0|reps|3|10|60|哑铃贴着大腿下滑|髋向后推，背始终平直|腰
+h-bridge-march|臀桥交替踏步|strength|supine|mat|home|1|0|reps|3|12|45|先抬起臀桥，骨盆保持水平|左右交替抬脚，髋不晃|腰
+w-chair-hip-thrust|椅子臀推|strength|supine|chair|home|2|0|reps|3|12|60|上背靠椅边，双脚踩稳|顶髋到身体成一条直线，夹紧臀部|腰
+w-feet-on-chair-bridge|脚踩椅面臀桥|strength|supine|chair,mat|home|1|0|reps|3|12|45|脚跟踩椅面，膝微屈|抬臀时感觉大腿后侧和臀发力|腰
+glute-max-A|单腿臀桥|strength|supine|mat|home|2|1|reps|3|10|45|一腿伸直，支撑脚踩稳|用臀部把骨盆顶起，骨盆不歪|腰
+h-chair-kickback|扶椅站姿后踢腿|strength|standing|chair|home,office|1|1|reps|2|12|30|扶椅站稳，躯干不前倾|腿向后上方踢，臀部收紧|腰
+h-side-leg-raise|站姿侧抬腿|strength|standing||home,office|1|1|reps|2|12|30|身体站直，脚尖朝前|腿向侧面抬起，慢慢放下|
+w-clamshell|侧卧蚌式开合|strength|side_lying|mat|home|1|1|reps|2|15|30|侧卧屈膝，双脚并拢|上侧膝打开，骨盆不后倒|
+w-fire-hydrant|四足消防栓|strength|quadruped|mat|home|1|1|reps|2|12|30|手在肩下、膝在髋下|膝向侧上方抬起，躯干不扭|
+h-reverse-clam|侧卧反向蚌式|strength|side_lying|mat|home|1|1|reps|2|12|30|侧卧屈膝，膝盖并拢|小腿向上抬起，做髋内旋|膝
+h-calf-raise|扶墙提踵|strength|standing|wall|home,office|1|0|reps|3|15|30|手扶墙，前脚掌站稳|脚跟抬到最高，慢慢放下|
+h-tib-raise|靠墙勾脚尖|strength|standing|wall|home,office|1|0|reps|2|15|30|背靠墙，脚跟在前|脚尖向上勾起再慢慢放下|
+w-wall-sit|靠墙静蹲|strength|standing|wall|home,office|1|0|time|3|30|45|背贴墙下滑，膝约 90 度|膝盖对准脚尖，均匀呼吸|膝
+h-incline-pushup|扶凳上斜俯卧撑|strength|standing|chair|home,office|1|0|reps|3|10|60|双手撑在椅面，身体成直线|胸口靠近椅面再推起|手腕
+h-chair-dip|椅子臂屈伸|strength|seated|chair|home|2|0|reps|3|10|60|双手撑椅边，臀部离开椅面|屈肘下沉，肩不耸|肩
+h-db-floor-press|哑铃地板卧推|strength|supine|dumbbell,mat|home|1|0|reps|3|10|60|仰卧屈膝，上臂贴地起始|向上推直，再慢慢落回|肩
+h-db-press|站姿哑铃推举|strength|standing|dumbbell|home|2|0|reps|3|10|60|收紧腹部，肋骨不外翻|哑铃推到头顶正上方|肩
+h-db-lateral|哑铃侧平举|strength|standing|dumbbell|home|1|0|reps|3|12|45|微屈肘，肩膀下沉|手臂抬到与肩同高|肩
+h-db-row|扶椅单臂哑铃划船|strength|standing|dumbbell,chair|home|1|1|reps|3|10|45|一手扶椅，背部平直|肘向后上方拉，肩胛收紧|腰
+h-db-reverse-fly|哑铃俯身飞鸟|strength|standing|dumbbell|home|2|0|reps|3|12|45|俯身背平，微屈肘|手臂向两侧打开，夹紧肩胛|腰
+h-db-curl|哑铃交替弯举|strength|standing|dumbbell|home|1|0|reps|3|12|45|上臂贴紧身体|左右交替弯举，不甩身体|
+h-band-row|弹力带坐姿划船|strength|seated|band,mat|home|1|0|reps|3|12|45|坐直，弹力带绕过脚底|肘向后拉，挺胸夹肩胛|
+h-band-pull-apart|弹力带水平拉开|strength|standing|band|home,office|1|0|reps|3|15|30|双臂前平举握带|向两侧拉开到胸前，肩不耸|
+h-band-pallof|弹力带抗旋转推|core|standing|band|home|2|1|reps|3|10|45|侧对锚点站稳|双手前推，躯干不被拉转|
+h-side-er|侧卧肩外旋|strength|side_lying|mat|home|1|1|reps|2|12|30|上侧肘贴身体，屈肘 90 度|前臂向上旋起，肩不前顶|肩
+h-superman|俯卧超人式|strength|prone|mat|home|1|0|reps|3|10|45|俯卧，手脚伸直|同时抬起手脚，停一下再放|腰
+w-prone-swimmer|俯卧游泳式|strength|prone|mat|home|1|0|reps|2|10|30|俯卧，额头离地一点|手臂贴地画弧，肩胛下沉|肩
+w-bird-dog|鸟狗式|core|quadruped|mat|home|1|0|reps|3|10|45|手在肩下、膝在髋下|对侧手脚同时伸直，背不塌|腰
+w-dead-bug|死虫式|core|supine|mat|home|1|0|reps|3|10|45|腰背贴地，手脚朝上|对侧手脚慢慢下放，腰不离地|腰
+h-forearm-plank|前臂平板支撑|core|prone|mat|home|1|0|time|3|30|45|肘在肩正下方|身体成一条直线，臀不塌不翘|腰
+h-crunch|卷腹|core|supine|mat|home|1|0|reps|3|15|30|屈膝仰卧，手轻扶耳侧|用腹部卷起上背，下巴不夹|颈
+h-reverse-crunch|反向卷腹|core|supine|mat|home|2|0|reps|3|12|45|仰卧屈膝抬腿|卷起骨盆，膝向胸口靠近|腰
+h-russian-twist|俄罗斯转体|core|seated|mat|home|2|0|reps|3|16|45|坐姿后倾，脚着地|左右转动上身，骨盆稳定|腰
+h-step-jack|低冲击开合跳|cardio|standing||home,office,outdoor|1|0|time|3|40|30|左右交替向侧迈步|手臂同时上举，保持节奏|膝
+h-tabletop|桌面式后撑抬髋|strength|seated|mat|home|2|0|reps|3|10|45|手在肩后，指尖朝前|顶髋成桌面，胸口打开|手腕
+h-wall-angel|靠墙天使|mobility|standing|wall|home,office|1|0|reps|2|10|30|背、头贴墙，手臂成 W|手臂沿墙上滑，腰不离墙|肩
+h-cobra|眼镜蛇式|stretch|prone|mat|home|1|0|reps|2|8|20|俯卧，手在胸旁|推起上身，髋贴地，肩下沉|腰
+h-catcow-quad|四足猫牛式|mobility|quadruped|mat|home|1|0|reps|2|8|15|吸气塌腰抬头|呼气拱背低头，一节一节动|
+h-chair-lat|扶椅背阔肌拉伸|stretch|standing|chair|home,office|1|0|time|2|30|15|双手扶椅背，臀部后坐|胸口下沉，感觉腋下拉长|肩
+h-chair-tspine|跪姿椅面胸椎伸展|mobility|kneeling|chair,mat|home|1|0|reps|2|8|15|跪姿，手肘放椅面|臀向后坐，胸口下沉|肩
+h-dd-shoulder|下犬式压肩|stretch|quadruped|mat|home|2|0|reps|2|8|20|手推地，臀部向后上|胸口向腿的方向压|手腕
+h-wall-calf|靠墙小腿拉伸|stretch|standing|wall|home,office|1|1|time|2|30|10|后腿伸直，脚跟踩地|身体前倾，感觉小腿拉长|
+h-seated-reachback|坐姿后撑滑臀|stretch|seated|mat|home|1|0|reps|2|6|15|坐地，手撑身后|臀部向前滑，胸口打开|肩
+h-banana|仰卧香蕉式侧伸|stretch|supine|mat|home|1|1|time|2|30|10|仰卧，手脚同侧移动|身体弯成香蕉形，感觉侧腰拉长|
+o-seated-catcow|坐姿猫牛式|mobility|seated|chair|office,home|1|0|reps|2|8|10|坐椅前半，手放膝上|挺胸抬头，再拱背低头|
+o-seated-twist|坐姿扶椅扭转|stretch|seated|chair|office,home|1|1|time|2|20|10|坐直，手扶椅背|呼气时向一侧转体|腰
+o-stand-quad|扶椅站姿股四头肌拉伸|stretch|standing|chair|office,home|1|1|time|1|30|10|扶椅站稳，手抓脚背|膝盖朝下，大腿前侧拉长|膝
+o-stand-sidebend|站姿举手侧屈|stretch|standing||office,home|1|1|time|1|25|10|手举过头，双脚站稳|身体向侧弯，髋不往外顶|
+o-seated-fig4|坐姿四字前压|stretch|seated|chair|office,home|1|1|time|1|30|10|脚踝搭在另一侧膝上|背挺直向前倾，臀部拉长|膝
+o-seated-ham|坐姿腘绳肌前伸|stretch|seated|chair|office,home|1|1|time|1|30|10|坐椅前缘，一腿伸直|背挺直前倾，大腿后侧拉长|腰
+o-stand-crossreach|扶椅站姿交叉侧伸|stretch|standing|chair|office,home|1|1|time|1|30|10|一腿交叉到另一腿后|手臂向侧上方伸，髋外侧拉长|
+o-stand-lunge|扶椅站姿弓步屈髋拉伸|stretch|standing|chair|office,home|1|1|time|1|30|10|扶椅成弓步，后腿伸直|收紧臀部，髋前侧拉长|膝
+n-pelvis-circle|站姿骨盆画圈|mobility|standing||office,home|1|0|time|1|40|10|双手叉腰，膝微屈|骨盆慢慢画大圈，正反都做|腰
+n-chair-wiper|坐椅雨刷（膝内倒）|mobility|seated|chair|office,home|1|0|time|1|30|10|坐椅，双脚分开|双膝交替向内倒|膝
+n-seated-knee-lift|坐姿抬膝悬停|strength|seated|chair|office,home|1|1|reps|2|5|20|坐直，双手扶椅|抬膝离开椅面，停 3 秒|
+n-seated-squeeze|坐姿夹砖（膝内夹）|strength|seated|chair|office,home|1|0|reps|2|10|20|膝间夹软物|用力内夹，停 3 秒再放|
+h-band-hip-ir|坐椅弹力带髋内旋|strength|seated|chair,band|office,home|1|1|reps|2|12|20|坐椅，弹力带套在脚踝|小腿向外摆，膝不动|膝
+h-hip-gate|扶椅站姿开髋门|mobility|standing|chair|office,home|1|1|reps|2|6|15|扶椅站稳，抬膝|膝向外画圈打开髋|
+n-wide-fold|站姿宽距体前屈（扶椅）|stretch|standing|chair|office,home|1|0|time|1|30|10|双脚宽站，手扶椅|背平向前倾，大腿内后侧拉长|腰
+h-knee-hug|仰卧抱膝|stretch|supine|mat|home|1|0|time|1|40|10|仰卧，双手抱膝|膝靠向胸口，腰背放松|
+h-supine-twist|仰卧屈膝扭转|stretch|supine|mat|home|1|0|time|1|40|10|仰卧屈膝，手臂打开|双膝倒向一侧，肩贴地|腰
+n-windshield|仰卧雨刷式|mobility|supine|mat|home|1|0|time|1|30|10|仰卧屈膝，双脚宽踩|双膝左右交替倒下|
+s-figure4|仰卧4字梨状肌拉伸|stretch|supine|mat|home|1|1|time|1|30|10|脚踝搭在另一侧膝上|抱住大腿拉向胸口|膝
+s-kneel-hipflex|半跪髋屈肌拉伸|stretch|kneeling|mat|home|1|1|time|1|30|10|半跪，躯干直立|收紧臀部，髋向前推|膝
+s-lizard|蜥蜴式低弓步|stretch|kneeling|mat|home|2|1|time|1|30|10|前脚在手外侧|髋向下沉，呼吸放松|膝
+s-pigeon|鸽子式|stretch|prone|mat|home|2|1|time|1|40|10|前腿屈膝横放|身体前倾，臀部拉长|膝
+s-seated-fold|坐姿体前屈|stretch|seated|mat|home|1|0|time|1|40|10|坐地，双腿伸直|背挺直从髋前倾|腰
+s-butterfly|蝴蝶式|stretch|seated|mat|home|1|0|time|1|40|10|脚心相对，坐直|膝盖自然下落，不硬压|膝
+s-9090|90/90坐姿换髋|mobility|seated|mat|home|1|0|time|1|40|10|双腿各屈 90 度|左右换边，躯干直立|膝
+h-couch-stretch|沙发拉伸|stretch|kneeling|chair,mat|home|2|1|time|1|30|10|后脚背靠椅面|收紧臀部，髋前侧和大腿前侧拉长|膝
+h-quad-cars|四足髋关节画圈|mobility|quadruped|mat|home|1|1|reps|1|5|10|四足支撑，躯干稳定|膝向侧后方慢慢画大圈|
+h-butterfly-active|仰卧蝴蝶主动开合|mobility|supine|mat|home|1|0|reps|2|10|15|仰卧，脚心相对|膝主动打开再合上|
+h-sumo-pry|相扑深蹲肘推膝停留|mobility|standing|mat|home|2|0|time|1|40|10|宽站深蹲，手合十|肘把膝往外推，胸口挺起|膝
+h-adductor-rock|四足单腿侧伸后摇|mobility|quadruped|mat|home|1|1|reps|1|8|10|一腿向侧伸直|臀部向后摇，大腿内侧拉长|膝
+h-band-leg-out|仰卧弹力带单腿侧落|stretch|supine|band,mat|home|1|1|time|1|30|10|弹力带套脚，腿伸直上举|腿慢慢向侧落|
+h-wall-straddle|靠墙仰卧V字分腿|stretch|supine|wall,mat|home|1|0|time|1|60|10|臀部贴墙，腿靠墙|双腿慢慢分开下落|
+hip-flexors-A|坐姿直腿抬腿（压缩）|strength|seated|mat|home|2|0|reps|2|8|30|坐直，双手撑身旁|直腿抬起离地，停 1 秒|
+n-thomas-test|仰卧单膝抱胸（托马斯测试）|stretch|supine|mat|home|1|1|time|1|30|10|仰卧，抱一侧膝到胸|另一腿放松贴地|
+n-leg-circles|仰卧直腿画圈|mobility|supine|mat|home|1|1|reps|1|5|10|仰卧，一腿伸直上举|腿画圈，骨盆稳定|
+n-prone-hip-ext|俯卧屈膝抬腿|strength|prone|mat|home|1|1|reps|2|10|20|俯卧，一腿屈膝|脚底推向天花板，臀部收紧|腰
+n-prone-ir|俯卧小腿外摆（髋内旋）|mobility|prone|mat|home|1|0|reps|1|10|10|俯卧屈膝 90 度|小腿向外摆，骨盆贴地|膝
+n-seated-ir-drop|坐姿后撑单膝内倒|mobility|seated|mat|home|1|1|reps|1|8|10|坐地后撑，屈膝|单膝向内倒向地面|膝
+n-squat-shift|低位蹲姿左右移重心|mobility|standing|mat|home|2|0|time|1|40|10|宽站深蹲|重心慢慢左右移动|膝
+n-straddle-fold|坐姿分腿体前屈|stretch|seated|mat|home|2|0|time|1|40|10|坐地双腿分开|背挺直向前倾|腰
+n-half-split|半跪半劈叉（扶砖）|stretch|kneeling|mat|home|2|1|time|1|30|10|半跪，前腿伸直|髋向后坐，大腿后侧拉长|膝

@@ -1,0 +1,1528 @@
+{
+ "schemaVersion": 1,
+ "templates": [
+  {
+   "id": "office-relax",
+   "name": "工位肩颈腰放松",
+   "goal": "relax",
+   "scenes": [
+    "office"
+   ],
+   "equipment": [],
+   "minutes": 8,
+   "level": [
+    1,
+    3
+   ],
+   "summary": "坐着站着都能做，不用换衣服，缓解久坐僵硬。",
+   "keywords": [
+    "办公室",
+    "工位",
+    "久坐",
+    "肩颈",
+    "颈椎",
+    "腰酸",
+    "上班",
+    "午休",
+    "放松"
+   ],
+   "blocks": [
+    {
+     "id": "b1",
+     "name": "唤醒",
+     "type": "warmup",
+     "rounds": 1,
+     "restBetweenRoundsSeconds": 0,
+     "items": [
+      {
+       "exerciseId": "n-pelvis-circle",
+       "mode": "time",
+       "sets": 1,
+       "perSide": false,
+       "restSeconds": 10,
+       "workSeconds": 30
+      },
+      {
+       "exerciseId": "o-seated-catcow",
+       "mode": "time",
+       "sets": 1,
+       "perSide": false,
+       "restSeconds": 10,
+       "workSeconds": 40
+      }
+     ]
+    },
+    {
+     "id": "b2",
+     "name": "拉伸放松",
+     "type": "main",
+     "rounds": 1,
+     "restBetweenRoundsSeconds": 0,
+     "items": [
+      {
+       "exerciseId": "o-seated-twist",
+       "mode": "time",
+       "sets": 1,
+       "perSide": false,
+       "restSeconds": 10,
+       "workSeconds": 40
+      },
+      {
+       "exerciseId": "h-chair-lat",
+       "mode": "time",
+       "sets": 1,
+       "perSide": false,
+       "restSeconds": 10,
+       "workSeconds": 30
+      },
+      {
+       "exerciseId": "o-stand-sidebend",
+       "mode": "time",
+       "sets": 1,
+       "perSide": true,
+       "restSeconds": 10,
+       "workSeconds": 25
+      },
+      {
+       "exerciseId": "o-stand-quad",
+       "mode": "time",
+       "sets": 1,
+       "perSide": true,
+       "restSeconds": 10,
+       "workSeconds": 25
+      },
+      {
+       "exerciseId": "o-seated-fig4",
+       "mode": "time",
+       "sets": 1,
+       "perSide": true,
+       "restSeconds": 10,
+       "workSeconds": 25
+      },
+      {
+       "exerciseId": "o-stand-lunge",
+       "mode": "time",
+       "sets": 1,
+       "perSide": true,
+       "restSeconds": 10,
+       "workSeconds": 25
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "office-active",
+   "name": "工位 10 分钟激活",
+   "goal": "fullbody",
+   "scenes": [
+    "office"
+   ],
+   "equipment": [],
+   "minutes": 10,
+   "level": [
+    1,
+    2
+   ],
+   "summary": "不出汗的小循环：蹲、推、提踵，把久坐的身体叫醒。",
+   "keywords": [
+    "办公室",
+    "工位",
+    "激活",
+    "提神",
+    "下午",
+    "犯困",
+    "久坐",
+    "站起来"
+   ],
+   "blocks": [
+    {
+     "id": "b1",
+     "name": "热身",
+     "type": "warmup",
+     "rounds": 1,
+     "restBetweenRoundsSeconds": 0,
+     "items": [
+      {
+       "exerciseId": "n-pelvis-circle",
+       "mode": "time",
+       "sets": 1,
+       "perSide": false,
+       "restSeconds": 10,
+       "workSeconds": 30
+      },
+      {
+       "exerciseId": "h-good-morning",
+       "mode": "reps",
+       "sets": 1,
+       "perSide": false,
+       "restSeconds": 30,
+       "reps": 10
+      }
+     ]
+    },
+    {
+     "id": "b2",
+     "name": "激活循环",
+     "type": "circuit",
+     "rounds": 2,
+     "restBetweenRoundsSeconds": 30,
+     "items": [
+      {
+       "exerciseId": "h-squat",
+       "mode": "reps",
+       "sets": 1,
+       "perSide": false,
+       "restSeconds": 10,
+       "reps": 10
+      },
+      {
+       "exerciseId": "h-incline-pushup",
+       "mode": "reps",
+       "sets": 1,
+       "perSide": false,
+       "restSeconds": 10,
+       "reps": 8
+      },
+      {
+       "exerciseId": "h-calf-raise",
+       "mode": "reps",
+       "sets": 1,
+       "perSide": false,
+       "restSeconds": 10,
+       "reps": 15
+      },
+      {
+       "exerciseId": "h-chair-kickback",
+       "mode": "reps",
+       "sets": 1,
+       "perSide": true,
+       "restSeconds": 10,
+       "reps": 10
+      }
+     ]
+    },
+    {
+     "id": "b3",
+     "name": "放松",
+     "type": "cooldown",
+     "rounds": 1,
+     "restBetweenRoundsSeconds": 0,
+     "items": [
+      {
+       "exerciseId": "o-stand-lunge",
+       "mode": "time",
+       "sets": 1,
+       "perSide": true,
+       "restSeconds": 10,
+       "workSeconds": 25
+      },
+      {
+       "exerciseId": "h-chair-lat",
+       "mode": "time",
+       "sets": 1,
+       "perSide": false,
+       "restSeconds": 10,
+       "workSeconds": 30
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "morning-wake",
+   "name": "晨起唤醒",
+   "goal": "mobility",
+   "scenes": [
+    "home"
+   ],
+   "equipment": [],
+   "minutes": 8,
+   "level": [
+    1,
+    3
+   ],
+   "summary": "从关节画圈到轻微出汗，起床后 8 分钟让身体醒过来。",
+   "keywords": [
+    "早上",
+    "晨起",
+    "起床",
+    "早晨",
+    "唤醒",
+    "精神"
+   ],
+   "blocks": [
+    {
+     "id": "b1",
+     "name": "关节唤醒",
+     "type": "warmup",
+     "rounds": 1,
+     "restBetweenRoundsSeconds": 0,
+     "items": [
+      {
+       "exerciseId": "h-catcow-quad",
+       "mode": "time",
+       "sets": 1,
+       "perSide": false,
+       "restSeconds": 10,
+       "workSeconds": 40
+      },
+      {
+       "exerciseId": "n-pelvis-circle",
+       "mode": "time",
+       "sets": 1,
+       "perSide": false,
+       "restSeconds": 10,
+       "workSeconds": 30
+      },
+      {
+       "exerciseId": "h-hip-gate",
+       "mode": "reps",
+       "sets": 1,
+       "perSide": true,
+       "restSeconds": 10,
+       "reps": 6
+      }
+     ]
+    },
+    {
+     "id": "b2",
+     "name": "轻激活",
+     "type": "main",
+     "rounds": 1,
+     "restBetweenRoundsSeconds": 0,
+     "items": [
+      {
+       "exerciseId": "h-squat",
+       "mode": "reps",
+       "sets": 2,
+       "perSide": false,
+       "restSeconds": 20,
+       "reps": 10
+      },
+      {
+       "exerciseId": "h-wall-angel",
+       "mode": "reps",
+       "sets": 1,
+       "perSide": false,
+       "restSeconds": 10,
+       "reps": 10
+      },
+      {
+       "exerciseId": "h-step-jack",
+       "mode": "time",
+       "sets": 2,
+       "perSide": false,
+       "restSeconds": 30,
+       "workSeconds": 40
+      }
+     ]
+    },
+    {
+     "id": "b3",
+     "name": "舒展",
+     "type": "cooldown",
+     "rounds": 1,
+     "restBetweenRoundsSeconds": 0,
+     "items": [
+      {
+       "exerciseId": "o-stand-sidebend",
+       "mode": "time",
+       "sets": 1,
+       "perSide": true,
+       "restSeconds": 10,
+       "workSeconds": 25
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "bedtime",
+   "name": "睡前放松",
+   "goal": "relax",
+   "scenes": [
+    "home"
+   ],
+   "equipment": [],
+   "minutes": 10,
+   "level": [
+    1,
+    3
+   ],
+   "summary": "全程躺着做，慢呼吸，放松腰背和髋。",
+   "keywords": [
+    "睡前",
+    "晚上",
+    "失眠",
+    "睡觉",
+    "放松",
+    "助眠",
+    "躺着"
+   ],
+   "blocks": [
+    {
+     "id": "b1",
+     "name": "放松",
+     "type": "main",
+     "rounds": 1,
+     "restBetweenRoundsSeconds": 0,
+     "items": [
+      {
+       "exerciseId": "h-knee-hug",
+       "mode": "time",
+       "sets": 1,
+       "perSide": false,
+       "restSeconds": 10,
+       "workSeconds": 40
+      },
+      {
+       "exerciseId": "n-windshield",
+       "mode": "reps",
+       "sets": 1,
+       "perSide": false,
+       "restSeconds": 10,
+       "reps": 8
+      },
+      {
+       "exerciseId": "s-figure4",
+       "mode": "time",
+       "sets": 1,
+       "perSide": true,
+       "restSeconds": 10,
+       "workSeconds": 30
+      },
+      {
+       "exerciseId": "h-supine-twist",
+       "mode": "time",
+       "sets": 1,
+       "perSide": false,
+       "restSeconds": 10,
+       "workSeconds": 40
+      },
+      {
+       "exerciseId": "h-banana",
+       "mode": "time",
+       "sets": 1,
+       "perSide": false,
+       "restSeconds": 10,
+       "workSeconds": 30
+      },
+      {
+       "exerciseId": "h-wall-straddle",
+       "mode": "time",
+       "sets": 1,
+       "perSide": false,
+       "restSeconds": 10,
+       "workSeconds": 60
+      },
+      {
+       "exerciseId": "n-thomas-test",
+       "mode": "time",
+       "sets": 1,
+       "perSide": true,
+       "restSeconds": 10,
+       "workSeconds": 30
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "fullbody-bodyweight",
+   "name": "居家徒手全身",
+   "goal": "strength",
+   "scenes": [
+    "home"
+   ],
+   "equipment": [],
+   "minutes": 20,
+   "level": [
+    1,
+    3
+   ],
+   "summary": "不需要器械的全身循环：下肢、推、后链、核心各一个。",
+   "keywords": [
+    "全身",
+    "徒手",
+    "居家",
+    "在家",
+    "健身",
+    "力量",
+    "减脂",
+    "无器械",
+    "自重"
+   ],
+   "blocks": [
+    {
+     "id": "b1",
+     "name": "热身",
+     "type": "warmup",
+     "rounds": 1,
+     "restBetweenRoundsSeconds": 0,
+     "items": [
+      {
+       "exerciseId": "h-step-jack",
+       "mode": "time",
+       "sets": 2,
+       "perSide": false,
+       "restSeconds": 30,
+       "workSeconds": 40
+      },
+      {
+       "exerciseId": "h-catcow-quad",
+       "mode": "time",
+       "sets": 1,
+       "perSide": false,
+       "restSeconds": 10,
+       "workSeconds": 40
+      },
+      {
+       "exerciseId": "h-good-morning",
+       "mode": "reps",
+       "sets": 1,
+       "perSide": false,
+       "restSeconds": 30,
+       "reps": 10
+      }
+     ]
+    },
+    {
+     "id": "b2",
+     "name": "全身循环",
+     "type": "circuit",
+     "rounds": 3,
+     "restBetweenRoundsSeconds": 60,
+     "items": [
+      {
+       "exerciseId": "h-squat",
+       "mode": "reps",
+       "sets": 1,
+       "perSide": false,
+       "restSeconds": 15,
+       "reps": 12
+      },
+      {
+       "exerciseId": "h-incline-pushup",
+       "mode": "reps",
+       "sets": 1,
+       "perSide": false,
+       "restSeconds": 15,
+       "reps": 10
+      },
+      {
+       "exerciseId": "w-feet-on-chair-bridge",
+       "mode": "reps",
+       "sets": 1,
+       "perSide": false,
+       "restSeconds": 15,
+       "reps": 12
+      },
+      {
+       "exerciseId": "w-bird-dog",
+       "mode": "reps",
+       "sets": 1,
+       "perSide": false,
+       "restSeconds": 15,
+       "reps": 8
+      },
+      {
+       "exerciseId": "h-forearm-plank",
+       "mode": "time",
+       "sets": 3,
+       "perSide": false,
+       "restSeconds": 15,
+       "workSeconds": 30
+      }
+     ]
+    },
+    {
+     "id": "b3",
+     "name": "放松",
+     "type": "cooldown",
+     "rounds": 1,
+     "restBetweenRoundsSeconds": 0,
+     "items": [
+      {
+       "exerciseId": "o-stand-quad",
+       "mode": "time",
+       "sets": 1,
+       "perSide": true,
+       "restSeconds": 10,
+       "workSeconds": 25
+      },
+      {
+       "exerciseId": "h-chair-lat",
+       "mode": "time",
+       "sets": 1,
+       "perSide": false,
+       "restSeconds": 10,
+       "workSeconds": 30
+      },
+      {
+       "exerciseId": "h-cobra",
+       "mode": "time",
+       "sets": 1,
+       "perSide": false,
+       "restSeconds": 10,
+       "workSeconds": 30
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "dumbbell-fullbody",
+   "name": "哑铃全身力量",
+   "goal": "strength",
+   "scenes": [
+    "home"
+   ],
+   "equipment": [
+    "dumbbell"
+   ],
+   "minutes": 25,
+   "level": [
+    1,
+    3
+   ],
+   "summary": "一对哑铃完成推、拉、髋铰链和肩部训练。",
+   "keywords": [
+    "哑铃",
+    "力量",
+    "增肌",
+    "塑形",
+    "全身",
+    "器械"
+   ],
+   "blocks": [
+    {
+     "id": "b1",
+     "name": "热身",
+     "type": "warmup",
+     "rounds": 1,
+     "restBetweenRoundsSeconds": 0,
+     "items": [
+      {
+       "exerciseId": "h-step-jack",
+       "mode": "time",
+       "sets": 2,
+       "perSide": false,
+       "restSeconds": 30,
+       "workSeconds": 40
+      },
+      {
+       "exerciseId": "h-good-morning",
+       "mode": "reps",
+       "sets": 1,
+       "perSide": false,
+       "restSeconds": 30,
+       "reps": 10
+      },
+      {
+       "exerciseId": "h-wall-angel",
+       "mode": "reps",
+       "sets": 1,
+       "perSide": false,
+       "restSeconds": 10,
+       "reps": 8
+      }
+     ]
+    },
+    {
+     "id": "b2",
+     "name": "力量",
+     "type": "main",
+     "rounds": 1,
+     "restBetweenRoundsSeconds": 0,
+     "items": [
+      {
+       "exerciseId": "h-db-rdl",
+       "mode": "reps",
+       "sets": 3,
+       "perSide": false,
+       "restSeconds": 45,
+       "reps": 10
+      },
+      {
+       "exerciseId": "h-db-floor-press",
+       "mode": "reps",
+       "sets": 3,
+       "perSide": false,
+       "restSeconds": 45,
+       "reps": 10
+      },
+      {
+       "exerciseId": "h-db-row",
+       "mode": "reps",
+       "sets": 3,
+       "perSide": true,
+       "restSeconds": 30,
+       "reps": 10
+      },
+      {
+       "exerciseId": "h-db-press",
+       "mode": "reps",
+       "sets": 2,
+       "perSide": false,
+       "restSeconds": 45,
+       "reps": 10
+      },
+      {
+       "exerciseId": "h-db-curl",
+       "mode": "reps",
+       "sets": 2,
+       "perSide": false,
+       "restSeconds": 30,
+       "reps": 12
+      },
+      {
+       "exerciseId": "h-db-lateral",
+       "mode": "reps",
+       "sets": 2,
+       "perSide": false,
+       "restSeconds": 30,
+       "reps": 12
+      }
+     ]
+    },
+    {
+     "id": "b3",
+     "name": "核心",
+     "type": "main",
+     "rounds": 1,
+     "restBetweenRoundsSeconds": 0,
+     "items": [
+      {
+       "exerciseId": "w-dead-bug",
+       "mode": "reps",
+       "sets": 2,
+       "perSide": false,
+       "restSeconds": 20,
+       "reps": 10
+      }
+     ]
+    },
+    {
+     "id": "b4",
+     "name": "放松",
+     "type": "cooldown",
+     "rounds": 1,
+     "restBetweenRoundsSeconds": 0,
+     "items": [
+      {
+       "exerciseId": "h-chair-lat",
+       "mode": "time",
+       "sets": 1,
+       "perSide": false,
+       "restSeconds": 10,
+       "workSeconds": 30
+      },
+      {
+       "exerciseId": "h-seated-reachback",
+       "mode": "time",
+       "sets": 1,
+       "perSide": false,
+       "restSeconds": 10,
+       "workSeconds": 30
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "band-upper-posture",
+   "name": "弹力带上肢与体态",
+   "goal": "strength",
+   "scenes": [
+    "home"
+   ],
+   "equipment": [
+    "band"
+   ],
+   "minutes": 15,
+   "level": [
+    1,
+    3
+   ],
+   "summary": "弹力带划船、拉开、抗旋转，改善圆肩含胸。",
+   "keywords": [
+    "弹力带",
+    "圆肩",
+    "驼背",
+    "含胸",
+    "体态",
+    "肩",
+    "背",
+    "上肢"
+   ],
+   "blocks": [
+    {
+     "id": "b1",
+     "name": "热身",
+     "type": "warmup",
+     "rounds": 1,
+     "restBetweenRoundsSeconds": 0,
+     "items": [
+      {
+       "exerciseId": "h-wall-angel",
+       "mode": "reps",
+       "sets": 1,
+       "perSide": false,
+       "restSeconds": 10,
+       "reps": 10
+      },
+      {
+       "exerciseId": "h-catcow-quad",
+       "mode": "time",
+       "sets": 1,
+       "perSide": false,
+       "restSeconds": 10,
+       "workSeconds": 30
+      }
+     ]
+    },
+    {
+     "id": "b2",
+     "name": "弹力带",
+     "type": "main",
+     "rounds": 1,
+     "restBetweenRoundsSeconds": 0,
+     "items": [
+      {
+       "exerciseId": "h-band-row",
+       "mode": "reps",
+       "sets": 3,
+       "perSide": false,
+       "restSeconds": 30,
+       "reps": 12
+      },
+      {
+       "exerciseId": "h-band-pull-apart",
+       "mode": "reps",
+       "sets": 3,
+       "perSide": false,
+       "restSeconds": 30,
+       "reps": 15
+      },
+      {
+       "exerciseId": "h-band-pallof",
+       "mode": "reps",
+       "sets": 2,
+       "perSide": false,
+       "restSeconds": 30,
+       "reps": 10
+      },
+      {
+       "exerciseId": "h-side-er",
+       "mode": "reps",
+       "sets": 2,
+       "perSide": true,
+       "restSeconds": 20,
+       "reps": 12
+      },
+      {
+       "exerciseId": "h-incline-pushup",
+       "mode": "reps",
+       "sets": 2,
+       "perSide": false,
+       "restSeconds": 30,
+       "reps": 10
+      }
+     ]
+    },
+    {
+     "id": "b3",
+     "name": "放松",
+     "type": "cooldown",
+     "rounds": 1,
+     "restBetweenRoundsSeconds": 0,
+     "items": [
+      {
+       "exerciseId": "h-chair-tspine",
+       "mode": "time",
+       "sets": 1,
+       "perSide": false,
+       "restSeconds": 10,
+       "workSeconds": 30
+      },
+      {
+       "exerciseId": "h-seated-reachback",
+       "mode": "time",
+       "sets": 1,
+       "perSide": false,
+       "restSeconds": 10,
+       "workSeconds": 30
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "core",
+   "name": "核心强化",
+   "goal": "core",
+   "scenes": [
+    "home"
+   ],
+   "equipment": [],
+   "minutes": 12,
+   "level": [
+    1,
+    3
+   ],
+   "summary": "腹部、腰背和抗旋转一起练，保护腰椎。",
+   "keywords": [
+    "核心",
+    "腹肌",
+    "马甲线",
+    "腰腹",
+    "小肚子",
+    "腹部",
+    "平板"
+   ],
+   "blocks": [
+    {
+     "id": "b1",
+     "name": "热身",
+     "type": "warmup",
+     "rounds": 1,
+     "restBetweenRoundsSeconds": 0,
+     "items": [
+      {
+       "exerciseId": "h-catcow-quad",
+       "mode": "time",
+       "sets": 1,
+       "perSide": false,
+       "restSeconds": 10,
+       "workSeconds": 30
+      }
+     ]
+    },
+    {
+     "id": "b2",
+     "name": "核心",
+     "type": "main",
+     "rounds": 1,
+     "restBetweenRoundsSeconds": 0,
+     "items": [
+      {
+       "exerciseId": "w-dead-bug",
+       "mode": "reps",
+       "sets": 2,
+       "perSide": false,
+       "restSeconds": 20,
+       "reps": 10
+      },
+      {
+       "exerciseId": "h-crunch",
+       "mode": "reps",
+       "sets": 2,
+       "perSide": false,
+       "restSeconds": 20,
+       "reps": 15
+      },
+      {
+       "exerciseId": "h-reverse-crunch",
+       "mode": "reps",
+       "sets": 2,
+       "perSide": false,
+       "restSeconds": 20,
+       "reps": 12
+      },
+      {
+       "exerciseId": "h-russian-twist",
+       "mode": "reps",
+       "sets": 2,
+       "perSide": false,
+       "restSeconds": 20,
+       "reps": 16
+      },
+      {
+       "exerciseId": "h-forearm-plank",
+       "mode": "time",
+       "sets": 2,
+       "perSide": false,
+       "restSeconds": 20,
+       "workSeconds": 30
+      },
+      {
+       "exerciseId": "w-bird-dog",
+       "mode": "reps",
+       "sets": 2,
+       "perSide": false,
+       "restSeconds": 20,
+       "reps": 8
+      },
+      {
+       "exerciseId": "h-superman",
+       "mode": "reps",
+       "sets": 2,
+       "perSide": false,
+       "restSeconds": 20,
+       "reps": 10
+      }
+     ]
+    },
+    {
+     "id": "b3",
+     "name": "放松",
+     "type": "cooldown",
+     "rounds": 1,
+     "restBetweenRoundsSeconds": 0,
+     "items": [
+      {
+       "exerciseId": "h-cobra",
+       "mode": "time",
+       "sets": 1,
+       "perSide": false,
+       "restSeconds": 10,
+       "workSeconds": 30
+      },
+      {
+       "exerciseId": "h-knee-hug",
+       "mode": "time",
+       "sets": 1,
+       "perSide": false,
+       "restSeconds": 10,
+       "workSeconds": 30
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "glutes-legs",
+   "name": "臀腿强化",
+   "goal": "strength",
+   "scenes": [
+    "home"
+   ],
+   "equipment": [],
+   "minutes": 18,
+   "level": [
+    1,
+    3
+   ],
+   "summary": "臀中肌激活 + 臀推 + 分腿蹲，练出稳定有力的下肢。",
+   "keywords": [
+    "臀",
+    "臀部",
+    "翘臀",
+    "腿",
+    "下肢",
+    "臀腿",
+    "美腿"
+   ],
+   "blocks": [
+    {
+     "id": "b1",
+     "name": "激活",
+     "type": "warmup",
+     "rounds": 1,
+     "restBetweenRoundsSeconds": 0,
+     "items": [
+      {
+       "exerciseId": "w-clamshell",
+       "mode": "reps",
+       "sets": 1,
+       "perSide": true,
+       "restSeconds": 30,
+       "reps": 15
+      },
+      {
+       "exerciseId": "w-fire-hydrant",
+       "mode": "reps",
+       "sets": 1,
+       "perSide": true,
+       "restSeconds": 30,
+       "reps": 12
+      }
+     ]
+    },
+    {
+     "id": "b2",
+     "name": "力量",
+     "type": "main",
+     "rounds": 1,
+     "restBetweenRoundsSeconds": 0,
+     "items": [
+      {
+       "exerciseId": "w-chair-hip-thrust",
+       "mode": "reps",
+       "sets": 3,
+       "perSide": false,
+       "restSeconds": 40,
+       "reps": 12
+      },
+      {
+       "exerciseId": "h-bulgarian",
+       "mode": "reps",
+       "sets": 3,
+       "perSide": true,
+       "restSeconds": 40,
+       "reps": 8
+      },
+      {
+       "exerciseId": "h-bridge-march",
+       "mode": "reps",
+       "sets": 2,
+       "perSide": false,
+       "restSeconds": 30,
+       "reps": 10
+      },
+      {
+       "exerciseId": "w-wall-sit",
+       "mode": "time",
+       "sets": 2,
+       "perSide": false,
+       "restSeconds": 30,
+       "workSeconds": 30
+      },
+      {
+       "exerciseId": "h-calf-raise",
+       "mode": "reps",
+       "sets": 2,
+       "perSide": false,
+       "restSeconds": 20,
+       "reps": 15
+      }
+     ]
+    },
+    {
+     "id": "b3",
+     "name": "放松",
+     "type": "cooldown",
+     "rounds": 1,
+     "restBetweenRoundsSeconds": 0,
+     "items": [
+      {
+       "exerciseId": "s-figure4",
+       "mode": "time",
+       "sets": 1,
+       "perSide": true,
+       "restSeconds": 10,
+       "workSeconds": 30
+      },
+      {
+       "exerciseId": "o-stand-quad",
+       "mode": "time",
+       "sets": 1,
+       "perSide": true,
+       "restSeconds": 10,
+       "workSeconds": 25
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hip-open",
+   "name": "开胯灵活",
+   "goal": "mobility",
+   "scenes": [
+    "home"
+   ],
+   "equipment": [],
+   "minutes": 12,
+   "level": [
+    1,
+    3
+   ],
+   "summary": "先动后拉：髋关节画圈、90/90、蝴蝶、屈髋拉伸。",
+   "keywords": [
+    "开胯",
+    "髋",
+    "胯",
+    "髋关节",
+    "劈叉",
+    "柔韧",
+    "一字马",
+    "灵活",
+    "舞蹈"
+   ],
+   "blocks": [
+    {
+     "id": "b1",
+     "name": "活动",
+     "type": "warmup",
+     "rounds": 1,
+     "restBetweenRoundsSeconds": 0,
+     "items": [
+      {
+       "exerciseId": "n-pelvis-circle",
+       "mode": "time",
+       "sets": 1,
+       "perSide": false,
+       "restSeconds": 10,
+       "workSeconds": 30
+      },
+      {
+       "exerciseId": "h-quad-cars",
+       "mode": "reps",
+       "sets": 1,
+       "perSide": true,
+       "restSeconds": 10,
+       "reps": 5
+      }
+     ]
+    },
+    {
+     "id": "b2",
+     "name": "开胯",
+     "type": "main",
+     "rounds": 1,
+     "restBetweenRoundsSeconds": 0,
+     "items": [
+      {
+       "exerciseId": "s-9090",
+       "mode": "time",
+       "sets": 1,
+       "perSide": false,
+       "restSeconds": 10,
+       "workSeconds": 40
+      },
+      {
+       "exerciseId": "h-adductor-rock",
+       "mode": "time",
+       "sets": 1,
+       "perSide": true,
+       "restSeconds": 10,
+       "workSeconds": 30
+      },
+      {
+       "exerciseId": "s-butterfly",
+       "mode": "time",
+       "sets": 1,
+       "perSide": false,
+       "restSeconds": 10,
+       "workSeconds": 40
+      },
+      {
+       "exerciseId": "s-kneel-hipflex",
+       "mode": "time",
+       "sets": 1,
+       "perSide": true,
+       "restSeconds": 10,
+       "workSeconds": 30
+      },
+      {
+       "exerciseId": "h-reverse-clam",
+       "mode": "reps",
+       "sets": 2,
+       "perSide": true,
+       "restSeconds": 20,
+       "reps": 12
+      },
+      {
+       "exerciseId": "s-figure4",
+       "mode": "time",
+       "sets": 1,
+       "perSide": true,
+       "restSeconds": 10,
+       "workSeconds": 30
+      }
+     ]
+    },
+    {
+     "id": "b3",
+     "name": "放松",
+     "type": "cooldown",
+     "rounds": 1,
+     "restBetweenRoundsSeconds": 0,
+     "items": [
+      {
+       "exerciseId": "h-wall-straddle",
+       "mode": "time",
+       "sets": 1,
+       "perSide": false,
+       "restSeconds": 10,
+       "workSeconds": 60
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "sedentary-posterior",
+   "name": "久坐后链激活",
+   "goal": "strength",
+   "scenes": [
+    "home"
+   ],
+   "equipment": [],
+   "minutes": 12,
+   "level": [
+    1,
+    2
+   ],
+   "summary": "唤醒久坐变弱的臀和腰背，预防腰酸。",
+   "keywords": [
+    "久坐",
+    "腰酸",
+    "后背",
+    "腰",
+    "臀",
+    "激活",
+    "程序员",
+    "学生"
+   ],
+   "blocks": [
+    {
+     "id": "b1",
+     "name": "激活",
+     "type": "main",
+     "rounds": 1,
+     "restBetweenRoundsSeconds": 0,
+     "items": [
+      {
+       "exerciseId": "w-bird-dog",
+       "mode": "reps",
+       "sets": 2,
+       "perSide": false,
+       "restSeconds": 20,
+       "reps": 8
+      },
+      {
+       "exerciseId": "w-dead-bug",
+       "mode": "reps",
+       "sets": 2,
+       "perSide": false,
+       "restSeconds": 20,
+       "reps": 10
+      },
+      {
+       "exerciseId": "w-feet-on-chair-bridge",
+       "mode": "reps",
+       "sets": 2,
+       "perSide": false,
+       "restSeconds": 30,
+       "reps": 12
+      },
+      {
+       "exerciseId": "w-clamshell",
+       "mode": "reps",
+       "sets": 2,
+       "perSide": true,
+       "restSeconds": 20,
+       "reps": 12
+      },
+      {
+       "exerciseId": "w-prone-swimmer",
+       "mode": "reps",
+       "sets": 2,
+       "perSide": false,
+       "restSeconds": 20,
+       "reps": 10
+      },
+      {
+       "exerciseId": "h-good-morning",
+       "mode": "reps",
+       "sets": 2,
+       "perSide": false,
+       "restSeconds": 20,
+       "reps": 10
+      }
+     ]
+    },
+    {
+     "id": "b2",
+     "name": "放松",
+     "type": "cooldown",
+     "rounds": 1,
+     "restBetweenRoundsSeconds": 0,
+     "items": [
+      {
+       "exerciseId": "h-knee-hug",
+       "mode": "time",
+       "sets": 1,
+       "perSide": false,
+       "restSeconds": 10,
+       "workSeconds": 30
+      },
+      {
+       "exerciseId": "h-supine-twist",
+       "mode": "time",
+       "sets": 1,
+       "perSide": false,
+       "restSeconds": 10,
+       "workSeconds": 30
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "warmup",
+   "name": "运动前热身",
+   "goal": "warmup",
+   "scenes": [
+    "home",
+    "office"
+   ],
+   "equipment": [],
+   "minutes": 6,
+   "level": [
+    1,
+    3
+   ],
+   "summary": "跑步、打球、健身前 6 分钟动态热身。",
+   "keywords": [
+    "热身",
+    "运动前",
+    "跑步前",
+    "打球",
+    "准备活动"
+   ],
+   "blocks": [
+    {
+     "id": "b1",
+     "name": "动态热身",
+     "type": "warmup",
+     "rounds": 1,
+     "restBetweenRoundsSeconds": 0,
+     "items": [
+      {
+       "exerciseId": "h-step-jack",
+       "mode": "time",
+       "sets": 2,
+       "perSide": false,
+       "restSeconds": 30,
+       "workSeconds": 40
+      },
+      {
+       "exerciseId": "n-pelvis-circle",
+       "mode": "time",
+       "sets": 1,
+       "perSide": false,
+       "restSeconds": 10,
+       "workSeconds": 30
+      },
+      {
+       "exerciseId": "h-hip-gate",
+       "mode": "reps",
+       "sets": 1,
+       "perSide": true,
+       "restSeconds": 10,
+       "reps": 6
+      },
+      {
+       "exerciseId": "h-squat",
+       "mode": "reps",
+       "sets": 1,
+       "perSide": false,
+       "restSeconds": 30,
+       "reps": 10
+      },
+      {
+       "exerciseId": "h-wall-angel",
+       "mode": "reps",
+       "sets": 1,
+       "perSide": false,
+       "restSeconds": 10,
+       "reps": 8
+      },
+      {
+       "exerciseId": "h-good-morning",
+       "mode": "reps",
+       "sets": 1,
+       "perSide": false,
+       "restSeconds": 30,
+       "reps": 10
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "cooldown",
+   "name": "运动后拉伸",
+   "goal": "cooldown",
+   "scenes": [
+    "home"
+   ],
+   "equipment": [],
+   "minutes": 8,
+   "level": [
+    1,
+    3
+   ],
+   "summary": "运动后把腿、髋、背拉开，缓解酸痛。",
+   "keywords": [
+    "拉伸",
+    "运动后",
+    "跑步后",
+    "放松",
+    "酸痛",
+    "冷身"
+   ],
+   "blocks": [
+    {
+     "id": "b1",
+     "name": "拉伸",
+     "type": "cooldown",
+     "rounds": 1,
+     "restBetweenRoundsSeconds": 0,
+     "items": [
+      {
+       "exerciseId": "o-stand-quad",
+       "mode": "time",
+       "sets": 1,
+       "perSide": true,
+       "restSeconds": 10,
+       "workSeconds": 30
+      },
+      {
+       "exerciseId": "h-wall-calf",
+       "mode": "time",
+       "sets": 1,
+       "perSide": true,
+       "restSeconds": 10,
+       "workSeconds": 30
+      },
+      {
+       "exerciseId": "s-kneel-hipflex",
+       "mode": "time",
+       "sets": 1,
+       "perSide": true,
+       "restSeconds": 10,
+       "workSeconds": 30
+      },
+      {
+       "exerciseId": "s-seated-fold",
+       "mode": "time",
+       "sets": 1,
+       "perSide": false,
+       "restSeconds": 10,
+       "workSeconds": 40
+      },
+      {
+       "exerciseId": "s-figure4",
+       "mode": "time",
+       "sets": 1,
+       "perSide": true,
+       "restSeconds": 10,
+       "workSeconds": 30
+      },
+      {
+       "exerciseId": "h-chair-lat",
+       "mode": "time",
+       "sets": 1,
+       "perSide": false,
+       "restSeconds": 10,
+       "workSeconds": 30
+      },
+      {
+       "exerciseId": "h-cobra",
+       "mode": "time",
+       "sets": 1,
+       "perSide": false,
+       "restSeconds": 10,
+       "workSeconds": 30
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
