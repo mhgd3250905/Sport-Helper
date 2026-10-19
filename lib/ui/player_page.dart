@@ -290,6 +290,7 @@ class _PlayerPageState extends State<PlayerPage> {
             children: [
               IconButton(
                 key: const ValueKey('close'),
+                tooltip: '关闭训练',
                 icon: const Icon(Icons.close_rounded),
                 onPressed: () async {
                   final nav = Navigator.of(context);
@@ -375,12 +376,14 @@ class _PlayerPageState extends State<PlayerPage> {
             children: [
               IconButton.filledTonal(
                 key: const ValueKey('prev'),
+                tooltip: '上一个动作',
                 iconSize: 28,
                 onPressed: _previous,
                 icon: const Icon(Icons.skip_previous_rounded),
               ),
               IconButton.filled(
                 key: const ValueKey('pause'),
+                tooltip: _paused ? '继续训练' : '暂停训练',
                 iconSize: 40,
                 style: IconButton.styleFrom(backgroundColor: SfColors.accent),
                 onPressed: _togglePause,
@@ -390,6 +393,7 @@ class _PlayerPageState extends State<PlayerPage> {
               ),
               IconButton.filledTonal(
                 key: const ValueKey('skip'),
+                tooltip: '跳过动作',
                 iconSize: 28,
                 onPressed: _skip,
                 icon: const Icon(Icons.skip_next_rounded),

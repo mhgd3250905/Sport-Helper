@@ -36,6 +36,15 @@ flutter build apk --release        # 本机工具链及验收状态见 docs/acce
 # 截图：SF_CJK_FONT=<NotoSansSC.ttf> flutter test test_screens/shots_test.dart --update-goldens
 ```
 
+## 本机 Web 预览
+
+```bash
+flutter build web --release --no-web-resources-cdn
+python -m http.server 8766 --bind 127.0.0.1 --directory build/web
+```
+
+打开 `http://127.0.0.1:8766`。Web 可验证界面、计划生成、跟练计时、语音和浏览器存储；动作视频目前只有封面，中文字体首次加载可能联网。Web 走查结果与 Android 待验项见 [验收记录](docs/acceptance.md)。
+
 ## 数据再生成
 
 ```bash

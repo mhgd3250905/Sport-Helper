@@ -76,7 +76,10 @@ class _HomePageState extends State<HomePage> {
     await s.store.rememberPlan(plan);
     if (!mounted) return;
     await Navigator.of(context).push(
-      MaterialPageRoute<void>(builder: (_) => PlanPage(plan: plan)),
+      MaterialPageRoute<void>(builder: (_) => PlanPage(
+        plan: plan,
+        request: const DescriptionMatcher().apply(req.description, req),
+      )),
     );
   }
 
@@ -138,7 +141,9 @@ class _HomePageState extends State<HomePage> {
                         label: Text(p, style: const TextStyle(fontSize: 13)),
                         onPressed: () => setState(() {
                           _text.text = p;
-                          _req = const DescriptionMatcher().apply(p, _req.copyWith(clearGoal: true));
+                          // Keep goal picks explicit; infer from the current text at generation.
+                          _req = const DescriptionMatcher().apply(p, _req)
+                              .copyWith(clearGoal: _req.goal == null);
                         }),
                       ),
                     ),

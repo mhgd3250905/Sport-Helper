@@ -4,7 +4,7 @@ import 'dart:io';
 
 import 'package:audio_session/audio_session.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:flutter/foundation.dart' show visibleForTesting;
+import 'package:flutter/foundation.dart' show kIsWeb, visibleForTesting;
 
 import 'voice_line_controller.dart';
 import 'voice_queue.dart';
@@ -150,7 +150,7 @@ class JustAudioVoiceOutput
   /// timers running while the process lives, so nothing to keep alive there.
   Future<void> _keepAliveOn() async {
     final generation = _sessionGeneration;
-    if (!Platform.isIOS || !_current(generation)) return;
+    if (!isIOS || !_current(generation)) return;
     final s = _session;
     if (s == null) return;
     await _step(() => s.setActive(true));
@@ -284,7 +284,7 @@ class JustAudioVoiceOutput
   }
 
   @override
-  bool get isIOS => Platform.isIOS;
+  bool get isIOS => !kIsWeb && Platform.isIOS;
 
   @override
   Future<void> configureSession({required bool duck}) async {

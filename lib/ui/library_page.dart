@@ -88,7 +88,7 @@ class _LibraryPageState extends State<LibraryPage> {
     isScrollControlled: true,
     backgroundColor: SfColors.surface,
     builder: (c) => SafeArea(
-      child: Padding(
+      child: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
           ExerciseVideo(exercise: e),

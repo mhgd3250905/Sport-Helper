@@ -129,7 +129,7 @@ class DescriptionMatcher {
 
     final avoid = {...r.avoid};
     for (final part in ['膝', '腰', '肩', '手腕']) {
-      if (RegExp('$part[^，。,\\s]{0,3}(疼|痛|伤|不好|不舒服|受伤)').hasMatch(t) ||
+      if (RegExp('$part[^，。,\\s]{0,3}(疼|痛|伤|酸|胀|不好|不太好|不舒服|受伤)').hasMatch(t) ||
           RegExp('(保护|护)$part').hasMatch(t)) {
         avoid.add(part);
       }

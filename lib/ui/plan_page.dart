@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../app/services.dart';
 import '../domain/exercise.dart';
 import '../domain/plan.dart';
+import '../domain/plan_validator.dart';
+import '../domain/scenario.dart';
 import '../domain/session.dart';
 import 'exercise_video.dart';
 import 'player_page.dart';
@@ -11,8 +13,9 @@ import 'theme.dart';
 /// The generated plan as training groups: one live preview on top (the
 /// selected move loops), every move below with its dose and key point.
 class PlanPage extends StatefulWidget {
-  const PlanPage({super.key, required this.plan});
+  const PlanPage({super.key, required this.plan, this.request});
   final TrainingPlan plan;
+  final ScenarioRequest? request;
   @override
   State<PlanPage> createState() => _PlanPageState();
 }
@@ -42,8 +45,22 @@ class _PlanPageState extends State<PlanPage> {
       replacedFrom: e.id,
     );
     blocks[bi] = blocks[bi].copyWith(items: items);
+    final updated = _plan.copyWith(blocks: blocks, notes: [..._plan.notes, '手动把「${e.name}」换成「${alt.name}」']);
+    final request = widget.request ?? ScenarioRequest(
+      scene: _plan.scene,
+      equipment: _plan.equipment.map(Equipment.byName).toSet(),
+      level: _plan.level,
+    );
+    final issues = PlanValidator(s.library).validate(updated, request);
+    if (alt.level > request.level + 1) issues.add('替代动作难度偏高');
+    if (issues.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('暂不能替换：${issues.first}')),
+      );
+      return;
+    }
     setState(() {
-      _plan = _plan.copyWith(blocks: blocks, notes: [..._plan.notes, '手动把「${e.name}」换成「${alt.name}」']);
+      _plan = updated;
       _selected = alt.id;
     });
     s.store.rememberPlan(_plan);
