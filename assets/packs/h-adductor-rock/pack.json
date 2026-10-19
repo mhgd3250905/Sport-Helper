@@ -1,0 +1,183 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "h-adductor-rock",
+ "version": "1.0.0",
+ "name": {
+  "zh": "四足单腿侧伸后摇",
+  "en": "Quadruped Adductor Rock-Back"
+ },
+ "category": "stretch",
+ "muscles": [
+  "大腿内侧"
+ ],
+ "muscleGroups": [
+  "adductors"
+ ],
+ "equipment": [
+  "mat"
+ ],
+ "position": "quadruped",
+ "unilateral": true,
+ "level": 1,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "time",
+  "sets": 1,
+  "seconds": 30,
+  "restSeconds": 10
+ },
+ "cues": {
+  "zh": [
+   "一条腿向侧面伸直，臀部慢慢往后坐",
+   "臀部向后摇，大腿内侧拉长"
+  ]
+ },
+ "primaryCue": 0,
+ "cautions": [
+  "膝"
+ ],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 2.4,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": null,
+  "showsSide": "right"
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "四足单腿侧伸后摇"
+    },
+    "ms": {
+     "zh": 1834
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "四足单腿侧伸后摇，拉伸大腿内侧"
+    },
+    "ms": {
+     "zh": 3251
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "一条腿向侧面伸直，臀部慢慢往后坐"
+    },
+    "ms": {
+     "zh": 3437
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "臀部向后摇，大腿内侧拉长"
+    },
+    "ms": {
+     "zh": 2647
+    }
+   },
+   {
+    "id": "side_switch",
+    "role": "side_switch",
+    "text": {
+     "zh": "左侧同样，一条腿向侧面伸直，臀部慢慢往后坐"
+    },
+    "ms": {
+     "zh": 4551
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，臀部向后摇，大腿内侧拉长"
+    },
+    "ms": {
+     "zh": 5132
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "四足单腿侧伸后摇，完成"
+    },
+    "ms": {
+     "zh": 2531
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub v0.2.0 dark soft-v1 clip (as frozen in HipLab), re-encoded 720²",
+  "mediaSource": "pose-hub-v0.2.0",
+  "spec": "drill-anim/specs/h-adductor-rock.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 11197,
+   "sha256": "57e553f4a1185bc5d2740b299ff4130c178cf7d828cc8c283eb1fac1fe5cc3b6"
+  },
+  "demo.mp4": {
+   "bytes": 143037,
+   "sha256": "9ec3b64dd71971dedd790d2508898a46898ce4df35af2342a90d2660d013123b"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 29231,
+   "sha256": "44f5fe0b4be3290cb60606e9d01f5bcdbb415a6ac6064abc5307e796fd3cc079"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 22746,
+   "sha256": "9f942db04319470711542b160c8f98a055d7af3bdd209f769d2edeaf9c3effd5"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 21871,
+   "sha256": "e83111f5216db4a31ccccfd951aeb059491f508805977e3d7ba95de460b49ddb"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 27841,
+   "sha256": "5a3de2cef4d0262ac2ac90e532afc082980571f5236bc90c0facdf38c6af1c76"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 16196,
+   "sha256": "d0e63e6e80aca44d63ee4168e651d6cf4694f8cf3b1bcd272716c1b4fab87845"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 43261,
+   "sha256": "b03d3643942192e671f9279011a1486edc9597c585969f87a178c706ffd66d8a"
+  },
+  "voice/zh/side_switch.m4a": {
+   "bytes": 38449,
+   "sha256": "62f08d11a752da9eb4641b9c3ae031948f1c3f06e107b319089f99438531bd1e"
+  }
+ }
+}

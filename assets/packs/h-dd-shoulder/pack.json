@@ -1,0 +1,171 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "h-dd-shoulder",
+ "version": "1.0.0",
+ "name": {
+  "zh": "下犬式压肩",
+  "en": "Downward Dog Shoulder Press"
+ },
+ "category": "stretch",
+ "muscles": [
+  "背阔肌",
+  "胸大肌"
+ ],
+ "muscleGroups": [
+  "lats",
+  "chest"
+ ],
+ "equipment": [
+  "mat"
+ ],
+ "position": "quadruped",
+ "unilateral": false,
+ "level": 2,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "time",
+  "sets": 1,
+  "seconds": 30,
+  "restSeconds": 10
+ },
+ "cues": {
+  "zh": [
+   "手推地，臀部向上向后，胸口靠近大腿",
+   "胸口向腿的方向压"
+  ]
+ },
+ "primaryCue": 0,
+ "cautions": [
+  "手腕",
+  "肩"
+ ],
+ "contraindications": [],
+ "alternative": "h-chair-lat",
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 1.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": null
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "下犬式压肩"
+    },
+    "ms": {
+     "zh": 1207
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "下犬式压肩，拉伸背部和胸部"
+    },
+    "ms": {
+     "zh": 2740
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "手推地，臀部向上向后，胸口靠近大腿"
+    },
+    "ms": {
+     "zh": 3738
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "胸口向腿的方向压"
+    },
+    "ms": {
+     "zh": 1741
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，胸口向腿的方向压"
+    },
+    "ms": {
+     "zh": 4156
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "下犬式压肩，完成"
+    },
+    "ms": {
+     "zh": 1927
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub Drive archive green-screen master, keyed onto #101013 by tools/media/prepare_media.py",
+  "mediaSource": "pose-hub-drive-greenscreen",
+  "spec": "drill-anim/specs/h-dd-shoulder.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 8645,
+   "sha256": "977872624250a41cc3ee128ae34c2dc82986bc4fa39eeb930256d76f5a1d9cca"
+  },
+  "demo.mp4": {
+   "bytes": 95832,
+   "sha256": "8e3faef390b5d012e1c20849471102b9d71d96eb97c9aa92d45dc70a642dff54"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 31815,
+   "sha256": "9c5e9382da14828e24821f69bc279e7b9a42a94ca60e91484ccc96d187a8dd1f"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 15252,
+   "sha256": "ca3cde555847eefb7c180af378bd38cac16c2aa00e6b04a099e4d6ef68294547"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 16980,
+   "sha256": "dff0a9e8f096a49b9b8f863536415b123283b2b19cfea9c42636ddf0e142fdb9"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 23475,
+   "sha256": "2e545ebeec7d8476c6df46c931eaf88e3a3fa9b49d72ab2e1c39fd9247d8144b"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 10915,
+   "sha256": "5b4923c8d33b78b4e2b921bbbeb6f9742e39366434fd16ed281ad6d8bdfcd19d"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 35100,
+   "sha256": "529379857612b8022732290a6d0498a4948a841821f30bbe14a2412c38555a19"
+  }
+ }
+}

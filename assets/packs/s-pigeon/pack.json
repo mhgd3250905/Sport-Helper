@@ -1,0 +1,198 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "s-pigeon",
+ "version": "1.0.0",
+ "name": {
+  "zh": "鸽子式（直立扶砖版）",
+  "en": "Pigeon Pose"
+ },
+ "category": "stretch",
+ "muscles": [
+  "臀大肌"
+ ],
+ "muscleGroups": [
+  "glute-max"
+ ],
+ "equipment": [
+  "mat"
+ ],
+ "position": "seated",
+ "unilateral": true,
+ "level": 3,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "time",
+  "sets": 1,
+  "seconds": 30,
+  "restSeconds": 10
+ },
+ "cues": {
+  "zh": [
+   "前腿屈膝横放",
+   "上身立直，手扶砖，髋往下沉",
+   "身体前倾，臀部拉长"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [
+  "膝"
+ ],
+ "contraindications": [],
+ "alternative": "s-figure4",
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 3.8,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": null,
+  "showsSide": "right"
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "鸽子式，直立扶砖版"
+    },
+    "ms": {
+     "zh": 1950
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "鸽子式，直立扶砖版，拉伸臀部"
+    },
+    "ms": {
+     "zh": 3042
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "前腿屈膝横放"
+    },
+    "ms": {
+     "zh": 1393
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "上身立直，手扶砖，髋往下沉"
+    },
+    "ms": {
+     "zh": 3019
+    }
+   },
+   {
+    "id": "cue3",
+    "role": "cue",
+    "text": {
+     "zh": "身体前倾，臀部拉长"
+    },
+    "ms": {
+     "zh": 2090
+    }
+   },
+   {
+    "id": "side_switch",
+    "role": "side_switch",
+    "text": {
+     "zh": "左侧同样，上身立直，手扶砖，髋往下沉"
+    },
+    "ms": {
+     "zh": 4040
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，身体前倾，臀部拉长"
+    },
+    "ms": {
+     "zh": 4574
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "鸽子式，直立扶砖版，完成"
+    },
+    "ms": {
+     "zh": 2670
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub v0.2.0 dark soft-v1 clip (as frozen in HipLab), re-encoded 720²",
+  "mediaSource": "pose-hub-v0.2.0",
+  "spec": "drill-anim/specs/s-pigeon.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 6355,
+   "sha256": "20d98668ebc8c47278392802aeb853ea8e2c301eb8a919797e89cb28f6826e28"
+  },
+  "demo.mp4": {
+   "bytes": 36503,
+   "sha256": "643edb3b66e925db1cb16e668b21a86ea0b41a47011102fde74f991604e19bcc"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 12404,
+   "sha256": "653ed68e307aa0c253f084acdef9dff9ec26df2a2647dbff3b5b13365687dfea"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 25957,
+   "sha256": "214db15417a351f2ea408b1b374847fc2690dfc78b3811356c1fdd761cd9b5c3"
+  },
+  "voice/zh/cue3.m4a": {
+   "bytes": 18331,
+   "sha256": "17ae1e4e35d43d2505ea86813acb81f44a225c9716404b521b6f4bb11b8216ba"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 23095,
+   "sha256": "19659e4754f4e69da3b502e56db4ecac09382a0e580744f618929e6e0cc9f954"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 26073,
+   "sha256": "ed3181d19ea617058ae6980d8a4a00b9edbef003461d100d4d6d2305f5c1b311"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 17191,
+   "sha256": "0a365ae88ed103b98d92c54827b7866791150ffc6a9662e6826e9f4b5683baec"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 37587,
+   "sha256": "79254397522714c3c9ad8b5f4cbdb10bedaf4622a72de0ca671d6b4dc25c7618"
+  },
+  "voice/zh/side_switch.m4a": {
+   "bytes": 34337,
+   "sha256": "ed39826f9605fae7e5ceaf4f8457b59642db996fcfac8b33d4f6c3ecb372c842"
+  }
+ }
+}

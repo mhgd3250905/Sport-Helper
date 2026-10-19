@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -10,7 +9,6 @@ import 'package:smartfit/domain/session.dart';
 import 'package:smartfit/voice/session_runner.dart';
 import 'package:smartfit/voice/session_script.dart';
 import 'package:smartfit/voice/voice_cue.dart';
-import 'package:smartfit/voice/voice_library.dart';
 import 'package:smartfit/voice/voice_queue.dart';
 
 import 'support.dart';
@@ -37,10 +35,7 @@ class RecordingVoiceOutput implements VoiceOutput {
 void main() {
   final exercises = loadLibrary();
   final catalog = loadCatalog();
-  final voices = VoiceLibrary.fromJson(
-    jsonDecode(File(VoiceLibrary.manifestAsset).readAsStringSync())
-        as Map<String, dynamic>,
-  );
+  final voices = loadVoices();
   final script = SessionScript(lib: voices, exercises: exercises);
 
   SessionRunner runner() {
@@ -118,7 +113,7 @@ void main() {
     },
   );
 
-  group('real voice manifest', () {
+  group('real drill-pack voice', () {
     test('every default template cue has a recorded asset', () async {
       final generator = TemplatePlanGenerator(lib: exercises, catalog: catalog);
       final checked = <String>{};
@@ -148,7 +143,7 @@ void main() {
               expect(
                 voices.has(key),
                 isTrue,
-                reason: '${template.id}: missing manifest clip $key',
+                reason: '${template.id}: missing pack clip $key',
               );
               expect(
                 File(voices.asset(key)).existsSync(),
@@ -167,6 +162,134 @@ void main() {
         checked,
         containsAll(['p.welcome', 'p.finish', 'n.1', 'chime.start']),
       );
+    });
+  });
+
+  group('drill-pack timelines', () {
+    /// Lines of one phase never overlap, flexible lines end before the
+    /// countdown (with margin), and nothing runs past the phase.
+    void checkPhase(String where, SessionPhase phase, List<VoiceCue> cues) {
+      final spans = [
+        for (final c in cues)
+          (c, c.at, c.at + voices.total(c.clips)),
+      ]..sort((a, b) => a.$2.compareTo(b.$2));
+      for (var i = 1; i < spans.length; i++) {
+        expect(
+          spans[i].$2,
+          greaterThanOrEqualTo(spans[i - 1].$3 - 1e-9),
+          reason: '$where: ${spans[i - 1].$1} overlaps ${spans[i].$1}',
+        );
+      }
+      if (phase.kind == PhaseKind.done) return;
+      final countdown = cues
+          .where((c) => c.priority == CuePriority.count && c.clips.contains('chime.tick'))
+          .map((c) => c.at)
+          .fold<double?>(null, (m, t) => m == null || t < m ? t : m);
+      for (final (c, _, end) in spans) {
+        expect(end, lessThanOrEqualTo(phase.seconds + 1e-9), reason: '$where: $c runs past the phase');
+        if (countdown != null && !c.clips.contains('chime.tick') &&
+            (c.priority == CuePriority.coach || c.priority == CuePriority.info)) {
+          expect(end, lessThanOrEqualTo(countdown - countdownMargin + 1e-9),
+              reason: '$where: $c would be cut by the countdown');
+        }
+      }
+    }
+
+    test('every template at every level: no overlap, no cut, pack lines used', () async {
+      final generator = TemplatePlanGenerator(lib: exercises, catalog: catalog);
+      final used = <String>{};
+      for (final template in catalog.templates) {
+        for (final level in [1, 2, 3]) {
+          final result = await generator.generate(
+            ScenarioRequest(
+              templateId: template.id,
+              scene: template.scenes.first,
+              equipment: template.equipment.map(Equipment.byName).toSet(),
+              minutes: template.minutes,
+              level: level,
+            ),
+          );
+          if (result.plan == null) continue;
+          final builder = SessionBuilder(exercises);
+          final phases = builder.phases(result.plan!);
+          for (var i = 0; i < phases.length; i++) {
+            for (final bySkip in [false, true]) {
+              final cues = script.cues(
+                phases[i],
+                planSeconds: builder.planSeconds(result.plan!),
+                bySkip: bySkip,
+              );
+              checkPhase('${template.id} L$level #$i ${phases[i]}', phases[i], cues);
+              for (final c in cues) {
+                for (final k in c.clips) {
+                  expect(File(voices.asset(k)).existsSync(), isTrue, reason: k);
+                  if (k.contains('/')) used.add(k.substring(k.indexOf('/') + 1));
+                }
+              }
+            }
+          }
+        }
+      }
+      expect(used, containsAll(['intro', 'cue1', 'cue2', 'rest', 'finish', 'side_switch']));
+    });
+
+    test('second side of a timed move speaks its side_switch line', () {
+      const item = PlanItem(
+        exerciseId: 'h-couch-stretch',
+        mode: DoseMode.time,
+        sets: 1,
+        workSeconds: 30,
+        perSide: true,
+        restSeconds: 10,
+      );
+      List<String> said(Side side) => [
+        for (final c in script.cues(
+          SessionPhase(
+            kind: PhaseKind.work,
+            seconds: 30,
+            exerciseId: item.exerciseId,
+            item: item,
+            set: 1,
+            sets: 1,
+            side: side,
+          ),
+          planSeconds: 300,
+        ))
+          ...c.clips,
+      ];
+      expect(said(Side.right), contains('h-couch-stretch/cue1'));
+      expect(said(Side.right), isNot(contains('h-couch-stretch/side_switch')));
+      expect(said(Side.left), contains('h-couch-stretch/side_switch'));
+      expect(said(Side.left).first, 'chime.start');
+    });
+
+    test('the rest after a move names it as finished, unless it was skipped', () {
+      const next = PlanItem(
+        exerciseId: 'w-dead-bug',
+        mode: DoseMode.time,
+        sets: 1,
+        workSeconds: 30,
+        perSide: false,
+        restSeconds: 10,
+      );
+      const rest = SessionPhase(
+        kind: PhaseKind.rest,
+        seconds: 15,
+        exerciseId: 'w-dead-bug',
+        item: next,
+        nextExerciseId: 'w-dead-bug',
+        nextItem: next,
+        doneExerciseId: 'h-squat',
+        sets: 1,
+        set: 1,
+      );
+      List<String> said({required bool bySkip}) => [
+        for (final c in script.cues(rest, planSeconds: 300, bySkip: bySkip)) ...c.clips,
+      ];
+      expect(said(bySkip: false), contains('h-squat/finish'));
+      expect(said(bySkip: false), contains('p.next'));
+      expect(said(bySkip: true), isNot(contains('h-squat/finish')));
+      expect(said(bySkip: true), contains('p.rest'));
     });
   });
 

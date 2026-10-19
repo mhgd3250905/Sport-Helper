@@ -1,0 +1,182 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "o-stand-crossreach",
+ "version": "1.0.0",
+ "name": {
+  "zh": "扶椅站姿交叉侧伸",
+  "en": "Chair-Supported Cross-Leg Side Reach"
+ },
+ "category": "stretch",
+ "muscles": [
+  "臀中肌"
+ ],
+ "muscleGroups": [
+  "hip-abductors"
+ ],
+ "equipment": [
+  "chair"
+ ],
+ "position": "standing",
+ "unilateral": true,
+ "level": 1,
+ "scenes": [
+  "home",
+  "office"
+ ],
+ "defaultDose": {
+  "mode": "time",
+  "sets": 1,
+  "seconds": 30,
+  "restSeconds": 10
+ },
+ "cues": {
+  "zh": [
+   "一条腿交叉到后面，手臂向上向侧面伸",
+   "手臂向侧上方伸，髋外侧拉长"
+  ]
+ },
+ "primaryCue": 0,
+ "cautions": [],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 3.8,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": null,
+  "showsSide": "right"
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "扶椅站姿交叉侧伸"
+    },
+    "ms": {
+     "zh": 1741
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "扶椅站姿交叉侧伸，拉伸臀部外侧"
+    },
+    "ms": {
+     "zh": 3158
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "一条腿交叉到后面，手臂向上向侧面伸"
+    },
+    "ms": {
+     "zh": 3576
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "手臂向侧上方伸，髋外侧拉长"
+    },
+    "ms": {
+     "zh": 2902
+    }
+   },
+   {
+    "id": "side_switch",
+    "role": "side_switch",
+    "text": {
+     "zh": "左侧同样，一条腿交叉到后面，手臂向上向侧面伸"
+    },
+    "ms": {
+     "zh": 4644
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，手臂向侧上方伸，髋外侧拉长"
+    },
+    "ms": {
+     "zh": 5433
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "扶椅站姿交叉侧伸，完成"
+    },
+    "ms": {
+     "zh": 2461
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub v0.2.0 dark soft-v1 clip (as frozen in HipLab), re-encoded 720²",
+  "mediaSource": "pose-hub-v0.2.0",
+  "spec": "drill-anim/specs/o-stand-crossreach.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 8076,
+   "sha256": "494243ff86456e9f294f5206d3c9cf484dfcf478261aa79425fc1de1a57e7f11"
+  },
+  "demo.mp4": {
+   "bytes": 60289,
+   "sha256": "b68e6bb55a31489b37fe791039b20bcb135331dfeb21ddd91271a308bf698fa6"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 30362,
+   "sha256": "42fcb030331e5297a739cbadcd5fdeae2ed81626a43c34016295c69fe21f5000"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 24920,
+   "sha256": "ec0d6451e5974624b885079aca854b95e0e77dc24366275338c653f91dbc1ab1"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 21303,
+   "sha256": "6892fb9386a517ae815a8cc0c086dfc415260c55f8606147add3947ead000b4a"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 27071,
+   "sha256": "000ff17c51c2a25bd67815437a06560f83d07aa946c921cbe4b25fafc449b622"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 15341,
+   "sha256": "48acea8cd948eb088f285e51c71231dcd2d126c1a58015aff4a2b03ba088283d"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 45059,
+   "sha256": "b6efe6fa8209f4797fa8422dfee2f658f291d73ae6c8dfafe8f0ad23a608ee66"
+  },
+  "voice/zh/side_switch.m4a": {
+   "bytes": 39240,
+   "sha256": "541aad2e279da6ec1e34b2aedc5e447c2bb56799f9dad7711742ecbc3fe54f9e"
+  }
+ }
+}

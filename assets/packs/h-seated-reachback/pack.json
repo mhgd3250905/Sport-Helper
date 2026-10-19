@@ -1,0 +1,171 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "h-seated-reachback",
+ "version": "1.0.0",
+ "name": {
+  "zh": "坐姿后撑滑臀",
+  "en": "Seated Reach-Back Shoulder Stretch"
+ },
+ "category": "stretch",
+ "muscles": [
+  "胸大肌",
+  "三角肌"
+ ],
+ "muscleGroups": [
+  "chest",
+  "deltoids"
+ ],
+ "equipment": [
+  "mat"
+ ],
+ "position": "seated",
+ "unilateral": false,
+ "level": 1,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "time",
+  "sets": 1,
+  "seconds": 30,
+  "restSeconds": 10
+ },
+ "cues": {
+  "zh": [
+   "双手在身后撑地，臀部慢慢向前滑",
+   "臀部向前滑，胸口打开"
+  ]
+ },
+ "primaryCue": 0,
+ "cautions": [
+  "肩",
+  "手腕"
+ ],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 1.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": null
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "坐姿后撑滑臀"
+    },
+    "ms": {
+     "zh": 1463
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "坐姿后撑滑臀，拉伸胸部和肩膀"
+    },
+    "ms": {
+     "zh": 2926
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "双手在身后撑地，臀部慢慢向前滑"
+    },
+    "ms": {
+     "zh": 3320
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "臀部向前滑，胸口打开"
+    },
+    "ms": {
+     "zh": 2229
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，臀部向前滑，胸口打开"
+    },
+    "ms": {
+     "zh": 4690
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "坐姿后撑滑臀，完成"
+    },
+    "ms": {
+     "zh": 2136
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub Drive archive green-screen master, keyed onto #101013 by tools/media/prepare_media.py",
+  "mediaSource": "pose-hub-drive-greenscreen",
+  "spec": "drill-anim/specs/h-seated-reachback.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 7885,
+   "sha256": "cd2f48632a486e861970449bd54bbfd52d4a4d29e82faf35fdca0157c2e91025"
+  },
+  "demo.mp4": {
+   "bytes": 105283,
+   "sha256": "2ed9785ec33e5c567887ab7250ec4a8f53bbb7552320b60edcf727e697fce555"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 28328,
+   "sha256": "c119726b9b32ad805cdc90eecd21fdacf3e7f5a8e06846e90f110c51efa4be2c"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 19250,
+   "sha256": "70969b1702d5d9f6e3d342caa2a1bc5df4b305c7b31a41327795bf1b7f3a56dd"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 18678,
+   "sha256": "58914ca0eb74b8082fd7c189cb989716937456303b8e5daf98118a5986ca87de"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 25187,
+   "sha256": "85c8003391e004610ef19c2ccb452d73966a48b4b8429fc6cd64ac34b6f558b2"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 12972,
+   "sha256": "5ce2d09609376c0e7b7368888dfd949afd84533c06ce82208ad86f04ab052c3d"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 38656,
+   "sha256": "a0e667da90650658dd8f3e37e24aadbd5da0de5dc870df162c64ca9da38c5b12"
+  }
+ }
+}

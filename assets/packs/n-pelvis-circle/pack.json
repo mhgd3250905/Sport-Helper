@@ -1,0 +1,169 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "n-pelvis-circle",
+ "version": "1.0.0",
+ "name": {
+  "zh": "站姿骨盆画圈",
+  "en": "Standing Pelvis Circles"
+ },
+ "category": "mobility",
+ "muscles": [
+  "髋屈肌",
+  "臀大肌",
+  "臀中肌"
+ ],
+ "muscleGroups": [
+  "hip-flexors",
+  "glute-max",
+  "hip-abductors"
+ ],
+ "equipment": [],
+ "position": "standing",
+ "unilateral": false,
+ "level": 1,
+ "scenes": [
+  "home",
+  "office"
+ ],
+ "defaultDose": {
+  "mode": "time",
+  "sets": 1,
+  "seconds": 30,
+  "restSeconds": 10
+ },
+ "cues": {
+  "zh": [
+   "双手叉腰，膝微屈",
+   "双脚不动，骨盆慢慢画圈"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 1.1,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": null
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "站姿骨盆画圈"
+    },
+    "ms": {
+     "zh": 1370
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "站姿骨盆画圈，活动髋前侧和臀部"
+    },
+    "ms": {
+     "zh": 3204
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "双手叉腰，膝微屈"
+    },
+    "ms": {
+     "zh": 1904
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "双脚不动，骨盆慢慢画圈"
+    },
+    "ms": {
+     "zh": 2368
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，双脚不动，骨盆慢慢画圈"
+    },
+    "ms": {
+     "zh": 4853
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "站姿骨盆画圈，完成"
+    },
+    "ms": {
+     "zh": 2067
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub v0.2.0 dark soft-v1 clip (as frozen in HipLab), re-encoded 720²",
+  "mediaSource": "pose-hub-v0.2.0",
+  "spec": "drill-anim/specs/n-pelvis-circle.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 7411,
+   "sha256": "8ab7a0396322033e1e66ef042c0b82700a33fa998459f9a17e86da9c8eab9b6e"
+  },
+  "demo.mp4": {
+   "bytes": 88769,
+   "sha256": "7c07fc07ce083b1445a1b071fc14cd2152b2cd4cd02b2d9d47a01d04f5162f9e"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 16707,
+   "sha256": "ea463b2af0a10bce4b6aa7655964eb5347f6b5ae7ee52393211886f05fd739ae"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 20614,
+   "sha256": "aa16f003a515cd5988be059c17300275bdc802d49152dae3a6f71f54432c26db"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 17948,
+   "sha256": "c54bd5609b1a9be34c44a26d4ed97b2776ba3604750f9a725f820fde3f1b9ecb"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 27403,
+   "sha256": "f80fc71ed695f1f334d3ef23f554010fdaa159cb59e002edff5b34d5b6c588fc"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 12248,
+   "sha256": "277158373530c175edd6bfcaaa4611098bec563aa9b76cfc1dcdcbbdc33ed5b5"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 41011,
+   "sha256": "7083a123b3e509a983915c8ce3e40c66cfcb1d62889b5115efc555ae5dac24ac"
+  }
+ }
+}

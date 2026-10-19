@@ -1,0 +1,184 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "h-chair-dip",
+ "version": "1.0.0",
+ "name": {
+  "zh": "椅子臂屈伸",
+  "en": "Chair Dip"
+ },
+ "category": "strength",
+ "muscles": [
+  "肱三头肌"
+ ],
+ "muscleGroups": [
+  "triceps"
+ ],
+ "equipment": [
+  "chair"
+ ],
+ "position": "seated",
+ "unilateral": false,
+ "level": 2,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "reps",
+  "sets": 3,
+  "reps": 10,
+  "restSeconds": 30
+ },
+ "cues": {
+  "zh": [
+   "双手撑椅边，臀部离开椅面",
+   "肩膀下沉远离耳朵，肘向后弯曲再撑起",
+   "屈肘下沉，肩不耸"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [
+  "肩",
+  "手腕"
+ ],
+ "contraindications": [],
+ "alternative": "h-incline-pushup",
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 1.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": 4.0
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "椅子臂屈伸"
+    },
+    "ms": {
+     "zh": 1161
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "椅子臂屈伸，练手臂后侧"
+    },
+    "ms": {
+     "zh": 2392
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "双手撑椅边，臀部离开椅面"
+    },
+    "ms": {
+     "zh": 2485
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "肩膀下沉远离耳朵，肘向后弯曲再撑起"
+    },
+    "ms": {
+     "zh": 3460
+    }
+   },
+   {
+    "id": "cue3",
+    "role": "cue",
+    "text": {
+     "zh": "屈肘下沉，肩不耸"
+    },
+    "ms": {
+     "zh": 1858
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，屈肘下沉，肩不耸"
+    },
+    "ms": {
+     "zh": 4319
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "椅子臂屈伸，完成"
+    },
+    "ms": {
+     "zh": 1858
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub Drive archive green-screen master, keyed onto #101013 by tools/media/prepare_media.py",
+  "mediaSource": "pose-hub-drive-greenscreen",
+  "spec": "drill-anim/specs/h-chair-dip.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 9171,
+   "sha256": "92f6d08180f87428dac680123a23b6b7f8014301ed00412b0fcd8bbc7acadb2a"
+  },
+  "demo.mp4": {
+   "bytes": 141789,
+   "sha256": "11effc46f2393fd1ac1cf5050f8422a7b94d64c1d03ba2a21500d38390ee2aad"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 21399,
+   "sha256": "00a0e48f52e69715a26f94ccd6631c097cbf56758657bd105b6145882279fb0b"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 29510,
+   "sha256": "6fdeb9041b1a4c2f9006550db6269a88f78233a9f32fab6be0486420755478bf"
+  },
+  "voice/zh/cue3.m4a": {
+   "bytes": 16185,
+   "sha256": "fae19522194903b00b407e0d1f7c5d9e5a55e83fd82c6490784d868a992e2df7"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 16405,
+   "sha256": "7db6495a2802911e0169d0158b1ebf44e70b78647a0d542b87fcb08f90b61d5c"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 20762,
+   "sha256": "6e4a58189c6a80ec9207e8b4abdd94479dab2858297ddf55a663c24cfe588c63"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 10512,
+   "sha256": "b94079c24561b99ed2eed907596c5c565757f2128e2897d08dafcec3cc9bb5c9"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 36394,
+   "sha256": "ed092329187aade869d2f29c80152d0372d5c8e9dc6ae6f6d7600555d9b357b4"
+  }
+ }
+}

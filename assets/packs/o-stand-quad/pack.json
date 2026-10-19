@@ -1,0 +1,184 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "o-stand-quad",
+ "version": "1.0.0",
+ "name": {
+  "zh": "扶椅站姿股四头肌拉伸",
+  "en": "Chair-Supported Standing Quad Stretch"
+ },
+ "category": "stretch",
+ "muscles": [
+  "股四头肌"
+ ],
+ "muscleGroups": [
+  "quadriceps"
+ ],
+ "equipment": [
+  "chair"
+ ],
+ "position": "standing",
+ "unilateral": true,
+ "level": 1,
+ "scenes": [
+  "home",
+  "office"
+ ],
+ "defaultDose": {
+  "mode": "time",
+  "sets": 1,
+  "seconds": 30,
+  "restSeconds": 10
+ },
+ "cues": {
+  "zh": [
+   "扶稳椅子，手拉脚背贴近臀部，膝盖朝下",
+   "膝盖朝下，大腿前侧拉长"
+  ]
+ },
+ "primaryCue": 0,
+ "cautions": [
+  "膝"
+ ],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 1.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": null,
+  "showsSide": "right"
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "扶椅站姿股四头肌拉伸"
+    },
+    "ms": {
+     "zh": 2229
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "扶椅站姿股四头肌拉伸，拉伸大腿前侧"
+    },
+    "ms": {
+     "zh": 3692
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "扶稳椅子，手拉脚背贴近臀部，膝盖朝下"
+    },
+    "ms": {
+     "zh": 3808
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "膝盖朝下，大腿前侧拉长"
+    },
+    "ms": {
+     "zh": 2508
+    }
+   },
+   {
+    "id": "side_switch",
+    "role": "side_switch",
+    "text": {
+     "zh": "左侧同样，扶稳椅子，手拉脚背贴近臀部，膝盖朝下"
+    },
+    "ms": {
+     "zh": 4923
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，膝盖朝下，大腿前侧拉长"
+    },
+    "ms": {
+     "zh": 5039
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "扶椅站姿股四头肌拉伸，完成"
+    },
+    "ms": {
+     "zh": 2926
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub Drive archive green-screen master, keyed onto #101013 by tools/media/prepare_media.py",
+  "mediaSource": "pose-hub-drive-greenscreen",
+  "spec": "drill-anim/specs/o-stand-quad.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 5684,
+   "sha256": "30d5c56b8774bf1863c655a87218f6947a788bd114c38f907e9fc091618fba5b"
+  },
+  "demo.mp4": {
+   "bytes": 43826,
+   "sha256": "155cddc3484c928089a8069ef5074ab7f394c50f4362ad3b29dbc9e35e3e7d12"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 32369,
+   "sha256": "766e4c5e532ac83a58565ce9e0ef31bf3e524c367c99fe6ea3d54d969e562fd9"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 21418,
+   "sha256": "c8a8e189bd8a186f1918ed5ba2af75e3cead2e5e06104e71732341410b0e578e"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 25037,
+   "sha256": "2ec171b42d2eedef30fee12b1d35066156a451f350e4acd10438f3881942e8cd"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 31191,
+   "sha256": "b4b2fb488ca8b361f870f93b022f56e56ae1c8b23b4c8861a6045674bfa0c9ad"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 19282,
+   "sha256": "5a9581aec3e9938826ffb9551090b195bd3e9d87eb95faded35040925f0f520d"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 42267,
+   "sha256": "15889f59cc10a39239b3a621ef62732c9e3ae3dded2ad1d0de226bfeb879dc29"
+  },
+  "voice/zh/side_switch.m4a": {
+   "bytes": 41436,
+   "sha256": "2500a36466822c3eeb83e1544f70ea8ebc6a74072fa3929fb4934efe8b70919b"
+  }
+ }
+}

@@ -1,0 +1,155 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "h-db-rdl",
+ "version": "1.0.0",
+ "name": {
+  "zh": "哑铃罗马尼亚硬拉",
+  "en": "Dumbbell Romanian Deadlift"
+ },
+ "category": "strength",
+ "muscles": [
+  "腘绳肌",
+  "臀大肌"
+ ],
+ "muscleGroups": [
+  "hamstrings",
+  "glute-max"
+ ],
+ "equipment": [
+  "dumbbell"
+ ],
+ "position": "standing",
+ "unilateral": false,
+ "level": 2,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "reps",
+  "sets": 3,
+  "reps": 10,
+  "restSeconds": 30
+ },
+ "cues": {
+  "zh": [
+   "哑铃贴腿下滑，臀部向后，背始终挺直"
+  ]
+ },
+ "primaryCue": 0,
+ "cautions": [
+  "腰"
+ ],
+ "contraindications": [],
+ "alternative": "h-good-morning",
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 1.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": 4.0
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "哑铃罗马尼亚硬拉"
+    },
+    "ms": {
+     "zh": 1579
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "哑铃罗马尼亚硬拉，练大腿后侧和臀部"
+    },
+    "ms": {
+     "zh": 3437
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "哑铃贴腿下滑，臀部向后，背始终挺直"
+    },
+    "ms": {
+     "zh": 3692
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，哑铃贴腿下滑，臀部向后，背始终挺直"
+    },
+    "ms": {
+     "zh": 6223
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "哑铃罗马尼亚硬拉，完成"
+    },
+    "ms": {
+     "zh": 2299
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub Drive archive green-screen master, keyed onto #101013 by tools/media/prepare_media.py",
+  "mediaSource": "pose-hub-drive-greenscreen",
+  "spec": "drill-anim/specs/h-db-rdl.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 6364,
+   "sha256": "046f8119e7ef8e202e7032134fa965dd717ffe91429bc5f6babf34f13a0f2c5b"
+  },
+  "demo.mp4": {
+   "bytes": 103356,
+   "sha256": "1928a5dccee085420df823a0b47505868c9c515b325377a12e18e287ebc3c4ed"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 31333,
+   "sha256": "148af55528f788bed910d644a323257a1a690f8fbb84efa82c74dbd38087b6cd"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 19778,
+   "sha256": "ab5fe2e00af8f116aac2be86811abd9bc267d3113d49e8f24d853a52de49f7ff"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 29202,
+   "sha256": "428b3820317195983ecace5613232dc9866c3412aeb5f96a5be787e1cfe6b4e2"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 13893,
+   "sha256": "e569b6b2bd1cb47a9a8a0a4757f106ddc54d37e845e9aa5bdc0711bd6544b465"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 52096,
+   "sha256": "66b452bcf802822ae2f00f4222ab7a60c1d73c05e42719a264a1dea890b8136f"
+  }
+ }
+}

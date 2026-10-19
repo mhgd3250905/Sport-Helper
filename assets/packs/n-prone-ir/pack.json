@@ -1,0 +1,170 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "n-prone-ir",
+ "version": "1.0.0",
+ "name": {
+  "zh": "俯卧小腿外摆",
+  "en": "Prone Hip Internal Rotation"
+ },
+ "category": "mobility",
+ "muscles": [
+  "臀中肌",
+  "臀大肌"
+ ],
+ "muscleGroups": [
+  "hip-abductors",
+  "glute-max"
+ ],
+ "equipment": [
+  "mat"
+ ],
+ "position": "prone",
+ "unilateral": false,
+ "level": 1,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "reps",
+  "sets": 1,
+  "reps": 10,
+  "restSeconds": 10
+ },
+ "cues": {
+  "zh": [
+   "俯卧屈膝 90 度",
+   "趴着，屈膝，小腿向外侧摆"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [
+  "膝"
+ ],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 2.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": 4.0
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "俯卧小腿外摆"
+    },
+    "ms": {
+     "zh": 1324
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "俯卧小腿外摆，活动臀部"
+    },
+    "ms": {
+     "zh": 2299
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "俯卧屈膝 90 度"
+    },
+    "ms": {
+     "zh": 1440
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "趴着，屈膝，小腿向外侧摆"
+    },
+    "ms": {
+     "zh": 2763
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，趴着，屈膝，小腿向外侧摆"
+    },
+    "ms": {
+     "zh": 5248
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "俯卧小腿外摆，完成"
+    },
+    "ms": {
+     "zh": 1997
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub v0.2.0 dark soft-v1 clip (as frozen in HipLab), re-encoded 720²",
+  "mediaSource": "pose-hub-v0.2.0",
+  "spec": "drill-anim/specs/n-prone-ir.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 11326,
+   "sha256": "90f4353b9a4af744eca74d6651960396b892daf28ab3f8b1e2648653389d7384"
+  },
+  "demo.mp4": {
+   "bytes": 157602,
+   "sha256": "b105bf13b45b77cfb601f3255ebbf0bba8e17da9e965576d3f79cd7d3b4da438"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 12957,
+   "sha256": "4819ac972f8e10b8614f12c679289219e01e21016399c4261896275428b619f4"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 23730,
+   "sha256": "bdba989a7dfb295ac52f3ebd26d90aeb3de1acf916ce93862fb6e61bf5e4980f"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 17391,
+   "sha256": "0e7e6b0ea7bd6dc9b6ac87aa760c2a13851167f2e067a8f3723d07635bdc7486"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 19856,
+   "sha256": "2623a8ff77483de13cc5bf6c69fa4145316ecf58473b18516f65bed9f7721a80"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 12035,
+   "sha256": "7fff43aa0f87e89a1a194850860cbb39abab0f8e359e12e33e6ff9a1fc5808e1"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 43099,
+   "sha256": "795fb8e7c039ff6194606369255072e4aa337b70bfe9f5b0751586f56df8de15"
+  }
+ }
+}

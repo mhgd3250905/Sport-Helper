@@ -1,0 +1,199 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "n-half-split",
+ "version": "1.0.0",
+ "name": {
+  "zh": "半跪半劈叉",
+  "en": "Half-Kneeling Half Split (Blocks)"
+ },
+ "category": "stretch",
+ "muscles": [
+  "腘绳肌"
+ ],
+ "muscleGroups": [
+  "hamstrings"
+ ],
+ "equipment": [
+  "block"
+ ],
+ "position": "kneeling",
+ "unilateral": true,
+ "level": 1,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "time",
+  "sets": 1,
+  "seconds": 30,
+  "restSeconds": 10
+ },
+ "cues": {
+  "zh": [
+   "半跪，前腿伸直",
+   "前腿伸直，从髋部往前折，手扶砖",
+   "髋向后坐，大腿后侧拉长"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [
+  "膝",
+  "腰"
+ ],
+ "contraindications": [],
+ "alternative": "o-seated-ham",
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 3.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": null,
+  "showsSide": "right"
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "半跪半劈叉"
+    },
+    "ms": {
+     "zh": 1184
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "半跪半劈叉，拉伸大腿后侧"
+    },
+    "ms": {
+     "zh": 2601
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "半跪，前腿伸直"
+    },
+    "ms": {
+     "zh": 1741
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "前腿伸直，从髋部往前折，手扶砖"
+    },
+    "ms": {
+     "zh": 3344
+    }
+   },
+   {
+    "id": "cue3",
+    "role": "cue",
+    "text": {
+     "zh": "髋向后坐，大腿后侧拉长"
+    },
+    "ms": {
+     "zh": 2485
+    }
+   },
+   {
+    "id": "side_switch",
+    "role": "side_switch",
+    "text": {
+     "zh": "左侧同样，前腿伸直，从髋部往前折，手扶砖"
+    },
+    "ms": {
+     "zh": 4412
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，髋向后坐，大腿后侧拉长"
+    },
+    "ms": {
+     "zh": 5039
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "半跪半劈叉，完成"
+    },
+    "ms": {
+     "zh": 1881
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub v0.2.0 dark soft-v1 clip (as frozen in HipLab), re-encoded 720²",
+  "mediaSource": "pose-hub-v0.2.0",
+  "spec": "drill-anim/specs/n-half-split.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 10572,
+   "sha256": "7553612c2eea352e8ab56e610d74cd280a7a0d4cc418e86bf54613747be8e57b"
+  },
+  "demo.mp4": {
+   "bytes": 122919,
+   "sha256": "c526c301ecd045a6a9ccebe6fa9dcc402794cdaebcc894f2eed8d6009cbe8b31"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 15477,
+   "sha256": "d3ef5c2703d512445aaa3cb894342f22b65c425ebbd192aef3a9249320816621"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 28567,
+   "sha256": "bf5436f91f0c5ecd4abc30c33ab25fb2828d1b89ae5a69e501cb133879695191"
+  },
+  "voice/zh/cue3.m4a": {
+   "bytes": 21543,
+   "sha256": "e0e7754b8564ec592c0ccbe7f2687672e69efa1b4a8fc61bdb00d8a4f20fe832"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 16404,
+   "sha256": "e5c2e8be9baa009aa841663c98e407c62441814a47e853cb8eee36048a50bf82"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 22326,
+   "sha256": "93c9a279f65349aaf3ab25c35fe96c97795e8dd16a314528829492b074c05a6b"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 10777,
+   "sha256": "9b30a849b72a47e56b27c7efad31f310489dcc1f0ecd23280b0cc12e292e96a0"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 41789,
+   "sha256": "99f3ee5c37e693930af5288c792a7e1bfa5bc519069abac5f62934a27378065c"
+  },
+  "voice/zh/side_switch.m4a": {
+   "bytes": 37264,
+   "sha256": "5d344103b1500fef6689e7d9b3527f28793c6a0761fe5ebff20f3d831e78dcfb"
+  }
+ }
+}

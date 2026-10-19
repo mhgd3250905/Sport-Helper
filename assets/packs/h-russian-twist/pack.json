@@ -1,0 +1,183 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "h-russian-twist",
+ "version": "1.0.0",
+ "name": {
+  "zh": "俄罗斯转体",
+  "en": "Russian Twist (Feet Down)"
+ },
+ "category": "core",
+ "muscles": [
+  "腹斜肌"
+ ],
+ "muscleGroups": [
+  "obliques"
+ ],
+ "equipment": [
+  "mat"
+ ],
+ "position": "seated",
+ "unilateral": false,
+ "level": 2,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "reps",
+  "sets": 3,
+  "reps": 16,
+  "restSeconds": 30
+ },
+ "cues": {
+  "zh": [
+   "坐姿后倾，脚着地",
+   "上身微后仰，背挺直，左右转动肩膀",
+   "左右转动上身，骨盆稳定"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [
+  "腰"
+ ],
+ "contraindications": [],
+ "alternative": "h-band-pallof",
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 1.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": 3.0
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "俄罗斯转体"
+    },
+    "ms": {
+     "zh": 1115
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "俄罗斯转体，练腰两侧"
+    },
+    "ms": {
+     "zh": 2183
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "坐姿后倾，脚着地"
+    },
+    "ms": {
+     "zh": 1834
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "上身微后仰，背挺直，左右转动肩膀"
+    },
+    "ms": {
+     "zh": 3413
+    }
+   },
+   {
+    "id": "cue3",
+    "role": "cue",
+    "text": {
+     "zh": "左右转动上身，骨盆稳定"
+    },
+    "ms": {
+     "zh": 2392
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，左右转动上身，骨盆稳定"
+    },
+    "ms": {
+     "zh": 4923
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "俄罗斯转体，完成"
+    },
+    "ms": {
+     "zh": 1858
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub Drive archive green-screen master, keyed onto #101013 by tools/media/prepare_media.py",
+  "mediaSource": "pose-hub-drive-greenscreen",
+  "spec": "drill-anim/specs/h-russian-twist.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 10322,
+   "sha256": "d9a4071043a41078f0d0d24674aef9a82b4644fba0f8261f893c8dee770826f3"
+  },
+  "demo.mp4": {
+   "bytes": 165529,
+   "sha256": "0268a87968bf16780cd09100dbf55ec75ad6f8e8fb267e2ff41befff9c715553"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 16131,
+   "sha256": "22e3d349210d554d55e5608c1bc7bba60d8845f87d06c11fca9ad3f5dec8f1c5"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 29140,
+   "sha256": "ea1484b68b7faceb9606c3b906cb8bf4a9014d2f822b7f964fdbe9beef7107fb"
+  },
+  "voice/zh/cue3.m4a": {
+   "bytes": 20624,
+   "sha256": "80b73f3360f6ce740bc206dee28dda80c9e50aaf6969733290950d59f1f6e3eb"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 16196,
+   "sha256": "e9b4fdbccd495f84bf43d7cbc18b2730961878be2316b3070892ff78b0a86df0"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 19079,
+   "sha256": "84a9f789d77ee92b6be4cc9d088aec329a4ab012e685eacd3b40b0aa7dfbbc2e"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 10325,
+   "sha256": "fce5ce677cb061122bfa4ee6ad199bee633ebd5e8344dc7fac3a203bb0d89692"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 41483,
+   "sha256": "be9d5abe3ed8d7fe872887f1f2e4b5f0ce44f6b86094f3f62677ba44ac3f38aa"
+  }
+ }
+}

@@ -1,0 +1,183 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "n-thomas-test",
+ "version": "1.0.0",
+ "name": {
+  "zh": "仰卧单膝抱胸",
+  "en": "Supine Single Knee-to-Chest (Thomas Test)"
+ },
+ "category": "stretch",
+ "muscles": [
+  "髋屈肌"
+ ],
+ "muscleGroups": [
+  "hip-flexors"
+ ],
+ "equipment": [
+  "mat"
+ ],
+ "position": "supine",
+ "unilateral": true,
+ "level": 1,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "time",
+  "sets": 1,
+  "seconds": 30,
+  "restSeconds": 10
+ },
+ "cues": {
+  "zh": [
+   "仰卧，抱一侧膝到胸",
+   "抱住一边膝盖，另一条腿放松伸直"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [
+  "髋"
+ ],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 2.5,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": null,
+  "showsSide": "right"
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "仰卧单膝抱胸"
+    },
+    "ms": {
+     "zh": 1347
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "仰卧单膝抱胸，拉伸髋前侧"
+    },
+    "ms": {
+     "zh": 2647
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "仰卧，抱一侧膝到胸"
+    },
+    "ms": {
+     "zh": 1904
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "抱住一边膝盖，另一条腿放松伸直"
+    },
+    "ms": {
+     "zh": 2995
+    }
+   },
+   {
+    "id": "side_switch",
+    "role": "side_switch",
+    "text": {
+     "zh": "左侧同样，抱住一边膝盖，另一条腿放松伸直"
+    },
+    "ms": {
+     "zh": 4133
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，抱住一边膝盖，另一条腿放松伸直"
+    },
+    "ms": {
+     "zh": 5526
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "仰卧单膝抱胸，完成"
+    },
+    "ms": {
+     "zh": 2020
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub v0.2.0 dark soft-v1 clip (as frozen in HipLab), re-encoded 720²",
+  "mediaSource": "pose-hub-v0.2.0",
+  "spec": "drill-anim/specs/n-thomas-test.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 7510,
+   "sha256": "9109f8ec94d12276fc19c763f1392ea64903b55e03b29c0e7e0d4dd78a6203df"
+  },
+  "demo.mp4": {
+   "bytes": 74694,
+   "sha256": "decd043d5b0b7c0b72558167c9a05de623f7c0774de2d5e1fada27b7508c2991"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 16625,
+   "sha256": "48b7a69b04eb3c50b519e707069a5ce651b6f163b8d56cd49054f8f9b2660ab2"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 25788,
+   "sha256": "28d6fa5ea9fcbdee266d2cbb17c64ecab81b2050b81952b454ba4575714a55be"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 17720,
+   "sha256": "764f505c4fc091f95ed6326b0223bba888d483ee4424d041593477390fd4c7da"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 22696,
+   "sha256": "10db5e5aba123e8a5c675146227bb6a36191e0912498cff77101d0e3618b8356"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 12054,
+   "sha256": "b2651dd26ef86ecd4329e129628d2abbd08e09afea1ca57be06d06d8773b6930"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 46355,
+   "sha256": "bce837421b47ca2d1e38549aad336e3745095ce878f4d295061bc125fdd88593"
+  },
+  "voice/zh/side_switch.m4a": {
+   "bytes": 34966,
+   "sha256": "54d1ed6ea44ad3236c69332276f27646c880a4bafb7a3f175594a0d71d0d6b56"
+  }
+ }
+}

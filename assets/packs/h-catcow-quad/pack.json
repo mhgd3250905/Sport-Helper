@@ -1,0 +1,153 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "h-catcow-quad",
+ "version": "1.0.0",
+ "name": {
+  "zh": "四足猫牛式",
+  "en": "Quadruped Cat-Cow"
+ },
+ "category": "mobility",
+ "muscles": [
+  "竖脊肌",
+  "腹直肌"
+ ],
+ "muscleGroups": [
+  "erectors",
+  "abs"
+ ],
+ "equipment": [
+  "mat"
+ ],
+ "position": "quadruped",
+ "unilateral": false,
+ "level": 1,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "time",
+  "sets": 1,
+  "seconds": 40,
+  "restSeconds": 10
+ },
+ "cues": {
+  "zh": [
+   "吸气塌腰抬头，呼气拱背低头"
+  ]
+ },
+ "primaryCue": 0,
+ "cautions": [],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 1.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": null
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "四足猫牛式"
+    },
+    "ms": {
+     "zh": 1207
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "四足猫牛式，活动下背和腹部"
+    },
+    "ms": {
+     "zh": 2786
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "吸气塌腰抬头，呼气拱背低头"
+    },
+    "ms": {
+     "zh": 2740
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，吸气塌腰抬头，呼气拱背低头"
+    },
+    "ms": {
+     "zh": 5271
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "四足猫牛式，完成"
+    },
+    "ms": {
+     "zh": 1950
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub Drive archive green-screen master, keyed onto #101013 by tools/media/prepare_media.py",
+  "mediaSource": "pose-hub-drive-greenscreen",
+  "spec": "drill-anim/specs/h-catcow-quad.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 8273,
+   "sha256": "656dbc656807078e3cfe5a96d591088601fbd27755d8bd0cfbddc3cd45bcd67a"
+  },
+  "demo.mp4": {
+   "bytes": 104978,
+   "sha256": "087d708f73ad1c7a1390430aa6ab636c2b278df98c12ba252d183aa6293e492e"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 23471,
+   "sha256": "0e640e5ea93f3696410805b95093c5a1605483f5727cec67371250e8303501df"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 16991,
+   "sha256": "1ff70a4b33fdea4d17b0aefdecf1fea7cd08575d1cbe7182395215a1965fd124"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 23986,
+   "sha256": "962d4879245c23bb4ae855a7200aab14e1ff542d064fa74c992d3861e05a70e1"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 10946,
+   "sha256": "9220a7b4cd3f60140e6c7b0c1b9767e453336de5cdd1727367f192b36cf4350a"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 44226,
+   "sha256": "eb7d4ca44b23d263c2d32e437ba4298ca069e670549b6aea9623fa5a0270986b"
+  }
+ }
+}

@@ -1,0 +1,186 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "h-band-pull-apart",
+ "version": "1.0.0",
+ "name": {
+  "zh": "弹力带水平拉开",
+  "en": "Band Pull-Apart"
+ },
+ "category": "strength",
+ "muscles": [
+  "菱形肌·中下斜方",
+  "三角肌"
+ ],
+ "muscleGroups": [
+  "scapular",
+  "deltoids"
+ ],
+ "equipment": [
+  "band"
+ ],
+ "position": "standing",
+ "unilateral": false,
+ "level": 1,
+ "scenes": [
+  "home",
+  "office"
+ ],
+ "defaultDose": {
+  "mode": "reps",
+  "sets": 2,
+  "reps": 15,
+  "restSeconds": 30
+ },
+ "cues": {
+  "zh": [
+   "双臂前平举握带",
+   "手臂伸直与肩同高，把弹力带向两侧拉开",
+   "向两侧拉开到胸前，肩不耸"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [
+  "肩"
+ ],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 1.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": 4.0
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "弹力带水平拉开"
+    },
+    "ms": {
+     "zh": 1533
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "弹力带水平拉开，练上背和肩膀"
+    },
+    "ms": {
+     "zh": 2902
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "双臂前平举握带"
+    },
+    "ms": {
+     "zh": 1556
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "手臂伸直与肩同高，把弹力带向两侧拉开"
+    },
+    "ms": {
+     "zh": 3785
+    }
+   },
+   {
+    "id": "cue3",
+    "role": "cue",
+    "text": {
+     "zh": "向两侧拉开到胸前，肩不耸"
+    },
+    "ms": {
+     "zh": 2601
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，向两侧拉开到胸前，肩不耸"
+    },
+    "ms": {
+     "zh": 5108
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "弹力带水平拉开，完成"
+    },
+    "ms": {
+     "zh": 2229
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub Drive archive green-screen master, keyed onto #101013 by tools/media/prepare_media.py",
+  "mediaSource": "pose-hub-drive-greenscreen",
+  "spec": "drill-anim/specs/h-band-pull-apart.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 8682,
+   "sha256": "7e991ae32819168529fa1b0db9a15b1bf8533516409e8f24d9e4654a2d5e19f4"
+  },
+  "demo.mp4": {
+   "bytes": 116629,
+   "sha256": "b08363a35513cce8718d4453d7d15ee852f60f3f307991054bfc54fdd7d64ae9"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 13834,
+   "sha256": "8ff1f872227e7dc6c91dd4eaa49dc4b31c7d56878489f615ac475547c5728681"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 32222,
+   "sha256": "238ebb559ac82332d19f25f9cbc455da2356baaa437f071c5d4227efbbd07c21"
+  },
+  "voice/zh/cue3.m4a": {
+   "bytes": 22477,
+   "sha256": "0d9919f6d1862287c30dc5b4e86c54cd79e0092a745c6d94b0e2bc6a0aff1e12"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 19304,
+   "sha256": "6fc5057d00bbd2c396bf8b28003366a99eabe6b3651888f1091e6fd6a8ecabb8"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 25013,
+   "sha256": "19efe02dd6a011f61ac29a1b9aae457d36f9330c23890820d081f99b42805aad"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 13742,
+   "sha256": "f32211039fd944c806c85ef590981cc2d278234d44ab1d44205cc05187fd479a"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 42880,
+   "sha256": "4a933f16a1027b925ca05800b79330321d7e658bea996bb8122caf69411ea383"
+  }
+ }
+}

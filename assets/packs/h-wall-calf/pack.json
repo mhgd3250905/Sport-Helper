@@ -1,0 +1,182 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "h-wall-calf",
+ "version": "1.0.0",
+ "name": {
+  "zh": "靠墙小腿拉伸",
+  "en": "Wall Calf Stretch"
+ },
+ "category": "stretch",
+ "muscles": [
+  "小腿"
+ ],
+ "muscleGroups": [
+  "calves"
+ ],
+ "equipment": [
+  "wall"
+ ],
+ "position": "standing",
+ "unilateral": true,
+ "level": 1,
+ "scenes": [
+  "home",
+  "office"
+ ],
+ "defaultDose": {
+  "mode": "time",
+  "sets": 1,
+  "seconds": 30,
+  "restSeconds": 10
+ },
+ "cues": {
+  "zh": [
+   "后腿伸直，脚跟踩实，身体前倾",
+   "身体前倾，感觉小腿拉长"
+  ]
+ },
+ "primaryCue": 0,
+ "cautions": [],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 1.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": null,
+  "showsSide": "right"
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "靠墙小腿拉伸"
+    },
+    "ms": {
+     "zh": 1440
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "靠墙小腿拉伸，拉伸小腿"
+    },
+    "ms": {
+     "zh": 2531
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "后腿伸直，脚跟踩实，身体前倾"
+    },
+    "ms": {
+     "zh": 3158
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "身体前倾，感觉小腿拉长"
+    },
+    "ms": {
+     "zh": 2461
+    }
+   },
+   {
+    "id": "side_switch",
+    "role": "side_switch",
+    "text": {
+     "zh": "左侧同样，后腿伸直，脚跟踩实，身体前倾"
+    },
+    "ms": {
+     "zh": 4272
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，身体前倾，感觉小腿拉长"
+    },
+    "ms": {
+     "zh": 4876
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "靠墙小腿拉伸，完成"
+    },
+    "ms": {
+     "zh": 2113
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub Drive archive green-screen master, keyed onto #101013 by tools/media/prepare_media.py",
+  "mediaSource": "pose-hub-drive-greenscreen",
+  "spec": "drill-anim/specs/h-wall-calf.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 8875,
+   "sha256": "e61a0b48e621029d92308bb0b562b0a4aa71c9f62ab39bb8ef3cf3853037a6d0"
+  },
+  "demo.mp4": {
+   "bytes": 97907,
+   "sha256": "d9c8648304bcad34085c12c9cacde9834028d4cf13e586189484a7d0accf05f9"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 27086,
+   "sha256": "f630ff3567e0c6fed0055c03fd3373f9ad6a5c5a70dd172d1db7417388ed30f6"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 21315,
+   "sha256": "6d81aa0157ec10c7733cab38872676afef5687c3207638e81e8b207f6df6ac8f"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 18439,
+   "sha256": "492869b13551352e403cf3e0a46585400fddf96f5a630faa2c7125295da1f2af"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 21920,
+   "sha256": "cbeb18cee0f8bb8d3c1a1340a583f9fab08e146444cb389955a86063bb98e1ca"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 12825,
+   "sha256": "6aa2487fec1a65cef16fac0dddec7d12d0d65dc2b516a3b4115bef40293cbb37"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 39972,
+   "sha256": "e7d5ecb9e7498f22201a88183c1cbeb444e4be8cf95cc18168888ac0740b21b9"
+  },
+  "voice/zh/side_switch.m4a": {
+   "bytes": 36151,
+   "sha256": "0493981b66028401b18993731045c880d7759643f6059d2a09c389d0045285e4"
+  }
+ }
+}

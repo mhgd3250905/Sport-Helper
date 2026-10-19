@@ -1,0 +1,157 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "h-incline-pushup",
+ "version": "1.0.0",
+ "name": {
+  "zh": "扶凳上斜俯卧撑",
+  "en": "Incline Push-Up (Stool)"
+ },
+ "category": "strength",
+ "muscles": [
+  "胸大肌",
+  "肱三头肌"
+ ],
+ "muscleGroups": [
+  "chest",
+  "triceps"
+ ],
+ "equipment": [
+  "chair"
+ ],
+ "position": "standing",
+ "unilateral": false,
+ "level": 1,
+ "scenes": [
+  "home",
+  "office"
+ ],
+ "defaultDose": {
+  "mode": "reps",
+  "sets": 3,
+  "reps": 10,
+  "restSeconds": 30
+ },
+ "cues": {
+  "zh": [
+   "双手撑稳凳面，身体成一条直线，胸口贴近再推起"
+  ]
+ },
+ "primaryCue": 0,
+ "cautions": [
+  "手腕",
+  "肩"
+ ],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 1.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": 4.0
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "扶凳上斜俯卧撑"
+    },
+    "ms": {
+     "zh": 1533
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "扶凳上斜俯卧撑，练胸部和手臂后侧"
+    },
+    "ms": {
+     "zh": 3483
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "双手撑稳凳面，身体成一条直线，胸口贴近再推起"
+    },
+    "ms": {
+     "zh": 4598
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，双手撑稳凳面，身体成一条直线，胸口贴近再推起"
+    },
+    "ms": {
+     "zh": 7105
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "扶凳上斜俯卧撑，完成"
+    },
+    "ms": {
+     "zh": 2252
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub Drive archive green-screen master, keyed onto #101013 by tools/media/prepare_media.py",
+  "mediaSource": "pose-hub-drive-greenscreen",
+  "spec": "drill-anim/specs/h-incline-pushup.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 8854,
+   "sha256": "88c971598153df61a1086d09477542c364cb149ce7433fb19438a9fac5591f03"
+  },
+  "demo.mp4": {
+   "bytes": 126275,
+   "sha256": "f719c457d481efbd99a619137e2c66d5f9716df9db618bfc93925938c4c03147"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 38681,
+   "sha256": "0f24ec17829b497274d4ac0c60fdb2e24684fad89c13244b401f393af1fc1ec7"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 19590,
+   "sha256": "affd3243db4b770fc437a6283aebecea45f74998b9f254c1b8e5d05487c2011f"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 29728,
+   "sha256": "ade1c54a973b046c683e28babe872465996fd33071307c12ed3fb8668e76691b"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 13736,
+   "sha256": "6621589738cf1e21372d636f7d89a7254ec23d9b9ce3f8e6f2089a4ffb360b12"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 58875,
+   "sha256": "bebea650ff98d5682696f73d061de0df9fc829b7746e64aca51ebb3c32c04f0a"
+  }
+ }
+}

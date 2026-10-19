@@ -1,0 +1,183 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "w-feet-on-chair-bridge",
+ "version": "1.0.0",
+ "name": {
+  "zh": "脚踩椅面臀桥",
+  "en": "Feet-on-Chair Glute Bridge"
+ },
+ "category": "strength",
+ "muscles": [
+  "腘绳肌",
+  "臀大肌"
+ ],
+ "muscleGroups": [
+  "hamstrings",
+  "glute-max"
+ ],
+ "equipment": [
+  "chair"
+ ],
+ "position": "supine",
+ "unilateral": false,
+ "level": 1,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "reps",
+  "sets": 3,
+  "reps": 12,
+  "restSeconds": 30
+ },
+ "cues": {
+  "zh": [
+   "脚跟踩椅面，膝微屈",
+   "脚跟踩椅，收紧臀部抬髋，肋骨不外翻",
+   "抬臀时感觉大腿后侧和臀发力"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 2.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": 4.0
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "脚踩椅面臀桥"
+    },
+    "ms": {
+     "zh": 1440
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "脚踩椅面臀桥，练大腿后侧和臀部"
+    },
+    "ms": {
+     "zh": 3251
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "脚跟踩椅面，膝微屈"
+    },
+    "ms": {
+     "zh": 1950
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "脚跟踩椅，收紧臀部抬髋，肋骨不外翻"
+    },
+    "ms": {
+     "zh": 3599
+    }
+   },
+   {
+    "id": "cue3",
+    "role": "cue",
+    "text": {
+     "zh": "抬臀时感觉大腿后侧和臀发力"
+    },
+    "ms": {
+     "zh": 2949
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，抬臀时感觉大腿后侧和臀发力"
+    },
+    "ms": {
+     "zh": 5503
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "脚踩椅面臀桥，完成"
+    },
+    "ms": {
+     "zh": 2113
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub v0.2.0 dark soft-v1 clip (as frozen in HipLab), re-encoded 720²",
+  "mediaSource": "pose-hub-v0.2.0",
+  "spec": "drill-anim/specs/w-feet-on-chair-bridge.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 8924,
+   "sha256": "87007d82a2e55ce87a0183f2fbe04907d8d195b1e303b82012045ebff5a37ce1"
+  },
+  "demo.mp4": {
+   "bytes": 92536,
+   "sha256": "ac405ad9a521376b73d5199d51de9b7c4f369d1f181687c540a6fec50f217fd1"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 17175,
+   "sha256": "19c81fac503b41741b8d2afda17e1e440e62e88e26f4e35a1c5798c615cdf61c"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 30381,
+   "sha256": "c50fb37070c029bb801698de3626788d429cbf96839ab9912357c8ed8595aa20"
+  },
+  "voice/zh/cue3.m4a": {
+   "bytes": 25152,
+   "sha256": "7350c35e667ca1443cc03024e06c9b62e4f8f0f0590c268e90592418ed5b6e04"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 18485,
+   "sha256": "d37b57c0cedc6f6c611ea1961463120655b3f0c450775dc3a691996381eaca16"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 27569,
+   "sha256": "ad8dc9a65ad5c45c13a35f07e043046f5cf7c954f83b35e8d1d3f34c120b0d23"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 12827,
+   "sha256": "5590828592d118ee9fffbf2a8efe21b278b57f50dff14886890e66f3fbd7585d"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 45634,
+   "sha256": "a2a2cff41190d31ed732385cf47100bec9dcffeb3e342d801d68249bed209b71"
+  }
+ }
+}

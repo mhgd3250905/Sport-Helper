@@ -1,0 +1,170 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "n-seated-ir-drop",
+ "version": "1.0.0",
+ "name": {
+  "zh": "坐姿后撑单膝内倒",
+  "en": "Seated Hip Internal-Rotation Drop"
+ },
+ "category": "mobility",
+ "muscles": [
+  "臀大肌",
+  "臀中肌"
+ ],
+ "muscleGroups": [
+  "glute-max",
+  "hip-abductors"
+ ],
+ "equipment": [
+  "mat"
+ ],
+ "position": "seated",
+ "unilateral": false,
+ "level": 1,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "reps",
+  "sets": 1,
+  "reps": 8,
+  "restSeconds": 10
+ },
+ "cues": {
+  "zh": [
+   "坐地后撑，屈膝",
+   "手在身后撑地，一侧膝盖向内倒"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [
+  "膝"
+ ],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 2.2,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": 3.0
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "坐姿后撑单膝内倒"
+    },
+    "ms": {
+     "zh": 1788
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "坐姿后撑单膝内倒，活动臀部"
+    },
+    "ms": {
+     "zh": 2949
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "坐地后撑，屈膝"
+    },
+    "ms": {
+     "zh": 1672
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "手在身后撑地，一侧膝盖向内倒"
+    },
+    "ms": {
+     "zh": 2879
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，手在身后撑地，一侧膝盖向内倒"
+    },
+    "ms": {
+     "zh": 5364
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "坐姿后撑单膝内倒，完成"
+    },
+    "ms": {
+     "zh": 2717
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub v0.2.0 dark soft-v1 clip (as frozen in HipLab), re-encoded 720²",
+  "mediaSource": "pose-hub-v0.2.0",
+  "spec": "drill-anim/specs/n-seated-ir-drop.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 8173,
+   "sha256": "9ca514abeec05830f7c5ec3158c06d6084f2b9f33adaa1569045b12e5cc99563"
+  },
+  "demo.mp4": {
+   "bytes": 90704,
+   "sha256": "ee1d7b7f35b0070f07c80095bf89a925e3fa5cde1d5e5a3f04225cdf01317d2b"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 14652,
+   "sha256": "00ed3d7fc101c9a0270022c21b0efdbee01df00535bc0648a054b087186739e1"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 24769,
+   "sha256": "5d0ad1fa656d87c8fbad3f8830e13ea595b90acf2a73e7308ee0289578fe07e5"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 23288,
+   "sha256": "a0bb334e1ee69ce41024b90d5585f46c073a04bdb043a197b3ea7c9f13e664e1"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 25196,
+   "sha256": "17e141dead8a24da6197ab7e28f36d4d3d82ae45053e253b39a708d9a0a244e0"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 15616,
+   "sha256": "6bceab6e57fe795753ff122caa85e4fd254a98fe14b4366b053b8d489f826fcf"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 44385,
+   "sha256": "fcec31bfc870660e919c2a7e8cc291a9d33ef4739a5e6cebf771ed7f84cd06d3"
+  }
+ }
+}

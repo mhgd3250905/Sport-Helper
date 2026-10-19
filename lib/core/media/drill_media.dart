@@ -3,7 +3,7 @@
 // is dropped (loop lengths come from assets/hip/hip-content.json).
 
 /// One prerecorded drill clip served to the WebView player
-/// (`assets/drill_media/<id>.mp4` + `<id>.jpg`).
+/// (SmartFit: a drill pack's `assets/packs/<id>/demo.mp4` + `cover.jpg`).
 class DrillMedia {
   const DrillMedia({
     required this.id,

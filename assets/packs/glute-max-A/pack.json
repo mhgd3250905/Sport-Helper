@@ -1,0 +1,168 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "glute-max-A",
+ "version": "1.0.0",
+ "name": {
+  "zh": "单腿臀桥",
+  "en": "Single-Leg Glute Bridge"
+ },
+ "category": "strength",
+ "muscles": [
+  "臀大肌"
+ ],
+ "muscleGroups": [
+  "glute-max"
+ ],
+ "equipment": [
+  "mat"
+ ],
+ "position": "supine",
+ "unilateral": false,
+ "level": 2,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "reps",
+  "sets": 3,
+  "reps": 10,
+  "restSeconds": 30
+ },
+ "cues": {
+  "zh": [
+   "一腿伸直，另一侧脚跟推地把臀部抬起",
+   "用臀部把骨盆顶起，骨盆不歪"
+  ]
+ },
+ "primaryCue": 0,
+ "cautions": [
+  "腰"
+ ],
+ "contraindications": [],
+ "alternative": "w-feet-on-chair-bridge",
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 2.1,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": 4.0
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "单腿臀桥"
+    },
+    "ms": {
+     "zh": 1045
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "单腿臀桥，练臀部"
+    },
+    "ms": {
+     "zh": 1881
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "一腿伸直，另一侧脚跟推地把臀部抬起"
+    },
+    "ms": {
+     "zh": 3553
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "用臀部把骨盆顶起，骨盆不歪"
+    },
+    "ms": {
+     "zh": 2670
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，用臀部把骨盆顶起，骨盆不歪"
+    },
+    "ms": {
+     "zh": 5201
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "单腿臀桥，完成"
+    },
+    "ms": {
+     "zh": 1718
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub v0.2.0 dark soft-v1 clip (as frozen in HipLab), re-encoded 720²",
+  "mediaSource": "pose-hub-v0.2.0",
+  "spec": "drill-anim/specs/glute-max-A.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 8028,
+   "sha256": "a0a8874d665e9cd08c1e006cc3cd64b08a7fa97d604bb1734e39fd800faeba62"
+  },
+  "demo.mp4": {
+   "bytes": 80514,
+   "sha256": "2aca8a3664a80a943c0e2e2d8d0227c63d45892da7e6a757fe0db5acbf161e18"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 30312,
+   "sha256": "1bc90a7e86c94978244d8e7ba5fdcc6e10f1f6acdd63cb67b4a00c4b1acb49f4"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 23012,
+   "sha256": "986fb0ed9a71026eb421b90ffecefa4a8c35de5a15e55dbf07a2f56064725b6b"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 15278,
+   "sha256": "b0298227d6892b275d90690d44794ac1e80e2ea4ae272891c3ebfa22527dff7e"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 16549,
+   "sha256": "1be9fdd61d55a4047934c97392f087d8cd3a8fc585a73e857f88afa034fe32b7"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 9652,
+   "sha256": "f7327591f62a7e42105045a4137e1e2879dd180d9d9270551b734694fbb17cd6"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 43510,
+   "sha256": "c3c22d6f2f38aa57de7e7ecd6413e176140d794bf202a84a74fbc0b40d0b83aa"
+  }
+ }
+}

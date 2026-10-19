@@ -7,6 +7,7 @@ import '../data/app_store.dart';
 import '../domain/exercise.dart';
 import '../domain/plan_generator.dart';
 import '../domain/template.dart';
+import '../packs/drill_pack.dart';
 import '../voice/session_script.dart';
 import '../voice/voice_library.dart';
 import '../voice/voice_queue.dart';
@@ -38,16 +39,21 @@ class AppServices {
 
   SessionScript script() => SessionScript(lib: voiceLibrary, exercises: library);
 
-  static Future<(ExerciseLibrary, TemplateCatalog)> loadContent() async {
-    final lib = ExerciseLibrary.fromJson(
-      jsonDecode(await rootBundle.loadString('assets/library/exercises.json'))
-          as Map<String, dynamic>,
-    );
+  /// The exercise library and the voice lines both come from the drill
+  /// packs (assets/packs/, docs/drill-pack-spec.md); templates stay
+  /// app-specific (assets/library/templates.json).
+  static Future<(ExerciseLibrary, TemplateCatalog, VoiceLibrary)>
+  loadContent() async {
+    final packs = await PackSet.load(rootBundle.loadString);
     final cat = TemplateCatalog.fromJson(
       jsonDecode(await rootBundle.loadString('assets/library/templates.json'))
           as Map<String, dynamic>,
     );
-    return (lib, cat);
+    return (
+      ExerciseLibrary.fromPacks(packs),
+      cat,
+      VoiceLibrary.fromPacks(packs),
+    );
   }
 
   static AppServices of(BuildContext context) =>

@@ -160,7 +160,14 @@ void main() {
     tester,
   ) async {
     await _show(tester, _services(), const LibraryPage(), const Size(844, 390));
-    await tester.ensureVisible(find.text('徒手深蹲'));
+    await tester.scrollUntilVisible(
+      find.text('徒手深蹲'),
+      500,
+      scrollable: find.byWidgetPredicate(
+        (widget) =>
+            widget is Scrollable && widget.axisDirection == AxisDirection.down,
+      ),
+    );
     await tester.pumpAndSettle();
     await tester.tap(find.text('徒手深蹲'));
     await tester.pumpAndSettle();

@@ -1,0 +1,198 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "n-prone-hip-ext",
+ "version": "1.0.0",
+ "name": {
+  "zh": "俯卧屈膝抬腿",
+  "en": "Prone Bent-Knee Hip Extension"
+ },
+ "category": "strength",
+ "muscles": [
+  "臀大肌"
+ ],
+ "muscleGroups": [
+  "glute-max"
+ ],
+ "equipment": [
+  "mat"
+ ],
+ "position": "prone",
+ "unilateral": true,
+ "level": 1,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "reps",
+  "sets": 2,
+  "reps": 10,
+  "restSeconds": 30
+ },
+ "cues": {
+  "zh": [
+   "俯卧，一腿屈膝",
+   "趴着，屈膝，大腿慢慢抬离地面",
+   "脚底推向天花板，臀部收紧"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [
+  "腰"
+ ],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 2.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": 4.0,
+  "showsSide": "right"
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "俯卧屈膝抬腿"
+    },
+    "ms": {
+     "zh": 1370
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "俯卧屈膝抬腿，练臀部"
+    },
+    "ms": {
+     "zh": 2159
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "俯卧，一腿屈膝"
+    },
+    "ms": {
+     "zh": 1649
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "趴着，屈膝，大腿慢慢抬离地面"
+    },
+    "ms": {
+     "zh": 3135
+    }
+   },
+   {
+    "id": "cue3",
+    "role": "cue",
+    "text": {
+     "zh": "脚底推向天花板，臀部收紧"
+    },
+    "ms": {
+     "zh": 2624
+    }
+   },
+   {
+    "id": "side_switch",
+    "role": "side_switch",
+    "text": {
+     "zh": "左侧同样，趴着，屈膝，大腿慢慢抬离地面"
+    },
+    "ms": {
+     "zh": 4249
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，脚底推向天花板，臀部收紧"
+    },
+    "ms": {
+     "zh": 5201
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "俯卧屈膝抬腿，完成"
+    },
+    "ms": {
+     "zh": 2043
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub v0.2.0 dark soft-v1 clip (as frozen in HipLab), re-encoded 720²",
+  "mediaSource": "pose-hub-v0.2.0",
+  "spec": "drill-anim/specs/n-prone-hip-ext.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 8039,
+   "sha256": "cefcf9001b1e9902069444484a113032678a31bc1b69c51a382d87681322fa98"
+  },
+  "demo.mp4": {
+   "bytes": 84554,
+   "sha256": "e9ac906a289df35909507b106c86f9f9eb31a6abeddaea42642852864827b519"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 14532,
+   "sha256": "984589f1835fb21418845f133bd8ba7a6cc7e2eb80cd927df38844ae878330f9"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 26848,
+   "sha256": "a204d74bf6c99cbf145b9312953bcbbad155da04019aaa78fcd44fc26282a82d"
+  },
+  "voice/zh/cue3.m4a": {
+   "bytes": 22653,
+   "sha256": "1d987b92f3e4390cecb3a86cdb11db9b99c6845e1db985e1f386ab5756295a7b"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 17772,
+   "sha256": "b413a28f72fa18b329ee6094d759128562172f5a1e43d025ac6d570357fba490"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 18885,
+   "sha256": "365f60e4a7c432c1d8d777653247ec3d1cb61465f55098d1498f502e4f9fd145"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 12349,
+   "sha256": "5e2e4738eff82a4af4d3948d7e1d2213fdb631213b17c20987547bcdb551ca0b"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 43795,
+   "sha256": "e6ff9ef53be555ae4e893cb3c52eb6110a5767036ae3926ce90c5e9e76e69767"
+  },
+  "voice/zh/side_switch.m4a": {
+   "bytes": 36034,
+   "sha256": "4616b642e48c6657617207d2391b45a7167cd6ab03cc743da72862f4dbea2147"
+  }
+ }
+}

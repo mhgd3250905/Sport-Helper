@@ -1,0 +1,184 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "h-hip-gate",
+ "version": "1.0.0",
+ "name": {
+  "zh": "扶椅站姿开髋门",
+  "en": "Chair-Supported Hip Gate Opener"
+ },
+ "category": "mobility",
+ "muscles": [
+  "髋屈肌",
+  "臀中肌"
+ ],
+ "muscleGroups": [
+  "hip-flexors",
+  "hip-abductors"
+ ],
+ "equipment": [
+  "chair"
+ ],
+ "position": "standing",
+ "unilateral": true,
+ "level": 1,
+ "scenes": [
+  "home",
+  "office"
+ ],
+ "defaultDose": {
+  "mode": "reps",
+  "sets": 1,
+  "reps": 6,
+  "restSeconds": 10
+ },
+ "cues": {
+  "zh": [
+   "扶椅站稳，抬膝",
+   "扶住椅子，膝盖抬高，向外画圈打开"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 1.6,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": 3.0,
+  "showsSide": "right"
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "扶椅站姿开髋门"
+    },
+    "ms": {
+     "zh": 1533
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "扶椅站姿开髋门，活动髋前侧和臀部外侧"
+    },
+    "ms": {
+     "zh": 3901
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "扶椅站稳，抬膝"
+    },
+    "ms": {
+     "zh": 1625
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "扶住椅子，膝盖抬高，向外画圈打开"
+    },
+    "ms": {
+     "zh": 3413
+    }
+   },
+   {
+    "id": "side_switch",
+    "role": "side_switch",
+    "text": {
+     "zh": "左侧同样，扶住椅子，膝盖抬高，向外画圈打开"
+    },
+    "ms": {
+     "zh": 4505
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，扶住椅子，膝盖抬高，向外画圈打开"
+    },
+    "ms": {
+     "zh": 5944
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "扶椅站姿开髋门，完成"
+    },
+    "ms": {
+     "zh": 2183
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub v0.2.0 dark soft-v1 clip (as frozen in HipLab), re-encoded 720²",
+  "mediaSource": "pose-hub-v0.2.0",
+  "spec": "drill-anim/specs/h-hip-gate.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 8260,
+   "sha256": "3e2f52354d7fb7698f02cb16f8827d2e73bcc1f13966c9c5200eca0a80234e6e"
+  },
+  "demo.mp4": {
+   "bytes": 101302,
+   "sha256": "ec8b9fd5fc7ce71d783d1fa6491cc6b3ba0a88b474af2bfd8f7ed31856911338"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 14449,
+   "sha256": "7ea8e60396b5d1bf8a68d94b24106c0114ba0b00ed8c45ba3e328a2c93949bc9"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 29153,
+   "sha256": "fcaa71565303de93f493523e78527c718d7fee250a7967dd85ed67d5a1d80be7"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 19072,
+   "sha256": "6301ac395165906821807de50b677ed48d342b70aed68fbbc993e726000b6b45"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 33153,
+   "sha256": "e38338119bdaf4ca7d0bffffe7eccc2ddf5386762ce9d6f8a005abd5cb0c17b3"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 13546,
+   "sha256": "6b0fc95761df3ea32b2daf4604ff7d2cce398d621b1c13c90ef998509a0878a0"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 48907,
+   "sha256": "333f61512859ac8c81c708d4ef334fad779fb7eb8a685d77032985da473938bc"
+  },
+  "voice/zh/side_switch.m4a": {
+   "bytes": 38841,
+   "sha256": "b09ea4833e997d944c08edfe042ad114f619b5992ac60ecde76fba2fdc0e3b90"
+  }
+ }
+}

@@ -125,7 +125,7 @@ class _MediaNativeState extends State<DrillMediaPlatformView> {
       setState(() => _webView = view);
       await view.loadRequest(
         server.origin
-            .resolve('/drill_media/player.html')
+            .resolve('/player/player.html')
             .replace(
               queryParameters: {
                 'id': widget.media.id,

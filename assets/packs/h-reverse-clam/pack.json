@@ -1,0 +1,200 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "h-reverse-clam",
+ "version": "1.0.0",
+ "name": {
+  "zh": "侧卧反向蚌式",
+  "en": "Side-Lying Reverse Clamshell"
+ },
+ "category": "strength",
+ "muscles": [
+  "臀中肌",
+  "臀大肌"
+ ],
+ "muscleGroups": [
+  "hip-abductors",
+  "glute-max"
+ ],
+ "equipment": [
+  "mat"
+ ],
+ "position": "side_lying",
+ "unilateral": true,
+ "level": 1,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "reps",
+  "sets": 2,
+  "reps": 12,
+  "restSeconds": 30
+ },
+ "cues": {
+  "zh": [
+   "侧卧屈膝，膝盖并拢",
+   "膝盖并拢，小腿慢慢向上抬",
+   "小腿向上抬起，做髋内旋"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [
+  "膝"
+ ],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 1.8,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": 4.0,
+  "showsSide": "right"
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "侧卧反向蚌式"
+    },
+    "ms": {
+     "zh": 1416
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "侧卧反向蚌式，练臀部"
+    },
+    "ms": {
+     "zh": 2299
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "侧卧屈膝，膝盖并拢"
+    },
+    "ms": {
+     "zh": 1997
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "膝盖并拢，小腿慢慢向上抬"
+    },
+    "ms": {
+     "zh": 2670
+    }
+   },
+   {
+    "id": "cue3",
+    "role": "cue",
+    "text": {
+     "zh": "小腿向上抬起，做髋内旋"
+    },
+    "ms": {
+     "zh": 2554
+    }
+   },
+   {
+    "id": "side_switch",
+    "role": "side_switch",
+    "text": {
+     "zh": "左侧同样，膝盖并拢，小腿慢慢向上抬"
+    },
+    "ms": {
+     "zh": 3785
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，小腿向上抬起，做髋内旋"
+    },
+    "ms": {
+     "zh": 5062
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "侧卧反向蚌式，完成"
+    },
+    "ms": {
+     "zh": 2113
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub v0.2.0 dark soft-v1 clip (as frozen in HipLab), re-encoded 720²",
+  "mediaSource": "pose-hub-v0.2.0",
+  "spec": "drill-anim/specs/h-reverse-clam.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 10288,
+   "sha256": "9d834650feb586b56adf6c1e619eb499df58019da587ca6a4473088b858fa161"
+  },
+  "demo.mp4": {
+   "bytes": 111722,
+   "sha256": "8681cdf3d048329a62b30d36873ce28cd49628fa4731820efd3fefb7be08c0dd"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 17536,
+   "sha256": "446313006e147e557036fad36c816542bb9ea9ca9125890970c1c09b43846a79"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 23082,
+   "sha256": "3623c24d2f4c596deb4010aacf1ec310b802e664e3a041a38849bbd439a81f0b"
+  },
+  "voice/zh/cue3.m4a": {
+   "bytes": 22028,
+   "sha256": "f7cae248cc70abeedb0c9790c6bbbd2fbac9f53f833a2754d9975ed38966b8ef"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 18335,
+   "sha256": "a0f411cc8f204499bf6b1c90c2db7a8aa324dd02c5993050813bbf44897e520c"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 19861,
+   "sha256": "5b4f412731dc3baa88d3436ca3b3a28c21733b101f8fbb64e72ac3841b47ca60"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 12579,
+   "sha256": "b6356a7edba1717369fad76c01f422c33f80964b8c04a1ddf0a9be3e1ca24f34"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 42448,
+   "sha256": "5f1800d78d024b9fd5297b515ab20d8450c961609c6f9ce78269c9a93341c51b"
+  },
+  "voice/zh/side_switch.m4a": {
+   "bytes": 32190,
+   "sha256": "42fc636364d7fd1e86b7473756179977c790538d34667976b8c5bece38477531"
+  }
+ }
+}

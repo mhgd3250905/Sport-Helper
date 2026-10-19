@@ -1,6 +1,8 @@
 // Copied from 3D-Body@a83a0f4 (branch feat/hiplab-flavor) `app/lib/platform/scene/scene_asset_router.dart`.
-// Unchanged. HipLab bundles no assets/scene/, so only /drill_media/* (and
-// /fonts/*) resolve; everything else is a 404 from the manifest whitelist.
+// HipLab bundles no assets/scene/. SmartFit (2026-10-19, drill packs): the
+// player page is served from /player/* (assets/media_player/) and each
+// pack's clip/cover from /packs/<id>/* (assets/packs/, media files only);
+// everything else is a 404 from the manifest whitelist.
 import 'dart:typed_data';
 
 typedef SceneAssetLoader = Future<Uint8List> Function(String assetKey);
@@ -30,14 +32,17 @@ class SceneAssetRouter {
           if (_mimeForAsset(key) != null)
             if (key.startsWith(assetPrefix))
               key.substring(assetPrefix.length): key
-            else if (key.startsWith(mediaAssetPrefix))
-              'drill_media/${key.substring(mediaAssetPrefix.length)}': key
+            else if (key.startsWith(playerAssetPrefix))
+              'player/${key.substring(playerAssetPrefix.length)}': key
+            else if (key.startsWith(packAssetPrefix))
+              'packs/${key.substring(packAssetPrefix.length)}': key
             else if (key.startsWith('assets/fonts/'))
               'fonts/${key.substring('assets/fonts/'.length)}': key,
       };
 
   static const assetPrefix = 'assets/scene/';
-  static const mediaAssetPrefix = 'assets/drill_media/';
+  static const playerAssetPrefix = 'assets/media_player/';
+  static const packAssetPrefix = 'assets/packs/';
   final Map<String, String> _assets;
   final SceneAssetLoader load;
 
@@ -53,7 +58,7 @@ class SceneAssetRouter {
     if (key == null) return _error(404);
     try {
       final bytes = await load(key);
-      final isMedia = key.startsWith(mediaAssetPrefix);
+      final isMedia = key.startsWith(packAssetPrefix);
       final headers = <String, String>{if (isMedia) 'Accept-Ranges': 'bytes'};
       if (isMedia && method == 'GET' && range != null) {
         final selected = _range(range, bytes.length);
@@ -118,11 +123,15 @@ class SceneAssetRouter {
     if (key.startsWith('assets/fonts/') && key.endsWith('.ttf')) {
       return 'font/ttf';
     }
-    if (!key.startsWith(mediaAssetPrefix)) return null;
+    if (key.startsWith(playerAssetPrefix)) {
+      return _mimeFor(key.substring(playerAssetPrefix.length));
+    }
+    if (!key.startsWith(packAssetPrefix)) return null;
+    // Only a pack's picture and clip reach the WebView (no JSON, no audio).
     return switch (key.split('.').last.toLowerCase()) {
       'mp4' => 'video/mp4',
       'jpg' || 'jpeg' => 'image/jpeg',
-      _ => _mimeFor(key.substring(mediaAssetPrefix.length)),
+      _ => null,
     };
   }
 

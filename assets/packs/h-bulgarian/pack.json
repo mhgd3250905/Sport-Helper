@@ -1,0 +1,185 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "h-bulgarian",
+ "version": "1.0.0",
+ "name": {
+  "zh": "椅子保加利亚分腿蹲",
+  "en": "Bulgarian Split Squat"
+ },
+ "category": "strength",
+ "muscles": [
+  "股四头肌",
+  "臀大肌"
+ ],
+ "muscleGroups": [
+  "quadriceps",
+  "glute-max"
+ ],
+ "equipment": [
+  "chair"
+ ],
+ "position": "standing",
+ "unilateral": true,
+ "level": 3,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "reps",
+  "sets": 3,
+  "reps": 8,
+  "restSeconds": 30
+ },
+ "cues": {
+  "zh": [
+   "后脚搭椅，前膝对准脚尖，身体垂直下沉",
+   "身体下沉到前腿大腿接近水平"
+  ]
+ },
+ "primaryCue": 0,
+ "cautions": [
+  "膝"
+ ],
+ "contraindications": [],
+ "alternative": "h-squat",
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 1.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": 4.0,
+  "showsSide": "right"
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "椅子保加利亚分腿蹲"
+    },
+    "ms": {
+     "zh": 1765
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "椅子保加利亚分腿蹲，练大腿前侧和臀部"
+    },
+    "ms": {
+     "zh": 3646
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "后脚搭椅，前膝对准脚尖，身体垂直下沉"
+    },
+    "ms": {
+     "zh": 3878
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "身体下沉到前腿大腿接近水平"
+    },
+    "ms": {
+     "zh": 2879
+    }
+   },
+   {
+    "id": "side_switch",
+    "role": "side_switch",
+    "text": {
+     "zh": "左侧同样，后脚搭椅，前膝对准脚尖，身体垂直下沉"
+    },
+    "ms": {
+     "zh": 5016
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，身体下沉到前腿大腿接近水平"
+    },
+    "ms": {
+     "zh": 5317
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "椅子保加利亚分腿蹲，完成"
+    },
+    "ms": {
+     "zh": 2461
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub Drive archive green-screen master, keyed onto #101013 by tools/media/prepare_media.py",
+  "mediaSource": "pose-hub-drive-greenscreen",
+  "spec": "drill-anim/specs/h-bulgarian.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 7670,
+   "sha256": "c44b7e1fa7797f6bebf6835b8f9f5cb04271baba7c715d7be2e95c5be8afcdd2"
+  },
+  "demo.mp4": {
+   "bytes": 97294,
+   "sha256": "571d7683a0625ab9630a8f450b5f23cfed01dfad90c672ffaf7fbbaf6adc7c10"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 32971,
+   "sha256": "1a35bd43c9675de224dc054e19cf15d8295332968d1fea7d45e17a96d279ac40"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 24779,
+   "sha256": "9f8a3e6f115f5f5a00e05e1104faf73bdc769a651747001e0b7b45827899cc24"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 21334,
+   "sha256": "2317c024dd895eda0eb10792d312c9155ebdae19145c3dcbe22ce3a28bd62c97"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 31004,
+   "sha256": "7459386626e6bc0b0c907c7c0e2baccd0efa6dc1ff1dff191ed6b2028162ab73"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 15521,
+   "sha256": "63c89fe9e6dd0e930b63730c758d5c222bd35aca93f75c5d1c6cec6b26104ea3"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 44744,
+   "sha256": "2a2cff5e77bce805281c1ba83af6e8116ca1393a2dbc1ae1e18852f73a55c1ec"
+  },
+  "voice/zh/side_switch.m4a": {
+   "bytes": 42279,
+   "sha256": "df30e15d8b1aee89d43c96952a582bb16f6c491c7cc6de1ae1442f4ade65d095"
+  }
+ }
+}

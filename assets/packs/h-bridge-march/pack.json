@@ -1,0 +1,170 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "h-bridge-march",
+ "version": "1.0.0",
+ "name": {
+  "zh": "臀桥交替踏步",
+  "en": "Glute Bridge March"
+ },
+ "category": "strength",
+ "muscles": [
+  "臀大肌",
+  "腘绳肌"
+ ],
+ "muscleGroups": [
+  "glute-max",
+  "hamstrings"
+ ],
+ "equipment": [
+  "mat"
+ ],
+ "position": "supine",
+ "unilateral": false,
+ "level": 2,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "reps",
+  "sets": 3,
+  "reps": 10,
+  "restSeconds": 30
+ },
+ "cues": {
+  "zh": [
+   "先抬起臀桥，骨盆保持水平",
+   "臀桥撑住不晃，左右膝交替抬起"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [
+  "腰"
+ ],
+ "contraindications": [],
+ "alternative": "w-feet-on-chair-bridge",
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 1.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": 3.0
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "臀桥交替踏步"
+    },
+    "ms": {
+     "zh": 1370
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "臀桥交替踏步，练臀部和大腿后侧"
+    },
+    "ms": {
+     "zh": 3297
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "先抬起臀桥，骨盆保持水平"
+    },
+    "ms": {
+     "zh": 2647
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "臀桥撑住不晃，左右膝交替抬起"
+    },
+    "ms": {
+     "zh": 2926
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，臀桥撑住不晃，左右膝交替抬起"
+    },
+    "ms": {
+     "zh": 5410
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "臀桥交替踏步，完成"
+    },
+    "ms": {
+     "zh": 2113
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub Drive archive green-screen master, keyed onto #101013 by tools/media/prepare_media.py",
+  "mediaSource": "pose-hub-drive-greenscreen",
+  "spec": "drill-anim/specs/h-bridge-march.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 8473,
+   "sha256": "b0a716107e3250a79c26d18eb49ba252129811d5f8c36f0a9039caa2e4d04ad2"
+  },
+  "demo.mp4": {
+   "bytes": 114377,
+   "sha256": "59f9f584ca3426c168db5dd84c73ca97bbbfdd68538a94c2f19e1b7ef0bf25bd"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 22931,
+   "sha256": "d4baba86cf482fd4bac8d44ad06e6df8d446051f7426279c7e14f6011e66be5e"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 25030,
+   "sha256": "86c4e0041c88ead53310548857bcb9ce3c45e95fda670f43d215081563ff89c3"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 18431,
+   "sha256": "58bfe42fc31992e55229aab59a858aced52b855bc8683816579919da3a476767"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 28174,
+   "sha256": "96c89b87121ff0f6cd89a8eb7875e1cfa2fd38113838153af74110d781a4e424"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 12435,
+   "sha256": "6795b8c23fdbd71c4bef6c1cdbfc24fa500ed53c50d793afa7ec690f585ddf4a"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 45525,
+   "sha256": "54271b1b36a01147cbc75a64a640c41992528e5b96638f410eb2561c1c0fd2c9"
+  }
+ }
+}

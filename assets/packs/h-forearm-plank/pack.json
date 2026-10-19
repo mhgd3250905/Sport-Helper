@@ -1,0 +1,171 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "h-forearm-plank",
+ "version": "1.0.0",
+ "name": {
+  "zh": "前臂平板支撑",
+  "en": "Forearm Plank"
+ },
+ "category": "core",
+ "muscles": [
+  "腹直肌",
+  "腹斜肌"
+ ],
+ "muscleGroups": [
+  "abs",
+  "obliques"
+ ],
+ "equipment": [
+  "mat"
+ ],
+ "position": "prone",
+ "unilateral": false,
+ "level": 1,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "time",
+  "sets": 3,
+  "seconds": 30,
+  "restSeconds": 30
+ },
+ "cues": {
+  "zh": [
+   "肘在肩正下方",
+   "肘在肩下，身体成一条直线，不塌腰不撅臀"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [
+  "腰",
+  "肩"
+ ],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 1.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": null
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "前臂平板支撑"
+    },
+    "ms": {
+     "zh": 1416
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "前臂平板支撑，练腹部和腰两侧"
+    },
+    "ms": {
+     "zh": 3111
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "肘在肩正下方"
+    },
+    "ms": {
+     "zh": 1300
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "肘在肩下，身体成一条直线，不塌腰不撅臀"
+    },
+    "ms": {
+     "zh": 4063
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，肘在肩下，身体成一条直线，不塌腰不撅臀"
+    },
+    "ms": {
+     "zh": 6571
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "前臂平板支撑，完成"
+    },
+    "ms": {
+     "zh": 2159
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub Drive archive green-screen master, keyed onto #101013 by tools/media/prepare_media.py",
+  "mediaSource": "pose-hub-drive-greenscreen",
+  "spec": "drill-anim/specs/h-forearm-plank.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 7182,
+   "sha256": "4d9fb1dbfaa8aa1881b38a83d0bd54f5af8f8841683a5200213c30577375bf90"
+  },
+  "demo.mp4": {
+   "bytes": 69142,
+   "sha256": "27a4b53f5a04d9891f2c576221daeb25ce9e7d6060d1ac2fce91dec7e9f11842"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 11748,
+   "sha256": "cbfc8cdc87746fce07408e26598af8110f7e81671c54ed7fdf3d1a0b48a8a751"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 34346,
+   "sha256": "c4fa64c3be4504071d794878ae69f699ddcdf20b88f3278d248145c9c1661478"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 18877,
+   "sha256": "fc1614dd0e4c64e09ab6aacec48030fd79b8496d29d6190001cba29de4bedd91"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 26494,
+   "sha256": "312633268233e6f64b8cfbc3ba8ccd433a232b455738e38912e8ab41b2dfa416"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 12666,
+   "sha256": "9ac1d48e310d62255b338377895b15acb6945d2c6651b6429f65b4bf4815720b"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 55175,
+   "sha256": "612738331a3509f446fe1cc7871cb89e344682985aa4538668cacab630ed7329"
+  }
+ }
+}

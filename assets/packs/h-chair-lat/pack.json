@@ -1,0 +1,167 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "h-chair-lat",
+ "version": "1.0.0",
+ "name": {
+  "zh": "扶椅背阔肌拉伸",
+  "en": "Chair-Supported Lat Stretch"
+ },
+ "category": "stretch",
+ "muscles": [
+  "背阔肌"
+ ],
+ "muscleGroups": [
+  "lats"
+ ],
+ "equipment": [
+  "chair"
+ ],
+ "position": "standing",
+ "unilateral": false,
+ "level": 1,
+ "scenes": [
+  "home",
+  "office"
+ ],
+ "defaultDose": {
+  "mode": "time",
+  "sets": 1,
+  "seconds": 30,
+  "restSeconds": 10
+ },
+ "cues": {
+  "zh": [
+   "双手扶椅，臀部向后推，胸口下沉",
+   "胸口下沉，感觉腋下拉长"
+  ]
+ },
+ "primaryCue": 0,
+ "cautions": [],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 1.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": null
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "扶椅背阔肌拉伸"
+    },
+    "ms": {
+     "zh": 1556
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "扶椅背阔肌拉伸，拉伸背部"
+    },
+    "ms": {
+     "zh": 2577
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "双手扶椅，臀部向后推，胸口下沉"
+    },
+    "ms": {
+     "zh": 3460
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "胸口下沉，感觉腋下拉长"
+    },
+    "ms": {
+     "zh": 2485
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，胸口下沉，感觉腋下拉长"
+    },
+    "ms": {
+     "zh": 4992
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "扶椅背阔肌拉伸，完成"
+    },
+    "ms": {
+     "zh": 2252
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub Drive archive green-screen master, keyed onto #101013 by tools/media/prepare_media.py",
+  "mediaSource": "pose-hub-drive-greenscreen",
+  "spec": "drill-anim/specs/h-chair-lat.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 9018,
+   "sha256": "71cd9892e0cf29c63f8ac6588a4decdf81051c2eaf9acfa7a07ba334d4f88c12"
+  },
+  "demo.mp4": {
+   "bytes": 121828,
+   "sha256": "ca61f37bb01507d3f43b5a865026e5bc74622b8c0ca0c6d68f120540c2f717e9"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 29383,
+   "sha256": "8080ee354e921722e1542ff17dab7c2dc6049d791c5a79e4baa4c168d7109a77"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 21454,
+   "sha256": "b84b439c39afd3df08b4641358437748f260967e48d9d73d6886ff5cf7ff6b0e"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 19653,
+   "sha256": "44fb6408bab5a0664b3de3c07a8afa4eb3f87b04d8142f8944b81cfd213c4754"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 22196,
+   "sha256": "c9149cf8cdc565ba5e0097bc36e0be48193c6b1b42c1291076c751e52dbdf8a2"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 13808,
+   "sha256": "ec6b4dc6a2f5879db29638673708228e1e54ace2ca50ba7725771a1275626d90"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 41941,
+   "sha256": "92347f185c545519deb0993b2ad9d0e1874a78b701705cbd1bf090296235f289"
+  }
+ }
+}

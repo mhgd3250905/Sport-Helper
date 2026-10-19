@@ -1,0 +1,183 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "h-sumo-pry",
+ "version": "1.0.0",
+ "name": {
+  "zh": "相扑深蹲肘推膝停留",
+  "en": "Sumo Squat Hold with Elbow Pry"
+ },
+ "category": "stretch",
+ "muscles": [
+  "大腿内侧",
+  "臀大肌"
+ ],
+ "muscleGroups": [
+  "adductors",
+  "glute-max"
+ ],
+ "equipment": [],
+ "position": "standing",
+ "unilateral": false,
+ "level": 3,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "time",
+  "sets": 1,
+  "seconds": 30,
+  "restSeconds": 10
+ },
+ "cues": {
+  "zh": [
+   "宽站深蹲，手合十",
+   "蹲低，手肘把膝盖轻轻向外推",
+   "肘把膝往外推，胸口挺起"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [
+  "膝"
+ ],
+ "contraindications": [],
+ "alternative": "h-squat",
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 2.6,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": null
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "相扑深蹲肘推膝停留"
+    },
+    "ms": {
+     "zh": 2043
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "相扑深蹲肘推膝停留，拉伸大腿内侧和臀部"
+    },
+    "ms": {
+     "zh": 4040
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "宽站深蹲，手合十"
+    },
+    "ms": {
+     "zh": 1950
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "蹲低，手肘把膝盖轻轻向外推"
+    },
+    "ms": {
+     "zh": 2926
+    }
+   },
+   {
+    "id": "cue3",
+    "role": "cue",
+    "text": {
+     "zh": "肘把膝往外推，胸口挺起"
+    },
+    "ms": {
+     "zh": 2392
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，肘把膝往外推，胸口挺起"
+    },
+    "ms": {
+     "zh": 4853
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "相扑深蹲肘推膝停留，完成"
+    },
+    "ms": {
+     "zh": 2717
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub v0.2.0 dark soft-v1 clip (as frozen in HipLab), re-encoded 720²",
+  "mediaSource": "pose-hub-v0.2.0",
+  "spec": "drill-anim/specs/h-sumo-pry.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 9164,
+   "sha256": "829493f95298e5a803c9217df2744eaf07b08f0da276052b736e41a7b23c3a2d"
+  },
+  "demo.mp4": {
+   "bytes": 134627,
+   "sha256": "57b7f21792d5f6a2056437b0b941cbb860ee27c31076c331b3824a9fdab8260c"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 17120,
+   "sha256": "39370ce55ab8f42527518aa1efd20ab796ed1264c6977110a3adcc55f0517841"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 24945,
+   "sha256": "05e58eeb45e226e2fa67b436504fe19208541bb6653215b88bfd3e68c5727461"
+  },
+  "voice/zh/cue3.m4a": {
+   "bytes": 20749,
+   "sha256": "7d1252edf3bc62398f8db2ff789838ebbe662842abaf9932a65c6c0c0c0e2d7e"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 23479,
+   "sha256": "90b376fdd93c7470e493c5d8b82e858dac96edcaa6a8923f62c92a5a0d2b762b"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 34286,
+   "sha256": "3d7254cf9cebe8d79798b8254724e35df214aba223217fcafb3d19f66d2b8589"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 17793,
+   "sha256": "24711c6a37595209e5961c1634a7262f4064ea09530c79f433e295033363b828"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 40922,
+   "sha256": "42a26a6c818c2952f61e105c74230f39386fd462123b897d56feba848c014037"
+  }
+ }
+}

@@ -1,0 +1,166 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "s-butterfly",
+ "version": "1.0.0",
+ "name": {
+  "zh": "蝴蝶式",
+  "en": "Seated Butterfly Stretch"
+ },
+ "category": "stretch",
+ "muscles": [
+  "大腿内侧"
+ ],
+ "muscleGroups": [
+  "adductors"
+ ],
+ "equipment": [
+  "mat"
+ ],
+ "position": "seated",
+ "unilateral": false,
+ "level": 1,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "time",
+  "sets": 1,
+  "seconds": 40,
+  "restSeconds": 10
+ },
+ "cues": {
+  "zh": [
+   "脚心对脚心，坐直，让膝盖自然落下",
+   "膝盖自然下落，不硬压"
+  ]
+ },
+ "primaryCue": 0,
+ "cautions": [],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 3.8,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": null
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "蝴蝶式"
+    },
+    "ms": {
+     "zh": 813
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "蝴蝶式，拉伸大腿内侧"
+    },
+    "ms": {
+     "zh": 2299
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "脚心对脚心，坐直，让膝盖自然落下"
+    },
+    "ms": {
+     "zh": 3367
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "膝盖自然下落，不硬压"
+    },
+    "ms": {
+     "zh": 2113
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，膝盖自然下落，不硬压"
+    },
+    "ms": {
+     "zh": 4574
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "蝴蝶式，完成"
+    },
+    "ms": {
+     "zh": 1533
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub v0.2.0 dark soft-v1 clip (as frozen in HipLab), re-encoded 720²",
+  "mediaSource": "pose-hub-v0.2.0",
+  "spec": "drill-anim/specs/s-butterfly.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 10174,
+   "sha256": "9bee1e6d948efb53bcd9e3528c5380aa5fdc0f5b79512a017f72c81cfdd8ac6b"
+  },
+  "demo.mp4": {
+   "bytes": 115417,
+   "sha256": "ca9b14b9fc27abc5c9b4d3b70c5d8fc24c072196d35a14b0ea92296fe977b285"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 28769,
+   "sha256": "805e1f9939f009eeff07e56d63cae601fd96dd9ad13ddf0422b37e10cb87f585"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 18484,
+   "sha256": "a28447e86594e61cc9b18b5900fbd2ce045e4c84b42f410926ab2ab55043283e"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 13714,
+   "sha256": "296ca9672aa296340c63b13ea149bde1421fc4b770448eaa00e02f9053aa5e57"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 19856,
+   "sha256": "fda8c313c06bb5e8b0553e546a46163ee8d86066c08a302429b10e5b33846558"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 7785,
+   "sha256": "910c3665181a331caa7ae221e8aa857891853d9a856e9e0497b09b3d2abe20e1"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 38595,
+   "sha256": "0e54775ac93890ef7b5682398e85c425a29e6e88168e60da0273451803a9fde5"
+  }
+ }
+}

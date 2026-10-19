@@ -1,0 +1,170 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "h-chair-tspine",
+ "version": "1.0.0",
+ "name": {
+  "zh": "跪姿椅面胸椎伸展",
+  "en": "Kneeling Chair Thoracic Extension"
+ },
+ "category": "stretch",
+ "muscles": [
+  "背阔肌",
+  "竖脊肌"
+ ],
+ "muscleGroups": [
+  "lats",
+  "erectors"
+ ],
+ "equipment": [
+  "chair"
+ ],
+ "position": "kneeling",
+ "unilateral": false,
+ "level": 1,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "time",
+  "sets": 1,
+  "seconds": 30,
+  "restSeconds": 10
+ },
+ "cues": {
+  "zh": [
+   "跪姿，手肘放椅面",
+   "手肘搭椅面，胸口慢慢下沉"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [
+  "肩"
+ ],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 1.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": null
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "跪姿椅面胸椎伸展"
+    },
+    "ms": {
+     "zh": 1672
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "跪姿椅面胸椎伸展，拉伸背部和下背"
+    },
+    "ms": {
+     "zh": 3228
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "跪姿，手肘放椅面"
+    },
+    "ms": {
+     "zh": 1834
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "手肘搭椅面，胸口慢慢下沉"
+    },
+    "ms": {
+     "zh": 2717
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，手肘搭椅面，胸口慢慢下沉"
+    },
+    "ms": {
+     "zh": 5155
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "跪姿椅面胸椎伸展，完成"
+    },
+    "ms": {
+     "zh": 2392
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub Drive archive green-screen master, keyed onto #101013 by tools/media/prepare_media.py",
+  "mediaSource": "pose-hub-drive-greenscreen",
+  "spec": "drill-anim/specs/h-chair-tspine.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 7413,
+   "sha256": "7e30d4316755506f6614ab172d6fc50fdd7ca38f947c31366716c5cabd1eb6ff"
+  },
+  "demo.mp4": {
+   "bytes": 85615,
+   "sha256": "aab24788a76d9cefb6b2410990ce30bb2969aa591e97b895669d099ecee5eef2"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 16184,
+   "sha256": "fb139b3eb95a14ae36338819cda0cc6897eaf08a1067c922867c3dd7271caf52"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 23468,
+   "sha256": "8f68669f33a92caa1b4339bb7c8c3de1207f7527cd00b7709c1e4b682e430b6d"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 20742,
+   "sha256": "3d4d7a2ee1fb45ae2665837f7857a34435ca1a01be9f67862c9a1b8999a169a2"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 27627,
+   "sha256": "0fb40746b3f3dd557fb272fd2b230965f54ab0fae0ec1407485c7e0c386c6880"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 14892,
+   "sha256": "2a13116ac5a93d53e2c7853faf27ae4d8118bb12ab64ba90b502af4238441486"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 43313,
+   "sha256": "33c87e829a5603dd0f299001eb07edc4778206ac1cd75f8cffe41381df7bfa37"
+  }
+ }
+}

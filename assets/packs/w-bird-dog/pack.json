@@ -1,0 +1,168 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "w-bird-dog",
+ "version": "1.0.0",
+ "name": {
+  "zh": "鸟狗式",
+  "en": "Bird Dog"
+ },
+ "category": "core",
+ "muscles": [
+  "竖脊肌"
+ ],
+ "muscleGroups": [
+  "erectors"
+ ],
+ "equipment": [
+  "mat"
+ ],
+ "position": "quadruped",
+ "unilateral": false,
+ "level": 1,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "reps",
+  "sets": 2,
+  "reps": 10,
+  "restSeconds": 30
+ },
+ "cues": {
+  "zh": [
+   "手在肩下、膝在髋下",
+   "对侧手脚伸直，背部保持水平不晃"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [
+  "膝"
+ ],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 1.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": 4.0
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "鸟狗式"
+    },
+    "ms": {
+     "zh": 836
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "鸟狗式，练下背"
+    },
+    "ms": {
+     "zh": 1672
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "手在肩下、膝在髋下"
+    },
+    "ms": {
+     "zh": 2043
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "对侧手脚伸直，背部保持水平不晃"
+    },
+    "ms": {
+     "zh": 3065
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，对侧手脚伸直，背部保持水平不晃"
+    },
+    "ms": {
+     "zh": 5619
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "鸟狗式，完成"
+    },
+    "ms": {
+     "zh": 1533
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub Drive archive green-screen master, keyed onto #101013 by tools/media/prepare_media.py",
+  "mediaSource": "pose-hub-drive-greenscreen",
+  "spec": "drill-anim/specs/w-bird-dog.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 6133,
+   "sha256": "a61c82bbaa5ae6f61b6c0032239e3049d0e6427e786646b962cec9a4526768b8"
+  },
+  "demo.mp4": {
+   "bytes": 86774,
+   "sha256": "d19f44e9b6dfd87e04bc954d342b093b87edd6025976250abf9fba617cfd186a"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 17887,
+   "sha256": "c442db3d1271840a1cd20aee2a8ff48aeb0ff80e5f3d1237facd7432c0948d73"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 26096,
+   "sha256": "c8e4d5b33609bd29cb3c28200997ddd84be6b7ea9fde7be701b40fb186cbcd75"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 13548,
+   "sha256": "b124605a2aa60cc4f0fdc09e77ecf20b3415d455d3cc15ff1b64c2d8b93a67d0"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 14673,
+   "sha256": "054c9b81dcf66360b1cfa66b34b7bd4359a307003f8044265137b66de301119a"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 8045,
+   "sha256": "ccb4f1315c88e46d9ad7b2905b17dc8d2948825fc53ea081c4cfac6a7d54c6d2"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 47072,
+   "sha256": "81404233d96323a5fc61b826de41f373a26e570b14d0158c6233917e02743383"
+  }
+ }
+}

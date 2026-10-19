@@ -1,0 +1,148 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "t-seated-straddle-lift-1leg",
+ "version": "1.0.0",
+ "name": {
+  "zh": "坐姿分腿单腿抬起"
+ },
+ "category": "core",
+ "muscles": [
+  "髋屈肌"
+ ],
+ "muscleGroups": [],
+ "equipment": [
+  "mat"
+ ],
+ "position": "seated",
+ "unilateral": false,
+ "level": 3,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "reps",
+  "sets": 2,
+  "reps": 8,
+  "restSeconds": 30
+ },
+ "cues": {
+  "zh": [
+   "分腿坐直，一条腿抬离地面"
+  ]
+ },
+ "primaryCue": 0,
+ "cautions": [],
+ "contraindications": [],
+ "alternative": "n-leg-circles",
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 0.9,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": 3.0
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "坐姿分腿单腿抬起"
+    },
+    "ms": {
+     "zh": 1858
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "坐姿分腿单腿抬起，练髋前侧"
+    },
+    "ms": {
+     "zh": 2972
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "分腿坐直，一条腿抬离地面"
+    },
+    "ms": {
+     "zh": 2485
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，分腿坐直，一条腿抬离地面"
+    },
+    "ms": {
+     "zh": 4992
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "坐姿分腿单腿抬起，完成"
+    },
+    "ms": {
+     "zh": 2554
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub v0.2.0 dark soft-v1 clip (as frozen in HipLab), re-encoded 720²",
+  "mediaSource": "pose-hub-v0.2.0",
+  "spec": null,
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 8828,
+   "sha256": "d308af262cd3635cf05bf95f33d4f7bfa56d6238dde34a4c97623cdcc52cd261"
+  },
+  "demo.mp4": {
+   "bytes": 157863,
+   "sha256": "dd05cf9081163b380d73c7f3f672362ed724e89f08c80cdcc1ea786e0465df04"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 21487,
+   "sha256": "e068f3d144911faf5dd972e7072590ddde98a9fd81915e2e350a41f8e13b91c7"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 22073,
+   "sha256": "2eb96e4ce4e37da2aa8cbe6faefb285dd1e77a3fdbbd0fabd0c813898ff81dc4"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 25383,
+   "sha256": "b734b91257c69bdc3b1e688245652fa87326abab596b3a3ab6ecbbdef37f6599"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 16270,
+   "sha256": "b9db0febb6f5d9302515ddaf29c13519186e877b4201aea9875053388abab3b9"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 41169,
+   "sha256": "b98a257e19e22f6e98b9154ac18ed1115c63d7934155ebb2653378e3a0596ea9"
+  }
+ }
+}

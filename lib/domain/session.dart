@@ -33,6 +33,7 @@ class SessionPhase {
     this.repSeconds,
     this.nextExerciseId,
     this.nextItem,
+    this.doneExerciseId,
   });
 
   final PhaseKind kind;
@@ -63,6 +64,9 @@ class SessionPhase {
   /// During rest: what comes next (null when the next set is the same item).
   final String? nextExerciseId;
   final PlanItem? nextItem;
+
+  /// During the rest after an exercise: the one just finished (for "X，完成").
+  final String? doneExerciseId;
 
   bool get isWork => kind == PhaseKind.work;
 
@@ -213,6 +217,7 @@ class SessionBuilder {
             blockName: n.block.name,
             nextExerciseId: n.item.exerciseId,
             nextItem: n.item,
+            doneExerciseId: o.item.exerciseId,
           ),
         );
       }

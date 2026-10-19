@@ -1,0 +1,168 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "h-banana",
+ "version": "1.0.0",
+ "name": {
+  "zh": "仰卧香蕉式侧伸",
+  "en": "Supine Banana Stretch"
+ },
+ "category": "stretch",
+ "muscles": [
+  "腹斜肌",
+  "背阔肌"
+ ],
+ "muscleGroups": [
+  "obliques",
+  "lats"
+ ],
+ "equipment": [
+  "mat"
+ ],
+ "position": "supine",
+ "unilateral": false,
+ "level": 1,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "time",
+  "sets": 1,
+  "seconds": 30,
+  "restSeconds": 10
+ },
+ "cues": {
+  "zh": [
+   "仰卧，手脚同侧移动",
+   "仰卧把身体弯成香蕉形，感受体侧拉长"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 1.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": null
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "仰卧香蕉式侧伸"
+    },
+    "ms": {
+     "zh": 1556
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "仰卧香蕉式侧伸，拉伸腰两侧和背部"
+    },
+    "ms": {
+     "zh": 3344
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "仰卧，手脚同侧移动"
+    },
+    "ms": {
+     "zh": 1950
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "仰卧把身体弯成香蕉形，感受体侧拉长"
+    },
+    "ms": {
+     "zh": 3553
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，仰卧把身体弯成香蕉形，感受体侧拉长"
+    },
+    "ms": {
+     "zh": 6084
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "仰卧香蕉式侧伸，完成"
+    },
+    "ms": {
+     "zh": 2252
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub Drive archive green-screen master, keyed onto #101013 by tools/media/prepare_media.py",
+  "mediaSource": "pose-hub-drive-greenscreen",
+  "spec": "drill-anim/specs/h-banana.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 6561,
+   "sha256": "b0d34810a7bb09f2a692b8247e77afa8bf414ec94d761724bf0b1a3155ba8e23"
+  },
+  "demo.mp4": {
+   "bytes": 94515,
+   "sha256": "092d3a04290c31b1271cdaa6af91ab94ed576da8ca33a7915278c11cbe0a4f09"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 17159,
+   "sha256": "d4f8e39a0d67317db9b1409ae8db414e4abde116a0cb78d966e5b8bfaba05f4f"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 30100,
+   "sha256": "1471abb0d02fd56b402e9de3e2d4516be91ef24350a70201d711a88bb996f2a5"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 19370,
+   "sha256": "7de3fae8cc7d743e8db5cf2b561a364705bce77e12cde9007dec7b06f9f1854f"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 28371,
+   "sha256": "de25d1c26f5481907d7abe58b9698e2cb38ae0e3a826733197ac5c861640fa9a"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 13796,
+   "sha256": "08988406821db3d009eeee0afe81f2d54ba654a7bcc01a1146aa137b183a9a41"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 50948,
+   "sha256": "92fef9611c90ff026a2f5c933ee67cce31cad2239b928c02ae3c5e8ee0374dc6"
+  }
+ }
+}

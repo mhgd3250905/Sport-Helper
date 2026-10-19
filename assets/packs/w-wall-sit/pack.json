@@ -1,0 +1,185 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "w-wall-sit",
+ "version": "1.0.0",
+ "name": {
+  "zh": "靠墙静蹲",
+  "en": "Wall Sit"
+ },
+ "category": "strength",
+ "muscles": [
+  "股四头肌",
+  "臀大肌"
+ ],
+ "muscleGroups": [
+  "quadriceps",
+  "glute-max"
+ ],
+ "equipment": [
+  "wall"
+ ],
+ "position": "standing",
+ "unilateral": false,
+ "level": 2,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "time",
+  "sets": 3,
+  "seconds": 30,
+  "restSeconds": 30
+ },
+ "cues": {
+  "zh": [
+   "背贴墙下滑，膝约 90 度",
+   "背贴墙，大腿接近水平，膝盖在脚踝上方",
+   "膝盖对准脚尖，均匀呼吸"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [
+  "膝"
+ ],
+ "contraindications": [],
+ "alternative": "h-squat",
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 1.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": null
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "靠墙静蹲"
+    },
+    "ms": {
+     "zh": 998
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "靠墙静蹲，练大腿前侧和臀部"
+    },
+    "ms": {
+     "zh": 2856
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "背贴墙下滑，膝约 90 度"
+    },
+    "ms": {
+     "zh": 2276
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "背贴墙，大腿接近水平，膝盖在脚踝上方"
+    },
+    "ms": {
+     "zh": 3901
+    }
+   },
+   {
+    "id": "cue3",
+    "role": "cue",
+    "text": {
+     "zh": "膝盖对准脚尖，均匀呼吸"
+    },
+    "ms": {
+     "zh": 2392
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，膝盖对准脚尖，均匀呼吸"
+    },
+    "ms": {
+     "zh": 4876
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "靠墙静蹲，完成"
+    },
+    "ms": {
+     "zh": 1718
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub Drive archive green-screen master, keyed onto #101013 by tools/media/prepare_media.py",
+  "mediaSource": "pose-hub-drive-greenscreen",
+  "spec": "drill-anim/specs/w-wall-sit.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 9283,
+   "sha256": "d8ea17359c070fef43b1943354b10faaa78e7e9626328ed9825f91ffe7839a56"
+  },
+  "demo.mp4": {
+   "bytes": 95620,
+   "sha256": "39f626be8cb41f15f5b86634aeae9eaa56082f641cc23d6e18fd362c136e324a"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 19767,
+   "sha256": "bbbdc74a5972bc74d338bf874cba75f7a58ccee760a6779532dace66050e43b4"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 33146,
+   "sha256": "8d9feaed086e541cc5013f1cc306629ecbdc6856c8d1e9b0f5adaa113523e4e8"
+  },
+  "voice/zh/cue3.m4a": {
+   "bytes": 20590,
+   "sha256": "d001b415cddf9bf767cd0edf270fb66343273573ad201465f144d0d8385461c9"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 15231,
+   "sha256": "bd2749e2b8a5a4838faaf801e8f454e301463d600b7f417d2b745e809e6d2a82"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 24595,
+   "sha256": "6e57007ff47893d5e52550de145b6720a9703d968c1c5a5824ed3d4193c34caf"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 9206,
+   "sha256": "9842573e1f32add51b9f61413738d7e5f892b8661d7087cd468dc4b85a718bff"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 40359,
+   "sha256": "d9941205702e541a48fb97592eeb1c9bd5b7196dab4cde775f3383bdc6e898f3"
+  }
+ }
+}

@@ -1,0 +1,180 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "o-stand-sidebend",
+ "version": "1.0.0",
+ "name": {
+  "zh": "站姿举手侧屈",
+  "en": "Standing Overhead Side Bend"
+ },
+ "category": "stretch",
+ "muscles": [
+  "腹斜肌"
+ ],
+ "muscleGroups": [
+  "obliques"
+ ],
+ "equipment": [],
+ "position": "standing",
+ "unilateral": true,
+ "level": 1,
+ "scenes": [
+  "home",
+  "office"
+ ],
+ "defaultDose": {
+  "mode": "time",
+  "sets": 1,
+  "seconds": 30,
+  "restSeconds": 10
+ },
+ "cues": {
+  "zh": [
+   "手举过头，双脚站稳",
+   "手臂举过头，身体向侧面弯，不前倾"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 1.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": null,
+  "showsSide": "right"
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "站姿举手侧屈"
+    },
+    "ms": {
+     "zh": 1440
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "站姿举手侧屈，拉伸腰两侧"
+    },
+    "ms": {
+     "zh": 2647
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "手举过头，双脚站稳"
+    },
+    "ms": {
+     "zh": 2043
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "手臂举过头，身体向侧面弯，不前倾"
+    },
+    "ms": {
+     "zh": 3437
+    }
+   },
+   {
+    "id": "side_switch",
+    "role": "side_switch",
+    "text": {
+     "zh": "左侧同样，手臂举过头，身体向侧面弯，不前倾"
+    },
+    "ms": {
+     "zh": 4481
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，手臂举过头，身体向侧面弯，不前倾"
+    },
+    "ms": {
+     "zh": 5851
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "站姿举手侧屈，完成"
+    },
+    "ms": {
+     "zh": 2113
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub Drive archive green-screen master, keyed onto #101013 by tools/media/prepare_media.py",
+  "mediaSource": "pose-hub-drive-greenscreen",
+  "spec": "drill-anim/specs/o-stand-sidebend.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 6300,
+   "sha256": "667d4abf41bebb2a9351b7b4505dfa68d63b7fc4f1facf5865e8549eecc65fa2"
+  },
+  "demo.mp4": {
+   "bytes": 51131,
+   "sha256": "7e0602e45f170d2544cdb32f3807dcc94d831705f0620a2a0922bd49ebdf3560"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 17943,
+   "sha256": "aad23dd42c39475d10bfe197d60432ca239ed7cf94cd773435b43012a36d11a4"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 29337,
+   "sha256": "68567c1a43c78d8b9ebedb52f943ebf82ed27e45596897f1315566363cf52dae"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 18373,
+   "sha256": "eedabec9940b577b37b720c3db4e8a471a1a2b9f78e96eda6f8936e9dcaa6eb2"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 22869,
+   "sha256": "47efac6b66b191b84defcd55dc364a73013cfbad84d64b54228f062febfae791"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 12769,
+   "sha256": "8e910c8f1c009eb8cffa157bd0e1f65496ee4e553c49fb400417c9fef89ee746"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 49129,
+   "sha256": "5d12f4a0b2d8273f8f3dccdfbd44874310b49f4e33c255adca852f858a6817bd"
+  },
+  "voice/zh/side_switch.m4a": {
+   "bytes": 37962,
+   "sha256": "f2c38069b0d7e40d3e9844a7468d93e4bf61fc10038ae0f3a67d6d5863dc18e5"
+  }
+ }
+}

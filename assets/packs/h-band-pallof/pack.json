@@ -1,0 +1,166 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "h-band-pallof",
+ "version": "1.0.0",
+ "name": {
+  "zh": "弹力带抗旋转推",
+  "en": "Banded Pallof Press"
+ },
+ "category": "core",
+ "muscles": [
+  "腹斜肌"
+ ],
+ "muscleGroups": [
+  "obliques"
+ ],
+ "equipment": [
+  "band"
+ ],
+ "position": "standing",
+ "unilateral": false,
+ "level": 2,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "reps",
+  "sets": 2,
+  "reps": 10,
+  "restSeconds": 30
+ },
+ "cues": {
+  "zh": [
+   "侧对锚点站稳",
+   "双手向前推直，身体不被弹力带拉转"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 1.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": 4.0
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "弹力带抗旋转推"
+    },
+    "ms": {
+     "zh": 1509
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "弹力带抗旋转推，练腰两侧"
+    },
+    "ms": {
+     "zh": 2601
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "侧对锚点站稳"
+    },
+    "ms": {
+     "zh": 1347
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "双手向前推直，身体不被弹力带拉转"
+    },
+    "ms": {
+     "zh": 3390
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，双手向前推直，身体不被弹力带拉转"
+    },
+    "ms": {
+     "zh": 5898
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "弹力带抗旋转推，完成"
+    },
+    "ms": {
+     "zh": 2299
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub Drive archive green-screen master, keyed onto #101013 by tools/media/prepare_media.py",
+  "mediaSource": "pose-hub-drive-greenscreen",
+  "spec": "drill-anim/specs/h-band-pallof.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 7923,
+   "sha256": "d1780038f7d31b40c22226079514f1546464ba21b77911d98586deb4a49c6832"
+  },
+  "demo.mp4": {
+   "bytes": 72448,
+   "sha256": "26f532b6abbf2c2d7704e5aa252f53865627a7edbbb75b263bab113b5ec6fc67"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 12179,
+   "sha256": "74b4d1445384fec16fe51e2f7d288ac0138d4b5e69ac3a5973c2542a5f32f947"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 28807,
+   "sha256": "030e682aa993537a6bcb14db902676eac3096752a7d1ac4defef29a9518038cb"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 19858,
+   "sha256": "d9fd712d089d435d11bb47c150a4f6887326f6a62fd1f4a1cd64fa99f5615095"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 22497,
+   "sha256": "a3d3a819fcce5b9899ab0ef234b967b6e5bb4935c747e7869e516c1885b01afd"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 13469,
+   "sha256": "d4f70b65e7fbd69866e7d2b997e144c1ecf452f92b90d6e6c4e6b5a3a4ea7999"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 49365,
+   "sha256": "c9a82e727312aa1af186bcb1c252eec64962483ba5938a93d7b8c9307de8e182"
+  }
+ }
+}

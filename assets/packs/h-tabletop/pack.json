@@ -1,0 +1,186 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "h-tabletop",
+ "version": "1.0.0",
+ "name": {
+  "zh": "桌面式后撑抬髋",
+  "en": "Reverse Tabletop Bridge"
+ },
+ "category": "strength",
+ "muscles": [
+  "胸大肌",
+  "三角肌"
+ ],
+ "muscleGroups": [
+  "chest",
+  "deltoids"
+ ],
+ "equipment": [
+  "mat"
+ ],
+ "position": "seated",
+ "unilateral": false,
+ "level": 1,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "reps",
+  "sets": 2,
+  "reps": 10,
+  "restSeconds": 30
+ },
+ "cues": {
+  "zh": [
+   "手在肩后，指尖朝前",
+   "手在肩下，推地把臀部抬到桌面高度",
+   "顶髋成桌面，胸口打开"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [
+  "手腕",
+  "肩"
+ ],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 1.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": 4.0
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "桌面式后撑抬髋"
+    },
+    "ms": {
+     "zh": 1556
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "桌面式后撑抬髋，练胸部和肩膀"
+    },
+    "ms": {
+     "zh": 2926
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "手在肩后，指尖朝前"
+    },
+    "ms": {
+     "zh": 2113
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "手在肩下，推地把臀部抬到桌面高度"
+    },
+    "ms": {
+     "zh": 3344
+    }
+   },
+   {
+    "id": "cue3",
+    "role": "cue",
+    "text": {
+     "zh": "顶髋成桌面，胸口打开"
+    },
+    "ms": {
+     "zh": 2229
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，顶髋成桌面，胸口打开"
+    },
+    "ms": {
+     "zh": 4760
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "桌面式后撑抬髋，完成"
+    },
+    "ms": {
+     "zh": 2252
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub Drive archive green-screen master, keyed onto #101013 by tools/media/prepare_media.py",
+  "mediaSource": "pose-hub-drive-greenscreen",
+  "spec": "drill-anim/specs/h-tabletop.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 7276,
+   "sha256": "6dc0c7a72e84783cfcdd4d05ebd68ea351fc4fdb1e659a779c15092818b60b81"
+  },
+  "demo.mp4": {
+   "bytes": 127274,
+   "sha256": "91ce58eb24f290b68ed2557bd9eab7dcd6c291c521700f272392160fe4e05600"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 18504,
+   "sha256": "ea33a91ae419001fc9e7cd990bc78c1c271665a04ebbb1911ea07d929d61e42d"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 28547,
+   "sha256": "c2dd42035ea3983837041a1b3e938ad4d0137aab4239dacc10cbbfaa8efff89b"
+  },
+  "voice/zh/cue3.m4a": {
+   "bytes": 19455,
+   "sha256": "eee9f020336b2f14862cc7ba4a681b86aba04795189612f93165f867343fbc24"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 19599,
+   "sha256": "f43479a04d5866b310a9ea51c8341d00b20abccce85dd1fd818a0077c5807a2c"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 25165,
+   "sha256": "412d5137375f5ca856711042ea445e77c1ca1be55b99ab293627fb842629d5c0"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 13877,
+   "sha256": "da2370ec21fa8ff262a4da3b8b1dd0c6f399e81e7ed5ee35db315d19366277bf"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 40021,
+   "sha256": "75d99654ca78a5f8c9b95b57df0390b50ab2084f928c375710d4655b5199a5d9"
+  }
+ }
+}

@@ -1,0 +1,155 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "h-db-reverse-fly",
+ "version": "1.0.0",
+ "name": {
+  "zh": "哑铃俯身飞鸟",
+  "en": "Bent-Over Dumbbell Reverse Fly"
+ },
+ "category": "strength",
+ "muscles": [
+  "三角肌",
+  "菱形肌·中下斜方"
+ ],
+ "muscleGroups": [
+  "deltoids",
+  "scapular"
+ ],
+ "equipment": [
+  "dumbbell"
+ ],
+ "position": "standing",
+ "unilateral": false,
+ "level": 2,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "reps",
+  "sets": 3,
+  "reps": 12,
+  "restSeconds": 30
+ },
+ "cues": {
+  "zh": [
+   "俯身背平，双臂向两侧打开，夹紧肩胛"
+  ]
+ },
+ "primaryCue": 0,
+ "cautions": [
+  "腰"
+ ],
+ "contraindications": [],
+ "alternative": "h-band-pull-apart",
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 1.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": 4.0
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "哑铃俯身飞鸟"
+    },
+    "ms": {
+     "zh": 1370
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "哑铃俯身飞鸟，练肩膀和上背"
+    },
+    "ms": {
+     "zh": 2833
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "俯身背平，双臂向两侧打开，夹紧肩胛"
+    },
+    "ms": {
+     "zh": 3924
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，俯身背平，双臂向两侧打开，夹紧肩胛"
+    },
+    "ms": {
+     "zh": 6432
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "哑铃俯身飞鸟，完成"
+    },
+    "ms": {
+     "zh": 2113
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub Drive archive green-screen master, keyed onto #101013 by tools/media/prepare_media.py",
+  "mediaSource": "pose-hub-drive-greenscreen",
+  "spec": "drill-anim/specs/h-db-reverse-fly.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 8747,
+   "sha256": "adaefd8dcebed0f7e7aba62d564f54954b46c6d8c1732a4d373b1f1591397d29"
+  },
+  "demo.mp4": {
+   "bytes": 124030,
+   "sha256": "88bfb5101f2c1af8a7fdc9cf69e18f335f6ac6602071e01f791bea72b349badd"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 33307,
+   "sha256": "63062858f8bf5f8d5610a3c0ee87414442d992bca87fc8e506db9e80df63839f"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 18454,
+   "sha256": "fb88b1bd82895735455cb4b662f74d035977e0e34c0346b962104ec275b05fe0"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 24234,
+   "sha256": "78dcf585b48feae64f12b15371b74650f6a85128f4904a0c8a9e299e02c6fa9c"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 12250,
+   "sha256": "e5f5e3f259552ab145b2a1585062fdc2b5c7f651527b61b502c7baf5eff8948c"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 53782,
+   "sha256": "4bb5596aa67b71add62677e8d0ff98dc246adf6ddd91120672d9e45c12b1910d"
+  }
+ }
+}

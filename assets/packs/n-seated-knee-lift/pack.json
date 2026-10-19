@@ -1,0 +1,167 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "n-seated-knee-lift",
+ "version": "1.0.0",
+ "name": {
+  "zh": "坐姿抬膝悬停",
+  "en": "Seated Knee Lift Hover"
+ },
+ "category": "core",
+ "muscles": [
+  "髋屈肌"
+ ],
+ "muscleGroups": [
+  "hip-flexors"
+ ],
+ "equipment": [
+  "chair"
+ ],
+ "position": "seated",
+ "unilateral": false,
+ "level": 1,
+ "scenes": [
+  "home",
+  "office"
+ ],
+ "defaultDose": {
+  "mode": "time",
+  "sets": 2,
+  "seconds": 30,
+  "restSeconds": 30
+ },
+ "cues": {
+  "zh": [
+   "坐直，膝盖抬起，悬停住",
+   "抬膝离开椅面，停 3 秒"
+  ]
+ },
+ "primaryCue": 0,
+ "cautions": [],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 2.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": null
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "坐姿抬膝悬停"
+    },
+    "ms": {
+     "zh": 1416
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "坐姿抬膝悬停，练髋前侧"
+    },
+    "ms": {
+     "zh": 2485
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "坐直，膝盖抬起，悬停住"
+    },
+    "ms": {
+     "zh": 2577
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "抬膝离开椅面，停 3 秒"
+    },
+    "ms": {
+     "zh": 2136
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，抬膝离开椅面，停 3 秒"
+    },
+    "ms": {
+     "zh": 4621
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "坐姿抬膝悬停，完成"
+    },
+    "ms": {
+     "zh": 2113
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub v0.2.0 dark soft-v1 clip (as frozen in HipLab), re-encoded 720²",
+  "mediaSource": "pose-hub-v0.2.0",
+  "spec": "drill-anim/specs/n-seated-knee-lift.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 8211,
+   "sha256": "dc22d7e93724bed62bebedf4f1d2a2f797a6b0eb2d4d738bbc216f8277273c15"
+  },
+  "demo.mp4": {
+   "bytes": 76328,
+   "sha256": "c41928db620dfee61d8c60ea62a727c4a52f633b750e0273222e68e3a8fe77b8"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 22161,
+   "sha256": "2d23663f60c8e86a1bc1a7e5aa5e08dc4e1be8d93157c6bf19edf457dd4c43e5"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 18696,
+   "sha256": "60ca2d7954f1c186cd5f601bf731bab14af4705201306692e8c61b6384b1ed75"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 18482,
+   "sha256": "1980feb88499d2a81224c4268b301ca929b7e414be33e516e9a7868dc3dff7c3"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 21365,
+   "sha256": "4681756bdc596923cd924045ef88bfd9fb788c019db926113da004373631874b"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 12785,
+   "sha256": "335225878d24ae2cdc9ca792e996707d3fde20529c0f3c5992ab33ad8edbe67c"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 38856,
+   "sha256": "a3418c679e32ad411b3bde3ed51718a25ee9f5a6b9d2e2a0e1b2fb57a4e4913b"
+  }
+ }
+}

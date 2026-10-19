@@ -1,0 +1,166 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "h-db-curl",
+ "version": "1.0.0",
+ "name": {
+  "zh": "哑铃交替弯举",
+  "en": "Alternating Dumbbell Curl"
+ },
+ "category": "strength",
+ "muscles": [
+  "肱二头肌"
+ ],
+ "muscleGroups": [
+  "biceps"
+ ],
+ "equipment": [
+  "dumbbell"
+ ],
+ "position": "standing",
+ "unilateral": false,
+ "level": 1,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "reps",
+  "sets": 3,
+  "reps": 12,
+  "restSeconds": 30
+ },
+ "cues": {
+  "zh": [
+   "大臂贴住身体，只动小臂",
+   "左右交替弯举，不甩身体"
+  ]
+ },
+ "primaryCue": 0,
+ "cautions": [],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 1.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": 4.0
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "哑铃交替弯举"
+    },
+    "ms": {
+     "zh": 1370
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "哑铃交替弯举，练手臂前侧"
+    },
+    "ms": {
+     "zh": 2647
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "大臂贴住身体，只动小臂"
+    },
+    "ms": {
+     "zh": 2415
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "左右交替弯举，不甩身体"
+    },
+    "ms": {
+     "zh": 2345
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，左右交替弯举，不甩身体"
+    },
+    "ms": {
+     "zh": 4853
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "哑铃交替弯举，完成"
+    },
+    "ms": {
+     "zh": 2067
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub Drive archive green-screen master, keyed onto #101013 by tools/media/prepare_media.py",
+  "mediaSource": "pose-hub-drive-greenscreen",
+  "spec": "drill-anim/specs/h-db-curl.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 6577,
+   "sha256": "bdaa75ffa7fd4c4a2aa2cbc89d9ca5d0fe41cb92b3af0267e0f5f7c0390f4319"
+  },
+  "demo.mp4": {
+   "bytes": 71085,
+   "sha256": "325d813600f9eb3d8228b04433d0e879f35bbb6d150e70ab0f7411599a9a2c81"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 20927,
+   "sha256": "e28067bded90bf619f10fa598da02d722cf7ad37b5eefc47546106cd43319bc5"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 20269,
+   "sha256": "2df54e5fe10de8c12e6b11a90afbf6ce4e10289dc21ab6f05b9b21b936bb02f9"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 17963,
+   "sha256": "ab8e0fb09cbb1657a9bdbae55248bdf8cc8f62bc067936f3ab2ff2b24cd069cb"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 22867,
+   "sha256": "6000d59a02cbfd0e00dc8e9511c5c0a02dbc88d4578c62f810f2a0fbd9d9337a"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 12384,
+   "sha256": "c6e1b40c7020b365c4e677794f29fcdc62def04668306f6ec9e1708857a96d92"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 40962,
+   "sha256": "6bc7893d8de20d189c3843d3b4cd2b9d997183a945c6d60427889d5329845a28"
+  }
+ }
+}

@@ -1,0 +1,185 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "h-superman",
+ "version": "1.0.0",
+ "name": {
+  "zh": "俯卧超人式",
+  "en": "Prone Superman"
+ },
+ "category": "strength",
+ "muscles": [
+  "竖脊肌",
+  "臀大肌"
+ ],
+ "muscleGroups": [
+  "erectors",
+  "glute-max"
+ ],
+ "equipment": [
+  "mat"
+ ],
+ "position": "prone",
+ "unilateral": false,
+ "level": 1,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "reps",
+  "sets": 2,
+  "reps": 10,
+  "restSeconds": 30
+ },
+ "cues": {
+  "zh": [
+   "俯卧，手脚伸直",
+   "手脚同时轻轻抬离地面，颈部保持中立",
+   "同时抬起手脚，停一下再放"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [
+  "腰"
+ ],
+ "contraindications": [],
+ "alternative": "w-prone-swimmer",
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 1.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": 4.0
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "俯卧超人式"
+    },
+    "ms": {
+     "zh": 1138
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "俯卧超人式，练下背和臀部"
+    },
+    "ms": {
+     "zh": 2531
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "俯卧，手脚伸直"
+    },
+    "ms": {
+     "zh": 1765
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "手脚同时轻轻抬离地面，颈部保持中立"
+    },
+    "ms": {
+     "zh": 3785
+    }
+   },
+   {
+    "id": "cue3",
+    "role": "cue",
+    "text": {
+     "zh": "同时抬起手脚，停一下再放"
+    },
+    "ms": {
+     "zh": 2438
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，同时抬起手脚，停一下再放"
+    },
+    "ms": {
+     "zh": 4946
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "俯卧超人式，完成"
+    },
+    "ms": {
+     "zh": 1811
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub Drive archive green-screen master, keyed onto #101013 by tools/media/prepare_media.py",
+  "mediaSource": "pose-hub-drive-greenscreen",
+  "spec": "drill-anim/specs/h-superman.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 5815,
+   "sha256": "82a3fd1953533906b6dddb997939277c2385a825e7c8883749826351c5f5af82"
+  },
+  "demo.mp4": {
+   "bytes": 76181,
+   "sha256": "f90fbac67f980a62bb25f19c56e61e3fef3b16a2948ced5b9a03480e2edbffef"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 15529,
+   "sha256": "c86e1be3a08211bca5d8405b403a63bdc88942d56777cccfd9118e34d23d9835"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 32074,
+   "sha256": "7cede7e8162f0925c7ae9edc524807f3186514743555b2bd293f9a3d5ce289bb"
+  },
+  "voice/zh/cue3.m4a": {
+   "bytes": 21087,
+   "sha256": "ffb3744e1689419655e8665c231f49174a22080719b6ec0aaf5a8625e9138266"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 15821,
+   "sha256": "9ac8a9e6446b30290ce3ab1418236efb856cd7648cbd650a0457f36d9db8cfe7"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 21755,
+   "sha256": "4e828fda670089709f969d345dc9b06f4786b2b8e880e706436d6c9e7b10f1d0"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 10468,
+   "sha256": "e140fd09b8c718eab36c72cc9f270b3f9816f80c88824f4f650cb4f8b4b01231"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 41627,
+   "sha256": "efeb2c665f5e32a168300779951fdd68bd313e7d1a4ecb859bfe7d0a3a8daa0d"
+  }
+ }
+}

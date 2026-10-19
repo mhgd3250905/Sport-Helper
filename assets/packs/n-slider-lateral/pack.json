@@ -1,0 +1,165 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "n-slider-lateral",
+ "version": "1.0.0",
+ "name": {
+  "zh": "滑垫侧向滑"
+ },
+ "category": "mobility",
+ "muscles": [
+  "大腿内侧"
+ ],
+ "muscleGroups": [],
+ "equipment": [
+  "slider"
+ ],
+ "position": "standing",
+ "unilateral": true,
+ "level": 3,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "reps",
+  "sets": 2,
+  "reps": 8,
+  "restSeconds": 10
+ },
+ "cues": {
+  "zh": [
+   "一只脚向侧面滑出去，再收回来"
+  ]
+ },
+ "primaryCue": 0,
+ "cautions": [
+  "膝"
+ ],
+ "contraindications": [],
+ "alternative": "h-adductor-rock",
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 2.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": 4.0,
+  "showsSide": "right"
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "滑垫侧向滑"
+    },
+    "ms": {
+     "zh": 1207
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "滑垫侧向滑，活动大腿内侧"
+    },
+    "ms": {
+     "zh": 2577
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "一只脚向侧面滑出去，再收回来"
+    },
+    "ms": {
+     "zh": 2856
+    }
+   },
+   {
+    "id": "side_switch",
+    "role": "side_switch",
+    "text": {
+     "zh": "左侧同样，一只脚向侧面滑出去，再收回来"
+    },
+    "ms": {
+     "zh": 3971
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，一只脚向侧面滑出去，再收回来"
+    },
+    "ms": {
+     "zh": 5317
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "滑垫侧向滑，完成"
+    },
+    "ms": {
+     "zh": 1881
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub v0.2.0 dark soft-v1 clip (as frozen in HipLab), re-encoded 720²",
+  "mediaSource": "pose-hub-v0.2.0",
+  "spec": null,
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 8487,
+   "sha256": "31d24f5f4215e36dcce6d06f3db6b05d3e20ad717ad7c2635efc7e1b99830b0d"
+  },
+  "demo.mp4": {
+   "bytes": 123783,
+   "sha256": "d5499fa9af00855f08e4317ccdafd436273cb765b6e680a59df4c3459e3be82a"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 24641,
+   "sha256": "4d3f5ce27af502bb3d632b56cd6a4ba2dc0f69db5da1cc882f6d98cd081cbff8"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 16587,
+   "sha256": "80fc605b49044745d976a587e8bfdf8baa8d156cc1a27ef9684d3a5034328064"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 22148,
+   "sha256": "20a0f343afbf815b730c69357967945ae97217c072f082f58f127493b679afee"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 11050,
+   "sha256": "52aa502037512c7bc1295b9100e7270dadfcb8b2a61660551efd99fe66b41573"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 44705,
+   "sha256": "ad7c78556f14872e7731d603e800f6550740b275ce09cb8de5d689edf4775f11"
+  },
+  "voice/zh/side_switch.m4a": {
+   "bytes": 33560,
+   "sha256": "df36246a2dcdf283659e590cad83ce72409ebe34025cf48c9b504f4e5c0c5cd5"
+  }
+ }
+}

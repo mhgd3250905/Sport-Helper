@@ -1,6 +1,9 @@
-/// One move in the exercise library (assets/library/exercises.json, built by
-/// tools/library/build_library.py). Ids are the 3D-Pose-Hub drill ids.
+/// One move in the exercise library. Each move comes from its drill pack
+/// (`assets/packs/<id>/pack.json`, docs/drill-pack-spec.md). Ids are the
+/// 3D-Pose-Hub drill ids.
 library;
+
+import '../packs/drill_pack.dart';
 
 enum DoseMode { reps, time }
 
@@ -63,28 +66,36 @@ class Dose {
 
 class ExerciseMedia {
   const ExerciseMedia({
+    required this.id,
     required this.video,
     required this.poster,
     required this.loopSeconds,
     required this.posterSeconds,
     required this.source,
   });
+  /// Pack id; the WebView player plays `/packs/<id>/demo.mp4`.
+  final String id;
+
+  /// Asset paths (`assets/packs/<id>/demo.mp4`, `…/cover.jpg`).
   final String video;
   final String poster;
   final double loopSeconds;
   final double posterSeconds;
   final String source;
 
-  /// The WebView player id: file name without extension (`sf-h-squat`).
-  String get playerId => video.split('/').last.replaceAll('.mp4', '');
+  String get playerId => id;
 
-  factory ExerciseMedia.fromJson(Map<String, dynamic> j) => ExerciseMedia(
-    video: j['video'] as String,
-    poster: j['poster'] as String,
-    loopSeconds: (j['loopSeconds'] as num).toDouble(),
-    posterSeconds: (j['posterSeconds'] as num?)?.toDouble() ?? 0,
-    source: j['source'] as String? ?? '',
-  );
+  factory ExerciseMedia.fromPack(DrillPack p) {
+    final m = p.media!;
+    return ExerciseMedia(
+      id: p.id,
+      video: p.asset(m.video),
+      poster: p.asset(m.cover),
+      loopSeconds: m.loopSeconds,
+      posterSeconds: m.coverSeconds,
+      source: (p.json['credits'] as Map?)?['mediaSource'] as String? ?? '',
+    );
+  }
 }
 
 class Exercise {
@@ -100,7 +111,7 @@ class Exercise {
     required this.scenes,
     required this.dose,
     required this.repSeconds,
-    required this.cue,
+    required this.cues,
     required this.cautions,
     required this.alternative,
     required this.media,
@@ -121,7 +132,12 @@ class Exercise {
 
   /// Seconds per repetition in the clip (reps mode only).
   final double? repSeconds;
-  final String cue;
+
+  /// Key points in the order they are spoken (1–3).
+  final List<String> cues;
+
+  /// All key points as one line, for display.
+  String get cue => cues.join('；');
 
   /// Body parts to be careful with: 膝 腰 肩 手腕 颈 髋 大腿内侧.
   final List<String> cautions;
@@ -130,25 +146,29 @@ class Exercise {
 
   bool get isFloor => floorPositions.contains(position);
 
-  factory Exercise.fromJson(Map<String, dynamic> j) => Exercise(
-    id: j['id'] as String,
-    name: j['name'] as String,
-    muscles: List<String>.from(j['muscles'] as List),
-    unilateral: j['unilateral'] == true,
-    category: ExerciseCategory.byName(j['category'] as String),
-    equipment: [
-      for (final e in j['equipment'] as List) Equipment.byName(e as String),
-    ],
-    position: j['position'] as String,
-    level: (j['level'] as num).toInt(),
-    scenes: List<String>.from(j['scenes'] as List),
-    dose: Dose.fromJson(Map<String, dynamic>.from(j['dose'] as Map)),
-    repSeconds: (j['repSeconds'] as num?)?.toDouble(),
-    cue: j['cue'] as String,
-    cautions: List<String>.from(j['cautions'] as List),
-    alternative: j['alternative'] as String?,
-    media: ExerciseMedia.fromJson(Map<String, dynamic>.from(j['media'] as Map)),
-  );
+  factory Exercise.fromPack(DrillPack p) {
+    final j = p.json;
+    final dose = Map<String, dynamic>.from(j['defaultDose'] as Map);
+    return Exercise(
+      id: p.id,
+      name: p.name['zh'] ?? p.id,
+      muscles: List<String>.from(j['muscles'] as List),
+      unilateral: j['unilateral'] == true,
+      category: ExerciseCategory.byName(j['category'] as String),
+      equipment: [
+        for (final e in j['equipment'] as List) Equipment.byName(e as String),
+      ],
+      position: j['position'] as String,
+      level: (j['level'] as num).toInt(),
+      scenes: List<String>.from(j['scenes'] as List),
+      dose: Dose.fromJson(dose),
+      repSeconds: dose['mode'] == 'reps' ? p.media?.repSeconds : null,
+      cues: List<String>.from((j['cues'] as Map)['zh'] as List),
+      cautions: List<String>.from(j['cautions'] as List),
+      alternative: j['alternative'] as String?,
+      media: ExerciseMedia.fromPack(p),
+    );
+  }
 }
 
 class ExerciseLibrary {
@@ -163,8 +183,7 @@ class ExerciseLibrary {
   Exercise operator [](String id) =>
       _byId[id] ?? (throw ArgumentError('Unknown exercise id: $id'));
 
-  factory ExerciseLibrary.fromJson(Map<String, dynamic> j) => ExerciseLibrary([
-    for (final e in j['exercises'] as List)
-      Exercise.fromJson(Map<String, dynamic>.from(e as Map)),
+  factory ExerciseLibrary.fromPacks(PackSet packs) => ExerciseLibrary([
+    for (final p in packs.exercises) Exercise.fromPack(p),
   ]);
 }
