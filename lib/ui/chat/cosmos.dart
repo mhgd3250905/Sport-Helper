@@ -6,39 +6,6 @@ import 'package:flutter/scheduler.dart';
 
 import '../theme/tokens.dart';
 
-/// Legacy colours of the first chat build. Only pages not yet moved to
-/// [SfColors] read these; new code uses the tokens.
-class CosmosColors {
-  static const skyTop = Color(0xFF0B1022);
-  static const skyMid = Color(0xFF070A16);
-  static const skyBottom = Color(0xFF03040A);
-  static const nebulaViolet = Color(0xFF2D2766);
-  static const nebulaTeal = Color(0xFF0E3A52);
-
-  static const text = Color(0xFFEFF1F8);
-  static const textSoft = Color(0xFFC9CDDC);
-  static const muted = Color(0xFF8C93AB);
-  static const faint = Color(0xFF5E6580);
-
-  /// Glass: a whisper of white over the sky, a hairline edge.
-  static const glass = Color(0x14FFFFFF);
-  static const glassHi = Color(0x22FFFFFF);
-  static const edge = Color(0x24FFFFFF);
-
-  static const accent = Color(0xFFFF7A45);
-  static const accentGlass = Color(0x38FF7A45);
-  static const accentEdge = Color(0x66FFB08A);
-
-  /// The user's bubble: warm, nearly opaque glass (coral → rose).
-  static const userFill = [Color(0xD9FF8A57), Color(0xCCEB5F6E)];
-
-  /// Player states: rest / prep in a cool sky blue, the side switch and
-  /// 不舒服 in a soft amber (both readable on the glass at 4.5:1+).
-  static const rest = Color(0xFF7CC8FF);
-  static const warn = Color(0xFFFFC857);
-  static const track = Color(0x1FFFFFFF);
-}
-
 /// The endless space behind the chat and the player: a two-stop sky
 /// (deep blue-black on dark, paper white on light), one very faint cool
 /// light in a corner, and a few dozen motes of dust drifting upward.

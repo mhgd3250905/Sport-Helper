@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../app/services.dart';
 import '../core/platform/screen_awake.dart';
@@ -13,13 +12,17 @@ import '../voice/session_runner.dart';
 import '../voice/voice_cue.dart';
 import '../voice/voice_queue.dart';
 import 'chat/cosmos.dart';
-import 'chat/glass.dart';
 import 'exercise_video.dart';
+import 'theme/app_theme.dart';
+import 'theme/sf_icons.dart';
+import 'theme/tokens.dart';
+import 'theme/widgets.dart';
 
 /// Full-screen follow-along: clip, set / side / round, rep counter or
 /// countdown, rests with a next-move preview, voice coaching. Drawn in the
-/// chat's sky (held still) with glass panels; the clip itself is never
-/// blurred or tinted.
+/// chat's sky (held still); layout after HipLab's player: top bar, the clip
+/// on its stage, the move, the ring, three controls. One accent: the ring
+/// while working and the pause / continue disc.
 class PlayerPage extends StatefulWidget {
   const PlayerPage({
     super.key,
@@ -180,41 +183,33 @@ class _PlayerPageState extends State<PlayerPage> {
     if (wasRunning) _togglePause();
     final choice = await showModalBottomSheet<String>(
       context: context,
-      backgroundColor: const Color(0xF5121733),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-        side: BorderSide(color: CosmosColors.edge, width: .7),
-      ),
       builder: (c) => SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
+          padding: const EdgeInsets.fromLTRB(SfSpace.gutter, 0, SfSpace.gutter, SfSpace.x2),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                '哪里不舒服？',
-                style: TextStyle(color: CosmosColors.text, fontSize: 19, fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(height: 8),
-              const Text(
+              Text('哪里不舒服？', style: SfType.title),
+              const SizedBox(height: SfSpace.x2),
+              Text(
                 '出现刺痛、麻木、头晕或胸闷，请立即停止训练。轻微酸胀可以减小幅度、放慢速度。',
-                style: TextStyle(color: CosmosColors.muted, height: 1.55, fontSize: 14),
+                style: SfType.body.copyWith(fontSize: 15, color: SfColors.muted),
               ),
-              const SizedBox(height: 12),
-              _SheetOption(
-                icon: Icons.compress_rounded,
+              const SizedBox(height: SfSpace.x5),
+              SfSheetOption(
+                icon: SfGlyph.pinch,
                 label: '减小幅度，继续',
                 onTap: () => Navigator.pop(c, 'continue'),
               ),
-              _SheetOption(
-                icon: Icons.skip_next_rounded,
+              SfSheetOption(
+                icon: SfGlyph.skipNext,
                 label: '跳过这个动作',
                 onTap: () => Navigator.pop(c, 'skip'),
               ),
-              _SheetOption(
-                icon: Icons.stop_circle_outlined,
-                color: CosmosColors.warn,
+              SfSheetOption(
+                icon: SfGlyph.stop,
+                color: SfColors.danger,
                 label: '结束今天的训练',
                 onTap: () => Navigator.pop(c, 'end'),
               ),
@@ -240,21 +235,16 @@ class _PlayerPageState extends State<PlayerPage> {
     final ok = await showDialog<bool>(
       context: context,
       builder: (c) => AlertDialog(
-        backgroundColor: const Color(0xFF151A2E),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-          side: const BorderSide(color: CosmosColors.edge, width: .7),
-        ),
-        title: const Text('结束训练？', style: TextStyle(color: CosmosColors.text)),
-        content: const Text('本次进度会记为未完成。', style: TextStyle(color: CosmosColors.textSoft)),
+        title: const Text('结束训练？'),
+        content: const Text('本次进度会记为未完成。'),
         actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(c, true),
+            child: Text('结束', style: TextStyle(color: SfColors.muted, fontWeight: FontWeight.w500)),
+          ),
           TextButton(
             onPressed: () => Navigator.pop(c, false),
             child: const Text('继续练'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(c, true),
-            child: const Text('结束', style: TextStyle(color: CosmosColors.muted)),
           ),
         ],
       ),
@@ -275,21 +265,14 @@ class _PlayerPageState extends State<PlayerPage> {
         final nav = Navigator.of(context);
         if (await _confirmClose()) nav.pop();
       },
-      child: AnnotatedRegion<SystemUiOverlayStyle>(
-        value: SystemUiOverlayStyle.light.copyWith(
-          statusBarColor: Colors.transparent,
-          systemNavigationBarColor: CosmosColors.skyBottom,
-        ),
+      child: AnnotatedRegion(
+        value: sfOverlay,
         child: Scaffold(
-          backgroundColor: CosmosColors.skyBottom,
+          backgroundColor: SfColors.skyBottom,
           // The chat's sky, held still: no star drift during a workout.
           body: CosmosBackground(
             animate: false,
-            child: SafeArea(
-              child: BackdropGroup(
-                child: _engine.done ? _doneView() : _sessionView(p, e),
-              ),
-            ),
+            child: SafeArea(child: _engine.done ? _doneView() : _sessionView(p, e)),
           ),
         ),
       ),
@@ -306,7 +289,6 @@ class _PlayerPageState extends State<PlayerPage> {
         p.kind == PhaseKind.rest ||
         p.kind == PhaseKind.roundRest ||
         p.kind == PhaseKind.prep;
-    final color = rest ? CosmosColors.rest : CosmosColors.accent;
     final done = _engine.completedExercises;
     final label = switch (p.kind) {
       PhaseKind.prep => '准备 · 第一个动作',
@@ -316,209 +298,208 @@ class _PlayerPageState extends State<PlayerPage> {
       PhaseKind.switchSide => '换左侧',
       _ => '',
     };
-    final labelColor = p.kind == PhaseKind.switchSide ? CosmosColors.warn : color;
     final sub = _subtitle ?? (rest ? e?.cue : null);
+    final current = (done + (rest ? 0 : 1)).clamp(1, _occurrences);
     return Column(
       children: [
+        // Top bar: close · block + progress · count.
         Padding(
-          padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+          padding: const EdgeInsets.fromLTRB(SfSpace.x4, SfSpace.x2, SfSpace.gutter, SfSpace.x2),
           child: Row(
             children: [
-              _RoundGlassButton(
+              SfCircleButton(
                 key: const ValueKey('close'),
                 tooltip: '关闭训练',
-                icon: Icons.close_rounded,
+                icon: SfGlyph.close,
                 onPressed: () async {
                   final nav = Navigator.of(context);
                   if (await _confirmClose()) nav.pop();
                 },
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: SfSpace.x4),
               Expanded(
-                child: Glass(
-                  radius: BorderRadius.circular(22),
-                  padding: const EdgeInsets.fromLTRB(16, 9, 16, 10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        '${p.blockName}  ·  动作 ${(done + (rest ? 0 : 1)).clamp(1, _occurrences)}/$_occurrences',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(color: CosmosColors.textSoft, fontSize: 13, height: 1.3),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      p.blockName,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: SfType.label.copyWith(color: SfColors.accentText, fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(height: 6),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(2),
+                      child: LinearProgressIndicator(
+                        value: _occurrences == 0 ? 0 : done / _occurrences,
+                        minHeight: 4,
+                        backgroundColor: SfColors.track,
+                        color: SfColors.accent,
                       ),
-                      const SizedBox(height: 6),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(2),
-                        child: LinearProgressIndicator(
-                          value: _occurrences == 0 ? 0 : done / _occurrences,
-                          minHeight: 3,
-                          backgroundColor: CosmosColors.track,
-                          color: CosmosColors.accent,
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(width: 10),
-              Glass(
-                radius: BorderRadius.circular(22),
-                child: InkWell(
-                  key: const ValueKey('discomfort'),
-                  onTap: _discomfort,
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.healing_outlined, size: 18, color: CosmosColors.warn),
-                        SizedBox(width: 6),
-                        Text('不舒服', style: TextStyle(color: CosmosColors.warn, fontSize: 14)),
-                      ],
-                    ),
-                  ),
-                ),
+              const SizedBox(width: SfSpace.x4),
+              Text.rich(
+                TextSpan(children: [
+                  TextSpan(text: '$current', style: SfType.callout.copyWith(fontWeight: FontWeight.w700)),
+                  TextSpan(text: ' / $_occurrences', style: SfType.label),
+                ]),
+                style: const TextStyle(fontFeatures: SfType.tabular),
               ),
             ],
           ),
         ),
         Expanded(
           child: ListView(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+            padding: const EdgeInsets.fromLTRB(SfSpace.x4, SfSpace.x2, SfSpace.x4, SfSpace.x2),
             children: [
               if (e != null)
-                // The clip stays sharp: a plain frame (no blur) around it.
-                Glass(
-                  blur: 0,
-                  radius: BorderRadius.circular(26),
-                  padding: const EdgeInsets.all(5),
-                  child: Stack(
-                    children: [
-                      ExerciseVideo(
-                        key: ValueKey('player-${e.id}'),
-                        exercise: e,
-                        mirrored: p.side == Side.left,
-                        paused: _paused,
-                        radius: 21,
-                      ),
-                      if (_paused)
-                        const Positioned(left: 12, top: 12, child: _Badge('已暂停')),
-                      if (p.kind == PhaseKind.switchSide)
-                        const Positioned(right: 12, top: 12, child: _Badge('换左侧', color: CosmosColors.warn)),
-                    ],
-                  ),
-                ),
-              const SizedBox(height: 12),
-              Glass(
-                radius: BorderRadius.circular(24),
-                padding: const EdgeInsets.fromLTRB(18, 16, 16, 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                Stack(
                   children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              if (label.isNotEmpty) ...[
-                                Text(
-                                  label,
-                                  style: TextStyle(color: labelColor, fontSize: 13.5, fontWeight: FontWeight.w600),
-                                ),
-                                const SizedBox(height: 4),
-                              ],
-                              Text(
-                                e?.name ?? '',
-                                style: const TextStyle(
-                                  color: CosmosColors.text,
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.w700,
-                                  height: 1.3,
-                                ),
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                _meta(p),
-                                style: const TextStyle(color: CosmosColors.muted, fontSize: 14, height: 1.4),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        _counter(p, left, progress, color),
-                      ],
+                    ExerciseVideo(
+                      key: ValueKey('player-${e.id}'),
+                      exercise: e,
+                      mirrored: p.side == Side.left,
+                      paused: _paused,
+                      radius: SfRadius.lg,
                     ),
-                    if (sub != null) ...[
-                      const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 12),
-                        child: Divider(height: 1, thickness: .6, color: CosmosColors.edge),
+                    if (_paused)
+                      const Positioned(left: SfSpace.x3, top: SfSpace.x3, child: SfMediaTag(label: '已暂停'))
+                    else if (p.kind == PhaseKind.switchSide)
+                      Positioned(
+                        left: SfSpace.x3,
+                        top: SfSpace.x3,
+                        child: SfMediaTag(label: '换左侧', icon: SfGlyph.swap, color: SfColors.palette.isDark ? SfColors.caution : SfPalette.dark.caution),
                       ),
-                      Text(
-                        '要领：$sub',
-                        style: const TextStyle(color: CosmosColors.textSoft, fontSize: 14.5, height: 1.55),
+                    Positioned(
+                      right: SfSpace.x2,
+                      top: SfSpace.x2,
+                      child: SfPressable(
+                        key: const ValueKey('discomfort'),
+                        semanticLabel: '不舒服',
+                        onTap: _discomfort,
+                        child: Padding(
+                          padding: const EdgeInsets.all(SfSpace.x1),
+                          child: SfMediaTag(label: '不舒服', icon: SfGlyph.bandage, color: SfPalette.dark.caution),
+                        ),
                       ),
-                    ],
+                    ),
+                  ],
+                ),
+              const SizedBox(height: SfSpace.x5),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: SfSpace.x1),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (label.isNotEmpty) ...[
+                            Text(
+                              label,
+                              style: SfType.label.copyWith(
+                                color: p.kind == PhaseKind.switchSide ? SfColors.caution : SfColors.muted,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: SfSpace.x1),
+                          ],
+                          Text(
+                            e?.name ?? '',
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: SfType.title.copyWith(fontSize: 24, height: 1.25),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(_meta(p), style: SfType.label.copyWith(fontSize: 14)),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: SfSpace.x3),
+                    _counter(p, left, progress, !rest && p.kind != PhaseKind.switchSide),
                   ],
                 ),
               ),
+              if (sub != null)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(SfSpace.x1, SfSpace.x4, SfSpace.x1, 0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: 2),
+                        child: SfIcon(SfGlyph.subtitles, size: 18, color: SfColors.faint),
+                      ),
+                      const SizedBox(width: SfSpace.x2),
+                      Expanded(
+                        child: Text(
+                          sub,
+                          style: SfType.body.copyWith(fontSize: 15, height: 1.55, color: SfColors.muted),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              if (!rest) ?_nextUp(p),
             ],
           ),
         ),
         Padding(
-          padding: const EdgeInsets.fromLTRB(40, 4, 40, 14),
-          child: Glass(
-            radius: BorderRadius.circular(44),
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _RoundGlassButton(
-                  key: const ValueKey('prev'),
-                  tooltip: '上一个动作',
-                  icon: Icons.skip_previous_rounded,
-                  size: 52,
-                  iconSize: 28,
-                  onPressed: _previous,
-                ),
-                Tooltip(
-                  message: _paused ? '继续训练' : '暂停训练',
-                  child: DecoratedBox(
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      boxShadow: [BoxShadow(color: Color(0x55FF7A45), blurRadius: 22, spreadRadius: -4)],
-                    ),
-                    child: Material(
-                      color: CosmosColors.accent,
-                      shape: const CircleBorder(),
-                      clipBehavior: Clip.antiAlias,
-                      child: InkWell(
-                        key: const ValueKey('pause'),
-                        onTap: _togglePause,
-                        child: SizedBox.square(
-                          dimension: 68,
-                          child: Icon(
-                            _paused ? Icons.play_arrow_rounded : Icons.pause_rounded,
-                            size: 38,
-                            color: Colors.white,
-                          ),
+          padding: const EdgeInsets.fromLTRB(48, SfSpace.x2, 48, SfSpace.x5),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              SfCircleButton(
+                key: const ValueKey('prev'),
+                tooltip: '上一个动作',
+                icon: SfGlyph.skipPrevious,
+                size: 56,
+                onPressed: _previous,
+              ),
+              SfPressable(
+                key: const ValueKey('pause'),
+                tooltip: _paused ? '继续训练' : '暂停训练',
+                semanticLabel: _paused ? '继续训练' : '暂停训练',
+                onTap: _togglePause,
+                scale: .94,
+                child: Builder(
+                  builder: (context) {
+                    final down = SfPressedScope.of(context);
+                    return AnimatedContainer(
+                      duration: down ? SfMotion.press : SfMotion.release,
+                      width: 76,
+                      height: 76,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: down ? Color.lerp(SfColors.accent, Colors.black, .1) : SfColors.accent,
+                      ),
+                      child: AnimatedSwitcher(
+                        duration: SfMotion.fast,
+                        child: SfIcon(
+                          _paused ? SfGlyph.play : SfGlyph.pause,
+                          key: ValueKey(_paused),
+                          size: 32,
+                          filled: true,
+                          color: SfColors.onAccent,
                         ),
                       ),
-                    ),
-                  ),
+                    );
+                  },
                 ),
-                _RoundGlassButton(
-                  key: const ValueKey('skip'),
-                  tooltip: '跳过动作',
-                  icon: Icons.skip_next_rounded,
-                  size: 52,
-                  iconSize: 28,
-                  onPressed: _skip,
-                ),
-              ],
-            ),
+              ),
+              SfCircleButton(
+                key: const ValueKey('skip'),
+                tooltip: '跳过动作',
+                icon: SfGlyph.skipNext,
+                size: 56,
+                onPressed: _skip,
+              ),
+            ],
           ),
         ),
       ],
@@ -535,7 +516,58 @@ class _PlayerPageState extends State<PlayerPage> {
     return parts.join(' · ');
   }
 
-  Widget _counter(SessionPhase p, int left, double progress, Color color) {
+  /// While working: the move after this one (HipLab's 下一个 strip).
+  Widget? _nextUp(SessionPhase p) {
+    final phases = _engine.phases;
+    SessionPhase? next;
+    for (var i = _engine.index + 1; i < phases.length; i++) {
+      final q = phases[i];
+      if (q.kind == PhaseKind.work && q.exerciseId != null && q.exerciseId != p.exerciseId) {
+        next = q;
+        break;
+      }
+    }
+    final e = next == null ? null : _s.library.tryGet(next.exerciseId!);
+    if (next == null || e == null) return null;
+    final dose = next.item?.copyWith(sets: 1).doseText();
+    return Padding(
+      padding: const EdgeInsets.only(top: SfSpace.x6),
+      child: SfPanel(
+        padding: const EdgeInsets.all(SfSpace.x2),
+        radius: SfRadius.md + 2,
+        child: Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(SfRadius.sm - 2),
+              child: SizedBox.square(
+                dimension: 44,
+                child: ColoredBox(
+                  color: SfColors.mediaStage,
+                  child: Image.asset(e.media.poster, fit: BoxFit.cover,
+                      errorBuilder: (_, _, _) => const SizedBox.shrink()),
+                ),
+              ),
+            ),
+            const SizedBox(width: SfSpace.x3),
+            Text('下一个', style: SfType.label),
+            const SizedBox(width: SfSpace.x2),
+            Expanded(
+              child: Text(e.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: SfType.callout),
+            ),
+            if (dose != null) ...[
+              const SizedBox(width: SfSpace.x2),
+              Text(dose, style: SfType.label),
+            ],
+            const SizedBox(width: SfSpace.x2),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Reps or seconds inside a ring. The ring is the accent only while
+  /// working; prep / rest count down in a neutral tone.
+  Widget _counter(SessionPhase p, int left, double progress, bool working) {
     final reps = p.reps;
     String big;
     String small;
@@ -549,18 +581,18 @@ class _PlayerPageState extends State<PlayerPage> {
       small = p.isWork ? '秒' : '秒后开始';
     }
     return SizedBox(
-      width: 116,
-      height: 116,
+      width: 112,
+      height: 112,
       child: Stack(
         alignment: Alignment.center,
         children: [
           SizedBox.expand(
             child: CircularProgressIndicator(
               value: progress,
-              strokeWidth: 6,
+              strokeWidth: 5,
               strokeCap: StrokeCap.round,
-              backgroundColor: CosmosColors.track,
-              color: color,
+              backgroundColor: SfColors.track,
+              color: working ? SfColors.accent : SfColors.text.withValues(alpha: .55),
             ),
           ),
           Column(
@@ -573,11 +605,11 @@ class _PlayerPageState extends State<PlayerPage> {
                   fontSize: 40,
                   height: 1.1,
                   fontWeight: FontWeight.w700,
-                  color: color,
-                  fontFeatures: const [FontFeature.tabularFigures()],
+                  color: SfColors.text,
+                  fontFeatures: SfType.tabular,
                 ),
               ),
-              Text(small, style: const TextStyle(color: CosmosColors.muted, fontSize: 12.5)),
+              Text(small, style: SfType.caption.copyWith(color: SfColors.muted)),
             ],
           ),
         ],
@@ -588,133 +620,75 @@ class _PlayerPageState extends State<PlayerPage> {
   Widget _doneView() {
     final full =
         !_engine.endedEarly && _engine.completedExercises >= _occurrences;
-    final tone = full ? CosmosColors.accent : CosmosColors.warn;
-    return Center(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Glass(
-          radius: BorderRadius.circular(28),
-          glow: const Color(0x14BFD0FF),
-          padding: const EdgeInsets.fromLTRB(24, 32, 24, 24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              DecoratedBox(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: tone.withValues(alpha: .14),
-                  border: Border.all(color: tone.withValues(alpha: .4), width: .7),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(18),
-                  child: Icon(
-                    full ? Icons.emoji_events_rounded : Icons.flag_rounded,
-                    size: 44,
-                    color: tone,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 18),
-              Text(
-                full ? '训练完成！' : '今天先到这里',
-                style: const TextStyle(color: CosmosColors.text, fontSize: 26, fontWeight: FontWeight.w700),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                '${widget.plan.title} · ${((_endedAt ?? _t) / 60).round()} 分钟 · 完成 ${_engine.completedExercises}/$_occurrences 个动作',
-                textAlign: TextAlign.center,
-                style: const TextStyle(color: CosmosColors.muted, fontSize: 14, height: 1.5),
-              ),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton(
-                  key: const ValueKey('finish'),
-                  style: FilledButton.styleFrom(
-                    backgroundColor: CosmosColors.accent,
-                    foregroundColor: Colors.white,
-                    minimumSize: const Size.fromHeight(50),
-                    shape: const StadiumBorder(),
-                  ),
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('完成'),
+    final minutes = ((_endedAt ?? _t) / 60).round();
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(SfSpace.x6, 0, SfSpace.x6, SfSpace.x5),
+      child: Column(
+        children: [
+          Expanded(
+            child: Center(
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: full ? SfColors.accentSoft : SfColors.surfaceHigh,
+                      ),
+                      alignment: Alignment.center,
+                      child: SfIcon(
+                        full ? SfGlyph.check : SfGlyph.stop,
+                        size: 38,
+                        strokeWidth: 2.2,
+                        color: full ? SfColors.accentText : SfColors.muted,
+                      ),
+                    ),
+                    const SizedBox(height: SfSpace.x6),
+                    Text(full ? '训练完成！' : '今天先到这里', style: SfType.display),
+                    const SizedBox(height: SfSpace.x2),
+                    Text(
+                      widget.plan.title,
+                      textAlign: TextAlign.center,
+                      style: SfType.body.copyWith(color: SfColors.muted),
+                    ),
+                    const SizedBox(height: SfSpace.x8),
+                    Row(
+                      children: [
+                        Expanded(child: _stat('$minutes', '分钟')),
+                        const SizedBox(width: SfSpace.x3),
+                        Expanded(child: _stat('${_engine.completedExercises}/$_occurrences', '完成动作')),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-            ],
+            ),
           ),
-        ),
+          SfPrimaryButton(
+            key: const ValueKey('finish'),
+            label: '完成',
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ],
       ),
     );
   }
-}
 
-/// A round glass button (close, previous, skip).
-class _RoundGlassButton extends StatelessWidget {
-  const _RoundGlassButton({
-    super.key,
-    required this.icon,
-    required this.tooltip,
-    required this.onPressed,
-    this.size = 46,
-    this.iconSize = 22,
-  });
-  final IconData icon;
-  final String tooltip;
-  final VoidCallback onPressed;
-  final double size;
-  final double iconSize;
-
-  @override
-  Widget build(BuildContext context) => Tooltip(
-    message: tooltip,
-    child: Glass(
-      radius: BorderRadius.circular(size / 2),
-      tint: CosmosColors.glassHi,
-      child: InkResponse(
-        onTap: onPressed,
-        radius: size / 2,
-        child: SizedBox.square(
-          dimension: size,
-          child: Icon(icon, size: iconSize, color: CosmosColors.text),
+  Widget _stat(String value, String label) => SfPanel(
+    padding: const EdgeInsets.symmetric(vertical: SfSpace.x4),
+    radius: SfRadius.md + 2,
+    child: Column(
+      children: [
+        Text(
+          value,
+          style: SfType.title.copyWith(fontSize: 26, fontFeatures: SfType.tabular),
         ),
-      ),
+        const SizedBox(height: 2),
+        Text(label, style: SfType.label),
+      ],
     ),
-  );
-}
-
-/// A small dark glass label over the clip (已暂停 / 换左侧).
-class _Badge extends StatelessWidget {
-  const _Badge(this.text, {this.color = CosmosColors.text});
-  final String text;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) => DecoratedBox(
-    decoration: BoxDecoration(
-      color: const Color(0xB3070A16),
-      borderRadius: BorderRadius.circular(14),
-      border: Border.all(color: CosmosColors.edge, width: .7),
-    ),
-    child: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      child: Text(text, style: TextStyle(color: color, fontSize: 12.5, fontWeight: FontWeight.w500)),
-    ),
-  );
-}
-
-class _SheetOption extends StatelessWidget {
-  const _SheetOption({required this.icon, required this.label, required this.onTap, this.color});
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-  final Color? color;
-
-  @override
-  Widget build(BuildContext context) => ListTile(
-    contentPadding: const EdgeInsets.symmetric(horizontal: 4),
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-    leading: Icon(icon, color: color ?? CosmosColors.textSoft),
-    title: Text(label, style: TextStyle(color: color ?? CosmosColors.text, fontSize: 15.5)),
-    onTap: onTap,
   );
 }

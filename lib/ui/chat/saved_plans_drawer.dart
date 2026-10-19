@@ -1,5 +1,3 @@
-import 'dart:ui' as ui;
-
 import 'package:flutter/material.dart';
 
 import '../../data/app_store.dart';
@@ -7,7 +5,9 @@ import '../../domain/exercise.dart';
 import '../../domain/saved_plan.dart';
 import '../../domain/session.dart';
 import '../theme.dart' show minutesZh;
-import 'cosmos.dart';
+import '../theme/sf_icons.dart';
+import '../theme/tokens.dart';
+import '../theme/widgets.dart';
 import 'expand_route.dart';
 
 /// Drawer from the input's left icon: the saved plans (tap = show it in
@@ -37,75 +37,59 @@ class SavedPlansDrawer extends StatelessWidget {
     final width = (MediaQuery.sizeOf(context).width * .84).clamp(280.0, 360.0);
     return Drawer(
       width: width,
-      backgroundColor: Colors.transparent,
+      backgroundColor: SfColors.isDark ? SfColors.surface : SfColors.background,
+      surfaceTintColor: Colors.transparent,
       elevation: 0,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.horizontal(right: Radius.circular(28)),
+        borderRadius: BorderRadius.horizontal(right: Radius.circular(SfRadius.xl)),
       ),
       clipBehavior: Clip.antiAlias,
-      child: BackdropFilter(
-        filter: ui.ImageFilter.blur(sigmaX: 24, sigmaY: 24),
-        child: DecoratedBox(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Color(0xE6121733), Color(0xF0070A16)],
-            ),
-            border: Border(right: BorderSide(color: CosmosColors.edge, width: .7)),
-          ),
-          child: SafeArea(
-            child: ListenableBuilder(
-              listenable: store,
-              builder: (context, _) => Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 24, 24, 4),
-                    child: Text(
-                      '我的计划',
-                      style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                        color: CosmosColors.text,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 22,
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 0, 24, 12),
-                    child: Text(
-                      store.savedPlans.isEmpty
-                          ? '保存的计划会出现在这里'
-                          : '${store.savedPlans.length} 套 · 点一下在对话里调出',
-                      style: const TextStyle(color: CosmosColors.muted, fontSize: 13),
-                    ),
-                  ),
-                  Expanded(
-                    child: store.savedPlans.isEmpty
-                        ? const _Empty()
-                        : ListView.separated(
-                            padding: const EdgeInsets.fromLTRB(12, 4, 12, 12),
-                            itemCount: store.savedPlans.length,
-                            separatorBuilder: (_, _) => const SizedBox(height: 8),
-                            itemBuilder: (context, i) => _SavedTile(
-                              plan: store.savedPlans[i],
-                              library: library,
-                              onShow: onShow,
-                              onStart: onStart,
-                              onRename: (p) => _rename(context, p),
-                              onDelete: (p) => _delete(context, p),
-                            ),
-                          ),
-                  ),
-                  if (footer.isNotEmpty) ...[
-                    const Divider(height: 1, thickness: .6, color: CosmosColors.edge, indent: 20, endIndent: 20),
-                    const SizedBox(height: 6),
-                    ...footer,
-                    const SizedBox(height: 8),
-                  ],
-                ],
+      child: SafeArea(
+        child: ListenableBuilder(
+          listenable: store,
+          builder: (context, _) => Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(SfSpace.x6, SfSpace.x6, SfSpace.x6, SfSpace.x1),
+                child: Text('我的计划', style: SfType.title.copyWith(fontSize: 24)),
               ),
-            ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(SfSpace.x6, 0, SfSpace.x6, SfSpace.x4),
+                child: Text(
+                  store.savedPlans.isEmpty
+                      ? '保存的计划会出现在这里'
+                      : '${store.savedPlans.length} 套 · 点一下在对话里调出',
+                  style: SfType.label,
+                ),
+              ),
+              Expanded(
+                child: store.savedPlans.isEmpty
+                    ? const _Empty()
+                    : ListView.separated(
+                        padding: const EdgeInsets.fromLTRB(SfSpace.x4, 0, SfSpace.x4, SfSpace.x4),
+                        itemCount: store.savedPlans.length,
+                        separatorBuilder: (_, _) => const SizedBox(height: SfSpace.x2),
+                        itemBuilder: (context, i) => _SavedTile(
+                          plan: store.savedPlans[i],
+                          library: library,
+                          onShow: onShow,
+                          onStart: onStart,
+                          onRename: (p) => _rename(context, p),
+                          onDelete: (p) => _delete(context, p),
+                        ),
+                      ),
+              ),
+              if (footer.isNotEmpty) ...[
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: SfSpace.x6),
+                  child: Divider(color: SfColors.isDark ? SfColors.surfaceHigh : SfColors.line),
+                ),
+                const SizedBox(height: SfSpace.x2),
+                ...footer,
+                const SizedBox(height: SfSpace.x3),
+              ],
+            ],
           ),
         ),
       ),
@@ -117,7 +101,6 @@ class SavedPlansDrawer extends StatelessWidget {
     final name = await showDialog<String>(
       context: context,
       builder: (c) => AlertDialog(
-        backgroundColor: const Color(0xFF151A2E),
         title: const Text('重命名'),
         content: TextField(
           key: const ValueKey('rename-field'),
@@ -128,7 +111,10 @@ class SavedPlansDrawer extends StatelessWidget {
           onSubmitted: (v) => Navigator.pop(c, v),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(c), child: const Text('取消')),
+          TextButton(
+            onPressed: () => Navigator.pop(c),
+            child: Text('取消', style: TextStyle(color: SfColors.muted)),
+          ),
           TextButton(
             key: const ValueKey('rename-ok'),
             onPressed: () => Navigator.pop(c, text.text),
@@ -145,15 +131,17 @@ class SavedPlansDrawer extends StatelessWidget {
     final ok = await showDialog<bool>(
       context: context,
       builder: (c) => AlertDialog(
-        backgroundColor: const Color(0xFF151A2E),
         title: Text('删除「${p.name}」？'),
         content: const Text('删除后可以在对话里重新生成。'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(c, false), child: const Text('取消')),
+          TextButton(
+            onPressed: () => Navigator.pop(c, false),
+            child: Text('取消', style: TextStyle(color: SfColors.muted)),
+          ),
           TextButton(
             key: const ValueKey('delete-ok'),
             onPressed: () => Navigator.pop(c, true),
-            child: const Text('删除', style: TextStyle(color: Color(0xFFFF8A80))),
+            child: Text('删除', style: TextStyle(color: SfColors.danger)),
           ),
         ],
       ),
@@ -165,21 +153,18 @@ class SavedPlansDrawer extends StatelessWidget {
 class _Empty extends StatelessWidget {
   const _Empty();
   @override
-  Widget build(BuildContext context) => const Padding(
-    padding: EdgeInsets.fromLTRB(28, 40, 28, 0),
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.fromLTRB(28, 40, 28, 0),
     child: Column(
       children: [
-        Icon(Icons.bookmarks_outlined, color: CosmosColors.faint, size: 36),
-        SizedBox(height: 14),
-        Text(
-          '还没有保存的计划',
-          style: TextStyle(color: CosmosColors.textSoft, fontSize: 15),
-        ),
-        SizedBox(height: 6),
+        SfIcon(SfGlyph.bookmark, color: SfColors.faint, size: 36),
+        const SizedBox(height: 14),
+        Text('还没有保存的计划', style: SfType.callout),
+        const SizedBox(height: 6),
         Text(
           '在计划卡片上点「保存」，下次在这里一键开始，或者直接说「上次那个」。',
           textAlign: TextAlign.center,
-          style: TextStyle(color: CosmosColors.muted, fontSize: 13, height: 1.6),
+          style: SfType.label.copyWith(height: 1.6),
         ),
       ],
     ),
@@ -208,27 +193,27 @@ class _SavedTile extends StatelessWidget {
     final p = plan.plan;
     final first = p.items.map((i) => library.tryGet(i.exerciseId)).whereType<Exercise>().firstOrNull;
     final secs = SessionBuilder(library).planSeconds(p);
-    final used = plan.lastUsedAt == null ? '' : '\n${_ago(plan.lastUsedAt!)}练过';
+    final used = plan.lastUsedAt == null ? '' : '${_ago(plan.lastUsedAt!)}练过';
     return Material(
-      color: const Color(0x0DFFFFFF),
+      color: SfColors.isDark ? SfColors.surfaceHigh : SfColors.surface,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
-        side: const BorderSide(color: Color(0x14FFFFFF), width: .7),
+        borderRadius: BorderRadius.circular(SfRadius.md),
+        side: SfColors.cardEdge,
       ),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         key: ValueKey('saved-${plan.id}'),
         onTap: () => onShow(plan),
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(10, 10, 4, 10),
+          padding: const EdgeInsets.fromLTRB(SfSpace.x2, SfSpace.x2, 0, SfSpace.x2),
           child: Row(
             children: [
               ClipRRect(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(SfRadius.sm),
                 child: SizedBox.square(
-                  dimension: 52,
+                  dimension: 56,
                   child: ColoredBox(
-                    color: const Color(0xFF101013),
+                    color: SfColors.mediaStage,
                     child: first == null
                         ? null
                         : Image.asset(first.media.poster, fit: BoxFit.cover,
@@ -236,7 +221,7 @@ class _SavedTile extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: SfSpace.x3),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -245,22 +230,28 @@ class _SavedTile extends StatelessWidget {
                       plan.name,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(color: CosmosColors.text, fontSize: 15.5, fontWeight: FontWeight.w500),
+                      style: SfType.callout.copyWith(fontWeight: FontWeight.w600),
                     ),
-                    const SizedBox(height: 3),
+                    const SizedBox(height: 2),
                     Text(
-                      '${minutesZh(secs)} · ${p.items.length} 个动作$used',
-                      maxLines: 2,
+                      '${minutesZh(secs)} · ${p.items.length} 个动作',
+                      maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(color: CosmosColors.muted, fontSize: 12.5, height: 1.45),
+                      style: SfType.label.copyWith(fontSize: 12.5),
                     ),
+                    if (used.isNotEmpty)
+                      Text(used, maxLines: 1, style: SfType.caption),
                   ],
                 ),
               ),
-              IconButton(
+              const SizedBox(width: SfSpace.x2),
+              SfCircleButton(
                 key: ValueKey('saved-start-${plan.id}'),
-                visualDensity: VisualDensity.compact,
                 tooltip: '开始训练',
+                size: 40,
+                icon: SfGlyph.play,
+                fill: SfColors.isDark ? SfColors.surface : SfColors.surfaceHigh,
+                iconColor: SfColors.accentText,
                 onPressed: () {
                   // Where the tile is now; once the drawer is gone the
                   // player folds back into the middle of the chat.
@@ -272,25 +263,17 @@ class _SavedTile extends StatelessWidget {
                     return at;
                   });
                 },
-                icon: const DecoratedBox(
-                  decoration: BoxDecoration(color: CosmosColors.accent, shape: BoxShape.circle),
-                  child: Padding(
-                    padding: EdgeInsets.all(6),
-                    child: Icon(Icons.play_arrow_rounded, color: Colors.white, size: 20),
-                  ),
-                ),
               ),
               PopupMenuButton<String>(
                 key: ValueKey('saved-menu-${plan.id}'),
                 tooltip: '更多',
                 padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(minWidth: 36, minHeight: 40),
-                color: const Color(0xFF1A2038),
-                icon: const Icon(Icons.more_vert_rounded, color: CosmosColors.muted, size: 20),
+                constraints: const BoxConstraints(minWidth: 120),
+                icon: SfIcon(SfGlyph.more, color: SfColors.muted, size: 20),
                 onSelected: (v) => v == 'rename' ? onRename(plan) : onDelete(plan),
-                itemBuilder: (_) => const [
-                  PopupMenuItem(value: 'rename', child: Text('重命名')),
-                  PopupMenuItem(value: 'delete', child: Text('删除')),
+                itemBuilder: (_) => [
+                  const PopupMenuItem(value: 'rename', child: Text('重命名')),
+                  PopupMenuItem(value: 'delete', child: Text('删除', style: TextStyle(color: SfColors.danger))),
                 ],
               ),
             ],
@@ -311,7 +294,7 @@ class _SavedTile extends StatelessWidget {
 /// A quiet row at the bottom of the drawer (动作库, 关于与设置…).
 class DrawerEntry extends StatelessWidget {
   const DrawerEntry({super.key, required this.icon, required this.label, this.hint, required this.onTap});
-  final IconData icon;
+  final SfGlyph icon;
   final String label;
   final String? hint;
   final VoidCallback onTap;
@@ -320,23 +303,18 @@ class DrawerEntry extends StatelessWidget {
   Widget build(BuildContext context) => InkWell(
     onTap: onTap,
     child: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 11),
+      padding: const EdgeInsets.symmetric(horizontal: SfSpace.x6, vertical: 10),
       child: Row(
         children: [
-          Icon(icon, size: 20, color: CosmosColors.muted),
-          const SizedBox(width: 16),
+          SfIcon(icon, size: 20, color: SfColors.muted),
+          const SizedBox(width: SfSpace.x4),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(label, style: const TextStyle(color: CosmosColors.textSoft, fontSize: 15)),
+                Text(label, style: SfType.callout.copyWith(fontWeight: FontWeight.w400)),
                 if (hint != null)
-                  Text(
-                    hint!,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(color: CosmosColors.faint, fontSize: 12, height: 1.4),
-                  ),
+                  Text(hint!, maxLines: 1, overflow: TextOverflow.ellipsis, style: SfType.caption),
               ],
             ),
           ),

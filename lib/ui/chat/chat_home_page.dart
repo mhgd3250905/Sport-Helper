@@ -13,6 +13,7 @@ import '../library_page.dart';
 import '../plan_page.dart';
 import '../player_page.dart';
 import '../theme/app_theme.dart';
+import '../theme/sf_icons.dart';
 import '../theme/tokens.dart';
 import 'chat_widgets.dart';
 import 'cosmos.dart';
@@ -145,23 +146,23 @@ class _ChatHomePageState extends State<ChatHomePage> {
           footer: [
             DrawerEntry(
               key: const ValueKey('drawer-library'),
-              icon: Icons.grid_view_rounded,
+              icon: SfGlyph.grid,
               label: '动作库',
               hint: '${s.library.length} 个动作的示范',
               onTap: () => _fromDrawer(() => _push(const LibraryPage())),
             ),
             DrawerEntry(
               key: const ValueKey('drawer-custom'),
-              icon: Icons.tune_rounded,
+              icon: SfGlyph.sliders,
               label: '自定义计划',
               hint: '用表单选目标、器械和时长',
               onTap: () => _fromDrawer(() => _push(const CustomPlanPage())),
             ),
             DrawerEntry(
               key: const ValueKey('drawer-about'),
-              icon: Icons.info_outline_rounded,
+              icon: SfGlyph.info,
               label: '关于与设置',
-              hint: '语音、星尘动效、安全确认、素材署名',
+              hint: '外观、语音、安全确认、素材署名',
               onTap: () => _fromDrawer(() => _push(const AboutPage())),
             ),
           ],
