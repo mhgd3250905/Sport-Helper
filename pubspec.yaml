@@ -223,3 +223,10 @@ flutter:
     - assets/library/
     - assets/media_player/
     - assets/licenses/
+  # Noto Sans SC variable (wght 100–900), SIL OFL 1.1 — subset to GB2312 +
+  # every character in lib/ and assets/ (tools: pyftsubset, see
+  # docs/design-language.md §3.3). Licence: assets/licenses/NotoSansSC-OFL.txt.
+  fonts:
+    - family: NotoSansSC
+      fonts:
+        - asset: assets/fonts/NotoSansSC.ttf

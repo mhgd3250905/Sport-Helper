@@ -62,6 +62,10 @@ class AppStore extends ChangeNotifier {
   /// Drifting star dust behind the chat (off = static sky).
   bool starfield = true;
 
+  /// 外观: 'dark' (深空, default), 'light' (白色无边空间) or 'system'.
+  String appearance = 'dark';
+  static const appearances = ['dark', 'light', 'system'];
+
   /// How many chat messages are kept on the device.
   static const chatLogLimit = 60;
 
@@ -81,6 +85,7 @@ class AppStore extends ChangeNotifier {
         );
       }
       starfield = j['starfield'] != false;
+      if (appearances.contains(j['appearance'])) appearance = j['appearance'] as String;
       savedPlans
         ..clear()
         ..addAll([
@@ -116,6 +121,7 @@ class AppStore extends ChangeNotifier {
           'lastPlan': lastPlan?.toJson(),
           'history': [for (final h in history.take(30)) h.toJson()],
           'starfield': starfield,
+          'appearance': appearance,
           'savedPlans': [for (final p in savedPlans) p.toJson()],
           'chat': chatLog.length > chatLogLimit
               ? chatLog.sublist(chatLog.length - chatLogLimit)
@@ -150,6 +156,12 @@ class AppStore extends ChangeNotifier {
 
   Future<void> setStarfield(bool on) {
     starfield = on;
+    return _save();
+  }
+
+  Future<void> setAppearance(String a) {
+    if (!appearances.contains(a)) return Future.value();
+    appearance = a;
     return _save();
   }
 
