@@ -12,6 +12,7 @@ class PlanValidator {
 
   List<String> validate(TrainingPlan plan, [ScenarioRequest? r]) {
     final issues = <String>[];
+    final avoid = {...plan.avoid, ...?r?.avoid};
     if (plan.schemaVersion != 1) issues.add('schemaVersion 必须为 1');
     if (plan.blocks.isEmpty) issues.add('计划没有任何训练块');
     var sawCooldown = false;
@@ -46,6 +47,9 @@ class PlanValidator {
         if (i.perSide != e.unilateral) {
           issues.add('${e.name}：perSide 应为 ${e.unilateral}');
         }
+        for (final c in e.cautions) {
+          if (avoid.contains(c)) issues.add('${e.name} 会加重$c部负担');
+        }
         if (r != null) {
           for (final q in e.equipment) {
             if (!r.availableEquipment.contains(q)) {
@@ -54,9 +58,6 @@ class PlanValidator {
           }
           if (r.scene == 'office' && e.isFloor) {
             issues.add('${e.name} 需要趴/躺在地上，不适合办公室');
-          }
-          for (final c in e.cautions) {
-            if (r.avoid.contains(c)) issues.add('${e.name} 会加重$c部负担');
           }
         }
       }

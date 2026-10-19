@@ -4,8 +4,6 @@ import '../app/services.dart';
 import '../domain/exercise.dart';
 import '../domain/scenario.dart';
 import '../domain/template.dart';
-import 'about_page.dart';
-import 'library_page.dart';
 import 'plan_page.dart';
 import 'theme.dart';
 
@@ -18,13 +16,15 @@ const examplePrompts = [
   '膝盖不太好，想练练臀腿',
 ];
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+/// The original form (目标 / 场景 / 器械 / 时长 / 水平 / 保护部位 + templates),
+/// kept as the 「自定义计划」 entry in the chat drawer.
+class CustomPlanPage extends StatefulWidget {
+  const CustomPlanPage({super.key});
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<CustomPlanPage> createState() => _CustomPlanPageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _CustomPlanPageState extends State<CustomPlanPage> {
   final _text = TextEditingController();
   var _req = const ScenarioRequest(minutes: 10);
   bool _busy = false;
@@ -37,15 +37,15 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _generate({String? templateId}) async {
     final s = AppServices.of(context);
-    if (s.store.safetyBlocked) {
+    if (!s.store.trainingAllowed) {
       await showDialog<void>(
         context: context,
         builder: (c) => AlertDialog(
-          title: const Text('暂不生成训练计划'),
-          content: const Text(
-            '你在安全确认里选了需要注意的情况。建议先咨询医生；你仍可以在「动作库」里浏览动作示范。'
-            '如情况已变化，可在「关于」里重新做安全确认。',
-          ),
+          title: Text(s.store.safetyAccepted ? '暂不生成训练计划' : '先完成安全确认'),
+          content: Text(s.store.safetyAccepted
+              ? '你在安全确认里选了需要注意的情况。建议先咨询医生；你仍可以在「动作库」里浏览动作示范。'
+                  '如情况已变化，可在「关于与设置」里重新做安全确认。'
+              : '请返回首页对话，完成上方的安全确认后再生成计划。'),
           actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('知道了'))],
         ),
       );
@@ -88,30 +88,14 @@ class _HomePageState extends State<HomePage> {
     final s = AppServices.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('智能健身助手', style: TextStyle(fontWeight: FontWeight.w700)),
-        actions: [
-          IconButton(
-            tooltip: '动作库',
-            icon: const Icon(Icons.grid_view_rounded),
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute<void>(builder: (_) => const LibraryPage()),
-            ),
-          ),
-          IconButton(
-            tooltip: '关于与设置',
-            icon: const Icon(Icons.info_outline_rounded),
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute<void>(builder: (_) => const AboutPage()),
-            ),
-          ),
-        ],
+        title: const Text('自定义计划', style: TextStyle(fontWeight: FontWeight.w700)),
       ),
       body: ListenableBuilder(
         listenable: s.store,
         builder: (context, _) => ListView(
           padding: const EdgeInsets.fromLTRB(16, 4, 16, 32),
           children: [
-            if (s.store.safetyBlocked) _blockedBanner(),
+            if (!s.store.trainingAllowed) _blockedBanner(),
             const Text('描述你今天想怎么练', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700)),
             const SizedBox(height: 10),
             TextField(
@@ -124,10 +108,10 @@ class _HomePageState extends State<HomePage> {
               ),
               onChanged: (_) => setState(() {}),
             ),
-            const Padding(
-              padding: EdgeInsets.only(top: 6, bottom: 8),
+            Padding(
+              padding: const EdgeInsets.only(top: 6, bottom: 8),
               child: Text('描述里提到的场景、时长、器械、水平和不适部位会自动识别，并优先于下方选项。',
-                  style: TextStyle(color: SfColors.muted, fontSize: 12)),
+                  style: SfType.caption.copyWith(color: SfColors.muted)),
             ),
             SizedBox(
               height: 36,
@@ -223,7 +207,7 @@ class _HomePageState extends State<HomePage> {
             FilledButton.icon(
               key: const ValueKey('generate'),
               onPressed: _busy ? null : () => _generate(),
-              icon: const Icon(Icons.auto_awesome_rounded),
+              icon: const SfIcon(SfGlyph.sparkle, size: 18),
               label: Text(_busy ? '生成中…' : '生成训练计划'),
             ),
             const SizedBox(height: 28),
@@ -241,14 +225,14 @@ class _HomePageState extends State<HomePage> {
               for (final h in s.store.history.take(5))
                 ListTile(
                   contentPadding: EdgeInsets.zero,
-                  leading: Icon(
-                    h.completed >= h.total ? Icons.check_circle_rounded : Icons.timelapse_rounded,
-                    color: h.completed >= h.total ? SfColors.ok : SfColors.warn,
+                  leading: SfIcon(
+                    h.completed >= h.total ? SfGlyph.checkCircle : SfGlyph.clock,
+                    color: h.completed >= h.total ? SfColors.accentText : SfColors.muted,
                   ),
                   title: Text(h.title),
                   subtitle: Text(
                     '${h.at.month}月${h.at.day}日 · ${h.minutes} 分钟 · 完成 ${h.completed}/${h.total} 个动作',
-                    style: const TextStyle(color: SfColors.muted),
+                    style: TextStyle(color: SfColors.muted),
                   ),
                 ),
             ],
@@ -265,15 +249,17 @@ class _HomePageState extends State<HomePage> {
       color: const Color(0x33FFC857),
       borderRadius: BorderRadius.circular(14),
     ),
-    child: const Text(
-      '根据你的安全确认，当前只开放动作浏览。建议先咨询医生后再开始训练。',
-      style: TextStyle(height: 1.5),
+    child: Text(
+      AppServices.of(context).store.safetyAccepted
+          ? '根据你的安全确认，当前只开放动作浏览。建议先咨询医生后再开始训练。'
+          : '请先返回首页对话完成安全确认，再生成训练计划。',
+      style: const TextStyle(height: 1.5),
     ),
   );
 
   Widget _section(String title) => Padding(
     padding: const EdgeInsets.only(top: 14, bottom: 8),
-    child: Text(title, style: const TextStyle(color: SfColors.muted, fontSize: 14)),
+    child: Text(title, style: TextStyle(color: SfColors.muted, fontSize: 14)),
   );
 
   Widget _templateCard(PlanTemplate t) {
@@ -294,9 +280,9 @@ class _HomePageState extends State<HomePage> {
                   width: 64,
                   height: 64,
                   child: first == null
-                      ? const ColoredBox(color: SfColors.surface2)
+                      ? ColoredBox(color: SfColors.surfaceHigh)
                       : Image.asset(first.media.poster, fit: BoxFit.cover,
-                          errorBuilder: (_, _, _) => const ColoredBox(color: SfColors.surface2)),
+                          errorBuilder: (_, _, _) => ColoredBox(color: SfColors.surfaceHigh)),
                 ),
               ),
               const SizedBox(width: 12),
@@ -307,16 +293,16 @@ class _HomePageState extends State<HomePage> {
                     Text(t.name, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                     const SizedBox(height: 4),
                     Text(t.summary, maxLines: 2, overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(color: SfColors.muted, fontSize: 13, height: 1.4)),
+                        style: TextStyle(color: SfColors.muted, fontSize: 13, height: 1.4)),
                   ],
                 ),
               ),
               const SizedBox(width: 8),
               Column(
                 children: [
-                  Text('${t.minutes}′', style: const TextStyle(color: SfColors.accent, fontSize: 16, fontWeight: FontWeight.w700)),
+                  Text('${t.minutes}′', style: SfType.callout.copyWith(fontWeight: FontWeight.w700)),
                   Text(t.scenes.contains('office') ? (t.scenes.length > 1 ? '通用' : '办公室') : '居家',
-                      style: const TextStyle(color: SfColors.muted, fontSize: 12)),
+                      style: TextStyle(color: SfColors.muted, fontSize: 12)),
                 ],
               ),
             ],

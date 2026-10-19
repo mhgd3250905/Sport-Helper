@@ -2,6 +2,10 @@
 
 验收日期：2026-10-19（Asia/Shanghai）。接手基线：`main@6c2c1d3`。
 
+最新动作包检查点：PR #1 已合入 `main@adafcf9`，标签 `m4-drill-packs`。本机静态分析无问题，44 项 Flutter 测试、语音工具环境回归通过；93 个动作包与公共包校验通过，695 条语音审计 0 失败。Web release 与 Android **debug** APK 构建成功，APK 中检查到 94 个包 manifest、93 个视频、93 个封面和 695 条语音。下文最初的内存不足记录属于 M3 历史，不能据此认定当前 debug 构建仍失败；也不能把 debug 构建记为 release 或真机验收通过。
+
+对话首页 PR #2 本机复验：静态分析 0 issue、98 项测试及独立截图检查通过，Web release、Android debug APK 构建成功。已修复安全入口绕过、保护条件丢失、详情训练与改版保存、键盘/辅助功能和小屏布局问题，完成 360×640 浏览器主流程走查。[完整审核记录](pr2-local-review.md) 含固定 SHA、证据和 APK 摘要。Web 仍只有视频海报且存在字体回退联网；真机、release 签名与完整设备验收保持待办。
+
 本轮完成本机自动化验证与跟练缺陷修复，检查点标签为 `m3-local-tests`。**Android 设备走查及 release APK 尚未通过，M3 完整验收未完成。** `m3-local-verified` 留待下述设备与构建项目全部通过后再打。
 
 同日补做本机 Web 走查，检查点 `m3-web-qa`：Web release 构建成功，最新静态分析无问题，38 项测试通过；具体结果见下节。Android 待验项目保持未验状态。

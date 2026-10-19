@@ -1,6 +1,8 @@
 # 智能健身助手（SmartFit）交接说明
 
-> 2026-10-19 `feat/drill-packs`（PR 待合并）：动作库、视频、语音已改为「动作小包」`assets/packs/<id>/`，`assets/library/exercises.json`、`assets/drill_media/`、`assets/voice/` 及 `tools/library/build_library.py` 已移除。格式见 [drill-pack-spec.md](drill-pack-spec.md)，语音审计见 [voice-audit-2026-10-19.md](voice-audit-2026-10-19.md)。下文路径为旧结构。
+> 最新本机复验（2026-10-19）：PR #1 已合入 main（`adafcf9`，`m4-drill-packs`）；PR #2 已改 base 为 main，本机修复安全入口、保存复用约束与小屏交互后，98 项测试、截图检查及 Web release / Android debug 构建通过。见 [PR #2 审核记录](pr2-local-review.md) 和 [验收记录](acceptance.md)。下文保留各阶段历史；Android 真机与 release 签名尚未验收，`m3-local-verified` 未打。
+
+> 动作包迁移记录（2026-10-19）：动作库、视频、语音已改为「动作小包」`assets/packs/<id>/`，`assets/library/exercises.json`、`assets/drill_media/`、`assets/voice/` 及 `tools/library/build_library.py` 已移除。格式见 [drill-pack-spec.md](drill-pack-spec.md)，语音审计见 [voice-audit-2026-10-19.md](voice-audit-2026-10-19.md)。下文路径为旧结构。
 
 > Web 复验更新（2026-10-19）：检查点 `m3-web-qa`，本机 Web release 构建成功，静态分析无问题，38 项测试通过。已修复不适短语漏识别、旧推断目标残留、手动换动作绕过器械/保护条件校验及横屏详情溢出。浏览器验证主流程、真实音频播放、暂停、提前结束与存储。Web 仍只显示视频封面，中文字体首次加载可能联网；Android 完整验收继续待办，详见 [acceptance.md](acceptance.md)。
 

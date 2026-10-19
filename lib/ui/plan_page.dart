@@ -13,9 +13,12 @@ import 'theme.dart';
 /// The generated plan as training groups: one live preview on top (the
 /// selected move loops), every move below with its dose and key point.
 class PlanPage extends StatefulWidget {
-  const PlanPage({super.key, required this.plan, this.request});
+  const PlanPage({super.key, required this.plan, this.request, this.returnPlanOnStart = false});
   final TrainingPlan plan;
   final ScenarioRequest? request;
+  /// Chat details return the edited plan so the home owns the workout
+  /// and its completion summary, just like the card's start button.
+  final bool returnPlanOnStart;
   @override
   State<PlanPage> createState() => _PlanPageState();
 }
@@ -50,6 +53,7 @@ class _PlanPageState extends State<PlanPage> {
       scene: _plan.scene,
       equipment: _plan.equipment.map(Equipment.byName).toSet(),
       level: _plan.level,
+      avoid: _plan.avoid,
     );
     final issues = PlanValidator(s.library).validate(updated, request);
     if (alt.level > request.level + 1) issues.add('替代动作难度偏高');
@@ -60,7 +64,7 @@ class _PlanPageState extends State<PlanPage> {
       return;
     }
     setState(() {
-      _plan = updated;
+      _plan = updated.copyWith(id: '${updated.id.split('~').first}~${DateTime.now().microsecondsSinceEpoch}');
       _selected = alt.id;
     });
     s.store.rememberPlan(_plan);
@@ -81,13 +85,25 @@ class _PlanPageState extends State<PlanPage> {
           child: FilledButton.icon(
             key: const ValueKey('start'),
             onPressed: () async {
+              if (!s.store.trainingAllowed) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text(s.store.safetyAccepted
+                      ? '根据你的安全确认，暂不开始训练；可以在动作库里看示范。'
+                      : '请先在对话里完成安全确认，再开始训练。'),
+                ));
+                return;
+              }
+              if (widget.returnPlanOnStart) {
+                Navigator.of(context).pop(_plan);
+                return;
+              }
               setState(() => _previewOn = false); // free the preview WebView
               await Navigator.of(context).push(
                 MaterialPageRoute<void>(builder: (_) => PlayerPage(plan: _plan)),
               );
               if (mounted) setState(() => _previewOn = true);
             },
-            icon: const Icon(Icons.play_arrow_rounded),
+            icon: const SfIcon(SfGlyph.play, size: 20, filled: true),
             label: const Text('开始跟练'),
           ),
         ),
@@ -95,16 +111,16 @@ class _PlanPageState extends State<PlanPage> {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
         children: [
-          Text(_plan.summary, style: const TextStyle(color: SfColors.muted, height: 1.5)),
+          Text(_plan.summary, style: TextStyle(color: SfColors.muted, height: 1.5)),
           const SizedBox(height: 10),
           Wrap(
             spacing: 8,
             runSpacing: 6,
             children: [
-              _pill(Icons.schedule_rounded, minutesZh(seconds)),
-              _pill(Icons.fitness_center_rounded, '$count 个动作'),
-              _pill(Icons.trending_up_rounded, levelZh(_plan.level)),
-              _pill(Icons.place_outlined, _plan.scene == 'office' ? '办公室' : '居家'),
+              _pill(SfGlyph.clock, minutesZh(seconds)),
+              _pill(SfGlyph.figure, '$count 个动作'),
+              _pill(SfGlyph.progress, levelZh(_plan.level)),
+              _pill(_plan.scene == 'office' ? SfGlyph.chair : SfGlyph.home, _plan.scene == 'office' ? '办公室' : '居家'),
             ],
           ),
           const SizedBox(height: 14),
@@ -118,7 +134,7 @@ class _PlanPageState extends State<PlanPage> {
             Text(selected.name, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
             const SizedBox(height: 4),
             Text('要领：${selected.cue}', style: const TextStyle(height: 1.5)),
-            Text('目标：${selected.muscles.join('、')}', style: const TextStyle(color: SfColors.muted, fontSize: 13)),
+            Text('目标：${selected.muscles.join('、')}', style: TextStyle(color: SfColors.muted, fontSize: 13)),
           ],
           if (_plan.notes.isNotEmpty) ...[
             const SizedBox(height: 12),
@@ -131,7 +147,7 @@ class _PlanPageState extends State<PlanPage> {
                   const Text('已按你的情况调整', style: TextStyle(fontWeight: FontWeight.w600)),
                   const SizedBox(height: 4),
                   for (final n in _plan.notes)
-                    Text('· $n', style: const TextStyle(color: SfColors.muted, fontSize: 13, height: 1.5)),
+                    Text('· $n', style: TextStyle(color: SfColors.muted, fontSize: 13, height: 1.5)),
                 ],
               ),
             ),
@@ -145,17 +161,17 @@ class _PlanPageState extends State<PlanPage> {
           ],
           const SizedBox(height: 16),
           for (final n in _plan.safetyNotes)
-            Text('⚠ $n', style: const TextStyle(color: SfColors.muted, fontSize: 12, height: 1.6)),
+            Text('⚠ $n', style: TextStyle(color: SfColors.muted, fontSize: 12, height: 1.6)),
         ],
       ),
     );
   }
 
-  Widget _pill(IconData icon, String text) => Container(
+  Widget _pill(SfGlyph icon, String text) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-    decoration: BoxDecoration(color: SfColors.surface2, borderRadius: BorderRadius.circular(20)),
+    decoration: BoxDecoration(color: SfColors.surfaceHigh, borderRadius: BorderRadius.circular(20)),
     child: Row(mainAxisSize: MainAxisSize.min, children: [
-      Icon(icon, size: 16, color: SfColors.accent),
+      SfIcon(icon, size: 16, color: SfColors.muted),
       const SizedBox(width: 4),
       Text(text, style: const TextStyle(fontSize: 13)),
     ]),
@@ -182,7 +198,7 @@ class _PlanPageState extends State<PlanPage> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Material(
-        color: sel ? SfColors.surface2 : SfColors.surface,
+        color: sel ? SfColors.surfaceHigh : SfColors.surface,
         borderRadius: BorderRadius.circular(14),
         child: InkWell(
           key: ValueKey('item-${e.id}'),
@@ -204,17 +220,17 @@ class _PlanPageState extends State<PlanPage> {
                     children: [
                       Text(e.name, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
                       const SizedBox(height: 3),
-                      Text(dose, style: const TextStyle(color: SfColors.accent, fontSize: 14)),
+                      Text(dose, style: SfType.label.copyWith(color: SfColors.accentText, fontWeight: FontWeight.w600)),
                       Text('${e.category.zh} · ${e.muscles.join('、')}',
                           maxLines: 1, overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(color: SfColors.muted, fontSize: 12)),
+                          style: TextStyle(color: SfColors.muted, fontSize: 12)),
                     ],
                   ),
                 ),
                 if (e.alternative != null)
                   IconButton(
                     tooltip: '换一个',
-                    icon: const Icon(Icons.swap_horiz_rounded, color: SfColors.muted),
+                    icon: SfIcon(SfGlyph.swap, size: 20, color: SfColors.muted),
                     onPressed: () => _swap(bi, ii),
                   ),
               ],

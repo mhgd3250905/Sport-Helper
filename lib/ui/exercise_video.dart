@@ -107,7 +107,7 @@ class _ExerciseVideoState extends State<ExerciseVideo> {
             e.media.poster,
             fit: BoxFit.contain,
             gaplessPlayback: true,
-            errorBuilder: (_, _, _) => const ColoredBox(color: SfColors.bg),
+            errorBuilder: (_, _, _) => ColoredBox(color: SfColors.mediaStage),
           ),
       ],
     );
@@ -117,7 +117,7 @@ class _ExerciseVideoState extends State<ExerciseVideo> {
     return ClipRRect(
       borderRadius: BorderRadius.circular(widget.radius),
       child: ColoredBox(
-        color: SfColors.bg,
+        color: SfColors.mediaStage,
         child: AspectRatio(aspectRatio: 1, child: content),
       ),
     );

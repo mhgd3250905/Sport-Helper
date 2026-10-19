@@ -11,11 +11,18 @@ import '../domain/session.dart';
 import '../voice/session_runner.dart';
 import '../voice/voice_cue.dart';
 import '../voice/voice_queue.dart';
+import 'chat/cosmos.dart';
 import 'exercise_video.dart';
-import 'theme.dart';
+import 'theme/app_theme.dart';
+import 'theme/sf_icons.dart';
+import 'theme/tokens.dart';
+import 'theme/widgets.dart';
 
 /// Full-screen follow-along: clip, set / side / round, rep counter or
-/// countdown, rests with a next-move preview, voice coaching.
+/// countdown, rests with a next-move preview, voice coaching. Drawn in the
+/// chat's sky (held still); layout after HipLab's player: top bar, the clip
+/// on its stage, the move, the ring, three controls. One accent: the ring
+/// while working and the pause / continue disc.
 class PlayerPage extends StatefulWidget {
   const PlayerPage({
     super.key,
@@ -176,40 +183,34 @@ class _PlayerPageState extends State<PlayerPage> {
     if (wasRunning) _togglePause();
     final choice = await showModalBottomSheet<String>(
       context: context,
-      backgroundColor: SfColors.surface,
       builder: (c) => SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+          padding: const EdgeInsets.fromLTRB(SfSpace.gutter, 0, SfSpace.gutter, SfSpace.x2),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                '哪里不舒服？',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
-              ),
-              const SizedBox(height: 6),
-              const Text(
+              Text('哪里不舒服？', style: SfType.title),
+              const SizedBox(height: SfSpace.x2),
+              Text(
                 '出现刺痛、麻木、头晕或胸闷，请立即停止训练。轻微酸胀可以减小幅度、放慢速度。',
-                style: TextStyle(color: SfColors.muted, height: 1.5),
+                style: SfType.body.copyWith(fontSize: 15, color: SfColors.muted),
               ),
-              const SizedBox(height: 12),
-              ListTile(
-                leading: const Icon(Icons.compress_rounded),
-                title: const Text('减小幅度，继续'),
+              const SizedBox(height: SfSpace.x5),
+              SfSheetOption(
+                icon: SfGlyph.pinch,
+                label: '减小幅度，继续',
                 onTap: () => Navigator.pop(c, 'continue'),
               ),
-              ListTile(
-                leading: const Icon(Icons.skip_next_rounded),
-                title: const Text('跳过这个动作'),
+              SfSheetOption(
+                icon: SfGlyph.skipNext,
+                label: '跳过这个动作',
                 onTap: () => Navigator.pop(c, 'skip'),
               ),
-              ListTile(
-                leading: const Icon(
-                  Icons.stop_circle_outlined,
-                  color: SfColors.warn,
-                ),
-                title: const Text('结束今天的训练'),
+              SfSheetOption(
+                icon: SfGlyph.stop,
+                color: SfColors.danger,
+                label: '结束今天的训练',
                 onTap: () => Navigator.pop(c, 'end'),
               ),
             ],
@@ -238,12 +239,12 @@ class _PlayerPageState extends State<PlayerPage> {
         content: const Text('本次进度会记为未完成。'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(c, false),
-            child: const Text('继续练'),
+            onPressed: () => Navigator.pop(c, true),
+            child: Text('结束', style: TextStyle(color: SfColors.muted, fontWeight: FontWeight.w500)),
           ),
           TextButton(
-            onPressed: () => Navigator.pop(c, true),
-            child: const Text('结束'),
+            onPressed: () => Navigator.pop(c, false),
+            child: const Text('继续练'),
           ),
         ],
       ),
@@ -264,8 +265,16 @@ class _PlayerPageState extends State<PlayerPage> {
         final nav = Navigator.of(context);
         if (await _confirmClose()) nav.pop();
       },
-      child: Scaffold(
-        body: SafeArea(child: _engine.done ? _doneView() : _sessionView(p, e)),
+      child: AnnotatedRegion(
+        value: sfOverlay,
+        child: Scaffold(
+          backgroundColor: SfColors.skyBottom,
+          // The chat's sky, held still: no star drift during a workout.
+          body: CosmosBackground(
+            animate: false,
+            child: SafeArea(child: _engine.done ? _doneView() : _sessionView(p, e)),
+          ),
+        ),
       ),
     );
   }
@@ -280,123 +289,215 @@ class _PlayerPageState extends State<PlayerPage> {
         p.kind == PhaseKind.rest ||
         p.kind == PhaseKind.roundRest ||
         p.kind == PhaseKind.prep;
-    final color = rest ? SfColors.rest : SfColors.accent;
     final done = _engine.completedExercises;
+    final label = switch (p.kind) {
+      PhaseKind.prep => '准备 · 第一个动作',
+      PhaseKind.rest when p.nextExerciseId != null => '休息 · 下一个动作',
+      PhaseKind.rest => '组间休息',
+      PhaseKind.roundRest => '这一轮完成 · 休息',
+      PhaseKind.switchSide => '换左侧',
+      _ => '',
+    };
+    final sub = _subtitle ?? (rest ? e?.cue : null);
+    final current = (done + (rest ? 0 : 1)).clamp(1, _occurrences);
     return Column(
       children: [
+        // Top bar: close · block + progress · count.
         Padding(
-          padding: const EdgeInsets.fromLTRB(4, 4, 12, 0),
+          padding: const EdgeInsets.fromLTRB(SfSpace.x4, SfSpace.x2, SfSpace.gutter, SfSpace.x2),
           child: Row(
             children: [
-              IconButton(
+              SfCircleButton(
                 key: const ValueKey('close'),
                 tooltip: '关闭训练',
-                icon: const Icon(Icons.close_rounded),
+                icon: SfGlyph.close,
                 onPressed: () async {
                   final nav = Navigator.of(context);
                   if (await _confirmClose()) nav.pop();
                 },
               ),
+              const SizedBox(width: SfSpace.x4),
               Expanded(
-                child: Text(
-                  '${p.blockName}  ·  动作 ${(done + (rest ? 0 : 1)).clamp(1, _occurrences)}/$_occurrences',
-                  style: const TextStyle(color: SfColors.muted),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      p.blockName,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: SfType.label.copyWith(color: SfColors.accentText, fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(height: 6),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(2),
+                      child: LinearProgressIndicator(
+                        value: _occurrences == 0 ? 0 : done / _occurrences,
+                        minHeight: 4,
+                        backgroundColor: SfColors.track,
+                        color: SfColors.accent,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              TextButton.icon(
-                key: const ValueKey('discomfort'),
-                onPressed: _discomfort,
-                icon: const Icon(
-                  Icons.healing_outlined,
-                  size: 18,
-                  color: SfColors.warn,
-                ),
-                label: const Text(
-                  '不舒服',
-                  style: TextStyle(color: SfColors.warn),
-                ),
+              const SizedBox(width: SfSpace.x4),
+              Text.rich(
+                TextSpan(children: [
+                  TextSpan(text: '$current', style: SfType.callout.copyWith(fontWeight: FontWeight.w700)),
+                  TextSpan(text: ' / $_occurrences', style: SfType.label),
+                ]),
+                style: const TextStyle(fontFeatures: SfType.tabular),
               ),
             ],
           ),
         ),
-        LinearProgressIndicator(
-          value: _occurrences == 0 ? 0 : done / _occurrences,
-          minHeight: 3,
-          backgroundColor: SfColors.surface2,
-          color: SfColors.accent,
-        ),
         Expanded(
           child: ListView(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+            padding: const EdgeInsets.fromLTRB(SfSpace.x4, SfSpace.x2, SfSpace.x4, SfSpace.x2),
             children: [
               if (e != null)
-                ExerciseVideo(
-                  key: ValueKey('player-${e.id}'),
-                  exercise: e,
-                  mirrored: p.side == Side.left,
-                  paused: _paused,
+                Stack(
+                  children: [
+                    ExerciseVideo(
+                      key: ValueKey('player-${e.id}'),
+                      exercise: e,
+                      mirrored: p.side == Side.left,
+                      paused: _paused,
+                      radius: SfRadius.lg,
+                    ),
+                    if (_paused)
+                      const Positioned(left: SfSpace.x3, top: SfSpace.x3, child: SfMediaTag(label: '已暂停'))
+                    else if (p.kind == PhaseKind.switchSide)
+                      Positioned(
+                        left: SfSpace.x3,
+                        top: SfSpace.x3,
+                        child: SfMediaTag(label: '换左侧', icon: SfGlyph.swap, color: SfColors.palette.isDark ? SfColors.caution : SfPalette.dark.caution),
+                      ),
+                    Positioned(
+                      right: SfSpace.x2,
+                      top: SfSpace.x2,
+                      child: SfPressable(
+                        key: const ValueKey('discomfort'),
+                        semanticLabel: '不舒服',
+                        onTap: _discomfort,
+                        child: Padding(
+                          padding: const EdgeInsets.all(SfSpace.x1),
+                          child: SfMediaTag(label: '不舒服', icon: SfGlyph.bandage, color: SfPalette.dark.caution),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              const SizedBox(height: 12),
-              Text(switch (p.kind) {
-                PhaseKind.prep => '准备 · 第一个动作',
-                PhaseKind.rest when p.nextExerciseId != null => '休息 · 下一个动作',
-                PhaseKind.rest => '组间休息',
-                PhaseKind.roundRest => '这一轮完成 · 休息',
-                PhaseKind.switchSide => '换左侧',
-                _ => '',
-              }, style: TextStyle(color: color, fontWeight: FontWeight.w600)),
-              Text(
-                e?.name ?? '',
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w800,
+              const SizedBox(height: SfSpace.x5),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: SfSpace.x1),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (label.isNotEmpty) ...[
+                            Text(
+                              label,
+                              style: SfType.label.copyWith(
+                                color: p.kind == PhaseKind.switchSide ? SfColors.caution : SfColors.muted,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: SfSpace.x1),
+                          ],
+                          Text(
+                            e?.name ?? '',
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: SfType.title.copyWith(fontSize: 24, height: 1.25),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(_meta(p), style: SfType.label.copyWith(fontSize: 14)),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: SfSpace.x3),
+                    _counter(p, left, progress, !rest && p.kind != PhaseKind.switchSide),
+                  ],
                 ),
               ),
-              const SizedBox(height: 4),
-              Text(
-                _meta(p),
-                style: const TextStyle(color: SfColors.muted, fontSize: 15),
-              ),
-              const SizedBox(height: 16),
-              Center(child: _counter(p, left, progress, color)),
-              const SizedBox(height: 14),
-              if ((_subtitle ?? (rest ? e?.cue : null)) case final sub?)
-                Text(
-                  '要领：$sub',
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(height: 1.5),
+              if (sub != null)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(SfSpace.x1, SfSpace.x4, SfSpace.x1, 0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: 2),
+                        child: SfIcon(SfGlyph.subtitles, size: 18, color: SfColors.faint),
+                      ),
+                      const SizedBox(width: SfSpace.x2),
+                      Expanded(
+                        child: Text(
+                          sub,
+                          style: SfType.body.copyWith(fontSize: 15, height: 1.55, color: SfColors.muted),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
+              if (!rest) ?_nextUp(p),
             ],
           ),
         ),
         Padding(
-          padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
+          padding: const EdgeInsets.fromLTRB(48, SfSpace.x2, 48, SfSpace.x5),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              IconButton.filledTonal(
+              SfCircleButton(
                 key: const ValueKey('prev'),
                 tooltip: '上一个动作',
-                iconSize: 28,
+                icon: SfGlyph.skipPrevious,
+                size: 56,
                 onPressed: _previous,
-                icon: const Icon(Icons.skip_previous_rounded),
               ),
-              IconButton.filled(
+              SfPressable(
                 key: const ValueKey('pause'),
                 tooltip: _paused ? '继续训练' : '暂停训练',
-                iconSize: 40,
-                style: IconButton.styleFrom(backgroundColor: SfColors.accent),
-                onPressed: _togglePause,
-                icon: Icon(
-                  _paused ? Icons.play_arrow_rounded : Icons.pause_rounded,
+                semanticLabel: _paused ? '继续训练' : '暂停训练',
+                onTap: _togglePause,
+                scale: .94,
+                child: Builder(
+                  builder: (context) {
+                    final down = SfPressedScope.of(context);
+                    return AnimatedContainer(
+                      duration: down ? SfMotion.press : SfMotion.release,
+                      width: 76,
+                      height: 76,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: down ? Color.lerp(SfColors.accent, Colors.black, .1) : SfColors.accent,
+                      ),
+                      child: AnimatedSwitcher(
+                        duration: SfMotion.fast,
+                        child: SfIcon(
+                          _paused ? SfGlyph.play : SfGlyph.pause,
+                          key: ValueKey(_paused),
+                          size: 32,
+                          filled: true,
+                          color: SfColors.onAccent,
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
-              IconButton.filledTonal(
+              SfCircleButton(
                 key: const ValueKey('skip'),
                 tooltip: '跳过动作',
-                iconSize: 28,
+                icon: SfGlyph.skipNext,
+                size: 56,
                 onPressed: _skip,
-                icon: const Icon(Icons.skip_next_rounded),
               ),
             ],
           ),
@@ -415,7 +516,58 @@ class _PlayerPageState extends State<PlayerPage> {
     return parts.join(' · ');
   }
 
-  Widget _counter(SessionPhase p, int left, double progress, Color color) {
+  /// While working: the move after this one (HipLab's 下一个 strip).
+  Widget? _nextUp(SessionPhase p) {
+    final phases = _engine.phases;
+    SessionPhase? next;
+    for (var i = _engine.index + 1; i < phases.length; i++) {
+      final q = phases[i];
+      if (q.kind == PhaseKind.work && q.exerciseId != null && q.exerciseId != p.exerciseId) {
+        next = q;
+        break;
+      }
+    }
+    final e = next == null ? null : _s.library.tryGet(next.exerciseId!);
+    if (next == null || e == null) return null;
+    final dose = next.item?.copyWith(sets: 1).doseText();
+    return Padding(
+      padding: const EdgeInsets.only(top: SfSpace.x6),
+      child: SfPanel(
+        padding: const EdgeInsets.all(SfSpace.x2),
+        radius: SfRadius.md + 2,
+        child: Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(SfRadius.sm - 2),
+              child: SizedBox.square(
+                dimension: 44,
+                child: ColoredBox(
+                  color: SfColors.mediaStage,
+                  child: Image.asset(e.media.poster, fit: BoxFit.cover,
+                      errorBuilder: (_, _, _) => const SizedBox.shrink()),
+                ),
+              ),
+            ),
+            const SizedBox(width: SfSpace.x3),
+            Text('下一个', style: SfType.label),
+            const SizedBox(width: SfSpace.x2),
+            Expanded(
+              child: Text(e.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: SfType.callout),
+            ),
+            if (dose != null) ...[
+              const SizedBox(width: SfSpace.x2),
+              Text(dose, style: SfType.label),
+            ],
+            const SizedBox(width: SfSpace.x2),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Reps or seconds inside a ring. The ring is the accent only while
+  /// working; prep / rest count down in a neutral tone.
+  Widget _counter(SessionPhase p, int left, double progress, bool working) {
     final reps = p.reps;
     String big;
     String small;
@@ -429,17 +581,18 @@ class _PlayerPageState extends State<PlayerPage> {
       small = p.isWork ? '秒' : '秒后开始';
     }
     return SizedBox(
-      width: 150,
-      height: 150,
+      width: 112,
+      height: 112,
       child: Stack(
         alignment: Alignment.center,
         children: [
           SizedBox.expand(
             child: CircularProgressIndicator(
               value: progress,
-              strokeWidth: 8,
-              backgroundColor: SfColors.surface2,
-              color: color,
+              strokeWidth: 5,
+              strokeCap: StrokeCap.round,
+              backgroundColor: SfColors.track,
+              color: working ? SfColors.accent : SfColors.text.withValues(alpha: .55),
             ),
           ),
           Column(
@@ -449,12 +602,14 @@ class _PlayerPageState extends State<PlayerPage> {
                 big,
                 key: const ValueKey('counter'),
                 style: TextStyle(
-                  fontSize: 48,
-                  fontWeight: FontWeight.w800,
-                  color: color,
+                  fontSize: 40,
+                  height: 1.1,
+                  fontWeight: FontWeight.w700,
+                  color: SfColors.text,
+                  fontFeatures: SfType.tabular,
                 ),
               ),
-              Text(small, style: const TextStyle(color: SfColors.muted)),
+              Text(small, style: SfType.caption.copyWith(color: SfColors.muted)),
             ],
           ),
         ],
@@ -465,35 +620,75 @@ class _PlayerPageState extends State<PlayerPage> {
   Widget _doneView() {
     final full =
         !_engine.endedEarly && _engine.completedExercises >= _occurrences;
+    final minutes = ((_endedAt ?? _t) / 60).round();
     return Padding(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.fromLTRB(SfSpace.x6, 0, SfSpace.x6, SfSpace.x5),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            full ? Icons.emoji_events_rounded : Icons.flag_rounded,
-            size: 72,
-            color: full ? SfColors.accent : SfColors.warn,
+          Expanded(
+            child: Center(
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: full ? SfColors.accentSoft : SfColors.surfaceHigh,
+                      ),
+                      alignment: Alignment.center,
+                      child: SfIcon(
+                        full ? SfGlyph.check : SfGlyph.stop,
+                        size: 38,
+                        strokeWidth: 2.2,
+                        color: full ? SfColors.accentText : SfColors.muted,
+                      ),
+                    ),
+                    const SizedBox(height: SfSpace.x6),
+                    Text(full ? '训练完成！' : '今天先到这里', style: SfType.display),
+                    const SizedBox(height: SfSpace.x2),
+                    Text(
+                      widget.plan.title,
+                      textAlign: TextAlign.center,
+                      style: SfType.body.copyWith(color: SfColors.muted),
+                    ),
+                    const SizedBox(height: SfSpace.x8),
+                    Row(
+                      children: [
+                        Expanded(child: _stat('$minutes', '分钟')),
+                        const SizedBox(width: SfSpace.x3),
+                        Expanded(child: _stat('${_engine.completedExercises}/$_occurrences', '完成动作')),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
-          const SizedBox(height: 16),
-          Text(
-            full ? '训练完成！' : '今天先到这里',
-            style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w800),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            '${widget.plan.title} · ${((_endedAt ?? _t) / 60).round()} 分钟 · 完成 ${_engine.completedExercises}/$_occurrences 个动作',
-            textAlign: TextAlign.center,
-            style: const TextStyle(color: SfColors.muted),
-          ),
-          const SizedBox(height: 28),
-          FilledButton(
+          SfPrimaryButton(
             key: const ValueKey('finish'),
+            label: '完成',
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('完成'),
           ),
         ],
       ),
     );
   }
+
+  Widget _stat(String value, String label) => SfPanel(
+    padding: const EdgeInsets.symmetric(vertical: SfSpace.x4),
+    radius: SfRadius.md + 2,
+    child: Column(
+      children: [
+        Text(
+          value,
+          style: SfType.title.copyWith(fontSize: 26, fontFeatures: SfType.tabular),
+        ),
+        const SizedBox(height: 2),
+        Text(label, style: SfType.label),
+      ],
+    ),
+  );
 }

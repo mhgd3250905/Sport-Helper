@@ -1,16 +1,27 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'app/services.dart';
 import 'core/storage/local_state_storage.dart';
 import 'data/app_store.dart';
-import 'ui/home_page.dart';
-import 'ui/safety_page.dart';
-import 'ui/theme.dart';
+import 'ui/chat/chat_home_page.dart';
+import 'ui/theme/app_theme.dart';
+import 'ui/theme/tokens.dart';
 import 'voice/just_audio_output.dart';
+
+/// The bundled font's licence on the 开源软件许可 page.
+void registerFontLicense() {
+  LicenseRegistry.addLicense(() async* {
+    final text = await rootBundle.loadString('assets/licenses/NotoSansSC-OFL.txt');
+    yield LicenseEntryWithLineBreaks(const ['Noto Sans SC'], text);
+  });
+}
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  registerFontLicense();
   final (lib, catalog, voices) = await AppServices.loadContent();
   final store = AppStore(SharedPreferencesLocalStateStorage());
   await store.load();
@@ -28,7 +39,7 @@ class SmartFitApp extends StatefulWidget {
   const SmartFitApp({super.key, required this.services, this.fontFamily});
   final AppServices services;
 
-  /// Only set by the screenshot harness (tests have no system CJK font).
+  /// Kept for the screenshot harness; the app bundles Noto Sans SC.
   final String? fontFamily;
   @override
   State<SmartFitApp> createState() => _SmartFitAppState();
@@ -38,18 +49,26 @@ class _SmartFitAppState extends State<SmartFitApp> {
   @override
   Widget build(BuildContext context) => AppScope(
     services: widget.services,
-    child: MaterialApp(
-      title: '智能健身助手',
-      debugShowCheckedModeBanner: false,
-      theme: buildTheme(fontFamily: widget.fontFamily),
-      locale: const Locale('zh', 'CN'),
-      supportedLocales: const [Locale('zh', 'CN'), Locale('en')],
-      localizationsDelegates: GlobalMaterialLocalizations.delegates,
-      home: widget.services.store.safetyAccepted
-          ? const HomePage()
-          : Builder(
-              builder: (context) => SafetyPage(onDone: () => setState(() {})),
-            ),
+    child: ListenableBuilder(
+      listenable: widget.services.store,
+      builder: (context, _) => MaterialApp(
+        title: '智能健身助手',
+        debugShowCheckedModeBanner: false,
+        theme: buildTheme(SfPalette.light),
+        darkTheme: buildTheme(SfPalette.dark),
+        themeMode: switch (widget.services.store.appearance) {
+          'light' => ThemeMode.light,
+          'system' => ThemeMode.system,
+          _ => ThemeMode.dark,
+        },
+        themeAnimationDuration: Duration.zero,
+        locale: const Locale('zh', 'CN'),
+        supportedLocales: const [Locale('zh', 'CN'), Locale('en')],
+        localizationsDelegates: GlobalMaterialLocalizations.delegates,
+        builder: (context, child) => SfPaletteScope(child: child!),
+        // The chat opens with the safety talk on first launch.
+        home: const ChatHomePage(),
+      ),
     ),
   );
 }

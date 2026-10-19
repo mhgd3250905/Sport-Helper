@@ -3,6 +3,9 @@ import 'dart:convert';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter/widgets.dart';
 
+import '../chat/chat_controller.dart';
+import '../chat/chat_models.dart';
+import '../chat/rule_chat_engine.dart';
 import '../data/app_store.dart';
 import '../domain/exercise.dart';
 import '../domain/plan_generator.dart';
@@ -20,7 +23,8 @@ class AppServices {
     required this.store,
     required this.voiceLibrary,
     required this.voiceOutput,
-  }) : generator = TemplatePlanGenerator(lib: library, catalog: catalog);
+    this.chatReplyDelay = const Duration(milliseconds: 450),
+  }) : templates = TemplatePlanGenerator(lib: library, catalog: catalog);
 
   final ExerciseLibrary library;
   final TemplateCatalog catalog;
@@ -30,7 +34,8 @@ class AppServices {
 
   /// MVP: fixed templates only. An AI generator plugs in behind the same
   /// interface later (see AiPlanGenerator).
-  final PlanGenerator generator;
+  final TemplatePlanGenerator templates;
+  PlanGenerator get generator => templates;
 
   VoiceQueue voiceQueue() {
     voiceOutput.volume = store.voice.volume;
@@ -38,6 +43,21 @@ class AppServices {
   }
 
   SessionScript script() => SessionScript(lib: voiceLibrary, exercises: library);
+
+  /// What answers in the chat home.
+  /// Rules + templates today; a model-backed [ChatEngine] later, with the
+  /// same plan validation.
+  late final ChatEngine chatEngine = RuleChatEngine(lib: library, templates: templates);
+
+  /// The "typing" pause before a reply (zero in tests and screenshots).
+  final Duration chatReplyDelay;
+
+  /// The home conversation lives as long as the app (pages come and go).
+  late final ChatController chat = ChatController(
+    engine: chatEngine,
+    store: store,
+    replyDelay: chatReplyDelay,
+  );
 
   /// The exercise library and the voice lines both come from the drill
   /// packs (assets/packs/, docs/drill-pack-spec.md); templates stay
