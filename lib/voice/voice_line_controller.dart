@@ -1,4 +1,4 @@
-// Copied from HipLab@main lib/hip/voice/voice_line_controller.dart (mhgd3250905/HipLab, 2026-10-18). SmartFit: import paths only.
+// Copied from HipLab@6020d8e lib/hip/voice/voice_line_controller.dart (mhgd3250905/HipLab, 2026-10-18; identical to HipLab main after the 10-18 voice fixes). SmartFit: import paths only.
 import 'dart:async';
 
 /// What [VoiceLineController] needs from the platform: the voice player,

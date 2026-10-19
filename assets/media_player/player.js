@@ -152,8 +152,9 @@ window.__drillMediaSnapshot = () => ({id,active,disposed,hasFrame,mediaReady,pos
 // hidden (app background, screen lock) while the host still wants it.
 const fit = params.get('fit') === 'cover' ? 'cover' : 'contain';
 const pos = /^\d{1,3}% \d{1,3}%$/.test(params.get('pos') || '') ? params.get('pos') : '50% 50%';
-const variant = params.get('variant') === 'light' ? 'light/' : '';
 video.style.objectFit = fit;
 video.style.objectPosition = pos;
-if (!/^sf-[a-z0-9]+(?:-[a-z0-9]+)*$/.test(id || '')) emit('error');
-else { video.src=`${variant}${id}.mp4`; }
+// SmartFit 2026-10-19: `id` is a drill-pack id; the clip is the pack's
+// demo.mp4 (assets/packs/<id>/, served at /packs/<id>/). No light variant.
+if (!/^[A-Za-z0-9]+(?:-[A-Za-z0-9]+)*$/.test(id || '')) emit('error');
+else { video.src=`../packs/${id}/demo.mp4`; }

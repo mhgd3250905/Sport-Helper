@@ -27,6 +27,34 @@ void main() {
       }
     });
 
+    test('every move is a drill pack with 1–3 cues and its own voice lines', () {
+      final packs = loadPacksSync();
+      expect(packs.exercises.map((p) => p.id).toSet(), lib.all.map((e) => e.id).toSet());
+      for (final p in [packs.common, ...packs.exercises]) {
+        for (final l in p.lines) {
+          final ms = l.ms['zh'];
+          expect(ms, isNotNull, reason: '${p.id}/${l.id}');
+          expect(ms, greaterThan(0), reason: '${p.id}/${l.id}');
+          expect(File(p.voiceAsset(l.id, 'zh')).existsSync(), isTrue,
+              reason: '${p.id}/${l.id}');
+        }
+      }
+      for (final p in packs.exercises) {
+        final e = lib[p.id];
+        expect(e.cues.length, inInclusiveRange(1, 3), reason: p.id);
+        expect(p.linesWithRole('cue').length, e.cues.length, reason: p.id);
+        for (final role in ['name', 'intro', 'rest', 'finish']) {
+          expect(p.linesWithRole(role), hasLength(1), reason: '${p.id} $role');
+        }
+        expect(p.line('side_switch') != null, e.unilateral, reason: p.id);
+        expect(e.media.playerId, p.id);
+      }
+      for (final n in List.generate(60, (i) => 'n.${i + 1}')) {
+        expect(packs.common.line(n), isNotNull, reason: n);
+      }
+      expect(packs.common.chimes.keys, containsAll(['tick', 'start', 'end', 'finish', 'silence']));
+    });
+
     test('templates only reference library ids with matching side flags', () {
       expect(catalog.templates.length, greaterThanOrEqualTo(10));
       for (final t in catalog.templates) {

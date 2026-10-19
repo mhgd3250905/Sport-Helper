@@ -8,18 +8,17 @@ import 'ui/home_page.dart';
 import 'ui/safety_page.dart';
 import 'ui/theme.dart';
 import 'voice/just_audio_output.dart';
-import 'voice/voice_library.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final (lib, catalog) = await AppServices.loadContent();
+  final (lib, catalog, voices) = await AppServices.loadContent();
   final store = AppStore(SharedPreferencesLocalStateStorage());
   await store.load();
   final services = AppServices(
     library: lib,
     catalog: catalog,
     store: store,
-    voiceLibrary: await VoiceLibrary.load(),
+    voiceLibrary: voices,
     voiceOutput: JustAudioVoiceOutput(),
   );
   runApp(SmartFitApp(services: services));

@@ -1,4 +1,7 @@
-// Copied from HipLab@main lib/hip/voice/just_audio_output.dart (mhgd3250905/HipLab, 2026-10-18). SmartFit: import paths only.
+// Copied from HipLab@6020d8e lib/hip/voice/just_audio_output.dart (mhgd3250905/HipLab, 2026-10-18;
+// includes the 10-18 playback fixes and the Android USAGE_MEDIA routing). SmartFit: import
+// paths, a web guard on the iOS checks (kIsWeb, 4e45b7e), and the keep-alive silence clip now
+// lives in the shared drill pack (_common).
 import 'dart:async';
 import 'dart:io';
 
@@ -93,7 +96,7 @@ class JustAudioVoiceOutput
   @override
   Stream<AudioInterruption> get interruptions => _events.stream;
 
-  static const _silence = 'assets/voice/chime/silence.m4a';
+  static const _silence = 'assets/packs/_common/chime/silence.m4a';
 
   static AudioSessionConfiguration _config({
     required bool duck,
