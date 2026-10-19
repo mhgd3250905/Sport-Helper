@@ -29,6 +29,12 @@ class CosmosColors {
 
   /// The user's bubble: warm, nearly opaque glass (coral → rose).
   static const userFill = [Color(0xD9FF8A57), Color(0xCCEB5F6E)];
+
+  /// Player states: rest / prep in a cool sky blue, the side switch and
+  /// 不舒服 in a soft amber (both readable on the glass at 4.5:1+).
+  static const rest = Color(0xFF7CC8FF);
+  static const warn = Color(0xFFFFC857);
+  static const track = Color(0x1FFFFFFF);
 }
 
 /// Sky gradient + two faint nebulae + slowly drifting star dust.

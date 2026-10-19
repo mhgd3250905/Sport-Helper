@@ -12,6 +12,7 @@ import 'package:smartfit/domain/scenario.dart';
 import 'package:smartfit/ui/chat/chat_home_page.dart';
 import 'package:smartfit/ui/exercise_video.dart';
 import 'package:smartfit/ui/chat/chat_widgets.dart';
+import 'package:smartfit/ui/chat/cosmos.dart';
 import 'package:smartfit/ui/chat/plan_card.dart';
 import 'package:smartfit/ui/custom_plan_page.dart';
 import 'package:smartfit/ui/library_page.dart';
@@ -117,6 +118,20 @@ void main() {
     expect(paused(), isFalse);
     await tester.pumpWidget(const SizedBox());
     await output.events.close();
+  });
+
+  testWidgets('the player sits in the chat sky, held still, with a paused badge', (tester) async {
+    final s = services();
+    s.store.starfield = true; // even with star dust on, the workout keeps it still
+    await showPlayer(tester, s);
+    final sky = tester.widget<CosmosBackground>(find.byType(CosmosBackground));
+    expect(sky.animate, isFalse);
+    expect(find.text('已暂停'), findsNothing);
+    await tester.tap(find.byKey(const ValueKey('pause')));
+    await tester.pump();
+    expect(find.text('已暂停'), findsOneWidget);
+    expect(find.byKey(const ValueKey('counter')), findsOneWidget);
+    await tester.pumpWidget(const SizedBox());
   });
 
   testWidgets('ending from discomfort while paused records an incomplete workout once', (tester) async {

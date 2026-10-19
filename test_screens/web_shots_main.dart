@@ -3,7 +3,10 @@
 //   cp <NotoSansSC.ttf> build/web/assets/shots/NotoSansSC.ttf
 //   serve build/web, open ?shot=<name>, screenshot (tools/shots/chat_shots.py).
 // Each shot seeds an in-memory store and scripts the conversation.
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:smartfit/app/services.dart';
 import 'package:smartfit/core/storage/local_state_storage.dart';
@@ -52,6 +55,13 @@ Future<void> main() async {
       await chat.choose(chat.messages.last, 1); // 力量塑形
     case 'card':
       await chat.send('在家 15 分钟练核心，徒手');
+    case 'card-slow':
+      // The card → player move at 1/40 speed, for a mid-transition frame
+      // (chat_shots.py clicks 开始训练 and shoots part-way through).
+      // Slowed only once the card has settled (its own entrance would be
+      // slowed too); the click comes after SHOT_WAIT ≥ 12 s.
+      await chat.send('在家 15 分钟练核心，徒手');
+      unawaited(Future<void>.delayed(const Duration(seconds: 8), () => timeDilation = 40));
     case 'drawer':
       for (final t in ['在办公室午休 10 分钟，肩颈很僵', '在家 15 分钟练核心，徒手', '睡前放松一下，15 分钟']) {
         await chat.send(t);
