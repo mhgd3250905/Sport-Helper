@@ -13,6 +13,7 @@ import '../player_page.dart';
 import 'chat_widgets.dart';
 import 'cosmos.dart';
 import 'plan_card.dart';
+import 'saved_plans_drawer.dart';
 
 /// The home screen: one conversation floating in an endless sky. No app
 /// bar, no borders; the plans drawer opens from the input's left icon.
@@ -30,6 +31,7 @@ class _ChatHomePageState extends State<ChatHomePage> {
   late ChatController _chat;
   StreamSubscription<String>? _actions;
   final _scroll = ScrollController();
+  final _scaffold = GlobalKey<ScaffoldState>();
 
   /// Messages already on screen when the page opened don't animate in.
   final _seen = <String>{};
@@ -57,11 +59,19 @@ class _ChatHomePageState extends State<ChatHomePage> {
     switch (a) {
       case '@library':
         _push(const LibraryPage());
+      case '@drawer':
+        _scaffold.currentState?.openDrawer();
     }
   }
 
   Future<void> _push(Widget page) =>
       Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => page));
+
+  /// Close the drawer first so the chat (or the player) is what you see.
+  void _fromDrawer(Future<void> Function() then) {
+    _scaffold.currentState?.closeDrawer();
+    unawaited(then());
+  }
 
   Future<void> _start(TrainingPlan p) async {
     final s = AppServices.of(context);
@@ -117,8 +127,16 @@ class _ChatHomePageState extends State<ChatHomePage> {
         systemNavigationBarColor: CosmosColors.skyBottom,
       ),
       child: Scaffold(
+        key: _scaffold,
         backgroundColor: CosmosColors.skyBottom,
         resizeToAvoidBottomInset: true,
+        drawerScrimColor: const Color(0x8C02030A),
+        drawer: SavedPlansDrawer(
+          store: s.store,
+          library: s.library,
+          onShow: (p) => _fromDrawer(() => _chat.showSaved(p)),
+          onStart: (p) => _fromDrawer(() => _start(p.plan)),
+        ),
         body: ListenableBuilder(
           listenable: s.store,
           builder: (context, _) => CosmosBackground(
@@ -133,7 +151,11 @@ class _ChatHomePageState extends State<ChatHomePage> {
                       items: _chat.typing ? const [] : _chat.suggestions,
                       onTap: _send,
                     ),
-                    ChatInputBar(onSend: _send, enabled: !_chat.typing),
+                    ChatInputBar(
+                      onSend: _send,
+                      enabled: !_chat.typing,
+                      onPlans: () => _scaffold.currentState?.openDrawer(),
+                    ),
                   ],
                 ),
               ),

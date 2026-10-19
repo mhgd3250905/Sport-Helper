@@ -43,6 +43,8 @@ class RuleChatEngine implements ChatEngine {
     final t = input.trim();
     if (t.isEmpty) return ChatReply(messages: const [], state: s);
 
+    if (t.startsWith('@saved:')) return _showSaved(t.substring(7), s);
+
     if (_any(t, ['晕厥', '头晕', '眼前发黑', '呼吸困难', '喘不上气', '心慌', '心悸']) ||
         RegExp('胸[口部]?.{0,3}(闷|痛|疼|压)').hasMatch(t)) {
       return ChatReply(
@@ -54,6 +56,12 @@ class RuleChatEngine implements ChatEngine {
       );
     }
 
+    if (_any(t, ['上次那个', '上次的', '上一次', '老样子', '再来一次', '再来一遍', '跟上次一样', '上回那个'])) {
+      return _recallLast(s);
+    }
+    if (_any(t, ['我的计划', '保存的', '存的计划', '收藏', '已保存', '我存的'])) {
+      return _listSaved(s);
+    }
     if (_any(t, ['动作库', '有哪些动作', '所有动作', '看看动作'])) {
       return ChatReply(
         messages: const [BotMessage('打开动作库，点动作就能看示范。')],
@@ -117,7 +125,7 @@ class RuleChatEngine implements ChatEngine {
         messages: const [
           BotMessage(
             '我是你的训练助手：告诉我目标、场景和时间，我排一套带示范和语音的计划。\n'
-            '排好后可以说「再短一点」「难一点」「换掉第 2 个」。',
+            '排好后可以说「再短一点」「难一点」「换掉第 2 个」，满意就点「保存」，下次说「上次那个」就能调出来。',
           ),
         ],
         state: s,
@@ -438,6 +446,57 @@ class RuleChatEngine implements ChatEngine {
     safetyNotes: p.safetyNotes,
   );
 
+  // ---------------------------------------------------------------- saved
+
+  ChatReply _recallLast(ChatState s) {
+    final latestSaved = s.saved.isEmpty
+        ? null
+        : (s.saved.toList()..sort((a, b) => b.touchedAt.compareTo(a.touchedAt))).first;
+    final plan = s.lastPlan ?? latestSaved?.plan;
+    if (plan == null) {
+      return ChatReply(
+        messages: const [BotMessage('还没有练过的计划。先说说今天想怎么练？')],
+        state: s,
+        suggestions: defaultSuggestions,
+      );
+    }
+    if (s.safetyBlocked) return _blocked(s);
+    final req = requestForPlan(plan);
+    return _planReply('这是你上次的「${plan.title}」，直接开始就行。', plan, req, s);
+  }
+
+  ChatReply _listSaved(ChatState s) {
+    if (s.saved.isEmpty) {
+      return ChatReply(
+        messages: const [BotMessage('还没有保存的计划。练得顺手的计划，点卡片上的「保存」就能存下来。')],
+        state: s,
+        suggestions: _suggestions(s),
+      );
+    }
+    final list = s.saved.toList()..sort((a, b) => b.touchedAt.compareTo(a.touchedAt));
+    return ChatReply(
+      messages: [
+        BotMessage(
+          '你保存了 ${list.length} 套计划，点一个调出来：',
+          options: [
+            for (final p in list.take(4)) ChatOption(p.name, '@saved:${p.id}'),
+            if (list.length > 4) const ChatOption('全部计划', '@drawer'),
+          ],
+        ),
+      ],
+      state: s,
+    );
+  }
+
+  ChatReply _showSaved(String id, ChatState s) {
+    final saved = s.saved.where((p) => p.id == id).firstOrNull;
+    if (saved == null) {
+      return ChatReply(messages: const [BotMessage('这套计划已经删掉了。')], state: s);
+    }
+    if (s.safetyBlocked) return _blocked(s);
+    return _planReply('「${saved.name}」来了。', saved.plan, requestForPlan(saved.plan), s);
+  }
+
   ChatReply _blocked(ChatState s) => ChatReply(
     messages: const [
       BotMessage(
@@ -451,7 +510,10 @@ class RuleChatEngine implements ChatEngine {
 
   // ---------------------------------------------------------------- utils
 
-  List<String> _suggestions(ChatState s) => defaultSuggestions;
+  List<String> _suggestions(ChatState s) => [
+    if (s.lastPlan != null || s.saved.isNotEmpty) '上次那个',
+    ...defaultSuggestions,
+  ].take(4).toList();
 
   List<String> _names(TrainingPlan p) => [
     for (final i in p.items) ?lib.tryGet(i.exerciseId)?.name,

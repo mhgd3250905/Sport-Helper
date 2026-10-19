@@ -49,9 +49,23 @@ Future<void> main() async {
       await chat.choose(chat.messages.last, 1); // 力量塑形
     case 'card':
       await chat.send('在家 15 分钟练核心，徒手');
+    case 'drawer':
+      for (final t in ['在办公室午休 10 分钟，肩颈很僵', '在家 15 分钟练核心，徒手', '睡前放松一下，15 分钟']) {
+        await chat.send(t);
+        final saved = await chat.save(chat.currentPlan!);
+        if (t.contains('办公室')) {
+          await store.renamePlan(saved.id, '午休肩颈放松');
+          await chat.started(saved.plan);
+        }
+      }
+      await chat.send('我的计划');
     case 'edit':
       await chat.send('在办公室午休 10 分钟，肩颈很僵');
       await chat.send('再短一点');
   }
   runApp(SmartFitApp(services: services, fontFamily: 'NotoSansSC'));
+  if (shot == 'drawer') {
+    await Future<void>.delayed(const Duration(seconds: 2));
+    chat.command('@drawer');
+  }
 }

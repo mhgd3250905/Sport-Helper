@@ -7,6 +7,7 @@ import 'package:smartfit/domain/exercise.dart';
 import 'package:smartfit/domain/plan.dart';
 import 'package:smartfit/domain/plan_generator.dart';
 import 'package:smartfit/domain/plan_validator.dart';
+import 'package:smartfit/domain/saved_plan.dart';
 import 'package:smartfit/domain/session.dart';
 
 import 'support.dart';
@@ -202,6 +203,54 @@ void main() {
       final (r, _) = await talk(['在家练 20 分钟力量，徒手', '有哑铃']);
       expect(planOf(r[1])!.templateId, 'dumbbell-fullbody');
       expect(r[1].state.request?.equipment, contains(Equipment.dumbbell));
+    });
+  });
+
+  group('saved plans in the conversation', () {
+    late TrainingPlan core;
+    late TrainingPlan office;
+    setUp(() async {
+      core = planOf((await talk(['在家 15 分钟练核心，徒手'])).$1.single)!;
+      office = planOf((await talk(['在办公室午休 10 分钟，肩颈很僵'])).$1.single)!;
+    });
+
+    SavedPlan saved(String id, TrainingPlan p, {DateTime? used}) =>
+        SavedPlan(id: id, name: p.title, plan: p, savedAt: DateTime(2026, 10, 1), lastUsedAt: used);
+
+    test('上次那个: nothing yet → asks; otherwise the last started plan', () async {
+      final none = await engine.reply('上次那个', const ChatState());
+      expect(planOf(none), isNull);
+      expect(none.messages.single.text, contains('还没有'));
+
+      final r = await engine.reply('来个上次那个', ChatState(lastPlan: office, saved: [saved('a', core)]));
+      expect(planOf(r)?.id, office.id);
+      expect(r.state.plan?.id, office.id); // edits now apply to it
+      final bySaved = await engine.reply('老样子', ChatState(saved: [
+        saved('a', core, used: DateTime(2026, 10, 2)),
+        saved('b', office, used: DateTime(2026, 10, 5)),
+      ]));
+      expect(planOf(bySaved)?.id, office.id);
+    });
+
+    test('我的计划 lists saved plans as options; tapping one shows its card', () async {
+      final empty = await engine.reply('我的计划', const ChatState());
+      expect(empty.messages.single.text, contains('还没有保存'));
+
+      final list = [for (var i = 0; i < 5; i++) saved('s$i', i.isEven ? core : office)];
+      final r = await engine.reply('看看我的计划', ChatState(saved: list));
+      final values = r.messages.single.options.map((o) => o.value).toList();
+      expect(values.take(4), everyElement(startsWith('@saved:')));
+      expect(values.last, '@drawer');
+
+      final card = await engine.reply('@saved:s1', ChatState(saved: list));
+      expect(planOf(card)?.id, office.id);
+      final gone = await engine.reply('@saved:nope', ChatState(saved: list));
+      expect(planOf(gone), isNull);
+    });
+
+    test('a recalled plan is still blocked after a "是" safety answer', () async {
+      final r = await engine.reply('上次那个', ChatState(lastPlan: core, safetyBlocked: true));
+      expect(planOf(r), isNull);
     });
   });
 }

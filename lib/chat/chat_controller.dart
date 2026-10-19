@@ -67,7 +67,11 @@ class ChatController extends ChangeNotifier {
 
   static final _none = ChatMessage(id: '', role: ChatRole.user, at: DateTime(2000));
 
-  ChatState get _context => _state.copyWith(safetyBlocked: store.safetyBlocked);
+  ChatState get _context => _state.copyWith(
+    safetyBlocked: store.safetyBlocked,
+    saved: List.unmodifiable(store.savedPlans),
+    lastPlan: store.lastPlan,
+  );
 
   /// The user typed [text] (or tapped a chip / option labelled [label]).
   Future<void> send(String text, {String? label}) async {
@@ -99,7 +103,7 @@ class ChatController extends ChangeNotifier {
     if (!isActive(m) || index < 0 || index >= m.options.length || typing) return;
     final o = m.options[index];
     // Links (动作库, 全部计划) stay tappable; answers lock.
-    final isLink = o.isCommand && !o.value.startsWith('@save:');
+    final isLink = o.isCommand && !o.value.startsWith('@save:') && !o.value.startsWith('@saved:');
     if (!isLink) _replace(m.copyWith(chosen: index));
     if (o.value.startsWith('@save:')) {
       final plan = _planById(o.value.substring(6));
@@ -160,6 +164,9 @@ class ChatController extends ChangeNotifier {
     unawaited(_persist());
   }
 
+  /// A saved plan picked in the drawer: show it as a card in the chat.
+  Future<void> showSaved(SavedPlan p) => send('@saved:${p.id}', label: p.name);
+
   TrainingPlan? _planById(String id) {
     for (final m in messages.reversed) {
       if (m.plan?.id == id) return m.plan;
@@ -169,7 +176,10 @@ class ChatController extends ChangeNotifier {
 
   // ------------------------------------------------------------ helpers
 
-  List<String> _defaults() => defaultSuggestions;
+  List<String> _defaults() => [
+    if (store.lastPlan != null || store.savedPlans.isNotEmpty) '上次那个',
+    ...defaultSuggestions,
+  ].take(4).toList();
 
   ChatMessage _user(String text) => _add(ChatMessage(
     id: _id(),
