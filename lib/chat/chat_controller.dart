@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import '../data/app_store.dart';
+import '../domain/plan.dart';
+import '../domain/saved_plan.dart';
 import 'chat_models.dart';
 import 'rule_chat_engine.dart' show defaultSuggestions;
 
@@ -97,14 +99,72 @@ class ChatController extends ChangeNotifier {
     if (!isActive(m) || index < 0 || index >= m.options.length || typing) return;
     final o = m.options[index];
     // Links (动作库, 全部计划) stay tappable; answers lock.
-    final isLink = o.isCommand;
+    final isLink = o.isCommand && !o.value.startsWith('@save:');
     if (!isLink) _replace(m.copyWith(chosen: index));
+    if (o.value.startsWith('@save:')) {
+      final plan = _planById(o.value.substring(6));
+      _user(o.label);
+      if (plan != null) {
+        final saved = await save(plan);
+        _bot(BotMessage('存好了，叫「${saved.name}」。下次说「上次那个」或者从左下角的计划里一键开始。'));
+      }
+      notifyListeners();
+      unawaited(_persist());
+      return;
+    }
     if (isLink) {
       _actions.add(o.value);
       notifyListeners();
       return;
     }
     await send(o.value, label: o.label);
+  }
+
+  // ------------------------------------------------------------ plans
+
+  /// The plan on the latest card (what "再短一点" edits).
+  TrainingPlan? get currentPlan => _state.plan;
+
+  bool isSaved(TrainingPlan p) => store.savedFor(p) != null;
+
+  Future<SavedPlan> save(TrainingPlan p) async {
+    final saved = await store.savePlan(p);
+    notifyListeners();
+    return saved;
+  }
+
+  /// Called right before the player opens: becomes "上次那个".
+  Future<void> started(TrainingPlan p) async {
+    final saved = store.savedFor(p);
+    if (saved != null) await store.touchPlan(saved.id);
+    await store.rememberPlan(p);
+  }
+
+  /// Back from the player: a short word about it, and an offer to keep an
+  /// unsaved plan that was actually trained.
+  void finished(TrainingPlan p, {required int completed, required int total}) {
+    if (total <= 0) return;
+    final done = completed >= total;
+    final text = done
+        ? '练完「${p.title}」了，辛苦！记得喝点水。'
+        : completed == 0
+        ? '这次先到这儿。想换个更轻松的，跟我说「简单点」。'
+        : '完成了 $completed/$total 个动作，已经不错了。';
+    final offer = completed > 0 && !isSaved(p);
+    _bot(BotMessage(
+      offer ? '$text\n要把这套存下来，下次直接用吗？' : text,
+      options: offer ? [ChatOption('保存这套', '@save:${p.id}')] : const [],
+    ));
+    suggestions = _defaults();
+    notifyListeners();
+    unawaited(_persist());
+  }
+
+  TrainingPlan? _planById(String id) {
+    for (final m in messages.reversed) {
+      if (m.plan?.id == id) return m.plan;
+    }
+    return null;
   }
 
   // ------------------------------------------------------------ helpers

@@ -44,6 +44,14 @@ Future<void> main() async {
   switch (shot) {
     case 'shell':
       await chat.send('你好');
+    case 'ask':
+      await chat.send('想在家练练，有点犯懒');
+      await chat.choose(chat.messages.last, 1); // 力量塑形
+    case 'card':
+      await chat.send('在家 15 分钟练核心，徒手');
+    case 'edit':
+      await chat.send('在办公室午休 10 分钟，肩颈很僵');
+      await chat.send('再短一点');
   }
   runApp(SmartFitApp(services: services, fontFamily: 'NotoSansSC'));
 }

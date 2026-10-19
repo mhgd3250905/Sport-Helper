@@ -6,13 +6,13 @@ import 'package:flutter/services.dart';
 import '../../app/services.dart';
 import '../../chat/chat_controller.dart';
 import '../../chat/chat_models.dart';
-import '../../domain/session.dart';
+import '../../domain/plan.dart';
 import '../library_page.dart';
 import '../plan_page.dart';
-import '../theme.dart' show minutesZh;
+import '../player_page.dart';
 import 'chat_widgets.dart';
 import 'cosmos.dart';
-import 'glass.dart';
+import 'plan_card.dart';
 
 /// The home screen: one conversation floating in an endless sky. No app
 /// bar, no borders; the plans drawer opens from the input's left icon.
@@ -62,6 +62,43 @@ class _ChatHomePageState extends State<ChatHomePage> {
 
   Future<void> _push(Widget page) =>
       Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => page));
+
+  Future<void> _start(TrainingPlan p) async {
+    final s = AppServices.of(context);
+    if (s.store.safetyBlocked) {
+      _toast('根据你的安全确认，暂不开始训练；可以在动作库里看示范。');
+      return;
+    }
+    HapticFeedback.lightImpact();
+    await _chat.started(p);
+    final before = s.store.history.length;
+    await _push(PlayerPage(plan: p));
+    if (!mounted) return;
+    if (s.store.history.length > before) {
+      final h = s.store.history.first;
+      _chat.finished(p, completed: h.completed, total: h.total);
+    }
+  }
+
+  Future<void> _save(TrainingPlan p) async {
+    HapticFeedback.selectionClick();
+    final saved = await _chat.save(p);
+    _toast('已保存为「${saved.name}」');
+  }
+
+  void _toast(String text) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: const Color(0xF0161B2E),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        margin: const EdgeInsets.fromLTRB(24, 0, 24, 96),
+        content: Text(text, style: const TextStyle(color: CosmosColors.text)),
+        duration: const Duration(seconds: 2),
+      ));
+  }
 
   Future<void> _send(String text, {String? label}) async {
     HapticFeedback.selectionClick();
@@ -173,28 +210,18 @@ class _ChatHomePageState extends State<ChatHomePage> {
     );
   }
 
-  Widget _message(ChatMessage m) => m.isPlan ? _planPreview(m) : MessageBubble(
+  Widget _message(ChatMessage m) => m.isPlan
+      ? PlanCard(
+          plan: m.plan!,
+          library: AppServices.of(context).library,
+          saved: _chat.isSaved(m.plan!),
+          onStart: () => _start(m.plan!),
+          onSave: () => _save(m.plan!),
+          onOpen: () => _push(PlanPage(plan: m.plan!, request: m.request)),
+        )
+      : MessageBubble(
     message: m,
     optionsActive: _chat.isActive(m),
     onOption: (i) => _chat.choose(m, i),
   );
-
-  Widget _planPreview(ChatMessage m) {
-    final s = AppServices.of(context);
-    final p = m.plan!;
-    final secs = SessionBuilder(s.library).planSeconds(p);
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: GestureDetector(
-        onTap: () => _push(PlanPage(plan: p, request: m.request)),
-        child: Glass(
-          padding: const EdgeInsets.all(16),
-          child: Text(
-            '${p.title} · ${minutesZh(secs)} · ${p.items.length} 个动作  ›',
-            style: const TextStyle(color: CosmosColors.text, fontSize: 15.5),
-          ),
-        ),
-      ),
-    );
-  }
 }

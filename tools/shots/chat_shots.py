@@ -17,8 +17,8 @@ with sync_playwright() as p:
     for spec in shots:
         name, _, file = spec.partition(':')
         page = b.new_page(viewport={'width': 390, 'height': 844}, device_scale_factor=3)
-        page.on('console', lambda m: print('  console:', m.text) if 'rror' in m.text else None)
-        page.goto(f'http://127.0.0.1:8767/?shot={name}', wait_until='networkidle')
+        page.on('console', lambda m: print('  console:', m.text[:300]) if 'rror' in m.text else None)
+        page.goto(f'http://127.0.0.1:8767/?shot={name}', wait_until='load', timeout=60000)
         page.wait_for_selector('flutter-view', timeout=60000)
         time.sleep(float(os.environ.get('SHOT_WAIT', '6')))
         path = os.path.join(out, (file or f'chat-{name}') + '.png')
