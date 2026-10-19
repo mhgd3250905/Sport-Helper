@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 
 import '../core/storage/local_state_storage.dart';
 import '../domain/plan.dart';
+import '../domain/saved_plan.dart';
 import '../voice/voice_queue.dart';
 
 class HistoryEntry {
@@ -52,6 +53,18 @@ class AppStore extends ChangeNotifier {
   TrainingPlan? lastPlan;
   final List<HistoryEntry> history = [];
 
+  /// Plans kept from the chat, newest first.
+  final List<SavedPlan> savedPlans = [];
+
+  /// The chat home's recent conversation (ChatMessage JSON, oldest first).
+  final List<Map<String, dynamic>> chatLog = [];
+
+  /// Drifting star dust behind the chat (off = static sky).
+  bool starfield = true;
+
+  /// How many chat messages are kept on the device.
+  static const chatLogLimit = 60;
+
   Future<void> load() async {
     try {
       final raw = await _storage.read(key);
@@ -67,6 +80,19 @@ class AppStore extends ChangeNotifier {
           Map<String, dynamic>.from(j['lastPlan'] as Map),
         );
       }
+      starfield = j['starfield'] != false;
+      savedPlans
+        ..clear()
+        ..addAll([
+          for (final p in j['savedPlans'] as List? ?? const [])
+            SavedPlan.fromJson(Map<String, dynamic>.from(p as Map)),
+        ]);
+      chatLog
+        ..clear()
+        ..addAll([
+          for (final m in j['chat'] as List? ?? const [])
+            Map<String, dynamic>.from(m as Map),
+        ]);
       history
         ..clear()
         ..addAll([
@@ -89,6 +115,11 @@ class AppStore extends ChangeNotifier {
           'voice': voice.toJson(),
           'lastPlan': lastPlan?.toJson(),
           'history': [for (final h in history.take(30)) h.toJson()],
+          'starfield': starfield,
+          'savedPlans': [for (final p in savedPlans) p.toJson()],
+          'chat': chatLog.length > chatLogLimit
+              ? chatLog.sublist(chatLog.length - chatLogLimit)
+              : chatLog,
         }),
       );
     } on Object {
@@ -114,6 +145,58 @@ class AppStore extends ChangeNotifier {
 
   Future<void> addHistory(HistoryEntry e) {
     history.insert(0, e);
+    return _save();
+  }
+
+  Future<void> setStarfield(bool on) {
+    starfield = on;
+    return _save();
+  }
+
+  SavedPlan? savedFor(TrainingPlan p) =>
+      savedPlans.where((s) => s.plan.id == p.id).firstOrNull;
+
+  /// Keeps [p] (once per plan id). The name defaults to the plan title,
+  /// numbered when that name is taken ("核心训练 2").
+  Future<SavedPlan> savePlan(TrainingPlan p, {String? name, DateTime? now}) async {
+    final existing = savedFor(p);
+    if (existing != null) return existing;
+    final base = (name ?? p.title).trim().isEmpty ? '我的计划' : (name ?? p.title).trim();
+    var n = base;
+    for (var i = 2; savedPlans.any((s) => s.name == n); i++) {
+      n = '$base $i';
+    }
+    final at = now ?? DateTime.now();
+    final saved = SavedPlan(id: 'saved-${at.microsecondsSinceEpoch}', name: n, plan: p, savedAt: at);
+    savedPlans.insert(0, saved);
+    await _save();
+    return saved;
+  }
+
+  Future<void> renamePlan(String id, String name) {
+    final i = savedPlans.indexWhere((s) => s.id == id);
+    if (i < 0 || name.trim().isEmpty) return Future.value();
+    savedPlans[i] = savedPlans[i].copyWith(name: name.trim());
+    return _save();
+  }
+
+  Future<void> deletePlan(String id) {
+    savedPlans.removeWhere((s) => s.id == id);
+    return _save();
+  }
+
+  /// A saved plan was started: it becomes the "上次那个" candidate.
+  Future<void> touchPlan(String id, {DateTime? now}) {
+    final i = savedPlans.indexWhere((s) => s.id == id);
+    if (i < 0) return Future.value();
+    savedPlans[i] = savedPlans[i].copyWith(lastUsedAt: now ?? DateTime.now());
+    return _save();
+  }
+
+  Future<void> setChatLog(List<Map<String, dynamic>> log) {
+    chatLog
+      ..clear()
+      ..addAll(log.length > chatLogLimit ? log.sublist(log.length - chatLogLimit) : log);
     return _save();
   }
 }

@@ -9,7 +9,9 @@ import 'package:smartfit/main.dart';
 import 'package:smartfit/domain/exercise.dart';
 import 'package:smartfit/domain/plan.dart';
 import 'package:smartfit/domain/scenario.dart';
+import 'package:smartfit/ui/chat/chat_home_page.dart';
 import 'package:smartfit/ui/exercise_video.dart';
+import 'package:smartfit/ui/home_page.dart';
 import 'package:smartfit/ui/player_page.dart';
 import 'package:smartfit/voice/voice_library.dart';
 import 'package:smartfit/voice/voice_queue.dart';
@@ -24,13 +26,19 @@ class MemoryStorage implements LocalStateStorage {
   Future<void> write(String key, String value) async => data[key] = value;
 }
 
-AppServices services({VoiceOutput output = const MutedVoiceOutput()}) => AppServices(
-  library: loadLibrary(),
-  catalog: loadCatalog(),
-  store: AppStore(MemoryStorage()),
-  voiceLibrary: VoiceLibrary.empty,
-  voiceOutput: output,
-);
+AppServices services({VoiceOutput output = const MutedVoiceOutput()}) {
+  final store = AppStore(MemoryStorage())
+    // A drifting sky never settles: keep it still so pumpAndSettle can.
+    ..starfield = false;
+  return AppServices(
+    library: loadLibrary(),
+    catalog: loadCatalog(),
+    store: store,
+    voiceLibrary: VoiceLibrary.empty,
+    voiceOutput: output,
+    chatReplyDelay: Duration.zero,
+  );
+}
 
 class InterruptibleTestOutput extends MutedVoiceOutput implements InterruptibleVoiceOutput {
   final events = StreamController<AudioInterruption>.broadcast(sync: true);
@@ -159,7 +167,10 @@ void main() {
     expect(s.store.safetyAccepted, isTrue);
     expect(s.store.safetyBlocked, isFalse);
 
-    // Describe and generate.
+    // The chat is home now; the old form still generates the same plan.
+    expect(find.byType(ChatHomePage), findsOneWidget);
+    await tester.pumpWidget(AppScope(services: s, child: const MaterialApp(home: HomePage())));
+    await tester.pumpAndSettle();
     expect(find.text('描述你今天想怎么练'), findsOneWidget);
     await tester.enterText(find.byKey(const ValueKey('prompt')), '在办公室午休 10 分钟，肩颈很僵');
     await tester.ensureVisible(find.byKey(const ValueKey('generate')));
@@ -206,6 +217,8 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('safety-continue')));
     await tester.pumpAndSettle();
     expect(s.store.safetyBlocked, isTrue);
+    await tester.pumpWidget(AppScope(services: s, child: const MaterialApp(home: HomePage())));
+    await tester.pumpAndSettle();
     await tester.ensureVisible(find.byKey(const ValueKey('generate')));
     await tester.tap(find.byKey(const ValueKey('generate')));
     await tester.pumpAndSettle();

@@ -3,6 +3,9 @@ import 'dart:convert';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter/widgets.dart';
 
+import '../chat/chat_controller.dart';
+import '../chat/chat_models.dart';
+import '../chat/shell_engine.dart';
 import '../data/app_store.dart';
 import '../domain/exercise.dart';
 import '../domain/plan_generator.dart';
@@ -20,6 +23,7 @@ class AppServices {
     required this.store,
     required this.voiceLibrary,
     required this.voiceOutput,
+    this.chatReplyDelay = const Duration(milliseconds: 450),
   }) : generator = TemplatePlanGenerator(lib: library, catalog: catalog);
 
   final ExerciseLibrary library;
@@ -38,6 +42,19 @@ class AppServices {
   }
 
   SessionScript script() => SessionScript(lib: voiceLibrary, exercises: library);
+
+  /// What answers in the chat home.
+  late final ChatEngine chatEngine = const ShellChatEngine();
+
+  /// The "typing" pause before a reply (zero in tests and screenshots).
+  final Duration chatReplyDelay;
+
+  /// The home conversation lives as long as the app (pages come and go).
+  late final ChatController chat = ChatController(
+    engine: chatEngine,
+    store: store,
+    replyDelay: chatReplyDelay,
+  );
 
   /// The exercise library and the voice lines both come from the drill
   /// packs (assets/packs/, docs/drill-pack-spec.md); templates stay

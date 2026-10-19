@@ -4,7 +4,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'app/services.dart';
 import 'core/storage/local_state_storage.dart';
 import 'data/app_store.dart';
-import 'ui/home_page.dart';
+import 'ui/chat/chat_home_page.dart';
 import 'ui/safety_page.dart';
 import 'ui/theme.dart';
 import 'voice/just_audio_output.dart';
@@ -46,7 +46,7 @@ class _SmartFitAppState extends State<SmartFitApp> {
       supportedLocales: const [Locale('zh', 'CN'), Locale('en')],
       localizationsDelegates: GlobalMaterialLocalizations.delegates,
       home: widget.services.store.safetyAccepted
-          ? const HomePage()
+          ? const ChatHomePage()
           : Builder(
               builder: (context) => SafetyPage(onDone: () => setState(() {})),
             ),
