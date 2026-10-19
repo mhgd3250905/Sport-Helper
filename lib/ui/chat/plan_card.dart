@@ -5,6 +5,7 @@ import '../../domain/plan.dart';
 import '../../domain/session.dart';
 import '../theme.dart' show levelZh, minutesZh;
 import 'cosmos.dart';
+import 'expand_route.dart';
 import 'glass.dart';
 
 /// The assistant's plan reply: covers of the first moves, title, length,
@@ -24,7 +25,8 @@ class PlanCard extends StatefulWidget {
   final TrainingPlan plan;
   final ExerciseLibrary library;
   final bool saved;
-  final VoidCallback onStart;
+  /// 开始训练; [from] says where the card is, for the grow-into-player move.
+  final void Function(OriginRect from) onStart;
   final VoidCallback onSave;
 
   /// Details (the plan page: preview, every move, swaps).
@@ -37,6 +39,7 @@ class PlanCard extends StatefulWidget {
 class _PlanCardState extends State<PlanCard> {
   static const _collapsed = 5;
   bool _expanded = false;
+  final _glass = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
@@ -70,6 +73,7 @@ class _PlanCardState extends State<PlanCard> {
       child: SizedBox(
         width: width,
         child: Glass(
+          key: _glass,
           radius: BorderRadius.circular(24),
           glow: const Color(0x10BFD0FF),
           child: Column(
@@ -179,7 +183,7 @@ class _PlanCardState extends State<PlanCard> {
                           shape: const StadiumBorder(),
                           textStyle: label.copyWith(fontSize: 15.5, fontWeight: FontWeight.w600),
                         ),
-                        onPressed: widget.onStart,
+                        onPressed: () => widget.onStart(() => rectOf(_glass.currentContext)),
                         icon: const Icon(Icons.play_arrow_rounded, size: 22),
                         label: const Text('开始训练'),
                       ),

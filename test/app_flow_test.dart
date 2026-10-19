@@ -199,23 +199,87 @@ void main() {
     expect(s.store.savedPlans.single.plan.id, plan.id);
     expect(find.text('已保存'), findsOneWidget);
 
-    // 开始训练 → the existing player.
+    // 开始训练 → the card grows into the player (container transform).
+    final screen = tester.getRect(find.byType(ChatHomePage));
+    final card = tester.getRect(find.byType(PlanCard));
     await tester.tap(find.byKey(ValueKey('plan-start-${plan.id}')));
     await tester.pump();
-    await tester.pump(const Duration(milliseconds: 200));
+    await tester.pump(const Duration(milliseconds: 60));
     expect(find.byType(PlayerPage), findsOneWidget);
+    final early = tester.getRect(find.byType(PlayerPage));
+    expect(early.width, lessThan(screen.width)); // still card-sized
+    expect(early.left, greaterThanOrEqualTo(card.left - 1));
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(tester.getRect(find.byType(PlayerPage)), screen); // full screen
     expect(s.store.lastPlan?.id, plan.id);
     await tester.tap(find.byKey(const ValueKey('skip')));
     await tester.pump(const Duration(milliseconds: 200));
     await tester.tap(find.byKey(const ValueKey('close')));
     await tester.pumpAndSettle();
     await tester.tap(find.text('结束'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 200));
+    // Folding back into the card.
+    expect(tester.getRect(find.byType(PlayerPage)).width, lessThan(screen.width));
     await tester.pumpAndSettle();
     expect(find.byType(PlayerPage), findsNothing);
     expect(s.store.history, hasLength(1));
     expect(find.byType(ChatHomePage), findsOneWidget);
     expect(s.chat.messages.last.isUser, isFalse);
     expect(s.chat.messages.last.isPlan, isFalse); // a word after the workout
+  });
+
+  testWidgets('reduced motion: the player fades in instead of growing', (tester) async {
+    tall(tester);
+    tester.platformDispatcher.accessibilityFeaturesTestValue =
+        const FakeAccessibilityFeatures(disableAnimations: true);
+    addTearDown(tester.platformDispatcher.clearAccessibilityFeaturesTestValue);
+    final s = services();
+    await s.store.acceptSafety(blocked: false);
+    await tester.pumpWidget(SmartFitApp(services: s));
+    await tester.pumpAndSettle();
+    await say(tester, '在家 15 分钟练核心，徒手');
+    final plan = s.chat.currentPlan!;
+    final screen = tester.getRect(find.byType(ChatHomePage));
+    await tester.tap(find.byKey(ValueKey('plan-start-${plan.id}')));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 60));
+    expect(tester.getRect(find.byType(PlayerPage)), screen);
+    expect(
+      find.ancestor(of: find.byType(PlayerPage), matching: find.byType(FadeTransition)),
+      findsWidgets,
+    );
+    await tester.pump(const Duration(milliseconds: 500));
+    await tester.tap(find.byKey(const ValueKey('close')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('结束'));
+    await tester.pumpAndSettle();
+    expect(find.byType(PlayerPage), findsNothing);
+  });
+
+  testWidgets('drawer ▶ starts a saved plan in the player and comes back to the chat', (tester) async {
+    tall(tester);
+    final s = services();
+    await s.store.acceptSafety(blocked: false);
+    await tester.pumpWidget(SmartFitApp(services: s));
+    await tester.pumpAndSettle();
+    await say(tester, '在家 15 分钟练核心，徒手');
+    await tester.tap(find.byKey(ValueKey('plan-save-${s.chat.currentPlan!.id}')));
+    await tester.pumpAndSettle();
+    final saved = s.store.savedPlans.single;
+    await tester.tap(find.byKey(const ValueKey('open-plans')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(ValueKey('saved-start-${saved.id}')));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 600));
+    expect(find.byType(PlayerPage), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('close')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('结束'));
+    await tester.pumpAndSettle();
+    expect(find.byType(PlayerPage), findsNothing);
+    expect(find.byType(ChatHomePage), findsOneWidget);
+    expect(s.store.history, hasLength(1));
   });
 
   testWidgets('a "是" in the safety talk → advice, no plans, library still open', (tester) async {

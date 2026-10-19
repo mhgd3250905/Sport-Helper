@@ -8,6 +8,7 @@ import '../../domain/saved_plan.dart';
 import '../../domain/session.dart';
 import '../theme.dart' show minutesZh;
 import 'cosmos.dart';
+import 'expand_route.dart';
 
 /// Drawer from the input's left icon: the saved plans (tap = show it in
 /// the chat, ▶ = start now, ⋯ = rename / delete), then app entries.
@@ -24,7 +25,9 @@ class SavedPlansDrawer extends StatelessWidget {
   final AppStore store;
   final ExerciseLibrary library;
   final void Function(SavedPlan) onShow;
-  final void Function(SavedPlan) onStart;
+
+  /// ▶; [from] is the tile, which the player grows out of.
+  final void Function(SavedPlan, OriginRect from) onStart;
 
   /// Entries under the list (动作库, 关于与设置…).
   final List<Widget> footer;
@@ -196,7 +199,7 @@ class _SavedTile extends StatelessWidget {
   final SavedPlan plan;
   final ExerciseLibrary library;
   final void Function(SavedPlan) onShow;
-  final void Function(SavedPlan) onStart;
+  final void Function(SavedPlan, OriginRect from) onStart;
   final void Function(SavedPlan) onRename;
   final void Function(SavedPlan) onDelete;
 
@@ -258,7 +261,17 @@ class _SavedTile extends StatelessWidget {
                 key: ValueKey('saved-start-${plan.id}'),
                 visualDensity: VisualDensity.compact,
                 tooltip: '开始训练',
-                onPressed: () => onStart(plan),
+                onPressed: () {
+                  // Where the tile is now; once the drawer is gone the
+                  // player folds back into the middle of the chat.
+                  final at = rectOf(context);
+                  var first = true;
+                  onStart(plan, () {
+                    if (!first) return null;
+                    first = false;
+                    return at;
+                  });
+                },
                 icon: const DecoratedBox(
                   decoration: BoxDecoration(color: CosmosColors.accent, shape: BoxShape.circle),
                   child: Padding(

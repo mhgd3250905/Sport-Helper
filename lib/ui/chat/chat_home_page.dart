@@ -14,6 +14,7 @@ import '../plan_page.dart';
 import '../player_page.dart';
 import 'chat_widgets.dart';
 import 'cosmos.dart';
+import 'expand_route.dart';
 import 'plan_card.dart';
 import 'saved_plans_drawer.dart';
 
@@ -75,7 +76,9 @@ class _ChatHomePageState extends State<ChatHomePage> {
     unawaited(then());
   }
 
-  Future<void> _start(TrainingPlan p) async {
+  /// The card (or drawer tile) grows into the player and folds back into
+  /// the chat afterwards; the summary and the save offer follow.
+  Future<void> _start(TrainingPlan p, {OriginRect? from}) async {
     final s = AppServices.of(context);
     if (s.store.safetyBlocked) {
       _toast('根据你的安全确认，暂不开始训练；可以在动作库里看示范。');
@@ -84,7 +87,12 @@ class _ChatHomePageState extends State<ChatHomePage> {
     HapticFeedback.lightImpact();
     await _chat.started(p);
     final before = s.store.history.length;
-    await _push(PlayerPage(plan: p));
+    if (!mounted) return;
+    await Navigator.of(context).push(CardExpandRoute<void>(
+      origin: from,
+      settings: const RouteSettings(name: 'player'),
+      builder: (_) => PlayerPage(plan: p),
+    ));
     if (!mounted) return;
     if (s.store.history.length > before) {
       final h = s.store.history.first;
@@ -137,7 +145,7 @@ class _ChatHomePageState extends State<ChatHomePage> {
           store: s.store,
           library: s.library,
           onShow: (p) => _fromDrawer(() => _chat.showSaved(p)),
-          onStart: (p) => _fromDrawer(() => _start(p.plan)),
+          onStart: (p, from) => _fromDrawer(() => _start(p.plan, from: from)),
           footer: [
             DrawerEntry(
               key: const ValueKey('drawer-library'),
@@ -262,7 +270,7 @@ class _ChatHomePageState extends State<ChatHomePage> {
           plan: m.plan!,
           library: AppServices.of(context).library,
           saved: _chat.isSaved(m.plan!),
-          onStart: () => _start(m.plan!),
+          onStart: (from) => _start(m.plan!, from: from),
           onSave: () => _save(m.plan!),
           onOpen: () => _push(PlanPage(plan: m.plan!, request: m.request)),
         )
