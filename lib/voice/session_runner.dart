@@ -36,11 +36,13 @@ class SessionRunner {
 
   void _load() {
     _gen = engine.generation;
-    _cues = script.cues(
-      engine.phase,
-      planSeconds: planSeconds,
-      bySkip: engine.enteredBySkip,
-    );
+    _cues = engine.endedEarly
+        ? const []
+        : script.cues(
+            engine.phase,
+            planSeconds: planSeconds,
+            bySkip: engine.enteredBySkip,
+          );
     _fired.clear();
   }
 

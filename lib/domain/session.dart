@@ -95,8 +95,13 @@ class SessionBuilder {
         for (final item in b.items) {
           if (!lib.contains(item.exerciseId)) continue;
           out.add(
-            _Occurrence(b, item, circuit ? r : 0, circuit ? rounds : 0,
-                circuit ? 1 : item.sets),
+            _Occurrence(
+              b,
+              item,
+              circuit ? r : 0,
+              circuit ? rounds : 0,
+              circuit ? 1 : item.sets,
+            ),
           );
         }
       }
@@ -162,7 +167,9 @@ class SessionBuilder {
               side: sides[k],
               blockName: o.block.name,
               reps: o.item.mode == DoseMode.reps ? o.item.reps : null,
-              repSeconds: o.item.mode == DoseMode.reps ? e.repSeconds ?? 3 : null,
+              repSeconds: o.item.mode == DoseMode.reps
+                  ? e.repSeconds ?? 3
+                  : null,
             ),
           );
         }
@@ -210,14 +217,16 @@ class SessionBuilder {
         );
       }
     }
-    out.add(SessionPhase(kind: PhaseKind.done, seconds: 0, itemIndex: occ.length));
+    out.add(
+      SessionPhase(kind: PhaseKind.done, seconds: 0, itemIndex: occ.length),
+    );
     return out;
   }
 
   /// Total active seconds of the plan, excluding the lead-in.
-  double planSeconds(TrainingPlan plan) => phases(plan)
-      .where((p) => p.kind != PhaseKind.prep)
-      .fold(0.0, (s, p) => s + p.seconds);
+  double planSeconds(TrainingPlan plan) => phases(
+    plan,
+  ).where((p) => p.kind != PhaseKind.prep).fold(0.0, (s, p) => s + p.seconds);
 
   int occurrenceCount(TrainingPlan plan) => _occurrences(plan).length;
 }
@@ -231,6 +240,7 @@ class SessionEngine {
   int _index = 0;
   double _phaseStart = 0;
   bool _enteredBySkip = false;
+  int? _completedOnEarlyEnd;
 
   /// Bumped every time the phase changes (for listeners).
   int generation = 0;
@@ -239,6 +249,7 @@ class SessionEngine {
   SessionPhase get phase => _phases[_index];
   int get index => _index;
   bool get done => phase.kind == PhaseKind.done;
+  bool get endedEarly => _completedOnEarlyEnd != null;
   double get phaseStart => _phaseStart;
   bool get enteredBySkip => _enteredBySkip;
 
@@ -249,7 +260,8 @@ class SessionEngine {
 
   /// Exercise occurrences fully passed (prep 0; a transition rest already
   /// points at the next one, so its index equals the count done).
-  int get completedExercises => phase.itemIndex.clamp(0, 1 << 30);
+  int get completedExercises =>
+      _completedOnEarlyEnd ?? phase.itemIndex.clamp(0, 1 << 30);
 
   /// Advance to active time [t]; returns true when the phase changed.
   bool update(double t) {
@@ -265,6 +277,7 @@ class SessionEngine {
   }
 
   void _jump(int index, double t) {
+    _completedOnEarlyEnd = null;
     _index = index.clamp(0, _phases.length - 1);
     _phaseStart = t;
     _enteredBySkip = true;
@@ -300,6 +313,12 @@ class SessionEngine {
     _jump(target, t);
   }
 
-  /// End now.
-  void finish(double t) => _jump(_phases.length - 1, t);
+  /// End now, preserving progress instead of counting unvisited exercises.
+  void finish(double t) {
+    update(t);
+    if (done) return;
+    final completed = completedExercises;
+    _jump(_phases.length - 1, t);
+    _completedOnEarlyEnd = completed;
+  }
 }

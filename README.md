@@ -31,8 +31,8 @@ docs/            评估报告、验收清单、风险、计划 schema、截图
 flutter pub get
 flutter analyze
 flutter test
-flutter build apk --debug          # 沙盒(aarch64)只能出 debug 包，见 docs/acceptance.md
-flutter build apk --release        # 在正常 x64 机器上
+flutter build apk --debug
+flutter build apk --release        # 本机工具链及验收状态见 docs/acceptance.md
 # 截图：SF_CJK_FONT=<NotoSansSC.ttf> flutter test test_screens/shots_test.dart --update-goldens
 ```
 

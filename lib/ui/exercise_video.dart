@@ -14,12 +14,16 @@ class ExerciseVideo extends StatefulWidget {
     super.key,
     required this.exercise,
     this.playing = true,
+    this.paused = false,
     this.mirrored = false,
     this.radius = 16,
   });
 
   final Exercise exercise;
   final bool playing;
+
+  /// Freeze an existing demonstration without discarding its current frame.
+  final bool paused;
 
   /// Left side of a unilateral move: the clip shows the right side.
   final bool mirrored;
@@ -45,12 +49,19 @@ class _ExerciseVideoState extends State<ExerciseVideo> {
         old.playing != widget.playing) {
       _stop();
       if (widget.playing) _start();
+    } else if (old.paused != widget.paused) {
+      final c = _controller;
+      if (widget.paused) {
+        c?.pause();
+      } else if (c != null && !c.wantsPlay) {
+        c.toggle();
+      }
     }
   }
 
   void _start() {
     final c = DrillMediaController()..addListener(_changed);
-    c.toggle(); // ask to play as soon as the page is ready
+    if (!widget.paused) c.toggle(); // play as soon as the page is ready
     _controller = c;
   }
 

@@ -17,7 +17,11 @@ import 'theme.dart';
 /// Full-screen follow-along: clip, set / side / round, rep counter or
 /// countdown, rests with a next-move preview, voice coaching.
 class PlayerPage extends StatefulWidget {
-  const PlayerPage({super.key, required this.plan, this.tick = const Duration(milliseconds: 100)});
+  const PlayerPage({
+    super.key,
+    required this.plan,
+    this.tick = const Duration(milliseconds: 100),
+  });
   final TrainingPlan plan;
   final Duration tick;
   @override
@@ -34,6 +38,7 @@ class _PlayerPageState extends State<PlayerPage> {
   StreamSubscription<AudioInterruption>? _interruptions;
   bool _ready = false;
   bool _recorded = false;
+  double? _endedAt;
   String? _subtitle;
   int _shownSecond = -1;
   int _shownGen = -1;
@@ -51,7 +56,10 @@ class _PlayerPageState extends State<PlayerPage> {
     _s = AppServices.of(context);
     final builder = SessionBuilder(_s.library);
     _occurrences = builder.occurrenceCount(widget.plan);
-    _runner = SessionRunner(SessionEngine(builder.phases(widget.plan)), _s.script());
+    _runner = SessionRunner(
+      SessionEngine(builder.phases(widget.plan)),
+      _s.script(),
+    );
     _queue = _s.voiceQueue();
     final v = _s.store.voice;
     if (v.voice || v.chimes) unawaited(_s.voiceOutput.begin());
@@ -77,7 +85,7 @@ class _PlayerPageState extends State<PlayerPage> {
   }
 
   void _tick() {
-    if (!mounted || _paused) return;
+    if (!mounted || (_paused && !_engine.done)) return;
     final t = _t;
     for (final f in _runner.update(t)) {
       _queue.submit(f.cue, t);
@@ -87,7 +95,10 @@ class _PlayerPageState extends State<PlayerPage> {
     if (_engine.generation != _shownGen && _phase.kind != PhaseKind.work) {
       _subtitle = null;
     }
-    if (_engine.done) _record();
+    if (_engine.done) {
+      _endedAt ??= t;
+      _record();
+    }
     final sec = (_engine.elapsedIn(t) * 4).floor(); // 4 Hz repaint is plenty
     if (sec != _shownSecond || _engine.generation != _shownGen) {
       setState(() {
@@ -104,7 +115,7 @@ class _PlayerPageState extends State<PlayerPage> {
       HistoryEntry(
         title: widget.plan.title,
         at: DateTime.now(),
-        minutes: (_t / 60).round(),
+        minutes: ((_endedAt ?? _t) / 60).round(),
         completed: _engine.completedExercises,
         total: _occurrences,
       ),
@@ -112,7 +123,9 @@ class _PlayerPageState extends State<PlayerPage> {
   }
 
   void _onInterruption(AudioInterruption e) {
-    if (!mounted || _engine.done || e == AudioInterruption.ended || _paused) return;
+    if (!mounted || _engine.done || e == AudioInterruption.ended || _paused) {
+      return;
+    }
     _queue.cancelAll(_t);
     _clock.stop();
     setState(() {});
@@ -152,7 +165,9 @@ class _PlayerPageState extends State<PlayerPage> {
   Future<void> _endEarly() async {
     _queue.cancelAll(_t);
     _runner.finish(_t);
-    _tick();
+    _endedAt ??= _t;
+    _clock.stop();
+    _record();
     setState(() {});
   }
 
@@ -169,10 +184,15 @@ class _PlayerPageState extends State<PlayerPage> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('哪里不舒服？', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+              const Text(
+                '哪里不舒服？',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+              ),
               const SizedBox(height: 6),
-              const Text('出现刺痛、麻木、头晕或胸闷，请立即停止训练。轻微酸胀可以减小幅度、放慢速度。',
-                  style: TextStyle(color: SfColors.muted, height: 1.5)),
+              const Text(
+                '出现刺痛、麻木、头晕或胸闷，请立即停止训练。轻微酸胀可以减小幅度、放慢速度。',
+                style: TextStyle(color: SfColors.muted, height: 1.5),
+              ),
               const SizedBox(height: 12),
               ListTile(
                 leading: const Icon(Icons.compress_rounded),
@@ -185,7 +205,10 @@ class _PlayerPageState extends State<PlayerPage> {
                 onTap: () => Navigator.pop(c, 'skip'),
               ),
               ListTile(
-                leading: const Icon(Icons.stop_circle_outlined, color: SfColors.warn),
+                leading: const Icon(
+                  Icons.stop_circle_outlined,
+                  color: SfColors.warn,
+                ),
                 title: const Text('结束今天的训练'),
                 onTap: () => Navigator.pop(c, 'end'),
               ),
@@ -197,10 +220,9 @@ class _PlayerPageState extends State<PlayerPage> {
     if (!mounted) return;
     switch (choice) {
       case 'skip':
-        _togglePause();
+        if (wasRunning) _togglePause();
         _skip();
       case 'end':
-        _togglePause();
         await _endEarly();
       default:
         if (wasRunning) _togglePause();
@@ -215,8 +237,14 @@ class _PlayerPageState extends State<PlayerPage> {
         title: const Text('结束训练？'),
         content: const Text('本次进度会记为未完成。'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(c, false), child: const Text('继续练')),
-          TextButton(onPressed: () => Navigator.pop(c, true), child: const Text('结束')),
+          TextButton(
+            onPressed: () => Navigator.pop(c, false),
+            child: const Text('继续练'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(c, true),
+            child: const Text('结束'),
+          ),
         ],
       ),
     );
@@ -237,9 +265,7 @@ class _PlayerPageState extends State<PlayerPage> {
         if (await _confirmClose()) nav.pop();
       },
       child: Scaffold(
-        body: SafeArea(
-          child: _engine.done ? _doneView() : _sessionView(p, e),
-        ),
+        body: SafeArea(child: _engine.done ? _doneView() : _sessionView(p, e)),
       ),
     );
   }
@@ -247,36 +273,50 @@ class _PlayerPageState extends State<PlayerPage> {
   Widget _sessionView(SessionPhase p, Exercise? e) {
     final t = _t;
     final left = _engine.secondsLeft(t);
-    final progress = p.seconds == 0 ? 0.0 : (_engine.elapsedIn(t) / p.seconds).clamp(0.0, 1.0);
-    final rest = p.kind == PhaseKind.rest || p.kind == PhaseKind.roundRest || p.kind == PhaseKind.prep;
+    final progress = p.seconds == 0
+        ? 0.0
+        : (_engine.elapsedIn(t) / p.seconds).clamp(0.0, 1.0);
+    final rest =
+        p.kind == PhaseKind.rest ||
+        p.kind == PhaseKind.roundRest ||
+        p.kind == PhaseKind.prep;
     final color = rest ? SfColors.rest : SfColors.accent;
     final done = _engine.completedExercises;
     return Column(
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(4, 4, 12, 0),
-          child: Row(children: [
-            IconButton(
-              key: const ValueKey('close'),
-              icon: const Icon(Icons.close_rounded),
-              onPressed: () async {
-                final nav = Navigator.of(context);
-                if (await _confirmClose()) nav.pop();
-              },
-            ),
-            Expanded(
-              child: Text(
-                '${p.blockName}  ·  动作 ${(done + (rest ? 0 : 1)).clamp(1, _occurrences)}/$_occurrences',
-                style: const TextStyle(color: SfColors.muted),
+          child: Row(
+            children: [
+              IconButton(
+                key: const ValueKey('close'),
+                icon: const Icon(Icons.close_rounded),
+                onPressed: () async {
+                  final nav = Navigator.of(context);
+                  if (await _confirmClose()) nav.pop();
+                },
               ),
-            ),
-            TextButton.icon(
-              key: const ValueKey('discomfort'),
-              onPressed: _discomfort,
-              icon: const Icon(Icons.healing_outlined, size: 18, color: SfColors.warn),
-              label: const Text('不舒服', style: TextStyle(color: SfColors.warn)),
-            ),
-          ]),
+              Expanded(
+                child: Text(
+                  '${p.blockName}  ·  动作 ${(done + (rest ? 0 : 1)).clamp(1, _occurrences)}/$_occurrences',
+                  style: const TextStyle(color: SfColors.muted),
+                ),
+              ),
+              TextButton.icon(
+                key: const ValueKey('discomfort'),
+                onPressed: _discomfort,
+                icon: const Icon(
+                  Icons.healing_outlined,
+                  size: 18,
+                  color: SfColors.warn,
+                ),
+                label: const Text(
+                  '不舒服',
+                  style: TextStyle(color: SfColors.warn),
+                ),
+              ),
+            ],
+          ),
         ),
         LinearProgressIndicator(
           value: _occurrences == 0 ? 0 : done / _occurrences,
@@ -293,27 +333,38 @@ class _PlayerPageState extends State<PlayerPage> {
                   key: ValueKey('player-${e.id}'),
                   exercise: e,
                   mirrored: p.side == Side.left,
+                  paused: _paused,
                 ),
               const SizedBox(height: 12),
+              Text(switch (p.kind) {
+                PhaseKind.prep => '准备 · 第一个动作',
+                PhaseKind.rest when p.nextExerciseId != null => '休息 · 下一个动作',
+                PhaseKind.rest => '组间休息',
+                PhaseKind.roundRest => '这一轮完成 · 休息',
+                PhaseKind.switchSide => '换左侧',
+                _ => '',
+              }, style: TextStyle(color: color, fontWeight: FontWeight.w600)),
               Text(
-                switch (p.kind) {
-                  PhaseKind.prep => '准备 · 第一个动作',
-                  PhaseKind.rest when p.nextExerciseId != null => '休息 · 下一个动作',
-                  PhaseKind.rest => '组间休息',
-                  PhaseKind.roundRest => '这一轮完成 · 休息',
-                  PhaseKind.switchSide => '换左侧',
-                  _ => '',
-                },
-                style: TextStyle(color: color, fontWeight: FontWeight.w600),
+                e?.name ?? '',
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w800,
+                ),
               ),
-              Text(e?.name ?? '', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800)),
               const SizedBox(height: 4),
-              Text(_meta(p), style: const TextStyle(color: SfColors.muted, fontSize: 15)),
+              Text(
+                _meta(p),
+                style: const TextStyle(color: SfColors.muted, fontSize: 15),
+              ),
               const SizedBox(height: 16),
               Center(child: _counter(p, left, progress, color)),
               const SizedBox(height: 14),
               if ((_subtitle ?? (rest ? e?.cue : null)) case final sub?)
-                Text('要领：$sub', textAlign: TextAlign.center, style: const TextStyle(height: 1.5)),
+                Text(
+                  '要领：$sub',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(height: 1.5),
+                ),
             ],
           ),
         ),
@@ -333,7 +384,9 @@ class _PlayerPageState extends State<PlayerPage> {
                 iconSize: 40,
                 style: IconButton.styleFrom(backgroundColor: SfColors.accent),
                 onPressed: _togglePause,
-                icon: Icon(_paused ? Icons.play_arrow_rounded : Icons.pause_rounded),
+                icon: Icon(
+                  _paused ? Icons.play_arrow_rounded : Icons.pause_rounded,
+                ),
               ),
               IconButton.filledTonal(
                 key: const ValueKey('skip'),
@@ -374,39 +427,58 @@ class _PlayerPageState extends State<PlayerPage> {
     return SizedBox(
       width: 150,
       height: 150,
-      child: Stack(alignment: Alignment.center, children: [
-        SizedBox.expand(
-          child: CircularProgressIndicator(
-            value: progress,
-            strokeWidth: 8,
-            backgroundColor: SfColors.surface2,
-            color: color,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          SizedBox.expand(
+            child: CircularProgressIndicator(
+              value: progress,
+              strokeWidth: 8,
+              backgroundColor: SfColors.surface2,
+              color: color,
+            ),
           ),
-        ),
-        Column(mainAxisSize: MainAxisSize.min, children: [
-          Text(big, key: const ValueKey('counter'),
-              style: TextStyle(fontSize: 48, fontWeight: FontWeight.w800, color: color)),
-          Text(small, style: const TextStyle(color: SfColors.muted)),
-        ]),
-      ]),
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                big,
+                key: const ValueKey('counter'),
+                style: TextStyle(
+                  fontSize: 48,
+                  fontWeight: FontWeight.w800,
+                  color: color,
+                ),
+              ),
+              Text(small, style: const TextStyle(color: SfColors.muted)),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
   Widget _doneView() {
-    final full = _engine.completedExercises >= _occurrences;
+    final full =
+        !_engine.endedEarly && _engine.completedExercises >= _occurrences;
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(full ? Icons.emoji_events_rounded : Icons.flag_rounded,
-              size: 72, color: full ? SfColors.accent : SfColors.warn),
+          Icon(
+            full ? Icons.emoji_events_rounded : Icons.flag_rounded,
+            size: 72,
+            color: full ? SfColors.accent : SfColors.warn,
+          ),
           const SizedBox(height: 16),
-          Text(full ? '训练完成！' : '今天先到这里',
-              style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w800)),
+          Text(
+            full ? '训练完成！' : '今天先到这里',
+            style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w800),
+          ),
           const SizedBox(height: 8),
           Text(
-            '${widget.plan.title} · ${(_t / 60).round()} 分钟 · 完成 ${_engine.completedExercises}/$_occurrences 个动作',
+            '${widget.plan.title} · ${((_endedAt ?? _t) / 60).round()} 分钟 · 完成 ${_engine.completedExercises}/$_occurrences 个动作',
             textAlign: TextAlign.center,
             style: const TextStyle(color: SfColors.muted),
           ),

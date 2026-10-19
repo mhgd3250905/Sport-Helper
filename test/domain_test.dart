@@ -202,5 +202,25 @@ void main() {
       expect(e.done, isTrue);
       expect(e.completedExercises, 2);
     });
+
+    test('early end preserves progress in prep, work and transition', () {
+      final phases = SessionBuilder(lib).phases(plan(const [
+        PlanItem(exerciseId: 'h-squat', mode: DoseMode.reps, sets: 1, reps: 10, perSide: false, restSeconds: 30),
+        PlanItem(exerciseId: 'w-dead-bug', mode: DoseMode.reps, sets: 1, reps: 10, perSide: false, restSeconds: 20),
+      ]));
+      final firstWorkEnd = phases[0].seconds + phases[1].seconds;
+      for (final (time, completed) in [(0.0, 0), (11.0, 0), (firstWorkEnd, 1)]) {
+        final engine = SessionEngine(phases)..finish(time);
+        expect(engine.done, isTrue);
+        expect(engine.endedEarly, isTrue);
+        expect(engine.completedExercises, completed);
+        engine.finish(time + 1);
+        engine.update(time + 10000);
+        expect(engine.completedExercises, completed);
+      }
+      final natural = SessionEngine(phases)..finish(10000);
+      expect(natural.endedEarly, isFalse);
+      expect(natural.completedExercises, 2);
+    });
   });
 }

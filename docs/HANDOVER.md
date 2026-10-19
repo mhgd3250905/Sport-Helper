@@ -1,5 +1,7 @@
 # 智能健身助手（SmartFit）交接说明
 
+> 本机接手更新（2026-10-19）：已从 `6c2c1d3` 开始推进；本机 Flutter 3.44.7 / Dart 3.12.2 静态分析无问题，修复后 31 项测试通过。修复提前结束误记全部完成、暂停未冻结视频及暂停跳过的历史记录边界，补齐真实语音时序测试。检查点 `m3-local-tests`；真机未连接，模拟器和 release 构建因系统可用提交内存不足失败，尚未产出 APK。完整记录与待验清单见 [acceptance.md](acceptance.md)；`m3-local-verified` 仍待完整验收。下文保留原始交接记录。
+
 > 交接日期：2026-10-19 · 交出方：Hark 云端沙盒 · 接手方：用户本机（从此为 **main 主线**）
 > 仓库：https://github.com/mhgd3250905/Sport-Helper · 当前 `main` = `b386d03` · tags：`m1-core`、`m2-voice-docs`
 
