@@ -9,13 +9,13 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 LIB = {e['id']: e for e in json.loads((ROOT/'assets/library/exercises.json').read_text())['exercises']}
 
-def item(s):
+def item(s, typ='main'):
     m = re.fullmatch(r'([\w-]+?)(?::(\d+))?(?:x(\d+)|@(\d+))?(?:~(\d+))?', s)
     assert m, s
     i, sets, reps, sec, rest = m.groups()
     e = LIB[i]; d = e['dose']
     mode = 'reps' if reps else 'time' if sec else d['mode']
-    out = {'exerciseId': i, 'mode': mode, 'sets': int(sets or d['sets']),
+    out = {'exerciseId': i, 'mode': mode, 'sets': int(sets or (1 if typ in ('warmup', 'cooldown') else d['sets'])),
            'perSide': e['unilateral'], 'restSeconds': int(rest or d['restSeconds'])}
     if mode == 'reps': out['reps'] = int(reps or d.get('reps') or 10)
     else: out['workSeconds'] = int(sec or d.get('seconds') or 30)
@@ -23,7 +23,7 @@ def item(s):
 
 def block(bid, name, typ, rows, rounds=1, rr=0):
     return {'id': bid, 'name': name, 'type': typ, 'rounds': rounds,
-            'restBetweenRoundsSeconds': rr, 'items': [item(r) for r in rows.split()]}
+            'restBetweenRoundsSeconds': rr, 'items': [item(r, typ) for r in rows.split()]}
 
 T = [
  dict(id='office-relax', name='工位肩颈腰放松', goal='relax', scenes=['office'], equipment=[], minutes=8, level=[1,3],

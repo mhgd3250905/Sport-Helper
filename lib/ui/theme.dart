@@ -16,7 +16,7 @@ class SfColors {
   static const warn = Color(0xFFFFC857);
 }
 
-ThemeData buildTheme() {
+ThemeData buildTheme({String? fontFamily}) {
   final scheme = ColorScheme.fromSeed(
     seedColor: SfColors.accent,
     brightness: Brightness.dark,
@@ -27,6 +27,7 @@ ThemeData buildTheme() {
     colorScheme: scheme,
     scaffoldBackgroundColor: SfColors.bg,
     brightness: Brightness.dark,
+    fontFamily: fontFamily,
   );
   return base.copyWith(
     appBarTheme: const AppBarTheme(
@@ -47,7 +48,7 @@ ThemeData buildTheme() {
       backgroundColor: SfColors.surface2,
       selectedColor: SfColors.accentSoft,
       side: const BorderSide(color: SfColors.line),
-      labelStyle: const TextStyle(color: SfColors.text, fontSize: 14),
+      labelStyle: TextStyle(color: SfColors.text, fontSize: 14, fontFamily: fontFamily),
       shape: const StadiumBorder(),
     ),
     filledButtonTheme: FilledButtonThemeData(
@@ -55,7 +56,7 @@ ThemeData buildTheme() {
         backgroundColor: SfColors.accent,
         foregroundColor: Colors.white,
         minimumSize: const Size.fromHeight(52),
-        textStyle: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+        textStyle: TextStyle(fontSize: 17, fontWeight: FontWeight.w600, fontFamily: fontFamily),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       ),
     ),

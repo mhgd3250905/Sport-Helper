@@ -26,8 +26,11 @@ Future<void> main() async {
 }
 
 class SmartFitApp extends StatefulWidget {
-  const SmartFitApp({super.key, required this.services});
+  const SmartFitApp({super.key, required this.services, this.fontFamily});
   final AppServices services;
+
+  /// Only set by the screenshot harness (tests have no system CJK font).
+  final String? fontFamily;
   @override
   State<SmartFitApp> createState() => _SmartFitAppState();
 }
@@ -39,7 +42,7 @@ class _SmartFitAppState extends State<SmartFitApp> {
     child: MaterialApp(
       title: '智能健身助手',
       debugShowCheckedModeBanner: false,
-      theme: buildTheme(),
+      theme: buildTheme(fontFamily: widget.fontFamily),
       locale: const Locale('zh', 'CN'),
       supportedLocales: const [Locale('zh', 'CN'), Locale('en')],
       localizationsDelegates: GlobalMaterialLocalizations.delegates,

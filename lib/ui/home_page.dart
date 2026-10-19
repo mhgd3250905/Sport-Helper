@@ -121,7 +121,11 @@ class _HomePageState extends State<HomePage> {
               ),
               onChanged: (_) => setState(() {}),
             ),
-            const SizedBox(height: 8),
+            const Padding(
+              padding: EdgeInsets.only(top: 6, bottom: 8),
+              child: Text('描述里提到的场景、时长、器械、水平和不适部位会自动识别，并优先于下方选项。',
+                  style: TextStyle(color: SfColors.muted, fontSize: 12)),
+            ),
             SizedBox(
               height: 36,
               child: ListView(

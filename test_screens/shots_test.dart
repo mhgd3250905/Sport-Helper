@@ -1,0 +1,118 @@
+// Renders key screens to docs/screenshots/*.png (not part of `flutter test`):
+//   flutter test test_screens/shots_test.dart --update-goldens
+// Needs a CJK font for real glyphs: set SF_CJK_FONT to a .ttf (e.g. HipLab's
+// NotoSansSC.ttf); videos show their posters (no WebView in tests).
+import 'dart:io';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:smartfit/app/services.dart';
+import 'package:smartfit/data/app_store.dart';
+import 'package:smartfit/main.dart';
+import 'package:smartfit/voice/voice_library.dart';
+import 'package:smartfit/voice/voice_queue.dart';
+
+import '../test/app_flow_test.dart' show MemoryStorage;
+import '../test/support.dart';
+
+Future<void> _loadFonts() async {
+  final cjk = Platform.environment['SF_CJK_FONT'];
+  final root = Platform.environment['FLUTTER_ROOT'] ?? '/workspace/tools/flutter';
+  final mat = '$root/bin/cache/artifacts/material_fonts';
+  Future<void> load(String family, List<String> files) async {
+    final l = FontLoader(family);
+    for (final f in files) {
+      if (File(f).existsSync()) {
+        l.addFont(Future.value(ByteData.sublistView(File(f).readAsBytesSync())));
+      }
+    }
+    await l.load();
+  }
+  if (cjk != null) {
+    await load('NotoSansSC', [cjk]);
+  }
+  await load('MaterialIcons', ['$mat/MaterialIcons-Regular.otf']);
+}
+
+Future<void> _settleImages(WidgetTester tester) async {
+  await tester.runAsync(() async {
+    for (final e in tester.allElements.toList()) {
+      final w = e.widget;
+      if (w is Image) {
+        try {
+          await precacheImage(w.image, e);
+        } catch (_) {}
+      }
+    }
+  });
+  await tester.pump(const Duration(milliseconds: 50));
+}
+
+Future<void> _shot(WidgetTester tester, String name) async {
+  await _settleImages(tester);
+  await expectLater(find.byType(MaterialApp), matchesGoldenFile('../docs/screenshots/$name.png'));
+}
+
+void main() {
+  testWidgets('screens', (tester) async {
+    await _loadFonts();
+    tester.view.physicalSize = const Size(1080, 2340);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.reset);
+    final s = AppServices(
+      library: loadLibrary(), catalog: loadCatalog(), store: AppStore(MemoryStorage()),
+      voiceLibrary: VoiceLibrary.empty, voiceOutput: const MutedVoiceOutput());
+    await tester.pumpWidget(SmartFitApp(services: s, fontFamily: 'NotoSansSC'));
+    await tester.pumpAndSettle();
+    await _shot(tester, '01-safety');
+
+    await s.store.acceptSafety(blocked: false);
+    await tester.pumpWidget(SmartFitApp(key: UniqueKey(), services: s, fontFamily: 'NotoSansSC'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byKey(const ValueKey('prompt')), '家里有哑铃，想练 25 分钟全身力量');
+    await tester.tap(find.text('力量塑形'));
+    await tester.tap(find.text('哑铃'));
+    await tester.pumpAndSettle();
+    await _shot(tester, '02-home');
+
+    await tester.scrollUntilVisible(find.byKey(const ValueKey('generate')), 300,
+        scrollable: find.byType(Scrollable).first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('generate')));
+    await tester.pumpAndSettle();
+    await _shot(tester, '04-plan');
+    await tester.drag(find.byType(ListView).first, const Offset(0, -900));
+    await tester.pumpAndSettle();
+    await _shot(tester, '05-plan-groups');
+
+    await tester.tap(find.byKey(const ValueKey('start')));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    await _shot(tester, '06-player-prep');
+    await tester.tap(find.byKey(const ValueKey('skip')));
+    await tester.pump(const Duration(milliseconds: 300));
+    await _shot(tester, '07-player-work');
+    await tester.tap(find.byKey(const ValueKey('skip')));
+    await tester.pump(const Duration(milliseconds: 300));
+    await _shot(tester, '08-player-rest');
+    await tester.tap(find.byKey(const ValueKey('close')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('结束'));
+    await tester.pumpAndSettle();
+    tester.state<NavigatorState>(find.byType(Navigator)).pop();
+    await tester.pumpAndSettle();
+
+    await tester.drag(find.byType(ListView).first, const Offset(0, -1500));
+    await tester.pumpAndSettle();
+    await _shot(tester, '03-templates');
+    await tester.tap(find.byTooltip('动作库'));
+    await tester.pumpAndSettle();
+    await _shot(tester, '09-library');
+    tester.state<NavigatorState>(find.byType(Navigator)).pop();
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('关于与设置'));
+    await tester.pumpAndSettle();
+    await _shot(tester, '10-about');
+  });
+}

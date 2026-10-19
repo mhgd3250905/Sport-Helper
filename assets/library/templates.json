@@ -464,7 +464,7 @@
       {
        "exerciseId": "h-step-jack",
        "mode": "time",
-       "sets": 2,
+       "sets": 1,
        "perSide": false,
        "restSeconds": 30,
        "workSeconds": 40
@@ -606,7 +606,7 @@
       {
        "exerciseId": "h-step-jack",
        "mode": "time",
-       "sets": 2,
+       "sets": 1,
        "perSide": false,
        "restSeconds": 30,
        "workSeconds": 40
@@ -1385,7 +1385,7 @@
       {
        "exerciseId": "h-step-jack",
        "mode": "time",
-       "sets": 2,
+       "sets": 1,
        "perSide": false,
        "restSeconds": 30,
        "workSeconds": 40
