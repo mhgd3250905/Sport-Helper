@@ -13,9 +13,12 @@ import 'theme.dart';
 /// The generated plan as training groups: one live preview on top (the
 /// selected move loops), every move below with its dose and key point.
 class PlanPage extends StatefulWidget {
-  const PlanPage({super.key, required this.plan, this.request});
+  const PlanPage({super.key, required this.plan, this.request, this.returnPlanOnStart = false});
   final TrainingPlan plan;
   final ScenarioRequest? request;
+  /// Chat details return the edited plan so the home owns the workout
+  /// and its completion summary, just like the card's start button.
+  final bool returnPlanOnStart;
   @override
   State<PlanPage> createState() => _PlanPageState();
 }
@@ -50,6 +53,7 @@ class _PlanPageState extends State<PlanPage> {
       scene: _plan.scene,
       equipment: _plan.equipment.map(Equipment.byName).toSet(),
       level: _plan.level,
+      avoid: _plan.avoid,
     );
     final issues = PlanValidator(s.library).validate(updated, request);
     if (alt.level > request.level + 1) issues.add('替代动作难度偏高');
@@ -60,7 +64,7 @@ class _PlanPageState extends State<PlanPage> {
       return;
     }
     setState(() {
-      _plan = updated;
+      _plan = updated.copyWith(id: '${updated.id.split('~').first}~${DateTime.now().microsecondsSinceEpoch}');
       _selected = alt.id;
     });
     s.store.rememberPlan(_plan);
@@ -81,6 +85,18 @@ class _PlanPageState extends State<PlanPage> {
           child: FilledButton.icon(
             key: const ValueKey('start'),
             onPressed: () async {
+              if (!s.store.trainingAllowed) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text(s.store.safetyAccepted
+                      ? '根据你的安全确认，暂不开始训练；可以在动作库里看示范。'
+                      : '请先在对话里完成安全确认，再开始训练。'),
+                ));
+                return;
+              }
+              if (widget.returnPlanOnStart) {
+                Navigator.of(context).pop(_plan);
+                return;
+              }
               setState(() => _previewOn = false); // free the preview WebView
               await Navigator.of(context).push(
                 MaterialPageRoute<void>(builder: (_) => PlayerPage(plan: _plan)),

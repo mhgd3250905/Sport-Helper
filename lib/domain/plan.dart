@@ -171,6 +171,7 @@ class TrainingPlan {
     required this.level,
     required this.targetMinutes,
     required this.blocks,
+    this.avoid = const {},
     this.notes = const [],
     this.safetyNotes = const [],
   });
@@ -190,6 +191,9 @@ class TrainingPlan {
   final int targetMinutes;
   final List<PlanBlock> blocks;
 
+  /// User-requested body parts to protect, retained with saved plans.
+  final Set<String> avoid;
+
   /// What the generator changed for this user ("换成了…", "按 15 分钟加了一轮").
   final List<String> notes;
   final List<String> safetyNotes;
@@ -197,10 +201,10 @@ class TrainingPlan {
   Iterable<PlanItem> get items => blocks.expand((b) => b.items);
   Set<String> get exerciseIds => {for (final i in items) i.exerciseId};
 
-  TrainingPlan copyWith({List<PlanBlock>? blocks, List<String>? notes}) =>
+  TrainingPlan copyWith({String? id, List<PlanBlock>? blocks, List<String>? notes}) =>
       TrainingPlan(
         schemaVersion: schemaVersion,
-        id: id,
+        id: id ?? this.id,
         source: source,
         templateId: templateId,
         title: title,
@@ -211,6 +215,7 @@ class TrainingPlan {
         level: level,
         targetMinutes: targetMinutes,
         blocks: blocks ?? this.blocks,
+        avoid: avoid,
         notes: notes ?? this.notes,
         safetyNotes: safetyNotes,
       );
@@ -228,6 +233,7 @@ class TrainingPlan {
     'level': level,
     'targetMinutes': targetMinutes,
     'blocks': [for (final b in blocks) b.toJson()],
+    if (avoid.isNotEmpty) 'avoid': avoid.toList(),
     'notes': notes,
     'safetyNotes': safetyNotes,
   };
@@ -248,6 +254,7 @@ class TrainingPlan {
       for (final b in j['blocks'] as List)
         PlanBlock.fromJson(Map<String, dynamic>.from(b as Map)),
     ],
+    avoid: Set<String>.from(j['avoid'] as List? ?? const []),
     notes: List<String>.from(j['notes'] as List? ?? const []),
     safetyNotes: List<String>.from(j['safetyNotes'] as List? ?? const []),
   );

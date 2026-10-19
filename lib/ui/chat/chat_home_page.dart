@@ -83,12 +83,14 @@ class _ChatHomePageState extends State<ChatHomePage> {
   /// the chat afterwards; the summary and the save offer follow.
   Future<void> _start(TrainingPlan p, {OriginRect? from}) async {
     final s = AppServices.of(context);
-    if (s.store.safetyBlocked) {
-      _toast('根据你的安全确认，暂不开始训练；可以在动作库里看示范。');
+    if (!s.store.trainingAllowed) {
+      _toast(s.store.safetyAccepted
+          ? '根据你的安全确认，暂不开始训练；可以在动作库里看示范。'
+          : '请先在对话里完成安全确认，再开始训练。');
       return;
     }
     HapticFeedback.lightImpact();
-    await _chat.started(p);
+    if (!await _chat.started(p)) return;
     final before = s.store.history.length;
     if (!mounted) return;
     await Navigator.of(context).push(CardExpandRoute<void>(
@@ -107,6 +109,19 @@ class _ChatHomePageState extends State<ChatHomePage> {
     HapticFeedback.selectionClick();
     final saved = await _chat.save(p);
     _toast('已保存为「${saved.name}」');
+  }
+
+  Future<void> _details(ChatMessage m) async {
+    final plan = await Navigator.of(context).push<TrainingPlan>(
+      MaterialPageRoute(
+        builder: (_) => PlanPage(
+          plan: m.plan!,
+          request: m.request,
+          returnPlanOnStart: true,
+        ),
+      ),
+    );
+    if (mounted && plan != null) await _start(plan);
   }
 
   void _toast(String text) {
@@ -269,7 +284,7 @@ class _ChatHomePageState extends State<ChatHomePage> {
           saved: _chat.isSaved(m.plan!),
           onStart: (from) => _start(m.plan!, from: from),
           onSave: () => _save(m.plan!),
-          onOpen: () => _push(PlanPage(plan: m.plan!, request: m.request)),
+          onOpen: () => _details(m),
         )
       : MessageBubble(
     message: m,

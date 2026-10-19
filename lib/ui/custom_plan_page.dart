@@ -37,15 +37,15 @@ class _CustomPlanPageState extends State<CustomPlanPage> {
 
   Future<void> _generate({String? templateId}) async {
     final s = AppServices.of(context);
-    if (s.store.safetyBlocked) {
+    if (!s.store.trainingAllowed) {
       await showDialog<void>(
         context: context,
         builder: (c) => AlertDialog(
-          title: const Text('暂不生成训练计划'),
-          content: const Text(
-            '你在安全确认里选了需要注意的情况。建议先咨询医生；你仍可以在「动作库」里浏览动作示范。'
-            '如情况已变化，可在「关于与设置」里重新做安全确认。',
-          ),
+          title: Text(s.store.safetyAccepted ? '暂不生成训练计划' : '先完成安全确认'),
+          content: Text(s.store.safetyAccepted
+              ? '你在安全确认里选了需要注意的情况。建议先咨询医生；你仍可以在「动作库」里浏览动作示范。'
+                  '如情况已变化，可在「关于与设置」里重新做安全确认。'
+              : '请返回首页对话，完成上方的安全确认后再生成计划。'),
           actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('知道了'))],
         ),
       );
@@ -95,7 +95,7 @@ class _CustomPlanPageState extends State<CustomPlanPage> {
         builder: (context, _) => ListView(
           padding: const EdgeInsets.fromLTRB(16, 4, 16, 32),
           children: [
-            if (s.store.safetyBlocked) _blockedBanner(),
+            if (!s.store.trainingAllowed) _blockedBanner(),
             const Text('描述你今天想怎么练', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700)),
             const SizedBox(height: 10),
             TextField(
@@ -249,9 +249,11 @@ class _CustomPlanPageState extends State<CustomPlanPage> {
       color: const Color(0x33FFC857),
       borderRadius: BorderRadius.circular(14),
     ),
-    child: const Text(
-      '根据你的安全确认，当前只开放动作浏览。建议先咨询医生后再开始训练。',
-      style: TextStyle(height: 1.5),
+    child: Text(
+      AppServices.of(context).store.safetyAccepted
+          ? '根据你的安全确认，当前只开放动作浏览。建议先咨询医生后再开始训练。'
+          : '请先返回首页对话完成安全确认，再生成训练计划。',
+      style: const TextStyle(height: 1.5),
     ),
   );
 

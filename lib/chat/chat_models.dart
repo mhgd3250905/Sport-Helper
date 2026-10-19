@@ -127,6 +127,7 @@ ScenarioRequest requestForPlan(TrainingPlan p) => ScenarioRequest(
   }..removeWhere((e) => e == Equipment.none),
   minutes: p.targetMinutes,
   level: p.level,
+  avoid: p.avoid,
   templateId: p.templateId,
 );
 

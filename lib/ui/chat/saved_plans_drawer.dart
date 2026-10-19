@@ -49,35 +49,48 @@ class SavedPlansDrawer extends StatelessWidget {
           builder: (context, _) => Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(SfSpace.x6, SfSpace.x6, SfSpace.x6, SfSpace.x1),
-                child: Text('我的计划', style: SfType.title.copyWith(fontSize: 24)),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(SfSpace.x6, 0, SfSpace.x6, SfSpace.x4),
-                child: Text(
-                  store.savedPlans.isEmpty
-                      ? '保存的计划会出现在这里'
-                      : '${store.savedPlans.length} 套 · 点一下在对话里调出',
-                  style: SfType.label,
-                ),
-              ),
               Expanded(
-                child: store.savedPlans.isEmpty
-                    ? const _Empty()
-                    : ListView.separated(
-                        padding: const EdgeInsets.fromLTRB(SfSpace.x4, 0, SfSpace.x4, SfSpace.x4),
-                        itemCount: store.savedPlans.length,
-                        separatorBuilder: (_, _) => const SizedBox(height: SfSpace.x2),
-                        itemBuilder: (context, i) => _SavedTile(
-                          plan: store.savedPlans[i],
-                          library: library,
-                          onShow: onShow,
-                          onStart: onStart,
-                          onRename: (p) => _rename(context, p),
-                          onDelete: (p) => _delete(context, p),
+                // The heading and empty state also scroll when landscape or
+                // a keyboard leaves little room above the footer entries.
+                child: CustomScrollView(
+                  slivers: [
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(SfSpace.x6, SfSpace.x6, SfSpace.x6, SfSpace.x1),
+                        child: Text('我的计划', style: SfType.title.copyWith(fontSize: 24)),
+                      ),
+                    ),
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(SfSpace.x6, 0, SfSpace.x6, SfSpace.x4),
+                        child: Text(
+                          store.savedPlans.isEmpty
+                              ? '保存的计划会出现在这里'
+                              : '${store.savedPlans.length} 套 · 点一下在对话里调出',
+                          style: SfType.label,
                         ),
                       ),
+                    ),
+                    if (store.savedPlans.isEmpty)
+                      const SliverToBoxAdapter(child: _Empty())
+                    else
+                      SliverPadding(
+                        padding: const EdgeInsets.fromLTRB(SfSpace.x4, 0, SfSpace.x4, SfSpace.x4),
+                        sliver: SliverList.separated(
+                          itemCount: store.savedPlans.length,
+                          separatorBuilder: (_, _) => const SizedBox(height: SfSpace.x2),
+                          itemBuilder: (context, i) => _SavedTile(
+                            plan: store.savedPlans[i],
+                            library: library,
+                            onShow: onShow,
+                            onStart: onStart,
+                            onRename: (p) => _rename(context, p),
+                            onDelete: (p) => _delete(context, p),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
               if (footer.isNotEmpty) ...[
                 Padding(

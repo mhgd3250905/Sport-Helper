@@ -54,6 +54,7 @@ void main() {
       voiceLibrary: VoiceLibrary.empty,
       voiceOutput: const MutedVoiceOutput(),
     );
+    await services.store.acceptSafety(blocked: false);
     await tester.pumpWidget(
       AppScope(
         services: services,

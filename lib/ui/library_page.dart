@@ -43,10 +43,21 @@ class _LibraryPageState extends State<LibraryPage> {
           ),
         ),
         Expanded(
-          child: GridView.builder(
+          child: LayoutBuilder(builder: (context, bounds) {
+            final tileWidth = (bounds.maxWidth - SfSpace.x4 * 2 - SfSpace.x3) / 2;
+            final scaler = MediaQuery.textScalerOf(context);
+            final title = SfType.callout;
+            final caption = SfType.caption;
+            // A square image plus two text lines and their spacing. A fixed
+            // aspect ratio leaves too little text room on narrow screens or
+            // with larger system text; round each line up for font metrics.
+            final textHeight = (scaler.scale(title.fontSize!) * title.height!).ceil() +
+                (scaler.scale(caption.fontSize!) * caption.height!).ceil();
+            return GridView.builder(
             padding: const EdgeInsets.fromLTRB(SfSpace.x4, SfSpace.x1, SfSpace.x4, SfSpace.x6),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2, mainAxisSpacing: SfSpace.x3, crossAxisSpacing: SfSpace.x3, childAspectRatio: .76),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2, mainAxisSpacing: SfSpace.x3, crossAxisSpacing: SfSpace.x3,
+              mainAxisExtent: tileWidth + SfSpace.x3 + textHeight),
             itemCount: list.length,
             itemBuilder: (_, i) {
               final e = list[i];
@@ -81,7 +92,8 @@ class _LibraryPageState extends State<LibraryPage> {
                 ),
               );
             },
-          ),
+            );
+          }),
         ),
       ]),
     );

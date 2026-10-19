@@ -1,7 +1,8 @@
 // Renders key screens to docs/screenshots/*.png (not part of `flutter test`):
 //   flutter test test_screens/shots_test.dart --update-goldens
-// Needs a CJK font for real glyphs: set SF_CJK_FONT to a .ttf (e.g. HipLab's
-// NotoSansSC.ttf); videos show their posters (no WebView in tests).
+// Uses the bundled CJK font; SF_CJK_FONT can override it. Set
+// SF_SCREENSHOT_DIR to an absolute output directory to keep docs unchanged.
+// Videos show their posters (no WebView in tests).
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -21,7 +22,7 @@ import '../test/app_flow_test.dart' show MemoryStorage;
 import '../test/support.dart';
 
 Future<void> _loadFonts() async {
-  final cjk = Platform.environment['SF_CJK_FONT'];
+  final cjk = Platform.environment['SF_CJK_FONT'] ?? 'assets/fonts/NotoSansSC.ttf';
   final root = Platform.environment['FLUTTER_ROOT'] ?? '/workspace/tools/flutter';
   final mat = '$root/bin/cache/artifacts/material_fonts';
   Future<void> load(String family, List<String> files) async {
@@ -33,9 +34,7 @@ Future<void> _loadFonts() async {
     }
     await l.load();
   }
-  if (cjk != null) {
-    await load('NotoSansSC', [cjk]);
-  }
+  await load('NotoSansSC', [cjk]);
   await load('MaterialIcons', ['$mat/MaterialIcons-Regular.otf']);
 }
 
@@ -55,7 +54,9 @@ Future<void> _settleImages(WidgetTester tester) async {
 
 Future<void> _shot(WidgetTester tester, String name) async {
   await _settleImages(tester);
-  await expectLater(find.byType(MaterialApp), matchesGoldenFile('../docs/screenshots/$name.png'));
+  final out = Platform.environment['SF_SCREENSHOT_DIR'];
+  final target = out == null ? Uri.parse('../docs/screenshots/$name.png') : Uri.file('$out/$name.png');
+  await expectLater(find.byType(MaterialApp), matchesGoldenFile(target));
 }
 
 void main() {

@@ -18,7 +18,7 @@ lib/voice/       语音：session_script(台词时间线) + session_runner；voi
 lib/core/        复制自 HipLab（媒体播放 WebView、本地存储、屏幕常亮），文件头注明来源
 lib/chat/        对话：ChatEngine 接口 + RuleChatEngine（关键词/槽位 + 模板 + 校验）、SlotParser、
                  ChatController（会话、开场安全确认、保存计划、本地历史）、safety_script（免责声明与 4 问）
-lib/ui/chat/     对话主界面：宇宙背景、磨砂玻璃气泡、计划卡片、已存计划抽屉
+lib/ui/chat/     对话主界面：星尘背景、色调气泡、计划卡片、已存计划抽屉
 lib/ui/          训练计划(训练小组) → 跟练 → 动作库 / 关于；custom_plan_page = 原表单（抽屉「自定义计划」）
 lib/packs/       动作小包读取（与 App 无关，可整体拷走）
 assets/packs/    动作小包：每个动作一个文件夹 <id>/{pack.json, cover.jpg, demo.mp4, voice/zh/*.m4a}，
@@ -42,7 +42,8 @@ flutter analyze
 flutter test
 flutter build apk --debug
 flutter build apk --release        # 本机工具链及验收状态见 docs/acceptance.md
-# 截图：SF_CJK_FONT=<NotoSansSC.ttf> flutter test test_screens/shots_test.dart --update-goldens
+# 截图（使用内置字体）：flutter test test_screens/shots_test.dart --update-goldens
+# 仅检查渲染：设置 SF_SCREENSHOT_DIR 为临时目录的绝对路径，避免改写文档截图
 ```
 
 ## 本机 Web 预览

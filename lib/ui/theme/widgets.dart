@@ -48,6 +48,7 @@ class SfPressable extends StatefulWidget {
 
 class _SfPressableState extends State<SfPressable> {
   bool _down = false;
+  bool _showFocus = false;
 
   void _set(bool v) {
     if (_down != v && mounted) setState(() => _down = v);
@@ -59,6 +60,9 @@ class _SfPressableState extends State<SfPressable> {
     final still = MediaQuery.maybeDisableAnimationsOf(context) ?? false;
     Widget child = GestureDetector(
       behavior: HitTestBehavior.opaque,
+      // The outer semantics node owns activation, including when the visual
+      // child is excluded to keep an explicit button label from repeating.
+      excludeFromSemantics: true,
       onTapDown: enabled ? (_) => _set(true) : null,
       onTapUp: enabled ? (_) => _set(false) : null,
       onTapCancel: enabled ? () => _set(false) : null,
@@ -67,16 +71,56 @@ class _SfPressableState extends State<SfPressable> {
         scale: _down && !still ? widget.scale : 1,
         duration: _down ? SfMotion.press : SfMotion.release,
         curve: _down ? Curves.easeOut : Curves.easeOutCubic,
-        child: SfPressedScope(pressed: _down, child: widget.child),
+        child: SfPressedScope(
+          pressed: _down,
+          child: widget.semanticLabel == null
+              ? widget.child
+              : ExcludeSemantics(child: widget.child),
+        ),
+      ),
+    );
+    child = FocusableActionDetector(
+      enabled: enabled,
+      mouseCursor: enabled ? SystemMouseCursors.click : SystemMouseCursors.basic,
+      onShowFocusHighlight: (value) {
+        if (_showFocus != value) setState(() => _showFocus = value);
+      },
+      actions: {
+        ActivateIntent: CallbackAction<ActivateIntent>(onInvoke: (_) {
+          widget.onTap?.call();
+          return null;
+        }),
+        ButtonActivateIntent: CallbackAction<ButtonActivateIntent>(onInvoke: (_) {
+          widget.onTap?.call();
+          return null;
+        }),
+      },
+      child: DecoratedBox(
+        position: DecorationPosition.foreground,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(SfRadius.sm),
+          border: _showFocus ? Border.all(color: SfColors.accentText, width: 2) : null,
+        ),
+        child: child,
       ),
     );
     child = Semantics(
+      // Keep surrounding message text out of this button's accessible name.
+      // Wrap focus as well, so focus and activation belong to one node.
+      container: true,
       button: true,
       enabled: enabled,
       label: widget.semanticLabel,
+      onTap: widget.onTap,
       child: child,
     );
-    if (widget.tooltip != null) child = Tooltip(message: widget.tooltip!, child: child);
+    if (widget.tooltip != null) {
+      child = Tooltip(
+        message: widget.tooltip!,
+        excludeFromSemantics: widget.semanticLabel != null,
+        child: child,
+      );
+    }
     return child;
   }
 }

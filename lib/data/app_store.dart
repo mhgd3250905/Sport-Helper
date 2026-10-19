@@ -49,6 +49,9 @@ class AppStore extends ChangeNotifier {
 
   /// A safety question was answered "是": browse only, no generated plans.
   bool safetyBlocked = false;
+
+  /// All training entry points require a completed, clear safety check.
+  bool get trainingAllowed => safetyAccepted && !safetyBlocked;
   VoiceSettings voice = const VoiceSettings();
   TrainingPlan? lastPlan;
   final List<HistoryEntry> history = [];
@@ -136,6 +139,14 @@ class AppStore extends ChangeNotifier {
   Future<void> acceptSafety({required bool blocked}) {
     safetyAccepted = true;
     safetyBlocked = blocked;
+    return _save();
+  }
+
+  /// A re-check invalidates the previous answers immediately. Persist the
+  /// pending state so restarting halfway through cannot reopen training.
+  Future<void> beginSafetyCheck() {
+    if (!safetyAccepted) return Future.value();
+    safetyAccepted = false;
     return _save();
   }
 

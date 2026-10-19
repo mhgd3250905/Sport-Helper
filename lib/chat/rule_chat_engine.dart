@@ -442,6 +442,7 @@ class RuleChatEngine implements ChatEngine {
     level: p.level,
     targetMinutes: p.targetMinutes,
     blocks: p.blocks,
+    avoid: p.avoid,
     notes: p.notes,
     safetyNotes: p.safetyNotes,
   );

@@ -44,6 +44,7 @@ class ChatController extends ChangeNotifier {
   Stream<String> get actions => _actions.stream;
 
   int _seq = 0;
+  int _replyEpoch = 0;
   bool _started = false;
 
   /// Runs an app command (`@drawer`, `@library`…) as if a bubble asked.
@@ -82,7 +83,7 @@ class ChatController extends ChangeNotifier {
   static final _none = ChatMessage(id: '', role: ChatRole.user, at: DateTime(2000));
 
   ChatState get _context => _state.copyWith(
-    safetyBlocked: store.safetyBlocked,
+    safetyBlocked: !store.trainingAllowed,
     saved: List.unmodifiable(store.savedPlans),
     lastPlan: store.lastPlan,
   );
@@ -98,10 +99,12 @@ class ChatController extends ChangeNotifier {
       unawaited(_persist());
       return;
     }
+    final epoch = ++_replyEpoch;
     typing = true;
     notifyListeners();
     final reply = await engine.reply(t, _context);
     if (replyDelay > Duration.zero) await Future<void>.delayed(replyDelay);
+    if (epoch != _replyEpoch) return;
     typing = false;
     _state = reply.state;
     for (final m in reply.messages) {
@@ -173,10 +176,21 @@ class ChatController extends ChangeNotifier {
   }
 
   /// Called right before the player opens: becomes "上次那个".
-  Future<void> started(TrainingPlan p) async {
+  Future<bool> started(TrainingPlan p) async {
+    if (!store.trainingAllowed) return false;
     final saved = store.savedFor(p);
     if (saved != null) await store.touchPlan(saved.id);
     await store.rememberPlan(p);
+    if (!store.trainingAllowed) return false;
+    final card = messages.where((m) => m.plan?.id == p.id).lastOrNull;
+    final request = card?.request ?? requestForPlan(p);
+    _state = _state.copyWith(clearPending: true, plan: p, request: request);
+    // A plan edited in its detail page is a distinct version. Keep that
+    // exact snapshot so the post-workout save offer survives a restart.
+    if (card == null) _bot(BotMessage('', plan: p, request: request));
+    notifyListeners();
+    await _persist();
+    return store.trainingAllowed;
   }
 
   /// Back from the player: a short word about it, and an offer to keep an
@@ -217,6 +231,9 @@ class ChatController extends ChangeNotifier {
   }
 
   void _beginSafety({required bool firstRun}) {
+    _replyEpoch++;
+    typing = false;
+    unawaited(store.beginSafetyCheck());
     if (firstRun) {
       messages.clear();
       _bot(const BotMessage(safetyIntro));
@@ -316,6 +333,7 @@ class ChatController extends ChangeNotifier {
 
   @override
   void dispose() {
+    _replyEpoch++;
     _actions.close();
     super.dispose();
   }

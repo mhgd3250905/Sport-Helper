@@ -135,6 +135,7 @@ class TemplatePlanGenerator implements PlanGenerator {
       level: r.level,
       targetMinutes: r.minutes,
       blocks: blocks,
+      avoid: r.avoid,
       safetyNotes: const [
         '动作过程中出现关节刺痛、麻木或头晕，请立即停止。',
         '本计划为通用健身建议，不能替代医生或康复治疗师的意见。',
