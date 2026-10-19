@@ -6,9 +6,13 @@ import 'package:flutter/services.dart';
 import '../../app/services.dart';
 import '../../chat/chat_controller.dart';
 import '../../chat/chat_models.dart';
+import '../../domain/session.dart';
 import '../library_page.dart';
+import '../plan_page.dart';
+import '../theme.dart' show minutesZh;
 import 'chat_widgets.dart';
 import 'cosmos.dart';
+import 'glass.dart';
 
 /// The home screen: one conversation floating in an endless sky. No app
 /// bar, no borders; the plans drawer opens from the input's left icon.
@@ -169,9 +173,28 @@ class _ChatHomePageState extends State<ChatHomePage> {
     );
   }
 
-  Widget _message(ChatMessage m) => MessageBubble(
+  Widget _message(ChatMessage m) => m.isPlan ? _planPreview(m) : MessageBubble(
     message: m,
     optionsActive: _chat.isActive(m),
     onOption: (i) => _chat.choose(m, i),
   );
+
+  Widget _planPreview(ChatMessage m) {
+    final s = AppServices.of(context);
+    final p = m.plan!;
+    final secs = SessionBuilder(s.library).planSeconds(p);
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: GestureDetector(
+        onTap: () => _push(PlanPage(plan: p, request: m.request)),
+        child: Glass(
+          padding: const EdgeInsets.all(16),
+          child: Text(
+            '${p.title} · ${minutesZh(secs)} · ${p.items.length} 个动作  ›',
+            style: const TextStyle(color: CosmosColors.text, fontSize: 15.5),
+          ),
+        ),
+      ),
+    );
+  }
 }

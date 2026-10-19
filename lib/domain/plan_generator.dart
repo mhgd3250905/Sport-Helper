@@ -145,7 +145,7 @@ class TemplatePlanGenerator implements PlanGenerator {
   }
 
   /// Can the user do [e] in this scenario?
-  String? _blocker(Exercise e, ScenarioRequest r) {
+  String? blockerFor(Exercise e, ScenarioRequest r) {
     final have = r.availableEquipment;
     for (final q in e.equipment) {
       if (!have.contains(q)) return '没有${q.zh}';
@@ -165,16 +165,16 @@ class TemplatePlanGenerator implements PlanGenerator {
   ) {
     final e = lib.tryGet(item.exerciseId);
     if (e == null) return null;
-    final why = _blocker(e, r);
+    final why = blockerFor(e, r);
     if (why == null) return item;
     // Walk the alternative chain, then any same-category move that fits.
     final tried = <String>{e.id};
     var alt = e.alternative == null ? null : lib.tryGet(e.alternative!);
     while (alt != null && tried.add(alt.id)) {
-      if (_blocker(alt, r) == null) break;
+      if (blockerFor(alt, r) == null) break;
       alt = alt.alternative == null ? null : lib.tryGet(alt.alternative!);
     }
-    if (alt != null && _blocker(alt, r) != null) alt = null;
+    if (alt != null && blockerFor(alt, r) != null) alt = null;
     alt ??= _similar(e, r, sofar);
     if (alt == null) {
       notes.add('去掉了「${e.name}」（$why）');
@@ -203,7 +203,7 @@ class TemplatePlanGenerator implements PlanGenerator {
               !used.contains(c.id) &&
               c.category == e.category &&
               c.scenes.contains(r.scene) &&
-              _blocker(c, r) == null,
+              blockerFor(c, r) == null,
         )
         .toList();
     if (candidates.isEmpty) return null;
@@ -234,6 +234,30 @@ class TemplatePlanGenerator implements PlanGenerator {
   }
 
   double _seconds(TrainingPlan p) => SessionBuilder(lib).planSeconds(p);
+
+  /// Re-fits an existing plan to [minutes] (rounds → sets → holds), the
+  /// same way a fresh plan is fitted. Used by the chat's "再短一点 / 长一点".
+  TrainingPlan refit(TrainingPlan plan, int minutes) {
+    final notes = <String>[];
+    final p = _fitDuration(plan, minutes, notes);
+    return p.copyWith(notes: [...plan.notes, ...notes]);
+  }
+
+  /// A move that can stand in for [e] in this scenario and is not one of
+  /// [exclude]: its alternative chain first, then the closest move of the
+  /// same category (muscle overlap, then easier first).
+  Exercise? replacementFor(Exercise e, ScenarioRequest r, Set<String> exclude) {
+    final tried = <String>{e.id};
+    var alt = e.alternative == null ? null : lib.tryGet(e.alternative!);
+    while (alt != null && tried.add(alt.id)) {
+      if (blockerFor(alt, r) == null && !exclude.contains(alt.id)) return alt;
+      alt = alt.alternative == null ? null : lib.tryGet(alt.alternative!);
+    }
+    return _similar(e, r, [
+      for (final id in exclude)
+        PlanItem(exerciseId: id, mode: DoseMode.time, sets: 1, perSide: false, restSeconds: 0),
+    ]);
+  }
 
   /// Grow or shrink the plan toward [minutes]: circuit rounds first, then
   /// sets of main-block items, then hold lengths; within ±15 % or 6 steps.

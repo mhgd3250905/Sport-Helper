@@ -5,7 +5,7 @@ import 'package:flutter/widgets.dart';
 
 import '../chat/chat_controller.dart';
 import '../chat/chat_models.dart';
-import '../chat/shell_engine.dart';
+import '../chat/rule_chat_engine.dart';
 import '../data/app_store.dart';
 import '../domain/exercise.dart';
 import '../domain/plan_generator.dart';
@@ -24,7 +24,7 @@ class AppServices {
     required this.voiceLibrary,
     required this.voiceOutput,
     this.chatReplyDelay = const Duration(milliseconds: 450),
-  }) : generator = TemplatePlanGenerator(lib: library, catalog: catalog);
+  }) : templates = TemplatePlanGenerator(lib: library, catalog: catalog);
 
   final ExerciseLibrary library;
   final TemplateCatalog catalog;
@@ -34,7 +34,8 @@ class AppServices {
 
   /// MVP: fixed templates only. An AI generator plugs in behind the same
   /// interface later (see AiPlanGenerator).
-  final PlanGenerator generator;
+  final TemplatePlanGenerator templates;
+  PlanGenerator get generator => templates;
 
   VoiceQueue voiceQueue() {
     voiceOutput.volume = store.voice.volume;
@@ -44,7 +45,9 @@ class AppServices {
   SessionScript script() => SessionScript(lib: voiceLibrary, exercises: library);
 
   /// What answers in the chat home.
-  late final ChatEngine chatEngine = const ShellChatEngine();
+  /// Rules + templates today; a model-backed [ChatEngine] later, with the
+  /// same plan validation.
+  late final ChatEngine chatEngine = RuleChatEngine(lib: library, templates: templates);
 
   /// The "typing" pause before a reply (zero in tests and screenshots).
   final Duration chatReplyDelay;

@@ -4,8 +4,7 @@ import 'package:flutter/foundation.dart';
 
 import '../data/app_store.dart';
 import 'chat_models.dart';
-
-const defaultSuggestions = ['办公室 10 分钟肩颈放松', '在家 20 分钟练核心', '睡前拉伸 10 分钟', '跑步前热身'];
+import 'rule_chat_engine.dart' show defaultSuggestions;
 
 /// Owns the chat home's conversation: the message list, the engine's state,
 /// and persisting the recent history in [AppStore]. UI-only commands
@@ -49,6 +48,13 @@ class ChatController extends ChangeNotifier {
         // Skip a message an older build wrote differently.
       }
     }
+    final lastCard = messages.lastWhere((m) => m.isPlan, orElse: () => _none);
+    if (lastCard != _none) {
+      _state = ChatState(
+        plan: lastCard.plan,
+        request: lastCard.request ?? requestForPlan(lastCard.plan!),
+      );
+    }
     final last = messages.isEmpty ? null : messages.last.at;
     if (last == null || _clock().difference(last) > const Duration(hours: 6)) {
       _bot(BotMessage(messages.isEmpty ? '说说今天想怎么练？' : '欢迎回来。今天想怎么练？'));
@@ -56,6 +62,8 @@ class ChatController extends ChangeNotifier {
     suggestions = _defaults();
     notifyListeners();
   }
+
+  static final _none = ChatMessage(id: '', role: ChatRole.user, at: DateTime(2000));
 
   ChatState get _context => _state.copyWith(safetyBlocked: store.safetyBlocked);
 
