@@ -1,0 +1,169 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "h-good-morning",
+ "version": "1.0.0",
+ "name": {
+  "zh": "徒手早安式",
+  "en": "Bodyweight Good Morning"
+ },
+ "category": "strength",
+ "muscles": [
+  "腘绳肌",
+  "竖脊肌"
+ ],
+ "muscleGroups": [
+  "hamstrings",
+  "erectors"
+ ],
+ "equipment": [],
+ "position": "standing",
+ "unilateral": false,
+ "level": 1,
+ "scenes": [
+  "home",
+  "office"
+ ],
+ "defaultDose": {
+  "mode": "reps",
+  "sets": 3,
+  "reps": 12,
+  "restSeconds": 30
+ },
+ "cues": {
+  "zh": [
+   "微屈膝，臀部向后推",
+   "背挺直，臀部向后推，感到大腿后侧拉紧再起身"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [
+  "腰"
+ ],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 1.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": 4.0
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "徒手早安式"
+    },
+    "ms": {
+     "zh": 1161
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "徒手早安式，练大腿后侧和下背"
+    },
+    "ms": {
+     "zh": 2972
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "微屈膝，臀部向后推"
+    },
+    "ms": {
+     "zh": 2067
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "背挺直，臀部向后推，感到大腿后侧拉紧再起身"
+    },
+    "ms": {
+     "zh": 4435
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，背挺直，臀部向后推，感到大腿后侧拉紧再起身"
+    },
+    "ms": {
+     "zh": 6896
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "徒手早安式，完成"
+    },
+    "ms": {
+     "zh": 1834
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub Drive archive green-screen master, keyed onto #101013 by tools/media/prepare_media.py",
+  "mediaSource": "pose-hub-drive-greenscreen",
+  "spec": "drill-anim/specs/h-good-morning.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 6129,
+   "sha256": "29d1485769bc6a916f321ecb13dd4ffdf128fb7e0419d72e253276d424db36ed"
+  },
+  "demo.mp4": {
+   "bytes": 107469,
+   "sha256": "58014cb56080b560f9e112db265cb8fc64fb352c59d913c04e87cb36da85cc41"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 17978,
+   "sha256": "742643c6cccf52f0e9ed8eb68c7ec6ee67c2949e0b2c0dbc7464a3bc6210576a"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 37285,
+   "sha256": "9a72bbe9dcdf7f6c1ccd7476b4476e9be11f72c8f627c060586634b174433fdc"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 16202,
+   "sha256": "cb9f1a8c1b59c634e0f06111e64eb7858f0b03ac52d59c6dcb90af91d15628a6"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 25482,
+   "sha256": "889fc8567a16f12b3a9280782e9c79f434154e0a4e66175ea7727686ca33be5d"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 10638,
+   "sha256": "7c05f8e3ea4a07f1828c05723c05a981debd27e54b959d0942d6e75a083901ea"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 59456,
+   "sha256": "7b0e4fc991d928272fdab0d8d46e9fa05b0a18b1ea150d824b61da2d4fce94d5"
+  }
+ }
+}

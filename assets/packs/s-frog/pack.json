@@ -1,0 +1,150 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "s-frog",
+ "version": "1.0.0",
+ "name": {
+  "zh": "青蛙式"
+ },
+ "category": "stretch",
+ "muscles": [
+  "大腿内侧"
+ ],
+ "muscleGroups": [],
+ "equipment": [
+  "mat"
+ ],
+ "position": "quadruped",
+ "unilateral": false,
+ "level": 3,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "time",
+  "sets": 1,
+  "seconds": 40,
+  "restSeconds": 10
+ },
+ "cues": {
+  "zh": [
+   "膝盖向两侧打开，脚尖朝外，臀部慢慢往后坐"
+  ]
+ },
+ "primaryCue": 0,
+ "cautions": [
+  "膝"
+ ],
+ "contraindications": [],
+ "alternative": "s-butterfly",
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 3.8,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": null
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "青蛙式"
+    },
+    "ms": {
+     "zh": 813
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "青蛙式，拉伸大腿内侧"
+    },
+    "ms": {
+     "zh": 2252
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "膝盖向两侧打开，脚尖朝外，臀部慢慢往后坐"
+    },
+    "ms": {
+     "zh": 4226
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，膝盖向两侧打开，脚尖朝外，臀部慢慢往后坐"
+    },
+    "ms": {
+     "zh": 6780
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "青蛙式，完成"
+    },
+    "ms": {
+     "zh": 1533
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub v0.2.0 dark soft-v1 clip (as frozen in HipLab), re-encoded 720²",
+  "mediaSource": "pose-hub-v0.2.0",
+  "spec": null,
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 6474,
+   "sha256": "97982f83346c83fad923953f58cc0bf352c5b590795f7904da78726b4977c248"
+  },
+  "demo.mp4": {
+   "bytes": 53508,
+   "sha256": "6c64ca3f352d3e81ef6aa099b303ab39c119507a8c1668ae3de8a6f2c6e967bb"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 35824,
+   "sha256": "8e5c104208fc612bfb589fabda5de05950cea09f82f51236d938796c588c2fac"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 13719,
+   "sha256": "b8c1adcadd4ab8761937acc6f74debe1c898c0f9bff3f2bc7d2a716a55787b12"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 19626,
+   "sha256": "627d0e626a693f0c4200babd0ee17104d882941007a220aee41262dfc11f2121"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 7814,
+   "sha256": "7a201615ea62bc6d34e51896108d3e5560d8622c6f7f75d1a0dc5470adbff472"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 56679,
+   "sha256": "a3edbd9a2c24fdf36d533abf62394b031c8b3e42eed8c392ea3d0d215f7e1706"
+  }
+ }
+}

@@ -1,0 +1,181 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "o-seated-catcow",
+ "version": "1.0.0",
+ "name": {
+  "zh": "坐姿猫牛式",
+  "en": "Seated Cat-Cow"
+ },
+ "category": "mobility",
+ "muscles": [
+  "竖脊肌"
+ ],
+ "muscleGroups": [
+  "erectors"
+ ],
+ "equipment": [
+  "chair"
+ ],
+ "position": "seated",
+ "unilateral": false,
+ "level": 1,
+ "scenes": [
+  "office"
+ ],
+ "defaultDose": {
+  "mode": "time",
+  "sets": 1,
+  "seconds": 40,
+  "restSeconds": 10
+ },
+ "cues": {
+  "zh": [
+   "坐椅前半，手放膝上",
+   "坐在椅子前半部分，吸气挺胸，呼气拱背",
+   "挺胸抬头，再拱背低头"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 1.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": null
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "坐姿猫牛式"
+    },
+    "ms": {
+     "zh": 1184
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "坐姿猫牛式，活动下背"
+    },
+    "ms": {
+     "zh": 2252
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "坐椅前半，手放膝上"
+    },
+    "ms": {
+     "zh": 1997
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "坐在椅子前半部分，吸气挺胸，呼气拱背"
+    },
+    "ms": {
+     "zh": 3599
+    }
+   },
+   {
+    "id": "cue3",
+    "role": "cue",
+    "text": {
+     "zh": "挺胸抬头，再拱背低头"
+    },
+    "ms": {
+     "zh": 2183
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，挺胸抬头，再拱背低头"
+    },
+    "ms": {
+     "zh": 4667
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "坐姿猫牛式，完成"
+    },
+    "ms": {
+     "zh": 1927
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub Drive archive green-screen master, keyed onto #101013 by tools/media/prepare_media.py",
+  "mediaSource": "pose-hub-drive-greenscreen",
+  "spec": "drill-anim/specs/o-seated-catcow.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 7232,
+   "sha256": "9bd599884eed0cecdd5c08a6bc14f292ffe5c56e96efdfbcebd39da4279f7376"
+  },
+  "demo.mp4": {
+   "bytes": 71515,
+   "sha256": "31d26c228aaec615005bffa40168c8758d07dbb0031294160ed5712c8fab80a0"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 17514,
+   "sha256": "f41639d998cf68d521200636c42ecd85fda22b6a14a52be1faac99105f33d139"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 30678,
+   "sha256": "91393f4d199f60ad0b14f1d77c4b0d77c5122341f9f15d46a7e34a0d21268bc5"
+  },
+  "voice/zh/cue3.m4a": {
+   "bytes": 18897,
+   "sha256": "29de2edf582d3dff9e4c3ad3b7e8a62c49226b7ae1150f59d06150c01a5d9f49"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 16980,
+   "sha256": "d8e962a1e99e845789249b2b10729865d21973d929bc4d6115396cc01d981335"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 19452,
+   "sha256": "0b82ca9debdb88b0eeed82d0c278829eeac76ecd5f1e8649f076691e9821c5cd"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 10874,
+   "sha256": "35d2b69242ed3237b886ad3ac658d35e2520f54753a8a9a1b7dd202b6e383011"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 39443,
+   "sha256": "a22cb5d909e15ea6b8ca4592739c570ff5a69ab2166a24e9e142f1aabf0d3cfb"
+  }
+ }
+}

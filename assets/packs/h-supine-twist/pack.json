@@ -1,0 +1,170 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "h-supine-twist",
+ "version": "1.0.0",
+ "name": {
+  "zh": "仰卧屈膝扭转",
+  "en": "Supine Knee-Drop Twist"
+ },
+ "category": "stretch",
+ "muscles": [
+  "腹斜肌",
+  "竖脊肌"
+ ],
+ "muscleGroups": [
+  "obliques",
+  "erectors"
+ ],
+ "equipment": [
+  "mat"
+ ],
+ "position": "supine",
+ "unilateral": false,
+ "level": 1,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "time",
+  "sets": 1,
+  "seconds": 40,
+  "restSeconds": 10
+ },
+ "cues": {
+  "zh": [
+   "仰卧屈膝，手臂打开",
+   "双膝倒向一侧，肩膀贴地"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [
+  "腰"
+ ],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 2.3,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": null
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "仰卧屈膝扭转"
+    },
+    "ms": {
+     "zh": 1324
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "仰卧屈膝扭转，拉伸腰两侧和下背"
+    },
+    "ms": {
+     "zh": 3158
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "仰卧屈膝，手臂打开"
+    },
+    "ms": {
+     "zh": 2020
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "双膝倒向一侧，肩膀贴地"
+    },
+    "ms": {
+     "zh": 2392
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，双膝倒向一侧，肩膀贴地"
+    },
+    "ms": {
+     "zh": 4923
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "仰卧屈膝扭转，完成"
+    },
+    "ms": {
+     "zh": 2020
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub v0.2.0 dark soft-v1 clip (as frozen in HipLab), re-encoded 720²",
+  "mediaSource": "pose-hub-v0.2.0",
+  "spec": "drill-anim/specs/h-supine-twist-r2.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 8798,
+   "sha256": "04d61082e8694bc6b5110d1cbbe716c00be55272e80d920e1b0ae58d30bedb24"
+  },
+  "demo.mp4": {
+   "bytes": 112443,
+   "sha256": "a4d050c9287a1284d7bf295f47fe250979d46889f65bee22f1f6164131fe971f"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 17724,
+   "sha256": "a9a2eb1672aa38c78a624d15cce4932365a21c2c745a0dd2108852c85391ca68"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 20755,
+   "sha256": "240150eaca3c9d95339cef330587a9fa76d4cef1d9f3e199638da4c355a2b70f"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 17579,
+   "sha256": "2c6cac26d828932e7102956408586758d39281562c5340ce36bb91ffe5035d68"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 27042,
+   "sha256": "b2abe8dab5c8bec6ab2dbbc4578985605156df292cf8590e2bcee21139e78edb"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 12029,
+   "sha256": "6aedb384cc13658c712bb77fa523fc64f3532bcc617ed59305370067c18e418a"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 41082,
+   "sha256": "b5326e8e635e77eb7b5bd43f2a69d0025a7f63afaf8fe4aab9b9fda63f35b623"
+  }
+ }
+}

@@ -1,0 +1,183 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "w-fire-hydrant",
+ "version": "1.0.0",
+ "name": {
+  "zh": "四足消防栓",
+  "en": "Quadruped Fire Hydrant"
+ },
+ "category": "strength",
+ "muscles": [
+  "臀中肌"
+ ],
+ "muscleGroups": [
+  "hip-abductors"
+ ],
+ "equipment": [
+  "mat"
+ ],
+ "position": "quadruped",
+ "unilateral": true,
+ "level": 1,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "reps",
+  "sets": 2,
+  "reps": 12,
+  "restSeconds": 30
+ },
+ "cues": {
+  "zh": [
+   "手在肩下、膝在髋下",
+   "四点跪姿，膝盖向侧面抬起，躯干不倾斜"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [
+  "膝"
+ ],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 1.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": 4.0,
+  "showsSide": "right"
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "四足消防栓"
+    },
+    "ms": {
+     "zh": 1231
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "四足消防栓，练臀部外侧"
+    },
+    "ms": {
+     "zh": 2485
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "手在肩下、膝在髋下"
+    },
+    "ms": {
+     "zh": 2043
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "四点跪姿，膝盖向侧面抬起，躯干不倾斜"
+    },
+    "ms": {
+     "zh": 3971
+    }
+   },
+   {
+    "id": "side_switch",
+    "role": "side_switch",
+    "text": {
+     "zh": "左侧同样，四点跪姿，膝盖向侧面抬起，躯干不倾斜"
+    },
+    "ms": {
+     "zh": 5062
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，四点跪姿，膝盖向侧面抬起，躯干不倾斜"
+    },
+    "ms": {
+     "zh": 6478
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "四足消防栓，完成"
+    },
+    "ms": {
+     "zh": 1997
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub Drive archive green-screen master, keyed onto #101013 by tools/media/prepare_media.py",
+  "mediaSource": "pose-hub-drive-greenscreen",
+  "spec": "drill-anim/specs/w-fire-hydrant.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 12258,
+   "sha256": "1c80bc9a1531237d8c7c68664ab8a75fbf2dfa52da96f0f2909fd77b703b3dfc"
+  },
+  "demo.mp4": {
+   "bytes": 210498,
+   "sha256": "d2c8dccbae2c46ce37d8c071fbbbe64024cf8b47fed5174094795c6e4df7db54"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 17887,
+   "sha256": "c442db3d1271840a1cd20aee2a8ff48aeb0ff80e5f3d1237facd7432c0948d73"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 33718,
+   "sha256": "12ce726c101123dfc2840a669b3d3305646930af2212d7f097c1e86a40fb4a6d"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 17373,
+   "sha256": "ca4351f17ef30b9e236862cbe559242dd22fc862a6c8b4ce23f0096857dc112c"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 21539,
+   "sha256": "f1d286a6f3ae1b6540b31f06f30e16eb26574cdf86d5c8c56dd1c19ec4e3d325"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 11239,
+   "sha256": "4fc11c745ec667b038ad87dd4469d638148bc59a1ed6d8e2a701d3f5a4de2d2e"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 54309,
+   "sha256": "df0a38e9af6153da1afd5e47d755470144ca8700a520d40fe0f18142cc6f45fd"
+  },
+  "voice/zh/side_switch.m4a": {
+   "bytes": 42637,
+   "sha256": "6bcca51a10e760db25da9c6d405437d5318815a9646a8ecabe529276650ed1a6"
+  }
+ }
+}

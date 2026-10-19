@@ -1,0 +1,153 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "h-band-row",
+ "version": "1.0.0",
+ "name": {
+  "zh": "弹力带坐姿划船",
+  "en": "Seated Band Row"
+ },
+ "category": "strength",
+ "muscles": [
+  "背阔肌",
+  "菱形肌·中下斜方"
+ ],
+ "muscleGroups": [
+  "lats",
+  "scapular"
+ ],
+ "equipment": [
+  "band"
+ ],
+ "position": "seated",
+ "unilateral": false,
+ "level": 1,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "reps",
+  "sets": 3,
+  "reps": 12,
+  "restSeconds": 30
+ },
+ "cues": {
+  "zh": [
+   "坐直，手肘贴身向后拉，夹紧肩胛"
+  ]
+ },
+ "primaryCue": 0,
+ "cautions": [],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 1.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": 4.0
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "弹力带坐姿划船"
+    },
+    "ms": {
+     "zh": 1625
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "弹力带坐姿划船，练背部和上背"
+    },
+    "ms": {
+     "zh": 2995
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "坐直，手肘贴身向后拉，夹紧肩胛"
+    },
+    "ms": {
+     "zh": 3367
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，坐直，手肘贴身向后拉，夹紧肩胛"
+    },
+    "ms": {
+     "zh": 5851
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "弹力带坐姿划船，完成"
+    },
+    "ms": {
+     "zh": 2322
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub Drive archive green-screen master, keyed onto #101013 by tools/media/prepare_media.py",
+  "mediaSource": "pose-hub-drive-greenscreen",
+  "spec": "drill-anim/specs/h-band-row.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 8263,
+   "sha256": "ee1bc1755439f062fa006a31f1c95eee7c4735e3d2ed8057c48a306cd46c81fe"
+  },
+  "demo.mp4": {
+   "bytes": 123139,
+   "sha256": "221d94d6062a0b88bd54fdcd679a241c1305f721a2a29354b5d687641305f055"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 28620,
+   "sha256": "25eec4c9001ce211fdd1f28f1f82dbf3eb51c00e0241419c82d97126a23fe555"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 20229,
+   "sha256": "cb5a8599285205cdb3771fc4eca85e108cb9a9d347227ae77d8361cf918cb613"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 25605,
+   "sha256": "f1f485f5c1bed737936f8aac2a13d47d2d607283dd991200f5045ae22db67652"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 14319,
+   "sha256": "0a91a4fca49e0ab50a56087c2a70f2a5b5b6224f3b42ddb74703530c8c0fdc19"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 47642,
+   "sha256": "8d9d5711b648a37e03e837dd2cfeca9f02dec32fc828eed9f323140c7bca82b2"
+  }
+ }
+}

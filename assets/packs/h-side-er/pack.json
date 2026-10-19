@@ -1,0 +1,183 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "h-side-er",
+ "version": "1.0.0",
+ "name": {
+  "zh": "侧卧肩外旋",
+  "en": "Side-Lying External Rotation"
+ },
+ "category": "strength",
+ "muscles": [
+  "肩袖"
+ ],
+ "muscleGroups": [
+  "rotator-cuff"
+ ],
+ "equipment": [
+  "mat"
+ ],
+ "position": "side_lying",
+ "unilateral": true,
+ "level": 1,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "reps",
+  "sets": 2,
+  "reps": 12,
+  "restSeconds": 30
+ },
+ "cues": {
+  "zh": [
+   "肘贴身体侧面，小臂向上转开",
+   "前臂向上旋起，肩不前顶"
+  ]
+ },
+ "primaryCue": 0,
+ "cautions": [
+  "肩"
+ ],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 1.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": 4.0,
+  "showsSide": "right"
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "侧卧肩外旋"
+    },
+    "ms": {
+     "zh": 1254
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "侧卧肩外旋，练肩关节"
+    },
+    "ms": {
+     "zh": 2322
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "肘贴身体侧面，小臂向上转开"
+    },
+    "ms": {
+     "zh": 2856
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "前臂向上旋起，肩不前顶"
+    },
+    "ms": {
+     "zh": 2438
+    }
+   },
+   {
+    "id": "side_switch",
+    "role": "side_switch",
+    "text": {
+     "zh": "左侧同样，肘贴身体侧面，小臂向上转开"
+    },
+    "ms": {
+     "zh": 3971
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，前臂向上旋起，肩不前顶"
+    },
+    "ms": {
+     "zh": 4923
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "侧卧肩外旋，完成"
+    },
+    "ms": {
+     "zh": 1904
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub Drive archive green-screen master, keyed onto #101013 by tools/media/prepare_media.py",
+  "mediaSource": "pose-hub-drive-greenscreen",
+  "spec": "drill-anim/specs/h-side-er.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 7974,
+   "sha256": "afbd99dbf8b3b4f7f041c04e4db9e537b5a96f4b039f59ec3b0b32726c43adde"
+  },
+  "demo.mp4": {
+   "bytes": 100939,
+   "sha256": "d464a9fc9192fd9418d50f2c604ca2411e3975de9b2eb1a2d6d1f69a81ec1a78"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 24454,
+   "sha256": "321ff5dc04a58168d708d0209305d6cefa37fc56e9c8fdc6b59571a79bc9ff81"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 21158,
+   "sha256": "7e820b8563be97cc84a96139a23d3e811aab1cd4d21ea2fd2f494bd56fcebaf7"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 16780,
+   "sha256": "31edf26088bab9546f9ad6d985a91bfb14927801ef2bafeb799a9df19bfe4f7f"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 20030,
+   "sha256": "aa890b9574fcea1a28f9dd4f1bf80583e14d38cc6de49b4e1730d1686b624cf8"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 11348,
+   "sha256": "bba84d1403bb341d6c9fb7cce718eefc75ad78a38751780ab310dc0ebc7585ed"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 41407,
+   "sha256": "133372db16093e33ab6b55ce07d4fab737ccb589824dc5037b09862b590686f8"
+  },
+  "voice/zh/side_switch.m4a": {
+   "bytes": 33537,
+   "sha256": "181b5f9f323ed291e725592aa5919e81b55831ab4009a3ab3e29e88a22d867a8"
+  }
+ }
+}

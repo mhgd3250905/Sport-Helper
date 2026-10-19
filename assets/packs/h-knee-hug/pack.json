@@ -1,0 +1,170 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "h-knee-hug",
+ "version": "1.0.0",
+ "name": {
+  "zh": "仰卧抱膝",
+  "en": "Supine Knees-to-Chest"
+ },
+ "category": "stretch",
+ "muscles": [
+  "竖脊肌",
+  "臀大肌"
+ ],
+ "muscleGroups": [
+  "erectors",
+  "glute-max"
+ ],
+ "equipment": [
+  "mat"
+ ],
+ "position": "supine",
+ "unilateral": false,
+ "level": 1,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "time",
+  "sets": 1,
+  "seconds": 30,
+  "restSeconds": 10
+ },
+ "cues": {
+  "zh": [
+   "双手抱膝，慢慢呼吸",
+   "膝靠向胸口，腰背放松"
+  ]
+ },
+ "primaryCue": 0,
+ "cautions": [
+  "髋"
+ ],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 2.5,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": null
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "仰卧抱膝"
+    },
+    "ms": {
+     "zh": 929
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "仰卧抱膝，拉伸下背和臀部"
+    },
+    "ms": {
+     "zh": 2461
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "双手抱膝，慢慢呼吸"
+    },
+    "ms": {
+     "zh": 2043
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "膝靠向胸口，腰背放松"
+    },
+    "ms": {
+     "zh": 2252
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，膝靠向胸口，腰背放松"
+    },
+    "ms": {
+     "zh": 4760
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "仰卧抱膝，完成"
+    },
+    "ms": {
+     "zh": 1625
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub v0.2.0 dark soft-v1 clip (as frozen in HipLab), re-encoded 720²",
+  "mediaSource": "pose-hub-v0.2.0",
+  "spec": "drill-anim/specs/h-knee-hug-r2.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 10434,
+   "sha256": "6152e506210fd4960af0efd07b4b809c45d027a993d16f2c47fb2cf0c5f8d5fb"
+  },
+  "demo.mp4": {
+   "bytes": 108673,
+   "sha256": "fb1ae7314dbb03bd35564cde560bc56e16fb18631a40ec68f2d6da8c4405c83d"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 17880,
+   "sha256": "990eb82f1e713285f3b026e548bb333ca9ed1a5825d98cd68a962e27d6fa47a8"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 19661,
+   "sha256": "93304b666374148f6a407762503d8c540c5305e57ffcde02f18d29c139e76af5"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 14457,
+   "sha256": "6be3b5197e90b48a5430be25463d4b1a720e7dd342e8a025224b54a8c91ff151"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 21194,
+   "sha256": "2ae0e69caa49122552e5a4d3db761229904d4a43c19a800b9286aa7ac86e9157"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 8744,
+   "sha256": "05b1318fe7004b8257164bb26caf96bb46869cee53267baa143192a647f41d68"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 38894,
+   "sha256": "31a9cab46d9c317e14ac18b36326bc6b3b51a7d4c872be18efa524c0561a94e2"
+  }
+ }
+}

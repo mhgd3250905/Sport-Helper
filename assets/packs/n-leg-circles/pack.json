@@ -1,0 +1,185 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "n-leg-circles",
+ "version": "1.0.0",
+ "name": {
+  "zh": "仰卧直腿画圈",
+  "en": "Supine Straight-Leg Circles"
+ },
+ "category": "mobility",
+ "muscles": [
+  "髋屈肌",
+  "臀中肌"
+ ],
+ "muscleGroups": [
+  "hip-flexors",
+  "hip-abductors"
+ ],
+ "equipment": [
+  "mat"
+ ],
+ "position": "supine",
+ "unilateral": true,
+ "level": 1,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "reps",
+  "sets": 1,
+  "reps": 6,
+  "restSeconds": 10
+ },
+ "cues": {
+  "zh": [
+   "仰卧，一腿伸直上举",
+   "腿伸直，慢慢画圈，骨盆不动"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [
+  "腰"
+ ],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 2.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": 3.0,
+  "showsSide": "right"
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "仰卧直腿画圈"
+    },
+    "ms": {
+     "zh": 1393
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "仰卧直腿画圈，活动髋前侧和臀部外侧"
+    },
+    "ms": {
+     "zh": 3762
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "仰卧，一腿伸直上举"
+    },
+    "ms": {
+     "zh": 2020
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "腿伸直，慢慢画圈，骨盆不动"
+    },
+    "ms": {
+     "zh": 2833
+    }
+   },
+   {
+    "id": "side_switch",
+    "role": "side_switch",
+    "text": {
+     "zh": "左侧同样，腿伸直，慢慢画圈，骨盆不动"
+    },
+    "ms": {
+     "zh": 3924
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，腿伸直，慢慢画圈，骨盆不动"
+    },
+    "ms": {
+     "zh": 5341
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "仰卧直腿画圈，完成"
+    },
+    "ms": {
+     "zh": 2067
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub v0.2.0 dark soft-v1 clip (as frozen in HipLab), re-encoded 720²",
+  "mediaSource": "pose-hub-v0.2.0",
+  "spec": "drill-anim/specs/n-leg-circles.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 9693,
+   "sha256": "c44be7a36664bde8c39c7c0ec00547ba9c7c15bfbc340ddab1f91195cafe5c35"
+  },
+  "demo.mp4": {
+   "bytes": 191912,
+   "sha256": "500bd24832868971a391fa50a00ca53778f275f438d66736d663e47202a4dd17"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 17728,
+   "sha256": "73be6d32a490046bcce70d70666085709918be7cf0f8fd19f3ccdc234ace2e65"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 24335,
+   "sha256": "e6589c5e97252f904f3de3d854db25111b1f6516215f587c47c4ec31fc8e8ebe"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 17958,
+   "sha256": "ec62320ec19096b91e3e606e02f3b6e2133932cd2158ecea38189b2ccbfdc617"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 32042,
+   "sha256": "683c2b25e3f996468cddb2e4da99c9c1e1f25fb7ec11db4428327376a1fd8a46"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 12422,
+   "sha256": "7da040aa5a50b40d1ccd2ac60043fe361332153f108ab45719dc4343ef28eafb"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 44946,
+   "sha256": "c428c32dd61b85ead8ee2a7d166accaf595131bf327b7d8297bf235bb423a633"
+  },
+  "voice/zh/side_switch.m4a": {
+   "bytes": 33357,
+   "sha256": "ef7ad6ec5c6fcab7d8081c56fe12cd1e95215ad883d75ead7cfbf4a838618da2"
+  }
+ }
+}

@@ -1,0 +1,182 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "n-seated-squeeze",
+ "version": "1.0.0",
+ "name": {
+  "zh": "坐姿夹砖（膝内夹）",
+  "en": "Seated Block Knee Squeeze"
+ },
+ "category": "strength",
+ "muscles": [
+  "大腿内侧"
+ ],
+ "muscleGroups": [
+  "adductors"
+ ],
+ "equipment": [
+  "chair"
+ ],
+ "position": "seated",
+ "unilateral": false,
+ "level": 1,
+ "scenes": [
+  "home",
+  "office"
+ ],
+ "defaultDose": {
+  "mode": "time",
+  "sets": 2,
+  "seconds": 30,
+  "restSeconds": 30
+ },
+ "cues": {
+  "zh": [
+   "膝间夹软物",
+   "双膝夹住瑜伽砖，用力夹紧",
+   "用力内夹，停 3 秒再放"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 2.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": null
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "坐姿夹砖，膝内夹"
+    },
+    "ms": {
+     "zh": 1811
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "坐姿夹砖，膝内夹，练大腿内侧"
+    },
+    "ms": {
+     "zh": 3135
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "膝间夹软物"
+    },
+    "ms": {
+     "zh": 1184
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "双膝夹住瑜伽砖，用力夹紧"
+    },
+    "ms": {
+     "zh": 2624
+    }
+   },
+   {
+    "id": "cue3",
+    "role": "cue",
+    "text": {
+     "zh": "用力内夹，停 3 秒再放"
+    },
+    "ms": {
+     "zh": 2159
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，用力内夹，停 3 秒再放"
+    },
+    "ms": {
+     "zh": 4621
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "坐姿夹砖，膝内夹，完成"
+    },
+    "ms": {
+     "zh": 2554
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub v0.2.0 dark soft-v1 clip (as frozen in HipLab), re-encoded 720²",
+  "mediaSource": "pose-hub-v0.2.0",
+  "spec": "drill-anim/specs/n-seated-squeeze.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 8553,
+   "sha256": "4b2830a898fc7cd949c674d6fc7c7b877484dac406a77875931cdb5cc948cd9b"
+  },
+  "demo.mp4": {
+   "bytes": 66499,
+   "sha256": "bde2b82717475748ecb0f99c59e59afec6b15846b8f2c87af96144390d84fdb3"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 10757,
+   "sha256": "62d891e76d7d976ef091f01ad08823a2bf6490dad37e78369b0b87fc2aea5a97"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 22699,
+   "sha256": "71343343cf20966cb56466bd938f9a843b53851d7743674d770d4a489cb66fcf"
+  },
+  "voice/zh/cue3.m4a": {
+   "bytes": 18688,
+   "sha256": "2da82d10348de66e2444fe8842e68b4c9a29aea1a20abe967cf8d3e5348d6f70"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 22110,
+   "sha256": "d5b28c7c077394af534e04d2195c43c80ad66495e79fe3c4d20dcba69a4c6c6a"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 26798,
+   "sha256": "77ec0da00c9175acdfef7c1089da424539c4de4779970140ceb65173c44509dd"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 16034,
+   "sha256": "8ba6383b5ede9ce151f983a48495d8554b763f01aa36949f0dbbb7acb71d4eb2"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 38831,
+   "sha256": "edab17e0e58abe01eaa4a68160a2ba1b9c6d97d88e72af1569aa53340257de10"
+  }
+ }
+}

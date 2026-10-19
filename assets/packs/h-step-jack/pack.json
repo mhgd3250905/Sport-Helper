@@ -1,0 +1,184 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "h-step-jack",
+ "version": "1.0.0",
+ "name": {
+  "zh": "低冲击开合跳",
+  "en": "Low-Impact Step Jack"
+ },
+ "category": "cardio",
+ "muscles": [
+  "三角肌",
+  "臀中肌"
+ ],
+ "muscleGroups": [
+  "deltoids",
+  "hip-abductors"
+ ],
+ "equipment": [],
+ "position": "standing",
+ "unilateral": false,
+ "level": 1,
+ "scenes": [
+  "home",
+  "office"
+ ],
+ "defaultDose": {
+  "mode": "time",
+  "sets": 2,
+  "seconds": 40,
+  "restSeconds": 30
+ },
+ "cues": {
+  "zh": [
+   "左右交替向侧迈步",
+   "一只脚向侧面迈开，同时双臂上举",
+   "手臂同时上举，保持节奏"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [
+  "膝"
+ ],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 1.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": null
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "低冲击开合跳"
+    },
+    "ms": {
+     "zh": 1324
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "低冲击开合跳，练肩膀和臀部外侧"
+    },
+    "ms": {
+     "zh": 3251
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "左右交替向侧迈步"
+    },
+    "ms": {
+     "zh": 1904
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "一只脚向侧面迈开，同时双臂上举"
+    },
+    "ms": {
+     "zh": 3204
+    }
+   },
+   {
+    "id": "cue3",
+    "role": "cue",
+    "text": {
+     "zh": "手臂同时上举，保持节奏"
+    },
+    "ms": {
+     "zh": 2438
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，手臂同时上举，保持节奏"
+    },
+    "ms": {
+     "zh": 4876
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "低冲击开合跳，完成"
+    },
+    "ms": {
+     "zh": 2090
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub Drive archive green-screen master, keyed onto #101013 by tools/media/prepare_media.py",
+  "mediaSource": "pose-hub-drive-greenscreen",
+  "spec": "drill-anim/specs/h-step-jack.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 5793,
+   "sha256": "e6b5008d5d0e6d138de4c3bb91a17f087aa9921dbfa5a6db00693484eb6a6a96"
+  },
+  "demo.mp4": {
+   "bytes": 95365,
+   "sha256": "1a9f0e9791da846d092cde0e76150d1a42dbdf1d24b214a36beaedbc46ca6ae9"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 16672,
+   "sha256": "2860f2050dc72c996315803ba8f2f14c88d89a941e86a8869771ab34d09d56c0"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 27464,
+   "sha256": "6a9f92c7f1b1d234b0b92a4fe26377d8b8a9505a41ea77b5fc5a672e2e219353"
+  },
+  "voice/zh/cue3.m4a": {
+   "bytes": 21151,
+   "sha256": "3f53c77042ab91aa8eb2b6160d9a07847c27c49ba0e8ad7fe27f1cfb6451fe48"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 18290,
+   "sha256": "515432721a857044e81564b7eb608c169f884c2123ea758dfddc212182b99d21"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 27853,
+   "sha256": "07e11c76b59b1216f317c3bbf23ff35324570e8cbb6d8e942410990f0cd5794c"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 12016,
+   "sha256": "83f1dfe1ba79a50b19578569cce7c59ad114a0137ce383296612aafdfde2448c"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 40192,
+   "sha256": "34d4f837b2a9ae9b29bd864817d3896d9997297baa5a9aa968147ce16c624a1d"
+  }
+ }
+}

@@ -1,0 +1,171 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "h-db-press",
+ "version": "1.0.0",
+ "name": {
+  "zh": "站姿哑铃推举",
+  "en": "Standing Dumbbell Shoulder Press"
+ },
+ "category": "strength",
+ "muscles": [
+  "三角肌",
+  "肱三头肌"
+ ],
+ "muscleGroups": [
+  "deltoids",
+  "triceps"
+ ],
+ "equipment": [
+  "dumbbell"
+ ],
+ "position": "standing",
+ "unilateral": false,
+ "level": 2,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "reps",
+  "sets": 3,
+  "reps": 10,
+  "restSeconds": 30
+ },
+ "cues": {
+  "zh": [
+   "收紧腹部，哑铃从肩旁推到头顶，腰不后仰",
+   "哑铃推到头顶正上方"
+  ]
+ },
+ "primaryCue": 0,
+ "cautions": [
+  "肩",
+  "腰"
+ ],
+ "contraindications": [],
+ "alternative": "h-db-lateral",
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 1.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": 4.0
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "站姿哑铃推举"
+    },
+    "ms": {
+     "zh": 1370
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "站姿哑铃推举，练肩膀和手臂后侧"
+    },
+    "ms": {
+     "zh": 3228
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "收紧腹部，哑铃从肩旁推到头顶，腰不后仰"
+    },
+    "ms": {
+     "zh": 4017
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "哑铃推到头顶正上方"
+    },
+    "ms": {
+     "zh": 2067
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，哑铃推到头顶正上方"
+    },
+    "ms": {
+     "zh": 4365
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "站姿哑铃推举，完成"
+    },
+    "ms": {
+     "zh": 2043
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub Drive archive green-screen master, keyed onto #101013 by tools/media/prepare_media.py",
+  "mediaSource": "pose-hub-drive-greenscreen",
+  "spec": "drill-anim/specs/h-db-press.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 6681,
+   "sha256": "c5f87e09e2c36539fa345d62e7fa97cf7196f88c82a79ec3703163b2e823d1f5"
+  },
+  "demo.mp4": {
+   "bytes": 70137,
+   "sha256": "ff04092b48507073b08913bf3abee99c36e51adc0887df97076fe50778b5a1c8"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 34108,
+   "sha256": "313b1f9f566f7eaa0e3365beb7f0709c09b88f0b1757662ac9474a5f493b07ce"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 17949,
+   "sha256": "c5a4798c6160e95387f807dea0b33e52fce699678025b93a695dc419f1c259fb"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 17832,
+   "sha256": "c3a79562b22266969a5248976901b3ab1524fcccb85e17d85d720c7ce94ecd41"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 27475,
+   "sha256": "83787af72d0210f1f134e5c3d168f75644bade6c1586ec71c8943692b17050a3"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 12240,
+   "sha256": "993669436fa199d75da841072cafc2818d4eee937cae7519ea6c646a711a0dac"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 36810,
+   "sha256": "40b52ac8b3e978d6a7963f63612147e0c57e2c5240bf063e0ee4265865b73a28"
+  }
+ }
+}

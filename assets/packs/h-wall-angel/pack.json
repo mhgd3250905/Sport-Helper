@@ -1,0 +1,188 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "h-wall-angel",
+ "version": "1.0.0",
+ "name": {
+  "zh": "靠墙天使",
+  "en": "Wall Angel"
+ },
+ "category": "mobility",
+ "muscles": [
+  "胸大肌",
+  "背阔肌",
+  "菱形肌·中下斜方"
+ ],
+ "muscleGroups": [
+  "chest",
+  "lats",
+  "scapular"
+ ],
+ "equipment": [
+  "wall"
+ ],
+ "position": "standing",
+ "unilateral": false,
+ "level": 1,
+ "scenes": [
+  "home",
+  "office"
+ ],
+ "defaultDose": {
+  "mode": "reps",
+  "sets": 2,
+  "reps": 10,
+  "restSeconds": 10
+ },
+ "cues": {
+  "zh": [
+   "背、头贴墙，手臂成 W",
+   "后背和手臂贴墙，慢慢向上滑再向下",
+   "手臂沿墙上滑，腰不离墙"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [
+  "肩"
+ ],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 1.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": 4.0
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "靠墙天使"
+    },
+    "ms": {
+     "zh": 1091
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "靠墙天使，活动胸部、背部和上背"
+    },
+    "ms": {
+     "zh": 3251
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "背、头贴墙，手臂成 W"
+    },
+    "ms": {
+     "zh": 2601
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "后背和手臂贴墙，慢慢向上滑再向下"
+    },
+    "ms": {
+     "zh": 3437
+    }
+   },
+   {
+    "id": "cue3",
+    "role": "cue",
+    "text": {
+     "zh": "手臂沿墙上滑，腰不离墙"
+    },
+    "ms": {
+     "zh": 2392
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，手臂沿墙上滑，腰不离墙"
+    },
+    "ms": {
+     "zh": 4830
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "靠墙天使，完成"
+    },
+    "ms": {
+     "zh": 1741
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub Drive archive green-screen master, keyed onto #101013 by tools/media/prepare_media.py",
+  "mediaSource": "pose-hub-drive-greenscreen",
+  "spec": "drill-anim/specs/h-wall-angel.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 7529,
+   "sha256": "aede0d3714e60db02e61d8c63b7ba53a940d8b67ed6d1e556b1883c99e93a0ac"
+  },
+  "demo.mp4": {
+   "bytes": 83071,
+   "sha256": "a3b925c91b9a69a2d93fe94a442927bbfc7d0b744da00c6b4d0e1011d55da679"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 22515,
+   "sha256": "45095cedc4f81785499f70c3b4f14ce3ec0529db4e5b394d584baf4a708fa10a"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 29164,
+   "sha256": "894eef5d857657e63a6f8d13df4e47bd9cc0bcb9f14a053c462e5467a1c62950"
+  },
+  "voice/zh/cue3.m4a": {
+   "bytes": 20605,
+   "sha256": "bab945d37fb7728aa874ecfe22c4d3fbc3fbe3d903b13d6ad69c94f78ad2b68d"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 15416,
+   "sha256": "671f4fd64a943e1420742ee3e5325e37f85027a5498525f153845c3be6fcbbad"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 27829,
+   "sha256": "39fa53eb9957a882691d31dd422f70a6262a7ea2fc932f32ae644f14972d2d55"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 10128,
+   "sha256": "be0908f8c0b4a9e40f0f57c6a371c6581155f3fe791411a98a4c5c2b15a779ee"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 40606,
+   "sha256": "df5398d2cc671abc4ff9c2d577a4a5b2af3c3cbeb1deb5ebd6b70c4ae799b0c1"
+  }
+ }
+}

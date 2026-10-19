@@ -1,0 +1,168 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "w-chair-hip-thrust",
+ "version": "1.0.0",
+ "name": {
+  "zh": "椅子臀推",
+  "en": "Chair Hip Thrust"
+ },
+ "category": "strength",
+ "muscles": [
+  "臀大肌"
+ ],
+ "muscleGroups": [
+  "glute-max"
+ ],
+ "equipment": [
+  "chair"
+ ],
+ "position": "supine",
+ "unilateral": false,
+ "level": 2,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "reps",
+  "sets": 3,
+  "reps": 12,
+  "restSeconds": 30
+ },
+ "cues": {
+  "zh": [
+   "上背靠椅边，双脚踩稳",
+   "上背靠椅沿，臀部推到身体成一条直线"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [
+  "腰"
+ ],
+ "contraindications": [],
+ "alternative": "w-feet-on-chair-bridge",
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 1.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": 4.0
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "椅子臀推"
+    },
+    "ms": {
+     "zh": 929
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "椅子臀推，练臀部"
+    },
+    "ms": {
+     "zh": 1811
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "上背靠椅边，双脚踩稳"
+    },
+    "ms": {
+     "zh": 2252
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "上背靠椅沿，臀部推到身体成一条直线"
+    },
+    "ms": {
+     "zh": 3437
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，上背靠椅沿，臀部推到身体成一条直线"
+    },
+    "ms": {
+     "zh": 5851
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "椅子臀推，完成"
+    },
+    "ms": {
+     "zh": 1672
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub Drive archive green-screen master, keyed onto #101013 by tools/media/prepare_media.py",
+  "mediaSource": "pose-hub-drive-greenscreen",
+  "spec": "drill-anim/specs/w-chair-hip-thrust.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 7365,
+   "sha256": "46bbaf9c02dce0a3d7c1db62fa7af7148d3cfecee29d12be4099387cb64b3cb8"
+  },
+  "demo.mp4": {
+   "bytes": 96748,
+   "sha256": "d271c8a7532d770ef13472df1ca3a69439302687dd85c3bc847ab2be0b37a96e"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 19469,
+   "sha256": "7c3fe35a6c9e71dab63f7cf271631d7990c808b5f6857800b1ecc5f72f28449b"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 29093,
+   "sha256": "bdc0e7c8160140948940cf73aa89dd4128a343e8c0b49998dd17d1b3cf09ee95"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 14877,
+   "sha256": "a3319a570f0fbec9bfa6d1254cd461ca6c7df15460c0fbc949243b910d8b7ce1"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 15869,
+   "sha256": "5eec7f27995ba8a628bf6eb0af2ac7432fd7355a76801c0d107d3af7b36aabab"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 8622,
+   "sha256": "6dd9da8a0c8004a4d4bc43232d3a638d61133377b218e57c194c85a268a2d2a2"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 48666,
+   "sha256": "8bce633bf4e76d4cce4eb22da09150d1aae59ab7579374aefdc767a7b2ea3158"
+  }
+ }
+}

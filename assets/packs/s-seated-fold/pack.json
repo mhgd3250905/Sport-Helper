@@ -1,0 +1,183 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "s-seated-fold",
+ "version": "1.0.0",
+ "name": {
+  "zh": "坐姿体前屈",
+  "en": "Seated Forward Fold"
+ },
+ "category": "stretch",
+ "muscles": [
+  "腘绳肌"
+ ],
+ "muscleGroups": [
+  "hamstrings"
+ ],
+ "equipment": [
+  "mat"
+ ],
+ "position": "seated",
+ "unilateral": false,
+ "level": 1,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "time",
+  "sets": 1,
+  "seconds": 40,
+  "restSeconds": 10
+ },
+ "cues": {
+  "zh": [
+   "坐地，双腿伸直",
+   "膝盖伸直，从髋部往前折",
+   "背挺直从髋前倾"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [
+  "腰"
+ ],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 3.8,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": null
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "坐姿体前屈"
+    },
+    "ms": {
+     "zh": 1207
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "坐姿体前屈，拉伸大腿后侧"
+    },
+    "ms": {
+     "zh": 2601
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "坐地，双腿伸直"
+    },
+    "ms": {
+     "zh": 1765
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "膝盖伸直，从髋部往前折"
+    },
+    "ms": {
+     "zh": 2461
+    }
+   },
+   {
+    "id": "cue3",
+    "role": "cue",
+    "text": {
+     "zh": "背挺直从髋前倾"
+    },
+    "ms": {
+     "zh": 1649
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，背挺直从髋前倾"
+    },
+    "ms": {
+     "zh": 4156
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "坐姿体前屈，完成"
+    },
+    "ms": {
+     "zh": 1904
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub v0.2.0 dark soft-v1 clip (as frozen in HipLab), re-encoded 720²",
+  "mediaSource": "pose-hub-v0.2.0",
+  "spec": "drill-anim/specs/s-seated-fold-r3.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 7224,
+   "sha256": "42225eda6ab29f34e8446b1db25ac556119ceedbd6eac96bc5bf57c452a02965"
+  },
+  "demo.mp4": {
+   "bytes": 77304,
+   "sha256": "ca5923b3e42a619a42f2caceca78e09a76a6a344aa6053aef8fd101654855f6d"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 15689,
+   "sha256": "7937e273d6c8766e8cdaa71b038874e04b82a9c14f645b426806f9299f7fbefd"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 21308,
+   "sha256": "7245e041543059a67aa447ad007f723032c6965f67d0bf1fe1504f2816db5852"
+  },
+  "voice/zh/cue3.m4a": {
+   "bytes": 14464,
+   "sha256": "622a707ff9986480e4f9a8e06acd57882c0ec7f9cbf229db1717936abc040dc7"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 16851,
+   "sha256": "bd69c91e00fb822fabcef2aac5328ca4062511ab427648553640365aa9298e52"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 22510,
+   "sha256": "303c14e739254f12e7043ffac278a47881ee48840c60e9496a0e5e8ef4b80728"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 10925,
+   "sha256": "b572669de7857c99d76770abb11699d7c3e7dba596c6a8166aead11489001134"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 35238,
+   "sha256": "61a1df14aa7ab69934719d8cf53d1b4be89b4ffbafff4d22c425a97a800383c1"
+  }
+ }
+}

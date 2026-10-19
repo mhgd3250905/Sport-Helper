@@ -1,0 +1,183 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "h-wall-straddle",
+ "version": "1.0.0",
+ "name": {
+  "zh": "靠墙仰卧 V 字分腿",
+  "en": "Legs-Up-the-Wall Straddle"
+ },
+ "category": "stretch",
+ "muscles": [
+  "大腿内侧",
+  "腘绳肌"
+ ],
+ "muscleGroups": [
+  "adductors",
+  "hamstrings"
+ ],
+ "equipment": [
+  "wall"
+ ],
+ "position": "supine",
+ "unilateral": false,
+ "level": 1,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "time",
+  "sets": 1,
+  "seconds": 45,
+  "restSeconds": 10
+ },
+ "cues": {
+  "zh": [
+   "臀部贴墙，腿靠墙",
+   "腿靠墙，让双腿自然向两侧打开",
+   "双腿慢慢分开下落"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 4.5,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": null
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "靠墙仰卧 V 字分腿"
+    },
+    "ms": {
+     "zh": 1765
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "靠墙仰卧 V 字分腿，拉伸大腿内侧和大腿后侧"
+    },
+    "ms": {
+     "zh": 4458
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "臀部贴墙，腿靠墙"
+    },
+    "ms": {
+     "zh": 1950
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "腿靠墙，让双腿自然向两侧打开"
+    },
+    "ms": {
+     "zh": 3111
+    }
+   },
+   {
+    "id": "cue3",
+    "role": "cue",
+    "text": {
+     "zh": "双腿慢慢分开下落"
+    },
+    "ms": {
+     "zh": 1834
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，双腿慢慢分开下落"
+    },
+    "ms": {
+     "zh": 4272
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "靠墙仰卧 V 字分腿，完成"
+    },
+    "ms": {
+     "zh": 2531
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub v0.2.0 dark soft-v1 clip (as frozen in HipLab), re-encoded 720²",
+  "mediaSource": "pose-hub-v0.2.0",
+  "spec": "drill-anim/specs/h-wall-straddle.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 11763,
+   "sha256": "0e19d8c3070dcf34e3115da651c97685cf3a47c952956660d80995375a28b689"
+  },
+  "demo.mp4": {
+   "bytes": 156369,
+   "sha256": "58e414d18740582f289da225ade1ca6d9411f0bccbc96d74ad531e4fb9f9bfe0"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 17187,
+   "sha256": "1f7dbd93a9c7879ba077ff6a0a1b322c6ac2e51344888c7aaae5c56f18435866"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 26518,
+   "sha256": "d44af1f6c35644b67c7bcc047f819ba56ffb0479a222a6a59f889e3952f8e9ca"
+  },
+  "voice/zh/cue3.m4a": {
+   "bytes": 16121,
+   "sha256": "728455283a31c27c76db99dac80c55683d4c6f1d24eb2c0cedbd3f86ff3b48cd"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 21749,
+   "sha256": "efa52c8d03d8d2909872225a5d6e9d58799a0ed8e36f559edf300a41930a6a11"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 37724,
+   "sha256": "4c28046df4209d60ecd765387dd634f0289cb9a2c6c428d21b4fd8c43a612027"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 15638,
+   "sha256": "dee9c193f8c193d6d9a985b3447e17bd2b3bf8ac6b7fcc0267fd448ea2c4eabe"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 36162,
+   "sha256": "6fa0adcbaaea199eaac66dfc4d73b325c4072a24d61d66804b5d63a563e5ff74"
+  }
+ }
+}

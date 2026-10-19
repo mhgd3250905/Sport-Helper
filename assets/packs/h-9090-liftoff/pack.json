@@ -1,0 +1,166 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "h-9090-liftoff",
+ "version": "1.0.0",
+ "name": {
+  "zh": "90/90 后腿主动抬起"
+ },
+ "category": "mobility",
+ "muscles": [
+  "臀中肌",
+  "臀大肌"
+ ],
+ "muscleGroups": [],
+ "equipment": [
+  "mat"
+ ],
+ "position": "seated",
+ "unilateral": true,
+ "level": 3,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "reps",
+  "sets": 2,
+  "reps": 8,
+  "restSeconds": 10
+ },
+ "cues": {
+  "zh": [
+   "坐直，后腿膝盖慢慢抬离地面，再慢慢放下"
+  ]
+ },
+ "primaryCue": 0,
+ "cautions": [
+  "膝"
+ ],
+ "contraindications": [],
+ "alternative": "h-reverse-clam",
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 2.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": 4.0,
+  "showsSide": "right"
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "90 90 后腿主动抬起"
+    },
+    "ms": {
+     "zh": 2159
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "90 90 后腿主动抬起，活动臀部"
+    },
+    "ms": {
+     "zh": 3135
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "坐直，后腿膝盖慢慢抬离地面，再慢慢放下"
+    },
+    "ms": {
+     "zh": 4087
+    }
+   },
+   {
+    "id": "side_switch",
+    "role": "side_switch",
+    "text": {
+     "zh": "左侧同样，坐直，后腿膝盖慢慢抬离地面，再慢慢放下"
+    },
+    "ms": {
+     "zh": 5155
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，坐直，后腿膝盖慢慢抬离地面，再慢慢放下"
+    },
+    "ms": {
+     "zh": 6571
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "90 90 后腿主动抬起，完成"
+    },
+    "ms": {
+     "zh": 2810
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub v0.2.0 dark soft-v1 clip (as frozen in HipLab), re-encoded 720²",
+  "mediaSource": "pose-hub-v0.2.0",
+  "spec": null,
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 8234,
+   "sha256": "c2783da4d5e87f3b7e8d13d9c08733928335f9c5f698d6cc24733aefee942cf4"
+  },
+  "demo.mp4": {
+   "bytes": 93262,
+   "sha256": "14fb61e05b3edb5b477e5a9da5a6c615c70923dd2d7a7e23072b46383c1599ed"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 34521,
+   "sha256": "aeadf9a1afd3e57f1de12e8f70f1334e6e68ebfe41d66dd6b38e469b06082a0e"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 24242,
+   "sha256": "a210a1f6aad0e6c0a5006040a710986ebafb5c275ec298bf5553e5752acfced4"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 26903,
+   "sha256": "70deee7c36aa53722b54854389296933e91dfd502a4bb6a01bd38e0e76e036be"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 18878,
+   "sha256": "8f2e5885403cf21dddaf67ecaebdc2261edc1a0c5df2370533c570ada9e0f476"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 55025,
+   "sha256": "05408401c9ab8e2debcef86da38672a27e7b00fb6e65bfa453d1ff17cc3bd7e1"
+  },
+  "voice/zh/side_switch.m4a": {
+   "bytes": 43426,
+   "sha256": "015585bf526f7971c2dbb5febf61691750a6b5aa022d01f610f81ee7d03f8e6c"
+  }
+ }
+}

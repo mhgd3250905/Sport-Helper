@@ -1,0 +1,183 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "h-db-lateral",
+ "version": "1.0.0",
+ "name": {
+  "zh": "哑铃侧平举",
+  "en": "Dumbbell Lateral Raise"
+ },
+ "category": "strength",
+ "muscles": [
+  "三角肌"
+ ],
+ "muscleGroups": [
+  "deltoids"
+ ],
+ "equipment": [
+  "dumbbell"
+ ],
+ "position": "standing",
+ "unilateral": false,
+ "level": 1,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "reps",
+  "sets": 3,
+  "reps": 12,
+  "restSeconds": 30
+ },
+ "cues": {
+  "zh": [
+   "微屈肘，肩膀下沉",
+   "手肘微屈，向侧面抬到肩高，不耸肩",
+   "手臂抬到与肩同高"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [
+  "肩"
+ ],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 1.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": 4.0
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "哑铃侧平举"
+    },
+    "ms": {
+     "zh": 1184
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "哑铃侧平举，练肩膀"
+    },
+    "ms": {
+     "zh": 1997
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "微屈肘，肩膀下沉"
+    },
+    "ms": {
+     "zh": 1927
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "手肘微屈，向侧面抬到肩高，不耸肩"
+    },
+    "ms": {
+     "zh": 3553
+    }
+   },
+   {
+    "id": "cue3",
+    "role": "cue",
+    "text": {
+     "zh": "手臂抬到与肩同高"
+    },
+    "ms": {
+     "zh": 1881
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，手臂抬到与肩同高"
+    },
+    "ms": {
+     "zh": 4110
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "哑铃侧平举，完成"
+    },
+    "ms": {
+     "zh": 1881
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub Drive archive green-screen master, keyed onto #101013 by tools/media/prepare_media.py",
+  "mediaSource": "pose-hub-drive-greenscreen",
+  "spec": "drill-anim/specs/h-db-lateral.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 7230,
+   "sha256": "09ac2137c29bc5e8e3e1f7e42fc3d3c677ff5f5d8be9bd56096b4a555b4b7956"
+  },
+  "demo.mp4": {
+   "bytes": 89191,
+   "sha256": "e609146fc0cf9867a5a624fecfd01f537efb3f5d31f8b695957d24e435d43f2e"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 16990,
+   "sha256": "40ad55cb72bf7ab675757a1a7d3b50b396446b3cfc3da234ec65b907510514c1"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 30281,
+   "sha256": "f8468a5fdd5949f6ac8739451d63a3c7ffcb449eac0f0295e498bca3fd7039b7"
+  },
+  "voice/zh/cue3.m4a": {
+   "bytes": 16593,
+   "sha256": "62c7f91610aa8dc05b109ce9852f535eb15efa97daed521a46e64e13d79d7f9b"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 16592,
+   "sha256": "71f60b05db4f75be50430259b738d88cd1d96e4f8f684978d9071256ed002663"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 17525,
+   "sha256": "a5433e42437268abe09c62c19a2b4b95856806521c77920ff450b6d5f008fa74"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 10783,
+   "sha256": "f0184f16888fffbf9de0a8ad60dd6f115c70db969d017fbd6c7c461ea7978f52"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 34753,
+   "sha256": "b833f2baff4a941878230e582480d3876ec55cefacf6c9d9b99e0f4f300c2de1"
+  }
+ }
+}

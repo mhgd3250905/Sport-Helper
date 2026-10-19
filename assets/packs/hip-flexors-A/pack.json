@@ -1,0 +1,166 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "hip-flexors-A",
+ "version": "1.0.0",
+ "name": {
+  "zh": "坐姿直腿抬腿（压缩）",
+  "en": "Seated Pike Leg Lifts"
+ },
+ "category": "core",
+ "muscles": [
+  "髋屈肌"
+ ],
+ "muscleGroups": [
+  "hip-flexors"
+ ],
+ "equipment": [
+  "mat"
+ ],
+ "position": "seated",
+ "unilateral": false,
+ "level": 3,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "reps",
+  "sets": 3,
+  "reps": 8,
+  "restSeconds": 30
+ },
+ "cues": {
+  "zh": [
+   "坐直，腿伸直抬起，停一下再放下",
+   "直腿抬起离地，停 1 秒"
+  ]
+ },
+ "primaryCue": 0,
+ "cautions": [],
+ "contraindications": [],
+ "alternative": "n-seated-knee-lift",
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 1.9,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": 3.0
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "坐姿直腿抬腿，压缩"
+    },
+    "ms": {
+     "zh": 2113
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "坐姿直腿抬腿，压缩，练髋前侧"
+    },
+    "ms": {
+     "zh": 3204
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "坐直，腿伸直抬起，停一下再放下"
+    },
+    "ms": {
+     "zh": 3111
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "直腿抬起离地，停 1 秒"
+    },
+    "ms": {
+     "zh": 2113
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，直腿抬起离地，停 1 秒"
+    },
+    "ms": {
+     "zh": 4621
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "坐姿直腿抬腿，压缩，完成"
+    },
+    "ms": {
+     "zh": 2833
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub v0.2.0 dark soft-v1 clip (as frozen in HipLab), re-encoded 720²",
+  "mediaSource": "pose-hub-v0.2.0",
+  "spec": "drill-anim/specs/hip-flexors-A.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 11721,
+   "sha256": "d6e5b0b7fc19af3f3325eef4e9f287b6671dc4c3eca3cd3d3d0a7c927483626f"
+  },
+  "demo.mp4": {
+   "bytes": 90100,
+   "sha256": "9325bf423fb795182348f9f665153cfdf4e17cc7a0cfdfb89f02b552cc835b56"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 26489,
+   "sha256": "feced552d3fe215d254ef6d81f09b0facafb68a2f930f65c7629f54267b1f75c"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 18467,
+   "sha256": "34c88154664b0219c16d4d179595a757878426b315c5ef2c888d964f6aadc95b"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 24213,
+   "sha256": "1577fbd45d462da5ad1e8147c538117f3833cca061e616446374d9353ece8371"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 27262,
+   "sha256": "292b7df9d2b156fdf797a4ae117b97f8e153bf44430e40ec2f75d20b8e92d180"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 18444,
+   "sha256": "ca34d7e86c0844d307de321642f2a796e3b875e695db5c6da55d4d9e52dbccfe"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 39074,
+   "sha256": "9d9845567dc065d6f98fc5bf6caebd9b65047867b807b4b62be79beaf7c060c7"
+  }
+ }
+}

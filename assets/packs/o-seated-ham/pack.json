@@ -1,0 +1,197 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "o-seated-ham",
+ "version": "1.0.0",
+ "name": {
+  "zh": "坐姿腘绳肌前伸",
+  "en": "Seated Hamstring Stretch"
+ },
+ "category": "stretch",
+ "muscles": [
+  "腘绳肌"
+ ],
+ "muscleGroups": [
+  "hamstrings"
+ ],
+ "equipment": [
+  "chair"
+ ],
+ "position": "seated",
+ "unilateral": true,
+ "level": 1,
+ "scenes": [
+  "home",
+  "office"
+ ],
+ "defaultDose": {
+  "mode": "time",
+  "sets": 1,
+  "seconds": 30,
+  "restSeconds": 10
+ },
+ "cues": {
+  "zh": [
+   "坐椅前缘，一腿伸直",
+   "腿伸直，脚尖勾起，背挺直往前",
+   "背挺直前倾，大腿后侧拉长"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 3.8,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": null,
+  "showsSide": "right"
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "坐姿腘绳肌前伸"
+    },
+    "ms": {
+     "zh": 1811
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "坐姿腘绳肌前伸，拉伸大腿后侧"
+    },
+    "ms": {
+     "zh": 3111
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "坐椅前缘，一腿伸直"
+    },
+    "ms": {
+     "zh": 1997
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "腿伸直，脚尖勾起，背挺直往前"
+    },
+    "ms": {
+     "zh": 3158
+    }
+   },
+   {
+    "id": "cue3",
+    "role": "cue",
+    "text": {
+     "zh": "背挺直前倾，大腿后侧拉长"
+    },
+    "ms": {
+     "zh": 2694
+    }
+   },
+   {
+    "id": "side_switch",
+    "role": "side_switch",
+    "text": {
+     "zh": "左侧同样，腿伸直，脚尖勾起，背挺直往前"
+    },
+    "ms": {
+     "zh": 4272
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，背挺直前倾，大腿后侧拉长"
+    },
+    "ms": {
+     "zh": 5178
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "坐姿腘绳肌前伸，完成"
+    },
+    "ms": {
+     "zh": 2345
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub v0.2.0 dark soft-v1 clip (as frozen in HipLab), re-encoded 720²",
+  "mediaSource": "pose-hub-v0.2.0",
+  "spec": "drill-anim/specs/o-seated-ham.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 8301,
+   "sha256": "6cde2d071887fafbffe4468015e6cbb61d2fca1319f163b82e91c85567af617c"
+  },
+  "demo.mp4": {
+   "bytes": 68458,
+   "sha256": "47a2459b3d80ae778fb4c025da5e104fda78494e62c92371a49050ad3d7b7afd"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 17419,
+   "sha256": "bc80b9c083eec2554801f5ae635504b6a3d8c2a0af41d3add5222cd77b6fbe4f"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 27065,
+   "sha256": "305a619698806c2040c957727883345650803fc43d785717b0e45af81c1b3874"
+  },
+  "voice/zh/cue3.m4a": {
+   "bytes": 23227,
+   "sha256": "12d220801b1c8a43cd0297b847d4f1c3ff1ec3665340c54da2a28b44c11c2c8d"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 20252,
+   "sha256": "a941383b3b0451753a98d177f2eac1e5045be286b246d9e4006c57f62de121d9"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 26515,
+   "sha256": "780ba9e22d4863c34a536ffb2bfb516a00cc380315fddfb795e1c004bfeb56ba"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 16023,
+   "sha256": "a157f20b42bccd5224e0ce543ff71d97672a6c9ba593093af64f97c6dc5d3960"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 43063,
+   "sha256": "82018da93c39ac76e13960b1a23a47457fc9908dd5e135d61b0f9716b825afbd"
+  },
+  "voice/zh/side_switch.m4a": {
+   "bytes": 36253,
+   "sha256": "3e095b43fea9135633873e34318b71f67ccde93b73e567ea4328505596bcb7a2"
+  }
+ }
+}

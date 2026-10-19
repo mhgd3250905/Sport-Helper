@@ -1,0 +1,200 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "h-db-row",
+ "version": "1.0.0",
+ "name": {
+  "zh": "扶椅单臂哑铃划船",
+  "en": "Chair-Supported One-Arm Dumbbell Row"
+ },
+ "category": "strength",
+ "muscles": [
+  "背阔肌",
+  "菱形肌·中下斜方"
+ ],
+ "muscleGroups": [
+  "lats",
+  "scapular"
+ ],
+ "equipment": [
+  "dumbbell"
+ ],
+ "position": "standing",
+ "unilateral": true,
+ "level": 1,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "reps",
+  "sets": 3,
+  "reps": 10,
+  "restSeconds": 30
+ },
+ "cues": {
+  "zh": [
+   "一手扶椅，背部平直",
+   "背部平直，手肘向后拉到身侧",
+   "肘向后上方拉，肩胛收紧"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [
+  "腰"
+ ],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 1.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": 4.0,
+  "showsSide": "right"
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "扶椅单臂哑铃划船"
+    },
+    "ms": {
+     "zh": 1695
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "扶椅单臂哑铃划船，练背部和上背"
+    },
+    "ms": {
+     "zh": 3019
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "一手扶椅，背部平直"
+    },
+    "ms": {
+     "zh": 1997
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "背部平直，手肘向后拉到身侧"
+    },
+    "ms": {
+     "zh": 2833
+    }
+   },
+   {
+    "id": "cue3",
+    "role": "cue",
+    "text": {
+     "zh": "肘向后上方拉，肩胛收紧"
+    },
+    "ms": {
+     "zh": 2392
+    }
+   },
+   {
+    "id": "side_switch",
+    "role": "side_switch",
+    "text": {
+     "zh": "左侧同样，背部平直，手肘向后拉到身侧"
+    },
+    "ms": {
+     "zh": 3971
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，肘向后上方拉，肩胛收紧"
+    },
+    "ms": {
+     "zh": 4899
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "扶椅单臂哑铃划船，完成"
+    },
+    "ms": {
+     "zh": 2368
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub Drive archive green-screen master, keyed onto #101013 by tools/media/prepare_media.py",
+  "mediaSource": "pose-hub-drive-greenscreen",
+  "spec": "drill-anim/specs/h-db-row.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 11559,
+   "sha256": "9dbdd7fa5923f2dead1fc2579ef241266e3820ecd408ead29433bd23afd834e0"
+  },
+  "demo.mp4": {
+   "bytes": 165229,
+   "sha256": "c0ae58e17fbf89be3d472cf6f19d0e2f8cb3ed3964d0d7166992d33aa3255d67"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 17428,
+   "sha256": "6978c013aad5460eff02bcc14d12d7505b9fd6f2e15e45948d53dc6ffef71247"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 24417,
+   "sha256": "5117c4d2f7e4ce83ac380b073b59f23097629385ea0681d928cf286f849c062c"
+  },
+  "voice/zh/cue3.m4a": {
+   "bytes": 20772,
+   "sha256": "e1a6d097d5626527f1a531b090832e5778c04354fb13ab886edeb0ee783d9d3e"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 20524,
+   "sha256": "43c6218b5492025295bb021bfae2e4c3079ddef6cc0eaaad5005bcc3a787dd7a"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 25767,
+   "sha256": "9f7fb8dc4e9d5665959a5d9d30e8809d269469187ce63929ae82a2cbb3643e89"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 14906,
+   "sha256": "510e9a038cdf1cba4a3ecbdbf457d0020c62abb90c3a361cd8d02c3fb3ec4ccb"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 41158,
+   "sha256": "2be9553ce6b09d0cfc1c84b017029d782b5f1ddc7ab04cb73945ae788633c225"
+  },
+  "voice/zh/side_switch.m4a": {
+   "bytes": 33760,
+   "sha256": "73565c3016e5c1663929ae4487506035efb6a4a27742b64105af66eb1d1c5a91"
+  }
+ }
+}

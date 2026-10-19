@@ -1,0 +1,186 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "n-chair-wiper",
+ "version": "1.0.0",
+ "name": {
+  "zh": "坐椅雨刷（膝内倒）",
+  "en": "Seated Knee Drop-In"
+ },
+ "category": "mobility",
+ "muscles": [
+  "臀中肌",
+  "臀大肌"
+ ],
+ "muscleGroups": [
+  "hip-abductors",
+  "glute-max"
+ ],
+ "equipment": [
+  "chair"
+ ],
+ "position": "seated",
+ "unilateral": false,
+ "level": 1,
+ "scenes": [
+  "home",
+  "office"
+ ],
+ "defaultDose": {
+  "mode": "reps",
+  "sets": 1,
+  "reps": 6,
+  "restSeconds": 10
+ },
+ "cues": {
+  "zh": [
+   "坐椅，双脚分开",
+   "坐在椅子上，小腿向外摆，膝盖向内倒",
+   "双膝交替向内倒"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [
+  "膝"
+ ],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 2.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": 3.0
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "坐椅雨刷，膝内倒"
+    },
+    "ms": {
+     "zh": 1788
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "坐椅雨刷，膝内倒，活动臀部"
+    },
+    "ms": {
+     "zh": 2763
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "坐椅，双脚分开"
+    },
+    "ms": {
+     "zh": 1695
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "坐在椅子上，小腿向外摆，膝盖向内倒"
+    },
+    "ms": {
+     "zh": 3437
+    }
+   },
+   {
+    "id": "cue3",
+    "role": "cue",
+    "text": {
+     "zh": "双膝交替向内倒"
+    },
+    "ms": {
+     "zh": 1602
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，双膝交替向内倒"
+    },
+    "ms": {
+     "zh": 4063
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "坐椅雨刷，膝内倒，完成"
+    },
+    "ms": {
+     "zh": 2508
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub v0.2.0 dark soft-v1 clip (as frozen in HipLab), re-encoded 720²",
+  "mediaSource": "pose-hub-v0.2.0",
+  "spec": "drill-anim/specs/n-chair-wiper.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 7816,
+   "sha256": "766f6bdb8b8c538051eee1922821ab4bcca908a5b669f260d635697841deba48"
+  },
+  "demo.mp4": {
+   "bytes": 78140,
+   "sha256": "e5dfa50228209a048fc6c97b36d8d9c6bf1be98adedf225a8aa54d1618b67e95"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 14980,
+   "sha256": "a9584589177e6d384b1d8ecb5284907bbb4248ba33ccb393ebd43ce0e1b2c93a"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 29311,
+   "sha256": "a274eb6050113125243e72dcf9ce121953d17eacb97cbd2d19d76c93fdf653d7"
+  },
+  "voice/zh/cue3.m4a": {
+   "bytes": 14124,
+   "sha256": "3ccb35a45587a917909d6ed9da93159dc406e793d359cfa879579a126daf4184"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 21476,
+   "sha256": "cabb747553cac4365ae7d99258504a6b6cd3f5a621548951625c28de7e15d66e"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 23749,
+   "sha256": "3da1b0cc126546b178227f2f1cfc64dbcbcb864a1708c81fa797aa762c4a62b3"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 15654,
+   "sha256": "41b4efd65e1703fbe52ff590a6e30f9d8a87b59006c0a0d0044921d78b9ce107"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 34445,
+   "sha256": "47642a2b9f33de561ec78346b0075b8914c74c67f76a170810d4bc3d4ce9004d"
+  }
+ }
+}

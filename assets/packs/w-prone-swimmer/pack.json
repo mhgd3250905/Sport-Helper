@@ -1,0 +1,186 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "w-prone-swimmer",
+ "version": "1.0.0",
+ "name": {
+  "zh": "俯卧游泳式",
+  "en": "Prone Swimmers"
+ },
+ "category": "core",
+ "muscles": [
+  "菱形肌·中下斜方",
+  "竖脊肌"
+ ],
+ "muscleGroups": [
+  "scapular",
+  "erectors"
+ ],
+ "equipment": [
+  "mat"
+ ],
+ "position": "prone",
+ "unilateral": false,
+ "level": 1,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "reps",
+  "sets": 2,
+  "reps": 10,
+  "restSeconds": 30
+ },
+ "cues": {
+  "zh": [
+   "俯卧，额头离地一点",
+   "胸口微抬，手臂从前方划到身侧",
+   "手臂贴地画弧，肩胛下沉"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [
+  "腰",
+  "肩"
+ ],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 1.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": 4.0
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "俯卧游泳式"
+    },
+    "ms": {
+     "zh": 1115
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "俯卧游泳式，练上背和下背"
+    },
+    "ms": {
+     "zh": 2485
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "俯卧，额头离地一点"
+    },
+    "ms": {
+     "zh": 1927
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "胸口微抬，手臂从前方划到身侧"
+    },
+    "ms": {
+     "zh": 3088
+    }
+   },
+   {
+    "id": "cue3",
+    "role": "cue",
+    "text": {
+     "zh": "手臂贴地画弧，肩胛下沉"
+    },
+    "ms": {
+     "zh": 2601
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，手臂贴地画弧，肩胛下沉"
+    },
+    "ms": {
+     "zh": 5039
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "俯卧游泳式，完成"
+    },
+    "ms": {
+     "zh": 1788
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub Drive archive green-screen master, keyed onto #101013 by tools/media/prepare_media.py",
+  "mediaSource": "pose-hub-drive-greenscreen",
+  "spec": "drill-anim/specs/w-prone-swimmer.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 5963,
+   "sha256": "962c14b8d5958dd049e49457baeb88684dc181df8950a61af8bbdc0daebef74d"
+  },
+  "demo.mp4": {
+   "bytes": 99227,
+   "sha256": "3be890a4c9136db21548f84d00fa088077de3614ecc2a5abb6a89d3105b57902"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 16812,
+   "sha256": "9d830a0db6b80d0308f221c44b5df6db2e93a09932c74f9210ee5ba01761f4ac"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 26328,
+   "sha256": "b3ed666a7c18a9d3a357ab911cc9bb5b83de052eb28602ccb604320652aa9540"
+  },
+  "voice/zh/cue3.m4a": {
+   "bytes": 22326,
+   "sha256": "527236d75d26883ecce208a2d1ef8196ed9ed8c6cdeeda429ccab0cf841986ad"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 15635,
+   "sha256": "67536d754c4396eae6359cce4294f2995d3b093270842498e4e6b208ce0a69e0"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 21390,
+   "sha256": "8d3231e860df06e1aa548605975fbbd077e0f9fc1c6e2efb10bb6890ca221550"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 10183,
+   "sha256": "9299379bcfb071c1edc8d016aa2412688bd8c3deb5097d873ba6a89e85b29f61"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 42327,
+   "sha256": "799bcf337b20e44a9d9b2b1952b07d2447353278e547005b7c75ecb72f97d40f"
+  }
+ }
+}

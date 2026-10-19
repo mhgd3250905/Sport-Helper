@@ -1,0 +1,183 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "s-kneel-hipflex",
+ "version": "1.0.0",
+ "name": {
+  "zh": "半跪髋屈肌拉伸",
+  "en": "Half-Kneeling Hip Flexor Stretch"
+ },
+ "category": "stretch",
+ "muscles": [
+  "髋屈肌"
+ ],
+ "muscleGroups": [
+  "hip-flexors"
+ ],
+ "equipment": [
+  "mat"
+ ],
+ "position": "kneeling",
+ "unilateral": true,
+ "level": 1,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "time",
+  "sets": 1,
+  "seconds": 30,
+  "restSeconds": 10
+ },
+ "cues": {
+  "zh": [
+   "半跪，躯干直立",
+   "后侧臀部收紧，髋慢慢往前推"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [
+  "膝"
+ ],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 3.8,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": null,
+  "showsSide": "right"
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "半跪髋屈肌拉伸"
+    },
+    "ms": {
+     "zh": 1556
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "半跪髋屈肌拉伸，拉伸髋前侧"
+    },
+    "ms": {
+     "zh": 2810
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "半跪，躯干直立"
+    },
+    "ms": {
+     "zh": 1649
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "后侧臀部收紧，髋慢慢往前推"
+    },
+    "ms": {
+     "zh": 2856
+    }
+   },
+   {
+    "id": "side_switch",
+    "role": "side_switch",
+    "text": {
+     "zh": "左侧同样，后侧臀部收紧，髋慢慢往前推"
+    },
+    "ms": {
+     "zh": 4040
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，后侧臀部收紧，髋慢慢往前推"
+    },
+    "ms": {
+     "zh": 5410
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "半跪髋屈肌拉伸，完成"
+    },
+    "ms": {
+     "zh": 2252
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub v0.2.0 dark soft-v1 clip (as frozen in HipLab), re-encoded 720²",
+  "mediaSource": "pose-hub-v0.2.0",
+  "spec": "drill-anim/specs/s-kneel-hipflex.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 7522,
+   "sha256": "bc9d4799c67df65ecdff2b7fe76f352fb9903da70c96821dc179711da8d24ff8"
+  },
+  "demo.mp4": {
+   "bytes": 63041,
+   "sha256": "160b2415df06eea6d89a87825b096d62949f1c52b987a8630cb897ff86ff4013"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 14558,
+   "sha256": "ffa5d1e4682374d472ac662630429a5bb72bd0b72431955f10703e3a6880c5db"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 24429,
+   "sha256": "0aa2d74e8a41ced5026e23b1a26fed679b9a74fec5224d525e8af63fab12f177"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 19653,
+   "sha256": "7bbf5b944da22d2e8d0aa57b02bb16c2e41af814eed466d03f23bd6e5becbe69"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 24024,
+   "sha256": "671aec75218a7d01af8cc08a2482643dc4c27da86821c75c010c289205755f07"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 14008,
+   "sha256": "7b110168898d6635ad24486633fcaaddfe789f7548ac1ee7aa5c6fb15f72d97c"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 45604,
+   "sha256": "5d56aad429a5f8f97e70faa76be456b8010ff37dee668b80bb8cc9add23e1d2d"
+  },
+  "voice/zh/side_switch.m4a": {
+   "bytes": 34125,
+   "sha256": "7310c6ac900fa46d1e822461574a3dcb5dfdd82356b14c2989a9f5c22a94b16f"
+  }
+ }
+}

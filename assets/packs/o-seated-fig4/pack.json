@@ -1,0 +1,184 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "o-seated-fig4",
+ "version": "1.0.0",
+ "name": {
+  "zh": "坐姿四字前压",
+  "en": "Seated Figure-4 Stretch"
+ },
+ "category": "stretch",
+ "muscles": [
+  "臀大肌"
+ ],
+ "muscleGroups": [
+  "glute-max"
+ ],
+ "equipment": [
+  "chair"
+ ],
+ "position": "seated",
+ "unilateral": true,
+ "level": 1,
+ "scenes": [
+  "home",
+  "office"
+ ],
+ "defaultDose": {
+  "mode": "time",
+  "sets": 1,
+  "seconds": 30,
+  "restSeconds": 10
+ },
+ "cues": {
+  "zh": [
+   "脚踝搭在膝盖上，背挺直往前压",
+   "背挺直向前倾，臀部拉长"
+  ]
+ },
+ "primaryCue": 0,
+ "cautions": [
+  "膝"
+ ],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 3.8,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": null,
+  "showsSide": "right"
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "坐姿四字前压"
+    },
+    "ms": {
+     "zh": 1393
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "坐姿四字前压，拉伸臀部"
+    },
+    "ms": {
+     "zh": 2392
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "脚踝搭在膝盖上，背挺直往前压"
+    },
+    "ms": {
+     "zh": 2879
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "背挺直向前倾，臀部拉长"
+    },
+    "ms": {
+     "zh": 2461
+    }
+   },
+   {
+    "id": "side_switch",
+    "role": "side_switch",
+    "text": {
+     "zh": "左侧同样，脚踝搭在膝盖上，背挺直往前压"
+    },
+    "ms": {
+     "zh": 3971
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，背挺直向前倾，臀部拉长"
+    },
+    "ms": {
+     "zh": 5201
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "坐姿四字前压，完成"
+    },
+    "ms": {
+     "zh": 2090
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub v0.2.0 dark soft-v1 clip (as frozen in HipLab), re-encoded 720²",
+  "mediaSource": "pose-hub-v0.2.0",
+  "spec": "drill-anim/specs/o-seated-fig4.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 9473,
+   "sha256": "dfb45603b6d85826b613eb3f7000cbb42c6df8b7ae0cd7db738a939f57e06060"
+  },
+  "demo.mp4": {
+   "bytes": 90555,
+   "sha256": "4d828dac20ceaa03911fdf50578ee12bd29f5430bd8110b6c16fac9c108c5462"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 24779,
+   "sha256": "e6921bb3369d1454a63ee02c6476f903c029eec1305fa46a875623170e3f8bab"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 21358,
+   "sha256": "54506353f8d71848d85f722eef10402af5edd4d74bd18f7b714b43dabf755863"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 18288,
+   "sha256": "906cfe7c591672c65b3136a38d17f257a8835db99b2853d4204adf72d70c2231"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 20793,
+   "sha256": "3269eaec06089213ff3752ff2d8971e4eb16c5d9cad4895b23339aa440925a64"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 12505,
+   "sha256": "37031819965215686544706ed5f5aa340dea19a8ab9afb8fd1cb28891762c4f8"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 43797,
+   "sha256": "deccfa9da06bdf48f0806abde19a1efe3681990685601681110d17c06efe7c01"
+  },
+  "voice/zh/side_switch.m4a": {
+   "bytes": 33549,
+   "sha256": "4ec710b25bc8fd336c080830f29ed752c11485dfcad22f399db50fe0ab162179"
+  }
+ }
+}

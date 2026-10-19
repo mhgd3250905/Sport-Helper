@@ -1,0 +1,200 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "h-quad-cars",
+ "version": "1.0.0",
+ "name": {
+  "zh": "四足髋关节画圈",
+  "en": "Quadruped Hip CARs"
+ },
+ "category": "mobility",
+ "muscles": [
+  "臀大肌",
+  "臀中肌"
+ ],
+ "muscleGroups": [
+  "glute-max",
+  "hip-abductors"
+ ],
+ "equipment": [
+  "mat"
+ ],
+ "position": "quadruped",
+ "unilateral": true,
+ "level": 3,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "reps",
+  "sets": 1,
+  "reps": 5,
+  "restSeconds": 10
+ },
+ "cues": {
+  "zh": [
+   "四足支撑，躯干稳定",
+   "四点跪姿，膝盖画一个尽量大的圈，腰不要动",
+   "膝向侧后方慢慢画大圈"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [
+  "腰"
+ ],
+ "contraindications": [],
+ "alternative": "h-hip-gate",
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 2.2,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": 3.0,
+  "showsSide": "right"
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "四足髋关节画圈"
+    },
+    "ms": {
+     "zh": 1672
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "四足髋关节画圈，活动臀部"
+    },
+    "ms": {
+     "zh": 2647
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "四足支撑，躯干稳定"
+    },
+    "ms": {
+     "zh": 2020
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "四点跪姿，膝盖画一个尽量大的圈，腰不要动"
+    },
+    "ms": {
+     "zh": 3947
+    }
+   },
+   {
+    "id": "cue3",
+    "role": "cue",
+    "text": {
+     "zh": "膝向侧后方慢慢画大圈"
+    },
+    "ms": {
+     "zh": 2322
+    }
+   },
+   {
+    "id": "side_switch",
+    "role": "side_switch",
+    "text": {
+     "zh": "左侧同样，四点跪姿，膝盖画一个尽量大的圈，腰不要动"
+    },
+    "ms": {
+     "zh": 5016
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，膝向侧后方慢慢画大圈"
+    },
+    "ms": {
+     "zh": 4876
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "四足髋关节画圈，完成"
+    },
+    "ms": {
+     "zh": 2299
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub v0.2.0 dark soft-v1 clip (as frozen in HipLab), re-encoded 720²",
+  "mediaSource": "pose-hub-v0.2.0",
+  "spec": "drill-anim/specs/h-quad-cars.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 9459,
+   "sha256": "09cafab6e2a0b5c8635617a0a96afe72692b7f0ab6f8fbb4ef5a4f37a96255f6"
+  },
+  "demo.mp4": {
+   "bytes": 131629,
+   "sha256": "32b5d382419561ed326d760afcf0b18c230bf9d1904fac297436be344b0c3ff7"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 17746,
+   "sha256": "feeddb918c78441c4003056e11f8b2cedad288d4db754a8e7d85b5b9c4922c4b"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 33371,
+   "sha256": "c50aaab220259bf2dee85f9a732ba73390a0cdebbb4866a98c0fa3b0cdcea728"
+  },
+  "voice/zh/cue3.m4a": {
+   "bytes": 20040,
+   "sha256": "96e888cef2875fdac9be7c406215388a1a5702e1f59218b01196751e72141fcd"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 20012,
+   "sha256": "c7a1c0b47c2f560ea834848fe8e270b50d0f204b5475c18cddffa24dca58ea2b"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 22772,
+   "sha256": "7f1abd879f560c996d60a8d9d20b5ebfd1c8ab7d1f631859ef488b8a2dd1f519"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 14612,
+   "sha256": "96c6dd4ed7a6556b01c03c3f19ceb4bb6d3203c3ed86653f0594211306e0fda4"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 41122,
+   "sha256": "73528309c31cbd1711dcb74589e492600022bb6ceb51e94902bd915babd51df3"
+  },
+  "voice/zh/side_switch.m4a": {
+   "bytes": 42187,
+   "sha256": "bf8ec28072003e80bb4cb7eee1a9e9d99e4e49272a5c6a54c56b510fe3000dd5"
+  }
+ }
+}

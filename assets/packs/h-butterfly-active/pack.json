@@ -1,0 +1,181 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "h-butterfly-active",
+ "version": "1.0.0",
+ "name": {
+  "zh": "仰卧蝴蝶主动开合",
+  "en": "Supine Butterfly Active Open-Close"
+ },
+ "category": "mobility",
+ "muscles": [
+  "大腿内侧"
+ ],
+ "muscleGroups": [
+  "adductors"
+ ],
+ "equipment": [
+  "mat"
+ ],
+ "position": "supine",
+ "unilateral": false,
+ "level": 1,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "reps",
+  "sets": 1,
+  "reps": 10,
+  "restSeconds": 10
+ },
+ "cues": {
+  "zh": [
+   "仰卧，脚心相对",
+   "脚心相对，膝盖慢慢打开再收回",
+   "膝主动打开再合上"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 2.3,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": 4.0
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "仰卧蝴蝶主动开合"
+    },
+    "ms": {
+     "zh": 1672
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "仰卧蝴蝶主动开合，活动大腿内侧"
+    },
+    "ms": {
+     "zh": 3135
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "仰卧，脚心相对"
+    },
+    "ms": {
+     "zh": 1602
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "脚心相对，膝盖慢慢打开再收回"
+    },
+    "ms": {
+     "zh": 3065
+    }
+   },
+   {
+    "id": "cue3",
+    "role": "cue",
+    "text": {
+     "zh": "膝主动打开再合上"
+    },
+    "ms": {
+     "zh": 1718
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，膝主动打开再合上"
+    },
+    "ms": {
+     "zh": 4203
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "仰卧蝴蝶主动开合，完成"
+    },
+    "ms": {
+     "zh": 2392
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub v0.2.0 dark soft-v1 clip (as frozen in HipLab), re-encoded 720²",
+  "mediaSource": "pose-hub-v0.2.0",
+  "spec": "drill-anim/specs/h-butterfly-active.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 11526,
+   "sha256": "f8ccffb5aa06e3955b880ec356bdb93ab88fb074f70a4ec7f016d95a7f6b9e64"
+  },
+  "demo.mp4": {
+   "bytes": 168720,
+   "sha256": "9083241f24719721edf8b7dfb615d60cb767a0dca13ac84a66e8e178eb7d5fc9"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 14302,
+   "sha256": "ff2bfe61733311d750819abc826c6ce131e02a5c2e813b60b331f3862eab4149"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 26323,
+   "sha256": "d8b867cc4fefced37b5854dfccbcf5f5dbd469cd2cabcc837c7542d91c079045"
+  },
+  "voice/zh/cue3.m4a": {
+   "bytes": 15093,
+   "sha256": "4e2bc68348e7029f622aeffd0db2ecaec53fefd50a2cbdd767ce756fdc168a85"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 20820,
+   "sha256": "1c10211b4c0f76cad930dff5bb19df80e2e94be2aba812d6f2a7281ea3c05cfe"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 26785,
+   "sha256": "7067dce34c9bcc0978aff6b6eb60478272a01cdf988f4850d88b503e285a884e"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 14884,
+   "sha256": "8c8af4f31e6fe6125fe0a9e4ca586d067a0e8932f39dc2cf2704bb15e6d0b0bb"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 35453,
+   "sha256": "8b462156305f7d2f8eb876c27521e019757cfe0bee7d2abe70c5f46e34be2bc9"
+  }
+ }
+}

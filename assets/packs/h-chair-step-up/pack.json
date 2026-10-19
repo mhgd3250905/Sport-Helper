@@ -1,0 +1,170 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "h-chair-step-up",
+ "version": "1.0.0",
+ "name": {
+  "zh": "椅子上步",
+  "en": "Chair Step-Up"
+ },
+ "category": "strength",
+ "muscles": [
+  "股四头肌",
+  "臀大肌"
+ ],
+ "muscleGroups": [
+  "quadriceps",
+  "glute-max"
+ ],
+ "equipment": [
+  "chair"
+ ],
+ "position": "standing",
+ "unilateral": false,
+ "level": 2,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "reps",
+  "sets": 3,
+  "reps": 10,
+  "restSeconds": 30
+ },
+ "cues": {
+  "zh": [
+   "整只脚踩稳椅面，用前腿发力站起",
+   "用前腿蹬起，不靠后脚弹"
+  ]
+ },
+ "primaryCue": 0,
+ "cautions": [
+  "膝"
+ ],
+ "contraindications": [],
+ "alternative": "h-squat",
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 1.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": 3.0
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "椅子上步"
+    },
+    "ms": {
+     "zh": 906
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "椅子上步，练大腿前侧和臀部"
+    },
+    "ms": {
+     "zh": 2763
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "整只脚踩稳椅面，用前腿发力站起"
+    },
+    "ms": {
+     "zh": 3181
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "用前腿蹬起，不靠后脚弹"
+    },
+    "ms": {
+     "zh": 2415
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，用前腿蹬起，不靠后脚弹"
+    },
+    "ms": {
+     "zh": 4899
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "椅子上步，完成"
+    },
+    "ms": {
+     "zh": 1649
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub Drive archive green-screen master, keyed onto #101013 by tools/media/prepare_media.py",
+  "mediaSource": "pose-hub-drive-greenscreen",
+  "spec": "drill-anim/specs/h-chair-step-up.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 5653,
+   "sha256": "45bc51bbfa7ff48daae7bc813dffc33793b0a014f573ccac92d947f48ee12f04"
+  },
+  "demo.mp4": {
+   "bytes": 91142,
+   "sha256": "ac4e18affe3e909a557f4ec2e6e2451fb47b640783cc79f7a13017f96d926388"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 27227,
+   "sha256": "4262736e22642f760017db4ca54769ec2d37a87d8c91c532920803563e0e011f"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 20876,
+   "sha256": "228de5dde8d27991ad7f3705037fa4df4e1f19fae9bb48de9127782996904288"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 14440,
+   "sha256": "346c3965044b9341c7450fc1987c85d8959341e212714015e18faaa66b57926b"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 23763,
+   "sha256": "c585ea1b2a5bf36347a0ec9d2c43fe778074390e91ed6305589070650f5536dd"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 8503,
+   "sha256": "5f91e0b478ddde715697c2dbc517605f248a8d4faa92d324f5ed897b8de553cb"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 41188,
+   "sha256": "f953cbd4aa544d90e5885e246fe3bfff7fe20069dd72b5e5a55730ac523e8ff9"
+  }
+ }
+}

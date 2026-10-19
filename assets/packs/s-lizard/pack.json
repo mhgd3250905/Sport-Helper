@@ -1,0 +1,181 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "s-lizard",
+ "version": "1.0.0",
+ "name": {
+  "zh": "蜥蜴式低弓步",
+  "en": "Lizard Lunge"
+ },
+ "category": "stretch",
+ "muscles": [
+  "髋屈肌"
+ ],
+ "muscleGroups": [
+  "hip-flexors"
+ ],
+ "equipment": [
+  "mat"
+ ],
+ "position": "kneeling",
+ "unilateral": true,
+ "level": 3,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "time",
+  "sets": 1,
+  "seconds": 30,
+  "restSeconds": 10
+ },
+ "cues": {
+  "zh": [
+   "前脚放在手外侧，髋往下沉",
+   "髋向下沉，呼吸放松"
+  ]
+ },
+ "primaryCue": 0,
+ "cautions": [],
+ "contraindications": [],
+ "alternative": "o-stand-lunge",
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 3.8,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": null,
+  "showsSide": "right"
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "蜥蜴式低弓步"
+    },
+    "ms": {
+     "zh": 1277
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "蜥蜴式低弓步，拉伸髋前侧"
+    },
+    "ms": {
+     "zh": 2577
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "前脚放在手外侧，髋往下沉"
+    },
+    "ms": {
+     "zh": 2647
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "髋向下沉，呼吸放松"
+    },
+    "ms": {
+     "zh": 2020
+    }
+   },
+   {
+    "id": "side_switch",
+    "role": "side_switch",
+    "text": {
+     "zh": "左侧同样，前脚放在手外侧，髋往下沉"
+    },
+    "ms": {
+     "zh": 3738
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，髋向下沉，呼吸放松"
+    },
+    "ms": {
+     "zh": 4528
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "蜥蜴式低弓步，完成"
+    },
+    "ms": {
+     "zh": 2020
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub v0.2.0 dark soft-v1 clip (as frozen in HipLab), re-encoded 720²",
+  "mediaSource": "pose-hub-v0.2.0",
+  "spec": "drill-anim/specs/s-lizard.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 7770,
+   "sha256": "c8bf22c3c8eb634eb84d2018e3f23f92e1a236108fd336a21fcf1751e0399b5e"
+  },
+  "demo.mp4": {
+   "bytes": 71538,
+   "sha256": "5191e1eaa51ea7cedc37628c61aba45432ee7e4553036a2d0af79432e08e3dd4"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 22815,
+   "sha256": "7c075047307f771165b96289c43e61040ca619239d9a5a2f60c8de9e526cd759"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 17759,
+   "sha256": "1f6fd2b0cc848f21e9fcf32152169af5b673592fb14ff5c4f2262351033a218d"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 17749,
+   "sha256": "05fa647ef99e554d0897ae82bb29869000aa599535570904c50acdf278d44ee6"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 22158,
+   "sha256": "b0197120c3f06692e6253c83bea11a4b8f32b2460ddc7ac78629c405b722ebef"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 11650,
+   "sha256": "8db07faefc09213ffa934bb4d8fbd32c82c5c98b1eb5dacea3de92f8c207f689"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 38277,
+   "sha256": "6f02173bd7ea08b4a7894683c841e1bb6c016c9bfeec3e400941504c8e28111d"
+  },
+  "voice/zh/side_switch.m4a": {
+   "bytes": 31675,
+   "sha256": "9b1a0f9f3d0ae2a504327ff3cc96baa2adc4b39bf6b59e2aa3e6d47e14a0ff8f"
+  }
+ }
+}

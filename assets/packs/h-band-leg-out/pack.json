@@ -1,0 +1,185 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "h-band-leg-out",
+ "version": "1.0.0",
+ "name": {
+  "zh": "仰卧弹力带单腿侧落",
+  "en": "Supine Banded Leg Lower-Out"
+ },
+ "category": "stretch",
+ "muscles": [
+  "大腿内侧",
+  "腘绳肌"
+ ],
+ "muscleGroups": [
+  "adductors",
+  "hamstrings"
+ ],
+ "equipment": [
+  "band"
+ ],
+ "position": "supine",
+ "unilateral": true,
+ "level": 1,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "time",
+  "sets": 1,
+  "seconds": 30,
+  "restSeconds": 10
+ },
+ "cues": {
+  "zh": [
+   "弹力带套脚，腿伸直上举",
+   "腿伸直，慢慢向外侧落下"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [
+  "大腿内侧"
+ ],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 4.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": null,
+  "showsSide": "right"
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "仰卧弹力带单腿侧落"
+    },
+    "ms": {
+     "zh": 1881
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "仰卧弹力带单腿侧落，拉伸大腿内侧和大腿后侧"
+    },
+    "ms": {
+     "zh": 4598
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "弹力带套脚，腿伸直上举"
+    },
+    "ms": {
+     "zh": 2438
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "腿伸直，慢慢向外侧落下"
+    },
+    "ms": {
+     "zh": 2461
+    }
+   },
+   {
+    "id": "side_switch",
+    "role": "side_switch",
+    "text": {
+     "zh": "左侧同样，腿伸直，慢慢向外侧落下"
+    },
+    "ms": {
+     "zh": 3599
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，腿伸直，慢慢向外侧落下"
+    },
+    "ms": {
+     "zh": 4946
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "仰卧弹力带单腿侧落，完成"
+    },
+    "ms": {
+     "zh": 2763
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub v0.2.0 dark soft-v1 clip (as frozen in HipLab), re-encoded 720²",
+  "mediaSource": "pose-hub-v0.2.0",
+  "spec": "drill-anim/specs/h-band-leg-out.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 11463,
+   "sha256": "9e2e3096d2b09dc518fa90d923a8158abaf40fc9e9b66c31752a8c4ee7775f0e"
+  },
+  "demo.mp4": {
+   "bytes": 155925,
+   "sha256": "bb1fd86b18ada5191001782483af6af1f153cd8e6299b84695124687e6ba7d4a"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 21176,
+   "sha256": "d414a9582e9d79c3e0290e6f4002ee0ea893d1601de4790ad0a6562815dcc434"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 21299,
+   "sha256": "fe363b8bf87b9212edf2603fb6e79c1f71dfbe315f08e2ec453cdca77604f903"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 23812,
+   "sha256": "97c0b1dadaf6191920b379ec0ce133f685963706857e4e201e11a73676fccb80"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 38884,
+   "sha256": "bdd6e30faee12a39cfa4faa509075eded9547d278a76e624eaa442c53d3d005d"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 16610,
+   "sha256": "142eea809eb99e4d9fab38e795da2ad87fb9dfd13414764c2b5ce2c72d0232ac"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 41699,
+   "sha256": "6525761beb1d027e59929eb8b7b98de11042e65d36540384e4df12cbf31752c4"
+  },
+  "voice/zh/side_switch.m4a": {
+   "bytes": 30681,
+   "sha256": "e5fa06e6a03fddf1ffb11e32357468eed3850f6a501c290d6f905482c6ea38de"
+  }
+ }
+}

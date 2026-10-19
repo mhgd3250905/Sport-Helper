@@ -1,0 +1,184 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "o-stand-lunge",
+ "version": "1.0.0",
+ "name": {
+  "zh": "扶椅站姿弓步屈髋拉伸",
+  "en": "Chair-Supported Standing Hip Flexor Stretch"
+ },
+ "category": "stretch",
+ "muscles": [
+  "髋屈肌"
+ ],
+ "muscleGroups": [
+  "hip-flexors"
+ ],
+ "equipment": [
+  "chair"
+ ],
+ "position": "standing",
+ "unilateral": true,
+ "level": 1,
+ "scenes": [
+  "home",
+  "office"
+ ],
+ "defaultDose": {
+  "mode": "time",
+  "sets": 1,
+  "seconds": 30,
+  "restSeconds": 10
+ },
+ "cues": {
+  "zh": [
+   "扶椅成弓步，后腿伸直",
+   "扶住椅子，后侧臀部收紧，髋往前推"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [
+  "腰"
+ ],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 3.8,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": null,
+  "showsSide": "right"
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "扶椅站姿弓步屈髋拉伸"
+    },
+    "ms": {
+     "zh": 2206
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "扶椅站姿弓步屈髋拉伸，拉伸髋前侧"
+    },
+    "ms": {
+     "zh": 3529
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "扶椅成弓步，后腿伸直"
+    },
+    "ms": {
+     "zh": 2229
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "扶住椅子，后侧臀部收紧，髋往前推"
+    },
+    "ms": {
+     "zh": 3553
+    }
+   },
+   {
+    "id": "side_switch",
+    "role": "side_switch",
+    "text": {
+     "zh": "左侧同样，扶住椅子，后侧臀部收紧，髋往前推"
+    },
+    "ms": {
+     "zh": 4598
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，扶住椅子，后侧臀部收紧，髋往前推"
+    },
+    "ms": {
+     "zh": 6060
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "扶椅站姿弓步屈髋拉伸，完成"
+    },
+    "ms": {
+     "zh": 2856
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub v0.2.0 dark soft-v1 clip (as frozen in HipLab), re-encoded 720²",
+  "mediaSource": "pose-hub-v0.2.0",
+  "spec": "drill-anim/specs/o-stand-lunge.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 7561,
+   "sha256": "6285ae8150471e44c41c630dda5b654dd291bf2af17a7c8f4f3794f39a3ecf52"
+  },
+  "demo.mp4": {
+   "bytes": 65231,
+   "sha256": "517a38848651c09056be6ecb34e37e71ddaac698178cf474710c0e57dd025b9b"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 19294,
+   "sha256": "b981cd4bc94406829f29aac4d9031794c08b3f97bbb769dd556681aaa4a3fdd0"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 30315,
+   "sha256": "ecb22b547c9e41e720e083ea95c67d2c9f4997be5a5318b573c678ac60905ac1"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 24668,
+   "sha256": "c9f95bb4b8fc6d8d2832374ba30013bfc2c157172b06174c426c9d3dab8bd3bc"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 30106,
+   "sha256": "eea74d80f919ab497aedd6622c5ba64b5b34bb0a72e8cb7bcd9db352b7cac605"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 19250,
+   "sha256": "c5cd4e9755476997fb13abd38f2c61cde3a877c8cba6427b675dd869619a87ba"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 50673,
+   "sha256": "2f5f0b900a5875a3126f0f76f717218f1ea5d20f30eee6afb4557a8578f5747f"
+  },
+  "voice/zh/side_switch.m4a": {
+   "bytes": 38897,
+   "sha256": "7056466682b227ee678308cf2d3b424f8ae4e02ad8c2c2b9df3bafa431420059"
+  }
+ }
+}

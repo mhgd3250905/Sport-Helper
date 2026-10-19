@@ -1,0 +1,183 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "h-reverse-crunch",
+ "version": "1.0.0",
+ "name": {
+  "zh": "反向卷腹",
+  "en": "Reverse Crunch"
+ },
+ "category": "core",
+ "muscles": [
+  "腹直肌"
+ ],
+ "muscleGroups": [
+  "abs"
+ ],
+ "equipment": [
+  "mat"
+ ],
+ "position": "supine",
+ "unilateral": false,
+ "level": 2,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "reps",
+  "sets": 3,
+  "reps": 12,
+  "restSeconds": 30
+ },
+ "cues": {
+  "zh": [
+   "仰卧屈膝抬腿",
+   "屈膝把骨盆卷离地面，慢慢放回",
+   "卷起骨盆，膝向胸口靠近"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [
+  "腰"
+ ],
+ "contraindications": [],
+ "alternative": "h-crunch",
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 1.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": 4.0
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "反向卷腹"
+    },
+    "ms": {
+     "zh": 998
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "反向卷腹，练腹部"
+    },
+    "ms": {
+     "zh": 1858
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "仰卧屈膝抬腿"
+    },
+    "ms": {
+     "zh": 1370
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "屈膝把骨盆卷离地面，慢慢放回"
+    },
+    "ms": {
+     "zh": 2879
+    }
+   },
+   {
+    "id": "cue3",
+    "role": "cue",
+    "text": {
+     "zh": "卷起骨盆，膝向胸口靠近"
+    },
+    "ms": {
+     "zh": 2415
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，卷起骨盆，膝向胸口靠近"
+    },
+    "ms": {
+     "zh": 4923
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "反向卷腹，完成"
+    },
+    "ms": {
+     "zh": 1718
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub Drive archive green-screen master, keyed onto #101013 by tools/media/prepare_media.py",
+  "mediaSource": "pose-hub-drive-greenscreen",
+  "spec": "drill-anim/specs/h-reverse-crunch.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 7661,
+   "sha256": "064fa603f05d5f776d373b8f2761e42f7d314d6c635e67e2501c5fd5a5026f71"
+  },
+  "demo.mp4": {
+   "bytes": 117973,
+   "sha256": "b725be639e576f87680bd89af757d80b898ff96b57e026f87778243f98aebecb"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 12406,
+   "sha256": "b49050760295b5d1e3e302009294b915b639b1d8672dc04b0b9f58c2cebddeb6"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 24797,
+   "sha256": "5db27852837b3e61772550a0928b71950fa44602e1f27e547662640997800812"
+  },
+  "voice/zh/cue3.m4a": {
+   "bytes": 20945,
+   "sha256": "38b3a9bda0b6387d221e1edf54495a37983bb29b2378cd3ef215e67eb667ebc6"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 15217,
+   "sha256": "670345547fecd58f68bccba717fcafa3fab7bf9d7886ca2af8115d2c33cbbcce"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 16411,
+   "sha256": "47fdf6a624f6da2b91a301e2f720b46507ddf1b78d4e95b520ce266deeb6e972"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 9230,
+   "sha256": "893894d7c746a9734acd347034653b0537384d7d2e0150fc2b38d4402510fcb5"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 41362,
+   "sha256": "1e21e3a481b3b724820e0bbf26fd4128752d1e6b47f8236cc9b959e2ebcf8292"
+  }
+ }
+}

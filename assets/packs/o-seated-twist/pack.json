@@ -1,0 +1,170 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "o-seated-twist",
+ "version": "1.0.0",
+ "name": {
+  "zh": "坐姿扶椅扭转",
+  "en": "Seated Chair Twist"
+ },
+ "category": "stretch",
+ "muscles": [
+  "腹斜肌",
+  "竖脊肌"
+ ],
+ "muscleGroups": [
+  "obliques",
+  "erectors"
+ ],
+ "equipment": [
+  "chair"
+ ],
+ "position": "seated",
+ "unilateral": false,
+ "level": 1,
+ "scenes": [
+  "office"
+ ],
+ "defaultDose": {
+  "mode": "time",
+  "sets": 1,
+  "seconds": 40,
+  "restSeconds": 10
+ },
+ "cues": {
+  "zh": [
+   "坐直，手扶椅背慢慢转身，先长高再转",
+   "呼气时向一侧转体"
+  ]
+ },
+ "primaryCue": 0,
+ "cautions": [
+  "腰"
+ ],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 1.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": null
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "坐姿扶椅扭转"
+    },
+    "ms": {
+     "zh": 1324
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "坐姿扶椅扭转，拉伸腰两侧和下背"
+    },
+    "ms": {
+     "zh": 3135
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "坐直，手扶椅背慢慢转身，先长高再转"
+    },
+    "ms": {
+     "zh": 3715
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "呼气时向一侧转体"
+    },
+    "ms": {
+     "zh": 1950
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，呼气时向一侧转体"
+    },
+    "ms": {
+     "zh": 4272
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "坐姿扶椅扭转，完成"
+    },
+    "ms": {
+     "zh": 2020
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub Drive archive green-screen master, keyed onto #101013 by tools/media/prepare_media.py",
+  "mediaSource": "pose-hub-drive-greenscreen",
+  "spec": "drill-anim/specs/o-seated-twist.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 6671,
+   "sha256": "dc104ed1d919825836dd1370b3db515d0b8b808030291a540addcaee1c02fc8a"
+  },
+  "demo.mp4": {
+   "bytes": 71588,
+   "sha256": "23443c6adfe81c30bfbf9cc358f9ff7b16b93b5e79b852b1dea6d54840716ac5"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 31559,
+   "sha256": "e7713fadfca23ebde35d1b703cfb1cf7e39585205340cfc726cc886e89b79660"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 16997,
+   "sha256": "0585b998a5a09a7227591fc846f559c04242662a9b0e59e747cf9d093f7b9211"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 17781,
+   "sha256": "7d473c96037865419e66e7887788d112aaf56cf8e3a5c053e4f72963c7d4e172"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 26785,
+   "sha256": "101a1b454656f952dd8f656be56206dfb731e9e8498461acc5caf364163294df"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 12000,
+   "sha256": "564a605c802ab4d0c4645f1ff77d4923550762ddd1598b4cadc1a5075aff3f10"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 36103,
+   "sha256": "c5dcbbd79b2b9ee2c2918fdaba55376b86ae360a6285833db2f459ac9c809d09"
+  }
+ }
+}

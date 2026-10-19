@@ -1,0 +1,186 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "h-band-hip-ir",
+ "version": "1.0.0",
+ "name": {
+  "zh": "坐椅弹力带髋内旋",
+  "en": "Seated Banded Hip Internal Rotation"
+ },
+ "category": "strength",
+ "muscles": [
+  "臀中肌",
+  "臀大肌"
+ ],
+ "muscleGroups": [
+  "hip-abductors",
+  "glute-max"
+ ],
+ "equipment": [
+  "band"
+ ],
+ "position": "seated",
+ "unilateral": true,
+ "level": 1,
+ "scenes": [
+  "home",
+  "office"
+ ],
+ "defaultDose": {
+  "mode": "reps",
+  "sets": 2,
+  "reps": 12,
+  "restSeconds": 30
+ },
+ "cues": {
+  "zh": [
+   "坐椅，弹力带套在脚踝",
+   "膝盖不动，小腿向外转"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [
+  "膝"
+ ],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 2.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": 4.0,
+  "showsSide": "right"
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "坐椅弹力带髋内旋"
+    },
+    "ms": {
+     "zh": 1718
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "坐椅弹力带髋内旋，练臀部"
+    },
+    "ms": {
+     "zh": 2601
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "坐椅，弹力带套在脚踝"
+    },
+    "ms": {
+     "zh": 2229
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "膝盖不动，小腿向外转"
+    },
+    "ms": {
+     "zh": 2206
+    }
+   },
+   {
+    "id": "side_switch",
+    "role": "side_switch",
+    "text": {
+     "zh": "左侧同样，膝盖不动，小腿向外转"
+    },
+    "ms": {
+     "zh": 3251
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，膝盖不动，小腿向外转"
+    },
+    "ms": {
+     "zh": 4644
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "坐椅弹力带髋内旋，完成"
+    },
+    "ms": {
+     "zh": 2415
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub v0.2.0 dark soft-v1 clip (as frozen in HipLab), re-encoded 720²",
+  "mediaSource": "pose-hub-v0.2.0",
+  "spec": "drill-anim/specs/h-band-hip-ir.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 8555,
+   "sha256": "a46bedbc21edb86a3c4020f72b201175dca4ee9ce9027f7e33c5420c6777b635"
+  },
+  "demo.mp4": {
+   "bytes": 76960,
+   "sha256": "ae2f91c935ca74293e8fae9f08bfebb3fa74bcb1ec249f8d8e79573e45e9dabb"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 19287,
+   "sha256": "aeeada7df33bf6e6505f1f35809b41d2ed24c84f68a0c155cad402c4c178ed7c"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 19247,
+   "sha256": "36080613dec1e2b1d2d225dd488d129a9438d7ff1ef68de464bc6d6a55986403"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 20972,
+   "sha256": "75aa4ed84cc2753ab8becc393f1b9e86a64bdd36095c78e1011c216eda39eeee"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 22370,
+   "sha256": "9c73ee6e8e7a0cbfe5075ca4f6ecc5faad39a1c8548f2c75777850635933d701"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 15259,
+   "sha256": "bb00a57bf64258b6cc0b5302838c9ff570c8815b111a9508ba2d688fbdaf1967"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 39168,
+   "sha256": "079e7f02dec9d88b8c8de7a259485b1235239e43a8f58d3a85870cf0cbc66861"
+  },
+  "voice/zh/side_switch.m4a": {
+   "bytes": 27820,
+   "sha256": "7c65237ddd47c6b15c6c50caf9d6d8f60f091f9268edff619ff45d91bd019633"
+  }
+ }
+}

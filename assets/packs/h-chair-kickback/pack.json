@@ -1,0 +1,199 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "h-chair-kickback",
+ "version": "1.0.0",
+ "name": {
+  "zh": "扶椅站姿后踢腿",
+  "en": "Chair-Supported Standing Kickback"
+ },
+ "category": "strength",
+ "muscles": [
+  "臀大肌"
+ ],
+ "muscleGroups": [
+  "glute-max"
+ ],
+ "equipment": [
+  "chair"
+ ],
+ "position": "standing",
+ "unilateral": true,
+ "level": 1,
+ "scenes": [
+  "home",
+  "office"
+ ],
+ "defaultDose": {
+  "mode": "reps",
+  "sets": 2,
+  "reps": 12,
+  "restSeconds": 30
+ },
+ "cues": {
+  "zh": [
+   "扶椅站稳，躯干不前倾",
+   "扶稳椅背，腿向后抬，腰不要塌",
+   "腿向后上方踢，臀部收紧"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [
+  "腰"
+ ],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 1.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": 4.0,
+  "showsSide": "right"
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "扶椅站姿后踢腿"
+    },
+    "ms": {
+     "zh": 1509
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "扶椅站姿后踢腿，练臀部"
+    },
+    "ms": {
+     "zh": 2299
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "扶椅站稳，躯干不前倾"
+    },
+    "ms": {
+     "zh": 2159
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "扶稳椅背，腿向后抬，腰不要塌"
+    },
+    "ms": {
+     "zh": 2879
+    }
+   },
+   {
+    "id": "cue3",
+    "role": "cue",
+    "text": {
+     "zh": "腿向后上方踢，臀部收紧"
+    },
+    "ms": {
+     "zh": 2485
+    }
+   },
+   {
+    "id": "side_switch",
+    "role": "side_switch",
+    "text": {
+     "zh": "左侧同样，扶稳椅背，腿向后抬，腰不要塌"
+    },
+    "ms": {
+     "zh": 4017
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，腿向后上方踢，臀部收紧"
+    },
+    "ms": {
+     "zh": 4992
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "扶椅站姿后踢腿，完成"
+    },
+    "ms": {
+     "zh": 2183
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub Drive archive green-screen master, keyed onto #101013 by tools/media/prepare_media.py",
+  "mediaSource": "pose-hub-drive-greenscreen",
+  "spec": "drill-anim/specs/h-chair-kickback.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 8134,
+   "sha256": "8f5cf572d35073a5d5576d0860fd1ac061281c271e3ce554f2d6e349bcba0757"
+  },
+  "demo.mp4": {
+   "bytes": 84195,
+   "sha256": "d40e6a244070fab2f7422b0879609b728255c58aeeda9420f98a5f3448507f83"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 18746,
+   "sha256": "19a944f0460e705e72e822f881b48e5141644fa1cfbe3cad720823d239b3b743"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 24616,
+   "sha256": "17e17108fe5cb5d8ae68bbdf787108c0e7e835cf984b176d9f207b04d286e4ea"
+  },
+  "voice/zh/cue3.m4a": {
+   "bytes": 21338,
+   "sha256": "8290e9dc764e2aed38a8016e540d5442d9f54ad6d0d379719eaa8214359e1fee"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 18853,
+   "sha256": "8317e7e4227d3906f466ecda353de65febdf6f92a44b625e6303f5f1cb80d04b"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 19892,
+   "sha256": "4607202a80fa514187b81fd60869f469b5696751a68b11fbcfc2a719f1581798"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 13567,
+   "sha256": "5f74ee3fc1cd926901893f2f48dc20bf252b97124e23c8ef8d124971523984fa"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 42055,
+   "sha256": "acfcf2d4b89c63c4d585aa05d6251ae11e113f8e275a627a9987263546a85d35"
+  },
+  "voice/zh/side_switch.m4a": {
+   "bytes": 33983,
+   "sha256": "c15d4eb537f2ac1ac8e37cef3f1c3ff10225feba882c17b7223898bca703793f"
+  }
+ }
+}

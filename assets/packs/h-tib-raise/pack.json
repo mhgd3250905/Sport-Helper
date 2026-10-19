@@ -1,0 +1,152 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "h-tib-raise",
+ "version": "1.0.0",
+ "name": {
+  "zh": "靠墙勾脚尖",
+  "en": "Wall Tibialis Raise"
+ },
+ "category": "strength",
+ "muscles": [
+  "胫骨前肌"
+ ],
+ "muscleGroups": [
+  "tibialis"
+ ],
+ "equipment": [
+  "wall"
+ ],
+ "position": "standing",
+ "unilateral": false,
+ "level": 1,
+ "scenes": [
+  "home",
+  "office"
+ ],
+ "defaultDose": {
+  "mode": "reps",
+  "sets": 2,
+  "reps": 15,
+  "restSeconds": 30
+ },
+ "cues": {
+  "zh": [
+   "背靠墙，脚尖勾起再放下，脚跟不离地"
+  ]
+ },
+ "primaryCue": 0,
+ "cautions": [],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 1.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": 4.0
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "靠墙勾脚尖"
+    },
+    "ms": {
+     "zh": 1231
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "靠墙勾脚尖，练小腿前侧"
+    },
+    "ms": {
+     "zh": 2461
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "背靠墙，脚尖勾起再放下，脚跟不离地"
+    },
+    "ms": {
+     "zh": 3367
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，背靠墙，脚尖勾起再放下，脚跟不离地"
+    },
+    "ms": {
+     "zh": 5782
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "靠墙勾脚尖，完成"
+    },
+    "ms": {
+     "zh": 1927
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub Drive archive green-screen master, keyed onto #101013 by tools/media/prepare_media.py",
+  "mediaSource": "pose-hub-drive-greenscreen",
+  "spec": "drill-anim/specs/h-tib-raise.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 6333,
+   "sha256": "b9180b9fbfb8832ffea0ada1e35c4b4d4fb11287e311f98ac9a9d3a0c5b1a9ce"
+  },
+  "demo.mp4": {
+   "bytes": 76267,
+   "sha256": "6a672dd700a666139e44a6ee61f462ebeda7f97a5519c528c3dc182bef702bb5"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 28604,
+   "sha256": "60fcf5b244c88a06c2270e95f45696db86d034df1c173b8d1db2abde46fbdea9"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 16818,
+   "sha256": "c5fed1314f043e7921c9584b0fb7a02eb417469041c00aa72a3346f8f41debf0"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 21331,
+   "sha256": "2028daff89ae79d300f0131c3a76823898e940198724c00c445a5d51304450da"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 11079,
+   "sha256": "92620cfea8dbe2d1fe011e95452b65111ea8ce1ee941bd7864ce8547795c1a81"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 47604,
+   "sha256": "556cae0841b3c4d0a2f6526f62331731fec342e6ae45c5892965835805f0794e"
+  }
+ }
+}

@@ -1,0 +1,183 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "h-cobra",
+ "version": "1.0.0",
+ "name": {
+  "zh": "眼镜蛇式",
+  "en": "Cobra Stretch"
+ },
+ "category": "stretch",
+ "muscles": [
+  "腹直肌"
+ ],
+ "muscleGroups": [
+  "abs"
+ ],
+ "equipment": [
+  "mat"
+ ],
+ "position": "prone",
+ "unilateral": false,
+ "level": 1,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "time",
+  "sets": 1,
+  "seconds": 30,
+  "restSeconds": 10
+ },
+ "cues": {
+  "zh": [
+   "俯卧，手在胸旁",
+   "耻骨贴地，手推地慢慢抬起胸口",
+   "推起上身，髋贴地，肩下沉"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [
+  "腰"
+ ],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 1.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": null
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "眼镜蛇式"
+    },
+    "ms": {
+     "zh": 1068
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "眼镜蛇式，拉伸腹部"
+    },
+    "ms": {
+     "zh": 2067
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "俯卧，手在胸旁"
+    },
+    "ms": {
+     "zh": 1695
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "耻骨贴地，手推地慢慢抬起胸口"
+    },
+    "ms": {
+     "zh": 2995
+    }
+   },
+   {
+    "id": "cue3",
+    "role": "cue",
+    "text": {
+     "zh": "推起上身，髋贴地，肩下沉"
+    },
+    "ms": {
+     "zh": 2810
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，推起上身，髋贴地，肩下沉"
+    },
+    "ms": {
+     "zh": 5317
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "眼镜蛇式，完成"
+    },
+    "ms": {
+     "zh": 1741
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub Drive archive green-screen master, keyed onto #101013 by tools/media/prepare_media.py",
+  "mediaSource": "pose-hub-drive-greenscreen",
+  "spec": "drill-anim/specs/h-cobra.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 8198,
+   "sha256": "84023133e3f4eaacbec9ac2bda5af285ec08a7ff4aec11d90ff34384141854f6"
+  },
+  "demo.mp4": {
+   "bytes": 128146,
+   "sha256": "925fbee1236820fe84fe4e0bf673cefd60a5d23f581e7b260b916922faf136f9"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 15082,
+   "sha256": "83ba4167a32297464d963cd5e1fe60141434aef1cbda17d6b194353429c95d78"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 25785,
+   "sha256": "533378fd6be35deeb890476f0b0a8b652103ed4a7668c2d53078fdb6501e74a9"
+  },
+  "voice/zh/cue3.m4a": {
+   "bytes": 24232,
+   "sha256": "5314b69ee25f962d7f2abf936542adeb949450582ea699ddc61abae341bed7d2"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 15451,
+   "sha256": "9a9a51a8df6aa5ca9730b77dc63d81ded0e9e3ca95293cce21be84ab87a40f78"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 18123,
+   "sha256": "d23c1c02470be87d57e9a9c2e4b3fa19d63f46e023b7883b43582ace06f6a209"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 9793,
+   "sha256": "9e980fe6bcd2f10d7cd7517b720dcdb219c29516efec29d53d3e80d862c1ebc8"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 44552,
+   "sha256": "50c4f4fcacf12803be9ce411f10db9d5277050520ffc1c805c857a1bf30b8bc8"
+  }
+ }
+}

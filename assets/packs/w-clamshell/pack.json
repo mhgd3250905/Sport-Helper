@@ -1,0 +1,166 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "w-clamshell",
+ "version": "1.0.0",
+ "name": {
+  "zh": "侧卧蚌式开合",
+  "en": "Side-Lying Clamshell"
+ },
+ "category": "strength",
+ "muscles": [
+  "臀中肌"
+ ],
+ "muscleGroups": [
+  "hip-abductors"
+ ],
+ "equipment": [
+  "mat"
+ ],
+ "position": "side_lying",
+ "unilateral": true,
+ "level": 1,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "reps",
+  "sets": 2,
+  "reps": 15,
+  "restSeconds": 30
+ },
+ "cues": {
+  "zh": [
+   "双脚并拢，上侧膝盖打开，骨盆不后倒"
+  ]
+ },
+ "primaryCue": 0,
+ "cautions": [],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 1.8,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": 4.0,
+  "showsSide": "right"
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "侧卧蚌式开合"
+    },
+    "ms": {
+     "zh": 1370
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "侧卧蚌式开合，练臀部外侧"
+    },
+    "ms": {
+     "zh": 2531
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "双脚并拢，上侧膝盖打开，骨盆不后倒"
+    },
+    "ms": {
+     "zh": 3576
+    }
+   },
+   {
+    "id": "side_switch",
+    "role": "side_switch",
+    "text": {
+     "zh": "左侧同样，双脚并拢，上侧膝盖打开，骨盆不后倒"
+    },
+    "ms": {
+     "zh": 4621
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，双脚并拢，上侧膝盖打开，骨盆不后倒"
+    },
+    "ms": {
+     "zh": 6037
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "侧卧蚌式开合，完成"
+    },
+    "ms": {
+     "zh": 2020
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub v0.2.0 dark soft-v1 clip (as frozen in HipLab), re-encoded 720²",
+  "mediaSource": "pose-hub-v0.2.0",
+  "spec": "drill-anim/specs/w-clamshell.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 8672,
+   "sha256": "9a8c2f4c2495f85281d0228fb3db54e75364327b232451b9de52f3b868252f3c"
+  },
+  "demo.mp4": {
+   "bytes": 91924,
+   "sha256": "7766719b950f4bce08f44c300a65c4918edbb8a6c81ab097f6abdf972d365d4f"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 30511,
+   "sha256": "94889804e33e4b87596978c3aa2d573f4f0e518195a501dbeb8eb24c11d4c89c"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 17704,
+   "sha256": "67ee22c6a67b90c37b04ebb0131b3ef851ec008286515afc4229929e223e7312"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 21948,
+   "sha256": "cb050dacd67fd2f1fae9ce9fa2d5c162bf3c92f9f6d838dcb81f60c382726237"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 12215,
+   "sha256": "4f24eab26456f85bc79015d1d928d1a0ab05c1e46c53398a97c4d73b8c5ea5a9"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 50702,
+   "sha256": "c45b1feca2984d4d85da45b0263f1345eb93e61d7eed6ad97b751c01aa1fc38a"
+  },
+  "voice/zh/side_switch.m4a": {
+   "bytes": 38890,
+   "sha256": "cd5cb50e1b1973609fb1e067d1333f8511d70abea8b9caa732e262332ebc9770"
+  }
+ }
+}

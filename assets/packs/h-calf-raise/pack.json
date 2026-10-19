@@ -1,0 +1,167 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "h-calf-raise",
+ "version": "1.0.0",
+ "name": {
+  "zh": "扶墙提踵",
+  "en": "Wall-Supported Calf Raise"
+ },
+ "category": "strength",
+ "muscles": [
+  "小腿"
+ ],
+ "muscleGroups": [
+  "calves"
+ ],
+ "equipment": [
+  "wall"
+ ],
+ "position": "standing",
+ "unilateral": false,
+ "level": 1,
+ "scenes": [
+  "home",
+  "office"
+ ],
+ "defaultDose": {
+  "mode": "reps",
+  "sets": 2,
+  "reps": 15,
+  "restSeconds": 30
+ },
+ "cues": {
+  "zh": [
+   "手扶墙，前脚掌站稳",
+   "脚跟抬到最高停一下，慢慢落下"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 1.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": 4.0
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "扶墙提踵"
+    },
+    "ms": {
+     "zh": 1045
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "扶墙提踵，练小腿"
+    },
+    "ms": {
+     "zh": 1881
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "手扶墙，前脚掌站稳"
+    },
+    "ms": {
+     "zh": 2067
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "脚跟抬到最高停一下，慢慢落下"
+    },
+    "ms": {
+     "zh": 2763
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，脚跟抬到最高停一下，慢慢落下"
+    },
+    "ms": {
+     "zh": 5248
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "扶墙提踵，完成"
+    },
+    "ms": {
+     "zh": 1741
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub Drive archive green-screen master, keyed onto #101013 by tools/media/prepare_media.py",
+  "mediaSource": "pose-hub-drive-greenscreen",
+  "spec": "drill-anim/specs/h-calf-raise.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 6597,
+   "sha256": "8a93ab2ac1fc8a556c9e8c7e2c24602b7f92651c2129a34d964f43a54b138405"
+  },
+  "demo.mp4": {
+   "bytes": 81702,
+   "sha256": "b4f577af80aa7b606c9f54a25d0040097532fd85d4795b6f141fc6d57fd63693"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 17910,
+   "sha256": "f9b0c4af57936d544e50e49fc0e07075c983177b74914eaf142094a7ae07b3f1"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 23779,
+   "sha256": "5743f2b78fa0d0aee9fc92b65d439c41cba19c68ac48e3ced036cd321b49deaf"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 15409,
+   "sha256": "2756329cf724a61d972574150a11294dab383cee438fa3b9c91ef505379d4675"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 16519,
+   "sha256": "0348ce2288eee73c959ac48259ffe4aaa44a0dbb1408dfb37a482edd20242e36"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 9588,
+   "sha256": "576c0c2cfe5b775d3e080df8074dceec0921245b06fa3346df164c62467bd867"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 43488,
+   "sha256": "adff9f4a68ff512a2a2d60a5bef2078e41dc6a05538b4f89cdc2470f74b642a2"
+  }
+ }
+}

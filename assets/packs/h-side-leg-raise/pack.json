@@ -1,0 +1,180 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "h-side-leg-raise",
+ "version": "1.0.0",
+ "name": {
+  "zh": "站姿侧抬腿",
+  "en": "Standing Side Leg Raise"
+ },
+ "category": "strength",
+ "muscles": [
+  "臀中肌"
+ ],
+ "muscleGroups": [
+  "hip-abductors"
+ ],
+ "equipment": [],
+ "position": "standing",
+ "unilateral": true,
+ "level": 1,
+ "scenes": [
+  "home",
+  "office"
+ ],
+ "defaultDose": {
+  "mode": "reps",
+  "sets": 2,
+  "reps": 12,
+  "restSeconds": 30
+ },
+ "cues": {
+  "zh": [
+   "身体站直，脚尖朝前",
+   "身体保持直立，腿向侧面抬起再慢慢放下"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 1.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": 4.0,
+  "showsSide": "right"
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "站姿侧抬腿"
+    },
+    "ms": {
+     "zh": 1207
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "站姿侧抬腿，练臀部外侧"
+    },
+    "ms": {
+     "zh": 2461
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "身体站直，脚尖朝前"
+    },
+    "ms": {
+     "zh": 2183
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "身体保持直立，腿向侧面抬起再慢慢放下"
+    },
+    "ms": {
+     "zh": 4040
+    }
+   },
+   {
+    "id": "side_switch",
+    "role": "side_switch",
+    "text": {
+     "zh": "左侧同样，身体保持直立，腿向侧面抬起再慢慢放下"
+    },
+    "ms": {
+     "zh": 5132
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，身体保持直立，腿向侧面抬起再慢慢放下"
+    },
+    "ms": {
+     "zh": 6525
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "站姿侧抬腿，完成"
+    },
+    "ms": {
+     "zh": 1904
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub Drive archive green-screen master, keyed onto #101013 by tools/media/prepare_media.py",
+  "mediaSource": "pose-hub-drive-greenscreen",
+  "spec": "drill-anim/specs/h-side-leg-raise.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 6143,
+   "sha256": "aefc8d9f9f322c3a4c3ab4140237e5fc1a42d246b1f0c9d2060fe8c950d13c6f"
+  },
+  "demo.mp4": {
+   "bytes": 52435,
+   "sha256": "d04bfa91e859fe593fc7a3e6c24e6789051d7dafdba5463f0ca54acbf034e68e"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 18984,
+   "sha256": "ad05ad86a97aee2411908e83231a7f3dabcbc4c322409313f99d0fcd2ce31bd3"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 34259,
+   "sha256": "8938178fca151a41527581ad353cf0e4bb25d0c3867e5ca0d0da8705835346e4"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 16826,
+   "sha256": "ccb0bad0e245a61ceedbf897956e4f3267511d63705b3406850ebf43643196e5"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 21189,
+   "sha256": "cffbb201291891fab4c7dbeee7107e066e93b5fcf2e86029b131f45901527417"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 11041,
+   "sha256": "3db2ae898500697dd5c5027b46bfbd6f6b5fa025b1e571a581cbf4ab3574b0d0"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 54607,
+   "sha256": "3944c9d58426f108fb28041203e01c9f6bef872cab0b23beebc0b9b1009f157d"
+  },
+  "voice/zh/side_switch.m4a": {
+   "bytes": 43252,
+   "sha256": "da6a75730780d4aaef372e98825e5ba66e9a35a5b138dd7405f934a94fcdb33a"
+  }
+ }
+}

@@ -1,0 +1,168 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "n-squat-shift",
+ "version": "1.0.0",
+ "name": {
+  "zh": "低位蹲姿左右移重心",
+  "en": "Low Squat Side-to-Side Shift"
+ },
+ "category": "mobility",
+ "muscles": [
+  "大腿内侧",
+  "臀大肌"
+ ],
+ "muscleGroups": [
+  "adductors",
+  "glute-max"
+ ],
+ "equipment": [],
+ "position": "standing",
+ "unilateral": false,
+ "level": 3,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "time",
+  "sets": 1,
+  "seconds": 30,
+  "restSeconds": 10
+ },
+ "cues": {
+  "zh": [
+   "宽站深蹲",
+   "低蹲，重心慢慢左右移"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [
+  "膝"
+ ],
+ "contraindications": [],
+ "alternative": "h-adductor-rock",
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 2.2,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": null
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "低位蹲姿左右移重心"
+    },
+    "ms": {
+     "zh": 1997
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "低位蹲姿左右移重心，活动大腿内侧和臀部"
+    },
+    "ms": {
+     "zh": 4063
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "宽站深蹲"
+    },
+    "ms": {
+     "zh": 998
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "低蹲，重心慢慢左右移"
+    },
+    "ms": {
+     "zh": 2252
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，低蹲，重心慢慢左右移"
+    },
+    "ms": {
+     "zh": 4760
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "低位蹲姿左右移重心，完成"
+    },
+    "ms": {
+     "zh": 2694
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub v0.2.0 dark soft-v1 clip (as frozen in HipLab), re-encoded 720²",
+  "mediaSource": "pose-hub-v0.2.0",
+  "spec": "drill-anim/specs/n-squat-shift.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 9801,
+   "sha256": "e2aa65005c3fd7f20192062fbe2247f8c66757dfd64dfd9a7d66206b6f99d377"
+  },
+  "demo.mp4": {
+   "bytes": 117039,
+   "sha256": "d0049feeff799b92e2b569006de6907ff6b298416af3383b03f19b9f247e1e2c"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 9141,
+   "sha256": "7761be670afbd49b67c47a853df147d199bd0f516690606176ada623d01ce9a4"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 19609,
+   "sha256": "6a8919ff5afdb44906896ba206e594f6afff3cfe24b80f09e6a5082dde661b0f"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 23253,
+   "sha256": "2c3e65cff06dcc8754b5aa8649da4d448f0b45163099e40e1065a3cb3e951454"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 34510,
+   "sha256": "f006d47add1e43c34e375f01a6438bbac3380121cd3319d1965f94d139119bdf"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 17412,
+   "sha256": "7b56ab2929bfe6ee2a3fb8d9e7323deb71ee7a21895c15177723fa7b6cb2da00"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 40042,
+   "sha256": "057f567944123797c0379a5b31d8f6bca755142c96820b89fe155b0e725f797c"
+  }
+ }
+}

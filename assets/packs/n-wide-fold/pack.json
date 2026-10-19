@@ -1,0 +1,186 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "n-wide-fold",
+ "version": "1.0.0",
+ "name": {
+  "zh": "站姿宽距体前屈（扶椅）",
+  "en": "Standing Wide-Leg Fold (Chair)"
+ },
+ "category": "stretch",
+ "muscles": [
+  "大腿内侧",
+  "腘绳肌"
+ ],
+ "muscleGroups": [
+  "adductors",
+  "hamstrings"
+ ],
+ "equipment": [
+  "chair"
+ ],
+ "position": "standing",
+ "unilateral": false,
+ "level": 1,
+ "scenes": [
+  "home",
+  "office"
+ ],
+ "defaultDose": {
+  "mode": "time",
+  "sets": 1,
+  "seconds": 30,
+  "restSeconds": 10
+ },
+ "cues": {
+  "zh": [
+   "双脚宽站，手扶椅",
+   "双脚分开，扶住椅子，从髋部往前折",
+   "背平向前倾，大腿内后侧拉长"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [
+  "腰"
+ ],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 3.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": null
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "站姿宽距体前屈，扶椅"
+    },
+    "ms": {
+     "zh": 2252
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "站姿宽距体前屈，扶椅，拉伸大腿内侧和大腿后侧"
+    },
+    "ms": {
+     "zh": 4899
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "双脚宽站，手扶椅"
+    },
+    "ms": {
+     "zh": 1950
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "双脚分开，扶住椅子，从髋部往前折"
+    },
+    "ms": {
+     "zh": 3460
+    }
+   },
+   {
+    "id": "cue3",
+    "role": "cue",
+    "text": {
+     "zh": "背平向前倾，大腿内后侧拉长"
+    },
+    "ms": {
+     "zh": 2972
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，背平向前倾，大腿内后侧拉长"
+    },
+    "ms": {
+     "zh": 5410
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "站姿宽距体前屈，扶椅，完成"
+    },
+    "ms": {
+     "zh": 2972
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub v0.2.0 dark soft-v1 clip (as frozen in HipLab), re-encoded 720²",
+  "mediaSource": "pose-hub-v0.2.0",
+  "spec": "drill-anim/specs/n-wide-fold.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 14503,
+   "sha256": "c1b3eb390bad2ea9ab94bac0786b334488a1b0887e0d8e10f9fcbdbf79897e1b"
+  },
+  "demo.mp4": {
+   "bytes": 184777,
+   "sha256": "b7b639e3c2cf3ff241f51ee56176c8e74f6b8733480ae038f78b33c78d140527"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 17159,
+   "sha256": "2137501d6a7657e3b14fa9249a00ebbf07d1a86fd1ed52c3aca909f7ad42d53c"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 29541,
+   "sha256": "9bbac8e518e5716c23f066e24d9e6f104a5d4d1225e0d1886142167a27c25b29"
+  },
+  "voice/zh/cue3.m4a": {
+   "bytes": 25320,
+   "sha256": "747bca75751e896368f4f86ca1bd84ce369b8e337ad8a406e91c9939af82f09c"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 25431,
+   "sha256": "29a9c13b96ef522cd8a85e451a9f60e1b7242412b5e0609bb2a263a5a0a9a2d0"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 41311,
+   "sha256": "1e46c179f7193aead7e2a177f31cbaf171719fc28489111b0013cb63be941838"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 19572,
+   "sha256": "574ae3b21c26e66aa6d69dfe91206bc9aa2f3c2e709011451174c6e1023820f1"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 45135,
+   "sha256": "350de8af0766ab3ba4eeab72f1749a494ffc86aaecaae139b3a11169ba8cbd0d"
+  }
+ }
+}

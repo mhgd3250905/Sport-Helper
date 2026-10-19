@@ -1,0 +1,185 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "h-db-floor-press",
+ "version": "1.0.0",
+ "name": {
+  "zh": "哑铃地板卧推",
+  "en": "Dumbbell Floor Press"
+ },
+ "category": "strength",
+ "muscles": [
+  "胸大肌",
+  "肱三头肌"
+ ],
+ "muscleGroups": [
+  "chest",
+  "triceps"
+ ],
+ "equipment": [
+  "dumbbell"
+ ],
+ "position": "supine",
+ "unilateral": false,
+ "level": 1,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "reps",
+  "sets": 3,
+  "reps": 10,
+  "restSeconds": 30
+ },
+ "cues": {
+  "zh": [
+   "仰卧屈膝，上臂贴地起始",
+   "大臂与身体约四十五度，推起时哑铃在胸口正上方",
+   "向上推直，再慢慢落回"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [
+  "肩"
+ ],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 1.0,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": 4.0
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "哑铃地板卧推"
+    },
+    "ms": {
+     "zh": 1324
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "哑铃地板卧推，练胸部和手臂后侧"
+    },
+    "ms": {
+     "zh": 3181
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "仰卧屈膝，上臂贴地起始"
+    },
+    "ms": {
+     "zh": 2438
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "大臂与身体约四十五度，推起时哑铃在胸口正上方"
+    },
+    "ms": {
+     "zh": 4714
+    }
+   },
+   {
+    "id": "cue3",
+    "role": "cue",
+    "text": {
+     "zh": "向上推直，再慢慢落回"
+    },
+    "ms": {
+     "zh": 2299
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，向上推直，再慢慢落回"
+    },
+    "ms": {
+     "zh": 4807
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "哑铃地板卧推，完成"
+    },
+    "ms": {
+     "zh": 2020
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub Drive archive green-screen master, keyed onto #101013 by tools/media/prepare_media.py",
+  "mediaSource": "pose-hub-drive-greenscreen",
+  "spec": "drill-anim/specs/h-db-floor-press.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 8366,
+   "sha256": "3e60830bb784907e9b15d3b872e936736047f17e771f890f30df3916b19bddb2"
+  },
+  "demo.mp4": {
+   "bytes": 124833,
+   "sha256": "7eb133b17d62994c12d6da01e0580dcb6f359a0831ddaa65312e927ab5d99bd0"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 21039,
+   "sha256": "c0348d607486599ba4d6e9ed1f5453d4fbd730530d963bab248894f8a36135e8"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 39776,
+   "sha256": "2680e6e2cead6d7bbd16e95a220bc8951d780ea1d0d9f6cbbc6dd44646be4aa8"
+  },
+  "voice/zh/cue3.m4a": {
+   "bytes": 20035,
+   "sha256": "1f81ed4abe0f2737f65e2cb6f11f00f3b81cf082e55067cd7feeabad5093b2ac"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 17495,
+   "sha256": "4e83e9c29b7ec3ab48fc7ce4fc1b387cf8bb422433227738b96d75ec5d0c9005"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 27229,
+   "sha256": "028c63d31867a3f352818f04244376b0b8c34c835ab96abbfa1da6cb1bd4b497"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 11921,
+   "sha256": "a8f0e2273603be75d77e6ef5ea53958501dbfb0af5a1854ff2d992b2439a789c"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 39274,
+   "sha256": "5c2e12ab0289e818765644fbf5429f8acb8b81c06ec398b25662f66676e54d73"
+  }
+ }
+}

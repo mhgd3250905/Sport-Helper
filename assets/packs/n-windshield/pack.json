@@ -1,0 +1,168 @@
+{
+ "format": "drill-pack",
+ "formatVersion": 1,
+ "kind": "exercise",
+ "id": "n-windshield",
+ "version": "1.0.0",
+ "name": {
+  "zh": "仰卧雨刷式",
+  "en": "Supine Windshield Wipers"
+ },
+ "category": "mobility",
+ "muscles": [
+  "臀大肌",
+  "臀中肌"
+ ],
+ "muscleGroups": [
+  "glute-max",
+  "hip-abductors"
+ ],
+ "equipment": [
+  "mat"
+ ],
+ "position": "supine",
+ "unilateral": false,
+ "level": 1,
+ "scenes": [
+  "home"
+ ],
+ "defaultDose": {
+  "mode": "reps",
+  "sets": 1,
+  "reps": 8,
+  "restSeconds": 10
+ },
+ "cues": {
+  "zh": [
+   "仰卧屈膝，双脚宽踩",
+   "双膝一起慢慢左右倒，肩膀贴地"
+  ]
+ },
+ "primaryCue": 1,
+ "cautions": [],
+ "contraindications": [],
+ "alternative": null,
+ "media": {
+  "cover": "cover.jpg",
+  "coverSeconds": 2.2,
+  "video": "demo.mp4",
+  "width": 720,
+  "height": 720,
+  "loopSeconds": 8.0,
+  "repSeconds": 3.0
+ },
+ "voice": {
+  "languages": [
+   "zh"
+  ],
+  "voices": {
+   "zh": "zh-CN-XiaoxiaoNeural"
+  },
+  "requires": "_common",
+  "lines": [
+   {
+    "id": "name",
+    "role": "name",
+    "text": {
+     "zh": "仰卧雨刷式"
+    },
+    "ms": {
+     "zh": 1161
+    }
+   },
+   {
+    "id": "intro",
+    "role": "intro",
+    "text": {
+     "zh": "仰卧雨刷式，活动臀部"
+    },
+    "ms": {
+     "zh": 2159
+    }
+   },
+   {
+    "id": "cue1",
+    "role": "cue",
+    "text": {
+     "zh": "仰卧屈膝，双脚宽踩"
+    },
+    "ms": {
+     "zh": 2113
+    }
+   },
+   {
+    "id": "cue2",
+    "role": "cue",
+    "text": {
+     "zh": "双膝一起慢慢左右倒，肩膀贴地"
+    },
+    "ms": {
+     "zh": 3111
+    }
+   },
+   {
+    "id": "rest",
+    "role": "rest",
+    "text": {
+     "zh": "放松一下。下一组记住，双膝一起慢慢左右倒，肩膀贴地"
+    },
+    "ms": {
+     "zh": 5642
+    }
+   },
+   {
+    "id": "finish",
+    "role": "finish",
+    "text": {
+     "zh": "仰卧雨刷式，完成"
+    },
+    "ms": {
+     "zh": 1881
+    }
+   }
+  ],
+  "postProcess": "HipLab v4.1: edge trim, -16 LUFS fixed gain, alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz"
+ },
+ "credits": {
+  "media": "3D-Pose-Hub v0.2.0 dark soft-v1 clip (as frozen in HipLab), re-encoded 720²",
+  "mediaSource": "pose-hub-v0.2.0",
+  "spec": "drill-anim/specs/n-windshield.js",
+  "license": "Snow Rig © Blender Foundation | studio.blender.org — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified Snow-derived training character rendered with the 3D-Body drill renderer.",
+  "voice": "edge-tts (Microsoft neural voice zh-CN-XiaoxiaoNeural); commercial terms unclear — regenerate with Azure Speech before a store release.",
+  "text": "SmartFit (智能健身助手) authors, 2026-10-19"
+ },
+ "files": {
+  "cover.jpg": {
+   "bytes": 11608,
+   "sha256": "1ae83583717c7b708a3f4fa6ce1ee1747fc4f2c770024890b9019c245194a504"
+  },
+  "demo.mp4": {
+   "bytes": 158100,
+   "sha256": "121b9bf616daa5d081fcabd6af9f3de7946c20f7967e9aceeeb68d9effc6d2ac"
+  },
+  "voice/zh/cue1.m4a": {
+   "bytes": 18411,
+   "sha256": "b5b0adbd85f1006714176cc96c9ba928fed80ab15fc4188413b6262494f8a555"
+  },
+  "voice/zh/cue2.m4a": {
+   "bytes": 26674,
+   "sha256": "afae8ffa88de5187602d7e404ee44d818b44cc2f4dfad6808796c744a8bc3040"
+  },
+  "voice/zh/finish.m4a": {
+   "bytes": 16386,
+   "sha256": "93e9de59d3502692a2e18fe9dce2a0347e943268a47637acdabd56e4a5719ed7"
+  },
+  "voice/zh/intro.m4a": {
+   "bytes": 18855,
+   "sha256": "9fbdf77e687351d44d826959219be7339b601bc2d18095308a54747de3e1e901"
+  },
+  "voice/zh/name.m4a": {
+   "bytes": 10695,
+   "sha256": "50b247f57627d49282f19f9fd2d8620b8fe16936ff2df6597b1c40b2b13a14c1"
+  },
+  "voice/zh/rest.m4a": {
+   "bytes": 46701,
+   "sha256": "bc9f8e8b45763d2719a26717b661998b75dd10f502766cb37e4d5b7d16a936e0"
+  }
+ }
+}
