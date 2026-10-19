@@ -1,5 +1,7 @@
 # 智能健身助手（SmartFit）交接说明
 
+> 输入与设备检查点（2026-10-19）：`m6-input-focus` 修复对话输入框上下留白点不到的问题，新增 4 项回归，全量 102 项测试及 Web release / Android debug 构建通过；已覆盖安装到小米 Android 16，用户确认输入测试通过。目前手机为搜狗输入法，USB 调试保持连接。完整媒体、系统中断及 release 验收仍见 [acceptance.md](acceptance.md)。
+
 > 最新本机复验（2026-10-19）：PR #1 已合入 main（`adafcf9`，`m4-drill-packs`）；PR #2 已改 base 为 main，本机修复安全入口、保存复用约束与小屏交互后，98 项测试、截图检查及 Web release / Android debug 构建通过。见 [PR #2 审核记录](pr2-local-review.md) 和 [验收记录](acceptance.md)。下文保留各阶段历史；Android 真机与 release 签名尚未验收，`m3-local-verified` 未打。
 
 > 动作包迁移记录（2026-10-19）：动作库、视频、语音已改为「动作小包」`assets/packs/<id>/`，`assets/library/exercises.json`、`assets/drill_media/`、`assets/voice/` 及 `tools/library/build_library.py` 已移除。格式见 [drill-pack-spec.md](drill-pack-spec.md)，语音审计见 [voice-audit-2026-10-19.md](voice-audit-2026-10-19.md)。下文路径为旧结构。

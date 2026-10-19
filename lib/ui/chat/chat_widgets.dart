@@ -387,29 +387,28 @@ class _ChatInputBarState extends State<ChatInputBar> {
                   else
                     const SizedBox(width: SfSpace.x3),
                   Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      child: TextField(
-                        key: const ValueKey('chat-input'),
-                        controller: _text,
-                        focusNode: _focus,
-                        minLines: 1,
-                        maxLines: 4,
-                        textInputAction: TextInputAction.send,
-                        style: TextStyle(color: SfColors.text, fontSize: 16, height: 1.5),
-                        decoration: InputDecoration(
-                          isCollapsed: true,
-                          contentPadding: EdgeInsets.zero,
-                          filled: false,
-                          border: InputBorder.none,
-                          enabledBorder: InputBorder.none,
-                          focusedBorder: InputBorder.none,
-                          hintText: '说说想怎么练…',
-                          hintStyle: TextStyle(color: SfColors.faint, fontSize: 16, height: 1.5),
-                        ),
-                        onChanged: (_) => setState(() {}),
-                        onSubmitted: (_) => _submit(),
+                    child: TextField(
+                      key: const ValueKey('chat-input'),
+                      controller: _text,
+                      focusNode: _focus,
+                      minLines: 1,
+                      maxLines: 4,
+                      textInputAction: TextInputAction.send,
+                      style: TextStyle(color: SfColors.text, fontSize: 16, height: 1.5),
+                      decoration: InputDecoration(
+                        // Keep the whole capsule's input area tappable,
+                        // including the space above and below the text.
+                        isDense: true,
+                        contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                        filled: false,
+                        border: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        hintText: '说说想怎么练…',
+                        hintStyle: TextStyle(color: SfColors.faint, fontSize: 16, height: 1.5),
                       ),
+                      onChanged: (_) => setState(() {}),
+                      onSubmitted: (_) => _submit(),
                     ),
                   ),
                   Padding(
