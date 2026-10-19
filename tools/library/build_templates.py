@@ -7,7 +7,8 @@ Unspecified fields fall back to the exercise's default dose. Edit here and re-ru
 import json, re
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
-LIB = {e['id']: e for e in json.loads((ROOT/'assets/library/exercises.json').read_text())['exercises']}
+# Exercise metadata lives in the drill packs (docs/drill-pack-spec.md).
+LIB = {p['id']: {**p, 'dose': p['defaultDose']} for p in (json.loads(f.read_text(encoding='utf-8')) for f in sorted((ROOT/'assets/packs').glob('*/pack.json'))) if p['kind'] == 'exercise'}
 
 def item(s, typ='main'):
     m = re.fullmatch(r'([\w-]+?)(?::(\d+))?(?:x(\d+)|@(\d+))?(?:~(\d+))?', s)

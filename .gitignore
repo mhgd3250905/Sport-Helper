@@ -50,6 +50,9 @@ tools/voice/.cache/
 
 # SmartFit
 tools/voice/.cache/
+tools/voice/.raw-cache/
+tools/voice/.voice-cache/
+__pycache__/
 android/key.properties
 *.apk
 *.aab
