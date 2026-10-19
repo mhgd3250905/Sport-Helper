@@ -1,6 +1,7 @@
 """Screenshots of the chat home from the web build of
 test_screens/web_shots_main.dart (see that file). Usage:
   PYTHONPATH=<playwright> python3 tools/shots/chat_shots.py <build/web> <out dir> shot[:file[:steps]] ...
+shot may end in @light for the light palette (card@light:chat-card-light).
 steps (after the page has settled), '|'-separated: cX,Y = click at CSS px
 (the mouse then leaves the page so no hover tooltip shows), wS = wait S s. E.g. card:chat-player-work:c138,691|w3|c287,790|w1.5
 Serves the build on 127.0.0.1:8767, renders a 390x844 phone at 3x.
@@ -21,7 +22,8 @@ with sync_playwright() as p:
         file, _, steps = rest.partition(':')
         page = b.new_page(viewport={'width': 390, 'height': 844}, device_scale_factor=3)
         page.on('console', lambda m: print('  console:', m.text[:300]) if 'rror' in m.text else None)
-        page.goto(f'http://127.0.0.1:8767/?shot={name}', wait_until='load', timeout=60000)
+        q = name.replace('@', '&theme=')  # e.g. card@light
+        page.goto(f'http://127.0.0.1:8767/?shot={q}', wait_until='load', timeout=60000)
         page.wait_for_selector('flutter-view', timeout=60000)
         time.sleep(float(os.environ.get('SHOT_WAIT', '6')))
         for step in filter(None, steps.split('|')):

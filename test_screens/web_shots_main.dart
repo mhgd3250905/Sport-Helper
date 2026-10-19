@@ -35,6 +35,8 @@ Future<void> main() async {
     voiceOutput: const MutedVoiceOutput(),
     chatReplyDelay: Duration.zero,
   );
+  // ?theme=light shoots the light (白色无边空间) palette.
+  if (Uri.base.queryParameters['theme'] case final t?) await store.setAppearance(t);
   if (!shot.startsWith('opening')) await store.acceptSafety(blocked: false);
   final chat = services.chat..start();
   switch (shot) {
@@ -70,6 +72,10 @@ Future<void> main() async {
       await chat.send('再短一点');
   }
   runApp(SmartFitApp(services: services, fontFamily: 'NotoSansSC'));
+  if (shot == 'library') {
+    await Future<void>.delayed(const Duration(seconds: 2));
+    chat.command('@library');
+  }
   if (shot == 'drawer') {
     await Future<void>.delayed(const Duration(seconds: 2));
     chat.command('@drawer');

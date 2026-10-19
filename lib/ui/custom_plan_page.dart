@@ -108,10 +108,10 @@ class _CustomPlanPageState extends State<CustomPlanPage> {
               ),
               onChanged: (_) => setState(() {}),
             ),
-            const Padding(
-              padding: EdgeInsets.only(top: 6, bottom: 8),
+            Padding(
+              padding: const EdgeInsets.only(top: 6, bottom: 8),
               child: Text('描述里提到的场景、时长、器械、水平和不适部位会自动识别，并优先于下方选项。',
-                  style: TextStyle(color: SfColors.muted, fontSize: 12)),
+                  style: SfType.caption.copyWith(color: SfColors.muted)),
             ),
             SizedBox(
               height: 36,
@@ -207,7 +207,7 @@ class _CustomPlanPageState extends State<CustomPlanPage> {
             FilledButton.icon(
               key: const ValueKey('generate'),
               onPressed: _busy ? null : () => _generate(),
-              icon: const Icon(Icons.auto_awesome_rounded),
+              icon: const SfIcon(SfGlyph.sparkle, size: 18),
               label: Text(_busy ? '生成中…' : '生成训练计划'),
             ),
             const SizedBox(height: 28),
@@ -225,14 +225,14 @@ class _CustomPlanPageState extends State<CustomPlanPage> {
               for (final h in s.store.history.take(5))
                 ListTile(
                   contentPadding: EdgeInsets.zero,
-                  leading: Icon(
-                    h.completed >= h.total ? Icons.check_circle_rounded : Icons.timelapse_rounded,
-                    color: h.completed >= h.total ? SfColors.ok : SfColors.warn,
+                  leading: SfIcon(
+                    h.completed >= h.total ? SfGlyph.checkCircle : SfGlyph.clock,
+                    color: h.completed >= h.total ? SfColors.accentText : SfColors.muted,
                   ),
                   title: Text(h.title),
                   subtitle: Text(
                     '${h.at.month}月${h.at.day}日 · ${h.minutes} 分钟 · 完成 ${h.completed}/${h.total} 个动作',
-                    style: const TextStyle(color: SfColors.muted),
+                    style: TextStyle(color: SfColors.muted),
                   ),
                 ),
             ],
@@ -257,7 +257,7 @@ class _CustomPlanPageState extends State<CustomPlanPage> {
 
   Widget _section(String title) => Padding(
     padding: const EdgeInsets.only(top: 14, bottom: 8),
-    child: Text(title, style: const TextStyle(color: SfColors.muted, fontSize: 14)),
+    child: Text(title, style: TextStyle(color: SfColors.muted, fontSize: 14)),
   );
 
   Widget _templateCard(PlanTemplate t) {
@@ -278,9 +278,9 @@ class _CustomPlanPageState extends State<CustomPlanPage> {
                   width: 64,
                   height: 64,
                   child: first == null
-                      ? const ColoredBox(color: SfColors.surface2)
+                      ? ColoredBox(color: SfColors.surfaceHigh)
                       : Image.asset(first.media.poster, fit: BoxFit.cover,
-                          errorBuilder: (_, _, _) => const ColoredBox(color: SfColors.surface2)),
+                          errorBuilder: (_, _, _) => ColoredBox(color: SfColors.surfaceHigh)),
                 ),
               ),
               const SizedBox(width: 12),
@@ -291,16 +291,16 @@ class _CustomPlanPageState extends State<CustomPlanPage> {
                     Text(t.name, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                     const SizedBox(height: 4),
                     Text(t.summary, maxLines: 2, overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(color: SfColors.muted, fontSize: 13, height: 1.4)),
+                        style: TextStyle(color: SfColors.muted, fontSize: 13, height: 1.4)),
                   ],
                 ),
               ),
               const SizedBox(width: 8),
               Column(
                 children: [
-                  Text('${t.minutes}′', style: const TextStyle(color: SfColors.accent, fontSize: 16, fontWeight: FontWeight.w700)),
+                  Text('${t.minutes}′', style: SfType.callout.copyWith(fontWeight: FontWeight.w700)),
                   Text(t.scenes.contains('office') ? (t.scenes.length > 1 ? '通用' : '办公室') : '居家',
-                      style: const TextStyle(color: SfColors.muted, fontSize: 12)),
+                      style: TextStyle(color: SfColors.muted, fontSize: 12)),
                 ],
               ),
             ],

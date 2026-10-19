@@ -23,10 +23,10 @@ class _LibraryPageState extends State<LibraryPage> {
       appBar: AppBar(title: Text('动作库 · ${lib.length}')),
       body: Column(children: [
         SizedBox(
-          height: 48,
+          height: 52,
           child: ListView(
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 12),
+            padding: const EdgeInsets.fromLTRB(SfSpace.x4, SfSpace.x1, SfSpace.x4, SfSpace.x2),
             children: [
               Padding(
                 padding: const EdgeInsets.only(right: 8),
@@ -44,34 +44,38 @@ class _LibraryPageState extends State<LibraryPage> {
         ),
         Expanded(
           child: GridView.builder(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.fromLTRB(SfSpace.x4, SfSpace.x1, SfSpace.x4, SfSpace.x6),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2, mainAxisSpacing: 10, crossAxisSpacing: 10, childAspectRatio: .78),
+              crossAxisCount: 2, mainAxisSpacing: SfSpace.x3, crossAxisSpacing: SfSpace.x3, childAspectRatio: .76),
             itemCount: list.length,
             itemBuilder: (_, i) {
               final e = list[i];
-              return InkWell(
-                borderRadius: BorderRadius.circular(14),
+              return SfPressable(
+                semanticLabel: e.name,
                 onTap: () => _show(e),
-                child: Container(
-                  decoration: BoxDecoration(color: SfColors.surface, borderRadius: BorderRadius.circular(14)),
+                child: SfPanel(
+                  padding: const EdgeInsets.all(6),
+                  radius: SfRadius.md + 2,
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     ClipRRect(
-                      borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
+                      borderRadius: BorderRadius.circular(SfRadius.sm),
                       child: AspectRatio(aspectRatio: 1,
-                          child: Image.asset(e.media.poster, fit: BoxFit.cover,
-                              errorBuilder: (_, _, _) => const ColoredBox(color: SfColors.bg))),
+                          child: ColoredBox(
+                            color: SfColors.mediaStage,
+                            child: Image.asset(e.media.poster, fit: BoxFit.cover,
+                                errorBuilder: (_, _, _) => const SizedBox.shrink()),
+                          )),
                     ),
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(10, 8, 10, 0),
+                      padding: const EdgeInsets.fromLTRB(6, 10, 6, 0),
                       child: Text(e.name, maxLines: 1, overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(fontWeight: FontWeight.w600)),
+                          style: SfType.callout.copyWith(fontWeight: FontWeight.w600)),
                     ),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      padding: const EdgeInsets.fromLTRB(6, 2, 6, 0),
                       child: Text('${e.category.zh} · ${levelZh(e.level)} · ${e.equipment.isEmpty ? '徒手' : e.equipment.map((q) => q.zh).join('/')}',
                           maxLines: 1, overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(color: SfColors.muted, fontSize: 12)),
+                          style: SfType.caption.copyWith(color: SfColors.muted)),
                     ),
                   ]),
                 ),
@@ -86,21 +90,22 @@ class _LibraryPageState extends State<LibraryPage> {
   void _show(Exercise e) => showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
-    backgroundColor: SfColors.surface,
     builder: (c) => SafeArea(
       child: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(SfSpace.x4, 0, SfSpace.x4, SfSpace.x4),
         child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-          ExerciseVideo(exercise: e),
-          const SizedBox(height: 10),
-          Text(e.name, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
-          const SizedBox(height: 4),
-          Text('要领：${e.cue}', style: const TextStyle(height: 1.5)),
-          Text('目标：${e.muscles.join('、')}${e.unilateral ? ' · 左右各做' : ''}',
-              style: const TextStyle(color: SfColors.muted)),
-          if (e.cautions.isNotEmpty)
+          ExerciseVideo(exercise: e, radius: SfRadius.lg),
+          const SizedBox(height: SfSpace.x4),
+          Text(e.name, style: SfType.title),
+          const SizedBox(height: SfSpace.x1),
+          Text('目标：${e.muscles.join('、')}${e.unilateral ? ' · 左右各做' : ''}', style: SfType.label),
+          const SizedBox(height: SfSpace.x3),
+          Text('要领：${e.cue}', style: SfType.body.copyWith(fontSize: 15)),
+          if (e.cautions.isNotEmpty) ...[
+            const SizedBox(height: SfSpace.x2),
             Text('注意：${e.cautions.join('、')}不适时减小幅度或换动作',
-                style: const TextStyle(color: SfColors.warn, fontSize: 13)),
+                style: SfType.label.copyWith(color: SfColors.caution)),
+          ],
         ]),
       ),
     ),

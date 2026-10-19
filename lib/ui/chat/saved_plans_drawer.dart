@@ -4,7 +4,6 @@ import '../../data/app_store.dart';
 import '../../domain/exercise.dart';
 import '../../domain/saved_plan.dart';
 import '../../domain/session.dart';
-import '../theme.dart' show minutesZh;
 import '../theme/sf_icons.dart';
 import '../theme/tokens.dart';
 import '../theme/widgets.dart';
@@ -234,7 +233,7 @@ class _SavedTile extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      '${minutesZh(secs)} · ${p.items.length} 个动作',
+                      '${(secs / 60).round().clamp(1, 999)} 分钟 · ${p.items.length} 个动作',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: SfType.label.copyWith(fontSize: 12.5),

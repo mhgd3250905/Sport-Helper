@@ -79,7 +79,7 @@ void main() {
     await s.store.acceptSafety(blocked: false);
     Widget app(Widget home) => AppScope(
       services: s,
-      child: MaterialApp(key: UniqueKey(), theme: buildTheme(fontFamily: 'NotoSansSC'), home: home),
+      child: MaterialApp(key: UniqueKey(), theme: buildTheme(), home: home),
     );
     await tester.pumpWidget(app(const CustomPlanPage()));
     await tester.pumpAndSettle();

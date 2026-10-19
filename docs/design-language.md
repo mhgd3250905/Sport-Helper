@@ -152,3 +152,17 @@
 ### 3.6 不改的东西
 
 功能逻辑、`ChatEngine` 接口、语音时序、视频镜像（左侧 `Transform.flip`）、中断恢复、记录逻辑、所有测试用的 `ValueKey` 与文案（`plan-start-*`、`plan-save-*`、`pause`、`skip`、`prev`、`close`、`discomfort`、`counter`、`finish`、`chat-input`、`chat-send`、`open-plans`、`saved-*`、「已保存」「已暂停」「训练完成！」「今天先到这里」「结束」等）都保持。
+
+## 4. 结果
+
+| 对比 | 图 |
+|---|---|
+| 首页 / 计划卡片（深色）：HipLab 首页 · 上一版 · 本次 | ![](screenshots/design-compare-home.png) |
+| 跟练页（深色）：HipLab 训练页 · 上一版 · 本次 | ![](screenshots/design-compare-player.png) |
+| 浅色：HipLab 浅色首页 / 训练页 · SmartFit 浅色卡片 / 跟练 | ![](screenshots/design-compare-light.png) |
+
+单屏截图（390×844，Flutter Web + 无头 Chromium，3×）：`docs/screenshots/chat-opening.png`、`chat-safety.png`、`chat-ask.png`、`chat-card.png`、`chat-drawer.png`、`chat-player-prep.png`、`chat-player-work.png`、`chat-player-rest.png`、`chat-library.png`，浅色 `chat-card-light.png`、`chat-player-work-light.png`、`chat-drawer-light.png`。复现：`tools/shots/chat_shots.py`（镜头名后加 `@light` 拍浅色）。
+
+自审后改过的一轮：输入框继承了主题的 contentPadding（左侧空一截、整条偏高）→ 显式置零；抽屉里元信息折行（“10 个动\n作”）→ 去掉“约”、练过时间单独一行；跟练页训练中下半屏空 → 加「下一个」条（HipLab 同款）。
+
+已知局限：Web 截图里视频是封面静帧（平台视图在 Web 由海报代替）；阴影按 Chromium 渲染，真机需再看浅色卡片阴影强度。

@@ -86,6 +86,16 @@ ThemeData buildTheme([SfPalette p = SfPalette.dark]) {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(SfRadius.md)),
     ),
     listTileTheme: ListTileThemeData(textColor: p.text, iconColor: p.muted),
+    cardTheme: CardThemeData(
+      color: p.surface,
+      surfaceTintColor: Colors.transparent,
+      elevation: 0,
+      margin: EdgeInsets.zero,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(SfRadius.md + 2),
+        side: p.isDark ? BorderSide.none : BorderSide(color: p.line),
+      ),
+    ),
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(
         foregroundColor: p.accentText,

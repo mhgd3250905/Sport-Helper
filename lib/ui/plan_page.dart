@@ -87,7 +87,7 @@ class _PlanPageState extends State<PlanPage> {
               );
               if (mounted) setState(() => _previewOn = true);
             },
-            icon: const Icon(Icons.play_arrow_rounded),
+            icon: const SfIcon(SfGlyph.play, size: 20, filled: true),
             label: const Text('开始跟练'),
           ),
         ),
@@ -95,16 +95,16 @@ class _PlanPageState extends State<PlanPage> {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
         children: [
-          Text(_plan.summary, style: const TextStyle(color: SfColors.muted, height: 1.5)),
+          Text(_plan.summary, style: TextStyle(color: SfColors.muted, height: 1.5)),
           const SizedBox(height: 10),
           Wrap(
             spacing: 8,
             runSpacing: 6,
             children: [
-              _pill(Icons.schedule_rounded, minutesZh(seconds)),
-              _pill(Icons.fitness_center_rounded, '$count 个动作'),
-              _pill(Icons.trending_up_rounded, levelZh(_plan.level)),
-              _pill(Icons.place_outlined, _plan.scene == 'office' ? '办公室' : '居家'),
+              _pill(SfGlyph.clock, minutesZh(seconds)),
+              _pill(SfGlyph.figure, '$count 个动作'),
+              _pill(SfGlyph.progress, levelZh(_plan.level)),
+              _pill(_plan.scene == 'office' ? SfGlyph.chair : SfGlyph.home, _plan.scene == 'office' ? '办公室' : '居家'),
             ],
           ),
           const SizedBox(height: 14),
@@ -118,7 +118,7 @@ class _PlanPageState extends State<PlanPage> {
             Text(selected.name, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
             const SizedBox(height: 4),
             Text('要领：${selected.cue}', style: const TextStyle(height: 1.5)),
-            Text('目标：${selected.muscles.join('、')}', style: const TextStyle(color: SfColors.muted, fontSize: 13)),
+            Text('目标：${selected.muscles.join('、')}', style: TextStyle(color: SfColors.muted, fontSize: 13)),
           ],
           if (_plan.notes.isNotEmpty) ...[
             const SizedBox(height: 12),
@@ -131,7 +131,7 @@ class _PlanPageState extends State<PlanPage> {
                   const Text('已按你的情况调整', style: TextStyle(fontWeight: FontWeight.w600)),
                   const SizedBox(height: 4),
                   for (final n in _plan.notes)
-                    Text('· $n', style: const TextStyle(color: SfColors.muted, fontSize: 13, height: 1.5)),
+                    Text('· $n', style: TextStyle(color: SfColors.muted, fontSize: 13, height: 1.5)),
                 ],
               ),
             ),
@@ -145,17 +145,17 @@ class _PlanPageState extends State<PlanPage> {
           ],
           const SizedBox(height: 16),
           for (final n in _plan.safetyNotes)
-            Text('⚠ $n', style: const TextStyle(color: SfColors.muted, fontSize: 12, height: 1.6)),
+            Text('⚠ $n', style: TextStyle(color: SfColors.muted, fontSize: 12, height: 1.6)),
         ],
       ),
     );
   }
 
-  Widget _pill(IconData icon, String text) => Container(
+  Widget _pill(SfGlyph icon, String text) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-    decoration: BoxDecoration(color: SfColors.surface2, borderRadius: BorderRadius.circular(20)),
+    decoration: BoxDecoration(color: SfColors.surfaceHigh, borderRadius: BorderRadius.circular(20)),
     child: Row(mainAxisSize: MainAxisSize.min, children: [
-      Icon(icon, size: 16, color: SfColors.accent),
+      SfIcon(icon, size: 16, color: SfColors.muted),
       const SizedBox(width: 4),
       Text(text, style: const TextStyle(fontSize: 13)),
     ]),
@@ -182,7 +182,7 @@ class _PlanPageState extends State<PlanPage> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Material(
-        color: sel ? SfColors.surface2 : SfColors.surface,
+        color: sel ? SfColors.surfaceHigh : SfColors.surface,
         borderRadius: BorderRadius.circular(14),
         child: InkWell(
           key: ValueKey('item-${e.id}'),
@@ -204,17 +204,17 @@ class _PlanPageState extends State<PlanPage> {
                     children: [
                       Text(e.name, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
                       const SizedBox(height: 3),
-                      Text(dose, style: const TextStyle(color: SfColors.accent, fontSize: 14)),
+                      Text(dose, style: SfType.label.copyWith(color: SfColors.accentText, fontWeight: FontWeight.w600)),
                       Text('${e.category.zh} · ${e.muscles.join('、')}',
                           maxLines: 1, overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(color: SfColors.muted, fontSize: 12)),
+                          style: TextStyle(color: SfColors.muted, fontSize: 12)),
                     ],
                   ),
                 ),
                 if (e.alternative != null)
                   IconButton(
                     tooltip: '换一个',
-                    icon: const Icon(Icons.swap_horiz_rounded, color: SfColors.muted),
+                    icon: SfIcon(SfGlyph.swap, size: 20, color: SfColors.muted),
                     onPressed: () => _swap(bi, ii),
                   ),
               ],
