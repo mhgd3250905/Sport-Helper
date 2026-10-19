@@ -227,8 +227,9 @@ def cmd_build(a):
         unique[cache_key(text, voice, RATE[lang])] = (text, voice, RATE[lang])
     print(f'{len(jobs)} clips in {len({j[0] for j in jobs})} packs, {len(unique)} unique renders',
           flush=True)
+    clean_env = _no_proxy_env()
     os.environ.clear()
-    os.environ.update(_no_proxy_env())
+    os.environ.update(clean_env)
     finished = asyncio.run(render(unique, time.time() + (a.budget or 1e9)))
     left = sum(1 for k in unique if not (CACHE / f'{k}.m4a').exists())
     if not finished or left:
