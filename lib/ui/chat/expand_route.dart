@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../theme/tokens.dart';
 import 'cosmos.dart';
 
 /// Where a card sits on screen right now, or null when it is gone (the
@@ -29,7 +30,7 @@ class CardExpandRoute<T> extends PageRoute<T> {
   CardExpandRoute({
     required this.builder,
     this.origin,
-    this.radius = 24,
+    this.radius = SfRadius.lg,
     super.settings,
   });
 
@@ -40,9 +41,9 @@ class CardExpandRoute<T> extends PageRoute<T> {
   Rect? _openedFrom;
 
   @override
-  Duration get transitionDuration => const Duration(milliseconds: 460);
+  Duration get transitionDuration => SfMotion.expand;
   @override
-  Duration get reverseTransitionDuration => const Duration(milliseconds: 400);
+  Duration get reverseTransitionDuration => SfMotion.expandReverse;
   @override
   bool get opaque => true; // once open, the chat underneath stops drawing
   @override
@@ -95,19 +96,20 @@ class _ExpandTransition extends StatelessWidget {
   final double radius;
   final Widget child;
 
-  static final _grow = CurveTween(curve: Curves.easeInOutCubicEmphasized);
-  // The page appears once the card is a good way open; the sky fill and
-  // the card's glass edge carry the first part of the move.
-  static final _content = CurveTween(curve: const Interval(.18, .75, curve: Curves.easeOut));
+  // One move (HipLab transition audit): the card's bounds grow on the
+  // container curve; the chat underneath only dims, never scales.
+  static final _grow = CurveTween(curve: SfMotion.container);
+  // The sky fills the card's face first, so the card reads as lifting.
+  static final _fill = CurveTween(curve: const Interval(0, .3, curve: Curves.easeOut));
+  // The page fades in over the second half of the growth, scaled with it.
+  static final _content = CurveTween(curve: const Interval(.3, .8, curve: Curves.easeOut));
   static final _scrim = CurveTween(curve: const Interval(0, .6, curve: Curves.easeOut));
-  // The sky fill comes in over the card's own face, so the card is seen
-  // lifting before it opens.
-  static final _fill = CurveTween(curve: const Interval(0, .25, curve: Curves.easeOut));
 
   @override
   Widget build(BuildContext context) => LayoutBuilder(
     builder: (context, box) {
       final full = Offset.zero & box.biggest;
+      final palette = SfColors.palette;
       return AnimatedBuilder(
         animation: animation,
         child: child,
@@ -124,55 +126,37 @@ class _ExpandTransition extends StatelessWidget {
               // The chat dims as the card takes over.
               Positioned.fill(
                 child: IgnorePointer(
-                  child: ColoredBox(color: Color.fromRGBO(2, 3, 10, .55 * _scrim.transform(v))),
+                  child: ColoredBox(
+                    color: Colors.black.withValues(alpha: (palette.isDark ? .45 : .14) * _scrim.transform(v)),
+                  ),
                 ),
               ),
               Positioned.fromRect(
                 rect: rect,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(r),
-                    boxShadow: [
-                      BoxShadow(color: Color.fromRGBO(0, 0, 0, .35 * (1 - g)), blurRadius: 30, offset: const Offset(0, 10)),
-                    ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(r),
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        Opacity(opacity: _fill.transform(v), child: const _SkyFill()),
-                        // The page is laid out at full size and scaled with
-                        // the card's width, so nothing reflows mid-move.
-                        Opacity(
-                          opacity: _content.transform(v),
-                          child: OverflowBox(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(r),
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      Opacity(opacity: _fill.transform(v), child: SkyFill(palette: palette)),
+                      // The page is laid out at full size and scaled with
+                      // the card's width, so nothing reflows mid-move.
+                      Opacity(
+                        opacity: _content.transform(v),
+                        child: OverflowBox(
+                          alignment: Alignment.topLeft,
+                          minWidth: full.width,
+                          maxWidth: full.width,
+                          minHeight: full.height,
+                          maxHeight: full.height,
+                          child: Transform.scale(
+                            scale: scale,
                             alignment: Alignment.topLeft,
-                            minWidth: full.width,
-                            maxWidth: full.width,
-                            minHeight: full.height,
-                            maxHeight: full.height,
-                            child: Transform.scale(
-                              scale: scale,
-                              alignment: Alignment.topLeft,
-                              child: SizedBox.fromSize(size: full.size, child: page),
-                            ),
+                            child: SizedBox.fromSize(size: full.size, child: page),
                           ),
                         ),
-                        // The card's hairline edge, fading as it opens.
-                        IgnorePointer(
-                          child: DecoratedBox(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(r),
-                              border: Border.all(
-                                color: CosmosColors.edge.withValues(alpha: CosmosColors.edge.a * (1 - g)),
-                                width: .7,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -187,20 +171,4 @@ class _ExpandTransition extends StatelessWidget {
     final w = (full.width * .88).clamp(260.0, 380.0);
     return Rect.fromCenter(center: full.center, width: w, height: w * 1.2);
   }
-}
-
-/// The same sky the player sits in, painted flat while the card grows.
-class _SkyFill extends StatelessWidget {
-  const _SkyFill();
-  @override
-  Widget build(BuildContext context) => const DecoratedBox(
-    decoration: BoxDecoration(
-      gradient: LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        colors: [Color(0xFF151B33), CosmosColors.skyMid, CosmosColors.skyBottom],
-        stops: [0, .55, 1],
-      ),
-    ),
-  );
 }

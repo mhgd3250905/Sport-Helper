@@ -1,13 +1,12 @@
 // Web entry for docs/screenshots/chat-*.png (not part of the app):
 //   flutter build web -t test_screens/web_shots_main.dart --no-web-resources-cdn
-//   cp <NotoSansSC.ttf> build/web/assets/shots/NotoSansSC.ttf
 //   serve build/web, open ?shot=<name>, screenshot (tools/shots/chat_shots.py).
+// The app bundles Noto Sans SC, so no font needs copying in.
 // Each shot seeds an in-memory store and scripts the conversation.
 import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter/services.dart';
 import 'package:smartfit/app/services.dart';
 import 'package:smartfit/core/storage/local_state_storage.dart';
 import 'package:smartfit/data/app_store.dart';
@@ -25,12 +24,6 @@ class _Memory implements LocalStateStorage {
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  try {
-    final font = FontLoader('NotoSansSC')..addFont(rootBundle.load('shots/NotoSansSC.ttf'));
-    await font.load();
-  } on Object {
-    // No font copied in: the browser falls back to its own.
-  }
   final (lib, catalog, _) = await AppServices.loadContent();
   final store = AppStore(_Memory());
   final shot = Uri.base.queryParameters['shot'] ?? 'shell';

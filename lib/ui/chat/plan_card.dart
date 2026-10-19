@@ -3,14 +3,20 @@ import 'package:flutter/material.dart';
 import '../../domain/exercise.dart';
 import '../../domain/plan.dart';
 import '../../domain/session.dart';
-import '../theme.dart' show levelZh, minutesZh;
-import 'cosmos.dart';
+import '../theme.dart' show levelZh;
+import '../theme/sf_icons.dart';
+import '../theme/tokens.dart';
+import '../theme/widgets.dart';
 import 'expand_route.dart';
-import 'glass.dart';
 
-/// The assistant's plan reply: covers of the first moves, title, length,
-/// move count, gear, the numbered moves (so "换掉第 3 个" has something to
-/// point at), and the two actions — 开始训练 / 保存.
+/// The assistant's plan reply, one card with one prominent action:
+///
+/// * a cover stage (the first move's render on its own dark stage) with
+///   the title and the meta line laid over its lower edge, and the accent
+///   「开始」 disc in the corner — the card's only accent;
+/// * the numbered moves (so "换掉第 3 个" has something to point at), four
+///   shown, the rest behind 展开全部;
+/// * a quiet footer: 保存 · 详情 (tertiary text actions).
 class PlanCard extends StatefulWidget {
   const PlanCard({
     super.key,
@@ -25,6 +31,7 @@ class PlanCard extends StatefulWidget {
   final TrainingPlan plan;
   final ExerciseLibrary library;
   final bool saved;
+
   /// 开始训练; [from] says where the card is, for the grow-into-player move.
   final void Function(OriginRect from) onStart;
   final VoidCallback onSave;
@@ -37,9 +44,9 @@ class PlanCard extends StatefulWidget {
 }
 
 class _PlanCardState extends State<PlanCard> {
-  static const _collapsed = 5;
+  static const _collapsed = 4;
   bool _expanded = false;
-  final _glass = GlobalKey();
+  final _card = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
@@ -51,12 +58,6 @@ class _PlanCardState extends State<PlanCard> {
         for (final _ in b.items) b.type == BlockType.circuit,
     ];
     final moves = [for (final i in items) lib.tryGet(i.exerciseId)].whereType<Exercise>().toList();
-    final covers = <Exercise>[];
-    for (final e in moves) {
-      if (covers.every((c) => c.id != e.id)) covers.add(e);
-      if (covers.length == 4) break;
-    }
-    final unique = moves.map((e) => e.id).toSet().length;
     // Only gear people may not have; mat / chair / wall count as at hand.
     const extra = {Equipment.band, Equipment.dumbbell, Equipment.slider};
     final gear = <Equipment>{
@@ -64,151 +65,114 @@ class _PlanCardState extends State<PlanCard> {
     };
     final gearText = gear.isEmpty ? '徒手' : gear.map((q) => q.zh).join('、');
     final secs = SessionBuilder(lib).planSeconds(p);
+    final minutes = (secs / 60).round();
+    final meta = [
+      minutes < 1 ? '不到 1 分钟' : '$minutes 分钟',
+      '${items.length} 个动作',
+      gearText,
+      levelZh(p.level),
+    ].join(' · ');
     final shown = _expanded ? items.length : items.length.clamp(0, _collapsed);
-    final width = (MediaQuery.sizeOf(context).width * .88).clamp(260.0, 380.0);
-    final label = Theme.of(context).textTheme.labelLarge!;
+    final width = (MediaQuery.sizeOf(context).width - 32).clamp(280.0, 400.0);
 
     return Align(
       alignment: Alignment.centerLeft,
       child: SizedBox(
+        key: _card,
         width: width,
-        child: Glass(
-          key: _glass,
-          radius: BorderRadius.circular(24),
-          glow: const Color(0x10BFD0FF),
+        child: SfPanel(
+          padding: EdgeInsets.zero,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              InkWell(
-                key: ValueKey('plan-open-${p.id}'),
-                onTap: widget.onOpen,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          for (var i = 0; i < 4; i++) ...[
-                            if (i > 0) const SizedBox(width: 6),
-                            Expanded(
-                              child: _Cover(
-                                exercise: i < covers.length ? covers[i] : null,
-                                more: i == 3 && unique > 4 ? unique - 4 : 0,
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(4, 14, 4, 0),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: Text(
-                                p.title,
-                                style: const TextStyle(
-                                  color: CosmosColors.text,
-                                  fontSize: 19,
-                                  fontWeight: FontWeight.w600,
-                                  height: 1.3,
-                                ),
-                              ),
-                            ),
-                            const Padding(
-                              padding: EdgeInsets.only(top: 3, left: 6),
-                              child: Icon(Icons.chevron_right_rounded, size: 20, color: CosmosColors.muted),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(4, 6, 4, 0),
-                        child: Text(
-                          [minutesZh(secs), '${items.length} 个动作', gearText, levelZh(p.level)].join('  ·  '),
-                          style: const TextStyle(color: CosmosColors.muted, fontSize: 13, height: 1.4),
-                        ),
-                      ),
-                    ],
+              Padding(
+                padding: const EdgeInsets.all(SfSpace.x2),
+                child: _CoverStage(
+                  cover: moves.firstOrNull,
+                  title: p.title,
+                  meta: meta,
+                  onOpen: widget.onOpen,
+                  start: _StartDisc(
+                    key: ValueKey('plan-start-${p.id}'),
+                    onTap: () => widget.onStart(() => rectOf(_card.currentContext)),
                   ),
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                padding: const EdgeInsets.fromLTRB(SfSpace.x4, SfSpace.x2, SfSpace.x4, 0),
                 child: Column(
                   children: [
-                    for (var i = 0; i < shown; i++) _MoveRow(
+                    for (var i = 0; i < shown; i++)
+                      _MoveRow(
                         index: i + 1,
                         item: circuit[i] ? items[i].copyWith(sets: 1) : items[i],
                         exercise: lib.tryGet(items[i].exerciseId),
                       ),
-                    if (items.length > _collapsed)
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: TextButton(
-                          key: ValueKey('plan-expand-${p.id}'),
-                          style: TextButton.styleFrom(
-                            foregroundColor: CosmosColors.muted,
-                            padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 4),
-                            minimumSize: const Size(0, 32),
-                            textStyle: label.copyWith(fontSize: 13, fontWeight: FontWeight.w400),
-                          ),
-                          onPressed: () => setState(() => _expanded = !_expanded),
-                          child: Text(_expanded ? '收起' : '展开全部 ${items.length} 个动作'),
-                        ),
-                      ),
                   ],
                 ),
               ),
-              if (p.notes.isNotEmpty)
+              if (items.length > _collapsed || p.notes.isNotEmpty)
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
-                  child: Text(
-                    '已按你的情况调整 ${p.notes.length} 处，详情里可以看',
-                    style: const TextStyle(color: CosmosColors.faint, fontSize: 12, height: 1.4),
+                  padding: const EdgeInsets.fromLTRB(SfSpace.x3, 2, SfSpace.x4, 0),
+                  child: Row(
+                    children: [
+                      if (items.length > _collapsed)
+                        SfTextAction(
+                          key: ValueKey('plan-expand-${p.id}'),
+                          label: _expanded ? '收起' : '展开全部 ${items.length} 个动作',
+                          onPressed: () => setState(() => _expanded = !_expanded),
+                        ),
+                      const Spacer(),
+                      if (p.notes.isNotEmpty)
+                        Flexible(
+                          flex: 4,
+                          child: Text(
+                            '已按你的情况调整 ${p.notes.length} 处',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.right,
+                            style: SfType.caption,
+                          ),
+                        ),
+                    ],
                   ),
                 ),
               Padding(
-                padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: FilledButton.icon(
-                        key: ValueKey('plan-start-${p.id}'),
-                        style: FilledButton.styleFrom(
-                          backgroundColor: CosmosColors.accent,
-                          foregroundColor: Colors.white,
-                          minimumSize: const Size.fromHeight(46),
-                          shape: const StadiumBorder(),
-                          textStyle: label.copyWith(fontSize: 15.5, fontWeight: FontWeight.w600),
+                padding: const EdgeInsets.fromLTRB(SfSpace.x2, SfSpace.x1, SfSpace.x2, SfSpace.x1),
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border(top: BorderSide(color: SfColors.isDark ? SfColors.surfaceHigh : SfColors.line)),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: SfSpace.x2),
+                  child: Row(
+                    children: [
+                      SfTextAction(
+                        key: ValueKey('plan-save-${p.id}'),
+                        icon: SfGlyph.bookmark,
+                        iconFilled: widget.saved,
+                        color: widget.saved ? SfColors.accentText : SfColors.text,
+                        label: widget.saved ? '已保存' : '保存',
+                        onPressed: widget.saved ? null : widget.onSave,
+                      ),
+                      const Spacer(),
+                      SfPressable(
+                        key: ValueKey('plan-open-${p.id}'),
+                        semanticLabel: '计划详情',
+                        onTap: widget.onOpen,
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(minHeight: 44),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text('详情', style: SfType.callout.copyWith(fontSize: 14, color: SfColors.muted)),
+                              const SizedBox(width: 2),
+                              SfIcon(SfGlyph.chevronRight, size: 16, color: SfColors.muted, strokeWidth: 2),
+                            ],
+                          ),
                         ),
-                        onPressed: () => widget.onStart(() => rectOf(_glass.currentContext)),
-                        icon: const Icon(Icons.play_arrow_rounded, size: 22),
-                        label: const Text('开始训练'),
                       ),
-                    ),
-                    const SizedBox(width: 10),
-                    OutlinedButton.icon(
-                      key: ValueKey('plan-save-${p.id}'),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: widget.saved ? CosmosColors.muted : CosmosColors.text,
-                        minimumSize: const Size(0, 46),
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        shape: const StadiumBorder(),
-                        side: const BorderSide(color: CosmosColors.edge),
-                        backgroundColor: CosmosColors.glass,
-                        textStyle: label.copyWith(fontSize: 15, fontWeight: FontWeight.w500),
-                      ),
-                      onPressed: widget.saved ? null : widget.onSave,
-                      icon: Icon(
-                        widget.saved ? Icons.bookmark_added_rounded : Icons.bookmark_add_outlined,
-                        size: 19,
-                        color: widget.saved ? CosmosColors.accent : CosmosColors.textSoft,
-                      ),
-                      label: Text(widget.saved ? '已保存' : '保存'),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -219,40 +183,142 @@ class _PlanCardState extends State<PlanCard> {
   }
 }
 
-class _Cover extends StatelessWidget {
-  const _Cover({required this.exercise, this.more = 0});
-  final Exercise? exercise;
-  final int more;
+/// The first move's render on its dark stage, title and meta over the
+/// lower edge (a scrim keeps them readable), the start disc in the corner.
+class _CoverStage extends StatelessWidget {
+  const _CoverStage({
+    required this.cover,
+    required this.title,
+    required this.meta,
+    required this.start,
+    required this.onOpen,
+  });
+  final Exercise? cover;
+  final String title;
+  final String meta;
+  final Widget start;
+  final VoidCallback onOpen;
 
   @override
-  Widget build(BuildContext context) => AspectRatio(
-    aspectRatio: 1,
-    child: ClipRRect(
-      borderRadius: BorderRadius.circular(14),
+  Widget build(BuildContext context) => ClipRRect(
+    borderRadius: BorderRadius.circular(SfRadius.lg - SfSpace.x2),
+    child: AspectRatio(
+      aspectRatio: 16 / 11,
       child: Stack(
         fit: StackFit.expand,
         children: [
-          const ColoredBox(color: Color(0xFF101013)),
-          if (exercise != null)
-            Image.asset(
-              exercise!.media.poster,
-              fit: BoxFit.cover,
-              errorBuilder: (_, _, _) => const SizedBox.shrink(),
+          ColoredBox(color: SfColors.mediaStage),
+          if (cover != null)
+            GestureDetector(
+              onTap: onOpen,
+              child: Image.asset(
+                cover!.media.poster,
+                fit: BoxFit.cover,
+                alignment: const Alignment(0, -.15),
+                errorBuilder: (_, _, _) => const SizedBox.shrink(),
+              ),
             ),
-          if (more > 0)
-            ColoredBox(
-              color: const Color(0x99070A16),
-              child: Center(
-                child: Text(
-                  '+$more',
-                  style: const TextStyle(color: CosmosColors.text, fontSize: 17, fontWeight: FontWeight.w600),
+          // Lower scrim: transparent → stage, under the text only.
+          IgnorePointer(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  stops: const [.38, 1],
+                  colors: [SfColors.mediaStage.withValues(alpha: 0), SfColors.mediaStage.withValues(alpha: .92)],
                 ),
               ),
             ),
+          ),
+          Positioned(
+            left: SfSpace.x4,
+            right: 96,
+            bottom: SfSpace.x4,
+            child: IgnorePointer(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 22,
+                      height: 1.25,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: SfSpace.x1),
+                  Text(
+                    meta,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Color(0xB8FFFFFF),
+                      fontSize: 13,
+                      height: 1.4,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Positioned(right: SfSpace.x3, bottom: SfSpace.x3, child: start),
         ],
       ),
     ),
   );
+}
+
+/// 「开始」: the card's one prominent action. A flat accent disc with a
+/// tight contact shadow to sit it on the stage (no glow, no gradient).
+class _StartDisc extends StatelessWidget {
+  const _StartDisc({super.key, required this.onTap});
+  final VoidCallback onTap;
+
+  static const _size = 68.0;
+
+  @override
+  Widget build(BuildContext context) {
+    // On the dark stage the dark-theme accent reads best in both themes.
+    const accent = Color(0xFF3CCFA4);
+    const on = Color(0xFF07261D);
+    return SfPressable(
+      semanticLabel: '开始训练',
+      tooltip: '开始训练',
+      onTap: onTap,
+      child: Builder(
+        builder: (context) {
+          final down = SfPressedScope.of(context);
+          return AnimatedContainer(
+            duration: down ? SfMotion.press : SfMotion.release,
+            width: _size,
+            height: _size,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: down ? Color.lerp(accent, Colors.black, .1) : accent,
+              boxShadow: const [BoxShadow(color: Color(0x73000000), blurRadius: 6, offset: Offset(0, 2))],
+            ),
+            child: const Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SfIcon(SfGlyph.play, size: 22, filled: true, color: on),
+                SizedBox(height: 1),
+                Text(
+                  '开始',
+                  style: TextStyle(color: on, fontSize: 12.5, height: 1.15, fontWeight: FontWeight.w700),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
 }
 
 class _MoveRow extends StatelessWidget {
@@ -262,34 +328,44 @@ class _MoveRow extends StatelessWidget {
   final Exercise? exercise;
 
   @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 4),
+  Widget build(BuildContext context) => SizedBox(
+    height: 48,
     child: Row(
       children: [
         SizedBox(
-          width: 24,
+          width: 20,
           child: Text(
             '$index',
-            style: const TextStyle(
-              color: CosmosColors.faint,
-              fontSize: 12.5,
-              fontFeatures: [FontFeature.tabularFigures()],
+            style: SfType.label.copyWith(color: SfColors.faint, fontFeatures: SfType.tabular),
+          ),
+        ),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(SfRadius.xs + 2),
+          child: SizedBox.square(
+            dimension: 36,
+            child: ColoredBox(
+              color: SfColors.mediaStage,
+              child: exercise == null
+                  ? null
+                  : Image.asset(
+                      exercise!.media.poster,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                    ),
             ),
           ),
         ),
+        const SizedBox(width: SfSpace.x3),
         Expanded(
           child: Text(
             exercise?.name ?? item.exerciseId,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(color: CosmosColors.textSoft, fontSize: 14, height: 1.3),
+            style: SfType.callout,
           ),
         ),
-        const SizedBox(width: 8),
-        Text(
-          item.doseText(),
-          style: const TextStyle(color: CosmosColors.muted, fontSize: 12.5, height: 1.3),
-        ),
+        const SizedBox(width: SfSpace.x2),
+        Text(item.doseText(), style: SfType.label.copyWith(fontFeatures: SfType.tabular)),
       ],
     ),
   );

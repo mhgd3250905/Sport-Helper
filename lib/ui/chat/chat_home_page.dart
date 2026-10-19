@@ -12,6 +12,8 @@ import '../custom_plan_page.dart';
 import '../library_page.dart';
 import '../plan_page.dart';
 import '../player_page.dart';
+import '../theme/app_theme.dart';
+import '../theme/tokens.dart';
 import 'chat_widgets.dart';
 import 'cosmos.dart';
 import 'expand_route.dart';
@@ -111,11 +113,8 @@ class _ChatHomePageState extends State<ChatHomePage> {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(SnackBar(
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: const Color(0xF0161B2E),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         margin: const EdgeInsets.fromLTRB(24, 0, 24, 96),
-        content: Text(text, style: const TextStyle(color: CosmosColors.text)),
+        content: Text(text),
         duration: const Duration(seconds: 2),
       ));
   }
@@ -132,15 +131,12 @@ class _ChatHomePageState extends State<ChatHomePage> {
   Widget build(BuildContext context) {
     final s = AppServices.of(context);
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light.copyWith(
-        statusBarColor: Colors.transparent,
-        systemNavigationBarColor: CosmosColors.skyBottom,
-      ),
+      value: sfOverlay,
       child: Scaffold(
         key: _scaffold,
-        backgroundColor: CosmosColors.skyBottom,
+        backgroundColor: SfColors.skyBottom,
         resizeToAvoidBottomInset: true,
-        drawerScrimColor: const Color(0x8C02030A),
+        drawerScrimColor: SfColors.isDark ? const Color(0x99000000) : const Color(0x4D121614),
         drawer: SavedPlansDrawer(
           store: s.store,
           library: s.library,
@@ -213,7 +209,7 @@ class _ChatHomePageState extends State<ChatHomePage> {
       rows.add(
         Padding(
           key: ValueKey(m.id),
-          padding: EdgeInsets.only(top: sameSide ? 6 : 14),
+          padding: EdgeInsets.only(top: sameSide ? SfSpace.x2 : SfSpace.x4),
           child: Appear(
             animate: !_seen.contains(m.id) && !(MediaQuery.maybeDisableAnimationsOf(context) ?? false),
             child: _message(m),
@@ -224,7 +220,7 @@ class _ChatHomePageState extends State<ChatHomePage> {
     if (_chat.typing) {
       rows.add(const Padding(
         key: ValueKey('typing'),
-        padding: EdgeInsets.only(top: 14),
+        padding: EdgeInsets.only(top: SfSpace.x4),
         child: TypingBubble(),
       ));
     }
@@ -236,7 +232,7 @@ class _ChatHomePageState extends State<ChatHomePage> {
           child: ListView.builder(
             controller: _scroll,
             reverse: true,
-            padding: const EdgeInsets.fromLTRB(16, 40, 16, 12),
+            padding: const EdgeInsets.fromLTRB(SfSpace.x4, 48, SfSpace.x4, SfSpace.x3),
             itemCount: reversed.length,
             itemBuilder: (_, i) => reversed[i],
             findChildIndexCallback: (key) {
@@ -246,16 +242,16 @@ class _ChatHomePageState extends State<ChatHomePage> {
           ),
         ),
         // Messages dissolve into the sky at the top edge.
-        const IgnorePointer(
+        IgnorePointer(
           child: SizedBox(
-            height: 40,
+            height: 48,
             width: double.infinity,
             child: DecoratedBox(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [Color(0xE60B1022), Color(0x000B1022)],
+                  colors: [SfColors.skyTop, SfColors.skyTop.withValues(alpha: 0)],
                 ),
               ),
             ),
