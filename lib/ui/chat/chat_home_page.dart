@@ -7,6 +7,8 @@ import '../../app/services.dart';
 import '../../chat/chat_controller.dart';
 import '../../chat/chat_models.dart';
 import '../../domain/plan.dart';
+import '../about_page.dart';
+import '../custom_plan_page.dart';
 import '../library_page.dart';
 import '../plan_page.dart';
 import '../player_page.dart';
@@ -136,6 +138,29 @@ class _ChatHomePageState extends State<ChatHomePage> {
           library: s.library,
           onShow: (p) => _fromDrawer(() => _chat.showSaved(p)),
           onStart: (p) => _fromDrawer(() => _start(p.plan)),
+          footer: [
+            DrawerEntry(
+              key: const ValueKey('drawer-library'),
+              icon: Icons.grid_view_rounded,
+              label: '动作库',
+              hint: '${s.library.length} 个动作的示范',
+              onTap: () => _fromDrawer(() => _push(const LibraryPage())),
+            ),
+            DrawerEntry(
+              key: const ValueKey('drawer-custom'),
+              icon: Icons.tune_rounded,
+              label: '自定义计划',
+              hint: '用表单选目标、器械和时长',
+              onTap: () => _fromDrawer(() => _push(const CustomPlanPage())),
+            ),
+            DrawerEntry(
+              key: const ValueKey('drawer-about'),
+              icon: Icons.info_outline_rounded,
+              label: '关于与设置',
+              hint: '语音、星尘动效、安全确认、素材署名',
+              onTap: () => _fromDrawer(() => _push(const AboutPage())),
+            ),
+          ],
         ),
         body: ListenableBuilder(
           listenable: s.store,

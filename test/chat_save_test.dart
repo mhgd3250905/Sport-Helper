@@ -113,4 +113,64 @@ void main() {
     expect(back.chosen, 1);
     expect(back.at, m.at);
   });
+
+  group('safety talk', () {
+    Future<(ChatController, AppStore)> fresh() async {
+      final store = AppStore(MemoryStorage());
+      final c = ChatController(
+        engine: RuleChatEngine(lib: lib, templates: templates),
+        store: store,
+        replyDelay: Duration.zero,
+      )..start();
+      return (c, store);
+    }
+
+    ChatMessage open(ChatController c) => c.messages.lastWhere(c.isActive);
+
+    test('first launch: disclaimer → four 否 → accepted, plans allowed', () async {
+      final (c, store) = await fresh();
+      expect(c.inSafetyCheck, isTrue);
+      expect(c.messages.last.text, contains('不是医疗诊断'));
+      await c.choose(open(c), 0); // 我已了解
+      for (var i = 0; i < 4; i++) {
+        expect(open(c).text, startsWith('${i + 1}/4'));
+        await c.choose(open(c), 0); // 否
+      }
+      expect(c.inSafetyCheck, isFalse);
+      expect(store.safetyAccepted, isTrue);
+      expect(store.safetyBlocked, isFalse);
+      await c.send('在家 15 分钟练核心，徒手');
+      expect(c.currentPlan, isNotNull);
+    });
+
+    test('any 是 → advice, blocked; an old question cannot be re-answered', () async {
+      final (c, store) = await fresh();
+      await c.choose(open(c), 0);
+      final q1 = open(c);
+      await c.choose(q1, 0); // 否
+      await c.choose(open(c), 0); // 2/4 否
+      await c.choose(open(c), 1); // 3/4 是
+      expect(store.safetyBlocked, isTrue);
+      expect(c.messages.last.text, contains('先休息'));
+      expect(c.isActive(q1), isFalse);
+      await c.send('在家 15 分钟练核心');
+      expect(c.messages.where((m) => m.isPlan), isEmpty);
+    });
+
+    test('typing before finishing waits; a re-check can lift the block', () async {
+      final (c, store) = await fresh();
+      await c.send('在家 15 分钟练核心');
+      expect(c.messages.last.text, contains('先把上面的安全确认做完'));
+      await c.choose(open(c), 0);
+      await c.choose(open(c), 1); // 1/4 是
+      expect(store.safetyBlocked, isTrue);
+
+      c.startSafetyCheck();
+      await c.choose(open(c), 0);
+      for (var i = 0; i < 4; i++) {
+        await c.choose(open(c), 0);
+      }
+      expect(store.safetyBlocked, isFalse);
+    });
+  });
 }

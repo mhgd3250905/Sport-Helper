@@ -39,11 +39,14 @@ Future<void> main() async {
     voiceOutput: const MutedVoiceOutput(),
     chatReplyDelay: Duration.zero,
   );
-  if (shot != 'opening') await store.acceptSafety(blocked: false);
+  if (!shot.startsWith('opening')) await store.acceptSafety(blocked: false);
   final chat = services.chat..start();
   switch (shot) {
     case 'shell':
       await chat.send('你好');
+    case 'opening-q':
+      await chat.choose(chat.messages.last, 0); // 我已了解
+      await chat.choose(chat.messages.last, 0); // 1/4 否
     case 'ask':
       await chat.send('想在家练练，有点犯懒');
       await chat.choose(chat.messages.last, 1); // 力量塑形

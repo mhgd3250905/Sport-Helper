@@ -5,7 +5,6 @@ import 'app/services.dart';
 import 'core/storage/local_state_storage.dart';
 import 'data/app_store.dart';
 import 'ui/chat/chat_home_page.dart';
-import 'ui/safety_page.dart';
 import 'ui/theme.dart';
 import 'voice/just_audio_output.dart';
 
@@ -45,11 +44,8 @@ class _SmartFitAppState extends State<SmartFitApp> {
       locale: const Locale('zh', 'CN'),
       supportedLocales: const [Locale('zh', 'CN'), Locale('en')],
       localizationsDelegates: GlobalMaterialLocalizations.delegates,
-      home: widget.services.store.safetyAccepted
-          ? const ChatHomePage()
-          : Builder(
-              builder: (context) => SafetyPage(onDone: () => setState(() {})),
-            ),
+      // The chat opens with the safety talk on first launch.
+      home: const ChatHomePage(),
     ),
   );
 }

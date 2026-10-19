@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
 import '../app/services.dart';
-import 'safety_page.dart';
+import '../chat/safety_script.dart' show disclaimerText;
 import 'theme.dart';
 
 const appVersion = '0.1.0 (MVP)';
@@ -51,9 +51,12 @@ class AboutPage extends StatelessWidget {
             const Text(disclaimerText, style: TextStyle(height: 1.6, color: SfColors.muted)),
             const SizedBox(height: 8),
             OutlinedButton(
-              onPressed: () => Navigator.of(context).push(MaterialPageRoute<void>(
-                builder: (c) => SafetyPage(onDone: () => Navigator.of(c).pop()),
-              )),
+              key: const ValueKey('safety-recheck'),
+              // Back to the chat, where the safety talk runs again.
+              onPressed: () {
+                Navigator.of(context).popUntil((r) => r.isFirst);
+                s.chat.startSafetyCheck();
+              },
               child: const Text('重新做安全确认'),
             ),
             const Divider(height: 32),

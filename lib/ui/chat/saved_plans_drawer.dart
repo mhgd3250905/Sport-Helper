@@ -294,3 +294,41 @@ class _SavedTile extends StatelessWidget {
     return '刚刚';
   }
 }
+
+/// A quiet row at the bottom of the drawer (动作库, 关于与设置…).
+class DrawerEntry extends StatelessWidget {
+  const DrawerEntry({super.key, required this.icon, required this.label, this.hint, required this.onTap});
+  final IconData icon;
+  final String label;
+  final String? hint;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => InkWell(
+    onTap: onTap,
+    child: Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 11),
+      child: Row(
+        children: [
+          Icon(icon, size: 20, color: CosmosColors.muted),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(label, style: const TextStyle(color: CosmosColors.textSoft, fontSize: 15)),
+                if (hint != null)
+                  Text(
+                    hint!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: CosmosColors.faint, fontSize: 12, height: 1.4),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}

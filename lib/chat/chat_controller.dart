@@ -7,9 +7,11 @@ import '../domain/plan.dart';
 import '../domain/saved_plan.dart';
 import 'chat_models.dart';
 import 'rule_chat_engine.dart' show defaultSuggestions;
+import 'safety_script.dart';
 
 /// Owns the chat home's conversation: the message list, the engine's state,
-/// and persisting the recent history in [AppStore]. UI-only commands
+/// the safety talk (first launch and re-checks), saving plans, and
+/// persisting the recent history in [AppStore]. UI-only commands
 /// (`@library`, `@drawer`…) come out of [actions].
 class ChatController extends ChangeNotifier {
   ChatController({
@@ -31,6 +33,13 @@ class ChatController extends ChangeNotifier {
   bool typing = false;
   ChatState _state = const ChatState();
 
+  /// Index into [safetyQuestions] while the safety talk runs (-1 = waiting
+  /// for "我已了解"); null when no safety talk is open.
+  int? _safetyStep;
+  String? _safetyMessageId;
+
+  bool get inSafetyCheck => _safetyStep != null;
+
   final _actions = StreamController<String>.broadcast();
   Stream<String> get actions => _actions.stream;
 
@@ -43,6 +52,11 @@ class ChatController extends ChangeNotifier {
   void start() {
     if (_started) return;
     _started = true;
+    if (!store.safetyAccepted) {
+      _beginSafety(firstRun: true);
+      notifyListeners();
+      return;
+    }
     for (final j in store.chatLog) {
       try {
         messages.add(ChatMessage.fromJson(j));
@@ -78,6 +92,12 @@ class ChatController extends ChangeNotifier {
     final t = text.trim();
     if (t.isEmpty || typing) return;
     _user(label ?? t);
+    if (inSafetyCheck) {
+      _bot(const BotMessage('先把上面的安全确认做完，再帮你排计划。'));
+      notifyListeners();
+      unawaited(_persist());
+      return;
+    }
     typing = true;
     notifyListeners();
     final reply = await engine.reply(t, _context);
@@ -87,7 +107,11 @@ class ChatController extends ChangeNotifier {
     for (final m in reply.messages) {
       _bot(m);
     }
-    suggestions = reply.suggestions.isEmpty ? _defaults() : reply.suggestions;
+    // A question with its own options doesn't need the chips too.
+    final asks = reply.messages.any((m) => m.options.isNotEmpty);
+    suggestions = reply.suggestions.isNotEmpty
+        ? reply.suggestions
+        : (asks ? const [] : _defaults());
     notifyListeners();
     unawaited(_persist());
     if (reply.action != null) _actions.add(reply.action!);
@@ -96,6 +120,9 @@ class ChatController extends ChangeNotifier {
   /// Can [m]'s options still be tapped?
   bool isActive(ChatMessage m) {
     if (m.options.isEmpty || m.chosen != null) return false;
+    if (m.options.any((o) => o.value.startsWith('@safety:'))) {
+      return m.id == _safetyMessageId;
+    }
     return true;
   }
 
@@ -103,8 +130,16 @@ class ChatController extends ChangeNotifier {
     if (!isActive(m) || index < 0 || index >= m.options.length || typing) return;
     final o = m.options[index];
     // Links (动作库, 全部计划) stay tappable; answers lock.
-    final isLink = o.isCommand && !o.value.startsWith('@save:') && !o.value.startsWith('@saved:');
+    final isLink = o.isCommand &&
+        !o.value.startsWith('@save:') &&
+        !o.value.startsWith('@saved:') &&
+        !o.value.startsWith('@safety');
     if (!isLink) _replace(m.copyWith(chosen: index));
+    if (o.value.startsWith('@safety:')) return _safetyAnswer(o);
+    if (o.value == '@safety') {
+      startSafetyCheck();
+      return;
+    }
     if (o.value.startsWith('@save:')) {
       final plan = _planById(o.value.substring(6));
       _user(o.label);
@@ -174,10 +209,76 @@ class ChatController extends ChangeNotifier {
     return null;
   }
 
+  // ------------------------------------------------------------ safety
+
+  void startSafetyCheck() {
+    _beginSafety(firstRun: false);
+    notifyListeners();
+  }
+
+  void _beginSafety({required bool firstRun}) {
+    if (firstRun) {
+      messages.clear();
+      _bot(const BotMessage(safetyIntro));
+    } else {
+      _bot(const BotMessage('好，重新做一次安全确认。'));
+    }
+    _safetyMessageId = _bot(
+      const BotMessage(safetyDisclaimer, options: [ChatOption('我已了解', '@safety:ack')]),
+    ).id;
+    _safetyStep = -1;
+    suggestions = const [];
+  }
+
+  Future<void> _safetyAnswer(ChatOption o) async {
+    final step = _safetyStep;
+    if (step == null) return;
+    _user(o.label);
+    if (o.value == '@safety:ack') {
+      _bot(const BotMessage(safetyLead));
+      _askSafety(0);
+    } else if (o.value == '@safety:no') {
+      if (step + 1 < safetyQuestions.length) {
+        _askSafety(step + 1);
+      } else {
+        await _finishSafety(blockedBy: null);
+      }
+    } else {
+      await _finishSafety(blockedBy: step);
+    }
+    notifyListeners();
+    unawaited(_persist());
+  }
+
+  void _askSafety(int i) {
+    _safetyStep = i;
+    _safetyMessageId = _bot(BotMessage(
+      safetyQuestionText(i),
+      options: const [ChatOption('否', '@safety:no'), ChatOption('是', '@safety:yes')],
+    )).id;
+  }
+
+  Future<void> _finishSafety({required int? blockedBy}) async {
+    _safetyStep = null;
+    _safetyMessageId = null;
+    await store.acceptSafety(blocked: blockedBy != null);
+    if (blockedBy == null) {
+      _bot(const BotMessage(safetyAllClear));
+      suggestions = _defaults();
+    } else {
+      _bot(BotMessage(
+        safetyBlockedText(blockedBy),
+        options: const [ChatOption('浏览动作库', '@library')],
+      ));
+      suggestions = const ['浏览动作库'];
+    }
+  }
+
   // ------------------------------------------------------------ helpers
 
   List<String> _defaults() => [
-    if (store.lastPlan != null || store.savedPlans.isNotEmpty) '上次那个',
+    if (store.safetyBlocked) '动作库',
+    if (!store.safetyBlocked && (store.lastPlan != null || store.savedPlans.isNotEmpty)) '上次那个',
     ...defaultSuggestions,
   ].take(4).toList();
 

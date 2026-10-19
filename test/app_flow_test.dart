@@ -11,7 +11,10 @@ import 'package:smartfit/domain/plan.dart';
 import 'package:smartfit/domain/scenario.dart';
 import 'package:smartfit/ui/chat/chat_home_page.dart';
 import 'package:smartfit/ui/exercise_video.dart';
-import 'package:smartfit/ui/home_page.dart';
+import 'package:smartfit/ui/chat/chat_widgets.dart';
+import 'package:smartfit/ui/chat/plan_card.dart';
+import 'package:smartfit/ui/custom_plan_page.dart';
+import 'package:smartfit/ui/library_page.dart';
 import 'package:smartfit/ui/player_page.dart';
 import 'package:smartfit/voice/voice_library.dart';
 import 'package:smartfit/voice/voice_queue.dart';
@@ -147,81 +150,143 @@ void main() {
     await tester.pumpWidget(const SizedBox());
   });
 
-  testWidgets('safety → describe → plan → player → skip → close', (tester) async {
+  /// The safety question buttons that are still open (older answered ones
+  /// stay on screen, locked).
+  Finder openOption(String label) => find.byWidgetPredicate(
+    (w) => w is OptionPill && w.label == label && w.enabled,
+  );
+
+  Future<void> answerSafety(WidgetTester tester, List<String> answers) async {
+    expect(find.textContaining('开始之前'), findsOneWidget);
+    await tester.tap(openOption('我已了解'));
+    await tester.pumpAndSettle();
+    for (final a in answers) {
+      await tester.tap(openOption(a));
+      await tester.pumpAndSettle();
+    }
+  }
+
+  Future<void> say(WidgetTester tester, String text) async {
+    await tester.enterText(find.byKey(const ValueKey('chat-input')), text);
+    await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('chat-send')));
+    await tester.pumpAndSettle();
+  }
+
+  testWidgets('safety talk → describe → plan card → player → back in the chat', (tester) async {
     tall(tester);
     final s = services();
     await tester.pumpWidget(SmartFitApp(services: s));
     await tester.pumpAndSettle();
 
-    // Safety: four "否" + agree.
-    expect(find.text('开始之前'), findsOneWidget);
-    for (final no in find.text('否').evaluate().toList()) {
-      await tester.tap(find.byWidget(no.widget));
-    }
-    await tester.ensureVisible(find.byType(CheckboxListTile));
-    await tester.tap(find.byType(CheckboxListTile));
-    await tester.pump();
-    await tester.ensureVisible(find.byKey(const ValueKey('safety-continue')));
-    await tester.tap(find.byKey(const ValueKey('safety-continue')));
-    await tester.pumpAndSettle();
+    // First launch: the chat opens with the safety talk, four "否".
+    expect(find.byType(ChatHomePage), findsOneWidget);
+    await answerSafety(tester, ['否', '否', '否', '否']);
     expect(s.store.safetyAccepted, isTrue);
     expect(s.store.safetyBlocked, isFalse);
+    expect(find.textContaining('都没问题'), findsOneWidget);
 
-    // The chat is home now; the old form still generates the same plan.
-    expect(find.byType(ChatHomePage), findsOneWidget);
-    await tester.pumpWidget(AppScope(services: s, child: const MaterialApp(home: HomePage())));
-    await tester.pumpAndSettle();
-    expect(find.text('描述你今天想怎么练'), findsOneWidget);
-    await tester.enterText(find.byKey(const ValueKey('prompt')), '在办公室午休 10 分钟，肩颈很僵');
-    await tester.ensureVisible(find.byKey(const ValueKey('generate')));
-    await tester.tap(find.byKey(const ValueKey('generate')));
-    await tester.pumpAndSettle();
-    expect(find.text('工位肩颈腰放松'), findsWidgets);
-    expect(find.text('开始跟练'), findsOneWidget);
-    expect(s.store.lastPlan?.templateId, 'office-relax');
+    // Describe → the card.
+    await say(tester, '在办公室午休 10 分钟，肩颈很僵');
+    expect(find.byType(PlanCard), findsOneWidget);
+    expect(find.text('工位肩颈腰放松'), findsOneWidget);
+    final plan = s.chat.currentPlan!;
+    expect(plan.templateId, 'office-relax');
 
-    // Player.
-    await tester.tap(find.byKey(const ValueKey('start')));
+    // Save from the card.
+    await tester.tap(find.byKey(ValueKey('plan-save-${plan.id}')));
+    await tester.pumpAndSettle();
+    expect(s.store.savedPlans.single.plan.id, plan.id);
+    expect(find.text('已保存'), findsOneWidget);
+
+    // 开始训练 → the existing player.
+    await tester.tap(find.byKey(ValueKey('plan-start-${plan.id}')));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 200));
     expect(find.byType(PlayerPage), findsOneWidget);
-    expect(find.textContaining('准备'), findsWidgets);
+    expect(s.store.lastPlan?.id, plan.id);
     await tester.tap(find.byKey(const ValueKey('skip')));
     await tester.pump(const Duration(milliseconds: 200));
-    expect(find.textContaining('秒'), findsWidgets);
-
-    // Close → confirm → back on the plan.
     await tester.tap(find.byKey(const ValueKey('close')));
     await tester.pumpAndSettle();
     await tester.tap(find.text('结束'));
     await tester.pumpAndSettle();
     expect(find.byType(PlayerPage), findsNothing);
     expect(s.store.history, hasLength(1));
+    expect(find.byType(ChatHomePage), findsOneWidget);
+    expect(s.chat.messages.last.isUser, isFalse);
+    expect(s.chat.messages.last.isPlan, isFalse); // a word after the workout
   });
 
-  testWidgets('a "是" safety answer keeps the app in browse-only mode', (tester) async {
+  testWidgets('a "是" in the safety talk → advice, no plans, library still open', (tester) async {
     tall(tester);
     final s = services();
     await tester.pumpWidget(SmartFitApp(services: s));
     await tester.pumpAndSettle();
-    final yes = find.text('是').evaluate().toList();
-    final no = find.text('否').evaluate().toList();
-    await tester.tap(find.byWidget(yes.first.widget));
-    for (final n in no.skip(1)) {
-      await tester.tap(find.byWidget(n.widget));
-    }
-    await tester.ensureVisible(find.byType(CheckboxListTile));
-    await tester.tap(find.byType(CheckboxListTile));
-    await tester.pump();
-    await tester.ensureVisible(find.byKey(const ValueKey('safety-continue')));
-    await tester.tap(find.byKey(const ValueKey('safety-continue')));
-    await tester.pumpAndSettle();
+    await answerSafety(tester, ['否', '是']);
+    expect(s.store.safetyAccepted, isTrue);
     expect(s.store.safetyBlocked, isTrue);
-    await tester.pumpWidget(AppScope(services: s, child: const MaterialApp(home: HomePage())));
+    expect(find.textContaining('医生的康复安排'), findsOneWidget);
+
+    await say(tester, '在家 10 分钟拉伸');
+    expect(find.byType(PlanCard), findsNothing);
+    expect(find.textContaining('先不生成训练计划'), findsWidgets);
+
+    await tester.tap(openOption('浏览动作库').first);
     await tester.pumpAndSettle();
+    expect(find.byType(LibraryPage), findsOneWidget);
+  });
+
+  testWidgets('typing during the safety talk waits for it', (tester) async {
+    tall(tester);
+    final s = services();
+    await tester.pumpWidget(SmartFitApp(services: s));
+    await tester.pumpAndSettle();
+    await say(tester, '在家 10 分钟拉伸');
+    expect(find.byType(PlanCard), findsNothing);
+    expect(find.textContaining('先把上面的安全确认做完'), findsOneWidget);
+    expect(s.store.safetyAccepted, isFalse);
+  });
+
+  testWidgets('drawer: saved plans, show one in the chat, app entries', (tester) async {
+    tall(tester);
+    final s = services();
+    await s.store.acceptSafety(blocked: false);
+    await tester.pumpWidget(SmartFitApp(services: s));
+    await tester.pumpAndSettle();
+
+    await say(tester, '在家 15 分钟练核心，徒手');
+    final plan = s.chat.currentPlan!;
+    await tester.tap(find.byKey(ValueKey('plan-save-${plan.id}')));
+    await tester.pumpAndSettle();
+    await say(tester, '讲个笑话');
+
+    await tester.tap(find.byKey(const ValueKey('open-plans')));
+    await tester.pumpAndSettle();
+    expect(find.text('我的计划'), findsWidgets);
+    final saved = s.store.savedPlans.single;
+    await tester.tap(find.byKey(ValueKey('saved-${saved.id}')));
+    await tester.pumpAndSettle();
+    expect(s.chat.messages.last.plan?.id, plan.id); // shown again as a card
+
+    await tester.tap(find.byKey(const ValueKey('open-plans')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('drawer-custom')));
+    await tester.pumpAndSettle();
+    expect(find.text('描述你今天想怎么练'), findsOneWidget);
+  });
+
+  testWidgets('the custom form (drawer entry) still generates plans', (tester) async {
+    tall(tester);
+    final s = services();
+    await s.store.acceptSafety(blocked: false);
+    await tester.pumpWidget(AppScope(services: s, child: const MaterialApp(home: CustomPlanPage())));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byKey(const ValueKey('prompt')), '在办公室午休 10 分钟，肩颈很僵');
     await tester.ensureVisible(find.byKey(const ValueKey('generate')));
     await tester.tap(find.byKey(const ValueKey('generate')));
     await tester.pumpAndSettle();
-    expect(find.text('暂不生成训练计划'), findsOneWidget);
+    expect(find.text('工位肩颈腰放松'), findsWidgets);
+    expect(find.text('开始跟练'), findsOneWidget);
   });
 }

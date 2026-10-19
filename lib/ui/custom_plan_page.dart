@@ -4,8 +4,6 @@ import '../app/services.dart';
 import '../domain/exercise.dart';
 import '../domain/scenario.dart';
 import '../domain/template.dart';
-import 'about_page.dart';
-import 'library_page.dart';
 import 'plan_page.dart';
 import 'theme.dart';
 
@@ -18,13 +16,15 @@ const examplePrompts = [
   '膝盖不太好，想练练臀腿',
 ];
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+/// The original form (目标 / 场景 / 器械 / 时长 / 水平 / 保护部位 + templates),
+/// kept as the 「自定义计划」 entry in the chat drawer.
+class CustomPlanPage extends StatefulWidget {
+  const CustomPlanPage({super.key});
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<CustomPlanPage> createState() => _CustomPlanPageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _CustomPlanPageState extends State<CustomPlanPage> {
   final _text = TextEditingController();
   var _req = const ScenarioRequest(minutes: 10);
   bool _busy = false;
@@ -44,7 +44,7 @@ class _HomePageState extends State<HomePage> {
           title: const Text('暂不生成训练计划'),
           content: const Text(
             '你在安全确认里选了需要注意的情况。建议先咨询医生；你仍可以在「动作库」里浏览动作示范。'
-            '如情况已变化，可在「关于」里重新做安全确认。',
+            '如情况已变化，可在「关于与设置」里重新做安全确认。',
           ),
           actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('知道了'))],
         ),
@@ -88,23 +88,7 @@ class _HomePageState extends State<HomePage> {
     final s = AppServices.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('智能健身助手', style: TextStyle(fontWeight: FontWeight.w700)),
-        actions: [
-          IconButton(
-            tooltip: '动作库',
-            icon: const Icon(Icons.grid_view_rounded),
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute<void>(builder: (_) => const LibraryPage()),
-            ),
-          ),
-          IconButton(
-            tooltip: '关于与设置',
-            icon: const Icon(Icons.info_outline_rounded),
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute<void>(builder: (_) => const AboutPage()),
-            ),
-          ),
-        ],
+        title: const Text('自定义计划', style: TextStyle(fontWeight: FontWeight.w700)),
       ),
       body: ListenableBuilder(
         listenable: s.store,

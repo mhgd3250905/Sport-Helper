@@ -4,7 +4,7 @@ import 'package:smartfit/app/services.dart';
 import 'package:smartfit/core/storage/local_state_storage.dart';
 import 'package:smartfit/data/app_store.dart';
 import 'package:smartfit/domain/scenario.dart';
-import 'package:smartfit/ui/home_page.dart';
+import 'package:smartfit/ui/custom_plan_page.dart';
 import 'package:smartfit/voice/voice_library.dart';
 import 'package:smartfit/voice/voice_queue.dart';
 
@@ -57,7 +57,7 @@ void main() {
     await tester.pumpWidget(
       AppScope(
         services: services,
-        child: const MaterialApp(home: HomePage()),
+        child: const MaterialApp(home: CustomPlanPage()),
       ),
     );
     await tester.pumpAndSettle();
