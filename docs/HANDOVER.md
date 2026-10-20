@@ -1,5 +1,7 @@
 # 智能健身助手（SmartFit）交接说明
 
+> 美学 v2 检查点（2026-10-20）：PR #3 已合入 `main@a5997ef`，里程碑 `m7-aesthetic-v2`。对话入口、共享控件与动效统一，93 个动作均有浅色媒体；动作包版本 1.1.0，公共包 1.0.0。五项审核意见全部修复并复验：静态分析 0 issue、144 项测试、5 项独立复现/无障碍检查、资源校验 0 errors、Web release 与 Android debug 构建通过。合并树与审核源 `7ef80d7` 完全一致，详见 [PR #3 本机审核记录](pr3-local-review.md)。本次没有更新手机；真机媒体、系统中断与 release 验收继续待办。
+
 > 输入与设备检查点（2026-10-19）：`m6-input-focus` 修复对话输入框上下留白点不到的问题，新增 4 项回归，全量 102 项测试及 Web release / Android debug 构建通过；已覆盖安装到小米 Android 16，用户确认输入测试通过。目前手机为搜狗输入法，USB 调试保持连接。完整媒体、系统中断及 release 验收仍见 [acceptance.md](acceptance.md)。
 
 > 最新本机复验（2026-10-19）：PR #1 已合入 main（`adafcf9`，`m4-drill-packs`）；PR #2 已改 base 为 main，本机修复安全入口、保存复用约束与小屏交互后，98 项测试、截图检查及 Web release / Android debug 构建通过。见 [PR #2 审核记录](pr2-local-review.md) 和 [验收记录](acceptance.md)。下文保留各阶段历史；Android 真机与 release 签名尚未验收，`m3-local-verified` 未打。
