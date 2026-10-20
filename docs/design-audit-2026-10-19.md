@@ -297,3 +297,34 @@
 | 6 PR | 子代理 review 修 P1/P2；对比图；PR 到 main（不合并） | — |
 
 每阶段：`flutter analyze` 0 issue；push 前 `flutter test` 全量；`6d4eb30` 的输入区整块可点击回归（`chat_input_test.dart`）必须保持通过；所有测试用的 `ValueKey` 保留（`plan-start-*`、`plan-save-*`、`pause`、`skip`、`prev`、`close`、`discomfort`、`counter`、`finish`、`chat-input`、`chat-send`、`open-plans`、`saved-*`、`appearance-*` 等）。
+
+---
+
+## 8. 实施记录与已知限制
+
+### 8.1 阶段 3 动效（tag `aesthetic-v2-motion`）
+
+| 项 | 落地 | 位置 |
+|---|---|---|
+| M10–M12 倒计时 | `SfCountdownRing` 接入跟练页；计时器 50 ms，只更新 `ValueNotifier` 让圆环自己重绘，页面只在“显示的秒数 / 次数 / 阶段 / 字幕”变化时重建（约 1 Hz，原来 4 Hz 整页）；数字滚动 + 新数 .92→1 settle；计时阶段最后 3 秒呼吸、数字转强调色、每秒一下选择触感；休息 / 准备的环为中性色，最后 3 秒转强调色 | `player_page.dart`、`theme/countdown.dart` |
+| M13 阶段切换 | 动作名 280 ms 淡入上浮、标签 / 元信息 / 块名 180 ms 淡入、字幕淡入、媒体 420 ms 交叉淡入；进入训练组一下中等触感；休息时媒体左上「下一个」 | `player_page.dart` |
+| M14 暂停 | 环与数字 280 ms 降到 45%；暂停圆盘图标旋转 + 缩放形变 180 ms（减少动态效果：只淡入） | 同上 |
+| M15 进度条 | 420 ms 补间（减少动态效果：直接跳） | 同上 |
+| M16 完成 | `SfFinishTimeline` 一个控制器：勾描线 520 → 扩散环一次 → 标题 / 计划名 / 统计 / 按钮依次淡入上浮 → 统计数字计数；完成一下中等触感；提前结束无扩散环无触感；减少动态效果直接静态 | `theme/celebration.dart` |
+| M2 页面横推 | `SfPageTransitionsBuilder` 设为所有平台的 `pageTransitionsTheme`（400 / 340，被覆盖页左移 25% + 压暗）；卡片 → 跟练仍是容器展开，聊天页不跟着移动 | `theme/transitions.dart` |
+| M4 消息入场 | `Appear`：从说话人一侧的下角 fade + 10px + .98→1；同一次回复的助手消息依次错开 120 ms（先话后卡）；延迟写在动画 Interval 里，不留计时器；减少动态效果 200 ms 纯淡入 | `chat_widgets.dart`、`chat_home_page.dart` |
+| M6 chip 换批 | 每批 chip 依次 40 ms 错开、8px 左移淡入 | `chat_widgets.dart` |
+| M7 / M8 计划卡 | 新卡封面 1.04→1.0（600 ms，一次）；展开全部 `AnimatedSize` 280 ms 容器曲线 + 新行 30 ms 错开淡入 + chevron 旋转 180° + 选择触感 | `plan_card.dart` |
+| M9 发送键 | 箭头 180 ms 缩放（减少动态效果：只换色） | `chat_widgets.dart` |
+| M18 Toast | `showSfToast` 进 280 / 出 180 + 8px 上浮；自定义计划的错误提示也换成它 | `theme/components.dart` |
+| M19 弹层 | 不舒服、动作详情弹层都用 `SfMotion.sheet` | — |
+| 测试 | `test/motion_test.dart`：呼吸 / 降级、数字滚动、圆环不随页面重建也在走、横推 / 降级、消息角落入场 / 降级、完成动画收敛 | — |
+
+### 8.2 已知限制
+
+| 项 | 情况 | 处理 |
+|---|---|---|
+| 暂停时环中 caption | 规划写“环中 caption 变「已暂停」”；但媒体左上已有「已暂停」标签，两处同字重复（回归测试也要求只出现一次） | 环只降到 45%，“已暂停”由媒体标签说一次 |
+| 媒体交叉淡入 | 420 ms 内新旧两个视频控件同时存在（原生端短暂两路解码） | 接受；只在动作切换时发生 |
+| Toast | 仍基于 `SnackBar`（系统淡入 + 我们的 8px 上浮与时长），不是自绘 Overlay | 观感一致，避免测试里遗留计时器 |
+| M5 大字问候 | 依赖阶段 4 的问候排版 | 随阶段 4 落地 |
