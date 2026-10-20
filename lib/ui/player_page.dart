@@ -16,6 +16,7 @@ import 'exercise_video.dart';
 import 'theme/app_theme.dart';
 import 'theme/celebration.dart';
 import 'theme/countdown.dart';
+import 'theme/media_theme.dart';
 import 'theme/sf_icons.dart';
 import 'theme/tokens.dart';
 import 'theme/widgets.dart';
@@ -675,8 +676,8 @@ class _PlayerPageState extends State<PlayerPage> {
               child: SizedBox.square(
                 dimension: 44,
                 child: ColoredBox(
-                  color: SfColors.mediaStage,
-                  child: Image.asset(e.media.poster, fit: BoxFit.cover,
+                  color: sfStageFor(e).mediaStage,
+                  child: Image.asset(sfPoster(e), fit: BoxFit.cover,
                       errorBuilder: (_, _, _) => const SizedBox.shrink()),
                 ),
               ),

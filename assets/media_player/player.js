@@ -155,6 +155,8 @@ const pos = /^\d{1,3}% \d{1,3}%$/.test(params.get('pos') || '') ? params.get('po
 video.style.objectFit = fit;
 video.style.objectPosition = pos;
 // SmartFit 2026-10-19: `id` is a drill-pack id; the clip is the pack's
-// demo.mp4 (assets/packs/<id>/, served at /packs/<id>/). No light variant.
+// demo.mp4 (assets/packs/<id>/, served at /packs/<id>/); variant=light plays
+// the light-stage render demo-light.mp4 (2026-10-20, light theme).
+const clip = params.get('variant') === 'light' ? 'demo-light.mp4' : 'demo.mp4';
 if (!/^[A-Za-z0-9]+(?:-[A-Za-z0-9]+)*$/.test(id || '')) emit('error');
-else { video.src=`../packs/${id}/demo.mp4`; }
+else { video.src=`../packs/${id}/${clip}`; }

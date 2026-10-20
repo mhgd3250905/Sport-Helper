@@ -87,8 +87,8 @@ class SfPalette {
   /// Destructive confirmations (删除, 结束今天的训练).
   final Color danger;
 
-  /// What sits behind a drill clip: the renders are baked on #101013, so
-  /// the stage is the same in both themes (until light renders exist).
+  /// What sits behind a drill clip: the colour its render is baked on
+  /// (#101013 dark renders, #EFEFEF light-stage renders, §6).
   final Color mediaStage;
 
   /// Text laid over a media stage (the plan card's title and meta line).
@@ -143,8 +143,8 @@ class SfPalette {
 
   static const light = SfPalette(
     brightness: Brightness.light,
-    skyTop: Color(0xFFFBFBFA),
-    skyBottom: Color(0xFFEFF1EE),
+    skyTop: Color(0xFFFAFAF8),
+    skyBottom: Color(0xFFEEF0EC),
     dust: Color(0xFF7D8781),
     background: Color(0xFFF4F5F3),
     surface: Color(0xFFFFFFFF),
@@ -158,9 +158,9 @@ class SfPalette {
     faint: Color(0xFF9AA29E),
     caution: Color(0xFFB8650F),
     danger: Color(0xFFD43F3F),
-    mediaStage: Color(0xFF101013),
-    onStage: Color(0xFFFFFFFF),
-    onStageMuted: Color(0xB8FFFFFF),
+    mediaStage: Color(0xFFEFEFEF),
+    onStage: Color(0xFF121614),
+    onStageMuted: Color(0xFF5D6661),
     thumb: Color(0xFFFFFFFF),
     scrim: Color(0x8C000000),
     track: Color(0x14000000),

@@ -243,7 +243,7 @@ class ChatState {
     this.saved = const [],
     this.lastPlan,
     this.history = const [],
-    this.appearance = 'dark',
+    this.appearance = 'system',
     this.now,
   });
 

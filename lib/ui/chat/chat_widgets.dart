@@ -116,6 +116,9 @@ class _Bubble extends StatelessWidget {
       decoration: BoxDecoration(
         color: user ? SfColors.userBubble : SfColors.assistantBubble,
         borderRadius: r,
+        // Light: white on near-white needs the hairline as well as the
+        // faint ink shadow (§6.2); dark: the tone step carries it.
+        border: user || SfColors.isDark ? null : Border.fromBorderSide(SfColors.cardEdge),
         boxShadow: user ? null : SfColors.cardShadow,
       ),
       child: Padding(

@@ -65,8 +65,9 @@ class AppStore extends ChangeNotifier {
   /// Drifting star dust behind the chat (off = static sky).
   bool starfield = true;
 
-  /// 外观: 'dark' (深空, default), 'light' (白色无边空间) or 'system'.
-  String appearance = 'dark';
+  /// 外观: 'dark' (深空), 'light' (白色无边空间) or 'system' (default since the
+  /// light-stage media landed, §6.3; a stored choice is kept).
+  String appearance = 'system';
   static const appearances = ['dark', 'light', 'system'];
 
   /// How many chat messages are kept on the device.

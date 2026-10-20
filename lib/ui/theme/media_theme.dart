@@ -14,3 +14,9 @@ String sfPoster(Exercise e) => sfUsesLight(e) ? e.media.lightPoster! : e.media.p
 /// (Light stage = #EFEFEF, the light renders' background.)
 SfPalette sfStageFor(Exercise? e) =>
     e != null && sfUsesLight(e) ? SfPalette.light : SfPalette.dark;
+
+/// The clip for the theme in effect.
+String sfVideo(Exercise e) => sfUsesLight(e) ? e.media.lightVideo! : e.media.video;
+
+/// The web player's variant ('light' → `demo-light.mp4`), or null.
+String? sfVariant(Exercise e) => sfUsesLight(e) ? 'light' : null;

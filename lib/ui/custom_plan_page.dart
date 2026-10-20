@@ -294,7 +294,7 @@ class _CustomPlanPageState extends State<CustomPlanPage> {
               child: SizedBox.square(
                 dimension: 64,
                 child: ColoredBox(
-                  color: SfColors.mediaStage,
+                  color: sfStageFor(first).mediaStage,
                   child: first == null
                       ? null
                       : Image.asset(sfPoster(first), fit: BoxFit.cover, errorBuilder: (_, _, _) => const SizedBox.shrink()),

@@ -6,6 +6,7 @@ import '../../domain/session.dart';
 import '../theme.dart' show levelZh;
 import '../theme/sf_icons.dart';
 import '../theme/tokens.dart';
+import '../theme/media_theme.dart';
 import '../theme/widgets.dart';
 import 'expand_route.dart';
 
@@ -235,14 +236,18 @@ class _CoverStage extends StatelessWidget {
   final VoidCallback onOpen;
 
   @override
-  Widget build(BuildContext context) => ClipRRect(
+  Widget build(BuildContext context) {
+    // The stage is the colour the cover is baked on; title and meta take
+    // that stage's ink (dark ink on the light stage, white on the dark).
+    final stage = sfStageFor(cover);
+    return ClipRRect(
     borderRadius: BorderRadius.circular(SfRadius.lg - SfSpace.x2),
     child: AspectRatio(
       aspectRatio: 16 / 11,
       child: Stack(
         fit: StackFit.expand,
         children: [
-          ColoredBox(color: SfColors.mediaStage),
+          ColoredBox(color: stage.mediaStage),
           if (cover != null)
             GestureDetector(
               onTap: onOpen,
@@ -253,7 +258,7 @@ class _CoverStage extends StatelessWidget {
                 curve: SfMotion.standard,
                 builder: (_, k, img) => k == 1 ? img! : Transform.scale(scale: k, child: img),
                 child: Image.asset(
-                  cover!.media.poster,
+                  sfPoster(cover!),
                   fit: BoxFit.cover,
                   alignment: const Alignment(0, -.15),
                   errorBuilder: (_, _, _) => const SizedBox.shrink(),
@@ -268,7 +273,7 @@ class _CoverStage extends StatelessWidget {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   stops: const [.38, 1],
-                  colors: [SfColors.mediaStage.withValues(alpha: 0), SfColors.mediaStage.withValues(alpha: .92)],
+                  colors: [stage.mediaStage.withValues(alpha: 0), stage.mediaStage.withValues(alpha: .92)],
                 ),
               ),
             ),
@@ -286,8 +291,8 @@ class _CoverStage extends StatelessWidget {
                     title,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: stage.onStage,
                       fontSize: 22,
                       height: 1.25,
                       fontWeight: FontWeight.w700,
@@ -298,8 +303,8 @@ class _CoverStage extends StatelessWidget {
                     meta,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: Color(0xB8FFFFFF),
+                    style: TextStyle(
+                      color: stage.onStageMuted,
                       fontSize: 13,
                       height: 1.4,
                       fontWeight: FontWeight.w500,
@@ -314,6 +319,7 @@ class _CoverStage extends StatelessWidget {
       ),
     ),
   );
+  }
 }
 
 /// 「开始」: the card's one prominent action and the app's one raised
@@ -386,11 +392,11 @@ class _MoveRow extends StatelessWidget {
           child: SizedBox.square(
             dimension: 36,
             child: ColoredBox(
-              color: SfColors.mediaStage,
+              color: sfStageFor(exercise).mediaStage,
               child: exercise == null
                   ? null
                   : Image.asset(
-                      exercise!.media.poster,
+                      sfPoster(exercise!),
                       fit: BoxFit.cover,
                       errorBuilder: (_, _, _) => const SizedBox.shrink(),
                     ),
