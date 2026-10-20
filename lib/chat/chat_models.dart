@@ -48,6 +48,7 @@ class ChatMessage {
     this.plan,
     this.request,
     this.greeting = false,
+    this.aiVisible = false,
   });
 
   final String id;
@@ -67,10 +68,14 @@ class ChatMessage {
   /// (first line = 早上好 / 晚上好…, the rest = the invitation).
   final bool greeting;
 
+  /// Only completed AI turns are eligible for subsequent model history.
+  /// Local commands, records and safety answers are never shared implicitly.
+  final bool aiVisible;
+
   bool get isUser => role == ChatRole.user;
   bool get isPlan => plan != null;
 
-  ChatMessage copyWith({int? chosen}) => ChatMessage(
+  ChatMessage copyWith({int? chosen, bool? aiVisible}) => ChatMessage(
     id: id,
     role: role,
     at: at,
@@ -80,6 +85,7 @@ class ChatMessage {
     plan: plan,
     request: request,
     greeting: greeting,
+    aiVisible: aiVisible ?? this.aiVisible,
   );
 
   Map<String, Object?> toJson() => {
@@ -92,6 +98,7 @@ class ChatMessage {
     'plan': ?plan?.toJson(),
     'request': ?(request == null ? null : requestToJson(request!)),
     if (greeting) 'greeting': true,
+    if (aiVisible) 'aiVisible': true,
   };
 
   factory ChatMessage.fromJson(Map<String, dynamic> j) => ChatMessage(
@@ -105,6 +112,7 @@ class ChatMessage {
     ],
     chosen: (j['chosen'] as num?)?.toInt(),
     greeting: j['greeting'] == true,
+    aiVisible: j['aiVisible'] == true,
     plan: j['plan'] is Map
         ? TrainingPlan.fromJson(Map<String, dynamic>.from(j['plan'] as Map))
         : null,
@@ -177,6 +185,16 @@ class Slots {
   final Set<String> focus;
   final String description;
 
+  factory Slots.fromRequest(ScenarioRequest request) => Slots(
+    goal: request.goal,
+    scene: request.scene,
+    minutes: request.minutes,
+    equipment: request.equipment,
+    level: request.level,
+    avoid: request.avoid,
+    description: request.description,
+  );
+
   bool get isEmpty =>
       goal == null &&
       scene == null &&
@@ -236,6 +254,8 @@ class Slots {
 class ChatState {
   const ChatState({
     this.pending,
+    this.coachContext,
+    this.recentMessages = const [],
     this.asked = const [],
     this.plan,
     this.request,
@@ -250,6 +270,10 @@ class ChatState {
 
   /// A plan request still waiting for an answer to a follow-up question.
   final Slots? pending;
+
+  /// Explicit constraints and recent chat for the SDK; workout logs stay local.
+  final Slots? coachContext;
+  final List<ChatMessage> recentMessages;
 
   /// Slots already asked about for [pending] ('goal', 'minutes', 'equipment').
   final List<String> asked;
@@ -282,6 +306,8 @@ class ChatState {
 
   ChatState copyWith({
     Slots? pending,
+    Slots? coachContext,
+    List<ChatMessage>? recentMessages,
     bool clearPending = false,
     List<String>? asked,
     TrainingPlan? plan,
@@ -295,6 +321,8 @@ class ChatState {
     DateTime? now,
   }) => ChatState(
     pending: clearPending ? null : (pending ?? this.pending),
+    coachContext: coachContext ?? this.coachContext,
+    recentMessages: recentMessages ?? this.recentMessages,
     asked: clearPending ? const [] : (asked ?? this.asked),
     plan: plan ?? this.plan,
     request: request ?? this.request,
@@ -325,6 +353,7 @@ class ChatReply {
     required this.state,
     this.suggestions = const [],
     this.action,
+    this.aiTurn = false,
   });
 
   final List<BotMessage> messages;
@@ -335,6 +364,7 @@ class ChatReply {
 
   /// A command for the app to run after showing the reply (`@library`…).
   final String? action;
+  final bool aiTurn;
 }
 
 /// Turns what the user typed into assistant replies. [RuleChatEngine] is
@@ -343,4 +373,10 @@ class ChatReply {
 abstract interface class ChatEngine {
   String get id;
   Future<ChatReply> reply(String text, ChatState state);
+}
+
+/// Engines with an in-flight request owned by the home conversation.
+abstract interface class ManagedChatEngine implements ChatEngine {
+  void cancelPending();
+  void dispose();
 }

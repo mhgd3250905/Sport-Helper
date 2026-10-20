@@ -5,7 +5,7 @@ import '../app/services.dart';
 import '../chat/safety_script.dart' show disclaimerText;
 import 'theme.dart';
 
-const appVersion = '0.1.0+3 (MVP)';
+const appVersion = '0.1.0+4 (MVP)';
 
 class AboutPage extends StatelessWidget {
   const AboutPage({super.key});
@@ -64,6 +64,19 @@ class AboutPage extends StatelessWidget {
                 ],
               ),
             ),
+            const SfSectionTitle('隐私与 AI'),
+            SfPanel(
+              child: Text(
+                '启用 AI 时，你输入的内容、近期对话、当前计划和训练条件会经 '
+                'https://ugk-ai-proxy.294851575.workers.dev/v1 '
+                '发送给 AI 服务，用于生成回复与训练计划。\n\n'
+                'App 在本机随机生成并保存设备标识，随 AI 请求发送，用于服务器限流：'
+                '每个设备每 10 分钟最多 30 次请求，限制由服务器执行。\n\n'
+                '训练记录和已保存计划保存在本机。断网、请求超时或生成结果校验未通过时，'
+                '使用本地模板生成训练计划。',
+                style: SfType.body.copyWith(fontSize: 14.5, color: SfColors.muted),
+              ),
+            ),
             const SfSectionTitle('免责声明'),
             SfPanel(
               child: Column(
@@ -120,7 +133,7 @@ class AboutPage extends StatelessWidget {
             const SizedBox(height: SfSpace.x6),
             Center(
               child: Text(
-                '版本 $appVersion · 训练计划由内置模板生成，不联网、不收集个人数据。',
+                '版本 $appVersion',
                 textAlign: TextAlign.center,
                 style: SfType.caption,
               ),

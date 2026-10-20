@@ -96,13 +96,14 @@ class ChatController extends ChangeNotifier {
     appearance: store.appearance,
     systemLight: PlatformDispatcher.instance.platformBrightness == Brightness.light,
     now: _clock(),
+    recentMessages: List.unmodifiable(messages.skip(messages.length > 20 ? messages.length - 20 : 0)),
   );
 
   /// The user typed [text] (or tapped a chip / option labelled [label]).
   Future<void> send(String text, {String? label}) async {
     final t = text.trim();
     if (t.isEmpty || typing) return;
-    _user(label ?? t);
+    final userMessage = _user(label ?? t);
     if (inSafetyCheck) {
       _bot(const BotMessage('先把上面的安全确认做完，再帮你排计划。'));
       notifyListeners();
@@ -117,8 +118,9 @@ class ChatController extends ChangeNotifier {
     if (epoch != _replyEpoch) return;
     typing = false;
     _state = reply.state;
+    if (reply.aiTurn) _replace(userMessage.copyWith(aiVisible: true));
     for (final m in reply.messages) {
-      _bot(m);
+      _bot(m, aiVisible: reply.aiTurn);
     }
     // A question with its own options doesn't need the chips too.
     final asks = reply.messages.any((m) => m.options.isNotEmpty);
@@ -217,7 +219,12 @@ class ChatController extends ChangeNotifier {
     if (!store.trainingAllowed) return false;
     final card = messages.where((m) => m.plan?.id == p.id).lastOrNull;
     final request = card?.request ?? requestForPlan(p);
-    _state = _state.copyWith(clearPending: true, plan: p, request: request);
+    _state = _state.copyWith(
+      clearPending: true,
+      plan: p,
+      request: request,
+      coachContext: Slots.fromRequest(request).merge(Slots(avoid: _state.coachContext?.avoid ?? const {})),
+    );
     // A plan edited in its detail page is a distinct version. Keep that
     // exact snapshot so the post-workout save offer survives a restart.
     if (card == null) _bot(BotMessage('', plan: p, request: request));
@@ -265,6 +272,7 @@ class ChatController extends ChangeNotifier {
 
   void _beginSafety({required bool firstRun}) {
     _replyEpoch++;
+    if (engine case final ManagedChatEngine managed) managed.cancelPending();
     typing = false;
     unawaited(store.beginSafetyCheck());
     if (firstRun) {
@@ -338,7 +346,7 @@ class ChatController extends ChangeNotifier {
     text: text,
   ));
 
-  ChatMessage _bot(BotMessage m) => _add(ChatMessage(
+  ChatMessage _bot(BotMessage m, {bool aiVisible = false}) => _add(ChatMessage(
     id: _id(),
     role: ChatRole.assistant,
     at: _clock(),
@@ -347,6 +355,7 @@ class ChatController extends ChangeNotifier {
     plan: m.plan,
     request: m.request,
     greeting: m.greeting,
+    aiVisible: aiVisible,
   ));
 
   ChatMessage _add(ChatMessage m) {
@@ -367,6 +376,7 @@ class ChatController extends ChangeNotifier {
   @override
   void dispose() {
     _replyEpoch++;
+    if (engine case final ManagedChatEngine managed) managed.cancelPending();
     _actions.close();
     super.dispose();
   }

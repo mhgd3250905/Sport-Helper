@@ -1,12 +1,13 @@
 # 智能健身助手 SmartFit
 
-描述训练场景 → 按模板生成规范训练计划 → 用预渲染动作直接展示训练小组 → 跟练（计时 / 组 × 次数 / 休息 / 换侧 / 语音播报）。
+描述训练场景 → AI 回复与生成规范训练计划（异常时回退本地模板）→ 用预渲染动作直接展示训练小组 → 跟练（计时 / 组 × 次数 / 休息 / 换侧 / 语音播报）。
 
 主界面是一段对话（[docs/chat-home.md](docs/chat-home.md)）：说想怎么练，助手追问一两句后回一张计划卡片，点「开始训练」直接跟练，「保存」后下次说「上次那个」或从左下角抽屉一键开始。
 
 - 包名 `com.ugk.smartfit`（与 `com.ugk.hiplab` 同族），App 名「智能健身助手」
 - Flutter（沙盒 3.47.6 / Dart 3.13，`sdk: ^3.12.0`，与 HipLab 3.44.7 兼容），Android 先行，iOS 同代码库
-- 完全离线、无账号、不联网（WebView 只连本机回环地址播放内置视频）
+- 无账号，训练记录和已保存计划保存在本机；WebView 通过本机回环地址播放内置视频。
+- 启用 AI 时，输入内容、近期对话和训练条件经 `https://ugk-ai-proxy.294851575.workers.dev/v1` 发送给 AI 服务，并携带本机随机生成的设备标识；服务器按每设备每 10 分钟最多 30 次请求限流。断网、超时或生成结果校验失败时回退本地模板。
 
 ## 版本与验收入口
 
@@ -20,11 +21,11 @@
 ## 目录
 
 ```
-lib/domain/      纯规则：exercise / plan(TrainingPlan v1) / template / scenario(描述匹配) /
-                 plan_generator(模板生成 + AI 预留接口) / plan_validator / session(SDK 计划及节奏适配)
+lib/domain/      训练领域：exercise / plan(TrainingPlan v1) / template / scenario(描述匹配) /
+                 plan_generator(本地模板生成) / plan_validator / session(SDK 计划及节奏适配)
 lib/voice/       ugk_trainer 导出入口；App 语言偏好与素材测试适配，训练语音由 SDK 负责
 lib/core/        复制自 HipLab（媒体播放 WebView、本地存储、屏幕常亮），文件头注明来源
-lib/chat/        对话：ChatEngine 接口 + RuleChatEngine（关键词/槽位 + 模板 + 校验）、SlotParser、
+lib/chat/        对话：ChatEngine 接口、AI 回复与本地规则回退、SlotParser、
                  ChatController（会话、开场安全确认、保存计划、本地历史）、safety_script（免责声明与 4 问）
 lib/ui/chat/     对话主界面：星尘背景、色调气泡、计划卡片、已存计划抽屉
 lib/ui/          训练计划(训练小组) → 跟练 → 动作库 / 设置；custom_plan_page = 原表单（对话「自己选条件」）

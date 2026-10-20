@@ -53,8 +53,8 @@ class RuleChatEngine implements ChatEngine {
 
   static const _maxQuestions = 2;
 
-  @override
-  Future<ChatReply> reply(String input, ChatState s) async {
+  /// Commands and safety messages stay on-device even when AI is enabled.
+  ChatReply? localReply(String input, ChatState s) {
     final t = input.trim();
     if (t.isEmpty) return ChatReply(messages: const [], state: s);
 
@@ -80,6 +80,15 @@ class RuleChatEngine implements ChatEngine {
     if (_any(t, ['我的计划', '保存的', '存的计划', '收藏', '已保存', '我存的'])) {
       return _listSaved(s);
     }
+
+    return null;
+  }
+
+  @override
+  Future<ChatReply> reply(String input, ChatState s) async {
+    final local = localReply(input, s);
+    if (local != null) return local;
+    final t = input.trim();
 
     final slots = parser.parse(t, asked: s.pending == null ? null : s.asked.lastOrNull);
 
@@ -160,6 +169,7 @@ class RuleChatEngine implements ChatEngine {
       return _plan(slots, s.copyWith(clearPending: true));
     }
     if (pending != null) {
+      if (s.asked.isEmpty) return _plan(pending, s);
       final q = _question(s.asked.last, pending);
       return ChatReply(
         messages: [BotMessage('没太听明白。${q.text}', options: q.options)],

@@ -2,9 +2,12 @@ import 'dart:convert';
 
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter/widgets.dart';
+import 'package:ugk_coach/ugk_coach.dart' as coach;
 import 'package:ugk_trainer/ugk_trainer.dart';
 
 import '../chat/chat_controller.dart';
+import '../chat/ai_chat_engine.dart';
+import '../chat/ai_coach_config.dart';
 import '../chat/chat_models.dart';
 import '../chat/rule_chat_engine.dart';
 import '../data/app_store.dart';
@@ -21,6 +24,10 @@ class AppServices {
     required this.store,
     required this.voiceLibrary,
     required this.voiceOutput,
+    this.coachCatalog,
+    this.coachProfile,
+    this.aiConfig = const AiCoachConfig.fromEnvironment(),
+    this.deviceId,
     this.chatReplyDelay = const Duration(milliseconds: 450),
   }) : templates = TemplatePlanGenerator(lib: library, catalog: catalog);
 
@@ -29,9 +36,12 @@ class AppServices {
   final AppStore store;
   final VoiceSource voiceLibrary;
   final VoiceOutput voiceOutput;
+  final coach.Catalog? coachCatalog;
+  final coach.CoachProfile? coachProfile;
+  final AiCoachConfig aiConfig;
+  final String? deviceId;
 
-  /// MVP: fixed templates only. An AI generator plugs in behind the same
-  /// interface later (see AiPlanGenerator).
+  /// Manual forms stay deterministic; AI enters through the chat engine.
   final TemplatePlanGenerator templates;
   PlanGenerator get generator => templates;
 
@@ -43,6 +53,8 @@ class AppServices {
 
   /// The output belongs to the App, so page navigation never destroys it.
   Future<void> dispose() async {
+    chat.dispose();
+    if (chatEngine case final ManagedChatEngine managed) managed.dispose();
     final output = voiceOutput;
     if (output is JustAudioVoiceOutput) {
       await output.dispose();
@@ -51,13 +63,18 @@ class AppServices {
     }
   }
 
-  /// What answers in the chat home.
-  /// Rules + templates today; a model-backed [ChatEngine] later, with the
-  /// same plan validation.
-  late final ChatEngine chatEngine = RuleChatEngine(
-    lib: library,
-    templates: templates,
-  );
+  /// No token means the original offline engine; a token never goes to storage.
+  late final ChatEngine chatEngine = _createChatEngine();
+
+  ChatEngine _createChatEngine() {
+    final local = RuleChatEngine(lib: library, templates: templates);
+    final catalog = coachCatalog;
+    final profile = coachProfile;
+    final id = deviceId;
+    if (!aiConfig.enabled || catalog == null || profile == null || id == null) return local;
+    return AiChatEngine(local: local, catalog: catalog, profile: profile,
+      client: aiConfig.createClient(deviceId: id));
+  }
 
   /// The "typing" pause before a reply (zero in tests and screenshots).
   final Duration chatReplyDelay;
@@ -72,7 +89,7 @@ class AppServices {
   /// The exercise library and the voice lines both come from the drill
   /// packs (assets/packs/, docs/drill-pack-spec.md); templates stay
   /// app-specific (assets/library/templates.json).
-  static Future<(ExerciseLibrary, TemplateCatalog, DrillPackVoiceSource)>
+  static Future<(ExerciseLibrary, TemplateCatalog, DrillPackVoiceSource, coach.Catalog)>
   loadContent() async {
     final packs = await PackSet.load(rootBundle.loadString);
     final cat = TemplateCatalog.fromJson(
@@ -84,6 +101,10 @@ class AppServices {
       cat,
       DrillPackVoiceSource.fromPacks(
         common: packs.common.json,
+        packs: {for (final p in packs.exercises) p.id: p.json},
+      ),
+      const coach.DrillPackAdapter().build(
+        version: 'smartfit-bundled-1.1.0',
         packs: {for (final p in packs.exercises) p.id: p.json},
       ),
     );

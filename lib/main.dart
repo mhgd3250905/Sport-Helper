@@ -1,11 +1,14 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:ugk_coach/ugk_coach.dart' as coach;
 
 import 'app/services.dart';
+import 'app/device_identity.dart';
 import 'core/storage/local_state_storage.dart';
 import 'data/app_store.dart';
 import 'ui/chat/chat_home_page.dart';
@@ -26,15 +29,28 @@ void registerFontLicense() {
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   registerFontLicense();
-  final (lib, catalog, voices) = await AppServices.loadContent();
-  final store = AppStore(SharedPreferencesLocalStateStorage());
+  final (lib, catalog, voices, coachCatalog) = await AppServices.loadContent();
+  final coachProfile = coach.CoachProfile.fromJson(
+    jsonDecode(await rootBundle.loadString('assets/coach/smartfit.json')),
+  );
+  final storage = SharedPreferencesLocalStateStorage();
+  final store = AppStore(storage);
   await store.load();
+  String? deviceId;
+  try {
+    deviceId = await DeviceIdentity(storage).loadOrCreate();
+  } on Object {
+    // No persisted identifier means no proxy call; offline training still works.
+  }
   final services = AppServices(
     library: lib,
     catalog: catalog,
     store: store,
     voiceLibrary: voices,
     voiceOutput: JustAudioVoiceOutput(),
+    coachCatalog: coachCatalog,
+    coachProfile: coachProfile,
+    deviceId: deviceId,
   );
   runApp(SmartFitApp(services: services));
 }
