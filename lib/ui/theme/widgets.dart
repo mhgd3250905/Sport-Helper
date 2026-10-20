@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'sf_icons.dart';
 import 'tokens.dart';
 
+export 'components.dart';
+export 'tactile.dart';
+
 /// Button pyramid (docs/design-language.md §4, after HipLab R3–R5):
 ///
 /// * [SfPrimaryButton] — the one most likely action of a view: flat
@@ -35,12 +38,16 @@ class SfPressable extends StatefulWidget {
     this.semanticLabel,
     this.tooltip,
     this.scale = SfMotion.pressScale,
+    this.haptic = SfHaptic.none,
   });
   final Widget child;
   final VoidCallback? onTap;
   final String? semanticLabel;
   final String? tooltip;
   final double scale;
+
+  /// Played on a completed tap (not on press-down, not on cancel).
+  final SfHaptic haptic;
 
   @override
   State<SfPressable> createState() => _SfPressableState();
@@ -49,6 +56,11 @@ class SfPressable extends StatefulWidget {
 class _SfPressableState extends State<SfPressable> {
   bool _down = false;
   bool _showFocus = false;
+
+  void _tap() {
+    widget.haptic.play();
+    widget.onTap?.call();
+  }
 
   void _set(bool v) {
     if (_down != v && mounted) setState(() => _down = v);
@@ -66,7 +78,7 @@ class _SfPressableState extends State<SfPressable> {
       onTapDown: enabled ? (_) => _set(true) : null,
       onTapUp: enabled ? (_) => _set(false) : null,
       onTapCancel: enabled ? () => _set(false) : null,
-      onTap: widget.onTap,
+      onTap: enabled ? _tap : null,
       child: AnimatedScale(
         scale: _down && !still ? widget.scale : 1,
         duration: _down ? SfMotion.press : SfMotion.release,
@@ -87,11 +99,11 @@ class _SfPressableState extends State<SfPressable> {
       },
       actions: {
         ActivateIntent: CallbackAction<ActivateIntent>(onInvoke: (_) {
-          widget.onTap?.call();
+          if (enabled) _tap();
           return null;
         }),
         ButtonActivateIntent: CallbackAction<ButtonActivateIntent>(onInvoke: (_) {
-          widget.onTap?.call();
+          if (enabled) _tap();
           return null;
         }),
       },
@@ -111,7 +123,7 @@ class _SfPressableState extends State<SfPressable> {
       button: true,
       enabled: enabled,
       label: widget.semanticLabel,
-      onTap: widget.onTap,
+      onTap: enabled ? _tap : null,
       child: child,
     );
     if (widget.tooltip != null) {
@@ -174,6 +186,7 @@ class SfPrimaryButton extends StatelessWidget {
       child: SfPressable(
         semanticLabel: label,
         onTap: onPressed,
+        haptic: SfHaptic.light,
         child: _Face(
           color: fill,
           pressedColor: Color.lerp(fill, Colors.black, .10)!,
@@ -316,6 +329,7 @@ class SfCircleButton extends StatelessWidget {
     this.fill,
     this.iconColor,
     this.filled = true,
+    this.haptic = SfHaptic.none,
   });
   final SfGlyph icon;
   final VoidCallback? onPressed;
@@ -324,6 +338,7 @@ class SfCircleButton extends StatelessWidget {
   final Color? fill;
   final Color? iconColor;
   final bool filled;
+  final SfHaptic haptic;
 
   @override
   Widget build(BuildContext context) {
@@ -332,6 +347,7 @@ class SfCircleButton extends StatelessWidget {
       semanticLabel: tooltip,
       tooltip: tooltip,
       onTap: onPressed,
+      haptic: haptic,
       scale: .92,
       child: Builder(
         builder: (context) {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 /// SmartFit design tokens (docs/design-language.md). Every colour, type
 /// size, spacing step, radius, shadow and motion timing in the UI comes
@@ -36,6 +37,9 @@ class SfPalette {
     required this.caution,
     required this.danger,
     required this.mediaStage,
+    required this.onStage,
+    required this.onStageMuted,
+    required this.thumb,
     required this.scrim,
     required this.track,
     required this.userBubble,
@@ -87,6 +91,13 @@ class SfPalette {
   /// the stage is the same in both themes (until light renders exist).
   final Color mediaStage;
 
+  /// Text laid over a media stage (the plan card's title and meta line).
+  final Color onStage;
+  final Color onStageMuted;
+
+  /// The sliding thumb of a segmented control (the one neutral raised part).
+  final Color thumb;
+
   /// Labels floating on media (已暂停, 不舒服).
   final Color scrim;
 
@@ -120,6 +131,9 @@ class SfPalette {
     caution: Color(0xFFF3A443),
     danger: Color(0xFFEF6A6A),
     mediaStage: Color(0xFF101013),
+    onStage: Color(0xFFFFFFFF),
+    onStageMuted: Color(0xB8FFFFFF),
+    thumb: Color(0xFF2A2D34),
     scrim: Color(0xA6000000),
     track: Color(0x1FFFFFFF),
     userBubble: Color(0xFF23262D),
@@ -145,6 +159,9 @@ class SfPalette {
     caution: Color(0xFFB8650F),
     danger: Color(0xFFD43F3F),
     mediaStage: Color(0xFF101013),
+    onStage: Color(0xFFFFFFFF),
+    onStageMuted: Color(0xB8FFFFFF),
+    thumb: Color(0xFFFFFFFF),
     scrim: Color(0x8C000000),
     track: Color(0x14000000),
     userBubble: Color(0xFFE5E9E6),
@@ -177,6 +194,9 @@ abstract final class SfColors {
   static Color get caution => palette.caution;
   static Color get danger => palette.danger;
   static Color get mediaStage => palette.mediaStage;
+  static Color get onStage => palette.onStage;
+  static Color get onStageMuted => palette.onStageMuted;
+  static Color get thumb => palette.thumb;
   static Color get scrim => palette.scrim;
   static Color get track => palette.track;
   static Color get userBubble => palette.userBubble;
@@ -201,11 +221,15 @@ abstract final class SfColors {
 abstract final class SfType {
   /// 完成页 title.
   static TextStyle get display => TextStyle(
-    fontSize: 28, height: 1.25, fontWeight: FontWeight.w700, color: SfColors.text);
+    fontSize: 30, height: 1.2, fontWeight: FontWeight.w800, letterSpacing: -.3, color: SfColors.text);
+
+  /// The chat's greeting: large type floating in the sky, no bubble.
+  static TextStyle get greeting => TextStyle(
+    fontSize: 28, height: 1.3, fontWeight: FontWeight.w700, letterSpacing: -.2, color: SfColors.text);
 
   /// Card / page / exercise titles.
   static TextStyle get title => TextStyle(
-    fontSize: 20, height: 1.3, fontWeight: FontWeight.w700, color: SfColors.text);
+    fontSize: 20, height: 1.3, fontWeight: FontWeight.w700, letterSpacing: -.1, color: SfColors.text);
 
   /// Section heads, sheet titles.
   static TextStyle get headline => TextStyle(
@@ -229,6 +253,17 @@ abstract final class SfType {
 
   /// Numbers that tick (counter, progress).
   static const tabular = [FontFeature.tabularFigures()];
+
+  /// A large number that changes (countdown, stats): tabular, tight, set
+  /// solid (HipLab's ring numeral: tracking −1.2 % of the size).
+  static TextStyle numeral(double size, {Color? color}) => TextStyle(
+    fontSize: size,
+    height: 1,
+    fontWeight: FontWeight.w700,
+    letterSpacing: -size * .012,
+    color: color ?? SfColors.text,
+    fontFeatures: tabular,
+  );
 }
 
 /// 4-pt spacing grid.
@@ -277,11 +312,72 @@ abstract final class SfMotion {
   static const expand = Duration(milliseconds: 500);
   static const expandReverse = Duration(milliseconds: 420);
 
+  /// Push / pop of a plain page, its reverse a touch quicker.
+  static const page = Duration(milliseconds: 400);
+  static const pageReverse = Duration(milliseconds: 340);
+
+  /// Sheets rise on the page timing.
+  static const sheet = AnimationStyle(duration: page, reverseDuration: pageReverse);
+
+  /// Items arriving together, one after another.
+  static const stagger = Duration(milliseconds: 40);
+
+  /// Messages of one reply (words first, then the card).
+  static const replyStagger = Duration(milliseconds: 120);
+
+  /// A digit rolling over (countdown, rep counter).
+  static const roll = Duration(milliseconds: 260);
+
+  /// The last-seconds breath of the countdown (once per second).
+  static const breath = Duration(milliseconds: 1000);
+
+  /// Segmented thumb slide.
+  static const segment = Duration(milliseconds: 380);
+
+  /// Finish: the check drawing itself, the one ring going out, counting up.
+  static const check = Duration(milliseconds: 520);
+  static const ripple = Duration(milliseconds: 900);
+  static const countUp = Duration(milliseconds: 700);
+
   static const Curve standard = Curves.easeOutCubic;
 
   /// Pages arriving: a gentle first frame, half way at ~20 %.
   static const Curve enter = Cubic(0.2, 0.0, 0.0, 1.0);
 
+  /// A page leaving (pop), as the distance travelled.
+  static const Curve exit = Curves.fastOutSlowIn;
+
   /// Container bounds, both ways.
   static const Curve container = Curves.fastOutSlowIn;
+
+  /// A soft spring (≈4 % overshoot): the segmented thumb only.
+  static const Curve spring = Cubic(0.32, 1.28, 0.52, 1.0);
+
+  /// Whether the platform asks for reduced motion.
+  static bool reduced(BuildContext context) =>
+      MediaQuery.maybeDisableAnimationsOf(context) ?? false;
+}
+
+/// Touch feedback, graded (docs/design-audit-2026-10-19.md §2.9): a
+/// selection tick for choices, a light tap for primary buttons, a medium
+/// one for starting / finishing a workout. Haptics stay on under reduced
+/// motion (they are not motion).
+enum SfHaptic {
+  none,
+  selection,
+  light,
+  medium;
+
+  void play() {
+    switch (this) {
+      case SfHaptic.none:
+        return;
+      case SfHaptic.selection:
+        HapticFeedback.selectionClick();
+      case SfHaptic.light:
+        HapticFeedback.lightImpact();
+      case SfHaptic.medium:
+        HapticFeedback.mediumImpact();
+    }
+  }
 }

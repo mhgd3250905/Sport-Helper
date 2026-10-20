@@ -274,8 +274,10 @@ class _CoverStage extends StatelessWidget {
   );
 }
 
-/// 「开始」: the card's one prominent action. A flat accent disc with a
-/// tight contact shadow to sit it on the stage (no glow, no gradient).
+/// 「开始」: the card's one prominent action and the app's one raised
+/// element (HipLab rule R2): the accent lit from above, a deeper edge of
+/// itself, a tight contact shadow — no glow, no gradient halo. It sinks
+/// while held. Drawn with the dark accent on the dark stage.
 class _StartDisc extends StatelessWidget {
   const _StartDisc({super.key, required this.onTap});
   final VoidCallback onTap;
@@ -284,38 +286,36 @@ class _StartDisc extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // On the dark stage the dark-theme accent reads best in both themes.
-    const accent = Color(0xFF3CCFA4);
-    const on = Color(0xFF07261D);
+    final stage = SfColors.palette;
+    final dark = stage.mediaStage.computeLuminance() < .2;
+    final accent = dark ? SfPalette.dark.accent : SfPalette.light.accent;
+    final on = dark ? SfPalette.dark.onAccent : SfPalette.light.onAccent;
     return SfPressable(
       semanticLabel: '开始训练',
       tooltip: '开始训练',
       onTap: onTap,
+      haptic: SfHaptic.medium,
       child: Builder(
-        builder: (context) {
-          final down = SfPressedScope.of(context);
-          return AnimatedContainer(
-            duration: down ? SfMotion.press : SfMotion.release,
-            width: _size,
-            height: _size,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: down ? Color.lerp(accent, Colors.black, .1) : accent,
-              boxShadow: const [BoxShadow(color: Color(0x73000000), blurRadius: 6, offset: Offset(0, 2))],
-            ),
-            child: const Column(
+        builder: (context) => SfTactile(
+          key: const ValueKey('start-disc'),
+          style: SfTactileStyle.accent(dark: dark, color: accent),
+          pressed: SfPressedScope.of(context),
+          circle: true,
+          child: SizedBox.square(
+            dimension: _size,
+            child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SfIcon(SfGlyph.play, size: 22, filled: true, color: on),
-                SizedBox(height: 1),
+                const SizedBox(height: 1),
                 Text(
                   '开始',
                   style: TextStyle(color: on, fontSize: 12.5, height: 1.15, fontWeight: FontWeight.w700),
                 ),
               ],
             ),
-          );
-        },
+          ),
+        ),
       ),
     );
   }
