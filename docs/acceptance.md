@@ -1,14 +1,16 @@
 # 本机验收记录
 
-## ugk_trainer 接入分支（2026-10-20）
+## ugk_trainer 主线接入（2026-10-20）
 
-`feat/ugk-trainer-integration` 开发版本 `0.1.0+2`，尚未合入/推送。App 静态分析无问题、156 项测试通过，SDK 保存可靠性修复后 96 项测试通过。Android debug 与 Web release 构建成功；APK 签名/ZIP 完整性与合并 manifest 检查通过，包含一个媒体播放前台服务及 3 项所需权限。Web 有 CupertinoIcons 字体提示，构建未失败。
+`feat/ugk-trainer-integration` 已经用户同意合入并推送 `main`，接入检查点 `04112472a1ab8f07cebc1e7feb00604a56796b56`，App `0.1.0+2`。App 静态分析无问题、156 项测试通过，SDK 保存可靠性修复后 96 项测试通过。Android debug 与 Web release 构建成功；APK 签名/ZIP 完整性与合并 manifest 检查通过，包含一个媒体播放前台服务及 3 项所需权限。Web 有 CupertinoIcons 字体提示，构建未失败。
 
-新包 `SmartFit-ugk-trainer-0.1.0+2-debug.apk` 本地保存（203,720,356 bytes），SHA-256 `7fd8c50b521090dd9bf60e2a332f266729c44bdab3e10936ff6de8e7bb4d24fd`，versionCode 2、minSdk 24、targetSdk 36。签名仍为同一本机 debug 证书，已按用户安排用 `adb install -r` 覆盖安装，未清数据、未上传。本次包身份、SDK 未发布依赖与 Play Console 声明草稿见 [接入记录](ugk-trainer-integration.md)。
+合并前 SDK `ea00ff7` 已推送至 SDK main，全新 GitHub 克隆可取到固定包目录。修正 `pubspec.lock` 中两个 SDK 包错误的 `0.0.0` 元数据为 `ugk_coach 0.1.2` / `ugk_trainer 0.1.0`，固定 Git SHA 与其他依赖不变；`flutter pub get --enforce-lockfile` 及 23 项接入/存储/语音定向回归通过。合入后的 `lib/`、`android/`、`assets/` 和 `pubspec.yaml` 与真机已测源 `bbf0f6e` 无差异，没有重复构建或更换已测 APK。
+
+新包 `SmartFit-ugk-trainer-0.1.0+2-debug.apk` 本地保存（203,720,356 bytes），SHA-256 `7fd8c50b521090dd9bf60e2a332f266729c44bdab3e10936ff6de8e7bb4d24fd`，versionCode 2、minSdk 24、targetSdk 36。签名仍为同一本机 debug 证书，已按用户安排用 `adb install -r` 覆盖安装，未清数据、未上传。本次包身份、SDK 固定依赖与 Play Console 声明草稿见 [接入记录](ugk-trainer-integration.md)。
 
 随后连接 Android 16 真机：20:51–21:03 自然完成「睡前放松」7/7 动作、每项 2/2 组，活动时间 696 秒，没有跳过或提前结束。用户确认真实出声及锁屏语音正常；后台返回、普通解锁、暂停/继续、单条完整结果保存、旧历史保留、停止并重启 App 后界面读取、服务及唤醒锁释放通过，详见 [本次真机记录](trainer-device-check-2026-10-20.md)。
 
-当前设备通知权限为 ignore，通知可见性未验；来电/闹钟、耳机拔出、完整动作媒体及逐句听感、离线/性能仍未覆盖。Play Console 未提供应用条目/登录入口和演示录屏，声明未提交。合并 main 及推送继续等待依赖发布和开哥同意，不据一轮训练创建 `m3-local-verified`。以下保留的是 M7 主线及更早验证记录。
+当前设备通知权限为 ignore，通知可见性未验；来电/闹钟、耳机拔出、完整动作媒体及逐句听感、离线/性能仍未覆盖。Play Console 未提供应用条目/登录入口和演示录屏，声明未提交。用户已同意并完成 SDK 与 SmartFit main 的合并推送；上述待验仍独立保留，不据一轮训练创建 `m3-local-verified`。以下保留的是 M7 主线及更早验证记录。
 
 ## M7 主线状态与历史（2026-10-20）
 

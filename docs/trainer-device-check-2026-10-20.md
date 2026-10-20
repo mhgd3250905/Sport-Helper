@@ -32,6 +32,6 @@
 
 本机 `POST_NOTIFICATION` app-op 为 `ignore`，当前 manifest 未申请 `POST_NOTIFICATIONS`。因此本次没有把通知抽屉/锁屏中的通知可见性记为通过，也没有用 ADB 授予权限。服务实际处于前台，锁屏语音正常。Android 13+ 通知授权与前台服务启动是独立条件，拒绝通知时前台服务仍可运行，普通服务通知不显示在通知抽屉，见 [Android 官方通知权限说明](https://developer.android.com/develop/ui/views/notifications/notification-permission)。
 
-本次没有来电/闹钟或真实耳机拔出测试，没有离线断网、耗电/发热长期测试，没有提交 Play Console 声明，也没有合入 main 或推送。
+本次没有来电/闹钟或真实耳机拔出测试，没有离线断网、耗电/发热长期测试，没有提交 Play Console 声明。设备测试当时尚未合入 main；随后已获用户同意，依次合入并推送 SDK 和 SmartFit main，见 [合并与依赖记录](ugk-trainer-integration.md)。测试 APK 及其运行代码身份保持上述原始值。
 
 原始截图、UI 快照、偏好文件与进程日志只存本机 `.buildlog/device-trainer-20261020/`，不提交包含用户数据的偏好文件或原始日志。

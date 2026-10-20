@@ -1,14 +1,16 @@
 # SmartFit 接入 ugk_trainer
 
-2026-10-20，分支 `feat/ugk-trainer-integration`，开发包 `0.1.0+2`。尚未合入或推送 main；完整训练主链路已在 Android 16 真机通过，范围见 [真机记录](trainer-device-check-2026-10-20.md)。
+2026-10-20，`feat/ugk-trainer-integration` 已经用户同意合入并推送 main，接入检查点 `04112472a1ab8f07cebc1e7feb00604a56796b56`，App `0.1.0+2`。完整训练主链路已在 Android 16 真机通过，范围见 [真机记录](trainer-device-check-2026-10-20.md)。
 
 ## 依赖与包端修复
 
 `pubspec.yaml` 以 Git 引入 `mhgd3250905/ugk-3d-pose-sdk`，子目录 `packages/ugk_trainer`，并以相同提交引入根包 `ugk_coach`（仅使用计划编解码，没有启用 AI）。最初上游基线为 `68c3f32389749c04ad61a06af96e4b9841ccce87`。
 
-集成固定到本机 SDK 修复提交 `ea00ff7f2a4b7f46274b70708a45b435f269f993`，位于 SDK 分支 `feat/trainer-save-reliability`：同步保存异常后允许重试；完成、关闭与系统返回都等待保存成功，失败时保留相同结果与重试入口；连续返回不会重复弹出路由。SDK 包静态分析无问题，96 项测试通过。
+集成固定到 SDK 修复提交 `ea00ff7f2a4b7f46274b70708a45b435f269f993`，已从 `feat/trainer-save-reliability` 合入并推送 SDK main：同步保存异常后允许重试；完成、关闭与系统返回都等待保存成功，失败时保留相同结果与重试入口；连续返回不会重复弹出路由。SDK 包静态分析无问题，96 项测试通过。
 
-**该 SDK 提交尚未推送。** 本机解析依赖时仅在该次命令的 Git 环境中把 SDK URL 映射到本机 SDK 仓库，实际仍从 Git 提交建立 Pub 缓存，未修改全局 Git 配置、没有 path override。提交受审阅期间，新环境尚不能从 GitHub 获取该 SHA。获准发布后先推送 SDK 提交，再在没有本地映射的环境确认依赖可获取，之后才能合入 SmartFit。不能把本机成功解析等同于远端可复现。
+最初本机联调时，仅在该次命令的 Git 环境中把 SDK URL 映射到本机 SDK 仓库，实际仍从 Git 提交建立 Pub 缓存，未修改全局 Git 配置、没有 path override。该提交当时未发布；这只描述联调阶段。
+
+用户随后同意推进合并。先推送 SDK main 到 `ea00ff7`，再从 GitHub 全新克隆确认固定 SHA 及 `packages/ugk_trainer/pubspec.yaml` 可获取，没有使用本地 URL 映射。依赖复核发现早期锁文件把两个包记成 `0.0.0`，已按包内声明修正为 `ugk_coach 0.1.2` / `ugk_trainer 0.1.0`；固定 Git SHA 和其他依赖不变，`flutter pub get --enforce-lockfile` 与 23 项接入/存储/语音定向回归通过。随后 SmartFit main 快进至 `0411247` 并推送；运行文件与真机已测源 `bbf0f6e` 一致，本次没有重建或替换 APK。
 
 ## App 保留的职责
 
@@ -55,4 +57,4 @@ SDK：`flutter analyze --no-pub` 无问题；`flutter test --no-pub --reporter e
 - 当前设备通知 app-op 为 ignore，未申请通知权限；通知抽屉/锁屏可见性未验，也未用 ADB 授权。本次前台服务与锁屏语音本身正常。
 - 确认 Play Console 应用及权限，录制演示，审阅声明后提交。
 
-依赖远端可获取、Play Console 声明和上述范围按发布目标处理并经开哥同意后，才能合入 main 并推送。没有创建新发布标签，release 正式签名仍沿用原待办。
+SDK 与 SmartFit main 已按用户同意依次合入并推送，依赖远端可获取。Play Console、通知可见性及其余范围仍按发布目标继续处理；没有创建新发布标签，release 正式签名仍沿用原待办。

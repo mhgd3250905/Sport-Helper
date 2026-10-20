@@ -10,7 +10,7 @@
 
 ## 版本与验收入口
 
-主线源码里程碑为 `m7-aesthetic-v2`，PR #1、#2、#3 均已合并；上一交付包为 `0.1.0+1`。当前开发分支 `feat/ugk-trainer-integration` 接入共享训练包，包版本递增到 `0.1.0+2`，尚未合入主线。接入详情、尚未发布的 SDK 修复依赖及真机/Play Console 待办见 [ugk_trainer 接入记录](docs/ugk-trainer-integration.md)。release 构建、正式签名和完整真机验收仍未完成。
+最近的里程碑标签为 `m7-aesthetic-v2`，PR #1、#2、#3 均已合并。共享训练接入分支 `feat/ugk-trainer-integration` 已经用户同意合入并推送 `main`，当前包版本 `0.1.0+2`；SDK 固定修复提交也已进入 SDK 远端 `main`。Android 16 一轮完整训练主链路通过，接入、依赖和其余验收/Play Console 待办见 [ugk_trainer 接入记录](docs/ugk-trainer-integration.md)。release 构建、正式签名和完整设备验收仍未完成。
 
 - [版本管理与台账](docs/version-management.md)：当前版本、里程碑 SHA、测试包身份、版本更新及交付规则的统一入口。
 - [本机验收记录](docs/acceptance.md)：各检查点的验证证据、环境和待验清单。
