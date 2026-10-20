@@ -554,6 +554,24 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.4.0"
+  ugk_coach:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: ea00ff7f2a4b7f46274b70708a45b435f269f993
+      resolved-ref: ea00ff7f2a4b7f46274b70708a45b435f269f993
+      url: "https://github.com/mhgd3250905/ugk-3d-pose-sdk.git"
+    source: git
+    version: "0.0.0"
+  ugk_trainer:
+    dependency: "direct main"
+    description:
+      path: "packages/ugk_trainer"
+      ref: ea00ff7f2a4b7f46274b70708a45b435f269f993
+      resolved-ref: ea00ff7f2a4b7f46274b70708a45b435f269f993
+      url: "https://github.com/mhgd3250905/ugk-3d-pose-sdk.git"
+    source: git
+    version: "0.0.0"
   uuid:
     dependency: transitive
     description:

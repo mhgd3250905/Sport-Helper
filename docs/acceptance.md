@@ -1,6 +1,14 @@
 # 本机验收记录
 
-## 当前状态（2026-10-20）
+## ugk_trainer 接入分支（2026-10-20）
+
+`feat/ugk-trainer-integration` 开发版本 `0.1.0+2`，尚未合入/推送。App 静态分析无问题、156 项测试通过，SDK 保存可靠性修复后 96 项测试通过。Android debug 与 Web release 构建成功；APK 签名/ZIP 完整性与合并 manifest 检查通过，包含一个媒体播放前台服务及 3 项所需权限。Web 有 CupertinoIcons 字体提示，构建未失败。
+
+新包 `SmartFit-ugk-trainer-0.1.0+2-debug.apk` 仅本地保存（203,720,356 bytes），SHA-256 `7fd8c50b521090dd9bf60e2a332f266729c44bdab3e10936ff6de8e7bb4d24fd`，versionCode 2、minSdk 24、targetSdk 36。签名仍为同一本机 debug 证书，没有安装或上传。本次包身份、SDK 未发布依赖与 Play Console 声明草稿见 [接入记录](ugk-trainer-integration.md)。
+
+用户明确目前没有真机，语音人工复听、锁屏/后台及完整训练保存真机链路保持未验；Play Console 未提供应用条目/登录入口和演示录屏，声明未提交。合并 main 及推送继续等待真机验收和开哥同意。以下保留的是 M7 主线及更早验证记录。
+
+## M7 主线状态与历史（2026-10-20）
 
 版本、标签与交付包身份统一见 [版本管理与台账](version-management.md)。当前源码里程碑为 `m7-aesthetic-v2`，App 包版本仍为 `0.1.0+1`。
 

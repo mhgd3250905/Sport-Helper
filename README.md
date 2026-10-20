@@ -10,7 +10,7 @@
 
 ## 版本与验收入口
 
-当前源码里程碑为 `m7-aesthetic-v2`，PR #1、#2、#3 均已合并。App 包版本仍为 `0.1.0+1`；里程碑标签不等于 Android 包版本。最新版 Android debug 测试包已在本地交付，用户已取包，功能验证结果待反馈；release 构建、正式签名和完整真机验收仍未完成。
+主线源码里程碑为 `m7-aesthetic-v2`，PR #1、#2、#3 均已合并；上一交付包为 `0.1.0+1`。当前开发分支 `feat/ugk-trainer-integration` 接入共享训练包，包版本递增到 `0.1.0+2`，尚未合入主线。接入详情、尚未发布的 SDK 修复依赖及真机/Play Console 待办见 [ugk_trainer 接入记录](docs/ugk-trainer-integration.md)。release 构建、正式签名和完整真机验收仍未完成。
 
 - [版本管理与台账](docs/version-management.md)：当前版本、里程碑 SHA、测试包身份、版本更新及交付规则的统一入口。
 - [本机验收记录](docs/acceptance.md)：各检查点的验证证据、环境和待验清单。
@@ -20,9 +20,8 @@
 
 ```
 lib/domain/      纯规则：exercise / plan(TrainingPlan v1) / template / scenario(描述匹配) /
-                 plan_generator(模板生成 + AI 预留接口) / plan_validator / session(阶段 + 时钟)
-lib/voice/       语音：session_script(台词时间线) + session_runner；voice_queue / voice_library /
-                 voice_line_controller / just_audio_output 复制自 HipLab
+                 plan_generator(模板生成 + AI 预留接口) / plan_validator / session(SDK 计划及节奏适配)
+lib/voice/       ugk_trainer 导出入口；App 语言偏好与素材测试适配，训练语音由 SDK 负责
 lib/core/        复制自 HipLab（媒体播放 WebView、本地存储、屏幕常亮），文件头注明来源
 lib/chat/        对话：ChatEngine 接口 + RuleChatEngine（关键词/槽位 + 模板 + 校验）、SlotParser、
                  ChatController（会话、开场安全确认、保存计划、本地历史）、safety_script（免责声明与 4 问）

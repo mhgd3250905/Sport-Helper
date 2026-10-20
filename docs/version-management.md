@@ -7,18 +7,31 @@
 | 项目 | 当前事实 / 事实来源 |
 | --- | --- |
 | 主线与合并 | 本机维护 `main`；PR #1、#2、#3 已按顺序合并 |
+| 当前开发分支 | `feat/ugk-trainer-integration`，App `0.1.0+2`，关于页 `0.1.0+2 (MVP)`；尚未合入/推送，见 [接入记录](ugk-trainer-integration.md) |
+| 共享训练依赖 | SDK 本地修复 `ea00ff7f2a4b7f46274b70708a45b435f269f993`；尚未发布，需先推送 SDK 才可从新环境解析该 Git 依赖 |
 | 源码里程碑 | `m7-aesthetic-v2` → `d0b1c7ef6198a469a7f0a7cedcaa7c9f2512dbe7` |
-| 文档整理前主线快照 | `d0b1c7ef6198a469a7f0a7cedcaa7c9f2512dbe7`；本次仅整理文档，后续 HEAD 由 Git 查询，不把本表固定 SHA 写成永远最新的 HEAD |
+| 上一阶段文档整理前主线快照 | `d0b1c7ef6198a469a7f0a7cedcaa7c9f2512dbe7`；后续 HEAD 由 Git 查询，不把本表固定 SHA 写成永远最新的 HEAD |
 | PR #3 合并提交 | `a5997ef7aef2695b24cab3f4b330543bbb2c7027` |
 | PR #3 已测源 | `7ef80d75331a150b6a258ef3ba0c27832fd1e54b`；合并树相同，至上述主线快照只增加 3 份文档 |
 | Android 身份 | `com.ugk.smartfit`，App 名「智能健身助手」 |
-| 默认包版本 | `0.1.0+1`，来自 [pubspec.yaml](../pubspec.yaml)：versionName `0.1.0`、versionCode `1` |
-| 关于页显示 | `0.1.0 (MVP)`，来自 [about_page.dart](../lib/ui/about_page.dart) 的独立常量，尚未自动读取包版本 |
+| 默认包版本 | 开发分支 `0.1.0+2`，来自 [pubspec.yaml](../pubspec.yaml)：versionName `0.1.0`、versionCode `2`；主线上一交付包仍为 `0.1.0+1` |
+| 关于页显示 | 开发分支 `0.1.0+2 (MVP)`，来自 [about_page.dart](../lib/ui/about_page.dart) 的独立常量，尚未自动读取包版本 |
 | 资源版本 | 93 个动作包为 `1.1.0`；公共包 `_common` 为 `1.0.0`；格式版本仍为 `1`，见 [小包规范](drill-pack-spec.md) 与 [索引](../assets/packs/index.json) |
-| 交付状态 | 最新 Android debug 测试包已本地交付，用户已取包，测试结果待反馈；未上传或公开发布 |
-| 验收状态 | M7 自动化与本机构建已通过；M6 只有安装启动及输入获用户确认。M7 完整真机媒体、语音、中断、性能及 release 验收待执行 |
+| 交付状态 | M7 包已取包待反馈；接入分支新 debug 包仅本地保存，尚未安装或上传，身份见下表 |
+| 验收状态 | 接入分支 App 156 项、SDK 96 项测试及 Android debug 构建通过；真机与 Play Console 待办。M7 完整真机及 release 待验保持不变 |
 
-Git 标签、App 包版本与资源版本分别管理。`m7` 不代表 Android versionCode 为 7；本次实际交付包仍是 `0.1.0+1`。构建命令曾尝试覆盖版本号用于 release，但没有形成可交付 release 包，不能登记为已交付版本。
+Git 标签、App 包版本与资源版本分别管理。`m7` 不代表 Android versionCode 为 7；用户此前已取的包是 `0.1.0+1`，当前分支新构建为 `0.1.0+2`。构建命令曾尝试覆盖版本号用于 release，但没有形成可交付 release 包，不能登记为已交付版本。
+
+## 接入分支测试包（未做真机验收）
+
+| 项目 | 记录 |
+| --- | --- |
+| 文件 | `.buildlog/install/SmartFit-ugk-trainer-0.1.0+2-debug.apk`，仅本地忽略目录保存 |
+| 大小 / 身份 | 203,720,356 bytes；`com.ugk.smartfit`，versionName `0.1.0`、versionCode `2`；minSdk 24、targetSdk 36；三 ABI |
+| SHA-256 | `7fd8c50b521090dd9bf60e2a332f266729c44bdab3e10936ff6de8e7bb4d24fd` |
+| SDK 固定提交 | `ea00ff7f2a4b7f46274b70708a45b435f269f993`，尚未推送，发布顺序见 [接入记录](ugk-trainer-integration.md) |
+| 验证 | debug 签名与旧包一致，ZIP/静音素材/通知图标及单份媒体播放服务和权限检查通过 |
+| 未完成 | 用户目前没有真机，语音/锁屏/后台/完成保存设备链路未验；Play Console 声明草稿未提交；未合 main 或推送 |
 
 ## 源码里程碑台账
 

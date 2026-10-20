@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter/widgets.dart';
+import 'package:ugk_trainer/ugk_trainer.dart';
 
 import '../chat/chat_controller.dart';
 import '../chat/chat_models.dart';
@@ -11,9 +12,6 @@ import '../domain/exercise.dart';
 import '../domain/plan_generator.dart';
 import '../domain/template.dart';
 import '../packs/drill_pack.dart';
-import '../voice/session_script.dart';
-import '../voice/voice_library.dart';
-import '../voice/voice_queue.dart';
 
 /// Everything pages need, created once at start-up.
 class AppServices {
@@ -29,7 +27,7 @@ class AppServices {
   final ExerciseLibrary library;
   final TemplateCatalog catalog;
   final AppStore store;
-  final VoiceLibrary voiceLibrary;
+  final VoiceSource voiceLibrary;
   final VoiceOutput voiceOutput;
 
   /// MVP: fixed templates only. An AI generator plugs in behind the same
@@ -37,17 +35,29 @@ class AppServices {
   final TemplatePlanGenerator templates;
   PlanGenerator get generator => templates;
 
-  VoiceQueue voiceQueue() {
-    voiceOutput.volume = store.voice.volume;
-    return VoiceQueue(output: voiceOutput, lib: voiceLibrary, settings: store.voice);
-  }
+  TrainerVoice trainerVoice() => TrainerVoice(
+    source: voiceLibrary,
+    output: voiceOutput,
+    settings: store.voice.toTrainerSettings(),
+  );
 
-  SessionScript script() => SessionScript(lib: voiceLibrary, exercises: library);
+  /// The output belongs to the App, so page navigation never destroys it.
+  Future<void> dispose() async {
+    final output = voiceOutput;
+    if (output is JustAudioVoiceOutput) {
+      await output.dispose();
+    } else {
+      await output.end();
+    }
+  }
 
   /// What answers in the chat home.
   /// Rules + templates today; a model-backed [ChatEngine] later, with the
   /// same plan validation.
-  late final ChatEngine chatEngine = RuleChatEngine(lib: library, templates: templates);
+  late final ChatEngine chatEngine = RuleChatEngine(
+    lib: library,
+    templates: templates,
+  );
 
   /// The "typing" pause before a reply (zero in tests and screenshots).
   final Duration chatReplyDelay;
@@ -62,7 +72,7 @@ class AppServices {
   /// The exercise library and the voice lines both come from the drill
   /// packs (assets/packs/, docs/drill-pack-spec.md); templates stay
   /// app-specific (assets/library/templates.json).
-  static Future<(ExerciseLibrary, TemplateCatalog, VoiceLibrary)>
+  static Future<(ExerciseLibrary, TemplateCatalog, DrillPackVoiceSource)>
   loadContent() async {
     final packs = await PackSet.load(rootBundle.loadString);
     final cat = TemplateCatalog.fromJson(
@@ -72,7 +82,10 @@ class AppServices {
     return (
       ExerciseLibrary.fromPacks(packs),
       cat,
-      VoiceLibrary.fromPacks(packs),
+      DrillPackVoiceSource.fromPacks(
+        common: packs.common.json,
+        packs: {for (final p in packs.exercises) p.id: p.json},
+      ),
     );
   }
 

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:ugk_trainer/ugk_trainer.dart' show SessionResult;
 
 import '../../app/services.dart';
 import '../../chat/chat_controller.dart';
@@ -103,17 +104,21 @@ class _ChatHomePageState extends State<ChatHomePage> {
       return;
     }
     if (!await _chat.started(p)) return;
-    final before = s.store.history.length;
     if (!mounted) return;
-    await Navigator.of(context).push(CardExpandRoute<void>(
-      origin: from,
-      settings: const RouteSettings(name: 'player'),
-      builder: (_) => PlayerPage(plan: p),
-    ));
+    final result = await Navigator.of(context).push(
+      CardExpandRoute<SessionResult>(
+        origin: from,
+        settings: const RouteSettings(name: 'player'),
+        builder: (_) => PlayerPage(plan: p),
+      ),
+    );
     if (!mounted) return;
-    if (s.store.history.length > before) {
-      final h = s.store.history.first;
-      _chat.finished(p, completed: h.completed, total: h.total);
+    if (result != null) {
+      _chat.finished(
+        p,
+        completed: result.completedExercises,
+        total: result.totalExercises,
+      );
     }
   }
 
@@ -143,7 +148,13 @@ class _ChatHomePageState extends State<ChatHomePage> {
 
   Future<void> _send(String text, {String? label}) async {
     if (_scroll.hasClients && _scroll.offset > 0) {
-      unawaited(_scroll.animateTo(0, duration: const Duration(milliseconds: 300), curve: Curves.easeOut));
+      unawaited(
+        _scroll.animateTo(
+          0,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        ),
+      );
     }
     await _chat.send(text, label: label);
   }
@@ -157,7 +168,9 @@ class _ChatHomePageState extends State<ChatHomePage> {
         key: _scaffold,
         backgroundColor: SfColors.skyBottom,
         resizeToAvoidBottomInset: true,
-        drawerScrimColor: SfColors.isDark ? const Color(0x99000000) : const Color(0x4D121614),
+        drawerScrimColor: SfColors.isDark
+            ? const Color(0x99000000)
+            : const Color(0x4D121614),
         drawer: SavedPlansDrawer(
           store: s.store,
           library: s.library,
@@ -222,7 +235,8 @@ class _ChatHomePageState extends State<ChatHomePage> {
     for (var i = 0; i < msgs.length; i++) {
       final m = msgs[i];
       final prev = i == 0 ? null : msgs[i - 1];
-      if (prev == null || m.at.difference(prev.at) > const Duration(minutes: 45)) {
+      if (prev == null ||
+          m.at.difference(prev.at) > const Duration(minutes: 45)) {
         rows.add(TimeMark(m.at, now: now));
       }
       final sameSide = prev != null && prev.isUser == m.isUser;
@@ -242,29 +256,42 @@ class _ChatHomePageState extends State<ChatHomePage> {
                 )
               : Appear(
                   animate: !_seen.contains(m.id),
-                  delay: !_seen.contains(m.id) && !m.isUser && !still ? SfMotion.replyStagger * queued++ : Duration.zero,
-                  anchor: m.isUser ? Alignment.bottomRight : Alignment.bottomLeft,
+                  delay: !_seen.contains(m.id) && !m.isUser && !still
+                      ? SfMotion.replyStagger * queued++
+                      : Duration.zero,
+                  anchor: m.isUser
+                      ? Alignment.bottomRight
+                      : Alignment.bottomLeft,
                   child: _message(m, fresh: !_seen.contains(m.id)),
                 ),
         ),
       );
     }
     if (_chat.typing) {
-      rows.add(const Padding(
-        key: ValueKey('typing'),
-        padding: EdgeInsets.only(top: SfSpace.x4),
-        child: TypingBubble(),
-      ));
+      rows.add(
+        const Padding(
+          key: ValueKey('typing'),
+          padding: EdgeInsets.only(top: SfSpace.x4),
+          child: TypingBubble(),
+        ),
+      );
     }
     final reversed = rows.reversed.toList();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _seen.addAll(msgs.map((m) => m.id)));
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => _seen.addAll(msgs.map((m) => m.id)),
+    );
     return Stack(
       children: [
         BackdropGroup(
           child: ListView.builder(
             controller: _scroll,
             reverse: true,
-            padding: const EdgeInsets.fromLTRB(SfSpace.x4, 48, SfSpace.x4, SfSpace.x3),
+            padding: const EdgeInsets.fromLTRB(
+              SfSpace.x4,
+              48,
+              SfSpace.x4,
+              SfSpace.x3,
+            ),
             itemCount: reversed.length,
             itemBuilder: (_, i) => reversed[i],
             findChildIndexCallback: (key) {
@@ -283,7 +310,10 @@ class _ChatHomePageState extends State<ChatHomePage> {
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [SfColors.skyTop, SfColors.skyTop.withValues(alpha: 0)],
+                  colors: [
+                    SfColors.skyTop,
+                    SfColors.skyTop.withValues(alpha: 0),
+                  ],
                 ),
               ),
             ),
@@ -304,8 +334,8 @@ class _ChatHomePageState extends State<ChatHomePage> {
           onOpen: () => _details(m),
         )
       : MessageBubble(
-    message: m,
-    optionsActive: _chat.isActive(m),
-    onOption: (i) => _chat.choose(m, i),
-  );
+          message: m,
+          optionsActive: _chat.isActive(m),
+          onOption: (i) => _chat.choose(m, i),
+        );
 }

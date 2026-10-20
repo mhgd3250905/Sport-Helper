@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smartfit/chat/chat_controller.dart';
@@ -9,6 +11,19 @@ import 'package:smartfit/main.dart';
 import 'package:smartfit/ui/player_page.dart';
 
 import 'app_flow_test.dart' show MemoryStorage, services, tall;
+
+class _ObservedStorage extends MemoryStorage {
+  Completer<void>? _nextWrite;
+
+  Future<void> get nextWrite => (_nextWrite = Completer<void>()).future;
+
+  @override
+  Future<void> write(String key, String value) async {
+    await super.write(key, value);
+    _nextWrite?.complete();
+    _nextWrite = null;
+  }
+}
 
 const _original = TrainingPlan(
   id: 'details-original',
@@ -101,7 +116,7 @@ void main() {
   test(
     'the actual started snapshot and its save offer survive a restart',
     () async {
-      final mem = MemoryStorage();
+      final mem = _ObservedStorage();
       final s = services();
       final store = AppStore(mem);
       await store.acceptSafety(blocked: false);
@@ -131,7 +146,11 @@ void main() {
         ],
       );
       expect(await c.started(modified), isTrue);
+      final finishedSaved = mem.nextWrite;
       c.finished(modified, completed: 1, total: 1);
+      // finished() deliberately persists asynchronously; restart only once
+      // its queued storage write has completed.
+      await finishedSaved;
 
       final loaded = AppStore(mem);
       await loaded.load();

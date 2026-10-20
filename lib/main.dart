@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -14,7 +16,9 @@ import 'voice/just_audio_output.dart';
 /// The bundled font's licence on the 开源软件许可 page.
 void registerFontLicense() {
   LicenseRegistry.addLicense(() async* {
-    final text = await rootBundle.loadString('assets/licenses/NotoSansSC-OFL.txt');
+    final text = await rootBundle.loadString(
+      'assets/licenses/NotoSansSC-OFL.txt',
+    );
     yield LicenseEntryWithLineBreaks(const ['Noto Sans SC'], text);
   });
 }
@@ -46,6 +50,12 @@ class SmartFitApp extends StatefulWidget {
 }
 
 class _SmartFitAppState extends State<SmartFitApp> {
+  @override
+  void dispose() {
+    unawaited(widget.services.dispose());
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) => AppScope(
     services: widget.services,

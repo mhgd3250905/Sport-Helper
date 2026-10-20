@@ -2,6 +2,8 @@
 
 ## 当前交接入口（2026-10-20）
 
+开发分支 `feat/ugk-trainer-integration` 正在接入 `ugk_trainer`，App 开发版本 `0.1.0+2`。迁移与包端保存修复、验证范围及发布顺序见 [接入记录](ugk-trainer-integration.md)。用户目前没有真机，设备验收与 Play Console 声明未完成；没有合入或推送 main。下段版本与交付说明保留的是主线 M7 状态。
+
 版本状态以 [版本管理与台账](version-management.md) 为准，验证结果与未通过项以 [本机验收记录](acceptance.md) 为准。当前源码里程碑 `m7-aesthetic-v2`，PR #1、#2、#3 均已合并；App 包版本仍为 `0.1.0+1`，动作包 1.1.0、公共包 1.0.0。
 
 最新版 Android debug 测试包已本地交付，用户已取包，个人远程验证结果待反馈；未上传、未公开发布，也未在本轮安装手机。release 尚无成功交付记录，正式签名与完整真机验收保持待办，不能标记 `m3-local-verified`。下列引述按时间保存阶段记录；文末 M1/M2 路径、旧待办和“当前 main”只描述原始交接时点。
