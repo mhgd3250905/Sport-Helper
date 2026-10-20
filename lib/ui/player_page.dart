@@ -468,29 +468,32 @@ class _PlayerPageState extends State<PlayerPage> {
               const SizedBox(height: SfSpace.x5),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: SfSpace.x1),
+                // Fixed slots (H4): the phase label always has its line, the
+                // ring sets the row height, so changing phase only changes
+                // what is written, never where.
                 child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          SfFadeSwitcher(
-                            duration: SfMotion.fast,
-                            rise: 0,
-                            child: label.isEmpty
-                                ? const SizedBox(key: ValueKey('label-none'), width: double.infinity)
-                                : Padding(
-                                    key: ValueKey('label-$label'),
-                                    padding: const EdgeInsets.only(bottom: SfSpace.x1),
-                                    child: Text(
-                                      label,
-                                      style: SfType.label.copyWith(
-                                        color: p.kind == PhaseKind.switchSide ? SfColors.caution : SfColors.muted,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ),
+                          SizedBox(
+                            height: _labelSlot,
+                            child: SfFadeSwitcher(
+                              duration: SfMotion.fast,
+                              rise: 0,
+                              child: Text(
+                                label,
+                                key: ValueKey('label-$label'),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: SfType.label.copyWith(
+                                  color: p.kind == PhaseKind.switchSide ? SfColors.caution : SfColors.muted,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
                           ),
                           SfFadeSwitcher(
                             child: Text(
@@ -515,7 +518,11 @@ class _PlayerPageState extends State<PlayerPage> {
                   ],
                 ),
               ),
-              SfFadeSwitcher(
+              // Subtitle slot: three lines held whether or not a line is up.
+              SizedBox(
+                height: _subtitleSlot,
+                child: SfFadeSwitcher(
+                alignment: Alignment.topLeft,
                 child: sub == null
                     ? const SizedBox(key: ValueKey('sub-none'), width: double.infinity)
                     : Padding(
@@ -532,14 +539,25 @@ class _PlayerPageState extends State<PlayerPage> {
                             Expanded(
                               child: Text(
                                 sub,
+                                maxLines: 3,
+                                overflow: TextOverflow.ellipsis,
                                 style: SfType.body.copyWith(fontSize: 15, height: 1.55, color: SfColors.muted),
                               ),
                             ),
                           ],
                         ),
                       ),
+                ),
               ),
-              if (!rest) ?_nextUp(p),
+              // 下一个 slot: held at the same height when there is none
+              // (resting, the last move).
+              SizedBox(
+                height: _nextSlot,
+                child: SfFadeSwitcher(
+                  alignment: Alignment.topCenter,
+                  child: (rest ? null : _nextUp(p)) ?? const SizedBox(key: ValueKey('next-none'), width: double.infinity),
+                ),
+              ),
             ],
           ),
         ),
@@ -616,6 +634,10 @@ class _PlayerPageState extends State<PlayerPage> {
     );
   }
 
+  static const _labelSlot = 22.0;
+  static const _subtitleSlot = SfSpace.x4 + 15 * 1.55 * 3 + 2;
+  static const _nextSlot = SfSpace.x5 + 60.0;
+
   String _meta(SessionPhase p) {
     final parts = <String>[];
     if (p.rounds > 0) parts.add('第 ${p.round}/${p.rounds} 轮');
@@ -641,7 +663,8 @@ class _PlayerPageState extends State<PlayerPage> {
     if (next == null || e == null) return null;
     final dose = next.item?.copyWith(sets: 1).doseText();
     return Padding(
-      padding: const EdgeInsets.only(top: SfSpace.x6),
+      key: ValueKey('next-${e.id}'),
+      padding: const EdgeInsets.only(top: SfSpace.x5),
       child: SfPanel(
         padding: const EdgeInsets.all(SfSpace.x2),
         radius: SfRadius.md + 2,
