@@ -6,6 +6,7 @@ import '../../domain/session.dart';
 import '../theme.dart' show levelZh;
 import '../theme/sf_icons.dart';
 import '../theme/tokens.dart';
+import '../theme/media_theme.dart';
 import '../theme/widgets.dart';
 import 'expand_route.dart';
 
@@ -26,9 +27,13 @@ class PlanCard extends StatefulWidget {
     required this.onStart,
     required this.onSave,
     required this.onOpen,
+    this.landing = false,
   });
 
   final TrainingPlan plan;
+
+  /// A card that just arrived: its cover settles from 1.04 to 1 (M7).
+  final bool landing;
   final ExerciseLibrary library;
   final bool saved;
 
@@ -47,6 +52,23 @@ class _PlanCardState extends State<PlanCard> {
   static const _collapsed = 4;
   bool _expanded = false;
   final _card = GlobalKey();
+
+  /// Rows past the first four fade in 30 ms apart when the list opens.
+  Widget _rowIn(int i, Widget row) {
+    if (i < _collapsed) return row;
+    return TweenAnimationBuilder<double>(
+      key: ValueKey('row-in-$i'),
+      tween: Tween(begin: 0, end: 1),
+      duration: SfMotion.medium + Duration(milliseconds: 30 * (i - _collapsed)),
+      builder: (_, v, child) {
+        final total = 280 + 30 * (i - _collapsed);
+        final start = 30 * (i - _collapsed) / total;
+        final o = v <= start ? 0.0 : SfMotion.standard.transform((v - start) / (1 - start));
+        return Opacity(opacity: o, child: child);
+      },
+      child: row,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -88,6 +110,7 @@ class _PlanCardState extends State<PlanCard> {
               Padding(
                 padding: const EdgeInsets.all(SfSpace.x2),
                 child: _CoverStage(
+                  landing: widget.landing,
                   cover: moves.firstOrNull,
                   title: p.title,
                   meta: meta,
@@ -98,17 +121,27 @@ class _PlanCardState extends State<PlanCard> {
                   ),
                 ),
               ),
+              // M8: the list grows on the container curve and the extra rows
+              // fade in one after another; reduced motion: no height move.
               Padding(
                 padding: const EdgeInsets.fromLTRB(SfSpace.x4, SfSpace.x2, SfSpace.x4, 0),
-                child: Column(
-                  children: [
-                    for (var i = 0; i < shown; i++)
-                      _MoveRow(
-                        index: i + 1,
-                        item: circuit[i] ? items[i].copyWith(sets: 1) : items[i],
-                        exercise: lib.tryGet(items[i].exerciseId),
-                      ),
-                  ],
+                child: AnimatedSize(
+                  duration: SfMotion.reduced(context) ? Duration.zero : SfMotion.medium,
+                  curve: SfMotion.container,
+                  alignment: Alignment.topCenter,
+                  child: Column(
+                    children: [
+                      for (var i = 0; i < shown; i++)
+                        _rowIn(
+                          i,
+                          _MoveRow(
+                            index: i + 1,
+                            item: circuit[i] ? items[i].copyWith(sets: 1) : items[i],
+                            exercise: lib.tryGet(items[i].exerciseId),
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
               ),
               if (items.length > _collapsed || p.notes.isNotEmpty)
@@ -117,8 +150,9 @@ class _PlanCardState extends State<PlanCard> {
                   child: Row(
                     children: [
                       if (items.length > _collapsed)
-                        SfTextAction(
+                        _ExpandAction(
                           key: ValueKey('plan-expand-${p.id}'),
+                          expanded: _expanded,
                           label: _expanded ? '收起' : '展开全部 ${items.length} 个动作',
                           onPressed: () => setState(() => _expanded = !_expanded),
                         ),
@@ -187,12 +221,14 @@ class _PlanCardState extends State<PlanCard> {
 /// lower edge (a scrim keeps them readable), the start disc in the corner.
 class _CoverStage extends StatelessWidget {
   const _CoverStage({
+    this.landing = false,
     required this.cover,
     required this.title,
     required this.meta,
     required this.start,
     required this.onOpen,
   });
+  final bool landing;
   final Exercise? cover;
   final String title;
   final String meta;
@@ -200,22 +236,33 @@ class _CoverStage extends StatelessWidget {
   final VoidCallback onOpen;
 
   @override
-  Widget build(BuildContext context) => ClipRRect(
+  Widget build(BuildContext context) {
+    // The stage is the colour the cover is baked on; title and meta take
+    // that stage's ink (dark ink on the light stage, white on the dark).
+    final stage = sfStageFor(cover);
+    return ClipRRect(
     borderRadius: BorderRadius.circular(SfRadius.lg - SfSpace.x2),
     child: AspectRatio(
       aspectRatio: 16 / 11,
       child: Stack(
         fit: StackFit.expand,
         children: [
-          ColoredBox(color: SfColors.mediaStage),
+          ColoredBox(color: stage.mediaStage),
           if (cover != null)
             GestureDetector(
               onTap: onOpen,
-              child: Image.asset(
-                cover!.media.poster,
-                fit: BoxFit.cover,
-                alignment: const Alignment(0, -.15),
-                errorBuilder: (_, _, _) => const SizedBox.shrink(),
+              child: TweenAnimationBuilder<double>(
+                // M7: once, as the card lands, the cover settles into place.
+                tween: Tween(begin: landing && !SfMotion.reduced(context) ? 1.04 : 1, end: 1),
+                duration: const Duration(milliseconds: 600),
+                curve: SfMotion.standard,
+                builder: (_, k, img) => k == 1 ? img! : Transform.scale(scale: k, child: img),
+                child: Image.asset(
+                  sfPoster(cover!),
+                  fit: BoxFit.cover,
+                  alignment: const Alignment(0, -.15),
+                  errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                ),
               ),
             ),
           // Lower scrim: transparent → stage, under the text only.
@@ -226,7 +273,7 @@ class _CoverStage extends StatelessWidget {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   stops: const [.38, 1],
-                  colors: [SfColors.mediaStage.withValues(alpha: 0), SfColors.mediaStage.withValues(alpha: .92)],
+                  colors: [stage.mediaStage.withValues(alpha: 0), stage.mediaStage.withValues(alpha: .92)],
                 ),
               ),
             ),
@@ -244,8 +291,8 @@ class _CoverStage extends StatelessWidget {
                     title,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: stage.onStage,
                       fontSize: 22,
                       height: 1.25,
                       fontWeight: FontWeight.w700,
@@ -256,8 +303,8 @@ class _CoverStage extends StatelessWidget {
                     meta,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: Color(0xB8FFFFFF),
+                    style: TextStyle(
+                      color: stage.onStageMuted,
                       fontSize: 13,
                       height: 1.4,
                       fontWeight: FontWeight.w500,
@@ -272,10 +319,13 @@ class _CoverStage extends StatelessWidget {
       ),
     ),
   );
+  }
 }
 
-/// 「开始」: the card's one prominent action. A flat accent disc with a
-/// tight contact shadow to sit it on the stage (no glow, no gradient).
+/// 「开始」: the card's one prominent action and the app's one raised
+/// element (HipLab rule R2): the accent lit from above, a deeper edge of
+/// itself, a tight contact shadow — no glow, no gradient halo. It sinks
+/// while held. Drawn with the dark accent on the dark stage.
 class _StartDisc extends StatelessWidget {
   const _StartDisc({super.key, required this.onTap});
   final VoidCallback onTap;
@@ -284,38 +334,36 @@ class _StartDisc extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // On the dark stage the dark-theme accent reads best in both themes.
-    const accent = Color(0xFF3CCFA4);
-    const on = Color(0xFF07261D);
+    final stage = SfColors.palette;
+    final dark = stage.mediaStage.computeLuminance() < .2;
+    final accent = dark ? SfPalette.dark.accent : SfPalette.light.accent;
+    final on = dark ? SfPalette.dark.onAccent : SfPalette.light.onAccent;
     return SfPressable(
       semanticLabel: '开始训练',
       tooltip: '开始训练',
       onTap: onTap,
+      haptic: SfHaptic.medium,
       child: Builder(
-        builder: (context) {
-          final down = SfPressedScope.of(context);
-          return AnimatedContainer(
-            duration: down ? SfMotion.press : SfMotion.release,
-            width: _size,
-            height: _size,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: down ? Color.lerp(accent, Colors.black, .1) : accent,
-              boxShadow: const [BoxShadow(color: Color(0x73000000), blurRadius: 6, offset: Offset(0, 2))],
-            ),
-            child: const Column(
+        builder: (context) => SfTactile(
+          key: const ValueKey('start-disc'),
+          style: SfTactileStyle.accent(dark: dark, color: accent),
+          pressed: SfPressedScope.of(context),
+          circle: true,
+          child: SizedBox.square(
+            dimension: _size,
+            child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SfIcon(SfGlyph.play, size: 22, filled: true, color: on),
-                SizedBox(height: 1),
+                const SizedBox(height: 1),
                 Text(
                   '开始',
                   style: TextStyle(color: on, fontSize: 12.5, height: 1.15, fontWeight: FontWeight.w700),
                 ),
               ],
             ),
-          );
-        },
+          ),
+        ),
       ),
     );
   }
@@ -336,7 +384,7 @@ class _MoveRow extends StatelessWidget {
           width: 20,
           child: Text(
             '$index',
-            style: SfType.label.copyWith(color: SfColors.faint, fontFeatures: SfType.tabular),
+            style: SfType.label.copyWith(color: SfColors.muted, fontFeatures: SfType.tabular),
           ),
         ),
         ClipRRect(
@@ -344,11 +392,11 @@ class _MoveRow extends StatelessWidget {
           child: SizedBox.square(
             dimension: 36,
             child: ColoredBox(
-              color: SfColors.mediaStage,
+              color: sfStageFor(exercise).mediaStage,
               child: exercise == null
                   ? null
                   : Image.asset(
-                      exercise!.media.poster,
+                      sfPoster(exercise!),
                       fit: BoxFit.cover,
                       errorBuilder: (_, _, _) => const SizedBox.shrink(),
                     ),
@@ -367,6 +415,40 @@ class _MoveRow extends StatelessWidget {
         const SizedBox(width: SfSpace.x2),
         Text(item.doseText(), style: SfType.label.copyWith(fontFeatures: SfType.tabular)),
       ],
+    ),
+  );
+}
+
+/// 展开全部 / 收起 with a chevron that turns over (180°) as the list opens.
+class _ExpandAction extends StatelessWidget {
+  const _ExpandAction({super.key, required this.expanded, required this.label, required this.onPressed});
+  final bool expanded;
+  final String label;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) => SfPressable(
+    semanticLabel: label,
+    onTap: onPressed,
+    haptic: SfHaptic.selection,
+    child: ConstrainedBox(
+      constraints: const BoxConstraints(minHeight: 44),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: SfSpace.x1),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(label, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, height: 1.2, color: SfColors.muted)),
+            const SizedBox(width: 2),
+            AnimatedRotation(
+              turns: expanded ? -.25 : .25,
+              duration: SfMotion.reduced(context) ? Duration.zero : SfMotion.medium,
+              curve: SfMotion.container,
+              child: SfIcon(SfGlyph.chevronRight, size: 16, color: SfColors.muted, strokeWidth: 2),
+            ),
+          ],
+        ),
+      ),
     ),
   );
 }

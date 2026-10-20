@@ -33,6 +33,10 @@ REQUIRED_EXERCISE_ROLES = ('name', 'intro', 'cue', 'rest', 'finish')
 
 DURATION_TOLERANCE_MS = 50
 
+# Optional light-stage media (media.light, spec §2): files it carries.
+LIGHT_FILE_KEYS = ('cover', 'video')
+HEX_COLOR_RE = re.compile(r'^#[0-9A-Fa-f]{6}$')
+
 
 def packs_root(repo: Path) -> Path:
     return repo / 'assets' / 'packs'
@@ -79,6 +83,10 @@ def listed_files(pack: dict) -> list[str]:
     for k in ('cover', 'video'):
         if media.get(k):
             out.append(media[k])
+    light = media.get('light') or {}
+    for k in LIGHT_FILE_KEYS:
+        if light.get(k):
+            out.append(light[k])
     for c in (pack.get('chimes') or {}).values():
         out.append(c['file'])
     voice = pack.get('voice') or {}

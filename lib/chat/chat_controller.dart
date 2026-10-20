@@ -6,7 +6,7 @@ import '../data/app_store.dart';
 import '../domain/plan.dart';
 import '../domain/saved_plan.dart';
 import 'chat_models.dart';
-import 'rule_chat_engine.dart' show defaultSuggestions;
+import 'rule_chat_engine.dart' show discoverySuggestions;
 import 'safety_script.dart';
 
 /// Owns the chat home's conversation: the message list, the engine's state,
@@ -29,7 +29,7 @@ class ChatController extends ChangeNotifier {
   final DateTime Function() _clock;
 
   final List<ChatMessage> messages = [];
-  List<String> suggestions = defaultSuggestions;
+  List<String> suggestions = discoverySuggestions(returning: false);
   bool typing = false;
   ChatState _state = const ChatState();
 
@@ -74,7 +74,10 @@ class ChatController extends ChangeNotifier {
     }
     final last = messages.isEmpty ? null : messages.last.at;
     if (last == null || _clock().difference(last) > const Duration(hours: 6)) {
-      _bot(BotMessage(messages.isEmpty ? '说说今天想怎么练？' : '欢迎回来。今天想怎么练？'));
+      _bot(BotMessage(
+        '${greetingFor(_clock())}\n${messages.isEmpty ? '说说今天想怎么练？' : '欢迎回来，今天想怎么练？'}',
+        greeting: true,
+      ));
     }
     suggestions = _defaults();
     notifyListeners();
@@ -86,6 +89,13 @@ class ChatController extends ChangeNotifier {
     safetyBlocked: !store.trainingAllowed,
     saved: List.unmodifiable(store.savedPlans),
     lastPlan: store.lastPlan,
+    history: [
+      for (final h in store.history)
+        WorkoutLog(title: h.title, at: h.at, minutes: h.minutes, completed: h.completed, total: h.total),
+    ],
+    appearance: store.appearance,
+    systemLight: PlatformDispatcher.instance.platformBrightness == Brightness.light,
+    now: _clock(),
   );
 
   /// The user typed [text] (or tapped a chip / option labelled [label]).
@@ -117,7 +127,30 @@ class ChatController extends ChangeNotifier {
         : (asks ? const [] : _defaults());
     notifyListeners();
     unawaited(_persist());
-    if (reply.action != null) _actions.add(reply.action!);
+    if (reply.action case final a?) _run(a);
+  }
+
+  /// Settings the conversation changes itself (外观, 语音, 安全确认); the
+  /// rest (`@library`, `@settings`, `@custom`, `@drawer`) go to the UI.
+  void _run(String a) {
+    if (a.startsWith('@appearance:')) {
+      unawaited(store.setAppearance(a.substring(12)));
+    } else if (a.startsWith('@voice:') || a.startsWith('@chimes:')) {
+      final v = store.voice;
+      final next = switch (a) {
+        '@voice:off' => v.copyWith(voice: false),
+        '@voice:on' => v.copyWith(voice: true),
+        '@voice:mute' => v.copyWith(voice: false, chimes: false),
+        '@chimes:off' => v.copyWith(chimes: false),
+        '@chimes:on' => v.copyWith(chimes: true),
+        _ => v,
+      };
+      unawaited(store.setVoice(next));
+    } else if (a == '@safety') {
+      startSafetyCheck();
+    } else {
+      _actions.add(a);
+    }
   }
 
   /// Can [m]'s options still be tapped?
@@ -293,11 +326,10 @@ class ChatController extends ChangeNotifier {
 
   // ------------------------------------------------------------ helpers
 
-  List<String> _defaults() => [
-    if (store.safetyBlocked) '动作库',
-    if (!store.safetyBlocked && (store.lastPlan != null || store.savedPlans.isNotEmpty)) '上次那个',
-    ...defaultSuggestions,
-  ].take(4).toList();
+  List<String> _defaults() => discoverySuggestions(
+    returning: store.lastPlan != null || store.savedPlans.isNotEmpty || store.history.isNotEmpty,
+    blocked: store.safetyBlocked,
+  );
 
   ChatMessage _user(String text) => _add(ChatMessage(
     id: _id(),
@@ -314,6 +346,7 @@ class ChatController extends ChangeNotifier {
     options: m.options,
     plan: m.plan,
     request: m.request,
+    greeting: m.greeting,
   ));
 
   ChatMessage _add(ChatMessage m) {
@@ -338,3 +371,12 @@ class ChatController extends ChangeNotifier {
     super.dispose();
   }
 }
+
+/// 早上好 / 中午好 / 下午好 / 晚上好 / 夜深了, by the hour of [t].
+String greetingFor(DateTime t) => switch (t.hour) {
+  >= 5 && < 11 => '早上好',
+  >= 11 && < 13 => '中午好',
+  >= 13 && < 18 => '下午好',
+  >= 18 && < 23 => '晚上好',
+  _ => '夜深了',
+};

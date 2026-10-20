@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "n-pelvis-circle",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "站姿骨盆画圈",
   "en": "Standing Pelvis Circles"
@@ -50,7 +50,12 @@
   "width": 720,
   "height": 720,
   "loopSeconds": 8.0,
-  "repSeconds": null
+  "repSeconds": null,
+  "light": {
+   "video": "demo-light.mp4",
+   "cover": "cover-light.jpg",
+   "stage": "#EFEFEF"
+  }
  },
  "voice": {
   "languages": [
@@ -133,9 +138,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 9397,
+   "sha256": "3c5936aaa9e0a643916bd5054de71527abf140a9fff145bac5e03f13536add9a"
+  },
   "cover.jpg": {
    "bytes": 7411,
    "sha256": "8ab7a0396322033e1e66ef042c0b82700a33fa998459f9a17e86da9c8eab9b6e"
+  },
+  "demo-light.mp4": {
+   "bytes": 93338,
+   "sha256": "330b5126f1580589265da37d3df305f4479d32a4a00f9292ed6b23ec6e00cc12"
   },
   "demo.mp4": {
    "bytes": 88769,

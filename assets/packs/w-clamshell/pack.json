@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "w-clamshell",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "侧卧蚌式开合",
   "en": "Side-Lying Clamshell"
@@ -47,7 +47,12 @@
   "height": 720,
   "loopSeconds": 8.0,
   "repSeconds": 4.0,
-  "showsSide": "right"
+  "showsSide": "right",
+  "light": {
+   "video": "demo-light.mp4",
+   "cover": "cover-light.jpg",
+   "stage": "#EFEFEF"
+  }
  },
  "voice": {
   "languages": [
@@ -130,9 +135,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 10803,
+   "sha256": "4b93be3eeb2e708fd45b39f57ffcd652cad878078bec2e086374c5527406e6ed"
+  },
   "cover.jpg": {
    "bytes": 8672,
    "sha256": "9a8c2f4c2495f85281d0228fb3db54e75364327b232451b9de52f3b868252f3c"
+  },
+  "demo-light.mp4": {
+   "bytes": 93027,
+   "sha256": "e04aba37051d49692b7a8f0b5355b8416d8eddcfe05b65eb7f5ee84dbb7bef55"
   },
   "demo.mp4": {
    "bytes": 91924,

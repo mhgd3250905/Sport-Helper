@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "h-side-er",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "侧卧肩外旋",
   "en": "Side-Lying External Rotation"
@@ -50,7 +50,12 @@
   "height": 720,
   "loopSeconds": 8.0,
   "repSeconds": 4.0,
-  "showsSide": "right"
+  "showsSide": "right",
+  "light": {
+   "video": "demo-light.mp4",
+   "cover": "cover-light.jpg",
+   "stage": "#EFEFEF"
+  }
  },
  "voice": {
   "languages": [
@@ -143,9 +148,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 10399,
+   "sha256": "38b88c4bf6f68b0a9adecfc1171d6429d56e6b2079b00ccd2dfb5174693b289b"
+  },
   "cover.jpg": {
    "bytes": 7974,
    "sha256": "afbd99dbf8b3b4f7f041c04e4db9e537b5a96f4b039f59ec3b0b32726c43adde"
+  },
+  "demo-light.mp4": {
+   "bytes": 111404,
+   "sha256": "951c80413740dd79ccc942ec6fb335c654d70fdc4e340e26166df2aa355085da"
   },
   "demo.mp4": {
    "bytes": 100939,

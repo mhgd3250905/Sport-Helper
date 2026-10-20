@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "s-pigeon",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "鸽子式（直立扶砖版）",
   "en": "Pigeon Pose"
@@ -51,7 +51,12 @@
   "height": 720,
   "loopSeconds": 8.0,
   "repSeconds": null,
-  "showsSide": "right"
+  "showsSide": "right",
+  "light": {
+   "video": "demo-light.mp4",
+   "cover": "cover-light.jpg",
+   "stage": "#EFEFEF"
+  }
  },
  "voice": {
   "languages": [
@@ -154,9 +159,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 8543,
+   "sha256": "242be07de6658a68fcb5b8b7379ad3bc64355adec873838f58d960641faa4a1d"
+  },
   "cover.jpg": {
    "bytes": 6355,
    "sha256": "20d98668ebc8c47278392802aeb853ea8e2c301eb8a919797e89cb28f6826e28"
+  },
+  "demo-light.mp4": {
+   "bytes": 38927,
+   "sha256": "b7144e48571fbd6146cd126aed280ed0337a96b331d2fbc1ab8eefc622836190"
   },
   "demo.mp4": {
    "bytes": 36503,

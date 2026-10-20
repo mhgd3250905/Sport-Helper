@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "s-9090",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "90/90 坐姿换髋",
   "en": "90/90 Hip Stretch"
@@ -50,7 +50,12 @@
   "width": 720,
   "height": 720,
   "loopSeconds": 8.0,
-  "repSeconds": null
+  "repSeconds": null,
+  "light": {
+   "video": "demo-light.mp4",
+   "cover": "cover-light.jpg",
+   "stage": "#EFEFEF"
+  }
  },
  "voice": {
   "languages": [
@@ -143,9 +148,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 8499,
+   "sha256": "8c7a3911659b6c45e71a736458f262c04d6530f7ead66f281016a2ac29f1d5e5"
+  },
   "cover.jpg": {
    "bytes": 7087,
    "sha256": "d48d1e6fab81fe5e58bc3b021427f088e881c6de0f93113b0a7b76b5d3b2d226"
+  },
+  "demo-light.mp4": {
+   "bytes": 85012,
+   "sha256": "7fe3d0ed54b9c00ee9643a62e9a6d847242e44b3a3e650da3de74088b3a5c390"
   },
   "demo.mp4": {
    "bytes": 82799,

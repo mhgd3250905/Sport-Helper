@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "h-db-row",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "扶椅单臂哑铃划船",
   "en": "Chair-Supported One-Arm Dumbbell Row"
@@ -53,7 +53,12 @@
   "height": 720,
   "loopSeconds": 8.0,
   "repSeconds": 4.0,
-  "showsSide": "right"
+  "showsSide": "right",
+  "light": {
+   "video": "demo-light.mp4",
+   "cover": "cover-light.jpg",
+   "stage": "#EFEFEF"
+  }
  },
  "voice": {
   "languages": [
@@ -156,9 +161,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 17389,
+   "sha256": "57345de7b851826cf3ad75aff47bfcae9b18b9239edbc313df971aa29459a0d1"
+  },
   "cover.jpg": {
    "bytes": 11559,
    "sha256": "9dbdd7fa5923f2dead1fc2579ef241266e3820ecd408ead29433bd23afd834e0"
+  },
+  "demo-light.mp4": {
+   "bytes": 189657,
+   "sha256": "cae50b1024a90515e404d0e268062857d8df39c1050c6a88d19311b3bc1793b9"
   },
   "demo.mp4": {
    "bytes": 165229,

@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "s-frog",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "青蛙式"
  },
@@ -45,7 +45,12 @@
   "width": 720,
   "height": 720,
   "loopSeconds": 8.0,
-  "repSeconds": null
+  "repSeconds": null,
+  "light": {
+   "video": "demo-light.mp4",
+   "cover": "cover-light.jpg",
+   "stage": "#EFEFEF"
+  }
  },
  "voice": {
   "languages": [
@@ -118,9 +123,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 8492,
+   "sha256": "9f0c93ba1bf1d5aa9db7509371d30fab84d2d12eb261b5de89f235b45aa3d9d7"
+  },
   "cover.jpg": {
    "bytes": 6474,
    "sha256": "97982f83346c83fad923953f58cc0bf352c5b590795f7904da78726b4977c248"
+  },
+  "demo-light.mp4": {
+   "bytes": 52262,
+   "sha256": "b3bf1248d1f6ebf7c76f508b49bec4a80ff3471760e1e17cebac0ef34de12ab4"
   },
   "demo.mp4": {
    "bytes": 53508,

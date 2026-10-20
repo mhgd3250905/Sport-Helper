@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "n-half-split",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "半跪半劈叉",
   "en": "Half-Kneeling Half Split (Blocks)"
@@ -52,7 +52,12 @@
   "height": 720,
   "loopSeconds": 8.0,
   "repSeconds": null,
-  "showsSide": "right"
+  "showsSide": "right",
+  "light": {
+   "video": "demo-light.mp4",
+   "cover": "cover-light.jpg",
+   "stage": "#EFEFEF"
+  }
  },
  "voice": {
   "languages": [
@@ -155,9 +160,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 12990,
+   "sha256": "be882ba4b4129d9a0375e7c09963644bc1f78932b8dcd753d8b0b91f371bdb66"
+  },
   "cover.jpg": {
    "bytes": 10572,
    "sha256": "7553612c2eea352e8ab56e610d74cd280a7a0d4cc418e86bf54613747be8e57b"
+  },
+  "demo-light.mp4": {
+   "bytes": 114062,
+   "sha256": "8a01d2f46c133f4d33cb8aef46f683604f184bc6b37abc3b5b3812685319d67b"
   },
   "demo.mp4": {
    "bytes": 122919,

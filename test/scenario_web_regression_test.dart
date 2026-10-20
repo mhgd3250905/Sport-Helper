@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:smartfit/ui/theme.dart';
 import 'package:smartfit/app/services.dart';
 import 'package:smartfit/core/storage/local_state_storage.dart';
 import 'package:smartfit/data/app_store.dart';
@@ -94,7 +95,7 @@ void main() {
     tester,
   ) async {
     final services = await showHome(tester);
-    final goal = find.widgetWithText(ChoiceChip, '核心腰腹');
+    final goal = find.widgetWithText(SfChoiceChip, '核心腰腹');
     await tester.ensureVisible(goal);
     await tester.tap(goal);
     await tester.pump();

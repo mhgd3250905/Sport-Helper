@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "n-slider-lateral",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "滑垫侧向滑"
  },
@@ -46,7 +46,12 @@
   "height": 720,
   "loopSeconds": 8.0,
   "repSeconds": 4.0,
-  "showsSide": "right"
+  "showsSide": "right",
+  "light": {
+   "video": "demo-light.mp4",
+   "cover": "cover-light.jpg",
+   "stage": "#EFEFEF"
+  }
  },
  "voice": {
   "languages": [
@@ -129,9 +134,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 10378,
+   "sha256": "468f2f129c6be8e52550bfd61351718adc9b5017ddba44ea13b94b5d54096a83"
+  },
   "cover.jpg": {
    "bytes": 8487,
    "sha256": "31d24f5f4215e36dcce6d06f3db6b05d3e20ad717ad7c2635efc7e1b99830b0d"
+  },
+  "demo-light.mp4": {
+   "bytes": 126594,
+   "sha256": "b4e42859d6813c5eb9d87a5c3cdc1e6bacbc4350302d9f79aa234ba28d706459"
   },
   "demo.mp4": {
    "bytes": 123783,

@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "h-wall-calf",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "靠墙小腿拉伸",
   "en": "Wall Calf Stretch"
@@ -49,7 +49,12 @@
   "height": 720,
   "loopSeconds": 8.0,
   "repSeconds": null,
-  "showsSide": "right"
+  "showsSide": "right",
+  "light": {
+   "video": "demo-light.mp4",
+   "cover": "cover-light.jpg",
+   "stage": "#EFEFEF"
+  }
  },
  "voice": {
   "languages": [
@@ -142,9 +147,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 12254,
+   "sha256": "78b8e65ccd16b72575f9e7082d1e729afadcfc2ff54286d68c71972d9771dfb8"
+  },
   "cover.jpg": {
    "bytes": 8875,
    "sha256": "e61a0b48e621029d92308bb0b562b0a4aa71c9f62ab39bb8ef3cf3853037a6d0"
+  },
+  "demo-light.mp4": {
+   "bytes": 119901,
+   "sha256": "24f2a6070456e5ea746054e6f9cdfa4c6237877c75a473c7c1ee2b8c62eb49bb"
   },
   "demo.mp4": {
    "bytes": 97907,

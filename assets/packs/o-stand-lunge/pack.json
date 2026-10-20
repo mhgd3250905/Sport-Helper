@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "o-stand-lunge",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "扶椅站姿弓步屈髋拉伸",
   "en": "Chair-Supported Standing Hip Flexor Stretch"
@@ -51,7 +51,12 @@
   "height": 720,
   "loopSeconds": 8.0,
   "repSeconds": null,
-  "showsSide": "right"
+  "showsSide": "right",
+  "light": {
+   "video": "demo-light.mp4",
+   "cover": "cover-light.jpg",
+   "stage": "#EFEFEF"
+  }
  },
  "voice": {
   "languages": [
@@ -144,9 +149,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 10658,
+   "sha256": "1428476735dd350176343ed0e958525f652c561c1e23b282a853f6dd2809a088"
+  },
   "cover.jpg": {
    "bytes": 7561,
    "sha256": "6285ae8150471e44c41c630dda5b654dd291bf2af17a7c8f4f3794f39a3ecf52"
+  },
+  "demo-light.mp4": {
+   "bytes": 69802,
+   "sha256": "1fec053b82625b96423f179f98a1c72831ae9dd42e599b33ab3a438023b04fa9"
   },
   "demo.mp4": {
    "bytes": 65231,

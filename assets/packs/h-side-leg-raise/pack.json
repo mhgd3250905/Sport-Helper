@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "h-side-leg-raise",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "站姿侧抬腿",
   "en": "Standing Side Leg Raise"
@@ -47,7 +47,12 @@
   "height": 720,
   "loopSeconds": 8.0,
   "repSeconds": 4.0,
-  "showsSide": "right"
+  "showsSide": "right",
+  "light": {
+   "video": "demo-light.mp4",
+   "cover": "cover-light.jpg",
+   "stage": "#EFEFEF"
+  }
  },
  "voice": {
   "languages": [
@@ -140,9 +145,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 8968,
+   "sha256": "39bf1ccc3c50222ba22f8fa1e160f1f0f3cf67c690ec346679ad294fd5e656ba"
+  },
   "cover.jpg": {
    "bytes": 6143,
    "sha256": "aefc8d9f9f322c3a4c3ab4140237e5fc1a42d246b1f0c9d2060fe8c950d13c6f"
+  },
+  "demo-light.mp4": {
+   "bytes": 65127,
+   "sha256": "4ef094ae3410a51210ad542d7d0d571f2ae1780f3192e612f7741026384b13f6"
   },
   "demo.mp4": {
    "bytes": 52435,

@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "h-chair-tspine",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "跪姿椅面胸椎伸展",
   "en": "Kneeling Chair Thoracic Extension"
@@ -51,7 +51,12 @@
   "width": 720,
   "height": 720,
   "loopSeconds": 8.0,
-  "repSeconds": null
+  "repSeconds": null,
+  "light": {
+   "video": "demo-light.mp4",
+   "cover": "cover-light.jpg",
+   "stage": "#EFEFEF"
+  }
  },
  "voice": {
   "languages": [
@@ -134,9 +139,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 11124,
+   "sha256": "8f91180fa5130f915da0e815034114ce55b1becb0bfdefe6f10dbf0c691ea6fe"
+  },
   "cover.jpg": {
    "bytes": 7413,
    "sha256": "7e30d4316755506f6614ab172d6fc50fdd7ca38f947c31366716c5cabd1eb6ff"
+  },
+  "demo-light.mp4": {
+   "bytes": 108376,
+   "sha256": "c45d7696c829d387deec4d4f7ae8e22bf7212d4b4081bf760dfd3a720ff0e8d6"
   },
   "demo.mp4": {
    "bytes": 85615,

@@ -10,6 +10,18 @@ import '../domain/scenario.dart';
 
 enum ChatRole { user, assistant }
 
+/// One finished (or ended) workout, as the chat sees it: what 「上次练了
+/// 什么」「这周练了多少」 answer from.
+class WorkoutLog {
+  const WorkoutLog({required this.title, required this.at, required this.minutes, required this.completed, required this.total});
+  final String title;
+  final DateTime at;
+  final int minutes;
+  final int completed;
+  final int total;
+  bool get finished => total > 0 && completed >= total;
+}
+
 /// A tappable answer inside an assistant bubble. Tapping sends [value] as
 /// the user's message (shown as [label]); values starting with `@` are
 /// commands handled by the app (`@drawer`, `@library`, `@saved:<id>`…).
@@ -35,6 +47,7 @@ class ChatMessage {
     this.chosen,
     this.plan,
     this.request,
+    this.greeting = false,
   });
 
   final String id;
@@ -50,6 +63,10 @@ class ChatMessage {
   final TrainingPlan? plan;
   final ScenarioRequest? request;
 
+  /// The opening line, set as large type in the sky instead of a bubble
+  /// (first line = 早上好 / 晚上好…, the rest = the invitation).
+  final bool greeting;
+
   bool get isUser => role == ChatRole.user;
   bool get isPlan => plan != null;
 
@@ -62,6 +79,7 @@ class ChatMessage {
     chosen: chosen ?? this.chosen,
     plan: plan,
     request: request,
+    greeting: greeting,
   );
 
   Map<String, Object?> toJson() => {
@@ -73,6 +91,7 @@ class ChatMessage {
     'chosen': ?chosen,
     'plan': ?plan?.toJson(),
     'request': ?(request == null ? null : requestToJson(request!)),
+    if (greeting) 'greeting': true,
   };
 
   factory ChatMessage.fromJson(Map<String, dynamic> j) => ChatMessage(
@@ -85,6 +104,7 @@ class ChatMessage {
         ChatOption.fromJson(Map<String, dynamic>.from(o as Map)),
     ],
     chosen: (j['chosen'] as num?)?.toInt(),
+    greeting: j['greeting'] == true,
     plan: j['plan'] is Map
         ? TrainingPlan.fromJson(Map<String, dynamic>.from(j['plan'] as Map))
         : null,
@@ -222,6 +242,10 @@ class ChatState {
     this.safetyBlocked = false,
     this.saved = const [],
     this.lastPlan,
+    this.history = const [],
+    this.appearance = 'system',
+    this.systemLight = false,
+    this.now,
   });
 
   /// A plan request still waiting for an answer to a follow-up question.
@@ -241,6 +265,21 @@ class ChatState {
   final List<SavedPlan> saved;
   final TrainingPlan? lastPlan;
 
+  /// Workouts, newest first.
+  final List<WorkoutLog> history;
+
+  /// 'dark' / 'light' / 'system' (what 「换浅色」 changes).
+  final String appearance;
+
+  /// The platform is light right now (what 'system' resolves to).
+  final bool systemLight;
+
+  /// The light theme is in effect (chooses 「换深色」 vs 「换浅色」).
+  bool get looksLight => appearance == 'light' || (appearance == 'system' && systemLight);
+
+  /// The clock for 「这周」 (null = now).
+  final DateTime? now;
+
   ChatState copyWith({
     Slots? pending,
     bool clearPending = false,
@@ -250,6 +289,10 @@ class ChatState {
     bool? safetyBlocked,
     List<SavedPlan>? saved,
     TrainingPlan? lastPlan,
+    List<WorkoutLog>? history,
+    String? appearance,
+    bool? systemLight,
+    DateTime? now,
   }) => ChatState(
     pending: clearPending ? null : (pending ?? this.pending),
     asked: clearPending ? const [] : (asked ?? this.asked),
@@ -258,13 +301,18 @@ class ChatState {
     safetyBlocked: safetyBlocked ?? this.safetyBlocked,
     saved: saved ?? this.saved,
     lastPlan: lastPlan ?? this.lastPlan,
+    history: history ?? this.history,
+    appearance: appearance ?? this.appearance,
+    systemLight: systemLight ?? this.systemLight,
+    now: now ?? this.now,
   );
 }
 
 /// One assistant bubble the engine wants to show (ids and times are added
 /// by the controller).
 class BotMessage {
-  const BotMessage(this.text, {this.options = const [], this.plan, this.request});
+  const BotMessage(this.text, {this.options = const [], this.plan, this.request, this.greeting = false});
+  final bool greeting;
   final String text;
   final List<ChatOption> options;
   final TrainingPlan? plan;

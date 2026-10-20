@@ -5,31 +5,62 @@ import '../theme/sf_icons.dart';
 import '../theme/tokens.dart';
 import '../theme/widgets.dart';
 
-/// New messages rise 12 px and fade in once; old ones (and everything
-/// under reduced motion) appear as they are.
+/// A new message arriving (docs/design-audit-2026-10-19.md M4): fade +
+/// 10 px rise + 0.98 → 1 from the speaker's corner ([anchor]: bottom-left
+/// for the assistant, bottom-right for the user), 360 ms. Messages of one
+/// reply follow each other by [delay] (words first, then the card). Old
+/// messages appear as they are; reduced motion keeps a 200 ms fade only.
+///
+/// The delay is part of the animation (an [Interval]), not a timer, so
+/// nothing is left pending when the chat goes away.
 class Appear extends StatefulWidget {
-  const Appear({super.key, required this.animate, required this.child, this.delay = Duration.zero});
+  const Appear({
+    super.key,
+    required this.animate,
+    required this.child,
+    this.delay = Duration.zero,
+    this.anchor = Alignment.bottomLeft,
+    this.rise = 10,
+    this.shift = 0,
+    this.duration = SfMotion.appear,
+    this.scaleFrom = .98,
+  });
   final bool animate;
   final Duration delay;
   final Widget child;
+  final Alignment anchor;
+
+  /// Pixels it rises (y) / slides left (x, the suggestion chips) as it lands.
+  final double rise;
+  final double shift;
+  final Duration duration;
+  final double scaleFrom;
   @override
   State<Appear> createState() => _AppearState();
 }
 
 class _AppearState extends State<Appear> with SingleTickerProviderStateMixin {
-  late final AnimationController _c = AnimationController(vsync: this, duration: SfMotion.appear);
-  late final Animation<double> _t = CurvedAnimation(parent: _c, curve: SfMotion.standard);
+  late final AnimationController _c = AnimationController(vsync: this);
+  Animation<double> _t = kAlwaysCompleteAnimation;
+  bool _still = false;
+  bool _begun = false;
 
   @override
-  void initState() {
-    super.initState();
-    if (widget.animate) {
-      Future<void>.delayed(widget.delay, () {
-        if (mounted) _c.forward();
-      });
-    } else {
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_begun) return;
+    _begun = true;
+    _still = SfMotion.reduced(context);
+    if (!widget.animate) {
       _c.value = 1;
+      return;
     }
+    final run = _still ? const Duration(milliseconds: 200) : widget.duration;
+    final total = widget.delay + run;
+    _c.duration = total;
+    final start = widget.delay.inMicroseconds / total.inMicroseconds;
+    _t = CurvedAnimation(parent: _c, curve: Interval(start, 1, curve: _still ? Curves.easeOut : SfMotion.standard));
+    _c.forward();
   }
 
   @override
@@ -42,10 +73,22 @@ class _AppearState extends State<Appear> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) => AnimatedBuilder(
     animation: _t,
     child: widget.child,
-    builder: (_, child) => Opacity(
-      opacity: _t.value,
-      child: Transform.translate(offset: Offset(0, 12 * (1 - _t.value)), child: child),
-    ),
+    builder: (_, child) {
+      final v = _t.value;
+      if (v >= 1) return child!;
+      if (_still) return Opacity(opacity: v, child: child);
+      return Opacity(
+        opacity: v,
+        child: Transform.translate(
+          offset: Offset(widget.shift * (1 - v), widget.rise * (1 - v)),
+          child: Transform.scale(
+            scale: widget.scaleFrom + (1 - widget.scaleFrom) * v,
+            alignment: widget.anchor,
+            child: child,
+          ),
+        ),
+      );
+    },
   );
 }
 
@@ -73,6 +116,9 @@ class _Bubble extends StatelessWidget {
       decoration: BoxDecoration(
         color: user ? SfColors.userBubble : SfColors.assistantBubble,
         borderRadius: r,
+        // Light: white on near-white needs the hairline as well as the
+        // faint ink shadow (§6.2); dark: the tone step carries it.
+        border: user || SfColors.isDark ? null : Border.fromBorderSide(SfColors.cardEdge),
         boxShadow: user ? null : SfColors.cardShadow,
       ),
       child: Padding(
@@ -81,6 +127,12 @@ class _Bubble extends StatelessWidget {
       ),
     );
   }
+}
+
+/// "1/4　问题" → ('1/4', '问题'); null for any other text.
+(String, String)? _step(String text) {
+  final m = RegExp(r'^(\d+/\d+)\u3000(.+)$', dotAll: true).firstMatch(text);
+  return m == null ? null : ('安全确认 ${m.group(1)}', m.group(2)!);
 }
 
 class MessageBubble extends StatelessWidget {
@@ -105,7 +157,13 @@ class MessageBubble extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (message.text.isNotEmpty) Text(message.text, style: SfType.body),
+          if (_step(message.text) case (final step, final rest)) ...[
+            // 安全确认 1/4: the step as a caption over the question.
+            Text(step, style: SfType.caption.copyWith(color: SfColors.muted, letterSpacing: .6, fontFeatures: SfType.tabular)),
+            const SizedBox(height: 2),
+            Text(rest, style: SfType.body),
+          ] else if (message.text.isNotEmpty)
+            Text(message.text, style: SfType.body),
           if (message.options.isNotEmpty) ...[
             const SizedBox(height: SfSpace.x3),
             Wrap(
@@ -168,6 +226,7 @@ class OptionPill extends StatelessWidget {
     return SfPressable(
       semanticLabel: label,
       onTap: enabled ? onTap : null,
+      haptic: SfHaptic.selection,
       child: AnimatedContainer(
         duration: SfMotion.medium,
         constraints: const BoxConstraints(minHeight: 36),
@@ -186,6 +245,49 @@ class OptionPill extends StatelessWidget {
     );
   }
 }
+
+/// The opening line without a bubble (§2.1): 早上好 / 晚上好… in large type
+/// floating in the sky, the invitation under it in muted body text. It is
+/// still a message: later ones push it up.
+class GreetingBlock extends StatelessWidget {
+  const GreetingBlock({super.key, required this.text});
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final i = text.indexOf('\n');
+    final head = i < 0 ? text : text.substring(0, i);
+    final rest = i < 0 ? '' : text.substring(i + 1);
+    return Padding(
+      key: const ValueKey('greeting'),
+      padding: const EdgeInsets.fromLTRB(SfSpace.x2, SfSpace.x6, SfSpace.x2, SfSpace.x1),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(head, style: SfType.greeting),
+          if (rest.isNotEmpty) ...[
+            const SizedBox(height: SfSpace.x1),
+            Text(rest, style: SfType.body.copyWith(color: SfColors.muted)),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+/// The chips that open a feature (not plan requests) and their glyphs:
+/// the shape says what tapping does (§4.3).
+const chipGlyphs = <String, SfGlyph>{
+  '看看动作库': SfGlyph.grid,
+  '浏览动作库': SfGlyph.grid,
+  '动作库': SfGlyph.grid,
+  '上次练了什么': SfGlyph.clock,
+  '我的计划': SfGlyph.bookmark,
+  '换浅色': SfGlyph.contrast,
+  '换深色': SfGlyph.contrast,
+  '你能做什么': SfGlyph.sparkle,
+  '自己选条件': SfGlyph.sliders,
+};
 
 /// "今天 13:40" between sittings.
 class TimeMark extends StatelessWidget {
@@ -290,9 +392,20 @@ class SuggestionStrip extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(SfSpace.x4, SfSpace.x1, SfSpace.x4, SfSpace.x2),
         itemCount: items.length,
         separatorBuilder: (_, _) => const SizedBox(width: SfSpace.x2),
-        itemBuilder: (_, i) => SfPressable(
+        // M6: a new batch arrives chip by chip (40 ms apart), sliding 8 px
+        // left as it fades in.
+        itemBuilder: (_, i) => Appear(
+          key: ValueKey('suggestion-in-${items.join('|')}-$i'),
+          animate: true,
+          delay: SfMotion.stagger * i,
+          duration: SfMotion.medium,
+          rise: 0,
+          shift: 8,
+          scaleFrom: 1,
+          child: SfPressable(
           key: ValueKey('suggestion-$i'),
           semanticLabel: items[i],
+          haptic: SfHaptic.selection,
           onTap: () => onTap(items[i]),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 14),
@@ -301,10 +414,20 @@ class SuggestionStrip extends StatelessWidget {
               color: SfColors.isDark ? SfColors.surface : SfColors.surface,
               shape: StadiumBorder(side: SfColors.cardEdge),
             ),
-            child: Text(
-              items[i],
-              style: TextStyle(color: SfColors.muted, fontSize: 14, height: 1.2, fontWeight: FontWeight.w500),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (chipGlyphs[items[i]] case final g?) ...[
+                  SfIcon(g, size: 16, color: SfColors.accentText),
+                  const SizedBox(width: 6),
+                ],
+                Text(
+                  items[i],
+                  style: TextStyle(color: SfColors.muted, fontSize: 14, height: 1.2, fontWeight: FontWeight.w500),
+                ),
+              ],
             ),
+          ),
           ),
         ),
       ),
@@ -320,8 +443,11 @@ class ChatInputBar extends StatefulWidget {
     required this.onSend,
     this.onPlans,
     this.enabled = true,
+    this.focusNode,
   });
 
+  /// Lets the page put the cursor here (the drawer's 「去排一套」).
+  final FocusNode? focusNode;
   final void Function(String) onSend;
   final VoidCallback? onPlans;
   final bool enabled;
@@ -332,12 +458,13 @@ class ChatInputBar extends StatefulWidget {
 
 class _ChatInputBarState extends State<ChatInputBar> {
   final _text = TextEditingController();
-  final _focus = FocusNode();
+  final _ownFocus = FocusNode();
+  FocusNode get _focus => widget.focusNode ?? _ownFocus;
 
   @override
   void dispose() {
     _text.dispose();
-    _focus.dispose();
+    _ownFocus.dispose();
     super.dispose();
   }
 
@@ -428,12 +555,19 @@ class _ChatInputBarState extends State<ChatInputBar> {
                             shape: BoxShape.circle,
                             color: ready ? SfColors.accent : SfColors.surfaceHigh,
                           ),
+                          // M9: the arrow grows into place as the disc
+                          // turns accent; reduced motion: colour only.
                           child: Center(
-                            child: SfIcon(
-                              SfGlyph.arrowUp,
-                              size: 18,
-                              strokeWidth: 2.2,
-                              color: ready ? SfColors.onAccent : SfColors.faint,
+                            child: AnimatedScale(
+                              scale: ready || SfMotion.reduced(context) ? 1 : .84,
+                              duration: SfMotion.fast,
+                              curve: SfMotion.standard,
+                              child: SfIcon(
+                                SfGlyph.arrowUp,
+                                size: 18,
+                                strokeWidth: 2.2,
+                                color: ready ? SfColors.onAccent : SfColors.faint,
+                              ),
                             ),
                           ),
                         ),

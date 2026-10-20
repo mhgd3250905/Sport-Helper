@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "n-chair-wiper",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "坐椅雨刷（膝内倒）",
   "en": "Seated Knee Drop-In"
@@ -53,7 +53,12 @@
   "width": 720,
   "height": 720,
   "loopSeconds": 8.0,
-  "repSeconds": 3.0
+  "repSeconds": 3.0,
+  "light": {
+   "video": "demo-light.mp4",
+   "cover": "cover-light.jpg",
+   "stage": "#EFEFEF"
+  }
  },
  "voice": {
   "languages": [
@@ -146,9 +151,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 9704,
+   "sha256": "3255a17c76974643544c9c7f2902b668431bc84eb7addf2d5f6b5968836f9851"
+  },
   "cover.jpg": {
    "bytes": 7816,
    "sha256": "766f6bdb8b8c538051eee1922821ab4bcca908a5b669f260d635697841deba48"
+  },
+  "demo-light.mp4": {
+   "bytes": 81374,
+   "sha256": "4fec1523ff08f6cafc7f497d5be15b53d5470b6097313c4cdf9487235bb3a191"
   },
   "demo.mp4": {
    "bytes": 78140,

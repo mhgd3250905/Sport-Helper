@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import '../../app/services.dart';
 import '../../chat/chat_controller.dart';
 import '../../chat/chat_models.dart';
+import '../../domain/exercise.dart';
 import '../../domain/plan.dart';
 import '../about_page.dart';
 import '../custom_plan_page.dart';
@@ -15,6 +16,7 @@ import '../player_page.dart';
 import '../theme/app_theme.dart';
 import '../theme/sf_icons.dart';
 import '../theme/tokens.dart';
+import '../theme/widgets.dart';
 import 'chat_widgets.dart';
 import 'cosmos.dart';
 import 'expand_route.dart';
@@ -38,6 +40,7 @@ class _ChatHomePageState extends State<ChatHomePage> {
   StreamSubscription<String>? _actions;
   final _scroll = ScrollController();
   final _scaffold = GlobalKey<ScaffoldState>();
+  final _input = FocusNode();
 
   /// Messages already on screen when the page opened don't animate in.
   final _seen = <String>{};
@@ -57,6 +60,7 @@ class _ChatHomePageState extends State<ChatHomePage> {
   void dispose() {
     _actions?.cancel();
     _scroll.dispose();
+    _input.dispose();
     super.dispose();
   }
 
@@ -65,6 +69,12 @@ class _ChatHomePageState extends State<ChatHomePage> {
     switch (a) {
       case '@library':
         _push(const LibraryPage());
+      case final c when c.startsWith('@library:'):
+        _push(LibraryPage(initial: ExerciseCategory.byName(c.substring(9))));
+      case '@settings':
+        _push(const AboutPage());
+      case '@custom':
+        _push(const CustomPlanPage());
       case '@drawer':
         _scaffold.currentState?.openDrawer();
     }
@@ -84,12 +94,14 @@ class _ChatHomePageState extends State<ChatHomePage> {
   Future<void> _start(TrainingPlan p, {OriginRect? from}) async {
     final s = AppServices.of(context);
     if (!s.store.trainingAllowed) {
-      _toast(s.store.safetyAccepted
-          ? '根据你的安全确认，暂不开始训练；可以在动作库里看示范。'
-          : '请先在对话里完成安全确认，再开始训练。');
+      _toast(
+        s.store.safetyAccepted
+            ? '根据你的安全确认，暂不开始训练；可以在动作库里看示范。'
+            : '请先在对话里完成安全确认，再开始训练。',
+        icon: SfGlyph.shield,
+      );
       return;
     }
-    HapticFeedback.lightImpact();
     if (!await _chat.started(p)) return;
     final before = s.store.history.length;
     if (!mounted) return;
@@ -106,7 +118,7 @@ class _ChatHomePageState extends State<ChatHomePage> {
   }
 
   Future<void> _save(TrainingPlan p) async {
-    HapticFeedback.selectionClick();
+    SfHaptic.selection.play();
     final saved = await _chat.save(p);
     _toast('已保存为「${saved.name}」');
   }
@@ -124,19 +136,12 @@ class _ChatHomePageState extends State<ChatHomePage> {
     if (mounted && plan != null) await _start(plan);
   }
 
-  void _toast(String text) {
+  void _toast(String text, {SfGlyph icon = SfGlyph.checkCircle}) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(
-        margin: const EdgeInsets.fromLTRB(24, 0, 24, 96),
-        content: Text(text),
-        duration: const Duration(seconds: 2),
-      ));
+    showSfToast(context, text, icon: icon);
   }
 
   Future<void> _send(String text, {String? label}) async {
-    HapticFeedback.selectionClick();
     if (_scroll.hasClients && _scroll.offset > 0) {
       unawaited(_scroll.animateTo(0, duration: const Duration(milliseconds: 300), curve: Curves.easeOut));
     }
@@ -158,26 +163,20 @@ class _ChatHomePageState extends State<ChatHomePage> {
           library: s.library,
           onShow: (p) => _fromDrawer(() => _chat.showSaved(p)),
           onStart: (p, from) => _fromDrawer(() => _start(p.plan, from: from)),
+          // Nothing saved yet: close the drawer and put the cursor in the chat.
+          onCompose: () => _fromDrawer(() async => _input.requestFocus()),
+          // §4: two quiet rows; the form now opens from the chat (「自己选条件」).
           footer: [
             DrawerEntry(
               key: const ValueKey('drawer-library'),
               icon: SfGlyph.grid,
               label: '动作库',
-              hint: '${s.library.length} 个动作的示范',
               onTap: () => _fromDrawer(() => _push(const LibraryPage())),
             ),
             DrawerEntry(
-              key: const ValueKey('drawer-custom'),
-              icon: SfGlyph.sliders,
-              label: '自定义计划',
-              hint: '用表单选目标、器械和时长',
-              onTap: () => _fromDrawer(() => _push(const CustomPlanPage())),
-            ),
-            DrawerEntry(
               key: const ValueKey('drawer-about'),
-              icon: SfGlyph.info,
-              label: '关于与设置',
-              hint: '外观、语音、安全确认、素材署名',
+              icon: SfGlyph.sliders,
+              label: '设置',
               onTap: () => _fromDrawer(() => _push(const AboutPage())),
             ),
           ],
@@ -197,6 +196,7 @@ class _ChatHomePageState extends State<ChatHomePage> {
                       onTap: _send,
                     ),
                     ChatInputBar(
+                      focusNode: _input,
                       onSend: _send,
                       enabled: !_chat.typing,
                       onPlans: () => _scaffold.currentState?.openDrawer(),
@@ -215,6 +215,10 @@ class _ChatHomePageState extends State<ChatHomePage> {
     final rows = <Widget>[];
     final msgs = _chat.messages;
     final now = DateTime.now();
+    final still = SfMotion.reduced(context);
+    // M4: the messages of one reply land one after another, 120 ms apart
+    // (words first, then the card); the user's own line lands at once.
+    var queued = 0;
     for (var i = 0; i < msgs.length; i++) {
       final m = msgs[i];
       final prev = i == 0 ? null : msgs[i - 1];
@@ -226,10 +230,22 @@ class _ChatHomePageState extends State<ChatHomePage> {
         Padding(
           key: ValueKey(m.id),
           padding: EdgeInsets.only(top: sameSide ? SfSpace.x2 : SfSpace.x4),
-          child: Appear(
-            animate: !_seen.contains(m.id) && !(MediaQuery.maybeDisableAnimationsOf(context) ?? false),
-            child: _message(m),
-          ),
+          child: m.greeting
+              // M5: the greeting drifts up 16 px over 600 ms; nothing under
+              // reduced motion.
+              ? Appear(
+                  animate: !_seen.contains(m.id) && !still,
+                  duration: const Duration(milliseconds: 600),
+                  rise: 16,
+                  scaleFrom: 1,
+                  child: GreetingBlock(text: m.text),
+                )
+              : Appear(
+                  animate: !_seen.contains(m.id),
+                  delay: !_seen.contains(m.id) && !m.isUser && !still ? SfMotion.replyStagger * queued++ : Duration.zero,
+                  anchor: m.isUser ? Alignment.bottomRight : Alignment.bottomLeft,
+                  child: _message(m, fresh: !_seen.contains(m.id)),
+                ),
         ),
       );
     }
@@ -277,9 +293,10 @@ class _ChatHomePageState extends State<ChatHomePage> {
     );
   }
 
-  Widget _message(ChatMessage m) => m.isPlan
+  Widget _message(ChatMessage m, {bool fresh = false}) => m.isPlan
       ? PlanCard(
           plan: m.plan!,
+          landing: fresh,
           library: AppServices.of(context).library,
           saved: _chat.isSaved(m.plan!),
           onStart: (from) => _start(m.plan!, from: from),

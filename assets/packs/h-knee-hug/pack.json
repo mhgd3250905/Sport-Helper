@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "h-knee-hug",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "仰卧抱膝",
   "en": "Supine Knees-to-Chest"
@@ -51,7 +51,12 @@
   "width": 720,
   "height": 720,
   "loopSeconds": 8.0,
-  "repSeconds": null
+  "repSeconds": null,
+  "light": {
+   "video": "demo-light.mp4",
+   "cover": "cover-light.jpg",
+   "stage": "#EFEFEF"
+  }
  },
  "voice": {
   "languages": [
@@ -134,9 +139,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 11602,
+   "sha256": "acba1cf8279042e61dcc441c34e1b1fa6f412d3acf9f14cccf4f498cdcccba94"
+  },
   "cover.jpg": {
    "bytes": 10434,
    "sha256": "6152e506210fd4960af0efd07b4b809c45d027a993d16f2c47fb2cf0c5f8d5fb"
+  },
+  "demo-light.mp4": {
+   "bytes": 107997,
+   "sha256": "f94c9b798bc210486e85cd4b548bcb7fabb74540039e6d14210ce3a45b27a55e"
   },
   "demo.mp4": {
    "bytes": 108673,

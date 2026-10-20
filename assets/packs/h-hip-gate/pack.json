@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "h-hip-gate",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "扶椅站姿开髋门",
   "en": "Chair-Supported Hip Gate Opener"
@@ -51,7 +51,12 @@
   "height": 720,
   "loopSeconds": 8.0,
   "repSeconds": 3.0,
-  "showsSide": "right"
+  "showsSide": "right",
+  "light": {
+   "video": "demo-light.mp4",
+   "cover": "cover-light.jpg",
+   "stage": "#EFEFEF"
+  }
  },
  "voice": {
   "languages": [
@@ -144,9 +149,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 11170,
+   "sha256": "0dbb03f96197cb2d796e07e4cba9ae907e0d3c30c2ee9b6bea719ec9a0e4a2b8"
+  },
   "cover.jpg": {
    "bytes": 8260,
    "sha256": "3e2f52354d7fb7698f02cb16f8827d2e73bcc1f13966c9c5200eca0a80234e6e"
+  },
+  "demo-light.mp4": {
+   "bytes": 114686,
+   "sha256": "c7eab3276405bf0ca672d17ba66efb77d6e8a43e3b3efc73eaf491086471d98f"
   },
   "demo.mp4": {
    "bytes": 101302,

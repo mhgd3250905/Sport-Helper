@@ -17,15 +17,15 @@ import 'app_flow_test.dart' show MemoryStorage, services, tall;
 
 void main() {
   testWidgets(
-    'first-launch drawer cannot bypass safety with custom plans or templates',
+    'first launch: the custom form cannot bypass safety with custom plans or templates',
     (tester) async {
       tall(tester);
       final s = services();
       await tester.pumpWidget(SmartFitApp(services: s));
       await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const ValueKey('open-plans')));
-      await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const ValueKey('drawer-custom')));
+      // The form opens from the chat now (「自己选条件」→ @custom); the page
+      // still checks the safety talk itself.
+      s.chat.command('@custom');
       await tester.pumpAndSettle();
       expect(find.byType(CustomPlanPage), findsOneWidget);
 

@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "h-cobra",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "眼镜蛇式",
   "en": "Cobra Stretch"
@@ -50,7 +50,12 @@
   "width": 720,
   "height": 720,
   "loopSeconds": 8.0,
-  "repSeconds": null
+  "repSeconds": null,
+  "light": {
+   "video": "demo-light.mp4",
+   "cover": "cover-light.jpg",
+   "stage": "#EFEFEF"
+  }
  },
  "voice": {
   "languages": [
@@ -143,9 +148,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 10861,
+   "sha256": "b3f3117656eb2fe4050aec628bc3dbe3ba10900d7c9e907eadb2b7269b856595"
+  },
   "cover.jpg": {
    "bytes": 8198,
    "sha256": "84023133e3f4eaacbec9ac2bda5af285ec08a7ff4aec11d90ff34384141854f6"
+  },
+  "demo-light.mp4": {
+   "bytes": 131182,
+   "sha256": "638b5b6a39f492a50f2e7595b07fdb3df9d1df8a56893550c1beb7428651483f"
   },
   "demo.mp4": {
    "bytes": 128146,

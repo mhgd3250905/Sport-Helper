@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "h-band-pull-apart",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "弹力带水平拉开",
   "en": "Band Pull-Apart"
@@ -53,7 +53,12 @@
   "width": 720,
   "height": 720,
   "loopSeconds": 8.0,
-  "repSeconds": 4.0
+  "repSeconds": 4.0,
+  "light": {
+   "video": "demo-light.mp4",
+   "cover": "cover-light.jpg",
+   "stage": "#EFEFEF"
+  }
  },
  "voice": {
   "languages": [
@@ -146,9 +151,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 11533,
+   "sha256": "479be86f1585ec0c1eea83d012643bdb046916e80c40515ef56387906fcdcc12"
+  },
   "cover.jpg": {
    "bytes": 8682,
    "sha256": "7e991ae32819168529fa1b0db9a15b1bf8533516409e8f24d9e4654a2d5e19f4"
+  },
+  "demo-light.mp4": {
+   "bytes": 121904,
+   "sha256": "82842ad6cb9d9265e1178139aef02253b295c6e99925e0846d1d4aab44be93c7"
   },
   "demo.mp4": {
    "bytes": 116629,

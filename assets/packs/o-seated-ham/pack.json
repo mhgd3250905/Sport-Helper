@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "o-seated-ham",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "坐姿腘绳肌前伸",
   "en": "Seated Hamstring Stretch"
@@ -50,7 +50,12 @@
   "height": 720,
   "loopSeconds": 8.0,
   "repSeconds": null,
-  "showsSide": "right"
+  "showsSide": "right",
+  "light": {
+   "video": "demo-light.mp4",
+   "cover": "cover-light.jpg",
+   "stage": "#EFEFEF"
+  }
  },
  "voice": {
   "languages": [
@@ -153,9 +158,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 11647,
+   "sha256": "28ffc0edb85ded591d33ef4067e410a8537b5f240c8868e4849341e3d7217cbd"
+  },
   "cover.jpg": {
    "bytes": 8301,
    "sha256": "6cde2d071887fafbffe4468015e6cbb61d2fca1319f163b82e91c85567af617c"
+  },
+  "demo-light.mp4": {
+   "bytes": 75126,
+   "sha256": "07685e97de11c1c768736406e62203cc094456770579e681dd22fd65a9427522"
   },
   "demo.mp4": {
    "bytes": 68458,

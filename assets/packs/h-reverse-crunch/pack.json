@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "h-reverse-crunch",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "反向卷腹",
   "en": "Reverse Crunch"
@@ -50,7 +50,12 @@
   "width": 720,
   "height": 720,
   "loopSeconds": 8.0,
-  "repSeconds": 4.0
+  "repSeconds": 4.0,
+  "light": {
+   "video": "demo-light.mp4",
+   "cover": "cover-light.jpg",
+   "stage": "#EFEFEF"
+  }
  },
  "voice": {
   "languages": [
@@ -143,9 +148,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 10278,
+   "sha256": "ff88d024d7216d3ebdc7a0246dc0ea309244d54acfcc92adf112797c724d3aa8"
+  },
   "cover.jpg": {
    "bytes": 7661,
    "sha256": "064fa603f05d5f776d373b8f2761e42f7d314d6c635e67e2501c5fd5a5026f71"
+  },
+  "demo-light.mp4": {
+   "bytes": 130764,
+   "sha256": "836f0df971fea132270e700626727984879f0214650f40be42962df6c8a34e50"
   },
   "demo.mp4": {
    "bytes": 117973,

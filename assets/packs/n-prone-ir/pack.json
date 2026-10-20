@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "n-prone-ir",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "俯卧小腿外摆",
   "en": "Prone Hip Internal Rotation"
@@ -51,7 +51,12 @@
   "width": 720,
   "height": 720,
   "loopSeconds": 8.0,
-  "repSeconds": 4.0
+  "repSeconds": 4.0,
+  "light": {
+   "video": "demo-light.mp4",
+   "cover": "cover-light.jpg",
+   "stage": "#EFEFEF"
+  }
  },
  "voice": {
   "languages": [
@@ -134,9 +139,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 13150,
+   "sha256": "8bd754d13b4d757de1e891c7d5d52410e28920884d8f5c13886b590acd17dd08"
+  },
   "cover.jpg": {
    "bytes": 11326,
    "sha256": "90f4353b9a4af744eca74d6651960396b892daf28ab3f8b1e2648653389d7384"
+  },
+  "demo-light.mp4": {
+   "bytes": 156685,
+   "sha256": "a7ab27f10069d32b018aeace4a0d613adb158cdd94327ae3dcb141bfa0bce28f"
   },
   "demo.mp4": {
    "bytes": 157602,

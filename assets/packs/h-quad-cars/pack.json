@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "h-quad-cars",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "四足髋关节画圈",
   "en": "Quadruped Hip CARs"
@@ -53,7 +53,12 @@
   "height": 720,
   "loopSeconds": 8.0,
   "repSeconds": 3.0,
-  "showsSide": "right"
+  "showsSide": "right",
+  "light": {
+   "video": "demo-light.mp4",
+   "cover": "cover-light.jpg",
+   "stage": "#EFEFEF"
+  }
  },
  "voice": {
   "languages": [
@@ -156,9 +161,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 11704,
+   "sha256": "29886a643f1f49df0414a84687c696fadf052ec183119efa683725aaec4c28d1"
+  },
   "cover.jpg": {
    "bytes": 9459,
    "sha256": "09cafab6e2a0b5c8635617a0a96afe72692b7f0ab6f8fbb4ef5a4f37a96255f6"
+  },
+  "demo-light.mp4": {
+   "bytes": 128261,
+   "sha256": "74e3c78f6bea8c9b0a096c36c3a1dcaea68c414c8839851128f74369fb56fd93"
   },
   "demo.mp4": {
    "bytes": 131629,

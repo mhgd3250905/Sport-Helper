@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "h-chair-lat",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "扶椅背阔肌拉伸",
   "en": "Chair-Supported Lat Stretch"
@@ -48,7 +48,12 @@
   "width": 720,
   "height": 720,
   "loopSeconds": 8.0,
-  "repSeconds": null
+  "repSeconds": null,
+  "light": {
+   "video": "demo-light.mp4",
+   "cover": "cover-light.jpg",
+   "stage": "#EFEFEF"
+  }
  },
  "voice": {
   "languages": [
@@ -131,9 +136,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 12725,
+   "sha256": "7c21e443692549e83117c2265080a137d3e53d91410e9f647edf94440ed9a1e5"
+  },
   "cover.jpg": {
    "bytes": 9018,
    "sha256": "71cd9892e0cf29c63f8ac6588a4decdf81051c2eaf9acfa7a07ba334d4f88c12"
+  },
+  "demo-light.mp4": {
+   "bytes": 133458,
+   "sha256": "fd39bcdce6feb58992df48e19bd924a8430dde94080cdef9343fad71a443d27f"
   },
   "demo.mp4": {
    "bytes": 121828,

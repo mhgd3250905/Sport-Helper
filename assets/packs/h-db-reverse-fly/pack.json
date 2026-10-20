@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "h-db-reverse-fly",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "哑铃俯身飞鸟",
   "en": "Bent-Over Dumbbell Reverse Fly"
@@ -50,7 +50,12 @@
   "width": 720,
   "height": 720,
   "loopSeconds": 8.0,
-  "repSeconds": 4.0
+  "repSeconds": 4.0,
+  "light": {
+   "video": "demo-light.mp4",
+   "cover": "cover-light.jpg",
+   "stage": "#EFEFEF"
+  }
  },
  "voice": {
   "languages": [
@@ -123,9 +128,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 12147,
+   "sha256": "0f518123ad27c34a5f815bf5545147b1db89fb362e9f57a16d09599eaa654aae"
+  },
   "cover.jpg": {
    "bytes": 8747,
    "sha256": "adaefd8dcebed0f7e7aba62d564f54954b46c6d8c1732a4d373b1f1591397d29"
+  },
+  "demo-light.mp4": {
+   "bytes": 135460,
+   "sha256": "de76c494ce780bb7cb57ce8adfe515a3cbba0d7a9f7beef18fd5c04653684381"
   },
   "demo.mp4": {
    "bytes": 124030,

@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "h-db-press",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "站姿哑铃推举",
   "en": "Standing Dumbbell Shoulder Press"
@@ -52,7 +52,12 @@
   "width": 720,
   "height": 720,
   "loopSeconds": 8.0,
-  "repSeconds": 4.0
+  "repSeconds": 4.0,
+  "light": {
+   "video": "demo-light.mp4",
+   "cover": "cover-light.jpg",
+   "stage": "#EFEFEF"
+  }
  },
  "voice": {
   "languages": [
@@ -135,9 +140,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 9940,
+   "sha256": "6ba73cf2040ed054cc0dacd39daef58e15a9bdce06a138743be69892ddfbc6c2"
+  },
   "cover.jpg": {
    "bytes": 6681,
    "sha256": "c5f87e09e2c36539fa345d62e7fa97cf7196f88c82a79ec3703163b2e823d1f5"
+  },
+  "demo-light.mp4": {
+   "bytes": 86962,
+   "sha256": "e75408b23589ae51897fb6e9b7aa508df966bb4710a460124c0c2dfd650629ae"
   },
   "demo.mp4": {
    "bytes": 70137,

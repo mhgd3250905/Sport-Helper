@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "w-bird-dog",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "鸟狗式",
   "en": "Bird Dog"
@@ -49,7 +49,12 @@
   "width": 720,
   "height": 720,
   "loopSeconds": 8.0,
-  "repSeconds": 4.0
+  "repSeconds": 4.0,
+  "light": {
+   "video": "demo-light.mp4",
+   "cover": "cover-light.jpg",
+   "stage": "#EFEFEF"
+  }
  },
  "voice": {
   "languages": [
@@ -132,9 +137,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 9095,
+   "sha256": "b6cd4b0222921db5227b0afe89d47aad3ae03a2a3838e7163372d0103e7f60aa"
+  },
   "cover.jpg": {
    "bytes": 6133,
    "sha256": "a61c82bbaa5ae6f61b6c0032239e3049d0e6427e786646b962cec9a4526768b8"
+  },
+  "demo-light.mp4": {
+   "bytes": 105341,
+   "sha256": "df1cc8c64ad73232392b9df6b072a611b76e4806d50cffee1a963673f12b4843"
   },
   "demo.mp4": {
    "bytes": 86774,

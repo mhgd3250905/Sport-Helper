@@ -4,6 +4,7 @@ import '../../data/app_store.dart';
 import '../../domain/exercise.dart';
 import '../../domain/saved_plan.dart';
 import '../../domain/session.dart';
+import '../theme/media_theme.dart';
 import '../theme/sf_icons.dart';
 import '../theme/tokens.dart';
 import '../theme/widgets.dart';
@@ -19,7 +20,11 @@ class SavedPlansDrawer extends StatelessWidget {
     required this.onShow,
     required this.onStart,
     this.footer = const [],
+    this.onCompose,
   });
+
+  /// The empty state's 「去排一套」: close the drawer, focus the chat input.
+  final VoidCallback? onCompose;
 
   final AppStore store;
   final ExerciseLibrary library;
@@ -72,7 +77,7 @@ class SavedPlansDrawer extends StatelessWidget {
                       ),
                     ),
                     if (store.savedPlans.isEmpty)
-                      const SliverToBoxAdapter(child: _Empty())
+                      SliverToBoxAdapter(child: _Empty(onCompose: onCompose))
                     else
                       SliverPadding(
                         padding: const EdgeInsets.fromLTRB(SfSpace.x4, 0, SfSpace.x4, SfSpace.x4),
@@ -163,23 +168,15 @@ class SavedPlansDrawer extends StatelessWidget {
 }
 
 class _Empty extends StatelessWidget {
-  const _Empty();
+  const _Empty({this.onCompose});
+  final VoidCallback? onCompose;
   @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.fromLTRB(28, 40, 28, 0),
-    child: Column(
-      children: [
-        SfIcon(SfGlyph.bookmark, color: SfColors.faint, size: 36),
-        const SizedBox(height: 14),
-        Text('还没有保存的计划', style: SfType.callout),
-        const SizedBox(height: 6),
-        Text(
-          '在计划卡片上点「保存」，下次在这里一键开始，或者直接说「上次那个」。',
-          textAlign: TextAlign.center,
-          style: SfType.label.copyWith(height: 1.6),
-        ),
-      ],
-    ),
+  Widget build(BuildContext context) => SfEmptyState(
+    icon: SfGlyph.bookmark,
+    title: '还没有保存的计划',
+    body: '在计划卡片上点「保存」，下次在这里一键开始，或者直接说「上次那个」。',
+    action: onCompose == null ? null : '去排一套',
+    onAction: onCompose,
   );
 }
 
@@ -206,29 +203,31 @@ class _SavedTile extends StatelessWidget {
     final first = p.items.map((i) => library.tryGet(i.exerciseId)).whereType<Exercise>().firstOrNull;
     final secs = SessionBuilder(library).planSeconds(p);
     final used = plan.lastUsedAt == null ? '' : '${_ago(plan.lastUsedAt!)}练过';
-    return Material(
-      color: SfColors.isDark ? SfColors.surfaceHigh : SfColors.surface,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(SfRadius.md),
-        side: SfColors.cardEdge,
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        key: ValueKey('saved-${plan.id}'),
-        onTap: () => onShow(plan),
+    return SfPressable(
+      key: ValueKey('saved-${plan.id}'),
+      semanticLabel: plan.name,
+      onTap: () => onShow(plan),
+      scale: .985,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: SfColors.isDark ? SfColors.surfaceHigh : SfColors.surface,
+          borderRadius: BorderRadius.circular(SfRadius.lg),
+          border: SfColors.isDark ? null : Border.all(color: SfColors.line),
+          boxShadow: SfColors.cardShadow,
+        ),
         child: Padding(
           padding: const EdgeInsets.fromLTRB(SfSpace.x2, SfSpace.x2, 0, SfSpace.x2),
           child: Row(
             children: [
               ClipRRect(
-                borderRadius: BorderRadius.circular(SfRadius.sm),
+                borderRadius: BorderRadius.circular(SfRadius.lg - SfSpace.x2),
                 child: SizedBox.square(
                   dimension: 56,
                   child: ColoredBox(
-                    color: SfColors.mediaStage,
+                    color: sfStageFor(first).mediaStage,
                     child: first == null
                         ? null
-                        : Image.asset(first.media.poster, fit: BoxFit.cover,
+                        : Image.asset(sfPoster(first), fit: BoxFit.cover,
                             errorBuilder: (_, _, _) => const SizedBox.shrink()),
                   ),
                 ),
@@ -264,6 +263,7 @@ class _SavedTile extends StatelessWidget {
                 icon: SfGlyph.play,
                 fill: SfColors.isDark ? SfColors.surface : SfColors.surfaceHigh,
                 iconColor: SfColors.accentText,
+                haptic: SfHaptic.medium,
                 onPressed: () {
                   // Where the tile is now; once the drawer is gone the
                   // player folds back into the middle of the chat.
@@ -312,10 +312,12 @@ class DrawerEntry extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => InkWell(
+  Widget build(BuildContext context) => SfPressable(
+    semanticLabel: label,
     onTap: onTap,
+    scale: .985,
     child: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: SfSpace.x6, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: SfSpace.x6, vertical: 12),
       child: Row(
         children: [
           SfIcon(icon, size: 20, color: SfColors.muted),

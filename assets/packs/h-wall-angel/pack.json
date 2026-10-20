@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "h-wall-angel",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "靠墙天使",
   "en": "Wall Angel"
@@ -55,7 +55,12 @@
   "width": 720,
   "height": 720,
   "loopSeconds": 8.0,
-  "repSeconds": 4.0
+  "repSeconds": 4.0,
+  "light": {
+   "video": "demo-light.mp4",
+   "cover": "cover-light.jpg",
+   "stage": "#EFEFEF"
+  }
  },
  "voice": {
   "languages": [
@@ -148,9 +153,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 10480,
+   "sha256": "a10a1c0e6eec0999ab13c7561cf9613c6c1da528e8da11731328713286f0052b"
+  },
   "cover.jpg": {
    "bytes": 7529,
    "sha256": "aede0d3714e60db02e61d8c63b7ba53a940d8b67ed6d1e556b1883c99e93a0ac"
+  },
+  "demo-light.mp4": {
+   "bytes": 99274,
+   "sha256": "54d7a066ea92b6f435c12eaa75745c119204caf23a31cc1d88dc0f9b6f847bc3"
   },
   "demo.mp4": {
    "bytes": 83071,

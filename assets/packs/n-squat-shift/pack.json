@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "n-squat-shift",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "低位蹲姿左右移重心",
   "en": "Low Squat Side-to-Side Shift"
@@ -49,7 +49,12 @@
   "width": 720,
   "height": 720,
   "loopSeconds": 8.0,
-  "repSeconds": null
+  "repSeconds": null,
+  "light": {
+   "video": "demo-light.mp4",
+   "cover": "cover-light.jpg",
+   "stage": "#EFEFEF"
+  }
  },
  "voice": {
   "languages": [
@@ -132,9 +137,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 11962,
+   "sha256": "825dfda7f257ea51c27a240fc8c64f4240fa2e791beb2f891423f25ce6be9468"
+  },
   "cover.jpg": {
    "bytes": 9801,
    "sha256": "e2aa65005c3fd7f20192062fbe2247f8c66757dfd64dfd9a7d66206b6f99d377"
+  },
+  "demo-light.mp4": {
+   "bytes": 114784,
+   "sha256": "b0c5d257db659cf41eebd4397caa911b760a6626b9065db0b4a77df20d899220"
   },
   "demo.mp4": {
    "bytes": 117039,

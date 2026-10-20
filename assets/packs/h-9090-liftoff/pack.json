@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "h-9090-liftoff",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "90/90 后腿主动抬起"
  },
@@ -47,7 +47,12 @@
   "height": 720,
   "loopSeconds": 8.0,
   "repSeconds": 4.0,
-  "showsSide": "right"
+  "showsSide": "right",
+  "light": {
+   "video": "demo-light.mp4",
+   "cover": "cover-light.jpg",
+   "stage": "#EFEFEF"
+  }
  },
  "voice": {
   "languages": [
@@ -130,9 +135,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 9627,
+   "sha256": "744474612aa79db7c22556517ae2e8294aa0816ed12e8bf206a1a51bd35ec179"
+  },
   "cover.jpg": {
    "bytes": 8234,
    "sha256": "c2783da4d5e87f3b7e8d13d9c08733928335f9c5f698d6cc24733aefee942cf4"
+  },
+  "demo-light.mp4": {
+   "bytes": 94175,
+   "sha256": "58a2df527527afcf3818439e60e399f4dcc095eb8082509dbda9410f11c15707"
   },
   "demo.mp4": {
    "bytes": 93262,

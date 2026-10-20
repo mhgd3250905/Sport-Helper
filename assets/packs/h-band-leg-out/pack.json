@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "h-band-leg-out",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "仰卧弹力带单腿侧落",
   "en": "Supine Banded Leg Lower-Out"
@@ -52,7 +52,12 @@
   "height": 720,
   "loopSeconds": 8.0,
   "repSeconds": null,
-  "showsSide": "right"
+  "showsSide": "right",
+  "light": {
+   "video": "demo-light.mp4",
+   "cover": "cover-light.jpg",
+   "stage": "#EFEFEF"
+  }
  },
  "voice": {
   "languages": [
@@ -145,9 +150,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 15822,
+   "sha256": "2a468ddc7cd75e54d1e0357a9141ed5be4fe1a4097f3b2c4ce8790dc4acd8dd1"
+  },
   "cover.jpg": {
    "bytes": 11463,
    "sha256": "9e2e3096d2b09dc518fa90d923a8158abaf40fc9e9b66c31752a8c4ee7775f0e"
+  },
+  "demo-light.mp4": {
+   "bytes": 166340,
+   "sha256": "2323ccfb033cf58cc5b0096b5b41850093729b147757b64b814d0dd725443be3"
   },
   "demo.mp4": {
    "bytes": 155925,

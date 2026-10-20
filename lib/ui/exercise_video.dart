@@ -36,6 +36,21 @@ class ExerciseVideo extends StatefulWidget {
 class _ExerciseVideoState extends State<ExerciseVideo> {
   DrillMediaController? _controller;
 
+  /// Theme the running clip was started for: a switch reloads the
+  /// light/dark render (the poster covers the hand-over).
+  Brightness? _brightness;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final b = Theme.of(context).brightness;
+    if (_brightness != null && b != _brightness && widget.exercise.media.hasLight && _controller != null) {
+      _stop();
+      _start();
+    }
+    _brightness = b;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -85,10 +100,13 @@ class _ExerciseVideoState extends State<ExerciseVideo> {
   Widget build(BuildContext context) {
     final e = widget.exercise;
     final c = _controller;
+    final stage = sfStageFor(e);
+    final poster = sfPoster(e);
+    final variant = sfVariant(e);
     final media = DrillMedia(
       id: e.media.playerId,
-      videoAsset: e.media.video,
-      posterAsset: e.media.poster,
+      videoAsset: sfVideo(e),
+      posterAsset: poster,
       duration: e.media.loopSeconds,
       posterTime: e.media.posterSeconds,
     );
@@ -97,17 +115,32 @@ class _ExerciseVideoState extends State<ExerciseVideo> {
       children: [
         if (c != null)
           DrillMediaPlatformView(
-            key: ValueKey(e.id),
+            key: ValueKey('${e.id}/${variant ?? 'dark'}'),
             media: media,
             controller: c,
             labels: const {},
+            variant: variant,
           ),
         if (c == null || !c.hasFrame)
           Image.asset(
-            e.media.poster,
+            poster,
             fit: BoxFit.contain,
             gaplessPlayback: true,
-            errorBuilder: (_, _, _) => ColoredBox(color: SfColors.mediaStage),
+            // Error state: the stage with a quiet figure and one line, not
+            // an empty box that looks like a rendering bug.
+            errorBuilder: (_, _, _) => ColoredBox(
+              color: stage.mediaStage,
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SfIcon(SfGlyph.figure, size: 32, color: stage.onStageMuted.withValues(alpha: .5)),
+                    const SizedBox(height: SfSpace.x2),
+                    Text('示范暂时加载不了', style: SfType.caption.copyWith(color: stage.onStageMuted)),
+                  ],
+                ),
+              ),
+            ),
           ),
       ],
     );
@@ -117,7 +150,7 @@ class _ExerciseVideoState extends State<ExerciseVideo> {
     return ClipRRect(
       borderRadius: BorderRadius.circular(widget.radius),
       child: ColoredBox(
-        color: SfColors.mediaStage,
+        color: stage.mediaStage,
         child: AspectRatio(aspectRatio: 1, child: content),
       ),
     );

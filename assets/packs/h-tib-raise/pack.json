@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "h-tib-raise",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "靠墙勾脚尖",
   "en": "Wall Tibialis Raise"
@@ -47,7 +47,12 @@
   "width": 720,
   "height": 720,
   "loopSeconds": 8.0,
-  "repSeconds": 4.0
+  "repSeconds": 4.0,
+  "light": {
+   "video": "demo-light.mp4",
+   "cover": "cover-light.jpg",
+   "stage": "#EFEFEF"
+  }
  },
  "voice": {
   "languages": [
@@ -120,9 +125,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 8922,
+   "sha256": "bd5afcbd5601c4cb4ad5067d715c448127495efd80f5ee1d76cd2471d8332fa5"
+  },
   "cover.jpg": {
    "bytes": 6333,
    "sha256": "b9180b9fbfb8832ffea0ada1e35c4b4d4fb11287e311f98ac9a9d3a0c5b1a9ce"
+  },
+  "demo-light.mp4": {
+   "bytes": 98038,
+   "sha256": "67a827e9854025d9b4957cdb14bbaa2766003f874c27c018d99b2a351ba2cd75"
   },
   "demo.mp4": {
    "bytes": 76267,

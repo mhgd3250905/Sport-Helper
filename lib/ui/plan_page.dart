@@ -58,9 +58,7 @@ class _PlanPageState extends State<PlanPage> {
     final issues = PlanValidator(s.library).validate(updated, request);
     if (alt.level > request.level + 1) issues.add('替代动作难度偏高');
     if (issues.isNotEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('暂不能替换：${issues.first}')),
-      );
+      showSfToast(context, '暂不能替换：${issues.first}', icon: SfGlyph.info, bottom: 24);
       return;
     }
     setState(() {
@@ -77,20 +75,29 @@ class _PlanPageState extends State<PlanPage> {
     final seconds = SessionBuilder(lib).planSeconds(_plan);
     final count = _plan.items.length;
     final selected = lib.tryGet(_selected ?? _plan.items.first.exerciseId);
+    final meta = [
+      minutesZh(seconds),
+      '$count 个动作',
+      levelZh(_plan.level),
+      _plan.scene == 'office' ? '办公室' : '居家',
+    ].join(' · ');
     return Scaffold(
-      appBar: AppBar(title: Text(_plan.title)),
+      appBar: SfTopBar(title: _plan.title, caption: meta),
       bottomNavigationBar: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-          child: FilledButton.icon(
+          padding: const EdgeInsets.fromLTRB(SfSpace.x4, SfSpace.x2, SfSpace.x4, SfSpace.x3),
+          child: SfPrimaryButton(
             key: const ValueKey('start'),
+            icon: SfGlyph.play,
+            label: '开始跟练',
             onPressed: () async {
               if (!s.store.trainingAllowed) {
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text(s.store.safetyAccepted
-                      ? '根据你的安全确认，暂不开始训练；可以在动作库里看示范。'
-                      : '请先在对话里完成安全确认，再开始训练。'),
-                ));
+                showSfToast(
+                  context,
+                  s.store.safetyAccepted ? '根据你的安全确认，暂不开始训练；可以在动作库里看示范。' : '请先在对话里完成安全确认，再开始训练。',
+                  icon: SfGlyph.shield,
+                  bottom: 24,
+                );
                 return;
               }
               if (widget.returnPlanOnStart) {
@@ -103,89 +110,101 @@ class _PlanPageState extends State<PlanPage> {
               );
               if (mounted) setState(() => _previewOn = true);
             },
-            icon: const SfIcon(SfGlyph.play, size: 20, filled: true),
-            label: const Text('开始跟练'),
           ),
         ),
       ),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+        padding: const EdgeInsets.fromLTRB(SfSpace.x4, 0, SfSpace.x4, SfSpace.x6),
         children: [
-          Text(_plan.summary, style: TextStyle(color: SfColors.muted, height: 1.5)),
-          const SizedBox(height: 10),
-          Wrap(
-            spacing: 8,
-            runSpacing: 6,
-            children: [
-              _pill(SfGlyph.clock, minutesZh(seconds)),
-              _pill(SfGlyph.figure, '$count 个动作'),
-              _pill(SfGlyph.progress, levelZh(_plan.level)),
-              _pill(_plan.scene == 'office' ? SfGlyph.chair : SfGlyph.home, _plan.scene == 'office' ? '办公室' : '居家'),
-            ],
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: SfSpace.x1),
+            child: Text(_plan.summary, style: SfType.body.copyWith(fontSize: 15, color: SfColors.muted)),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: SfSpace.x4),
           if (selected != null) ...[
             ExerciseVideo(
               key: const ValueKey('preview'),
               exercise: selected,
               playing: _previewOn,
+              radius: SfRadius.lg,
             ),
-            const SizedBox(height: 8),
-            Text(selected.name, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
-            const SizedBox(height: 4),
-            Text('要领：${selected.cue}', style: const TextStyle(height: 1.5)),
-            Text('目标：${selected.muscles.join('、')}', style: TextStyle(color: SfColors.muted, fontSize: 13)),
-          ],
-          if (_plan.notes.isNotEmpty) ...[
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(color: SfColors.surface, borderRadius: BorderRadius.circular(12)),
+            const SizedBox(height: SfSpace.x3),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: SfSpace.x1),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('已按你的情况调整', style: TextStyle(fontWeight: FontWeight.w600)),
-                  const SizedBox(height: 4),
-                  for (final n in _plan.notes)
-                    Text('· $n', style: TextStyle(color: SfColors.muted, fontSize: 13, height: 1.5)),
+                  SfFadeSwitcher(
+                    child: Column(
+                      key: ValueKey(selected.id),
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(selected.name, style: SfType.title.copyWith(fontWeight: FontWeight.w800)),
+                        const SizedBox(height: 2),
+                        Text(selected.muscles.join('、'), style: SfType.label),
+                        const SizedBox(height: SfSpace.x2),
+                        // 要领: one line with the subtitle glyph, no prefix.
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(top: 2),
+                              child: SfIcon(SfGlyph.subtitles, size: 18, color: SfColors.faint),
+                            ),
+                            const SizedBox(width: SfSpace.x2),
+                            Expanded(
+                              child: Text(selected.cue, style: SfType.body.copyWith(fontSize: 15, height: 1.55, color: SfColors.muted)),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+          if (_plan.notes.isNotEmpty) ...[
+            const SizedBox(height: SfSpace.x4),
+            SfPanel(
+              padding: const EdgeInsets.all(SfSpace.x4),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('已按你的情况调整', style: SfType.label.copyWith(fontWeight: FontWeight.w600)),
+                  const SizedBox(height: SfSpace.x1),
+                  for (final n in _plan.notes) Text('· $n', style: SfType.label.copyWith(height: 1.6)),
                 ],
               ),
             ),
           ],
           for (var bi = 0; bi < _plan.blocks.length; bi++) ...[
-            const SizedBox(height: 18),
             _blockHeader(_plan.blocks[bi]),
-            const SizedBox(height: 8),
-            for (var ii = 0; ii < _plan.blocks[bi].items.length; ii++)
-              _itemTile(bi, ii, lib),
+            for (var ii = 0; ii < _plan.blocks[bi].items.length; ii++) _itemTile(bi, ii, lib),
           ],
-          const SizedBox(height: 16),
+          const SizedBox(height: SfSpace.x3),
           for (final n in _plan.safetyNotes)
-            Text('⚠ $n', style: TextStyle(color: SfColors.muted, fontSize: 12, height: 1.6)),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: SfSpace.x1, vertical: 2),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(padding: const EdgeInsets.only(top: 2), child: SfIcon(SfGlyph.shield, size: 14, color: SfColors.faint)),
+                  const SizedBox(width: SfSpace.x2),
+                  Expanded(child: Text(n, style: SfType.caption.copyWith(color: SfColors.muted, height: 1.6))),
+                ],
+              ),
+            ),
         ],
       ),
     );
   }
 
-  Widget _pill(SfGlyph icon, String text) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-    decoration: BoxDecoration(color: SfColors.surfaceHigh, borderRadius: BorderRadius.circular(20)),
-    child: Row(mainAxisSize: MainAxisSize.min, children: [
-      SfIcon(icon, size: 16, color: SfColors.muted),
-      const SizedBox(width: 4),
-      Text(text, style: const TextStyle(fontSize: 13)),
-    ]),
-  );
-
   Widget _blockHeader(PlanBlock b) {
     final extra = b.type == BlockType.circuit && b.rounds > 1
         ? ' · 循环 ${b.rounds} 轮，轮间休息 ${b.restBetweenRoundsSeconds} 秒'
         : '';
-    return Row(children: [
-      Container(width: 4, height: 18, decoration: BoxDecoration(color: SfColors.accent, borderRadius: BorderRadius.circular(2))),
-      const SizedBox(width: 8),
-      Text('${b.name}$extra', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
-    ]);
+    return SfSectionTitle('${b.name}$extra');
   }
 
   Widget _itemTile(int bi, int ii, ExerciseLibrary lib) {
@@ -196,47 +215,77 @@ class _PlanPageState extends State<PlanPage> {
     final circuit = _plan.blocks[bi].type == BlockType.circuit;
     final dose = circuit ? item.copyWith(sets: 1).doseText() : item.doseText();
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Material(
-        color: sel ? SfColors.surfaceHigh : SfColors.surface,
-        borderRadius: BorderRadius.circular(14),
-        child: InkWell(
-          key: ValueKey('item-${e.id}'),
-          borderRadius: BorderRadius.circular(14),
-          onTap: () => setState(() => _selected = e.id),
-          child: Padding(
-            padding: const EdgeInsets.all(10),
-            child: Row(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: Image.asset(e.media.poster, width: 64, height: 64, fit: BoxFit.cover,
-                      errorBuilder: (_, _, _) => const SizedBox(width: 64, height: 64)),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(e.name, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
-                      const SizedBox(height: 3),
-                      Text(dose, style: SfType.label.copyWith(color: SfColors.accentText, fontWeight: FontWeight.w600)),
-                      Text('${e.category.zh} · ${e.muscles.join('、')}',
-                          maxLines: 1, overflow: TextOverflow.ellipsis,
-                          style: TextStyle(color: SfColors.muted, fontSize: 12)),
-                    ],
+      padding: const EdgeInsets.only(bottom: SfSpace.x2),
+      // The row and its "换一个" are two separate accessible actions: the
+      // swap button sits over the row as a sibling, because the row's
+      // pressable excludes its own subtree from semantics.
+      child: Stack(
+        children: [
+          SfPressable(
+            key: ValueKey('item-${e.id}'),
+            semanticLabel: e.name,
+            selected: sel,
+            haptic: SfHaptic.selection,
+            scale: .985,
+            onTap: () => setState(() => _selected = e.id),
+            child: AnimatedContainer(
+              duration: SfMotion.medium,
+              curve: SfMotion.standard,
+              padding: const EdgeInsets.all(SfSpace.x2),
+              decoration: BoxDecoration(
+                color: sel ? SfColors.accentSoft : SfColors.surface,
+                borderRadius: BorderRadius.circular(SfRadius.lg),
+                border: Border.all(color: sel ? SfColors.accent.withValues(alpha: .5) : (SfColors.isDark ? Colors.transparent : SfColors.line)),
+              ),
+              child: Row(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(SfRadius.lg - SfSpace.x2),
+                    child: SizedBox.square(
+                      dimension: 60,
+                      child: ColoredBox(
+                        color: sfStageFor(e).mediaStage,
+                        child: Image.asset(sfPoster(e), fit: BoxFit.cover, errorBuilder: (_, _, _) => const SizedBox.shrink()),
+                      ),
+                    ),
                   ),
-                ),
-                if (e.alternative != null)
-                  IconButton(
-                    tooltip: '换一个',
-                    icon: SfIcon(SfGlyph.swap, size: 20, color: SfColors.muted),
-                    onPressed: () => _swap(bi, ii),
+                  const SizedBox(width: SfSpace.x3),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(e.name, style: SfType.callout.copyWith(fontWeight: FontWeight.w600)),
+                        const SizedBox(height: 2),
+                        Text(dose, style: SfType.label.copyWith(color: SfColors.accentText, fontWeight: FontWeight.w600, fontFeatures: SfType.tabular)),
+                        Text('${e.category.zh} · ${e.muscles.join('、')}', maxLines: 1, overflow: TextOverflow.ellipsis, style: SfType.caption.copyWith(color: SfColors.muted)),
+                      ],
+                    ),
                   ),
-              ],
+                  if (e.alternative != null) const SizedBox(width: 40),
+                ],
+              ),
             ),
           ),
-        ),
+          if (e.alternative != null)
+            Positioned(
+              top: 0,
+              bottom: 0,
+              right: SfSpace.x2,
+              child: Center(
+                child: SfCircleButton(
+                  key: ValueKey('swap-${e.id}'),
+                  tooltip: '换一个',
+                  icon: SfGlyph.swap,
+                  size: 40,
+                  filled: false,
+                  fill: Colors.transparent,
+                  iconColor: SfColors.muted,
+                  haptic: SfHaptic.selection,
+                  onPressed: () => _swap(bi, ii),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }

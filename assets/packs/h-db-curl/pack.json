@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "h-db-curl",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "哑铃交替弯举",
   "en": "Alternating Dumbbell Curl"
@@ -47,7 +47,12 @@
   "width": 720,
   "height": 720,
   "loopSeconds": 8.0,
-  "repSeconds": 4.0
+  "repSeconds": 4.0,
+  "light": {
+   "video": "demo-light.mp4",
+   "cover": "cover-light.jpg",
+   "stage": "#EFEFEF"
+  }
  },
  "voice": {
   "languages": [
@@ -130,9 +135,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 9294,
+   "sha256": "2bd123f6e8db89c818de88b450e1f65d1ce8ef935e4f62a09d185853ef3242a5"
+  },
   "cover.jpg": {
    "bytes": 6577,
    "sha256": "bdaa75ffa7fd4c4a2aa2cbc89d9ca5d0fe41cb92b3af0267e0f5f7c0390f4319"
+  },
+  "demo-light.mp4": {
+   "bytes": 83598,
+   "sha256": "e1d73809142d12f6814a1f90fb62815621494394619c0b6df6a0e1d2b448a4ca"
   },
   "demo.mp4": {
    "bytes": 71085,

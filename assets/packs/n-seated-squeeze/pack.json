@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "n-seated-squeeze",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "坐姿夹砖（膝内夹）",
   "en": "Seated Block Knee Squeeze"
@@ -49,7 +49,12 @@
   "width": 720,
   "height": 720,
   "loopSeconds": 8.0,
-  "repSeconds": null
+  "repSeconds": null,
+  "light": {
+   "video": "demo-light.mp4",
+   "cover": "cover-light.jpg",
+   "stage": "#EFEFEF"
+  }
  },
  "voice": {
   "languages": [
@@ -142,9 +147,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 10517,
+   "sha256": "8209f1459a0c26da6e5773f2aea09638feddb5efdc423a59cd54d1d115730721"
+  },
   "cover.jpg": {
    "bytes": 8553,
    "sha256": "4b2830a898fc7cd949c674d6fc7c7b877484dac406a77875931cdb5cc948cd9b"
+  },
+  "demo-light.mp4": {
+   "bytes": 68801,
+   "sha256": "27382587e6ec16d9769c21bae22607df2b9398db7918160a4ac593aca8a75164"
   },
   "demo.mp4": {
    "bytes": 66499,

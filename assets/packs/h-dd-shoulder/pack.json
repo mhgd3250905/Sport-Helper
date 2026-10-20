@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "h-dd-shoulder",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "下犬式压肩",
   "en": "Downward Dog Shoulder Press"
@@ -52,7 +52,12 @@
   "width": 720,
   "height": 720,
   "loopSeconds": 8.0,
-  "repSeconds": null
+  "repSeconds": null,
+  "light": {
+   "video": "demo-light.mp4",
+   "cover": "cover-light.jpg",
+   "stage": "#EFEFEF"
+  }
  },
  "voice": {
   "languages": [
@@ -135,9 +140,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 11877,
+   "sha256": "9e0578569f899fc04dd6528b7eee43022b078dec37a170dc724f8969e03d6424"
+  },
   "cover.jpg": {
    "bytes": 8645,
    "sha256": "977872624250a41cc3ee128ae34c2dc82986bc4fa39eeb930256d76f5a1d9cca"
+  },
+  "demo-light.mp4": {
+   "bytes": 105204,
+   "sha256": "a83ab3db2755d50acebd83ae50c85df2150e820fe878dd064d47e26008ffe3db"
   },
   "demo.mp4": {
    "bytes": 95832,

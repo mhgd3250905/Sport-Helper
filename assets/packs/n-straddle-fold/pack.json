@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "n-straddle-fold",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "坐姿分腿体前屈",
   "en": "Seated Straddle Forward Fold"
@@ -52,7 +52,12 @@
   "width": 720,
   "height": 720,
   "loopSeconds": 8.0,
-  "repSeconds": null
+  "repSeconds": null,
+  "light": {
+   "video": "demo-light.mp4",
+   "cover": "cover-light.jpg",
+   "stage": "#EFEFEF"
+  }
  },
  "voice": {
   "languages": [
@@ -145,9 +150,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 14926,
+   "sha256": "ef5e7b9c5e059effae692dcd1902be9a068d328b0656db2f19d93617a4b26403"
+  },
   "cover.jpg": {
    "bytes": 12131,
    "sha256": "fb24944673b8904c86c960023d9aa697044eeea6f35b507c7b71229a4d6242eb"
+  },
+  "demo-light.mp4": {
+   "bytes": 155191,
+   "sha256": "1cdec3b01924fa2915b66f760298931b5b056951d4a5a31b1f233effc3451eb3"
   },
   "demo.mp4": {
    "bytes": 155467,

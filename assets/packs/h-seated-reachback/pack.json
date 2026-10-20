@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "h-seated-reachback",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "坐姿后撑滑臀",
   "en": "Seated Reach-Back Shoulder Stretch"
@@ -52,7 +52,12 @@
   "width": 720,
   "height": 720,
   "loopSeconds": 8.0,
-  "repSeconds": null
+  "repSeconds": null,
+  "light": {
+   "video": "demo-light.mp4",
+   "cover": "cover-light.jpg",
+   "stage": "#EFEFEF"
+  }
  },
  "voice": {
   "languages": [
@@ -135,9 +140,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 11122,
+   "sha256": "d554a4c1a6f5fd2186d1364a4bc7b3033a377545ad77651caef7fbcc95a978be"
+  },
   "cover.jpg": {
    "bytes": 7885,
    "sha256": "cd2f48632a486e861970449bd54bbfd52d4a4d29e82faf35fdca0157c2e91025"
+  },
+  "demo-light.mp4": {
+   "bytes": 119947,
+   "sha256": "f0fdc1dd60668a9308cfea1dcbb4f13c26f034334b040d95d8533969794985b7"
   },
   "demo.mp4": {
    "bytes": 105283,

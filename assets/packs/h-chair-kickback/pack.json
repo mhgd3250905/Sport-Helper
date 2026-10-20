@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "h-chair-kickback",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "扶椅站姿后踢腿",
   "en": "Chair-Supported Standing Kickback"
@@ -52,7 +52,12 @@
   "height": 720,
   "loopSeconds": 8.0,
   "repSeconds": 4.0,
-  "showsSide": "right"
+  "showsSide": "right",
+  "light": {
+   "video": "demo-light.mp4",
+   "cover": "cover-light.jpg",
+   "stage": "#EFEFEF"
+  }
  },
  "voice": {
   "languages": [
@@ -155,9 +160,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 11745,
+   "sha256": "bcda33ad9e416f644d5e98614b7455b3d7b31641ad7d3b10062ea9c73906b575"
+  },
   "cover.jpg": {
    "bytes": 8134,
    "sha256": "8f5cf572d35073a5d5576d0860fd1ac061281c271e3ce554f2d6e349bcba0757"
+  },
+  "demo-light.mp4": {
+   "bytes": 99998,
+   "sha256": "8959f69ba44e8bd7ca07d64909af77f8cf4e354b5d15b436b1bf95bf4ad50f40"
   },
   "demo.mp4": {
    "bytes": 84195,

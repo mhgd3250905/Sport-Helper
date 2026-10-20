@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "h-crunch",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "卷腹",
   "en": "Crunch"
@@ -50,7 +50,12 @@
   "width": 720,
   "height": 720,
   "loopSeconds": 8.0,
-  "repSeconds": 4.0
+  "repSeconds": 4.0,
+  "light": {
+   "video": "demo-light.mp4",
+   "cover": "cover-light.jpg",
+   "stage": "#EFEFEF"
+  }
  },
  "voice": {
   "languages": [
@@ -143,9 +148,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 10642,
+   "sha256": "b33cec2b5dccc74467a2d99f408579f7dbbd1a64fa6cc0d521782349b2a066e1"
+  },
   "cover.jpg": {
    "bytes": 8044,
    "sha256": "2e84476f86b2e596fca01415f80bbe9cae6d891242b275037bcd816ab1cd383a"
+  },
+  "demo-light.mp4": {
+   "bytes": 131721,
+   "sha256": "cf4980d20d80ecddd6a28df520561d362310573f1e6688ddd0c925645c814295"
   },
   "demo.mp4": {
    "bytes": 121994,

@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "h-sumo-pry",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "相扑深蹲肘推膝停留",
   "en": "Sumo Squat Hold with Elbow Pry"
@@ -50,7 +50,12 @@
   "width": 720,
   "height": 720,
   "loopSeconds": 8.0,
-  "repSeconds": null
+  "repSeconds": null,
+  "light": {
+   "video": "demo-light.mp4",
+   "cover": "cover-light.jpg",
+   "stage": "#EFEFEF"
+  }
  },
  "voice": {
   "languages": [
@@ -143,9 +148,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 11655,
+   "sha256": "34d186f8f0af21d7c58ce1c797c1fad107337745efbc95f084ea4a87f20c4c55"
+  },
   "cover.jpg": {
    "bytes": 9164,
    "sha256": "829493f95298e5a803c9217df2744eaf07b08f0da276052b736e41a7b23c3a2d"
+  },
+  "demo-light.mp4": {
+   "bytes": 132578,
+   "sha256": "45bd30d98c82447ab056b4611832d80cd9acabe9f6fb129967735a5d1064266a"
   },
   "demo.mp4": {
    "bytes": 134627,

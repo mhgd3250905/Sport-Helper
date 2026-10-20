@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "hip-flexors-A",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "坐姿直腿抬腿（压缩）",
   "en": "Seated Pike Leg Lifts"
@@ -47,7 +47,12 @@
   "width": 720,
   "height": 720,
   "loopSeconds": 8.0,
-  "repSeconds": 3.0
+  "repSeconds": 3.0,
+  "light": {
+   "video": "demo-light.mp4",
+   "cover": "cover-light.jpg",
+   "stage": "#EFEFEF"
+  }
  },
  "voice": {
   "languages": [
@@ -130,9 +135,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 13015,
+   "sha256": "ab168eee518bea429bc442bbb9af4b50d3e346b590d54cc79722c76876bcf8d6"
+  },
   "cover.jpg": {
    "bytes": 11721,
    "sha256": "d6e5b0b7fc19af3f3325eef4e9f287b6671dc4c3eca3cd3d3d0a7c927483626f"
+  },
+  "demo-light.mp4": {
+   "bytes": 84580,
+   "sha256": "73ddc72ee1fceb440ea74890885fb4659a83a14f8e66f0912d53f2d1218cfaa5"
   },
   "demo.mp4": {
    "bytes": 90100,

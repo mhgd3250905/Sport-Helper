@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "h-step-jack",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "低冲击开合跳",
   "en": "Low-Impact Step Jack"
@@ -51,7 +51,12 @@
   "width": 720,
   "height": 720,
   "loopSeconds": 8.0,
-  "repSeconds": null
+  "repSeconds": null,
+  "light": {
+   "video": "demo-light.mp4",
+   "cover": "cover-light.jpg",
+   "stage": "#EFEFEF"
+  }
  },
  "voice": {
   "languages": [
@@ -144,9 +149,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 8570,
+   "sha256": "d34c52382141a28cb13c4dd14dd6090c34e6d99b2b9cb70eaaf4bcea01bca8c7"
+  },
   "cover.jpg": {
    "bytes": 5793,
    "sha256": "e6b5008d5d0e6d138de4c3bb91a17f087aa9921dbfa5a6db00693484eb6a6a96"
+  },
+  "demo-light.mp4": {
+   "bytes": 130482,
+   "sha256": "e073ac04a63a5f6298d252ce2fc0d429d4204abb283df1e30e81833fd071f994"
   },
   "demo.mp4": {
    "bytes": 95365,

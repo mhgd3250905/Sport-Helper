@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "h-band-row",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "弹力带坐姿划船",
   "en": "Seated Band Row"
@@ -48,7 +48,12 @@
   "width": 720,
   "height": 720,
   "loopSeconds": 8.0,
-  "repSeconds": 4.0
+  "repSeconds": 4.0,
+  "light": {
+   "video": "demo-light.mp4",
+   "cover": "cover-light.jpg",
+   "stage": "#EFEFEF"
+  }
  },
  "voice": {
   "languages": [
@@ -121,9 +126,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 10670,
+   "sha256": "04b8129bce67589393c5c9ac295766c1fe4e162b44ab58c93a8b565ff5e9df38"
+  },
   "cover.jpg": {
    "bytes": 8263,
    "sha256": "ee1bc1755439f062fa006a31f1c95eee7c4735e3d2ed8057c48a306cd46c81fe"
+  },
+  "demo-light.mp4": {
+   "bytes": 137873,
+   "sha256": "ffc6bb0f838a029edc20b924f7197fb88683ff6400884b1daf5be18312cce978"
   },
   "demo.mp4": {
    "bytes": 123139,

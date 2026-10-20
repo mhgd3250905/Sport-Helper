@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "h-band-pallof",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "弹力带抗旋转推",
   "en": "Banded Pallof Press"
@@ -47,7 +47,12 @@
   "width": 720,
   "height": 720,
   "loopSeconds": 8.0,
-  "repSeconds": 4.0
+  "repSeconds": 4.0,
+  "light": {
+   "video": "demo-light.mp4",
+   "cover": "cover-light.jpg",
+   "stage": "#EFEFEF"
+  }
  },
  "voice": {
   "languages": [
@@ -130,9 +135,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 11543,
+   "sha256": "44976934a7cd4df187a6742217e52f1758f94ffaf32f478d9087a6f7df165b46"
+  },
   "cover.jpg": {
    "bytes": 7923,
    "sha256": "d1780038f7d31b40c22226079514f1546464ba21b77911d98586deb4a49c6832"
+  },
+  "demo-light.mp4": {
+   "bytes": 90286,
+   "sha256": "d7518df71ed3df97ddbede3835a5125cba8e50393e0ed1b6303b5a36486e5d09"
   },
   "demo.mp4": {
    "bytes": 72448,

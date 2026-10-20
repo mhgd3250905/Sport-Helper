@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "n-prone-hip-ext",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "俯卧屈膝抬腿",
   "en": "Prone Bent-Knee Hip Extension"
@@ -51,7 +51,12 @@
   "height": 720,
   "loopSeconds": 8.0,
   "repSeconds": 4.0,
-  "showsSide": "right"
+  "showsSide": "right",
+  "light": {
+   "video": "demo-light.mp4",
+   "cover": "cover-light.jpg",
+   "stage": "#EFEFEF"
+  }
  },
  "voice": {
   "languages": [
@@ -154,9 +159,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 10075,
+   "sha256": "908657f9de895b5f2b96e98a612842034f686681ea5d81ff3570e33ada901b17"
+  },
   "cover.jpg": {
    "bytes": 8039,
    "sha256": "cefcf9001b1e9902069444484a113032678a31bc1b69c51a382d87681322fa98"
+  },
+  "demo-light.mp4": {
+   "bytes": 82922,
+   "sha256": "c4a4b8db5c713315ddd2317267075aa1501a16eac6792f278ab1b06656ab0483"
   },
   "demo.mp4": {
    "bytes": 84554,

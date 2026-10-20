@@ -1,0 +1,128 @@
+// Regressions for the PR #3 review (changes requested, 2026-10-20):
+// P1 light media sealed into the pack manifests, P2 ring follows a paused
+// skip/back, P2 switch/choice state semantics, P2 plan-detail "换一个" is
+// its own accessible action.
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:smartfit/app/services.dart';
+import 'package:smartfit/domain/exercise.dart';
+import 'package:smartfit/domain/plan.dart';
+import 'package:smartfit/ui/plan_page.dart';
+import 'package:smartfit/ui/player_page.dart';
+import 'package:smartfit/ui/theme.dart';
+import 'package:smartfit/ui/theme/countdown.dart';
+
+import 'app_flow_test.dart' show services, tall;
+
+const _two = TrainingPlan(
+  id: 'two', source: 'template', title: '两个动作', summary: '', goal: 'relax', scene: 'home',
+  equipment: [], level: 1, targetMinutes: 2,
+  blocks: [PlanBlock(id: 'main', name: '主训练', type: BlockType.main, rounds: 1, restBetweenRoundsSeconds: 0, items: [
+    PlanItem(exerciseId: 'h-squat', mode: DoseMode.time, sets: 1, workSeconds: 20, perSide: false, restSeconds: 15),
+    PlanItem(exerciseId: 'h-squat', mode: DoseMode.reps, sets: 1, reps: 8, perSide: false, restSeconds: 0),
+  ])],
+);
+
+const _swappable = TrainingPlan(
+  id: 'swap', source: 'template', title: '可替换', summary: '', goal: 'relax', scene: 'home',
+  equipment: [], level: 1, targetMinutes: 2,
+  blocks: [PlanBlock(id: 'main', name: '主训练', type: BlockType.main, rounds: 1, restBetweenRoundsSeconds: 0, items: [
+    PlanItem(exerciseId: 'h-bridge-march', mode: DoseMode.time, sets: 1, workSeconds: 20, perSide: false, restSeconds: 15),
+  ])],
+);
+
+Map<String, dynamic> _json(String path) => jsonDecode(File(path).readAsStringSync()) as Map<String, dynamic>;
+
+Widget _host(Widget child) => MaterialApp(theme: buildTheme(), home: Scaffold(body: Center(child: child)));
+
+void main() {
+  test('P1: light media is listed in every pack manifest, version bumped, index in step', () {
+    final index = _json('assets/packs/index.json');
+    final versions = {for (final e in index['packs'] as List) e['id']: e['version']};
+    var withLight = 0;
+    for (final dir in Directory('assets/packs').listSync().whereType<Directory>()) {
+      final f = File('${dir.path}/pack.json');
+      if (!f.existsSync()) continue;
+      final pack = _json(f.path);
+      expect(versions[pack['id']], pack['version'], reason: '${pack['id']} index version');
+      final light = (pack['media'] as Map?)?['light'] as Map?;
+      if (light == null) continue;
+      withLight++;
+      expect(pack['version'], isNot('1.0.0'), reason: '${pack['id']} content version not bumped');
+      final files = pack['files'] as Map<String, dynamic>;
+      for (final rel in [light['video'], light['cover']]) {
+        final meta = files[rel] as Map?;
+        expect(meta, isNotNull, reason: '${pack['id']}: $rel missing from files');
+        expect(meta!['bytes'], File('${dir.path}/$rel').lengthSync(), reason: '${pack['id']}: $rel size');
+      }
+    }
+    expect(withLight, greaterThan(0));
+  });
+
+  for (final back in [false, true]) {
+    testWidgets('P2: paused ${back ? 'back' : 'skip'} moves the ring to the new phase and stays paused', (tester) async {
+      tall(tester);
+      await tester.pumpWidget(AppScope(services: services(), child: MaterialApp(theme: buildTheme(), home: const PlayerPage(plan: _two))));
+      await tester.pump();
+      if (back) {
+        // Into work first, so "back" has a phase to return to.
+        await tester.tap(find.byKey(const ValueKey('skip')));
+        await tester.pump();
+      }
+      // The player clock is a real Stopwatch: let real time pass, then tick.
+      await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 400)));
+      await tester.pump(const Duration(milliseconds: 60));
+      double ring() => tester.widget<SfCountdownRing>(find.byType(SfCountdownRing)).progress.value;
+      expect(ring(), greaterThan(0.01));
+      await tester.tap(find.byKey(const ValueKey('pause')));
+      await tester.pump();
+      await tester.tap(find.byKey(ValueKey(back ? 'prev' : 'skip')));
+      await tester.pump();
+      expect(ring(), lessThan(0.001), reason: 'new phase starts from an empty ring');
+      expect(find.byKey(const ValueKey('tag-paused')), findsOneWidget);
+      await tester.pump(const Duration(seconds: 1));
+      expect(ring(), lessThan(0.001), reason: 'still paused: the ring does not move');
+      expect(tester.widget<SfCountdownRing>(find.byType(SfCountdownRing)).dim, isTrue);
+      await tester.pumpWidget(const SizedBox());
+    });
+  }
+
+  testWidgets('P2: SfSwitchRow exposes toggled state; SfChoiceChip exposes selected state', (tester) async {
+    final handle = tester.ensureSemantics();
+    for (final v in [true, false]) {
+      await tester.pumpWidget(_host(SfSwitchRow(title: '语音', subtitle: '播报口令', value: v, onChanged: (_) {})));
+      expect(
+        tester.getSemantics(find.byType(SfSwitchRow)),
+        isSemantics(label: '语音', hint: '播报口令', hasToggledState: true, isToggled: v, hasTapAction: true),
+      );
+      await tester.pumpWidget(_host(SfChoiceChip(label: '哑铃', selected: v, onTap: () {})));
+      expect(
+        tester.getSemantics(find.byType(SfChoiceChip)),
+        isSemantics(label: '哑铃', hasSelectedState: true, isSelected: v, isButton: true, hasTapAction: true),
+      );
+    }
+    handle.dispose();
+  });
+
+  testWidgets('P2: plan detail keeps "换一个" as its own TalkBack action', (tester) async {
+    final handle = tester.ensureSemantics();
+    tall(tester);
+    await tester.pumpWidget(AppScope(services: services(), child: MaterialApp(theme: buildTheme(), home: const PlanPage(plan: _swappable))));
+    await tester.pumpAndSettle();
+    final row = tester.getSemantics(find.byKey(const ValueKey('item-h-bridge-march')));
+    final swapFinder = find.descendant(of: find.byKey(const ValueKey('swap-h-bridge-march')), matching: find.bySemanticsLabel('换一个'));
+    expect(swapFinder, findsOneWidget);
+    final swap = tester.getSemantics(swapFinder);
+    expect(swap.id, isNot(row.id));
+    expect(row, isSemantics(isButton: true, hasTapAction: true));
+    expect(swap, isSemantics(label: '换一个', isButton: true, hasTapAction: true));
+    swap.owner!.performAction(swap.id, SemanticsAction.tap);
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('item-h-bridge-march')), findsNothing, reason: 'the move was swapped');
+    handle.dispose();
+  });
+}
