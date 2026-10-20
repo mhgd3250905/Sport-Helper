@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:ugk_coach/ugk_coach.dart' as coach;
 
@@ -24,6 +25,7 @@ class AiChatEngine implements ManagedChatEngine {
   final coach.LlmClient client;
   final Duration turnTimeout;
   final usage = coach.MemoryUsageSink();
+  final _random = Random.secure();
   coach.TurnOutcome? lastOutcome;
   coach.FallbackReason? lastFallbackReason;
   coach.CancelToken? _pending;
@@ -94,15 +96,41 @@ class AiChatEngine implements ManagedChatEngine {
     ChatReply? fallbackReply;
     Future<ChatReply> fallback() async {
       // The offline engine must receive constraints established by AI too.
+      final request = slots
+          .toRequest(fallbackGoal: state.plan?.goal)
+          .copyWith(description: input);
       final fallbackState = state.copyWith(
         coachContext: slots,
         pending: slots,
         asked: state.asked,
-        request: state.request == null
-            ? null
-            : slots.toRequest(fallbackGoal: state.plan?.goal),
+        request: state.request == null ? null : request,
       );
-      return local.reply(input, fallbackState);
+      final reply = await local.reply(input, fallbackState);
+      final unsafe = reply.messages.any(
+        (message) =>
+            message.plan != null &&
+            PlanValidator(
+              local.lib,
+            ).validate(message.plan!, request).isNotEmpty,
+      );
+      if (!unsafe) return reply;
+      // Existing local edits may retain old actions. Never expose that card
+      // if the new equipment, location or protection rules invalidate it.
+      final generated = await local.templates.generate(request);
+      final plan = generated.plan;
+      return ChatReply(
+        messages: [
+          plan == null
+              ? const BotMessage('当前条件下暂时没有合适的本地方案，可以调整条件后再试。')
+              : BotMessage('按刚确认的条件，改用这套本地方案。', plan: plan, request: request),
+        ],
+        state: fallbackState.copyWith(
+          clearPending: true,
+          plan: plan,
+          request: request,
+        ),
+        suggestions: plan == null ? const [] : planSuggestions,
+      );
     }
 
     final assistant = coach.CoachAssistant(
@@ -169,7 +197,9 @@ class AiChatEngine implements ManagedChatEngine {
       final reply = result.reply!;
       final plan = reply.plan == null
           ? null
-          : TrainingPlan.fromJson(reply.plan!.toJson());
+          : TrainingPlan.fromJson(reply.plan!.toJson()).copyWith(
+              id: 'ai-${DateTime.now().microsecondsSinceEpoch}-${_random.nextInt(0x100000000).toRadixString(16)}',
+            );
       final request = plan == null
           ? null
           : requestForPlan(plan).copyWith(description: input);
@@ -314,6 +344,7 @@ class AiChatEngine implements ManagedChatEngine {
   }
 
   ChatReply _withFallbackNotice(ChatReply reply) => ChatReply(
+    aiTurn: true,
     messages: [
       BotMessage(
         lastFallbackReason == coach.FallbackReason.rateLimited

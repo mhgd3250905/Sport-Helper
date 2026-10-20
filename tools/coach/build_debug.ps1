@@ -13,7 +13,7 @@ try {
   $content = [System.IO.File]::ReadAllText((Resolve-Path -LiteralPath $AppKeyFile)).Trim()
   # A shared local note may contain an upstream API key as well. Only use
   # the explicitly labelled Worker app key; never select an upstream key.
-  $matchesFound = [regex]::Matches($content, '(?i)X-App-Key[''"`]?\s*[:=：]\s*[''"`]?([^\s''"`]+)')
+  $matchesFound = [regex]::Matches($content, '(?i)X-App-Key[''"`]?\s*[:=\uFF1A]\s*[''"`]?([^\s''"`]+)')
   if ($matchesFound.Count -eq 1) {
     $appKey = $matchesFound[0].Groups[1].Value
   } elseif ($matchesFound.Count -eq 0 -and $content -notmatch '\s') {

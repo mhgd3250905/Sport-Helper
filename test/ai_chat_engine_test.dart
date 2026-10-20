@@ -479,10 +479,12 @@ void main() {
           .where((m) => m.role == coach.LlmRole.assistant)
           .map((m) => m.content)
           .join('\n');
-      expect(previousPlan, contains('ai-plan-one'));
+      expect(previousPlan, contains(replyPlan(second)!.id));
       expect(previousPlan, contains('"blocks"'));
       expect(previousPlan, contains('h-calf-raise'));
-      expect(replyPlan(third)!.id, 'ai-plan-shorter');
+      expect(replyPlan(third)!.id, isNot(replyPlan(second)!.id));
+      expect(replyPlan(third)!.targetMinutes, 7);
+      expect(replyPlan(third)!.exerciseIds, {'h-calf-raise'});
       expect(client.requests, hasLength(3));
     },
   );
@@ -499,14 +501,20 @@ void main() {
       expect(client.token?.isCancelled, isTrue);
       expect(replyPlan(cancelled), isNull);
       expect(ai.lastOutcome, coach.TurnOutcome.cancelled);
-      client.late.complete(coach.LlmResponse(content: jsonEncode(envelope())));
+      final latePlan = TrainingPlan.fromJson({
+        ...plan().toJson(),
+        'title': '晚到取消训练，不应进入任何历史',
+      });
+      client.late.complete(
+        coach.LlmResponse(content: jsonEncode(envelope(value: latePlan))),
+      );
       await Future<void>.delayed(Duration.zero);
       final next = await ai.reply('有什么建议？', cancelled.state);
       expect(replyPlan(next), isNull);
       final history = client.requests.last.messages
           .map((m) => m.content)
           .join('\n');
-      expect(history, isNot(contains('ai-plan-one')));
+      expect(history, isNot(contains('晚到取消训练，不应进入任何历史')));
       expect(texts(next), contains('新的回复'));
     },
   );
@@ -805,6 +813,120 @@ void main() {
       expectLocalPreserved(
         reply,
         await local().reply('在家练全身', const ChatState()),
+      );
+    },
+  );
+
+  test(
+    'fallback revalidates retimed old plans against newly protected knees or an office scene',
+    () async {
+      final base = plan(ids: ['h-squat', 'h-forearm-plank']);
+      final old = TrainingPlan.fromJson({
+        ...base.toJson(),
+        'targetMinutes': 20,
+        'blocks': [
+          {
+            ...base.blocks.single.toJson(),
+            'items': [
+              {
+                ...base.blocks.single.items.first.toJson(),
+                'sets': 6,
+                'reps': 30,
+                'restSeconds': 30,
+              },
+              {
+                ...base.blocks.single.items.last.toJson(),
+                'sets': 3,
+                'workSeconds': 120,
+                'restSeconds': 30,
+              },
+            ],
+          },
+        ],
+      });
+      expect(SessionBuilder(library).planSeconds(old), greaterThan(600));
+      for (final scenario in [
+        ('再短一点，保护膝', 'home', const {'膝'}),
+        ('再短一点，改在办公室，徒手', 'office', const <String>{}),
+      ]) {
+        final client = coach.FakeLlmClient([
+          const coach.LlmException(coach.LlmErrorKind.network, 'test offline'),
+        ], latency: Duration.zero);
+        final ai = engine(client);
+        final reply = await ai.reply(
+          scenario.$1,
+          ChatState(
+            plan: old,
+            request: requestForPlan(old),
+            coachContext: const Slots(
+              scene: 'home',
+              minutes: 20,
+              equipment: {},
+            ),
+          ),
+        );
+        expect(ai.lastFallbackReason, coach.FallbackReason.offline);
+        expect(reply.aiTurn, isTrue);
+        final merged = requestForPlan(old).copyWith(
+          scene: scenario.$2,
+          avoid: scenario.$3,
+          equipment: {},
+          minutes: 14,
+        );
+        final plans = reply.messages
+            .map((m) => m.plan)
+            .whereType<TrainingPlan>();
+        // A safe rebuilt template or an explanatory message is acceptable;
+        // forwarding the old unchecked squat/floor plan is not.
+        for (final candidate in plans) {
+          expect(candidate.scene, scenario.$2);
+          expect(candidate.avoid, containsAll(scenario.$3));
+          expect(PlanValidator(library).validate(candidate, merged), isEmpty);
+        }
+        expect(texts(reply).trim(), isNotEmpty);
+        expect(client.requests, hasLength(1));
+      }
+    },
+  );
+
+  test(
+    'different accepted AI plans with the same model id get distinct App ids and both reload',
+    () async {
+      final client = coach.FakeLlmClient([
+        envelope(
+          value: plan(id: 'model-reused-id', ids: ['h-calf-raise']),
+        ),
+        envelope(
+          value: plan(id: 'model-reused-id', ids: ['h-squat']),
+        ),
+      ], latency: Duration.zero);
+      final ai = engine(client);
+      final firstReply = await ai.reply('在家 10 分钟练全身，徒手', const ChatState());
+      final secondReply = await ai.reply('换一套', firstReply.state);
+      final first = replyPlan(firstReply)!;
+      final second = replyPlan(secondReply)!;
+      expect(first.id, isNot('model-reused-id'));
+      expect(second.id, isNot('model-reused-id'));
+      expect(first.id, isNot(second.id));
+      expect(first.exerciseIds, {'h-calf-raise'});
+      expect(second.exerciseIds, {'h-squat'});
+      final storage = _Storage();
+      final store = AppStore(storage);
+      await store.savePlan(first);
+      await store.savePlan(second);
+      final reloaded = AppStore(storage);
+      await reloaded.load();
+      expect(reloaded.savedPlans, hasLength(2));
+      expect(reloaded.savedPlans.map((p) => p.plan.id).toSet(), {
+        first.id,
+        second.id,
+      });
+      expect(
+        reloaded.savedPlans.map((p) => p.plan.exerciseIds),
+        containsAll([
+          {'h-calf-raise'},
+          {'h-squat'},
+        ]),
       );
     },
   );
