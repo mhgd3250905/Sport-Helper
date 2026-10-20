@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "w-feet-on-chair-bridge",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "脚踩椅面臀桥",
   "en": "Feet-on-Chair Glute Bridge"
@@ -148,9 +148,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 11108,
+   "sha256": "c77497db7ccce533f85f03348ad0b0e6205486e2062c83020fb85fa9055bd733"
+  },
   "cover.jpg": {
    "bytes": 8924,
    "sha256": "87007d82a2e55ce87a0183f2fbe04907d8d195b1e303b82012045ebff5a37ce1"
+  },
+  "demo-light.mp4": {
+   "bytes": 97698,
+   "sha256": "fc07927fb0f70c03ce741b5eb65fbce14f7da68b823612233451b4123f51d37d"
   },
   "demo.mp4": {
    "bytes": 92536,

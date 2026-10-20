@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "n-wide-fold",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "站姿宽距体前屈（扶椅）",
   "en": "Standing Wide-Leg Fold (Chair)"
@@ -151,9 +151,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 19187,
+   "sha256": "6678e4cf1645fe614e7e7c305f9c5731bbb79652822213536bd97026ad2157ae"
+  },
   "cover.jpg": {
    "bytes": 14503,
    "sha256": "c1b3eb390bad2ea9ab94bac0786b334488a1b0887e0d8e10f9fcbdbf79897e1b"
+  },
+  "demo-light.mp4": {
+   "bytes": 181688,
+   "sha256": "4060d3adb10cbc7528983e459df1dc2dcea41ca9a1194a674afc3c56578daa8b"
   },
   "demo.mp4": {
    "bytes": 184777,

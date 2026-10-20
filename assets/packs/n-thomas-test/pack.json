@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "n-thomas-test",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "仰卧单膝抱胸",
   "en": "Supine Single Knee-to-Chest (Thomas Test)"
@@ -148,9 +148,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 9245,
+   "sha256": "39cf1c814d43f5cf992720acc207153634c5376ad643dd0d92988ca286b751ab"
+  },
   "cover.jpg": {
    "bytes": 7510,
    "sha256": "9109f8ec94d12276fc19c763f1392ea64903b55e03b29c0e7e0d4dd78a6203df"
+  },
+  "demo-light.mp4": {
+   "bytes": 75672,
+   "sha256": "52c36dd18bce471ad4f2dde80452f7da076af93c90afe33a63ba14de243b5f23"
   },
   "demo.mp4": {
    "bytes": 74694,

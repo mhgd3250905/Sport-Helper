@@ -248,7 +248,7 @@
 | Pose-Hub v0.2.0（经 HipLab） | 46 | 取 HipLab `assets/drill_media/light/hip-<id>.mp4/.jpg`（只读复制，HipLab 用 Pose-Hub alpha 帧在 `#EFEFEF` 上重新合成，带 σ12 / dy10 / 14% 的柔和落地影）→ 按深色版同样参数缩到 720²（H.264 CRF 27）、封面 540² | 与 HipLab 浅色完全一致 |
 | Drive 绿幕母版 | 47 | 从 `work/drive/green/*.mp4`（1080² #00FF00）**重新抠像**到同一个 `#EFEFEF` 舞台，用抠像 alpha 生成同款落地影（模糊 σ8、下移 7px、14%，按 720 缩放折算），边缘去溢色 | 与上一行同一观感；边缘放大检查无绿边 |
 
-工具：`tools/media/build_light_media.py`（标准库 + ffmpeg，一次一个、`-threads 2`）。输出 `assets/packs/<id>/demo-light.mp4` + `cover-light.jpg`，`pack.json` 的 `media.light = {video, cover, stage}`，`build_packs.py` 重新封装（文件清单与 sha256 包含浅色文件）。`drill-pack-spec.md` 增补 `media.light` 为可选字段（其他 App 不认识也能用）。体积：约 +11 MB（每个浅色视频 100–170 KB）。
+工具：`tools/media/build_light_media.py`（标准库 + ffmpeg，一次一个、`-threads 2`）。输出 `assets/packs/<id>/demo-light.mp4` + `cover-light.jpg`，`pack.json` 的 `media.light = {video, cover, stage}`。**更正（2026-10-20，PR #3 审核）**：首版提交时 `build_packs.py` 并不认识 `media.light`，浅色文件没有进 `files`/`index.json`，规范也没补（`validate_packs.py` 279 errors）；现已扩展 `tools/packs/packlib.py`（`listed_files()` 枚举浅色视频/封面）与 `validate_packs.py`（校验 `media.light`），由 `build_packs.py` 重新封包、重建索引，93 个动作包内容版本 1.0.0 → 1.1.0，`drill-pack-spec.md` §1/§2/§6/§7 已补 `media.light` 可选字段（其他 App 不认识也能用），校验恢复 0 errors。体积：约 +11 MB（每个浅色视频 100–170 KB）。
 
 **为什么不选“浅色主题里保持深色画框”**：那是上一版的折中，开哥看过“比以前好一点但不够精致”，浅色页面中间一块黑框正是不精致的来源之一；HipLab 已经证明重新合成可行，我们有全部母版和 alpha 来源，成本可控（约 11 分钟沙盒算力）。
 

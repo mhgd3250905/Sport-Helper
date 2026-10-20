@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "n-leg-circles",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "仰卧直腿画圈",
   "en": "Supine Straight-Leg Circles"
@@ -150,9 +150,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 12408,
+   "sha256": "7fb859a5073687edfe8e9f620462c6f8e9dfc7db85688b679b048bca9a12a1ff"
+  },
   "cover.jpg": {
    "bytes": 9693,
    "sha256": "c44be7a36664bde8c39c7c0ec00547ba9c7c15bfbc340ddab1f91195cafe5c35"
+  },
+  "demo-light.mp4": {
+   "bytes": 194139,
+   "sha256": "b277396760c33c63f2f64103e3f1f0e1ec9886af21146e1ce91a829b970d1a16"
   },
   "demo.mp4": {
    "bytes": 191912,

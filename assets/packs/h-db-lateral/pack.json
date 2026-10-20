@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "h-db-lateral",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "哑铃侧平举",
   "en": "Dumbbell Lateral Raise"
@@ -148,9 +148,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 10815,
+   "sha256": "314eb0d652582d7b2593dd86ffe68b24b888fe8f9642e9a55376f8ec91945f74"
+  },
   "cover.jpg": {
    "bytes": 7230,
    "sha256": "09ac2137c29bc5e8e3e1f7e42fc3d3c677ff5f5d8be9bd56096b4a555b4b7956"
+  },
+  "demo-light.mp4": {
+   "bytes": 110075,
+   "sha256": "d57000b1b2c08646cf6ba979c261063f6205e6cbd97a496699c6804c609c3ed0"
   },
   "demo.mp4": {
    "bytes": 89191,

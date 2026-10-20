@@ -19,6 +19,8 @@ assets/packs/
     pack.json
     cover.jpg                封面静态帧（540²）
     demo.mp4                 示范视频（720²，H.264，无声，循环）
+    cover-light.jpg          可选：浅色舞台封面（540²，见 media.light）
+    demo-light.mp4           可选：浅色舞台示范视频（720²，与 demo.mp4 同步同长）
     voice/zh/name.m4a intro.m4a cue1.m4a cue2.m4a rest.m4a finish.m4a
     voice/zh/side_switch.m4a （仅单侧动作）
 ```
@@ -55,7 +57,11 @@ assets/packs/
   "video": "demo.mp4", "width": 720, "height": 720,
   "loopSeconds": 8.0,                // 视频一个循环的长度
   "repSeconds": 4.0,                 // 视频里一次动作的秒数（reps 模式按它数拍）
-  "showsSide": "right"               // 单侧动作：视频演示的是哪一侧（另一侧镜像播放）
+  "showsSide": "right",              // 单侧动作：视频演示的是哪一侧（另一侧镜像播放）
+  "light": {                         // 可选：浅色主题用的同一段动作（浅色舞台重新合成）
+   "video": "demo-light.mp4", "cover": "cover-light.jpg",   // 两项都要有；与深色版同尺寸、同循环
+   "stage": "#EFEFEF"                // 舞台底色 #RRGGBB，App 用它铺视频四周
+  }
  },
  "voice": {
   "languages": ["zh"],
@@ -134,12 +140,13 @@ App 启动读 `index.json` → 逐个读 `pack.json`。`bytes` 是包内全部�
 - `formatVersion`：格式本身。只加可选字段不升；改字段含义/删字段才升，并在本文件记录迁移方法。读取方遇到不认识的 `formatVersion` 应拒绝该包。
 - `version`（每个包，`MAJOR.MINOR.PATCH`）：
   - PATCH：重新生成音频（后处理/音色变了）、修错字、换更清晰的封面；
-  - MINOR：增删台词或要领、改默认剂量、替换视频；
+  - MINOR：增删台词或要领、改默认剂量、替换视频、新增/替换 `media.light` 浅色媒体；
   - MAJOR：动作本身变了（不同动作不应复用 id，正常不会发生）。
+- `files` 列出包里每个文件，**包括 `media.light` 的浅色视频和封面**（`packlib.listed_files()` 枚举，`validate_packs.py` 校验 `media.light` 字段并把未列出的文件报为 stray）。
 - `files` 里的 sha256 让拷贝方能判断某个文件是否和源一致；`index.json` 里的 `sha256` 让 App 判断包有没有变（以后做增量更新用）。
 
 ## 7. 现状（2026-10-19）
 
-- 93 个动作包 + 1 个公共包；全部中文语音（`zh`）。英文语音格式已支持（`languages` 加 `en`、台词加 `text.en`），暂未生成。
+- 93 个动作包 + 1 个公共包；全部中文语音（`zh`）。2026-10-20：93 个动作包加入 `media.light`（浅色视频 + 封面，已进 `files` 与 `index.json`），内容版本升到 1.1.0；公共包仍为 1.0.0。英文语音格式已支持（`languages` 加 `en`、台词加 `text.en`），暂未生成。
 - 要领来自原 `exercises.json` 的审过的主要领 + `tools/library/exercises.csv` 的准备/动作要领（去掉了换种说法重复的），每个动作 1–3 条；intro/rest/side_switch/finish 由元数据按固定句式生成，**需要人工复听润色**，改 `pack.json` 后重跑上面的流程即可。
 - `contraindications` 暂空：不编造医学禁忌，等专业审核补充；`cautions`（注意部位）已有。

@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "o-seated-catcow",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "坐姿猫牛式",
   "en": "Seated Cat-Cow"
@@ -146,9 +146,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 11419,
+   "sha256": "e18c7b5df674b64bcab7b62a19cd46872d5f9dda7844f0b7d1edd2d784ad767a"
+  },
   "cover.jpg": {
    "bytes": 7232,
    "sha256": "9bd599884eed0cecdd5c08a6bc14f292ffe5c56e96efdfbcebd39da4279f7376"
+  },
+  "demo-light.mp4": {
+   "bytes": 83394,
+   "sha256": "332d1340a515fa17e7ba88ab8941c6bfc63ba6b8833663aa9e04eb8ffcd70e70"
   },
   "demo.mp4": {
    "bytes": 71515,

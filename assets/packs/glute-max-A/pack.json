@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "glute-max-A",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "单腿臀桥",
   "en": "Single-Leg Glute Bridge"
@@ -137,9 +137,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 10410,
+   "sha256": "c9308eacbedd21abfd0079ab09187cf601278b16ee0d0eae7faa6143b6866fa9"
+  },
   "cover.jpg": {
    "bytes": 8028,
    "sha256": "a0a8874d665e9cd08c1e006cc3cd64b08a7fa97d604bb1734e39fd800faeba62"
+  },
+  "demo-light.mp4": {
+   "bytes": 90852,
+   "sha256": "c5cbd515de0c9511505c57eca0f44053ad50d464df2b9d1c0a2d6cdb03c642f0"
   },
   "demo.mp4": {
    "bytes": 80514,

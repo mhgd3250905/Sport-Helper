@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "h-russian-twist",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "俄罗斯转体",
   "en": "Russian Twist (Feet Down)"
@@ -148,9 +148,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 13922,
+   "sha256": "7f8193e20b105eb91bf2070718de3cc9d61ed60a469508464d9fb8ad900bdb80"
+  },
   "cover.jpg": {
    "bytes": 10322,
    "sha256": "d9a4071043a41078f0d0d24674aef9a82b4644fba0f8261f893c8dee770826f3"
+  },
+  "demo-light.mp4": {
+   "bytes": 173486,
+   "sha256": "7c2592c7af07e69b52fe1449a1653e6279b6a032f34d79e1d557ad9a84fbb045"
   },
   "demo.mp4": {
    "bytes": 165529,

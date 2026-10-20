@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "h-tabletop",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "桌面式后撑抬髋",
   "en": "Reverse Tabletop Bridge"
@@ -151,9 +151,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 10607,
+   "sha256": "a2a50bcf50b2df5ba1569df1fe4f8d44a429471ba526a51b733f1591976dee8c"
+  },
   "cover.jpg": {
    "bytes": 7276,
    "sha256": "6dc0c7a72e84783cfcdd4d05ebd68ea351fc4fdb1e659a779c15092818b60b81"
+  },
+  "demo-light.mp4": {
+   "bytes": 148527,
+   "sha256": "ed1598c75a3af1aebaabdf055d87d8e368155d5cc5afa8bd4d40c3714abb82fa"
   },
   "demo.mp4": {
    "bytes": 127274,

@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "w-chair-hip-thrust",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "椅子臀推",
   "en": "Chair Hip Thrust"
@@ -137,9 +137,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 10145,
+   "sha256": "9bb53f874dc4ff8d6fe1560457ccbde9e3d71ccb418116bd5b8c1e2b00704030"
+  },
   "cover.jpg": {
    "bytes": 7365,
    "sha256": "46bbaf9c02dce0a3d7c1db62fa7af7148d3cfecee29d12be4099387cb64b3cb8"
+  },
+  "demo-light.mp4": {
+   "bytes": 116084,
+   "sha256": "8cb678f603e40ef36394f343ce7c64a3093c141c651be54f240b2c6757176f45"
   },
   "demo.mp4": {
    "bytes": 96748,

@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "w-dead-bug",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "死虫式",
   "en": "Dead Bug"
@@ -135,9 +135,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 8935,
+   "sha256": "ba66e82b880115e239a20010269aae70765e12719fb25f60d198262c24216a69"
+  },
   "cover.jpg": {
    "bytes": 6157,
    "sha256": "043ab1a51e2a7269cde834807bd07adcf573c3f2917ad869ef246f8b6347a49a"
+  },
+  "demo-light.mp4": {
+   "bytes": 108881,
+   "sha256": "7b13d38cce985dbc2cd1f2eae353415f6c7cb4b20fbf6082886e282f6be01e96"
   },
   "demo.mp4": {
    "bytes": 89732,

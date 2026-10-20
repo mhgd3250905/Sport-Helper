@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "h-butterfly-active",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "仰卧蝴蝶主动开合",
   "en": "Supine Butterfly Active Open-Close"
@@ -146,9 +146,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 14356,
+   "sha256": "84f0c9dbfa2982cbe3d52f7301f346c11d0a3c1ee09fdb5aa59c5058ebf60229"
+  },
   "cover.jpg": {
    "bytes": 11526,
    "sha256": "f8ccffb5aa06e3955b880ec356bdb93ab88fb074f70a4ec7f016d95a7f6b9e64"
+  },
+  "demo-light.mp4": {
+   "bytes": 171677,
+   "sha256": "0f77976100c1dd8a9d9ac1841afcb81964609a3dc8bb3b85d4ec2e7bf4b6b459"
   },
   "demo.mp4": {
    "bytes": 168720,

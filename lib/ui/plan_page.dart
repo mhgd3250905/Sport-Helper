@@ -216,47 +216,64 @@ class _PlanPageState extends State<PlanPage> {
     final dose = circuit ? item.copyWith(sets: 1).doseText() : item.doseText();
     return Padding(
       padding: const EdgeInsets.only(bottom: SfSpace.x2),
-      child: SfPressable(
-        key: ValueKey('item-${e.id}'),
-        semanticLabel: e.name,
-        haptic: SfHaptic.selection,
-        scale: .985,
-        onTap: () => setState(() => _selected = e.id),
-        child: AnimatedContainer(
-          duration: SfMotion.medium,
-          curve: SfMotion.standard,
-          padding: const EdgeInsets.all(SfSpace.x2),
-          decoration: BoxDecoration(
-            color: sel ? SfColors.accentSoft : SfColors.surface,
-            borderRadius: BorderRadius.circular(SfRadius.lg),
-            border: Border.all(color: sel ? SfColors.accent.withValues(alpha: .5) : (SfColors.isDark ? Colors.transparent : SfColors.line)),
-          ),
-          child: Row(
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(SfRadius.lg - SfSpace.x2),
-                child: SizedBox.square(
-                  dimension: 60,
-                  child: ColoredBox(
-                    color: sfStageFor(e).mediaStage,
-                    child: Image.asset(sfPoster(e), fit: BoxFit.cover, errorBuilder: (_, _, _) => const SizedBox.shrink()),
+      // The row and its "换一个" are two separate accessible actions: the
+      // swap button sits over the row as a sibling, because the row's
+      // pressable excludes its own subtree from semantics.
+      child: Stack(
+        children: [
+          SfPressable(
+            key: ValueKey('item-${e.id}'),
+            semanticLabel: e.name,
+            selected: sel,
+            haptic: SfHaptic.selection,
+            scale: .985,
+            onTap: () => setState(() => _selected = e.id),
+            child: AnimatedContainer(
+              duration: SfMotion.medium,
+              curve: SfMotion.standard,
+              padding: const EdgeInsets.all(SfSpace.x2),
+              decoration: BoxDecoration(
+                color: sel ? SfColors.accentSoft : SfColors.surface,
+                borderRadius: BorderRadius.circular(SfRadius.lg),
+                border: Border.all(color: sel ? SfColors.accent.withValues(alpha: .5) : (SfColors.isDark ? Colors.transparent : SfColors.line)),
+              ),
+              child: Row(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(SfRadius.lg - SfSpace.x2),
+                    child: SizedBox.square(
+                      dimension: 60,
+                      child: ColoredBox(
+                        color: sfStageFor(e).mediaStage,
+                        child: Image.asset(sfPoster(e), fit: BoxFit.cover, errorBuilder: (_, _, _) => const SizedBox.shrink()),
+                      ),
+                    ),
                   ),
-                ),
+                  const SizedBox(width: SfSpace.x3),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(e.name, style: SfType.callout.copyWith(fontWeight: FontWeight.w600)),
+                        const SizedBox(height: 2),
+                        Text(dose, style: SfType.label.copyWith(color: SfColors.accentText, fontWeight: FontWeight.w600, fontFeatures: SfType.tabular)),
+                        Text('${e.category.zh} · ${e.muscles.join('、')}', maxLines: 1, overflow: TextOverflow.ellipsis, style: SfType.caption.copyWith(color: SfColors.muted)),
+                      ],
+                    ),
+                  ),
+                  if (e.alternative != null) const SizedBox(width: 40),
+                ],
               ),
-              const SizedBox(width: SfSpace.x3),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(e.name, style: SfType.callout.copyWith(fontWeight: FontWeight.w600)),
-                    const SizedBox(height: 2),
-                    Text(dose, style: SfType.label.copyWith(color: SfColors.accentText, fontWeight: FontWeight.w600, fontFeatures: SfType.tabular)),
-                    Text('${e.category.zh} · ${e.muscles.join('、')}', maxLines: 1, overflow: TextOverflow.ellipsis, style: SfType.caption.copyWith(color: SfColors.muted)),
-                  ],
-                ),
-              ),
-              if (e.alternative != null)
-                SfCircleButton(
+            ),
+          ),
+          if (e.alternative != null)
+            Positioned(
+              top: 0,
+              bottom: 0,
+              right: SfSpace.x2,
+              child: Center(
+                child: SfCircleButton(
+                  key: ValueKey('swap-${e.id}'),
                   tooltip: '换一个',
                   icon: SfGlyph.swap,
                   size: 40,
@@ -266,9 +283,9 @@ class _PlanPageState extends State<PlanPage> {
                   haptic: SfHaptic.selection,
                   onPressed: () => _swap(bi, ii),
                 ),
-            ],
-          ),
-        ),
+              ),
+            ),
+        ],
       ),
     );
   }

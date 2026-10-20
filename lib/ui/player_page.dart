@@ -122,9 +122,7 @@ class _PlayerPageState extends State<PlayerPage> {
       _record();
     }
     final p = _phase;
-    if (!_engine.done) {
-      _progress.value = p.seconds == 0 ? 0.0 : (_engine.elapsedIn(t) / p.seconds).clamp(0.0, 1.0);
-    }
+    _syncProgress(t);
     _haptics(p, t);
     final key = '${_engine.generation}:${_engine.done}:${_counterValue(p, t)}:${_subtitle ?? ''}';
     if (key != _shownKey || _engine.generation != _shownGen) {
@@ -201,10 +199,20 @@ class _PlayerPageState extends State<PlayerPage> {
     setState(() {});
   }
 
+  /// Sets the ring to the current phase's fill. [_tick] does this while
+  /// running; a manual skip/back while paused calls it too, so the ring
+  /// follows the new phase without resuming the clock.
+  void _syncProgress(double t) {
+    if (_engine.done) return;
+    final p = _phase;
+    _progress.value = p.seconds == 0 ? 0.0 : (_engine.elapsedIn(t) / p.seconds).clamp(0.0, 1.0);
+  }
+
   void _skip() {
     _queue.cancelAll(_t);
     _runner.skip(_t);
     _subtitle = null;
+    _syncProgress(_t);
     _tick();
     setState(() {});
   }
@@ -213,6 +221,7 @@ class _PlayerPageState extends State<PlayerPage> {
     _queue.cancelAll(_t);
     _runner.previous(_t);
     _subtitle = null;
+    _syncProgress(_t);
     _tick();
     setState(() {});
   }

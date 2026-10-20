@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "s-lizard",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "蜥蜴式低弓步",
   "en": "Lizard Lunge"
@@ -146,9 +146,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 10022,
+   "sha256": "4fce90605d035b7847116e1bc5e95ae5e0b3e4181e025fb681753bb6717dbc34"
+  },
   "cover.jpg": {
    "bytes": 7770,
    "sha256": "c8bf22c3c8eb634eb84d2018e3f23f92e1a236108fd336a21fcf1751e0399b5e"
+  },
+  "demo-light.mp4": {
+   "bytes": 65466,
+   "sha256": "edf65f3966b68da835891f9ff365e6b0afad44b048dee15594e69c785a11b01b"
   },
   "demo.mp4": {
    "bytes": 71538,

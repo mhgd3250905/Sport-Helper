@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "h-forearm-plank",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "前臂平板支撑",
   "en": "Forearm Plank"
@@ -140,9 +140,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 9985,
+   "sha256": "460bfb957eb692286f1e70fcf47f822aa07f2bc0da7f64fd4ecc9708f0e424c7"
+  },
   "cover.jpg": {
    "bytes": 7182,
    "sha256": "4d9fb1dbfaa8aa1881b38a83d0bd54f5af8f8841683a5200213c30577375bf90"
+  },
+  "demo-light.mp4": {
+   "bytes": 77693,
+   "sha256": "120ccdc271547d137d1f5829f231af155325a6ee3859a35c7a04d43a1ef26e79"
   },
   "demo.mp4": {
    "bytes": 69142,

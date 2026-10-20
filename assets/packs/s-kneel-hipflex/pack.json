@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "s-kneel-hipflex",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "半跪髋屈肌拉伸",
   "en": "Half-Kneeling Hip Flexor Stretch"
@@ -148,9 +148,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 9591,
+   "sha256": "55ebcb0fbb991a4476c07be5a21b01abb33e718c4f512e2c7cbea0b386d535b5"
+  },
   "cover.jpg": {
    "bytes": 7522,
    "sha256": "bc9d4799c67df65ecdff2b7fe76f352fb9903da70c96821dc179711da8d24ff8"
+  },
+  "demo-light.mp4": {
+   "bytes": 63577,
+   "sha256": "fd24bfb6eb4bb40695008a04733c77c5cfa737ec4d16fbfb0fbc2945d77b8e18"
   },
   "demo.mp4": {
    "bytes": 63041,

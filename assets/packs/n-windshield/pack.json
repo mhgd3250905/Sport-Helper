@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "n-windshield",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "仰卧雨刷式",
   "en": "Supine Windshield Wipers"
@@ -137,9 +137,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 13548,
+   "sha256": "6e36125d590a249221917f5334feb3c8bc567e8ad9170a055408b66c07a07a7e"
+  },
   "cover.jpg": {
    "bytes": 11608,
    "sha256": "1ae83583717c7b708a3f4fa6ce1ee1747fc4f2c770024890b9019c245194a504"
+  },
+  "demo-light.mp4": {
+   "bytes": 154982,
+   "sha256": "bc64d0247508568dff6d0f3edf57e8e6bfb20416515ec7a92fc3b2421ec85811"
   },
   "demo.mp4": {
    "bytes": 158100,

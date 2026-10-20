@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "h-adductor-rock",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "四足单腿侧伸后摇",
   "en": "Quadruped Adductor Rock-Back"
@@ -148,9 +148,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 13589,
+   "sha256": "297fb72d49cfbf517ee759b9d3d4f7a4570856694ead6eb63b9cb4cb860c2c81"
+  },
   "cover.jpg": {
    "bytes": 11197,
    "sha256": "57e553f4a1185bc5d2740b299ff4130c178cf7d828cc8c283eb1fac1fe5cc3b6"
+  },
+  "demo-light.mp4": {
+   "bytes": 133629,
+   "sha256": "c3bcaef2427f272d1209f1dcfb3b35fbac84acc36883168c3832a008baff21ce"
   },
   "demo.mp4": {
    "bytes": 143037,

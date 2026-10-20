@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "h-superman",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "俯卧超人式",
   "en": "Prone Superman"
@@ -150,9 +150,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 8466,
+   "sha256": "2b0847e16067b9a45f29417740a8c50ed0865aa0afe778236a982d4d85271365"
+  },
   "cover.jpg": {
    "bytes": 5815,
    "sha256": "82a3fd1953533906b6dddb997939277c2385a825e7c8883749826351c5f5af82"
+  },
+  "demo-light.mp4": {
+   "bytes": 90977,
+   "sha256": "0a6bb0652471072eaa22ce8540af902ee8cef530544cfab2edc1aa1d513c5dc5"
   },
   "demo.mp4": {
    "bytes": 76181,

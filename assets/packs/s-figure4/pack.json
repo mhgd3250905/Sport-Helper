@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "s-figure4",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "仰卧 4 字拉伸",
   "en": "Supine Figure-4 Stretch"
@@ -146,9 +146,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 14181,
+   "sha256": "085760c21bc161aea7cb482b337cea9737c9c668bb726938ab1db943dc27804e"
+  },
   "cover.jpg": {
    "bytes": 11144,
    "sha256": "0fed18b8de33c2a148b92d3b76fff1d24ea7e59ea361c31aa8673afb90d616f9"
+  },
+  "demo-light.mp4": {
+   "bytes": 112742,
+   "sha256": "49d66e076e76b7b44ad440fb25e35638e46fe28777c8c8206f2820ec45563735"
   },
   "demo.mp4": {
    "bytes": 116793,

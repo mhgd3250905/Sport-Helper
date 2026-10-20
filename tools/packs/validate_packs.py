@@ -93,6 +93,16 @@ def check_exercise(r, d, p, all_ids):
     for k in ('cover', 'video'):
         if not m.get(k):
             r.err(pid, f'media.{k} missing')
+    light = m.get('light')
+    if light is not None:
+        if not isinstance(light, dict):
+            r.err(pid, 'media.light must be an object')
+        else:
+            for k in P.LIGHT_FILE_KEYS:
+                if not light.get(k):
+                    r.err(pid, f'media.light.{k} missing')
+            if 'stage' in light and not P.HEX_COLOR_RE.match(str(light['stage'])):
+                r.err(pid, f"media.light.stage {light['stage']!r} is not #RRGGBB")
     if not m.get('loopSeconds'):
         r.err(pid, 'media.loopSeconds missing')
     if p.get('unilateral') and m.get('showsSide') not in ('left', 'right'):

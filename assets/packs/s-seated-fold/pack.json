@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "s-seated-fold",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "坐姿体前屈",
   "en": "Seated Forward Fold"
@@ -148,9 +148,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 8791,
+   "sha256": "8062f9b31940ea1f0467e8f8ad4fcb4440d0a1def395446769edea5b6dd127a5"
+  },
   "cover.jpg": {
    "bytes": 7224,
    "sha256": "42225eda6ab29f34e8446b1db25ac556119ceedbd6eac96bc5bf57c452a02965"
+  },
+  "demo-light.mp4": {
+   "bytes": 83993,
+   "sha256": "a4f3d47f9963c89b1b6cd287da1f7aa01d9ba3929c162e819e7cdb9a5cb9c942"
   },
   "demo.mp4": {
    "bytes": 77304,

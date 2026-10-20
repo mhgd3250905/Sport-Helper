@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "n-seated-ir-drop",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "坐姿后撑单膝内倒",
   "en": "Seated Hip Internal-Rotation Drop"
@@ -139,9 +139,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 10577,
+   "sha256": "45b82e37112d8b26eacb8677b576de1da5f071cc2e30b804a086d02234780da8"
+  },
   "cover.jpg": {
    "bytes": 8173,
    "sha256": "9ca514abeec05830f7c5ec3158c06d6084f2b9f33adaa1569045b12e5cc99563"
+  },
+  "demo-light.mp4": {
+   "bytes": 94370,
+   "sha256": "9d8c217253d571caaa65d2ff55f4c6e69f1e8bcf011531b3d054575950014d6b"
   },
   "demo.mp4": {
    "bytes": 90704,

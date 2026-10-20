@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "h-supine-twist",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "仰卧屈膝扭转",
   "en": "Supine Knee-Drop Twist"
@@ -139,9 +139,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 11257,
+   "sha256": "c3ae8249ed449530ced91e1ca38c694e7cf8cc760eb7217e1a921ce5d144a846"
+  },
   "cover.jpg": {
    "bytes": 8798,
    "sha256": "04d61082e8694bc6b5110d1cbbe716c00be55272e80d920e1b0ae58d30bedb24"
+  },
+  "demo-light.mp4": {
+   "bytes": 120580,
+   "sha256": "59f74cecd42591ba5dbfa894bb5eea3462c608b2c5eaba5f7c8573ddad568b99"
   },
   "demo.mp4": {
    "bytes": 112443,

@@ -39,10 +39,24 @@ class SfPressable extends StatefulWidget {
     this.tooltip,
     this.scale = SfMotion.pressScale,
     this.haptic = SfHaptic.none,
+    this.toggled,
+    this.selected,
+    this.semanticHint,
   });
   final Widget child;
   final VoidCallback? onTap;
   final String? semanticLabel;
+
+  /// Switch-like control: exposes the toggled state (TalkBack "on/off")
+  /// instead of a plain button.
+  final bool? toggled;
+
+  /// Choice-like control: exposes the selected state.
+  final bool? selected;
+
+  /// Extra spoken explanation (e.g. a settings row's subtitle), read after
+  /// the label; the excluded visual text is not announced twice.
+  final String? semanticHint;
   final String? tooltip;
   final double scale;
 
@@ -120,9 +134,12 @@ class _SfPressableState extends State<SfPressable> {
       // Keep surrounding message text out of this button's accessible name.
       // Wrap focus as well, so focus and activation belong to one node.
       container: true,
-      button: true,
+      button: widget.toggled == null,
+      toggled: widget.toggled,
+      selected: widget.selected,
       enabled: enabled,
       label: widget.semanticLabel,
+      hint: widget.semanticHint,
       onTap: enabled ? _tap : null,
       child: child,
     );

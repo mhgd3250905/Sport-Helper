@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "s-butterfly",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "蝴蝶式",
   "en": "Seated Butterfly Stretch"
@@ -135,9 +135,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 11889,
+   "sha256": "c378149ba4451ed9704babece0d885f9209e339714902bb7fb3146ede5a5605a"
+  },
   "cover.jpg": {
    "bytes": 10174,
    "sha256": "9bee1e6d948efb53bcd9e3528c5380aa5fdc0f5b79512a017f72c81cfdd8ac6b"
+  },
+  "demo-light.mp4": {
+   "bytes": 109751,
+   "sha256": "c2813f0a38f7b8af65ff84cb94a8c482cdb7d818b750a13421f9a97cbd73f3e6"
   },
   "demo.mp4": {
    "bytes": 115417,

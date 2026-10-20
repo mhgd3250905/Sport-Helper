@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "t-seated-straddle-lift-1leg",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "坐姿分腿单腿抬起"
  },
@@ -121,9 +121,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 11230,
+   "sha256": "f93912acef71fe963a9b615862bf96c071f4f544afb869cc2f123b92d7cd8259"
+  },
   "cover.jpg": {
    "bytes": 8828,
    "sha256": "d308af262cd3635cf05bf95f33d4f7bfa56d6238dde34a4c97623cdcc52cd261"
+  },
+  "demo-light.mp4": {
+   "bytes": 155818,
+   "sha256": "2e33ed66ee60156c1932236d4957b9bf2ac9993ba31b039ce1ff048bfe93b069"
   },
   "demo.mp4": {
    "bytes": 157863,

@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "o-stand-quad",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "扶椅站姿股四头肌拉伸",
   "en": "Chair-Supported Standing Quad Stretch"
@@ -149,9 +149,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 8873,
+   "sha256": "3a3c70eb75128a8ec3018fcf3b0aa0066940355cb220f4d91c3a5be66f09c51d"
+  },
   "cover.jpg": {
    "bytes": 5684,
    "sha256": "30d5c56b8774bf1863c655a87218f6947a788bd114c38f907e9fc091618fba5b"
+  },
+  "demo-light.mp4": {
+   "bytes": 56229,
+   "sha256": "ba2f0b2b0302f7fc5310e12298b04af41ccf3ee6638069db2fe540f545b80cd0"
   },
   "demo.mp4": {
    "bytes": 43826,

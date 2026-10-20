@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "o-seated-fig4",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "坐姿四字前压",
   "en": "Seated Figure-4 Stretch"
@@ -149,9 +149,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 13011,
+   "sha256": "40c3069c1d2a0d9064df3e856d369fb8e103eead712388610b54cea7fdb24a17"
+  },
   "cover.jpg": {
    "bytes": 9473,
    "sha256": "dfb45603b6d85826b613eb3f7000cbb42c6df8b7ae0cd7db738a939f57e06060"
+  },
+  "demo-light.mp4": {
+   "bytes": 90280,
+   "sha256": "9c1cb8c466d25eff2293a48bf38299c3b598ee1b26ab05426c9529116abb9bd0"
   },
   "demo.mp4": {
    "bytes": 90555,

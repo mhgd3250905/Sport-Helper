@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "h-reverse-clam",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "侧卧反向蚌式",
   "en": "Side-Lying Reverse Clamshell"
@@ -161,9 +161,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 12855,
+   "sha256": "b8b58a11f9ed4c81903b89e9baba5c1109fa29fad95d391041bc849fccebabaf"
+  },
   "cover.jpg": {
    "bytes": 10288,
    "sha256": "9d834650feb586b56adf6c1e619eb499df58019da587ca6a4473088b858fa161"
+  },
+  "demo-light.mp4": {
+   "bytes": 112499,
+   "sha256": "b8e589fd3a391839602db95bc9269718fbadd24fbe4b8fe46ca543c7624cc06c"
   },
   "demo.mp4": {
    "bytes": 111722,

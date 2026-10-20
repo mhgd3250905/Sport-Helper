@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "h-good-morning",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "徒手早安式",
   "en": "Bodyweight Good Morning"
@@ -138,9 +138,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 7539,
+   "sha256": "b187e13931e2d0522286e24089f61b1b4969639db0cbfa0e8205fdb94414453e"
+  },
   "cover.jpg": {
    "bytes": 6129,
    "sha256": "29d1485769bc6a916f321ecb13dd4ffdf128fb7e0419d72e253276d424db36ed"
+  },
+  "demo-light.mp4": {
+   "bytes": 114956,
+   "sha256": "4138ff318a49fd99c6aac685683b12684bbea4b562416e097ac863a3090c865d"
   },
   "demo.mp4": {
    "bytes": 107469,

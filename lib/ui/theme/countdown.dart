@@ -85,16 +85,9 @@ class SfCountdownRing extends StatelessWidget {
         ),
       ),
     );
-    if (urgent && !still) {
-      face = TweenAnimationBuilder<double>(
-        // A fresh breath every second: the tween restarts with the value.
-        key: ValueKey('breath-$value'),
-        tween: Tween(begin: 0, end: 1),
-        duration: SfMotion.breath,
-        builder: (_, t, child) => Transform.scale(scale: 1 + .06 * _breath(t), child: child),
-        child: face,
-      );
-    }
+    // Always the same wrapper, so the number below keeps its identity (and
+    // its 260 ms roll) when the last seconds start and on every beat.
+    face = _SfBreath(active: urgent && !still, beat: value, child: face);
     return AnimatedOpacity(
       opacity: dim ? .45 : 1,
       duration: SfMotion.medium,
@@ -103,10 +96,56 @@ class SfCountdownRing extends StatelessWidget {
     );
   }
 
+}
+
+/// One breath (scale up 6 %, settle) each time [beat] changes while
+/// [active]; restarts its own controller instead of remounting [child].
+class _SfBreath extends StatefulWidget {
+  const _SfBreath({required this.active, required this.beat, required this.child});
+  final bool active;
+  final Object beat;
+  final Widget child;
+
+  @override
+  State<_SfBreath> createState() => _SfBreathState();
+}
+
+class _SfBreathState extends State<_SfBreath> with SingleTickerProviderStateMixin {
+  late final _c = AnimationController(vsync: this, duration: SfMotion.breath);
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.active) _c.forward();
+  }
+
+  @override
+  void didUpdateWidget(_SfBreath old) {
+    super.didUpdateWidget(old);
+    if (!widget.active) {
+      _c.value = 0;
+    } else if (!old.active || old.beat != widget.beat) {
+      _c.forward(from: 0);
+    }
+  }
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
   /// 0 → 1 over the first 40 % (ease out), back to 0 over the rest.
   static double _breath(double t) => t < .4
       ? Curves.easeOut.transform(t / .4)
       : 1 - Curves.easeInOut.transform((t - .4) / .6);
+
+  @override
+  Widget build(BuildContext context) => AnimatedBuilder(
+    animation: _c,
+    builder: (_, child) => Transform.scale(scale: 1 + .06 * _breath(_c.value), child: child),
+    child: widget.child,
+  );
 }
 
 class SfRingPainter extends CustomPainter {

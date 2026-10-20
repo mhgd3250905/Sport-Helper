@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "h-banana",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "仰卧香蕉式侧伸",
   "en": "Supine Banana Stretch"
@@ -137,9 +137,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 8580,
+   "sha256": "5fcb4773730ce8e8a494e75923b80366cb0e4c90d82e23b093e50fa8d74b9d8f"
+  },
   "cover.jpg": {
    "bytes": 6561,
    "sha256": "b0d34810a7bb09f2a692b8247e77afa8bf414ec94d761724bf0b1a3155ba8e23"
+  },
+  "demo-light.mp4": {
+   "bytes": 106298,
+   "sha256": "13fec8214c126b73d8bd18e3b05426560902cbb08fb008f63c85b4e01477640a"
   },
   "demo.mp4": {
    "bytes": 94515,

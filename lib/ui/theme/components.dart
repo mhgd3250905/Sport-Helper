@@ -102,6 +102,7 @@ class SfChoiceChip extends StatelessWidget {
         : SfColors.surface;
     return SfPressable(
       semanticLabel: label,
+      selected: selected,
       onTap: onTap,
       haptic: SfHaptic.selection,
       child: AnimatedContainer(
@@ -150,6 +151,8 @@ class SfSwitchRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) => SfPressable(
     semanticLabel: title,
+    semanticHint: subtitle,
+    toggled: value,
     onTap: () => onChanged(!value),
     haptic: SfHaptic.selection,
     scale: 1,

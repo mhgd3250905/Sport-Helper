@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "o-seated-twist",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "坐姿扶椅扭转",
   "en": "Seated Chair Twist"
@@ -139,9 +139,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 9957,
+   "sha256": "0f57e8476c056ce677d0238fe52ab3faebb9365b53a37312a66b6a2a629360cf"
+  },
   "cover.jpg": {
    "bytes": 6671,
    "sha256": "dc104ed1d919825836dd1370b3db515d0b8b808030291a540addcaee1c02fc8a"
+  },
+  "demo-light.mp4": {
+   "bytes": 80658,
+   "sha256": "1516da234865a47a6bfbb6019387d1045ed682f332fd2c56e25c11657a59df12"
   },
   "demo.mp4": {
    "bytes": 71588,

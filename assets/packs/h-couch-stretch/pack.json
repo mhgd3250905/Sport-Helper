@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "h-couch-stretch",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "沙发拉伸（后脚搭矮凳）",
   "en": "Couch Stretch (Rear Foot on a Stool)"
@@ -151,9 +151,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 12924,
+   "sha256": "6b1365511cb7e90e08a0925727866c4deaec3e06f45b2cdfffb6eae2eb7dedb6"
+  },
   "cover.jpg": {
    "bytes": 9862,
    "sha256": "a15331828db714debceb5812abafe1af85dc1ad6744806b99bc10d828319a1e2"
+  },
+  "demo-light.mp4": {
+   "bytes": 102738,
+   "sha256": "cfe2740200b8415984d5cc8c8d052d68474888ced0157d7fc41ebb64bbeadf5a"
   },
   "demo.mp4": {
    "bytes": 100660,

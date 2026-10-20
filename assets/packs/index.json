@@ -17,1021 +17,1021 @@
   {
    "id": "glute-max-A",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "单腿臀桥",
     "en": "Single-Leg Glute Bridge"
    },
-   "bytes": 226855,
-   "sha256": "3e041ab882d64563cd931b7e7edf181534480434e5c172fd2af63f627b128ffc"
+   "bytes": 328117,
+   "sha256": "f0438bfbd86a632867574a4fe4b214ebbff4b9c7fea42eb83a7d381dc06a5f4c"
   },
   {
    "id": "h-9090-liftoff",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "90/90 后腿主动抬起"
    },
-   "bytes": 304491,
-   "sha256": "864e1ba65becfdd5ecaa95ce9a3c742536f1feac062a2f35d4c908eb50ab797b"
+   "bytes": 408293,
+   "sha256": "c83bd3dea169a962b44fa748c8669c51a1d58c3a8a215ccee507becc01d1b637"
   },
   {
    "id": "h-adductor-rock",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "四足单腿侧伸后摇",
     "en": "Quadruped Adductor Rock-Back"
    },
-   "bytes": 353829,
-   "sha256": "f0f9b9d73abffcdb71cbdeefa62f07e040364e18b1a8bf4b19e7faca8c6863b7"
+   "bytes": 501047,
+   "sha256": "a262d76dea1a4fa8979f4395a9bdab1c9831c91ddd677645eaffd39cc3a6f46d"
   },
   {
    "id": "h-banana",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "仰卧香蕉式侧伸",
     "en": "Supine Banana Stretch"
    },
-   "bytes": 260820,
-   "sha256": "8665455ef1b829f8dd03b62baeaf93f97f8656dea928403dc108ca17ae1b2dcc"
+   "bytes": 375698,
+   "sha256": "dea59c25fc46f012fa551d5f6c8d5838bdfc14d449c1a74e5878d927ea2c57c7"
   },
   {
    "id": "h-band-hip-ir",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "坐椅弹力带髋内旋",
     "en": "Seated Banded Hip Internal Rotation"
    },
-   "bytes": 249638,
-   "sha256": "91f54e7fa3e92fa94788361f618bb7022ad74bff53f5e76223e2ed6e54e21568"
+   "bytes": 350074,
+   "sha256": "e190802c53f2b84ebe27c7411e9218cd3d6b18146ab1017b869c9258892fde99"
   },
   {
    "id": "h-band-leg-out",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "仰卧弹力带单腿侧落",
     "en": "Supine Banded Leg Lower-Out"
    },
-   "bytes": 361549,
-   "sha256": "811622cfa3e5c9d89c64b0418b5ab183f557186778fd6e549b41ac03461b9666"
+   "bytes": 543711,
+   "sha256": "e391eec8cee253bf8b611cc3decda792976c3cc4ab5ea4ce2621bab183218675"
   },
   {
    "id": "h-band-pallof",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "弹力带抗旋转推",
     "en": "Banded Pallof Press"
    },
-   "bytes": 226546,
-   "sha256": "4ae8f64d4ddfaac49fdd5b23bc6b748813ecb2925829a11fa9cb0dcb0438dd55"
+   "bytes": 328375,
+   "sha256": "73e116318b83330a327112a40675e5bd400c72839e285aeae604522c8dfa29db"
   },
   {
    "id": "h-band-pull-apart",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "弹力带水平拉开",
     "en": "Band Pull-Apart"
    },
-   "bytes": 294783,
-   "sha256": "a076adbcbfb7ac178d385f44b1f1fffe60baf0c27e655c059aa103a28c941793"
+   "bytes": 428220,
+   "sha256": "f5a3b97748b557ca8a283cb35eb596c62b860992e26223ddb53219366ebd161a"
   },
   {
    "id": "h-band-row",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "弹力带坐姿划船",
     "en": "Seated Band Row"
    },
-   "bytes": 267817,
-   "sha256": "6b0d375256dfeaf4e036d9c3899e86aed1b380dfe25060857cbdacc819fbe49c"
+   "bytes": 416360,
+   "sha256": "f9aa92901222906d92c995506aebda0085b40f048f314aae9cb1aebc19ee5bae"
   },
   {
    "id": "h-bridge-march",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "臀桥交替踏步",
     "en": "Glute Bridge March"
    },
-   "bytes": 275376,
-   "sha256": "7badf43d6f7cd76414a8c626540d3105bb33867ddd27fb3c24f9201111fa3b6a"
+   "bytes": 408982,
+   "sha256": "cb406e8d06e0028536882e3cc3eeeeedbb9f7b43e3eb7d1cb97a8844de34ad33"
   },
   {
    "id": "h-bulgarian",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "椅子保加利亚分腿蹲",
     "en": "Bulgarian Split Squat"
    },
-   "bytes": 317596,
-   "sha256": "50ece9210441e2653df6bc1734ded566c89d1854d97adc333fef9ce5bce92b6b"
+   "bytes": 453792,
+   "sha256": "6768e88bd6d5584a1b1ba99f3f08e0b9c0a5277822f431534c613f05d6a4a2fa"
   },
   {
    "id": "h-butterfly-active",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "仰卧蝴蝶主动开合",
     "en": "Supine Butterfly Active Open-Close"
    },
-   "bytes": 333906,
-   "sha256": "2c423ad3848a07f06b05e5d3d3433219b1bdd2acd5be98ffb04a2f1a5f09b674"
+   "bytes": 519939,
+   "sha256": "31f1d8eaf3a047dbf77d0ea0be0746a200aabc1dd93ec929634e123aae296a25"
   },
   {
    "id": "h-calf-raise",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "扶墙提踵",
     "en": "Wall-Supported Calf Raise"
    },
-   "bytes": 214992,
-   "sha256": "beeb0464594805e3047ce4536de8c078eafb5a4a6e7b4e623aaf30049759e051"
+   "bytes": 329338,
+   "sha256": "37854695c10dba090f3ba230525e2d23513b589cb74b97afaa53061eed822471"
   },
   {
    "id": "h-catcow-quad",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "四足猫牛式",
     "en": "Quadruped Cat-Cow"
    },
-   "bytes": 232871,
-   "sha256": "14e3df50dcb54c7b2b1e6747a573b91de70471a8b3190fea3615a38fb6fbfc72"
+   "bytes": 355342,
+   "sha256": "f6684b2e1b13ab688623012e39536d78df918501c4bc8920ca420f5585f46631"
   },
   {
    "id": "h-chair-dip",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "椅子臂屈伸",
     "en": "Chair Dip"
    },
-   "bytes": 302127,
-   "sha256": "cd9dfff9af5a9c78a8633b46dbf5cbc89289593f57dd68e864985ce9eadac594"
+   "bytes": 486001,
+   "sha256": "028df4cb8854b9d6c10024e03d8bd942cc845247ffd78a4a224aeb05bd99f5bf"
   },
   {
    "id": "h-chair-kickback",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "扶椅站姿后踢腿",
     "en": "Chair-Supported Standing Kickback"
    },
-   "bytes": 285379,
-   "sha256": "a808ba3f6eea04395166800e9ca8aaaf5f7251ab9a6ee76de53a14a4c9eb44ab"
+   "bytes": 397122,
+   "sha256": "395c111d43c6121ea42ea9f2a3a821571bfe525b56c526c3021abf0a1757eb0b"
   },
   {
    "id": "h-chair-lat",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "扶椅背阔肌拉伸",
     "en": "Chair-Supported Lat Stretch"
    },
-   "bytes": 279281,
-   "sha256": "5057535ae9d4e3950ca8f8bb18a87617a577ee8c4a8516a961dda57f38cf5a42"
+   "bytes": 425464,
+   "sha256": "db26150b20d8f93ee4ad3ee6abd25af75cb6d7abfefc6b21962556e0e2b232ee"
   },
   {
    "id": "h-chair-step-up",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "椅子上步",
     "en": "Chair Step-Up"
    },
-   "bytes": 232792,
-   "sha256": "f890a9f6f78ce591dab8291590d42d5d6b26dde66908345d7de3c9ec522f0ab5"
+   "bytes": 359922,
+   "sha256": "3fa8f7a12defcc13becb3037905cba8cc7dfc278b6f8112aed3a42f80dcde082"
   },
   {
    "id": "h-chair-tspine",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "跪姿椅面胸椎伸展",
     "en": "Kneeling Chair Thoracic Extension"
    },
-   "bytes": 239254,
-   "sha256": "1695676e0db35bcc00d3eb85475ff613ee70a8a87db972a7d9663dc926f4120a"
+   "bytes": 358754,
+   "sha256": "d1c47db4390bdedf61152900c0d557215f109df3fd2aa5d1cc281553a8d7a4c2"
   },
   {
    "id": "h-cobra",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "眼镜蛇式",
     "en": "Cobra Stretch"
    },
-   "bytes": 289362,
-   "sha256": "f28cb22bd8d594ddd4c78cfbf768a08e3a3b3d32b5ab9d73dd995f4c4e8f8fca"
+   "bytes": 431405,
+   "sha256": "72b76fee5e401cfa9442b4f6c09b0ff9959ca4452348159d421846efd475d0d4"
   },
   {
    "id": "h-couch-stretch",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "沙发拉伸（后脚搭矮凳）",
     "en": "Couch Stretch (Rear Foot on a Stool)"
    },
-   "bytes": 314237,
-   "sha256": "701e9e493830c0b4f1259e3adc1974aa14df7d1019c696e5718e6f0a6dd65e1b"
+   "bytes": 429899,
+   "sha256": "807248967ba4e2d4e30fb7d20a648cd185b66a6069453acce1448bb0196ea20c"
   },
   {
    "id": "h-crunch",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "卷腹",
     "en": "Crunch"
    },
-   "bytes": 270261,
-   "sha256": "3e0ab80c94376896f065bf3fcc416ab89068c8103a87448a0ad0f95528b2ae9d"
+   "bytes": 412624,
+   "sha256": "dbf0a3611fec5b0b1adaffcebc158c40cd2a4defe652a8a8477621d207d975f4"
   },
   {
    "id": "h-db-curl",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "哑铃交替弯举",
     "en": "Alternating Dumbbell Curl"
    },
-   "bytes": 213034,
-   "sha256": "be112739d7aa70bb2e7c17f643ae65d86bd19b0c720d6737061dde5affad9d15"
+   "bytes": 305926,
+   "sha256": "e1a2a2e8f04de072c0c88111e16778204726eba2ca55bc78d03421b2186bbc2d"
   },
   {
    "id": "h-db-floor-press",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "哑铃地板卧推",
     "en": "Dumbbell Floor Press"
    },
-   "bytes": 309968,
-   "sha256": "1a9b93c832a1e2c0c75469a7e13a07a02551ec0cdb6358cbfbd3c7beb1e7489e"
+   "bytes": 464596,
+   "sha256": "459a70f5eeaa980319a33675aef333253b04b4422de0703bd625f243d31e0758"
   },
   {
    "id": "h-db-lateral",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "哑铃侧平举",
     "en": "Dumbbell Lateral Raise"
    },
-   "bytes": 239938,
-   "sha256": "3583aa8abfaf8eb806d67da08b17db024ed6226db8063a6ad36c639eeec1bcc9"
+   "bytes": 360828,
+   "sha256": "b4a7c00e5f3b1e24559bd649eff78407a3f1d207b5dd740434fdee2c1277b4e3"
   },
   {
    "id": "h-db-press",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "站姿哑铃推举",
     "en": "Standing Dumbbell Shoulder Press"
    },
-   "bytes": 223232,
-   "sha256": "d6a72acc9b8a3609e012bddb8fb93da75f5979e65929c4a297d8eae6cba34b8d"
+   "bytes": 320134,
+   "sha256": "66fcf8bcf1a4d2eacc10fda55ad8f09f5afd1b2228909e079ca80cf28a342681"
   },
   {
    "id": "h-db-rdl",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "哑铃罗马尼亚硬拉",
     "en": "Dumbbell Romanian Deadlift"
    },
-   "bytes": 256022,
-   "sha256": "0bdf7306570a4b9979db2c704756df3ff6ae4a09206f12709f37fd5628c15580"
+   "bytes": 378925,
+   "sha256": "6adc1b65f2a29d958766038fd2e9f633a608eb47d387b4d1d27228229d042e73"
   },
   {
    "id": "h-db-reverse-fly",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "哑铃俯身飞鸟",
     "en": "Bent-Over Dumbbell Reverse Fly"
    },
-   "bytes": 274804,
-   "sha256": "c32e34eabcddbc5881b294c3de4a8a8c748a030a8229fb31324840595ad64105"
+   "bytes": 422411,
+   "sha256": "6554393f4fa511e5c44fbd6e9bff652131c370faf77b897503f4d810c9b50f34"
   },
   {
    "id": "h-db-row",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "扶椅单臂哑铃划船",
     "en": "Chair-Supported One-Arm Dumbbell Row"
    },
-   "bytes": 375520,
-   "sha256": "5cedd251b4af3808e3e9640399711150d38136bbea7f3ef7439aca4b80f4f0f9"
+   "bytes": 582566,
+   "sha256": "c591b4327cd7bba1ae589d1cf3386ef3f6d06d85e33283eefd793c4c87c67b60"
   },
   {
    "id": "h-dd-shoulder",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "下犬式压肩",
     "en": "Downward Dog Shoulder Press"
    },
-   "bytes": 238014,
-   "sha256": "9dc3316c83c89eea1329f0c6e4c52cca6b229593202f9ac7293c9678e78710e3"
+   "bytes": 355095,
+   "sha256": "29e59cfad4198f222866074c344855109056682ffb4be7ab482fe0ae8000af23"
   },
   {
    "id": "h-forearm-plank",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "前臂平板支撑",
     "en": "Forearm Plank"
    },
-   "bytes": 235630,
-   "sha256": "99fd647355f06a02fdd42f241f6a47182feac07fab180a8e98db777974462d06"
+   "bytes": 323308,
+   "sha256": "3dd03c5200c5e4dd3c831138bad8f23889223287c99c46d35727950173a69a05"
   },
   {
    "id": "h-good-morning",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "徒手早安式",
     "en": "Bodyweight Good Morning"
    },
-   "bytes": 280639,
-   "sha256": "441088c79b9f0ee841ce3e8b527e113e31a622dbf8c7e6f4dadd3beff49ebdb1"
+   "bytes": 403134,
+   "sha256": "d3aedc23ee21128907fa8db4daf447e32b34aa334ff3cdc9f5dbbe2c25dcec06"
   },
   {
    "id": "h-hip-gate",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "扶椅站姿开髋门",
     "en": "Chair-Supported Hip Gate Opener"
    },
-   "bytes": 306683,
-   "sha256": "e83305825c4e5513ae72c89cd8fdeb6d010de427280429112a9482b8b050b9c8"
+   "bytes": 432539,
+   "sha256": "9a264f963aa7d1716678ba3484d5b7eadbcb179e2dd643b15d605336e93dbe01"
   },
   {
    "id": "h-incline-pushup",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "扶凳上斜俯卧撑",
     "en": "Incline Push-Up (Stool)"
    },
-   "bytes": 295739,
-   "sha256": "b495b58a4bc464fdc30d56e8cf0038eae61cedc15db4b7597943cea578078ffc"
+   "bytes": 460873,
+   "sha256": "5f2ddc900208a9ce1f6d55774ba41a62e298b1d47cee1f80639874d5f256eacc"
   },
   {
    "id": "h-knee-hug",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "仰卧抱膝",
     "en": "Supine Knees-to-Chest"
    },
-   "bytes": 239937,
-   "sha256": "053e513803039f4760ceb1fa596497bbe63fbd7c897242610f3352a47fbddb03"
+   "bytes": 359536,
+   "sha256": "ca7ea087323c9ea5954adba960c6c38398cbe9902156fda8ea7943704d4c7696"
   },
   {
    "id": "h-quad-cars",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "四足髋关节画圈",
     "en": "Quadruped Hip CARs"
    },
-   "bytes": 352950,
-   "sha256": "8ad45ba70fb762e7519f6decc1e2af4bd9dc429602361b1a83e0659f36180443"
+   "bytes": 492915,
+   "sha256": "50d89d6c01c417e31f977370be7ea53934a2363745400feff0df9708b49329f3"
   },
   {
    "id": "h-reverse-clam",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "侧卧反向蚌式",
     "en": "Side-Lying Reverse Clamshell"
    },
-   "bytes": 310069,
-   "sha256": "f8c78c0c216a656e9619000d738de73e940f33c9197274d8c2d6edfd2298cad1"
+   "bytes": 435423,
+   "sha256": "17ba9025df47438baa6522c91e9aa2222cd3f908df766733b69236c836dda1cb"
   },
   {
    "id": "h-reverse-crunch",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "反向卷腹",
     "en": "Reverse Crunch"
    },
-   "bytes": 266002,
-   "sha256": "6eefd7a3b15c7bc4bf7ec32e149714cb5438e86380702d35c69b03ab8ed65a50"
+   "bytes": 407044,
+   "sha256": "bebf72d91959f6abd75861f964e782f215ef5702a4c88e0207a76efedb0aefb6"
   },
   {
    "id": "h-russian-twist",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "俄罗斯转体",
     "en": "Russian Twist (Feet Down)"
    },
-   "bytes": 328829,
-   "sha256": "39948da49020f11c2564484d373e582227dfd18a2df402c086ceed5399c26e07"
+   "bytes": 516237,
+   "sha256": "69002cc93ddbd161ee6b34ec24711d7f6b33188101a685eb7f5e51d45824cedc"
   },
   {
    "id": "h-seated-reachback",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "坐姿后撑滑臀",
     "en": "Seated Reach-Back Shoulder Stretch"
    },
-   "bytes": 256239,
-   "sha256": "7cc7c2194e8f7c9624fcfb3b961ac51cb54a25173ce4e5642199d7bda5aa4539"
+   "bytes": 387308,
+   "sha256": "eb4e79c43c6b7642706b424b425baecbabc9ea032e1e902982c75ca7301359af"
   },
   {
    "id": "h-side-er",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "侧卧肩外旋",
     "en": "Side-Lying External Rotation"
    },
-   "bytes": 277627,
-   "sha256": "a0f0fc6287e09a64382e0d40cff5758037600b8b776fa4198d3b3eaee90236b6"
+   "bytes": 399430,
+   "sha256": "8032c76b28e383dc60c3e83dfa327a9374c903333cf437ef768555330977abf5"
   },
   {
    "id": "h-side-leg-raise",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "站姿侧抬腿",
     "en": "Standing Side Leg Raise"
    },
-   "bytes": 258736,
-   "sha256": "9c6c80ac79b0b2cc8984d9a7529f44fadaa9c14cd6fb37e26e4751cda148bddb"
+   "bytes": 332831,
+   "sha256": "5da026a1a741e51d945d001d8e66363787120702f571a23be7549609aeb273a3"
   },
   {
    "id": "h-squat",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "徒手深蹲",
     "en": "Bodyweight Squat"
    },
-   "bytes": 291484,
-   "sha256": "fbb94875973213996a030bcf2bb57ea2a241a052b3888c5fb15943141d274fe7"
+   "bytes": 455192,
+   "sha256": "266af9723a9ac66f80bee6860da77c48904aec93c3dbfa804575672de5ccc1cd"
   },
   {
    "id": "h-step-jack",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "低冲击开合跳",
     "en": "Low-Impact Step Jack"
    },
-   "bytes": 264796,
-   "sha256": "e038910994cbbddf1c7bb3694408d6d961987bc270f784d5491ade21698528a4"
+   "bytes": 403848,
+   "sha256": "70fdbf7fd6873598a57090e6508d737ba8dd5a788757707d8f6ad12586c5b4d9"
   },
   {
    "id": "h-sumo-pry",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "相扑深蹲肘推膝停留",
     "en": "Sumo Squat Hold with Elbow Pry"
    },
-   "bytes": 323085,
-   "sha256": "ec2a5969007913c4c22dfa74e0bb91f95eced09670db67621038f440a46f1762"
+   "bytes": 467318,
+   "sha256": "7c8fde45daff8a376062f48dc485660347e7c9655c00a1f4eadc0ceca92cd1d0"
   },
   {
    "id": "h-superman",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "俯卧超人式",
     "en": "Prone Superman"
    },
-   "bytes": 240357,
-   "sha256": "eb0f6c089564751a1c31eeb67dc1b9eaeddd3cc56b32ee27de5d5b5f1c456472"
+   "bytes": 339800,
+   "sha256": "7e581579d9938e8c3fea0c36a05991e4c4dc8566cf78705696c783ad8264629b"
   },
   {
    "id": "h-supine-twist",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "仰卧屈膝扭转",
     "en": "Supine Knee-Drop Twist"
    },
-   "bytes": 257452,
-   "sha256": "a2ccdb1f82e5a2cd4c7a3d9bca44336c4b40e95da64383bcdaec6c628f3babe3"
+   "bytes": 389289,
+   "sha256": "e065acc5b47f2c4c20d439044e23092dae7a679e898d90f0d2b522fba0b8e3bf"
   },
   {
    "id": "h-tabletop",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "桌面式后撑抬髋",
     "en": "Reverse Tabletop Bridge"
    },
-   "bytes": 299718,
-   "sha256": "05b0176bae7cdec6b2687cf1c542bdaff6785c384fdf7eaf92932281d722d76e"
+   "bytes": 458852,
+   "sha256": "3282481cf83aba208d205aac12390b2eef058e52db4418f8152151c77f0f6505"
   },
   {
    "id": "h-tib-raise",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "靠墙勾脚尖",
     "en": "Wall Tibialis Raise"
    },
-   "bytes": 208036,
-   "sha256": "f8ebf8a8ab1449c42f32db6bc4bc75ff4e62247341bdf81f6a7682b314dcd764"
+   "bytes": 314996,
+   "sha256": "491a6f46911fc14f44fb10e520d25dd87ce2c3c9bbdcb44a7560e76cb4eccb85"
   },
   {
    "id": "h-wall-angel",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "靠墙天使",
     "en": "Wall Angel"
    },
-   "bytes": 256863,
-   "sha256": "8582e4e17ebd409c802a49cfb287de289a6817ea0ce2725d93f8cce761bcc5fb"
+   "bytes": 366617,
+   "sha256": "d45f9334137c910dd51c0086aac2990ba918970e65deeb4a85839876db30529c"
   },
   {
    "id": "h-wall-calf",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "靠墙小腿拉伸",
     "en": "Wall Calf Stretch"
    },
-   "bytes": 284490,
-   "sha256": "8ff78bddfead0ea6738be324805b8a7956ee7751e05e5f8a2fbc017feef74ab3"
+   "bytes": 416645,
+   "sha256": "ec260b58dd8859e404e3b71dab54de1bedc0a49eb0c9812b17efc41afa6f20bd"
   },
   {
    "id": "h-wall-straddle",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "靠墙仰卧 V 字分腿",
     "en": "Legs-Up-the-Wall Straddle"
    },
-   "bytes": 339231,
-   "sha256": "a5357209a94f0e9f9acbb0f6e4c881da478c49cbaccb18327b73f77342a62ef1"
+   "bytes": 524214,
+   "sha256": "1567e6bf35ccd14f14b00c882152f2515737a5bc8e890c6735d62745ad752d1b"
   },
   {
    "id": "hip-flexors-A",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "坐姿直腿抬腿（压缩）",
     "en": "Seated Pike Leg Lifts"
    },
-   "bytes": 255770,
-   "sha256": "2157d6828a57eb351ec34396c1fd727081ebb44b1dc4f205b4fae87dc3700521"
+   "bytes": 353365,
+   "sha256": "c81b45d5e5b7aa1429f7fcf89d99f30499669f8fd1e8e736ac8870b54c5eab98"
   },
   {
    "id": "n-chair-wiper",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "坐椅雨刷（膝内倒）",
     "en": "Seated Knee Drop-In"
    },
-   "bytes": 239695,
-   "sha256": "6512a62224eecb2b5b0ade2318a360ad639dbc0dbb13802c2059a021b181bb39"
+   "bytes": 330773,
+   "sha256": "a1d8da8fa7ea8fea86379a88c9a2389b1c623d74252fd53dbb21f8f53a2418e4"
   },
   {
    "id": "n-half-split",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "半跪半劈叉",
     "en": "Half-Kneeling Half Split (Blocks)"
    },
-   "bytes": 327638,
-   "sha256": "b70b0d7df525b8e341d6313ab55ac298a4693c8d5e33edb6581796a337645c6a"
+   "bytes": 454690,
+   "sha256": "0ef517d5a20b5dc76390f9d1904d84ed98a57838c5d5bbcd19ec5d35ad7a38af"
   },
   {
    "id": "n-leg-circles",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "仰卧直腿画圈",
     "en": "Supine Straight-Leg Circles"
    },
-   "bytes": 384393,
-   "sha256": "559d8309389d14ba4f4c7d336c2d8264264dcd42ee03cc45c3872a91a2051301"
+   "bytes": 590940,
+   "sha256": "200e16d981bf051fb8c692f344c16c5044a95aa29fd05cecbf551b389c4abe71"
   },
   {
    "id": "n-pelvis-circle",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "站姿骨盆画圈",
     "en": "Standing Pelvis Circles"
    },
-   "bytes": 232111,
-   "sha256": "46479abfa2bbfc31c6ddc65369d0a7e0a8d0fa783e3b96d6a9b4cc1e54b96d22"
+   "bytes": 334846,
+   "sha256": "16b7d27c2a0653563a4f4bc843fbabd1c5df3113f21801a5e51844175116be00"
   },
   {
    "id": "n-prone-hip-ext",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "俯卧屈膝抬腿",
     "en": "Prone Bent-Knee Hip Extension"
    },
-   "bytes": 285461,
-   "sha256": "dcaa44eb51356b44723b0babca5474d1cea709045d3f5c9e8b19c5c380beb935"
+   "bytes": 378458,
+   "sha256": "5148dcee89ebb92d8f7a79cbcdb7b41d1fe03e21a04d1dfe35ecf625fa98a3c2"
   },
   {
    "id": "n-prone-ir",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "俯卧小腿外摆",
     "en": "Prone Hip Internal Rotation"
    },
-   "bytes": 297996,
-   "sha256": "50d92464308b17c6baf0849c512b126fcc43e2a0fd7673c2c464f054e9d4ab43"
+   "bytes": 467831,
+   "sha256": "ab1bd355a0aefaf58a96e5178471117cbde816139f4d57914d20ff7e59b81332"
   },
   {
    "id": "n-seated-ir-drop",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "坐姿后撑单膝内倒",
     "en": "Seated Hip Internal-Rotation Drop"
    },
-   "bytes": 246783,
-   "sha256": "9c821f1ba6bafce0fb7cc69276a4afdc7909148f587f9d9222ed5304075db8f0"
+   "bytes": 351730,
+   "sha256": "2a0519f686e73c056bd8791d3ccb1fc1b2409456cc36931cd49ffb20e10837be"
   },
   {
    "id": "n-seated-knee-lift",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "坐姿抬膝悬停",
     "en": "Seated Knee Lift Hover"
    },
-   "bytes": 216884,
-   "sha256": "4e4f0e2ebe90264a21c37954e19b6566b6aa165798cbf68628fcf168e58b3c47"
+   "bytes": 317101,
+   "sha256": "1fcb1885731338bad2d08ff9b3914f12ce0a9e156ee1b4220b7c812c65a7ef81"
   },
   {
    "id": "n-seated-squeeze",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "坐姿夹砖（膝内夹）",
     "en": "Seated Block Knee Squeeze"
    },
-   "bytes": 230969,
-   "sha256": "5dfef4bb5b61eea9d7d0e1b3aba3b8967ecbb91f64b00951c231413ddb531aa3"
+   "bytes": 310287,
+   "sha256": "a16be459a5264bfd1ae078379e5a4d4d21ff9d54bd034dd8f98591ef4f7fd86a"
   },
   {
    "id": "n-slider-lateral",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "滑垫侧向滑"
    },
-   "bytes": 284961,
-   "sha256": "4337defb62507daa7743d99b0076ec9e472c3eb0668ed5d9fe19e90f042fa68a"
+   "bytes": 421933,
+   "sha256": "2263b86d1594389452245b13a5d90e80b722bb47e8ad404df40c9c6b7032af55"
   },
   {
    "id": "n-squat-shift",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "低位蹲姿左右移重心",
     "en": "Low Squat Side-to-Side Shift"
    },
-   "bytes": 270807,
-   "sha256": "42d37f835fc6d04e1b443653efb3f9354b15ae0188d4b80cf3382986b51790ac"
+   "bytes": 397553,
+   "sha256": "1e969b8384ef06d1e9e408c9b1c44d7042a061712ae537e665af7bb8855518a6"
   },
   {
    "id": "n-straddle-fold",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "坐姿分腿体前屈",
     "en": "Seated Straddle Forward Fold"
    },
-   "bytes": 319797,
-   "sha256": "5f6af3e24d14f5f4087fffd4fca50816348f80500e45f594e005c3e5aa54ce99"
+   "bytes": 489914,
+   "sha256": "87a051e96821bc74fb11e84214c6e63b6be84ba5a7810dc8052b3066c2487b66"
   },
   {
    "id": "n-thomas-test",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "仰卧单膝抱胸",
     "en": "Supine Single Knee-to-Chest (Thomas Test)"
    },
-   "bytes": 258408,
-   "sha256": "f8c15ca903ef2d8dd54949abecda889565e243f0956df4e7d58dadf7bb410b0d"
+   "bytes": 343325,
+   "sha256": "cb038660a21708d28de8945f43f504d1416c7cda5a43b432420d5e16d67e93d9"
   },
   {
    "id": "n-wide-fold",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "站姿宽距体前屈（扶椅）",
     "en": "Standing Wide-Leg Fold (Chair)"
    },
-   "bytes": 402749,
-   "sha256": "acddde4963bae1f63502a82632015ba7bb9c9bf8baebb1209785f546db6d154b"
+   "bytes": 603624,
+   "sha256": "b7f4c55334a0142ece3cfc7ae2943b1db54234769672959c9dc7fc4aef6779c6"
   },
   {
    "id": "n-windshield",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "仰卧雨刷式",
     "en": "Supine Windshield Wipers"
    },
-   "bytes": 307430,
-   "sha256": "e273407ca294eb17cee3858e7fee744d7779583ad25e9476944e2db73342898f"
+   "bytes": 475960,
+   "sha256": "bbb26a479412ecf99d46542513f1c10fe72b4311ced60fc3558817b1723db0c4"
   },
   {
    "id": "o-seated-catcow",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "坐姿猫牛式",
     "en": "Seated Cat-Cow"
    },
-   "bytes": 232585,
-   "sha256": "eeb0d51549daaf66315b4e03ba50a8d62ae843dc9c30d6f0de7517f179a3642e"
+   "bytes": 327398,
+   "sha256": "c334ba0e5fadf8bc091785650f485586abd5d9bcf93fe8003097aa500f200c0a"
   },
   {
    "id": "o-seated-fig4",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "坐姿四字前压",
     "en": "Seated Figure-4 Stretch"
    },
-   "bytes": 275097,
-   "sha256": "12e1bafde10bc1ef8c7d3de0b02bf7b04f9c5606236b31f04c4ba1cdd9fb6c76"
+   "bytes": 378388,
+   "sha256": "9cb8a656b4441763289f5e63cc875d4c612b2593480b8bfedb6879932b679689"
   },
   {
    "id": "o-seated-ham",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "坐姿腘绳肌前伸",
     "en": "Seated Hamstring Stretch"
    },
-   "bytes": 286576,
-   "sha256": "62f5b5599621530009f57fa5a669b6b27cb1e0de8071d9cde7d7ae30ecdab826"
+   "bytes": 373349,
+   "sha256": "9b6e5ee1b6d690d914a5e6e9c635f69daaf7d258cc493a08d92c26ede084ff72"
   },
   {
    "id": "o-seated-twist",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "坐姿扶椅扭转",
     "en": "Seated Chair Twist"
    },
-   "bytes": 219484,
-   "sha256": "2237d8b795faca2e25978516bf0fa0709271364c729d4b6dd6d77949bfade60b"
+   "bytes": 310099,
+   "sha256": "3c6e4e840450ef90ff3b61cde0c9ccb2bc2e42d81f1bb8274fe72321e0605362"
   },
   {
    "id": "o-stand-crossreach",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "扶椅站姿交叉侧伸",
     "en": "Chair-Supported Cross-Leg Side Reach"
    },
-   "bytes": 271661,
-   "sha256": "9d3bf0afba06073201d3cc3bd1cf4a57e3abf5633c107941e094e98351d6c89d"
+   "bytes": 351754,
+   "sha256": "88c177049e805bdd8beae2d05e774e3f37ea8c54321691ada6b90ebb775bb0aa"
   },
   {
    "id": "o-stand-lunge",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "扶椅站姿弓步屈髋拉伸",
     "en": "Chair-Supported Standing Hip Flexor Stretch"
    },
-   "bytes": 285995,
-   "sha256": "d4e572e99d43142cce137e0671af7cb4e93bbbbaa711dfb930d61352ac6b1b34"
+   "bytes": 366455,
+   "sha256": "628b2fbd2bf3f6a2298ed6cf6880f37aac2e0aec8922d1058e1d3aa3107a9bde"
   },
   {
    "id": "o-stand-quad",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "扶椅站姿股四头肌拉伸",
     "en": "Chair-Supported Standing Quad Stretch"
    },
-   "bytes": 262510,
-   "sha256": "25ba54cec3bac069421099fd10e702caf46beb878941780a3b36961b400802fc"
+   "bytes": 327612,
+   "sha256": "47be1779594150451c358b3d5ef2214af6717412682f83eb07a998ec5c7e8577"
   },
   {
    "id": "o-stand-sidebend",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "站姿举手侧屈",
     "en": "Standing Overhead Side Bend"
    },
-   "bytes": 245813,
-   "sha256": "7ef2f5813b9bce8e87fa272ae148f070ac87f9630033baaa2ebd03fad148f921"
+   "bytes": 332214,
+   "sha256": "09d31a4c701f4f04ab13c8fdf29d3c12bb6343ccef6719a782e52c56ed0102e0"
   },
   {
    "id": "s-9090",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "90/90 坐姿换髋",
     "en": "90/90 Hip Stretch"
    },
-   "bytes": 246105,
-   "sha256": "c799e39144f352daf78d0c682bb2dce89b3961573ef94cb0adeac6e292a7b97d"
+   "bytes": 339616,
+   "sha256": "1c7aaa984c226cc3ccd896d38dc6ce2df8b8497a21f604caf53659a5265e6c57"
   },
   {
    "id": "s-butterfly",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "蝴蝶式",
     "en": "Seated Butterfly Stretch"
    },
-   "bytes": 252794,
-   "sha256": "5ebbb474f7f2bfe85ac1a4d112d5c872af47c6cea0ac0585a924ae9e33d7bfd0"
+   "bytes": 374434,
+   "sha256": "5554943eb86b0e2bcbdfe66d29a53f5516d20c4b25b96f44b16d2318026f57b7"
   },
   {
    "id": "s-figure4",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "仰卧 4 字拉伸",
     "en": "Supine Figure-4 Stretch"
    },
-   "bytes": 297062,
-   "sha256": "eb80820a57eb19a5becf490b5d0a7061c7a1a456fe05f7df82bdd68c64bdd0c1"
+   "bytes": 423985,
+   "sha256": "0599def3211ad45c57ea7f8336ad769d37c6e204ed50a3a8130a35658a65b470"
   },
   {
    "id": "s-frog",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "青蛙式"
    },
-   "bytes": 193644,
-   "sha256": "2ad57066555f19dfb6f998a0453528ddf39cf7d1b85288ec44547c021a566fb9"
+   "bytes": 254398,
+   "sha256": "af10f6537a853b439bdfbd2fab843d380ab3d62a7cc6733a6ed457007234377a"
   },
   {
    "id": "s-kneel-hipflex",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "半跪髋屈肌拉伸",
     "en": "Half-Kneeling Hip Flexor Stretch"
    },
-   "bytes": 246964,
-   "sha256": "124f3fb1b9f4abcfa0711e6eb2c695773600425447b10ea996d0da12fc148f55"
+   "bytes": 320132,
+   "sha256": "1db15b531c3960624a22a9a386532b8cd988b57c11d9d9c56ba7328a5b3bf849"
   },
   {
    "id": "s-lizard",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "蜥蜴式低弓步",
     "en": "Lizard Lunge"
    },
-   "bytes": 241391,
-   "sha256": "0fad9e8e384f530cbb86b71b0799516992a77562fe74b1bc97ff02b76fb4578d"
+   "bytes": 316879,
+   "sha256": "4359a2191eb1f88ee27bf4be5adf3d3c68307e68f625d4e19fdc9451f617e46e"
   },
   {
    "id": "s-pigeon",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "鸽子式（直立扶砖版）",
     "en": "Pigeon Pose"
    },
-   "bytes": 237833,
-   "sha256": "8713468a1b199cfd265655b668a2df588ec0f5af9745827194934ef1b41e860d"
+   "bytes": 285303,
+   "sha256": "4d0973ac231d4a1a38157f4fe0c0ff3882bc71130e8c71012a1cdee8ff3ccbb4"
   },
   {
    "id": "s-seated-fold",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "坐姿体前屈",
     "en": "Seated Forward Fold"
    },
-   "bytes": 221513,
-   "sha256": "11d6582e105d98ba3a6a6ec570e5e36eeb710d5f0c079cc231a87713d0e11c0a"
+   "bytes": 314297,
+   "sha256": "efbdc8a604d39db2d8d527c773de047edcef7cf8a9f45c60950666c6cf57c59a"
   },
   {
    "id": "t-seated-straddle-lift-1leg",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "坐姿分腿单腿抬起"
    },
-   "bytes": 293073,
-   "sha256": "06a06a4f713d261a10118b4b5570baccf72666d4407916de3d4a8a1f5cb0b966"
+   "bytes": 460121,
+   "sha256": "a58896a0783ca4cbc74b950899bc7b55c8916a3aa8e1f885cf87ed286a3b971b"
   },
   {
    "id": "w-bird-dog",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "鸟狗式",
     "en": "Bird Dog"
    },
-   "bytes": 220228,
-   "sha256": "931e128fc9eba47537d56a4b6deadad36526636bb2a263bcb7734606bba43dde"
+   "bytes": 334664,
+   "sha256": "d1f6932219a3a3bca4938271996ac3a9374e6834108d0018d2fe1720c6db405e"
   },
   {
    "id": "w-chair-hip-thrust",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "椅子臀推",
     "en": "Chair Hip Thrust"
    },
-   "bytes": 240709,
-   "sha256": "1c8209454769ac5804f9f912cc4456d1f6b2ce3941dde037588ad680ac467cf3"
+   "bytes": 366938,
+   "sha256": "1175d65d097470bb44d857d69c30603904d0a47620a38b1cdd72cb294623e1cd"
   },
   {
    "id": "w-clamshell",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "侧卧蚌式开合",
     "en": "Side-Lying Clamshell"
    },
-   "bytes": 272566,
-   "sha256": "537e9efc4f73eab1bec4af0b7836dfdafd80c881c9ceff684e25e431de8b7378"
+   "bytes": 376396,
+   "sha256": "79a53c8584bbe9eba9f8200ec2b1f5beebc151d1e0dee56e20b9c0c6fb26bba9"
   },
   {
    "id": "w-dead-bug",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "死虫式",
     "en": "Dead Bug"
    },
-   "bytes": 228128,
-   "sha256": "520365f20a0fcd93aab65798132b0d086ba3186dd33344f737d69842ab17b61d"
+   "bytes": 345944,
+   "sha256": "7a4b94b4cfe4a8aff5b434fd471d78cf5c8298cbe982809467f0dbf23d644561"
   },
   {
    "id": "w-feet-on-chair-bridge",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "脚踩椅面臀桥",
     "en": "Feet-on-Chair Glute Bridge"
    },
-   "bytes": 278683,
-   "sha256": "b2e2f091051ed3821a86a035ab7244f3bfe138bbaf7fb0c655606301a1b8eda8"
+   "bytes": 387489,
+   "sha256": "c02e351e99520e18d59974e378f28ec5d20ca75b661734b36c42ab027ca90901"
   },
   {
    "id": "w-fire-hydrant",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "四足消防栓",
     "en": "Quadruped Fire Hydrant"
    },
-   "bytes": 421458,
-   "sha256": "efac4b839b2f3525aa860ef5418dff96680163dde105aeeb26cd2a7ac34af1b9"
+   "bytes": 648433,
+   "sha256": "f1c081343741bba81ae455f3f82a951b4832d39e6b9e4876247cd942fd37f2c2"
   },
   {
    "id": "w-prone-swimmer",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "俯卧游泳式",
     "en": "Prone Swimmers"
    },
-   "bytes": 260191,
-   "sha256": "ac5d364691596e6380105142c28e855033832671187217d24b6a1b58dabdbfbd"
+   "bytes": 382049,
+   "sha256": "b1388d15cfb5e56841d32d37737d23810aa5e7d4da2248616f274100aef38207"
   },
   {
    "id": "w-wall-sit",
    "kind": "exercise",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "name": {
     "zh": "靠墙静蹲",
     "en": "Wall Sit"
    },
-   "bytes": 267797,
-   "sha256": "dfbaaf891ffbc65abc4dcad1e680b88ba5894c05a676b3da88aa660763222a01"
+   "bytes": 385043,
+   "sha256": "d2c36ea6b18b8c8ed1f570b9e76d0d06e08b817b497e6a338125a40871911103"
   }
  ]
 }

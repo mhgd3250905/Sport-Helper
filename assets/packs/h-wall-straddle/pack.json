@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "h-wall-straddle",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "靠墙仰卧 V 字分腿",
   "en": "Legs-Up-the-Wall Straddle"
@@ -148,9 +148,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 15600,
+   "sha256": "471f595bf6f2b0ed03b870bcaec44751ffbf6744eafe50504abfab5fab7353ae"
+  },
   "cover.jpg": {
    "bytes": 11763,
    "sha256": "0e19d8c3070dcf34e3115da651c97685cf3a47c952956660d80995375a28b689"
+  },
+  "demo-light.mp4": {
+   "bytes": 169383,
+   "sha256": "fbaca881c0fe14659870ee11de85fcf9e146989519197e9c81e12e2406774b80"
   },
   "demo.mp4": {
    "bytes": 156369,

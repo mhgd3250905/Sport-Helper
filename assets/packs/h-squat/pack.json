@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "h-squat",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "徒手深蹲",
   "en": "Bodyweight Squat"
@@ -138,9 +138,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 9028,
+   "sha256": "ce7810dab9cfe505cc5d0ed614886099bdbc6696527eb63de81e51cc52ea8e41"
+  },
   "cover.jpg": {
    "bytes": 7697,
    "sha256": "c15088f0bf422afaec20a4bbc69abcfc7f493f837d60bf7890aae471a6243889"
+  },
+  "demo-light.mp4": {
+   "bytes": 154680,
+   "sha256": "a4938cfbb3aae3a54c570cbcb34934d0a0c9bdd59286d592d4468d0e716199c1"
   },
   "demo.mp4": {
    "bytes": 145953,

@@ -40,17 +40,23 @@ void main() {
   testWidgets('countdown: the last seconds breathe; reduced motion only changes colour', (tester) async {
     final p = ValueNotifier(.5);
     addTearDown(p.dispose);
-    Finder breath() => find.byWidgetPredicate((w) => w.key is ValueKey<String> && (w.key! as ValueKey<String>).value.startsWith('breath-'));
+    // Breathing = the ring face is scaled above 1 part-way into a beat.
+    Future<bool> breathes() async {
+      await tester.pump(const Duration(milliseconds: 300));
+      return tester
+          .widgetList<Transform>(find.descendant(of: find.byType(SfCountdownRing), matching: find.byType(Transform)))
+          .any((t) => t.transform.getMaxScaleOnAxis() > 1.01);
+    }
 
     await tester.pumpWidget(_host(SfCountdownRing(progress: p, value: '3', urgent: true)));
-    expect(breath(), findsOneWidget);
+    expect(await breathes(), isTrue);
     await tester.pumpAndSettle();
 
-    await tester.pumpWidget(_host(SfCountdownRing(progress: p, value: '3', urgent: true), reduced: true));
-    expect(breath(), findsNothing);
+    await tester.pumpWidget(_host(SfCountdownRing(progress: p, value: '2', urgent: true), reduced: true));
+    expect(await breathes(), isFalse);
 
     await tester.pumpWidget(_host(SfCountdownRing(progress: p, value: '8')));
-    expect(breath(), findsNothing);
+    expect(await breathes(), isFalse);
   });
 
   testWidgets('countdown: the number rolls (two on screen mid-roll), one key', (tester) async {
@@ -65,6 +71,24 @@ void main() {
     expect(find.byKey(k), findsOneWidget);
     await tester.pumpAndSettle();
     expect(find.text('9'), findsNothing);
+  });
+
+  testWidgets('countdown: the last seconds still roll the digit while breathing (PR #3 review P3)', (tester) async {
+    final p = ValueNotifier(.8);
+    addTearDown(p.dispose);
+    const k = ValueKey('n');
+    await tester.pumpWidget(_host(SfCountdownRing(progress: p, value: '4', numberKey: k)));
+    final number = tester.element(find.byKey(k));
+    await tester.pumpWidget(_host(SfCountdownRing(progress: p, value: '3', numberKey: k, urgent: true)));
+    await tester.pumpAndSettle();
+    await tester.pumpWidget(_host(SfCountdownRing(progress: p, value: '2', numberKey: k, urgent: true)));
+    await tester.pump(const Duration(milliseconds: 100));
+    // Same number element (not remounted), old digit still rolling out.
+    expect(tester.element(find.byKey(k)), same(number));
+    expect(find.text('3'), findsOneWidget);
+    expect(find.text('2'), findsOneWidget);
+    await tester.pumpAndSettle();
+    expect(find.text('3'), findsNothing);
   });
 
   testWidgets('player: the ring follows time between page rebuilds', (tester) async {

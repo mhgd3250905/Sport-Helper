@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "w-prone-swimmer",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "俯卧游泳式",
   "en": "Prone Swimmers"
@@ -151,9 +151,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 8505,
+   "sha256": "9194b435237bcfb71b64419460ba20960767bb1afbc6b565db00348ae3d0f364"
+  },
   "cover.jpg": {
    "bytes": 5963,
    "sha256": "962c14b8d5958dd049e49457baeb88684dc181df8950a61af8bbdc0daebef74d"
+  },
+  "demo-light.mp4": {
+   "bytes": 113353,
+   "sha256": "a024bc0b7b30ec8916ddb5c947c3e9e7e7f8f4c05ad463c24b1d215939b96c76"
   },
   "demo.mp4": {
    "bytes": 99227,

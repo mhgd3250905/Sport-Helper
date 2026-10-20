@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "h-incline-pushup",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "扶凳上斜俯卧撑",
   "en": "Incline Push-Up (Stool)"
@@ -130,9 +130,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 13412,
+   "sha256": "4f7857915ca688067adcbfc21d7a4061683cc2e25ed13f5fbff900560f70e1aa"
+  },
   "cover.jpg": {
    "bytes": 8854,
    "sha256": "88c971598153df61a1086d09477542c364cb149ce7433fb19438a9fac5591f03"
+  },
+  "demo-light.mp4": {
+   "bytes": 151722,
+   "sha256": "d9feb6410097805238fb6b5c7c1801a69006e5837c47585c163062c038bf1511"
   },
   "demo.mp4": {
    "bytes": 126275,

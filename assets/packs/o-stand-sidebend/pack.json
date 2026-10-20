@@ -3,7 +3,7 @@
  "formatVersion": 1,
  "kind": "exercise",
  "id": "o-stand-sidebend",
- "version": "1.0.0",
+ "version": "1.1.0",
  "name": {
   "zh": "站姿举手侧屈",
   "en": "Standing Overhead Side Bend"
@@ -145,9 +145,17 @@
   "text": "SmartFit (智能健身助手) authors, 2026-10-19"
  },
  "files": {
+  "cover-light.jpg": {
+   "bytes": 10993,
+   "sha256": "2888a3a472ba0e28a322e491f2c9a3cbd5026f3d9a41f6092e2ffbe360cb4de8"
+  },
   "cover.jpg": {
    "bytes": 6300,
    "sha256": "667d4abf41bebb2a9351b7b4505dfa68d63b7fc4f1facf5865e8549eecc65fa2"
+  },
+  "demo-light.mp4": {
+   "bytes": 75408,
+   "sha256": "c3aabe2698283740d21b5919b579de3e9b7e62579a461f5e9a7313441f5152f0"
   },
   "demo.mp4": {
    "bytes": 51131,
