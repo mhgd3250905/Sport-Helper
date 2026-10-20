@@ -52,7 +52,12 @@
   "width": 720,
   "height": 720,
   "loopSeconds": 8.0,
-  "repSeconds": null
+  "repSeconds": null,
+  "light": {
+   "video": "demo-light.mp4",
+   "cover": "cover-light.jpg",
+   "stage": "#EFEFEF"
+  }
  },
  "voice": {
   "languages": [
