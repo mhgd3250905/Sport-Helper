@@ -1,5 +1,38 @@
 # 本机验收记录
 
+## AI 新接口（0.1.0+5，待验）
+
+分支 `feat/smartfit-ai-replies`，待验版本 `0.1.0+5`，源码 `e549e0f84aa9118ef20752b8926c7b8c602a7e0f`。BaseURL 为 `https://api.uuugk.win/v1`，模型 `deepseek-v4-flash-0731`。APK `.buildlog/install/SmartFit-ai-proxy-0.1.0+5-debug.apk`，203,741,474 bytes，SHA-256 `f3ac1f4276f82c629bb254065d5bc3108d4181a5531679fed7a7d2f90d2a14a4`；debug 签名与旧包相同，ZIP/profile 打包检查通过，已覆盖安装并保留旧数据。6 项 endpoint/UUID/header 配置测试及分析通过；此前核心 180 项本轮未重跑。尚未完成本次验收，合 main 与推送等待新的用户授权。
+
+App 沿用原 App Key 与原设备 UUID，鉴权仅为 `X-App-Key` 与 `X-Device-Id`，不发送 `Authorization`。`tools/coach/build_debug.ps1 -AppKeyFile` 仅用 dart-define 注入本机文件中的 App Key。随机 UUIDv4 首次持久化成功后才启用 AI，存储失败使用本地引擎。每设备 30 次 / 10 分钟限流由服务器执行，429 给出提示并回退本地。
+
+生成计划限定随包 93 个动作并严格校验后才可保存和开练；SDK 对不合格输出最多重写一次，网络超时/最终校验失败回退本地。发送的历史仅为 AI 可见相关轮次与显式当前计划/训练条件，已存计划和训练历史保存在本机、不自动上传。下方记录旧 AI 计划在 `+5` 的局部 UI 保存/开练，不把它或此前 `+2` 完整训练迁移为新地址 AI 生成链路通过。通知可见性、其他系统中断、Play Console 与正式 release 验收待办保持不变。
+
+### 新地址真机观察
+
+| 请求 | 结果 |
+| --- | --- |
+| 「训练后为什么要慢慢恢复呼吸？」 | AI 正常回答，`outcome=model`，27,722 ms，HTTP 请求 1 次 |
+| 第一次 3 分钟计划生成 | 43,447 ms 后回退本地，SDK 错误 `all upstreams failed (tencent:AbortError)` |
+| 第二次 3 分钟计划生成 | 41,589 ms 后再次回退本地，同一上游错误；用户确认服务调整完成后重试仍发生 |
+| 第三次极简 3 动作 / 3 分钟计划 | 41,952 ms、HTTP 请求 1 次，仍回退本地；同为 `all upstreams failed (tencent:AbortError)` |
+
+三次计划请求均已提示使用本地模板，本地功能继续可用。常规问答通过，新接口计划生成未通过，不能判定本次验收完成。目前不申请合并；待服务器恢复生成计划后再做新地址真机验收，合 main / 推送等待开哥新批准。没有实际连续发送 31 次请求验证服务器配额；429 仅有自动化覆盖“不重试、显示提示并回退”，不写为实机配额已验。
+
+### +5 局部保存与训练 UI
+
+保存的是旧 `+4` 接口生成的原始 AI 计划 `ai-1792509025833151-84572f23`（「办公室肩颈放松」，10 动作），不是新地址生成结果。实际 UI 保存后已存计划 1→2，点击原卡开始 `ugk_trainer`，视频与倒计时正常，暂停后于 34 活动秒提前结束。记录 `sessionId=s-mvgu0k9q-15e74dbd32c5`，`planId` 为上述 AI 计划，`endedEarly=true`、完成 0/10，历史 3→4。
+
+重启后已存计划仍为 2、历史仍为 4，原 AI 计划及该 SessionResult 均保留，原随机设备标识未变，前台服务已释放。收尾时从抽屉返回原 AI 计划卡，已保存状态可见，没有活动前台服务。本次仅验证局部启动/提前结束和持久化，不记作完整训练、`+5` 声音实听或新地址 AI 计划链路通过，源码和 APK 身份仍为上述 `e549e0f` / `+5`。
+
+问答和计划请求通过调试 VM 的延时 Future 调用真实 `ChatController` 发送，并在 UI 确认文字/卡片；保存、开练、暂停与结束均为实际 UI 点击。本机忽略日志为 `.buildlog/ai-v5-safe-usage.json`、`ai-new-endpoint-tests.log` / 分析日志及 `ai-phone-state.json`，不提交含设备状态的原始日志。
+
+### 旧地址与 +4 历史
+
+旧源 `cc16f530944cf4f6034365aa111528536978ecc3` / `0.1.0+4` 的全量 180 项测试及分析通过；旧地址实机曾约 21 秒成功生成 AI 计划，随后追问回落本地。服务调整中，这条观察不代表新地址或 `+5` 已通过。
+
+旧包 `.buildlog/install/SmartFit-ai-worker-0.1.0+4-final-debug.apk`，229,561,107 bytes，SHA-256 `e2fcb4d54fd10fa7d0d7a10783d751aafb197fbd4285f653a64eaae3f4533446`，仅作历史身份；它使用 `https://ugk-ai-proxy.294851575.workers.dev/v1` 与 `deepseek-v4.1-flash-1017`，不再作为当前最终待验包。
+
 ## 后续目录节奏修复与键盘恢复（2026-10-20）
 
 SDK 修复提交 `9407bf3` 将 JSON `source=repSeconds` 识别为派生节奏，其余来源仍为 catalog。新增目录解析、计次完整报数、计时剂量回退 `timedHold` 及其他来源回归；修前 3 失败、1 通过，修后包全量 100 项及分析通过。App 固定新 Git 提交，版本递增 `0.1.0+3`；两仓已经开哥授权依次合入并推送 main；SDK GitHub 全新克隆可获取该固定提交及包目录，App `flutter pub get --enforce-lockfile` 成功，依赖文件无变化。

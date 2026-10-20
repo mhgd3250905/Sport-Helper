@@ -7,20 +7,48 @@
 | 项目 | 当前事实 / 事实来源 |
 | --- | --- |
 | 主线与合并 | 本机维护 `main`；PR #1、#2、#3 及 `feat/ugk-trainer-integration` 已合入并推送 |
-| 当前源码状态 | 训练接入及后续 `fix/chat-keyboard-reopen` 已经开哥授权合入并推送 main，运行提交 `aea8791`、App `0.1.0+3`；最新 HEAD 以 Git 查询为准，见 [后续修复](ugk-trainer-integration.md#后续修复2026-10-20) |
+| 当前源码状态 | 开发分支 `feat/smartfit-ai-replies`，待验版本 `0.1.0+5`，源码 `e549e0f84aa9118ef20752b8926c7b8c602a7e0f`；尚未合 main 或推送，等待新的用户授权。此前主线运行提交 `aea8791`、App `0.1.0+3`，见 [后续修复](ugk-trainer-integration.md#后续修复2026-10-20) |
 | 共享训练依赖 | 固定 SDK 来源修复 `9407bf3` 已合入并推送 SDK main；GitHub 全新克隆确认可获取，App 严格锁解析通过且依赖文件无变化。包版本仍为 `ugk_coach 0.1.2` / `ugk_trainer 0.1.0` |
 | 源码里程碑 | `m7-aesthetic-v2` → `d0b1c7ef6198a469a7f0a7cedcaa7c9f2512dbe7` |
 | 上一阶段文档整理前主线快照 | `d0b1c7ef6198a469a7f0a7cedcaa7c9f2512dbe7`；后续 HEAD 由 Git 查询，不把本表固定 SHA 写成永远最新的 HEAD |
 | PR #3 合并提交 | `a5997ef7aef2695b24cab3f4b330543bbb2c7027` |
 | PR #3 已测源 | `7ef80d75331a150b6a258ef3ba0c27832fd1e54b`；合并树相同，至上述主线快照只增加 3 份文档 |
 | Android 身份 | `com.ugk.smartfit`，App 名「智能健身助手」 |
-| 默认包版本 | `0.1.0+3`，来自 [pubspec.yaml](../pubspec.yaml)：versionName `0.1.0`、versionCode `3`；原完整训练测试包为 `0.1.0+2` |
-| 关于页显示 | `0.1.0+3 (MVP)`，来自 [about_page.dart](../lib/ui/about_page.dart) 的独立常量，尚未自动读取包版本 |
+| 默认包版本 | 新接口待验版本 `0.1.0+5`：versionName `0.1.0`、versionCode `5`，APK 身份见下表。主线为 `0.1.0+3`，原完整训练测试包为 `0.1.0+2` |
+| 关于页版本 | 新接口目标为 `0.1.0+5 (MVP)`；独立常量见 [about_page.dart](../lib/ui/about_page.dart)，尚未自动读取包版本 |
 | 资源版本 | 93 个动作包为 `1.1.0`；公共包 `_common` 为 `1.0.0`；格式版本仍为 `1`，见 [小包规范](drill-pack-spec.md) 与 [索引](../assets/packs/index.json) |
-| 交付状态 | 后续 `0.1.0+3` 最终 debug 包已覆盖安装、未上传；身份及摘要见 [后续修复](ugk-trainer-integration.md#后续修复2026-10-20)，下表保留 `0.1.0+2` 基线 |
-| 验收状态 | 后续 App 156 项、SDK 100 项及分析通过；最终 debug 构建、签名/ZIP/版本检查、安装和软键盘输入/收起重开通过。此前 `0.1.0+2` 的完整训练见 [真机记录](trainer-device-check-2026-10-20.md)，其他发布待办保持不变 |
+| 交付状态 | AI `0.1.0+5` debug 包已覆盖安装，保留旧数据；旧 `+4` 包仅作历史记录。此前 `+3` 包见 [后续修复](ugk-trainer-integration.md#后续修复2026-10-20) |
+| 验收状态 | `+5` 的 6 项配置测试及分析通过，核心 180 项此前通过、本轮未重跑。新地址问答通过，三次计划请求均上游失败回退本地；旧 `+4` AI 计划在 `+5` 的保存/局部启动/提前结束/重启保留已观察，新接口计划生成未通过，未完成验收。见 [验收记录](acceptance.md) |
 
-Git 标签、App 包版本与资源版本分别管理。`m7` 不代表 Android versionCode 为 7；用户此前已取的包是 `0.1.0+1`，训练接入测试包为 `0.1.0+2`，后续目录节奏修复测试包为 `0.1.0+3`。构建命令曾尝试覆盖版本号用于 release，但没有形成可交付 release 包，不能登记为已交付版本。
+Git 标签、App 包版本与资源版本分别管理。`m7` 不代表 Android versionCode 为 7；此前为 `+1` M7、`+2` 训练接入、`+3` 目录节奏修复、`+4` 旧 AI 地址测试；当前新接口待验版本为 `0.1.0+5`。构建命令曾尝试覆盖版本号用于 release，但没有形成可交付 release 包，不能登记为已交付版本。
+
+## AI 新接口待验版本（0.1.0+5）
+
+| 项目 | 记录 |
+| --- | --- |
+| 配置 | BaseURL `https://api.uuugk.win/v1`；模型 `deepseek-v4-flash-0731` |
+| 鉴权 / 设备 | 沿用原 App Key 与原 UUID 的 `X-App-Key` + `X-Device-Id`；无 `Authorization` |
+| 源码 | `e549e0f84aa9118ef20752b8926c7b8c602a7e0f` |
+| APK | `.buildlog/install/SmartFit-ai-proxy-0.1.0+5-debug.apk`，203,741,474 bytes |
+| SHA-256 | `f3ac1f4276f82c629bb254065d5bc3108d4181a5531679fed7a7d2f90d2a14a4` |
+| 包检查 / 安装 | debug 签名与旧包相同，ZIP/profile 打包通过；已保留旧数据覆盖安装 |
+| 自动化 | 6 项 endpoint/UUID/header 配置测试及分析通过；此前核心 180 项本轮未重跑 |
+| 真机观察 | 通用问答 `outcome=model`，27,722 ms、HTTP 请求 1 次；三次计划请求 43,447 / 41,589 / 41,952 ms 后回退本地，均报 `all upstreams failed (tencent:AbortError)`；第三次为极简 3 动作 / 3 分钟、HTTP 请求 1 次，新接口计划生成未通过 |
+| 局部 UI 流程 | 保存旧 `+4` 原始 AI 计划，已存计划 1→2；原卡启动、视频/倒计时、暂停及 34 活动秒提前结束已观察，历史 3→4。重启后原计划及部分 SessionResult 保留，设备标识未变、前台服务释放 |
+| 验证边界 | 局部流程不代表新地址 AI 生成链路、完整训练或 `+5` 声音实听通过。本地回退已提示且继续可用；未刷第 31 次请求，仅自动化覆盖 429 无重试与提示 |
+| 构建 | `tools/coach/build_debug.ps1 -AppKeyFile '<本机 App Key 文件绝对路径>'`，只以 dart-define 注入 App Key |
+| 未完成 | 待服务器恢复计划生成后重验新地址；目前不申请合并，合 main / 推送等待开哥新批准；通知、Play Console、正式签名与其余设备验收仍待办 |
+
+## 旧 AI Worker 测试包（0.1.0+4，历史）
+
+| 项目 | 记录 |
+| --- | --- |
+| 文件 | `.buildlog/install/SmartFit-ai-worker-0.1.0+4-final-debug.apk`，本机忽略目录保存；名称含 final，但已不是当前最终待验包 |
+| 源码 / 版本 | `cc16f530944cf4f6034365aa111528536978ecc3`，分支 `feat/smartfit-ai-replies`；`com.ugk.smartfit`，`0.1.0+4`，debug |
+| 大小 / SHA-256 | 229,561,107 bytes；`e2fcb4d54fd10fa7d0d7a10783d751aafb197fbd4285f653a64eaae3f4533446` |
+| 自动化 | 该旧源全量 180 项测试、静态分析通过；不作为 `+5` 验证 |
+| 配置 | Worker `https://ugk-ai-proxy.294851575.workers.dev/v1`；模型 `deepseek-v4.1-flash-1017`；`X-App-Key` + `X-Device-Id`，无 `Authorization` |
+| 真机历史 | 旧地址曾约 21 秒成功生成 AI 计划，随后追问回落本地；服务调整中，现须验证新地址 |
 
 ## ugk_trainer 测试包（真机主链路已验）
 
