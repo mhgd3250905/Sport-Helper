@@ -14,6 +14,8 @@ import '../voice/voice_queue.dart';
 import 'chat/cosmos.dart';
 import 'exercise_video.dart';
 import 'theme/app_theme.dart';
+import 'theme/celebration.dart';
+import 'theme/countdown.dart';
 import 'theme/sf_icons.dart';
 import 'theme/tokens.dart';
 import 'theme/widgets.dart';
@@ -27,7 +29,7 @@ class PlayerPage extends StatefulWidget {
   const PlayerPage({
     super.key,
     required this.plan,
-    this.tick = const Duration(milliseconds: 100),
+    this.tick = const Duration(milliseconds: 50),
   });
   final TrainingPlan plan;
   final Duration tick;
@@ -47,8 +49,19 @@ class _PlayerPageState extends State<PlayerPage> {
   bool _recorded = false;
   double? _endedAt;
   String? _subtitle;
-  int _shownSecond = -1;
   int _shownGen = -1;
+
+  /// What the page shows that changes with time (seconds left / rep,
+  /// phase): the page rebuilds only when this changes, about once a
+  /// second; the ring follows [_progress] on its own.
+  String _shownKey = '';
+  int _hapticSecond = -1;
+  int _hapticGen = -1;
+
+  /// The ring's fill, updated every [PlayerPage.tick] (50 ms): only the
+  /// ring's painter listens (HipLab: the 33 ms timer repaints the ring,
+  /// not the page).
+  final _progress = ValueNotifier<double>(0);
 
   double get _t => _clock.elapsedMicroseconds / 1e6;
   bool get _paused => !_clock.isRunning;
@@ -82,6 +95,7 @@ class _PlayerPageState extends State<PlayerPage> {
   @override
   void dispose() {
     _timer?.cancel();
+    _progress.dispose();
     unawaited(_interruptions?.cancel());
     if (_ready) {
       ScreenAwake.release();
@@ -106,13 +120,46 @@ class _PlayerPageState extends State<PlayerPage> {
       _endedAt ??= t;
       _record();
     }
-    final sec = (_engine.elapsedIn(t) * 4).floor(); // 4 Hz repaint is plenty
-    if (sec != _shownSecond || _engine.generation != _shownGen) {
+    final p = _phase;
+    if (!_engine.done) {
+      _progress.value = p.seconds == 0 ? 0.0 : (_engine.elapsedIn(t) / p.seconds).clamp(0.0, 1.0);
+    }
+    _haptics(p, t);
+    final key = '${_engine.generation}:${_engine.done}:${_counterValue(p, t)}:${_subtitle ?? ''}';
+    if (key != _shownKey || _engine.generation != _shownGen) {
       setState(() {
-        _shownSecond = sec;
+        _shownKey = key;
         _shownGen = _engine.generation;
       });
     }
+  }
+
+  /// A medium tap as a working set begins; a selection tick on each of
+  /// the last three seconds of a timed phase (M12, M13).
+  void _haptics(SessionPhase p, double t) {
+    if (_engine.done || _paused) return;
+    if (_engine.generation != _hapticGen) {
+      _hapticGen = _engine.generation;
+      _hapticSecond = -1;
+      if (p.isWork && _engine.generation > 0) SfHaptic.medium.play();
+    }
+    if (p.seconds == 0 || (p.isWork && p.reps != null)) return;
+    final left = _engine.secondsLeft(t);
+    if (left >= 1 && left <= 3 && left != _hapticSecond) {
+      _hapticSecond = left;
+      SfHaptic.selection.play();
+    }
+  }
+
+  /// The big number in the ring: the rep (rep sets) or seconds left.
+  String _counterValue(SessionPhase p, double t) {
+    final reps = p.reps;
+    if (p.isWork && reps != null) {
+      final rep = p.repSeconds ?? 3;
+      final cur = (_engine.elapsedIn(t) / rep).floor() + 1;
+      return '${cur.clamp(1, reps)}';
+    }
+    return '${_engine.secondsLeft(t)}';
   }
 
   void _record() {
@@ -183,6 +230,7 @@ class _PlayerPageState extends State<PlayerPage> {
     if (wasRunning) _togglePause();
     final choice = await showModalBottomSheet<String>(
       context: context,
+      sheetAnimationStyle: SfMotion.sheet,
       builder: (c) => SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(SfSpace.gutter, 0, SfSpace.gutter, SfSpace.x2),
@@ -281,10 +329,7 @@ class _PlayerPageState extends State<PlayerPage> {
 
   Widget _sessionView(SessionPhase p, Exercise? e) {
     final t = _t;
-    final left = _engine.secondsLeft(t);
-    final progress = p.seconds == 0
-        ? 0.0
-        : (_engine.elapsedIn(t) / p.seconds).clamp(0.0, 1.0);
+    final still = SfMotion.reduced(context);
     final rest =
         p.kind == PhaseKind.rest ||
         p.kind == PhaseKind.roundRest ||
@@ -300,6 +345,7 @@ class _PlayerPageState extends State<PlayerPage> {
     };
     final sub = _subtitle ?? (rest ? e?.cue : null);
     final current = (done + (rest ? 0 : 1)).clamp(1, _occurrences);
+    final fraction = _occurrences == 0 ? 0.0 : done / _occurrences;
     return Column(
       children: [
         // Top bar: close · block + progress · count.
@@ -322,20 +368,31 @@ class _PlayerPageState extends State<PlayerPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      p.blockName,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: SfType.label.copyWith(color: SfColors.accentText, fontWeight: FontWeight.w600),
+                    SfFadeSwitcher(
+                      duration: SfMotion.fast,
+                      rise: 0,
+                      child: Text(
+                        p.blockName,
+                        key: ValueKey(p.blockName),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: SfType.label.copyWith(color: SfColors.accentText, fontWeight: FontWeight.w600),
+                      ),
                     ),
                     const SizedBox(height: 6),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(2),
-                      child: LinearProgressIndicator(
-                        value: _occurrences == 0 ? 0 : done / _occurrences,
-                        minHeight: 4,
-                        backgroundColor: SfColors.track,
-                        color: SfColors.accent,
+                    // M15: the bar eases to the new share instead of jumping.
+                    TweenAnimationBuilder<double>(
+                      tween: Tween(end: fraction),
+                      duration: still ? Duration.zero : SfMotion.slow,
+                      curve: SfMotion.standard,
+                      builder: (_, v, _) => ClipRRect(
+                        borderRadius: BorderRadius.circular(2),
+                        child: LinearProgressIndicator(
+                          value: v,
+                          minHeight: 4,
+                          backgroundColor: SfColors.track,
+                          color: SfColors.accent,
+                        ),
                       ),
                     ),
                   ],
@@ -359,21 +416,40 @@ class _PlayerPageState extends State<PlayerPage> {
               if (e != null)
                 Stack(
                   children: [
-                    ExerciseVideo(
-                      key: ValueKey('player-${e.id}'),
-                      exercise: e,
-                      mirrored: p.side == Side.left,
-                      paused: _paused,
-                      radius: SfRadius.lg,
-                    ),
-                    if (_paused)
-                      const Positioned(left: SfSpace.x3, top: SfSpace.x3, child: SfMediaTag(label: '已暂停'))
-                    else if (p.kind == PhaseKind.switchSide)
-                      Positioned(
-                        left: SfSpace.x3,
-                        top: SfSpace.x3,
-                        child: SfMediaTag(label: '换左侧', icon: SfGlyph.swap, color: SfColors.palette.isDark ? SfColors.caution : SfPalette.dark.caution),
+                    // M13: one move's clip cross-fades into the next.
+                    AnimatedSwitcher(
+                      duration: SfMotion.slow,
+                      switchInCurve: SfMotion.standard,
+                      switchOutCurve: Curves.easeIn,
+                      layoutBuilder: (current, previous) => Stack(children: [...previous, ?current]),
+                      child: ExerciseVideo(
+                        key: ValueKey('player-${e.id}'),
+                        exercise: e,
+                        mirrored: p.side == Side.left,
+                        paused: _paused,
+                        radius: SfRadius.lg,
                       ),
+                    ),
+                    Positioned(
+                      left: SfSpace.x3,
+                      top: SfSpace.x3,
+                      child: SfFadeSwitcher(
+                        duration: SfMotion.fast,
+                        rise: 0,
+                        child: _paused
+                            ? const SfMediaTag(key: ValueKey('tag-paused'), label: '已暂停')
+                            : p.kind == PhaseKind.switchSide
+                            ? SfMediaTag(
+                                key: const ValueKey('tag-side'),
+                                label: '换左侧',
+                                icon: SfGlyph.swap,
+                                color: SfPalette.dark.caution,
+                              )
+                            : rest && p.nextExerciseId != null
+                            ? const SfMediaTag(key: ValueKey('tag-next'), label: '下一个')
+                            : const SizedBox.shrink(key: ValueKey('tag-none')),
+                      ),
+                    ),
                     Positioned(
                       right: SfSpace.x2,
                       top: SfSpace.x2,
@@ -399,52 +475,70 @@ class _PlayerPageState extends State<PlayerPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          if (label.isNotEmpty) ...[
-                            Text(
-                              label,
-                              style: SfType.label.copyWith(
-                                color: p.kind == PhaseKind.switchSide ? SfColors.caution : SfColors.muted,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          SfFadeSwitcher(
+                            duration: SfMotion.fast,
+                            rise: 0,
+                            child: label.isEmpty
+                                ? const SizedBox(key: ValueKey('label-none'), width: double.infinity)
+                                : Padding(
+                                    key: ValueKey('label-$label'),
+                                    padding: const EdgeInsets.only(bottom: SfSpace.x1),
+                                    child: Text(
+                                      label,
+                                      style: SfType.label.copyWith(
+                                        color: p.kind == PhaseKind.switchSide ? SfColors.caution : SfColors.muted,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                          ),
+                          SfFadeSwitcher(
+                            child: Text(
+                              e?.name ?? '',
+                              key: ValueKey('name-${e?.id}'),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: SfType.title.copyWith(fontSize: 24, height: 1.25, fontWeight: FontWeight.w800),
                             ),
-                            const SizedBox(height: SfSpace.x1),
-                          ],
-                          Text(
-                            e?.name ?? '',
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: SfType.title.copyWith(fontSize: 24, height: 1.25),
                           ),
                           const SizedBox(height: 6),
-                          Text(_meta(p), style: SfType.label.copyWith(fontSize: 14)),
+                          SfFadeSwitcher(
+                            duration: SfMotion.fast,
+                            rise: 0,
+                            child: Text(_meta(p), key: ValueKey('meta-${_meta(p)}'), style: SfType.label.copyWith(fontSize: 14)),
+                          ),
                         ],
                       ),
                     ),
                     const SizedBox(width: SfSpace.x3),
-                    _counter(p, left, progress, !rest && p.kind != PhaseKind.switchSide),
+                    _counter(p, t, working: !rest && p.kind != PhaseKind.switchSide),
                   ],
                 ),
               ),
-              if (sub != null)
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(SfSpace.x1, SfSpace.x4, SfSpace.x1, 0),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 2),
-                        child: SfIcon(SfGlyph.subtitles, size: 18, color: SfColors.faint),
-                      ),
-                      const SizedBox(width: SfSpace.x2),
-                      Expanded(
-                        child: Text(
-                          sub,
-                          style: SfType.body.copyWith(fontSize: 15, height: 1.55, color: SfColors.muted),
+              SfFadeSwitcher(
+                child: sub == null
+                    ? const SizedBox(key: ValueKey('sub-none'), width: double.infinity)
+                    : Padding(
+                        key: ValueKey('sub-$sub'),
+                        padding: const EdgeInsets.fromLTRB(SfSpace.x1, SfSpace.x4, SfSpace.x1, 0),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(top: 2),
+                              child: SfIcon(SfGlyph.subtitles, size: 18, color: SfColors.faint),
+                            ),
+                            const SizedBox(width: SfSpace.x2),
+                            Expanded(
+                              child: Text(
+                                sub,
+                                style: SfType.body.copyWith(fontSize: 15, height: 1.55, color: SfColors.muted),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
-                ),
+              ),
               if (!rest) ?_nextUp(p),
             ],
           ),
@@ -480,8 +574,21 @@ class _PlayerPageState extends State<PlayerPage> {
                         shape: BoxShape.circle,
                         color: down ? Color.lerp(SfColors.accent, Colors.black, .1) : SfColors.accent,
                       ),
+                      // M14: play ⇄ pause morph (rotate a quarter + scale
+                      // through the swap); reduced motion: a plain fade.
                       child: AnimatedSwitcher(
                         duration: SfMotion.fast,
+                        switchInCurve: SfMotion.standard,
+                        switchOutCurve: Curves.easeIn,
+                        transitionBuilder: (child, a) => still
+                            ? FadeTransition(opacity: a, child: child)
+                            : FadeTransition(
+                                opacity: a,
+                                child: ScaleTransition(
+                                  scale: a.drive(Tween(begin: .6, end: 1)),
+                                  child: RotationTransition(turns: a.drive(Tween(begin: -.25, end: 0)), child: child),
+                                ),
+                              ),
                         child: SfIcon(
                           _paused ? SfGlyph.play : SfGlyph.pause,
                           key: ValueKey(_paused),
@@ -568,55 +675,29 @@ class _PlayerPageState extends State<PlayerPage> {
     );
   }
 
-  /// Reps or seconds inside a ring. The ring is the accent only while
-  /// working; prep / rest count down in a neutral tone.
-  Widget _counter(SessionPhase p, int left, double progress, bool working) {
-    final reps = p.reps;
-    String big;
-    String small;
-    if (p.isWork && reps != null) {
-      final rep = p.repSeconds ?? 3;
-      final cur = (_engine.elapsedIn(_t) / rep).floor() + 1;
-      big = '${cur.clamp(1, reps)}';
-      small = '/ $reps 次';
-    } else {
-      big = '$left';
-      small = p.isWork ? '秒' : '秒后开始';
-    }
-    return SizedBox(
-      width: 112,
-      height: 112,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          SizedBox.expand(
-            child: CircularProgressIndicator(
-              value: progress,
-              strokeWidth: 5,
-              strokeCap: StrokeCap.round,
-              backgroundColor: SfColors.track,
-              color: working ? SfColors.accent : SfColors.text.withValues(alpha: .55),
-            ),
-          ),
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                big,
-                key: const ValueKey('counter'),
-                style: TextStyle(
-                  fontSize: 40,
-                  height: 1.1,
-                  fontWeight: FontWeight.w700,
-                  color: SfColors.text,
-                  fontFeatures: SfType.tabular,
-                ),
-              ),
-              Text(small, style: SfType.caption.copyWith(color: SfColors.muted)),
-            ],
-          ),
-        ],
-      ),
+  /// Reps or seconds inside the countdown ring (M10–M12, M14). The ring
+  /// is the accent while working; prep / rest count down in a neutral
+  /// tone and turn accent for their last three seconds, which breathe.
+  /// Paused: ring and number at 45 % (the clip's badge says 已暂停).
+  Widget _counter(SessionPhase p, double t, {required bool working}) {
+    final reps = p.isWork ? p.reps : null;
+    final left = _engine.secondsLeft(t);
+    final urgent = reps == null && p.seconds > 0 && left >= 1 && left <= 3 && !_paused;
+    // Paused is said once, by the badge on the clip; the ring just dims.
+    final caption = reps != null
+        ? '/ $reps 次'
+        : p.isWork
+        ? '秒'
+        : '秒后开始';
+    return SfCountdownRing(
+      progress: _progress,
+      value: _counterValue(p, t),
+      numberKey: const ValueKey('counter'),
+      caption: caption,
+      size: 112,
+      color: working || urgent ? SfColors.accent : SfColors.text.withValues(alpha: .55),
+      urgent: urgent,
+      dim: _paused,
     );
   }
 
@@ -624,71 +705,87 @@ class _PlayerPageState extends State<PlayerPage> {
     final full =
         !_engine.endedEarly && _engine.completedExercises >= _occurrences;
     final minutes = ((_endedAt ?? _t) / 60).round();
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(SfSpace.x6, 0, SfSpace.x6, SfSpace.x5),
-      child: Column(
-        children: [
-          Expanded(
-            child: Center(
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 80,
-                      height: 80,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: full ? SfColors.accentSoft : SfColors.surfaceHigh,
+    final numeral = SfType.title.copyWith(fontSize: 26, fontWeight: FontWeight.w800, fontFeatures: SfType.tabular);
+    return SfFinishTimeline(
+      full: full,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(SfSpace.x6, 0, SfSpace.x6, SfSpace.x5),
+        child: Column(
+          children: [
+            Expanded(
+              child: Center(
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SfFinishMark(full: full),
+                      const SizedBox(height: SfSpace.x2),
+                      SfFinishReveal(
+                        beginMs: 420,
+                        child: Text(full ? '训练完成！' : '今天先到这里', style: SfType.display),
                       ),
-                      alignment: Alignment.center,
-                      child: SfIcon(
-                        full ? SfGlyph.check : SfGlyph.stop,
-                        size: 38,
-                        strokeWidth: 2.2,
-                        color: full ? SfColors.accentText : SfColors.muted,
+                      const SizedBox(height: SfSpace.x2),
+                      SfFinishReveal(
+                        beginMs: 480,
+                        child: Text(
+                          widget.plan.title,
+                          textAlign: TextAlign.center,
+                          style: SfType.body.copyWith(color: SfColors.muted),
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: SfSpace.x6),
-                    Text(full ? '训练完成！' : '今天先到这里', style: SfType.display),
-                    const SizedBox(height: SfSpace.x2),
-                    Text(
-                      widget.plan.title,
-                      textAlign: TextAlign.center,
-                      style: SfType.body.copyWith(color: SfColors.muted),
-                    ),
-                    const SizedBox(height: SfSpace.x8),
-                    Row(
-                      children: [
-                        Expanded(child: _stat('$minutes', '分钟')),
-                        const SizedBox(width: SfSpace.x3),
-                        Expanded(child: _stat('${_engine.completedExercises}/$_occurrences', '完成动作')),
-                      ],
-                    ),
-                  ],
+                      const SizedBox(height: SfSpace.x8),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: SfFinishReveal(
+                              beginMs: 540,
+                              child: _stat(
+                                SfFinishCount(values: [minutes], format: (v) => '${v[0]}', style: numeral),
+                                '分钟',
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: SfSpace.x3),
+                          Expanded(
+                            child: SfFinishReveal(
+                              beginMs: 600,
+                              child: _stat(
+                                SfFinishCount(
+                                  values: [_engine.completedExercises],
+                                  format: (v) => '${v[0]}/$_occurrences',
+                                  style: numeral,
+                                ),
+                                '完成动作',
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-          SfPrimaryButton(
-            key: const ValueKey('finish'),
-            label: '完成',
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-        ],
+            SfFinishReveal(
+              beginMs: 660,
+              child: SfPrimaryButton(
+                key: const ValueKey('finish'),
+                label: '完成',
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _stat(String value, String label) => SfPanel(
+  Widget _stat(Widget value, String label) => SfPanel(
     padding: const EdgeInsets.symmetric(vertical: SfSpace.x4),
     radius: SfRadius.md + 2,
     child: Column(
       children: [
-        Text(
-          value,
-          style: SfType.title.copyWith(fontSize: 26, fontFeatures: SfType.tabular),
-        ),
+        value,
         const SizedBox(height: 2),
         Text(label, style: SfType.label),
       ],

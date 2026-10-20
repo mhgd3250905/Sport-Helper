@@ -11,7 +11,8 @@ import 'tokens.dart';
 /// * a hairline track, a progress arc that runs from a softer tone at its
 ///   tail to the full colour at its head, a round tail cap and a small lit
 ///   knob at the head — nothing at 0 % (no stray dot at the top);
-/// * the number rolls over (old one up and out, new one up and in);
+/// * the number rolls over (old one up and out, new one up and in,
+///   settling from .92 to full size);
 /// * in the last seconds ([urgent]) ring and number breathe once per
 ///   second (1.0 → 1.06 → 1.0) and the number takes the ring colour;
 /// * [dim] (paused) fades both to 45 %.
@@ -192,9 +193,10 @@ class SfRollingNumber extends StatelessWidget {
         final fade = FadeTransition(opacity: a, child: child);
         if (still) return fade;
         final incoming = child.key == ValueKey(value);
+        // Roll + HipLab's settle: the incoming value also scales .92 → 1.
         return SlideTransition(
           position: a.drive(Tween(begin: Offset(0, incoming ? .42 : -.42), end: Offset.zero)),
-          child: fade,
+          child: incoming ? ScaleTransition(scale: a.drive(Tween(begin: .92, end: 1)), child: fade) : fade,
         );
       },
       child: Text(value, key: ValueKey(value), style: style),
