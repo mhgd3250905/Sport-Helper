@@ -74,6 +74,12 @@ Future<void> _settle(WidgetTester tester, [int ms = 1500]) async {
   }
 }
 
+/// SF_SHOTS=card,player limits the run to those shots (default: all).
+bool _want(String name) {
+  final only = Platform.environment['SF_SHOTS'];
+  return only == null || only.split(',').contains(name);
+}
+
 void main() {
   for (final theme in ['dark', 'light']) {
     testWidgets('shots $theme', (tester) async {
@@ -82,14 +88,16 @@ void main() {
       tester.view.devicePixelRatio = 3;
       addTearDown(tester.view.reset);
 
-      await _app(tester, theme);
-      await _settle(tester);
-      await _shot(tester, 'home-$theme');
+      if (_want('home')) {
+        await _app(tester, theme);
+        await _settle(tester);
+        await _shot(tester, 'home-$theme');
+      }
 
       var s = await _app(tester, theme);
       await s.chat.send('在家 15 分钟练核心，徒手');
       await _settle(tester);
-      await _shot(tester, 'card-$theme');
+      if (_want('card')) await _shot(tester, 'card-$theme');
 
       final start = find.byWidgetPredicate(
         (w) => w.key is ValueKey<String> && (w.key! as ValueKey<String>).value.startsWith('plan-start-'),
@@ -98,9 +106,10 @@ void main() {
       await _settle(tester, 1200);
       await tester.tap(find.byKey(const ValueKey('skip')));
       await _settle(tester, 2300);
-      await _shot(tester, 'player-$theme');
+      if (_want('player')) await _shot(tester, 'player-$theme');
       await tester.pumpWidget(const SizedBox());
       await tester.pump(const Duration(seconds: 1));
+      if (!_want('library') && !_want('settings')) return;
 
       s = await _app(tester, theme);
       s.chat.command('@library');
