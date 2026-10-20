@@ -459,6 +459,7 @@ class _PlayerPageState extends State<PlayerPage> {
                 tooltip: '上一个动作',
                 icon: SfGlyph.skipPrevious,
                 size: 56,
+                haptic: SfHaptic.selection,
                 onPressed: _previous,
               ),
               SfPressable(
@@ -466,6 +467,7 @@ class _PlayerPageState extends State<PlayerPage> {
                 tooltip: _paused ? '继续训练' : '暂停训练',
                 semanticLabel: _paused ? '继续训练' : '暂停训练',
                 onTap: _togglePause,
+                haptic: SfHaptic.light,
                 scale: .94,
                 child: Builder(
                   builder: (context) {
@@ -497,6 +499,7 @@ class _PlayerPageState extends State<PlayerPage> {
                 tooltip: '跳过动作',
                 icon: SfGlyph.skipNext,
                 size: 56,
+                haptic: SfHaptic.selection,
                 onPressed: _skip,
               ),
             ],
