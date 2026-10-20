@@ -168,6 +168,7 @@ class OptionPill extends StatelessWidget {
     return SfPressable(
       semanticLabel: label,
       onTap: enabled ? onTap : null,
+      haptic: SfHaptic.selection,
       child: AnimatedContainer(
         duration: SfMotion.medium,
         constraints: const BoxConstraints(minHeight: 36),
@@ -293,6 +294,7 @@ class SuggestionStrip extends StatelessWidget {
         itemBuilder: (_, i) => SfPressable(
           key: ValueKey('suggestion-$i'),
           semanticLabel: items[i],
+          haptic: SfHaptic.selection,
           onTap: () => onTap(items[i]),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 14),

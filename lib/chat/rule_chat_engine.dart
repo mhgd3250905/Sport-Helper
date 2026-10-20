@@ -502,7 +502,7 @@ class RuleChatEngine implements ChatEngine {
     messages: const [
       BotMessage(
         '根据你的安全确认，我先不生成训练计划，建议先咨询医生。你仍可以浏览动作库里的示范；'
-        '情况变化后，可以在「关于与设置」里重新确认。',
+        '情况变化后，可以在「设置」里重新确认。',
         options: [ChatOption('浏览动作库', '@library'), ChatOption('重新确认', '@safety')],
       ),
     ],

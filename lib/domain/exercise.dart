@@ -72,6 +72,8 @@ class ExerciseMedia {
     required this.loopSeconds,
     required this.posterSeconds,
     required this.source,
+    this.lightVideo,
+    this.lightPoster,
   });
   /// Pack id; the WebView player plays `/packs/<id>/demo.mp4`.
   final String id;
@@ -82,6 +84,12 @@ class ExerciseMedia {
   final double loopSeconds;
   final double posterSeconds;
   final String source;
+
+  /// Light-stage render of the same clip / cover, when the pack has one.
+  final String? lightVideo;
+  final String? lightPoster;
+
+  bool get hasLight => lightVideo != null && lightPoster != null;
 
   String get playerId => id;
 
@@ -94,6 +102,8 @@ class ExerciseMedia {
       loopSeconds: m.loopSeconds,
       posterSeconds: m.coverSeconds,
       source: (p.json['credits'] as Map?)?['mediaSource'] as String? ?? '',
+      lightVideo: m.lightVideo == null ? null : p.asset(m.lightVideo!),
+      lightPoster: m.lightCover == null ? null : p.asset(m.lightCover!),
     );
   }
 }

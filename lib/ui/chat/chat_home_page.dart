@@ -15,6 +15,7 @@ import '../player_page.dart';
 import '../theme/app_theme.dart';
 import '../theme/sf_icons.dart';
 import '../theme/tokens.dart';
+import '../theme/widgets.dart';
 import 'chat_widgets.dart';
 import 'cosmos.dart';
 import 'expand_route.dart';
@@ -84,12 +85,14 @@ class _ChatHomePageState extends State<ChatHomePage> {
   Future<void> _start(TrainingPlan p, {OriginRect? from}) async {
     final s = AppServices.of(context);
     if (!s.store.trainingAllowed) {
-      _toast(s.store.safetyAccepted
-          ? '根据你的安全确认，暂不开始训练；可以在动作库里看示范。'
-          : '请先在对话里完成安全确认，再开始训练。');
+      _toast(
+        s.store.safetyAccepted
+            ? '根据你的安全确认，暂不开始训练；可以在动作库里看示范。'
+            : '请先在对话里完成安全确认，再开始训练。',
+        icon: SfGlyph.shield,
+      );
       return;
     }
-    HapticFeedback.lightImpact();
     if (!await _chat.started(p)) return;
     final before = s.store.history.length;
     if (!mounted) return;
@@ -106,7 +109,7 @@ class _ChatHomePageState extends State<ChatHomePage> {
   }
 
   Future<void> _save(TrainingPlan p) async {
-    HapticFeedback.selectionClick();
+    SfHaptic.selection.play();
     final saved = await _chat.save(p);
     _toast('已保存为「${saved.name}」');
   }
@@ -124,19 +127,12 @@ class _ChatHomePageState extends State<ChatHomePage> {
     if (mounted && plan != null) await _start(plan);
   }
 
-  void _toast(String text) {
+  void _toast(String text, {SfGlyph icon = SfGlyph.checkCircle}) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(
-        margin: const EdgeInsets.fromLTRB(24, 0, 24, 96),
-        content: Text(text),
-        duration: const Duration(seconds: 2),
-      ));
+    showSfToast(context, text, icon: icon);
   }
 
   Future<void> _send(String text, {String? label}) async {
-    HapticFeedback.selectionClick();
     if (_scroll.hasClients && _scroll.offset > 0) {
       unawaited(_scroll.animateTo(0, duration: const Duration(milliseconds: 300), curve: Curves.easeOut));
     }

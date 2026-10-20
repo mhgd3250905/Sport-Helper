@@ -172,7 +172,7 @@ void main() {
     await tester.tap(find.text('徒手深蹲'));
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
-    await tester.ensureVisible(find.textContaining('注意：'));
+    await tester.ensureVisible(find.text('注意'));
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
     await tester.pumpWidget(const SizedBox());

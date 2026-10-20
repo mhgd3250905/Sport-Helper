@@ -61,6 +61,8 @@ class PackMedia {
     this.showsSide,
     this.width,
     this.height,
+    this.lightCover,
+    this.lightVideo,
   });
 
   /// Paths relative to the pack folder.
@@ -73,6 +75,11 @@ class PackMedia {
   final int? width;
   final int? height;
 
+  /// Optional light-stage render (`media.light`, drill-pack spec §media):
+  /// the same clip baked on #EFEFEF for light themes.
+  final String? lightCover;
+  final String? lightVideo;
+
   factory PackMedia.fromJson(Map<String, dynamic> j) => PackMedia(
     cover: j['cover'] as String,
     coverSeconds: (j['coverSeconds'] as num?)?.toDouble() ?? 0,
@@ -82,6 +89,8 @@ class PackMedia {
     showsSide: j['showsSide'] as String?,
     width: (j['width'] as num?)?.toInt(),
     height: (j['height'] as num?)?.toInt(),
+    lightCover: (j['light'] as Map?)?['cover'] as String?,
+    lightVideo: (j['light'] as Map?)?['video'] as String?,
   );
 }
 

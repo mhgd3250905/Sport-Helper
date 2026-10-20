@@ -371,6 +371,7 @@ void showSfToast(BuildContext context, String text, {SfGlyph icon = SfGlyph.chec
     ..hideCurrentSnackBar()
     ..showSnackBar(
       SnackBar(
+        behavior: SnackBarBehavior.floating,
         margin: EdgeInsets.fromLTRB(SfSpace.x6, 0, SfSpace.x6, bottom),
         backgroundColor: SfColors.isDark ? SfColors.surfaceHigh : SfColors.surface,
         elevation: 0,
