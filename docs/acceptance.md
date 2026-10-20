@@ -2,11 +2,24 @@
 
 ## AI 新接口（0.1.0+5，待验）
 
-分支 `feat/smartfit-ai-replies`，待验版本 `0.1.0+5`，源码 `e549e0f84aa9118ef20752b8926c7b8c602a7e0f`。BaseURL 为 `https://api.uuugk.win/v1`，模型 `deepseek-v4-flash-0731`。APK `.buildlog/install/SmartFit-ai-proxy-0.1.0+5-debug.apk`，203,741,474 bytes，SHA-256 `f3ac1f4276f82c629bb254065d5bc3108d4181a5531679fed7a7d2f90d2a14a4`；debug 签名与旧包相同，ZIP/profile 打包检查通过，已覆盖安装并保留旧数据。6 项 endpoint/UUID/header 配置测试及分析通过；此前核心 180 项本轮未重跑。尚未完成本次验收，合 main 与推送等待新的用户授权。
+分支 `feat/smartfit-ai-replies`，待验版本 `0.1.0+5`，源码 `e549e0f84aa9118ef20752b8926c7b8c602a7e0f`。BaseURL 为 `https://api.uuugk.win/v1`，模型 `deepseek-v4-flash-0731`。APK `.buildlog/install/SmartFit-ai-proxy-0.1.0+5-debug.apk`，203,741,474 bytes，SHA-256 `f3ac1f4276f82c629bb254065d5bc3108d4181a5531679fed7a7d2f90d2a14a4`；debug 签名与旧包相同，ZIP/profile 打包检查通过，已覆盖安装并保留旧数据。6 项 endpoint/UUID/header 配置测试及分析通过；旧源全量 180 项本轮未重跑。尚未完成本次验收，合 main 与推送等待新的用户授权。
 
 App 沿用原 App Key 与原设备 UUID，鉴权仅为 `X-App-Key` 与 `X-Device-Id`，不发送 `Authorization`。`tools/coach/build_debug.ps1 -AppKeyFile` 仅用 dart-define 注入本机文件中的 App Key。随机 UUIDv4 首次持久化成功后才启用 AI，存储失败使用本地引擎。每设备 30 次 / 10 分钟限流由服务器执行，429 给出提示并回退本地。
 
 生成计划限定随包 93 个动作并严格校验后才可保存和开练；SDK 对不合格输出最多重写一次，网络超时/最终校验失败回退本地。发送的历史仅为 AI 可见相关轮次与显式当前计划/训练条件，已存计划和训练历史保存在本机、不自动上传。下方记录旧 AI 计划在 `+5` 的局部 UI 保存/开练，不把它或此前 `+2` 完整训练迁移为新地址 AI 生成链路通过。通知可见性、其他系统中断、Play Console 与正式 release 验收待办保持不变。
+
+### 验证来源与源码绑定
+
+以下均为 2026-10-20 本会话实际执行并记录的结果；2026-10-21 文档收束只核对 Git delta，不读取原始日志、密钥或构建产物，也不重新操作手机。`e549e0f84aa9118ef20752b8926c7b8c602a7e0f` 到收束前 HEAD `4cbadb0c5be786d16694ff1e7fbd2f3cb453925c` 仅变更 README 和 4 份文档，因此下列配置测试与静态分析仍适用于相同运行源码。
+
+| 命令 / 方法 | 结果与 source state | 适用性 |
+| --- | --- | --- |
+| `flutter test --no-pub test/device_identity_test.dart` | 6 项通过；对应 `e549e0f84aa9118ef20752b8926c7b8c602a7e0f` 的提交前同一源码状态 | UUID 与代理配置回归；不把此前全量 180 项再加 6 写成 186 项 |
+| `flutter analyze --no-pub` | 无问题；对应上述 `e549e0f…` 同一源码状态 | 后续仅文档变化，可复用；不是本次新执行 |
+| `./tools/coach/build_debug.ps1 -AppKeyFile '<本机文件，路径不收录>' -FlutterCommand 'E:\flutter\bin\flutter.bat' -BuildLog '.buildlog/ai-proxy-v5-build.log'` | 成功；脚本执行 `flutter build apk --debug --no-pub` 并以 dart-define 注入 App Key；源码 `e549e0f…` | Windows/PowerShell；单次环境 `PUB_HOSTED_URL=https://pub.dev`、`JAVA_HOME=E:\Android\Android Studio\jbr`。只绑定上方已记录的 `+5` 包，不声称收束 HEAD 重新构建 |
+| 调试 VM 延时调用真实 `ChatController`，界面确认；保存/开练/暂停/结束使用 UI 点击，重启后读取持久化状态 | 使用上述 `+5` 包；问答成功、计划请求三次上游失败；旧 AI 计划局部训练及保存结果见下表与下节 | 设备与接口的当时观察；不能代替新接口计划生成成功或完整训练验收 |
+
+旧源 `cc16f530944cf4f6034365aa111528536978ecc3` 的全量 180 项和分析保留为历史记录。该源到 `e549e0f…` 修改了代理配置、关于页、包版本与配置测试；不将旧源全量结果直接写为当前新配置的全量复验。
 
 ### 新地址真机观察
 
@@ -23,7 +36,7 @@ App 沿用原 App Key 与原设备 UUID，鉴权仅为 `X-App-Key` 与 `X-Device
 
 保存的是旧 `+4` 接口生成的原始 AI 计划 `ai-1792509025833151-84572f23`（「办公室肩颈放松」，10 动作），不是新地址生成结果。实际 UI 保存后已存计划 1→2，点击原卡开始 `ugk_trainer`，视频与倒计时正常，暂停后于 34 活动秒提前结束。记录 `sessionId=s-mvgu0k9q-15e74dbd32c5`，`planId` 为上述 AI 计划，`endedEarly=true`、完成 0/10，历史 3→4。
 
-重启后已存计划仍为 2、历史仍为 4，原 AI 计划及该 SessionResult 均保留，原随机设备标识未变，前台服务已释放。收尾时从抽屉返回原 AI 计划卡，已保存状态可见，没有活动前台服务。本次仅验证局部启动/提前结束和持久化，不记作完整训练、`+5` 声音实听或新地址 AI 计划链路通过，源码和 APK 身份仍为上述 `e549e0f` / `+5`。
+重启后已存计划仍为 2、历史仍为 4，原 AI 计划及该 SessionResult 均保留，原随机设备标识未变，前台服务已释放。2026-10-20 收尾时从抽屉返回原 AI 计划卡，已保存状态可见，没有活动前台服务。本次仅验证局部启动/提前结束和持久化，不记作完整训练、`+5` 声音实听或新地址 AI 计划链路通过，源码和 APK 身份仍为上述 `e549e0f` / `+5`。
 
 问答和计划请求通过调试 VM 的延时 Future 调用真实 `ChatController` 发送，并在 UI 确认文字/卡片；保存、开练、暂停与结束均为实际 UI 点击。本机忽略日志为 `.buildlog/ai-v5-safe-usage.json`、`ai-new-endpoint-tests.log` / 分析日志及 `ai-phone-state.json`，不提交含设备状态的原始日志。
 
