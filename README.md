@@ -8,6 +8,14 @@
 - Flutter（沙盒 3.47.6 / Dart 3.13，`sdk: ^3.12.0`，与 HipLab 3.44.7 兼容），Android 先行，iOS 同代码库
 - 完全离线、无账号、不联网（WebView 只连本机回环地址播放内置视频）
 
+## 版本与验收入口
+
+当前源码里程碑为 `m7-aesthetic-v2`，PR #1、#2、#3 均已合并。App 包版本仍为 `0.1.0+1`；里程碑标签不等于 Android 包版本。最新版 Android debug 测试包已在本地交付，用户已取包，功能验证结果待反馈；release 构建、正式签名和完整真机验收仍未完成。
+
+- [版本管理与台账](docs/version-management.md)：当前版本、里程碑 SHA、测试包身份、版本更新及交付规则的统一入口。
+- [本机验收记录](docs/acceptance.md)：各检查点的验证证据、环境和待验清单。
+- [阶段交接记录](docs/HANDOVER.md)：角色与约束，以及明确标记的历史交接内容。
+
 ## 目录
 
 ```
@@ -19,7 +27,7 @@ lib/core/        复制自 HipLab（媒体播放 WebView、本地存储、屏幕
 lib/chat/        对话：ChatEngine 接口 + RuleChatEngine（关键词/槽位 + 模板 + 校验）、SlotParser、
                  ChatController（会话、开场安全确认、保存计划、本地历史）、safety_script（免责声明与 4 问）
 lib/ui/chat/     对话主界面：星尘背景、色调气泡、计划卡片、已存计划抽屉
-lib/ui/          训练计划(训练小组) → 跟练 → 动作库 / 关于；custom_plan_page = 原表单（抽屉「自定义计划」）
+lib/ui/          训练计划(训练小组) → 跟练 → 动作库 / 设置；custom_plan_page = 原表单（对话「自己选条件」）
 lib/packs/       动作小包读取（与 App 无关，可整体拷走）
 assets/packs/    动作小包：每个动作一个文件夹 <id>/{pack.json, cover.jpg, demo.mp4, voice/zh/*.m4a}，
                  公共包 _common/（数字、单位、口令、提示音）+ index.json —— 格式见 docs/drill-pack-spec.md
