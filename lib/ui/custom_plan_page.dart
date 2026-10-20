@@ -69,9 +69,7 @@ class _CustomPlanPageState extends State<CustomPlanPage> {
     setState(() => _busy = false);
     final plan = r.plan;
     if (plan == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('没能生成计划：${r.issues.take(2).join('；')}')),
-      );
+      showSfToast(context, '没能生成计划：${r.issues.take(2).join('；')}', icon: SfGlyph.info, bottom: 24);
       return;
     }
     await s.store.rememberPlan(plan);

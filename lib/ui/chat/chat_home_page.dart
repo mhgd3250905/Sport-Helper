@@ -211,6 +211,10 @@ class _ChatHomePageState extends State<ChatHomePage> {
     final rows = <Widget>[];
     final msgs = _chat.messages;
     final now = DateTime.now();
+    final still = SfMotion.reduced(context);
+    // M4: the messages of one reply land one after another, 120 ms apart
+    // (words first, then the card); the user's own line lands at once.
+    var queued = 0;
     for (var i = 0; i < msgs.length; i++) {
       final m = msgs[i];
       final prev = i == 0 ? null : msgs[i - 1];
@@ -223,8 +227,10 @@ class _ChatHomePageState extends State<ChatHomePage> {
           key: ValueKey(m.id),
           padding: EdgeInsets.only(top: sameSide ? SfSpace.x2 : SfSpace.x4),
           child: Appear(
-            animate: !_seen.contains(m.id) && !(MediaQuery.maybeDisableAnimationsOf(context) ?? false),
-            child: _message(m),
+            animate: !_seen.contains(m.id),
+            delay: !_seen.contains(m.id) && !m.isUser && !still ? SfMotion.replyStagger * queued++ : Duration.zero,
+            anchor: m.isUser ? Alignment.bottomRight : Alignment.bottomLeft,
+            child: _message(m, fresh: !_seen.contains(m.id)),
           ),
         ),
       );
@@ -273,9 +279,10 @@ class _ChatHomePageState extends State<ChatHomePage> {
     );
   }
 
-  Widget _message(ChatMessage m) => m.isPlan
+  Widget _message(ChatMessage m, {bool fresh = false}) => m.isPlan
       ? PlanCard(
           plan: m.plan!,
+          landing: fresh,
           library: AppServices.of(context).library,
           saved: _chat.isSaved(m.plan!),
           onStart: (from) => _start(m.plan!, from: from),

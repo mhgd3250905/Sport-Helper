@@ -5,31 +5,62 @@ import '../theme/sf_icons.dart';
 import '../theme/tokens.dart';
 import '../theme/widgets.dart';
 
-/// New messages rise 12 px and fade in once; old ones (and everything
-/// under reduced motion) appear as they are.
+/// A new message arriving (docs/design-audit-2026-10-19.md M4): fade +
+/// 10 px rise + 0.98 → 1 from the speaker's corner ([anchor]: bottom-left
+/// for the assistant, bottom-right for the user), 360 ms. Messages of one
+/// reply follow each other by [delay] (words first, then the card). Old
+/// messages appear as they are; reduced motion keeps a 200 ms fade only.
+///
+/// The delay is part of the animation (an [Interval]), not a timer, so
+/// nothing is left pending when the chat goes away.
 class Appear extends StatefulWidget {
-  const Appear({super.key, required this.animate, required this.child, this.delay = Duration.zero});
+  const Appear({
+    super.key,
+    required this.animate,
+    required this.child,
+    this.delay = Duration.zero,
+    this.anchor = Alignment.bottomLeft,
+    this.rise = 10,
+    this.shift = 0,
+    this.duration = SfMotion.appear,
+    this.scaleFrom = .98,
+  });
   final bool animate;
   final Duration delay;
   final Widget child;
+  final Alignment anchor;
+
+  /// Pixels it rises (y) / slides left (x, the suggestion chips) as it lands.
+  final double rise;
+  final double shift;
+  final Duration duration;
+  final double scaleFrom;
   @override
   State<Appear> createState() => _AppearState();
 }
 
 class _AppearState extends State<Appear> with SingleTickerProviderStateMixin {
-  late final AnimationController _c = AnimationController(vsync: this, duration: SfMotion.appear);
-  late final Animation<double> _t = CurvedAnimation(parent: _c, curve: SfMotion.standard);
+  late final AnimationController _c = AnimationController(vsync: this);
+  Animation<double> _t = kAlwaysCompleteAnimation;
+  bool _still = false;
+  bool _begun = false;
 
   @override
-  void initState() {
-    super.initState();
-    if (widget.animate) {
-      Future<void>.delayed(widget.delay, () {
-        if (mounted) _c.forward();
-      });
-    } else {
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_begun) return;
+    _begun = true;
+    _still = SfMotion.reduced(context);
+    if (!widget.animate) {
       _c.value = 1;
+      return;
     }
+    final run = _still ? const Duration(milliseconds: 200) : widget.duration;
+    final total = widget.delay + run;
+    _c.duration = total;
+    final start = widget.delay.inMicroseconds / total.inMicroseconds;
+    _t = CurvedAnimation(parent: _c, curve: Interval(start, 1, curve: _still ? Curves.easeOut : SfMotion.standard));
+    _c.forward();
   }
 
   @override
@@ -42,10 +73,22 @@ class _AppearState extends State<Appear> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) => AnimatedBuilder(
     animation: _t,
     child: widget.child,
-    builder: (_, child) => Opacity(
-      opacity: _t.value,
-      child: Transform.translate(offset: Offset(0, 12 * (1 - _t.value)), child: child),
-    ),
+    builder: (_, child) {
+      final v = _t.value;
+      if (v >= 1) return child!;
+      if (_still) return Opacity(opacity: v, child: child);
+      return Opacity(
+        opacity: v,
+        child: Transform.translate(
+          offset: Offset(widget.shift * (1 - v), widget.rise * (1 - v)),
+          child: Transform.scale(
+            scale: widget.scaleFrom + (1 - widget.scaleFrom) * v,
+            alignment: widget.anchor,
+            child: child,
+          ),
+        ),
+      );
+    },
   );
 }
 
@@ -291,7 +334,17 @@ class SuggestionStrip extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(SfSpace.x4, SfSpace.x1, SfSpace.x4, SfSpace.x2),
         itemCount: items.length,
         separatorBuilder: (_, _) => const SizedBox(width: SfSpace.x2),
-        itemBuilder: (_, i) => SfPressable(
+        // M6: a new batch arrives chip by chip (40 ms apart), sliding 8 px
+        // left as it fades in.
+        itemBuilder: (_, i) => Appear(
+          key: ValueKey('suggestion-in-${items.join('|')}-$i'),
+          animate: true,
+          delay: SfMotion.stagger * i,
+          duration: SfMotion.medium,
+          rise: 0,
+          shift: 8,
+          scaleFrom: 1,
+          child: SfPressable(
           key: ValueKey('suggestion-$i'),
           semanticLabel: items[i],
           haptic: SfHaptic.selection,
@@ -307,6 +360,7 @@ class SuggestionStrip extends StatelessWidget {
               items[i],
               style: TextStyle(color: SfColors.muted, fontSize: 14, height: 1.2, fontWeight: FontWeight.w500),
             ),
+          ),
           ),
         ),
       ),
@@ -430,12 +484,19 @@ class _ChatInputBarState extends State<ChatInputBar> {
                             shape: BoxShape.circle,
                             color: ready ? SfColors.accent : SfColors.surfaceHigh,
                           ),
+                          // M9: the arrow grows into place as the disc
+                          // turns accent; reduced motion: colour only.
                           child: Center(
-                            child: SfIcon(
-                              SfGlyph.arrowUp,
-                              size: 18,
-                              strokeWidth: 2.2,
-                              color: ready ? SfColors.onAccent : SfColors.faint,
+                            child: AnimatedScale(
+                              scale: ready || SfMotion.reduced(context) ? 1 : .84,
+                              duration: SfMotion.fast,
+                              curve: SfMotion.standard,
+                              child: SfIcon(
+                                SfGlyph.arrowUp,
+                                size: 18,
+                                strokeWidth: 2.2,
+                                color: ready ? SfColors.onAccent : SfColors.faint,
+                              ),
                             ),
                           ),
                         ),
