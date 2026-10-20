@@ -19,6 +19,8 @@ dependencies:
   just_audio: 0.10.6
   audio_session: 0.2.4
   wakelock_plus: 1.8.1
+  liquid_glass_widgets: 1.14.0
+  cupertino_icons: ^1.0.8
 
 dev_dependencies:
   flutter_test:

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
 import '../app/services.dart';
 import '../core/platform/screen_awake.dart';
@@ -16,6 +17,7 @@ import 'exercise_video.dart';
 import 'theme/app_theme.dart';
 import 'theme/celebration.dart';
 import 'theme/countdown.dart';
+import 'theme/glass.dart';
 import 'theme/media_theme.dart';
 import 'theme/sf_icons.dart';
 import 'theme/tokens.dart';
@@ -330,7 +332,15 @@ class _PlayerPageState extends State<PlayerPage> {
           // The chat's sky, held still: no star drift during a workout.
           body: CosmosBackground(
             animate: false,
-            child: SafeArea(child: _engine.done ? _doneView() : _sessionView(p, e)),
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                // A quieter colour field than the chat's, for the glass
+                // controls to refract (the video stays the hero).
+                const SfGlassField(player: true),
+                SafeArea(child: _engine.done ? _doneView() : _sessionView(p, e)),
+              ],
+            ),
           ),
         ),
       ),
@@ -356,25 +366,45 @@ class _PlayerPageState extends State<PlayerPage> {
     final sub = _subtitle ?? (rest ? e?.cue : null);
     final current = (done + (rest ? 0 : 1)).clamp(1, _occurrences);
     final fraction = _occurrences == 0 ? 0.0 : done / _occurrences;
-    return Column(
+    // Liquid glass budget on the player (docs/liquid-glass-plan.md §4): the
+    // close disc, the progress capsule, 不舒服, 下一个 and the control
+    // capsule, all ≤ standard quality, sharing one backdrop read where the
+    // engine allows it.
+    return GlassBackdropGroup(
+      child: Column(
       children: [
         // Top bar: close · block + progress · count.
         Padding(
           padding: const EdgeInsets.fromLTRB(SfSpace.x4, SfSpace.x2, SfSpace.gutter, SfSpace.x2),
           child: Row(
             children: [
-              SfCircleButton(
-                key: const ValueKey('close'),
-                tooltip: '关闭训练',
-                icon: SfGlyph.close,
-                onPressed: () async {
-                  final nav = Navigator.of(context);
-                  if (await _confirmClose()) nav.pop();
-                },
+              SfGlassSurface(
+                width: 44,
+                height: 44,
+                quality: SfGlass.overMedia,
+                child: SfCircleButton(
+                  key: const ValueKey('close'),
+                  tooltip: '关闭训练',
+                  icon: SfGlyph.close,
+                  fill: Colors.transparent,
+                  onPressed: () async {
+                    final nav = Navigator.of(context);
+                    if (await _confirmClose()) nav.pop();
+                  },
+                ),
               ),
-              const SizedBox(width: SfSpace.x4),
+              const SizedBox(width: SfSpace.x3),
               Expanded(
-                child: Column(
+                child: SfGlassSurface(
+                  radius: 22,
+                  height: 44,
+                  quality: SfGlass.overMedia,
+                  padding: const EdgeInsets.symmetric(horizontal: SfSpace.x4),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -389,7 +419,7 @@ class _PlayerPageState extends State<PlayerPage> {
                         style: SfType.label.copyWith(color: SfColors.accentText, fontWeight: FontWeight.w600),
                       ),
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 5),
                     // M15: the bar eases to the new share instead of jumping.
                     TweenAnimationBuilder<double>(
                       tween: Tween(end: fraction),
@@ -406,15 +436,19 @@ class _PlayerPageState extends State<PlayerPage> {
                       ),
                     ),
                   ],
+                        ),
+                      ),
+                      const SizedBox(width: SfSpace.x3),
+                      Text.rich(
+                        TextSpan(children: [
+                          TextSpan(text: '$current', style: SfType.callout.copyWith(fontWeight: FontWeight.w700)),
+                          TextSpan(text: ' / $_occurrences', style: SfType.label),
+                        ]),
+                        style: const TextStyle(fontFeatures: SfType.tabular),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(width: SfSpace.x4),
-              Text.rich(
-                TextSpan(children: [
-                  TextSpan(text: '$current', style: SfType.callout.copyWith(fontWeight: FontWeight.w700)),
-                  TextSpan(text: ' / $_occurrences', style: SfType.label),
-                ]),
-                style: const TextStyle(fontFeatures: SfType.tabular),
               ),
             ],
           ),
@@ -469,7 +503,24 @@ class _PlayerPageState extends State<PlayerPage> {
                         onTap: _discomfort,
                         child: Padding(
                           padding: const EdgeInsets.all(SfSpace.x1),
-                          child: SfMediaTag(label: '不舒服', icon: SfGlyph.bandage, color: SfPalette.dark.caution),
+                          // The one glass surface over the video.
+                          child: SfGlassSurface(
+                            radius: 16,
+                            height: 32,
+                            quality: SfGlass.overMedia,
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                SfIcon(SfGlyph.bandage, size: 15, filled: true, color: SfColors.caution),
+                                const SizedBox(width: 6),
+                                Text(
+                                  '不舒服',
+                                  style: TextStyle(fontSize: 13, height: 1.2, fontWeight: FontWeight.w600, color: SfColors.text),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -571,9 +622,16 @@ class _PlayerPageState extends State<PlayerPage> {
             ],
           ),
         ),
+        // The control capsule: one glass platter; prev / next are clear
+        // discs on it, pause stays the screen's one solid accent.
         Padding(
-          padding: const EdgeInsets.fromLTRB(48, SfSpace.x2, 48, SfSpace.x5),
-          child: Row(
+          padding: const EdgeInsets.fromLTRB(40, SfSpace.x2, 40, SfSpace.x5),
+          child: SfGlassSurface(
+            radius: 46,
+            height: 92,
+            quality: SfGlass.overMedia,
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               SfCircleButton(
@@ -581,6 +639,7 @@ class _PlayerPageState extends State<PlayerPage> {
                 tooltip: '上一个动作',
                 icon: SfGlyph.skipPrevious,
                 size: 56,
+                fill: Colors.transparent,
                 haptic: SfHaptic.selection,
                 onPressed: _previous,
               ),
@@ -634,13 +693,16 @@ class _PlayerPageState extends State<PlayerPage> {
                 tooltip: '跳过动作',
                 icon: SfGlyph.skipNext,
                 size: 56,
+                fill: Colors.transparent,
                 haptic: SfHaptic.selection,
                 onPressed: _skip,
               ),
             ],
           ),
+          ),
         ),
       ],
+      ),
     );
   }
 
@@ -675,9 +737,11 @@ class _PlayerPageState extends State<PlayerPage> {
     return Padding(
       key: ValueKey('next-${e.id}'),
       padding: const EdgeInsets.only(top: SfSpace.x5),
-      child: SfPanel(
+      // 下一个 peek: a glass strip (the thumbnail inside stays opaque).
+      child: SfGlassSurface(
         padding: const EdgeInsets.all(SfSpace.x2),
         radius: SfRadius.md + 2,
+        quality: SfGlass.overMedia,
         child: Row(
           children: [
             ClipRRect(

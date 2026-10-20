@@ -2,12 +2,14 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
 import 'app/services.dart';
 import 'core/storage/local_state_storage.dart';
 import 'data/app_store.dart';
 import 'ui/chat/chat_home_page.dart';
 import 'ui/theme/app_theme.dart';
+import 'ui/theme/glass.dart';
 import 'ui/theme/tokens.dart';
 import 'voice/just_audio_output.dart';
 
@@ -22,6 +24,8 @@ void registerFontLicense() {
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   registerFontLicense();
+  // Pre-warm the glass shaders before the first frame (no white flash).
+  await LiquidGlassWidgets.initialize();
   final (lib, catalog, voices) = await AppServices.loadContent();
   final store = AppStore(SharedPreferencesLocalStateStorage());
   await store.load();
@@ -32,7 +36,20 @@ Future<void> main() async {
     voiceLibrary: voices,
     voiceOutput: JustAudioVoiceOutput(),
   );
-  runApp(SmartFitApp(services: services));
+  runApp(
+    LiquidGlassWidgets.wrap(
+      // Material theme mode drives the glass brightness.
+      brightnessResolver: Theme.maybeBrightnessOf,
+      // Benchmarks the device's raster budget and settles premium / standard
+      // / minimal; the settled tier is kept so the next launch starts there.
+      adaptiveQuality: true,
+      adaptiveConfig: GlassAdaptiveScopeConfig(
+        initialQuality: SfGlass.parse(store.glassQuality),
+        onQualityChanged: (_, to) => store.setGlassQuality(to.name),
+      ),
+      child: SmartFitApp(services: services),
+    ),
+  );
 }
 
 class SmartFitApp extends StatefulWidget {
@@ -65,7 +82,12 @@ class _SmartFitAppState extends State<SmartFitApp> {
         locale: const Locale('zh', 'CN'),
         supportedLocales: const [Locale('zh', 'CN'), Locale('en')],
         localizationsDelegates: GlobalMaterialLocalizations.delegates,
-        builder: (context, child) => SfPaletteScope(child: child!),
+        // Glass widgets render text outside a Scaffold (toasts, overlays):
+        // a transparent Material gives them Material text and ink.
+        builder: (context, child) => Material(
+          type: MaterialType.transparency,
+          child: SfPaletteScope(child: child!),
+        ),
         // The chat opens with the safety talk on first launch.
         home: const ChatHomePage(),
       ),

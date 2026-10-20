@@ -70,6 +70,11 @@ class AppStore extends ChangeNotifier {
   String appearance = 'system';
   static const appearances = ['dark', 'light', 'system'];
 
+  /// The liquid-glass quality the adaptive scope settled on last run
+  /// ('premium' | 'standard' | 'minimal'), so the next launch starts there
+  /// instead of re-benchmarking from standard. Null until measured.
+  String? glassQuality;
+
   /// How many chat messages are kept on the device.
   static const chatLogLimit = 60;
 
@@ -89,6 +94,7 @@ class AppStore extends ChangeNotifier {
         );
       }
       starfield = j['starfield'] != false;
+      if (j['glassQuality'] is String) glassQuality = j['glassQuality'] as String;
       if (appearances.contains(j['appearance'])) appearance = j['appearance'] as String;
       savedPlans
         ..clear()
@@ -113,8 +119,8 @@ class AppStore extends ChangeNotifier {
     }
   }
 
-  Future<void> _save() async {
-    notifyListeners();
+  Future<void> _save({bool notify = true}) async {
+    if (notify) notifyListeners();
     try {
       await _storage.write(
         key,
@@ -126,6 +132,7 @@ class AppStore extends ChangeNotifier {
           'history': [for (final h in history.take(30)) h.toJson()],
           'starfield': starfield,
           'appearance': appearance,
+          'glassQuality': ?glassQuality,
           'savedPlans': [for (final p in savedPlans) p.toJson()],
           'chat': chatLog.length > chatLogLimit
               ? chatLog.sublist(chatLog.length - chatLogLimit)
@@ -169,6 +176,14 @@ class AppStore extends ChangeNotifier {
   Future<void> setStarfield(bool on) {
     starfield = on;
     return _save();
+  }
+
+  /// Silent: called from the glass adaptive scope mid-frame, and nothing
+  /// on screen depends on the stored value.
+  Future<void> setGlassQuality(String q) {
+    if (q == glassQuality) return Future.value();
+    glassQuality = q;
+    return _save(notify: false);
   }
 
   Future<void> setAppearance(String a) {

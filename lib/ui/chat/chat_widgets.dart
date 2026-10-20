@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../chat/chat_models.dart';
+import '../theme/glass.dart';
 import '../theme/sf_icons.dart';
 import '../theme/tokens.dart';
 import '../theme/widgets.dart';
@@ -407,13 +408,12 @@ class SuggestionStrip extends StatelessWidget {
           semanticLabel: items[i],
           haptic: SfHaptic.selection,
           onTap: () => onTap(items[i]),
-          child: Container(
+          // Liquid glass: discovery chips are controls, so they float on
+          // glass over the colour field (standard quality).
+          child: SfGlassSurface(
+            radius: 18,
+            height: 36,
             padding: const EdgeInsets.symmetric(horizontal: 14),
-            alignment: Alignment.center,
-            decoration: ShapeDecoration(
-              color: SfColors.isDark ? SfColors.surface : SfColors.surface,
-              shape: StadiumBorder(side: SfColors.cardEdge),
-            ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -423,7 +423,7 @@ class SuggestionStrip extends StatelessWidget {
                 ],
                 Text(
                   items[i],
-                  style: TextStyle(color: SfColors.muted, fontSize: 14, height: 1.2, fontWeight: FontWeight.w500),
+                  style: TextStyle(color: SfColors.text.withValues(alpha: .78), fontSize: 14, height: 1.2, fontWeight: FontWeight.w500),
                 ),
               ],
             ),
@@ -481,17 +481,13 @@ class _ChatInputBarState extends State<ChatInputBar> {
     final ready = _text.text.trim().isNotEmpty && widget.enabled;
     return Padding(
       padding: const EdgeInsets.fromLTRB(SfSpace.x3, 0, SfSpace.x3, SfSpace.x3),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(26),
-          boxShadow: SfColors.cardShadow,
-        ),
+      // Liquid glass: the input is the chat's persistent bar, so it gets
+      // the premium material when the device allows (adaptive ceiling).
+      child: SfGlassSurface(
+        radius: 26,
+        quality: SfGlass.bar,
         child: Material(
-          color: SfColors.surface,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(26),
-            side: SfColors.cardEdge,
-          ),
+          type: MaterialType.transparency,
           child: ConstrainedBox(
             constraints: const BoxConstraints(minHeight: 52),
             child: Padding(
@@ -553,7 +549,7 @@ class _ChatInputBarState extends State<ChatInputBar> {
                           height: 36,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: ready ? SfColors.accent : SfColors.surfaceHigh,
+                            color: ready ? SfColors.accent : SfColors.text.withValues(alpha: .08),
                           ),
                           // M9: the arrow grows into place as the disc
                           // turns accent; reduced motion: colour only.

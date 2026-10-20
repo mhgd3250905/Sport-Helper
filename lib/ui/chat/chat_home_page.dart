@@ -14,6 +14,7 @@ import '../library_page.dart';
 import '../plan_page.dart';
 import '../player_page.dart';
 import '../theme/app_theme.dart';
+import '../theme/glass.dart';
 import '../theme/sf_icons.dart';
 import '../theme/tokens.dart';
 import '../theme/widgets.dart';
@@ -185,25 +186,33 @@ class _ChatHomePageState extends State<ChatHomePage> {
           listenable: s.store,
           builder: (context, _) => CosmosBackground(
             animate: s.store.starfield,
-            child: SafeArea(
-              child: ListenableBuilder(
-                listenable: _chat,
-                builder: (context, _) => Column(
-                  children: [
-                    Expanded(child: _messages()),
-                    SuggestionStrip(
-                      items: _chat.typing ? const [] : _chat.suggestions,
-                      onTap: _send,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                // Liquid glass needs something to refract: a soft colour
+                // field under the chips and the input bar.
+                const SfGlassField(),
+                SafeArea(
+                  child: ListenableBuilder(
+                    listenable: _chat,
+                    builder: (context, _) => Column(
+                      children: [
+                        Expanded(child: _messages()),
+                        SuggestionStrip(
+                          items: _chat.typing ? const [] : _chat.suggestions,
+                          onTap: _send,
+                        ),
+                        ChatInputBar(
+                          focusNode: _input,
+                          onSend: _send,
+                          enabled: !_chat.typing,
+                          onPlans: () => _scaffold.currentState?.openDrawer(),
+                        ),
+                      ],
                     ),
-                    ChatInputBar(
-                      focusNode: _input,
-                      onSend: _send,
-                      enabled: !_chat.typing,
-                      onPlans: () => _scaffold.currentState?.openDrawer(),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
+              ],
             ),
           ),
         ),
