@@ -107,7 +107,21 @@ class _ExerciseVideoState extends State<ExerciseVideo> {
             e.media.poster,
             fit: BoxFit.contain,
             gaplessPlayback: true,
-            errorBuilder: (_, _, _) => ColoredBox(color: SfColors.mediaStage),
+            // Error state: the stage with a quiet figure and one line, not
+            // an empty box that looks like a rendering bug.
+            errorBuilder: (_, _, _) => ColoredBox(
+              color: SfColors.mediaStage,
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SfIcon(SfGlyph.figure, size: 32, color: SfColors.onStageMuted.withValues(alpha: .5)),
+                    const SizedBox(height: SfSpace.x2),
+                    Text('示范暂时加载不了', style: SfType.caption.copyWith(color: SfColors.onStageMuted)),
+                  ],
+                ),
+              ),
+            ),
           ),
       ],
     );

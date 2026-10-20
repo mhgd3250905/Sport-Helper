@@ -378,7 +378,7 @@ class _MoveRow extends StatelessWidget {
           width: 20,
           child: Text(
             '$index',
-            style: SfType.label.copyWith(color: SfColors.faint, fontFeatures: SfType.tabular),
+            style: SfType.label.copyWith(color: SfColors.muted, fontFeatures: SfType.tabular),
           ),
         ),
         ClipRRect(

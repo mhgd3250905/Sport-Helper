@@ -134,10 +134,32 @@ class _PlanPageState extends State<PlanPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SfFadeSwitcher(child: Text(selected.name, key: ValueKey(selected.id), style: SfType.title)),
-                  const SizedBox(height: SfSpace.x1),
-                  Text('要领：${selected.cue}', style: SfType.body.copyWith(fontSize: 15, height: 1.55)),
-                  Text('目标：${selected.muscles.join('、')}', style: SfType.label),
+                  SfFadeSwitcher(
+                    child: Column(
+                      key: ValueKey(selected.id),
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(selected.name, style: SfType.title.copyWith(fontWeight: FontWeight.w800)),
+                        const SizedBox(height: 2),
+                        Text(selected.muscles.join('、'), style: SfType.label),
+                        const SizedBox(height: SfSpace.x2),
+                        // 要领: one line with the subtitle glyph, no prefix.
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(top: 2),
+                              child: SfIcon(SfGlyph.subtitles, size: 18, color: SfColors.faint),
+                            ),
+                            const SizedBox(width: SfSpace.x2),
+                            Expanded(
+                              child: Text(selected.cue, style: SfType.body.copyWith(fontSize: 15, height: 1.55, color: SfColors.muted)),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -149,7 +171,7 @@ class _PlanPageState extends State<PlanPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('已按你的情况调整', style: SfType.callout.copyWith(fontWeight: FontWeight.w600)),
+                  Text('已按你的情况调整', style: SfType.label.copyWith(fontWeight: FontWeight.w600)),
                   const SizedBox(height: SfSpace.x1),
                   for (final n in _plan.notes) Text('· $n', style: SfType.label.copyWith(height: 1.6)),
                 ],

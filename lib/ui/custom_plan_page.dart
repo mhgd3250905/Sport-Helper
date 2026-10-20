@@ -96,7 +96,8 @@ class _CustomPlanPageState extends State<CustomPlanPage> {
             if (!s.store.trainingAllowed) _blockedBanner(),
             Padding(
               padding: const EdgeInsets.fromLTRB(SfSpace.x1, 0, SfSpace.x1, SfSpace.x2),
-              child: Text('描述你今天想怎么练', style: SfType.headline),
+              // One title (the top bar); the field is introduced by a hint.
+              child: Text('描述你今天想怎么练', style: SfType.label.copyWith(fontWeight: FontWeight.w600)),
             ),
             TextField(
               key: const ValueKey('prompt'),

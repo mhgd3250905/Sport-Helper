@@ -123,4 +123,15 @@ void main() {
     final field = tester.widget<TextField>(find.byKey(const ValueKey('chat-input')));
     expect(field.focusNode!.hasFocus, isTrue);
   });
+
+  testWidgets('safety talk: each question carries its step as a caption', (tester) async {
+    tall(tester);
+    final s = services();
+    await tester.pumpWidget(SmartFitApp(services: s));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byWidgetPredicate((w) => w is OptionPill && w.label == '我已了解' && w.enabled));
+    await tester.pumpAndSettle();
+    expect(find.text('安全确认 1/4'), findsOneWidget);
+    expect(find.textContaining('1/4\u3000'), findsNothing);
+  });
 }

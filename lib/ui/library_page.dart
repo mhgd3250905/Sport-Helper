@@ -24,7 +24,7 @@ class _LibraryPageState extends State<LibraryPage> {
     final lib = AppServices.of(context).library;
     final list = lib.all.where((e) => _cat == null || e.category == _cat).toList();
     return Scaffold(
-      appBar: SfTopBar(title: '动作库', caption: '${lib.length} 个动作 · 点开看示范'),
+      appBar: SfTopBar(title: '动作库', caption: '${lib.length} 个动作'),
       body: Column(children: [
         SizedBox(
           height: 50,

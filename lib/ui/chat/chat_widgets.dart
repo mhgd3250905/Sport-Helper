@@ -126,6 +126,12 @@ class _Bubble extends StatelessWidget {
   }
 }
 
+/// "1/4　问题" → ('1/4', '问题'); null for any other text.
+(String, String)? _step(String text) {
+  final m = RegExp(r'^(\d+/\d+)\u3000(.+)$', dotAll: true).firstMatch(text);
+  return m == null ? null : ('安全确认 ${m.group(1)}', m.group(2)!);
+}
+
 class MessageBubble extends StatelessWidget {
   const MessageBubble({
     super.key,
@@ -148,7 +154,13 @@ class MessageBubble extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (message.text.isNotEmpty) Text(message.text, style: SfType.body),
+          if (_step(message.text) case (final step, final rest)) ...[
+            // 安全确认 1/4: the step as a caption over the question.
+            Text(step, style: SfType.caption.copyWith(color: SfColors.muted, letterSpacing: .6, fontFeatures: SfType.tabular)),
+            const SizedBox(height: 2),
+            Text(rest, style: SfType.body),
+          ] else if (message.text.isNotEmpty)
+            Text(message.text, style: SfType.body),
           if (message.options.isNotEmpty) ...[
             const SizedBox(height: SfSpace.x3),
             Wrap(
