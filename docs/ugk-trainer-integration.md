@@ -58,3 +58,24 @@ SDK：`flutter analyze --no-pub` 无问题；`flutter test --no-pub --reporter e
 - 确认 Play Console 应用及权限，录制演示，审阅声明后提交。
 
 SDK 与 SmartFit main 已按用户同意依次合入并推送，依赖远端可获取。Play Console、通知可见性及其余范围仍按发布目标继续处理；没有创建新发布标签，release 正式签名仍沿用原待办。
+
+
+## 后续修复（2026-10-20）
+
+本轮源码在 SmartFit `fix/chat-keyboard-reopen`，运行提交 `aea879127ab0b7dbbc0b7f3463e1a45330916783`；SDK 在 `fix/catalog-repseconds-source@9407bf3afab547868d7079d3bc6833a4b1d94147`。两仓均为本地成果，尚未合入 main、未推送，等待开哥同意。合并时先推送 SDK，确认远端可获取后再合入、推送 App。
+
+SDK `Rhythm.fromJson` 将显式 `source=repSeconds` 映射为 `RhythmSource.repSeconds`，其余仍为 catalog。四项新增回归覆盖真实目录解析、与直接派生节奏一致、1–12 次语音报数、计时剂量退回 `timedHold` 和其他来源不变；修前 3 失败、1 通过，修后包全量 **100 项通过**、`flutter analyze --no-pub` 无问题。包版本仍为 `ugk_trainer 0.1.0` / `ugk_coach 0.1.2`。App 两个 Git 依赖和 lock 固定到相同新 SHA；当前联调仅在单次命令中以本机 Git 仓库解析该未发布提交，严格锁文件解析通过，没有 path override、全局 Git 配置变更或 hosted 依赖升级。远端可获取性须在获准推送后核实。
+
+主页键盘故障时微信输入法报告已显示，但实际 IME frame 只有 `[0,2771][1280,2772]` 的 1px。Dart 焦点重建与输入类型实验均未通过真机复验，已移除，最终输入组件与原 main 一致。仅重启微信输入法服务、保留默认输入法和全部数据后，IME 恢复为 1136px；用户以手指收起重开并输入，确认“现在正常”。本机 ADB 模拟文字输入能再次触发空键盘/顶端候选状态，不能再用它代替软件键盘验收，也未据此认定所有同类故障的根因。
+
+最终源码 `flutter test --no-pub --concurrency=2 --reporter expanded` **156 项通过**，`flutter analyze --no-pub` 无问题；`flutter build apk --debug --no-pub` 成功。去除实验后的最终 APK 已 `adb install -r` 覆盖安装，未清数据：点击输入框、实际软件键盘按键输入、删除测试草稿、收起重开均通过。没有发送测试消息、没有新增训练记录。本轮没有重跑完整训练，完整训练证据属于此前的 `0.1.0+2`。
+
+| 最终测试包 | 记录 |
+| --- | --- |
+| 文件 | `.buildlog/install/SmartFit-repseconds-0.1.0+3-final-debug.apk`，本地忽略目录，已安装，未上传 |
+| 包身份 | `com.ugk.smartfit`，versionName `0.1.0`、versionCode `3`；关于页 `0.1.0+3 (MVP)` |
+| 大小 / SHA-256 | 229,517,996 bytes；`eaf476070c6bcfbc1c55f9d0df13ed5a1981e785e87316a60192687d8b6ce8ad` |
+| 签名 | debug，与旧包同证书；SHA-256 `3761270a4764157f0e389014a9e5b800b05403bfddce0f4f7f8c039f6a53bdc7` |
+| 检查 / 原始证据 | ZIP 完整性、签名和版本检查通过；日志及截图仅在 `.buildlog/keyboard-fix-20261020/`，不入 Git |
+
+中途同版本的实验 APK 未作为最终验收包，以上文件名和摘要唯一标识最终包。先前 Play Console、通知可见性及 release 待办不因本轮修复改变。

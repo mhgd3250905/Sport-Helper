@@ -7,20 +7,20 @@
 | 项目 | 当前事实 / 事实来源 |
 | --- | --- |
 | 主线与合并 | 本机维护 `main`；PR #1、#2、#3 及 `feat/ugk-trainer-integration` 已合入并推送 |
-| 当前源码状态 | 接入检查点 `04112472a1ab8f07cebc1e7feb00604a56796b56` 已进入远端 main；后续仅对齐主线文档，最新 HEAD 以 Git 查询为准。App `0.1.0+2`，关于页 `0.1.0+2 (MVP)`，见 [接入记录](ugk-trainer-integration.md) |
-| 共享训练依赖 | SDK 修复 `ea00ff7f2a4b7f46274b70708a45b435f269f993` 已进入 SDK 远端 main；全新 GitHub 克隆及严格锁文件解析通过。包版本元数据为 `ugk_coach 0.1.2` / `ugk_trainer 0.1.0` |
+| 当前源码状态 | main 已合入训练接入；后续本地分支 `fix/chat-keyboard-reopen`，运行提交 `aea8791`、App `0.1.0+3`，待开哥同意后合并推送，见 [后续修复](ugk-trainer-integration.md#后续修复2026-10-20) |
+| 共享训练依赖 | 本地分支固定 SDK 来源修复 `9407bf3`，尚未发布；单次本机 Git 映射的严格锁解析通过。包版本仍为 `ugk_coach 0.1.2` / `ugk_trainer 0.1.0`；远端 main 基线为 `ea00ff7` |
 | 源码里程碑 | `m7-aesthetic-v2` → `d0b1c7ef6198a469a7f0a7cedcaa7c9f2512dbe7` |
 | 上一阶段文档整理前主线快照 | `d0b1c7ef6198a469a7f0a7cedcaa7c9f2512dbe7`；后续 HEAD 由 Git 查询，不把本表固定 SHA 写成永远最新的 HEAD |
 | PR #3 合并提交 | `a5997ef7aef2695b24cab3f4b330543bbb2c7027` |
 | PR #3 已测源 | `7ef80d75331a150b6a258ef3ba0c27832fd1e54b`；合并树相同，至上述主线快照只增加 3 份文档 |
 | Android 身份 | `com.ugk.smartfit`，App 名「智能健身助手」 |
-| 默认包版本 | `0.1.0+2`，来自 [pubspec.yaml](../pubspec.yaml)：versionName `0.1.0`、versionCode `2`；M7 历史交付包为 `0.1.0+1` |
-| 关于页显示 | `0.1.0+2 (MVP)`，来自 [about_page.dart](../lib/ui/about_page.dart) 的独立常量，尚未自动读取包版本 |
+| 默认包版本 | `0.1.0+3`，来自 [pubspec.yaml](../pubspec.yaml)：versionName `0.1.0`、versionCode `3`；原完整训练测试包为 `0.1.0+2` |
+| 关于页显示 | `0.1.0+3 (MVP)`，来自 [about_page.dart](../lib/ui/about_page.dart) 的独立常量，尚未自动读取包版本 |
 | 资源版本 | 93 个动作包为 `1.1.0`；公共包 `_common` 为 `1.0.0`；格式版本仍为 `1`，见 [小包规范](drill-pack-spec.md) 与 [索引](../assets/packs/index.json) |
-| 交付状态 | M7 包已取包待反馈；本次训练接入 debug 包已覆盖安装到真机，未上传，身份见下表 |
-| 验收状态 | App 156 项、SDK 96 项测试及 Android debug 构建通过；合并前严格依赖解析与 23 项定向回归通过；Android 16 一轮完整训练的出声、后台/锁屏、保存/重启通过，见 [真机记录](trainer-device-check-2026-10-20.md)。通知可见性/其他中断与 Play Console 待办，release 待验保持不变 |
+| 交付状态 | 后续 `0.1.0+3` 最终 debug 包已覆盖安装、未上传；身份及摘要见 [后续修复](ugk-trainer-integration.md#后续修复2026-10-20)，下表保留 `0.1.0+2` 基线 |
+| 验收状态 | 后续 App 156 项、SDK 100 项及分析通过；最终 debug 构建、签名/ZIP/版本检查、安装和软键盘输入/收起重开通过。此前 `0.1.0+2` 的完整训练见 [真机记录](trainer-device-check-2026-10-20.md)，其他发布待办保持不变 |
 
-Git 标签、App 包版本与资源版本分别管理。`m7` 不代表 Android versionCode 为 7；用户此前已取的包是 `0.1.0+1`，本次训练接入测试包为 `0.1.0+2`。构建命令曾尝试覆盖版本号用于 release，但没有形成可交付 release 包，不能登记为已交付版本。
+Git 标签、App 包版本与资源版本分别管理。`m7` 不代表 Android versionCode 为 7；用户此前已取的包是 `0.1.0+1`，训练接入测试包为 `0.1.0+2`，后续目录节奏修复测试包为 `0.1.0+3`。构建命令曾尝试覆盖版本号用于 release，但没有形成可交付 release 包，不能登记为已交付版本。
 
 ## ugk_trainer 测试包（真机主链路已验）
 

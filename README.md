@@ -10,7 +10,7 @@
 
 ## 版本与验收入口
 
-最近的里程碑标签为 `m7-aesthetic-v2`，PR #1、#2、#3 均已合并。共享训练接入分支 `feat/ugk-trainer-integration` 已经用户同意合入并推送 `main`，当前包版本 `0.1.0+2`；SDK 固定修复提交也已进入 SDK 远端 `main`。Android 16 一轮完整训练主链路通过，接入、依赖和其余验收/Play Console 待办见 [ugk_trainer 接入记录](docs/ugk-trainer-integration.md)。release 构建、正式签名和完整设备验收仍未完成。
+最近的里程碑标签为 `m7-aesthetic-v2`，PR #1、#2、#3 及共享训练接入均已合并并推送。后续本地分支 `fix/chat-keyboard-reopen` 更新为 `0.1.0+3`，固定 SDK 的目录 `repSeconds` 来源修复；本轮尚未合并、推送，等待开哥同意。主页键盘已通过重启微信输入法服务恢复，用户确认收起重开和输入正常；无效的 App 输入实验已移除。详见 [接入及后续修复记录](docs/ugk-trainer-integration.md)。release 构建、正式签名和完整设备验收仍未完成。
 
 - [版本管理与台账](docs/version-management.md)：当前版本、里程碑 SHA、测试包身份、版本更新及交付规则的统一入口。
 - [本机验收记录](docs/acceptance.md)：各检查点的验证证据、环境和待验清单。
