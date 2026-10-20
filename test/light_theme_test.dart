@@ -2,7 +2,10 @@
 // the light theme, symmetric contrast, follow-system default and switching.
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:smartfit/chat/chat_models.dart';
+import 'package:smartfit/chat/rule_chat_engine.dart';
 import 'package:smartfit/data/app_store.dart';
+import 'package:smartfit/domain/plan_generator.dart';
 import 'package:smartfit/main.dart';
 import 'package:smartfit/ui/exercise_video.dart';
 import 'package:smartfit/ui/theme.dart';
@@ -106,6 +109,17 @@ void main() {
   });
 
   group('switching', () {
+    test('「你能做什么」 offers the opposite of the look in effect, follow-system included', () async {
+      final lib = loadLibrary();
+      final engine = RuleChatEngine(lib: lib, templates: TemplatePlanGenerator(lib: lib, catalog: loadCatalog()));
+      Future<List<String>> labels(ChatState s) async =>
+          [for (final o in (await engine.reply('你能做什么', s)).messages.first.options) o.label];
+      expect(await labels(const ChatState(appearance: 'system', systemLight: true)), contains('换深色'));
+      expect(await labels(const ChatState(appearance: 'system')), contains('换浅色'));
+      expect(await labels(const ChatState(appearance: 'light')), contains('换深色'));
+      expect(await labels(const ChatState(appearance: 'dark', systemLight: true)), contains('换浅色'));
+    });
+
     test('a new install follows the system; a stored choice is kept', () async {
       final fresh = AppStore(MemoryStorage());
       await fresh.load();

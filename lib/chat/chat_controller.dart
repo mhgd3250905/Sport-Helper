@@ -94,6 +94,7 @@ class ChatController extends ChangeNotifier {
         WorkoutLog(title: h.title, at: h.at, minutes: h.minutes, completed: h.completed, total: h.total),
     ],
     appearance: store.appearance,
+    systemLight: PlatformDispatcher.instance.platformBrightness == Brightness.light,
     now: _clock(),
   );
 

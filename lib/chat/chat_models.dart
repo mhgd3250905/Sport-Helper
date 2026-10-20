@@ -244,6 +244,7 @@ class ChatState {
     this.lastPlan,
     this.history = const [],
     this.appearance = 'system',
+    this.systemLight = false,
     this.now,
   });
 
@@ -270,6 +271,12 @@ class ChatState {
   /// 'dark' / 'light' / 'system' (what 「换浅色」 changes).
   final String appearance;
 
+  /// The platform is light right now (what 'system' resolves to).
+  final bool systemLight;
+
+  /// The light theme is in effect (chooses 「换深色」 vs 「换浅色」).
+  bool get looksLight => appearance == 'light' || (appearance == 'system' && systemLight);
+
   /// The clock for 「这周」 (null = now).
   final DateTime? now;
 
@@ -284,6 +291,7 @@ class ChatState {
     TrainingPlan? lastPlan,
     List<WorkoutLog>? history,
     String? appearance,
+    bool? systemLight,
     DateTime? now,
   }) => ChatState(
     pending: clearPending ? null : (pending ?? this.pending),
@@ -295,6 +303,7 @@ class ChatState {
     lastPlan: lastPlan ?? this.lastPlan,
     history: history ?? this.history,
     appearance: appearance ?? this.appearance,
+    systemLight: systemLight ?? this.systemLight,
     now: now ?? this.now,
   );
 }

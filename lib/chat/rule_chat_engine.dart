@@ -142,7 +142,7 @@ class RuleChatEngine implements ChatEngine {
               const ChatOption('看看动作库', '@library'),
               ChatOption(s.history.isEmpty ? '我的计划' : '上次练了什么'),
               const ChatOption('自己选条件', '@custom'),
-              ChatOption(s.appearance == 'light' ? '换深色' : '换浅色'),
+              ChatOption(s.looksLight ? '换深色' : '换浅色'),
             ],
           ),
         ],
