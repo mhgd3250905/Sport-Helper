@@ -143,6 +143,7 @@ void main() {
 
       // 「换深色」 in the conversation overrides the system.
       await tester.enterText(find.byKey(const ValueKey('chat-input')), '换深色');
+      await tester.pump();
       await tester.tap(find.byKey(const ValueKey('chat-send')));
       await tester.pumpAndSettle();
       expect(s.store.appearance, 'dark');
@@ -152,6 +153,7 @@ void main() {
       // 「换浅色」 back: the light renders return without losing the chat.
       final messages = s.chat.messages.length;
       await tester.enterText(find.byKey(const ValueKey('chat-input')), '换浅色');
+      await tester.pump();
       await tester.tap(find.byKey(const ValueKey('chat-send')));
       await tester.pumpAndSettle();
       expect(s.store.appearance, 'light');
