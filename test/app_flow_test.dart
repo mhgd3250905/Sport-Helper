@@ -348,14 +348,22 @@ void main() {
     await tester.pumpAndSettle();
     expect(s.chat.messages.last.plan?.id, plan.id); // shown again as a card
 
+    // §4: the drawer keeps two rows (动作库 · 设置); the form opens from the chat.
     await tester.tap(find.byKey(const ValueKey('open-plans')));
     await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const ValueKey('drawer-custom')));
+    expect(find.byKey(const ValueKey('drawer-library')), findsOneWidget);
+    expect(find.byKey(const ValueKey('drawer-about')), findsOneWidget);
+    expect(find.byKey(const ValueKey('drawer-custom')), findsNothing);
+    await tester.tap(find.byKey(const ValueKey('drawer-library')));
     await tester.pumpAndSettle();
-    expect(find.text('描述你今天想怎么练'), findsOneWidget);
+    expect(find.byType(LibraryPage), findsOneWidget);
+    await tester.tap(find.byTooltip('返回').first);
+    await tester.pumpAndSettle();
+    await say(tester, '自己选条件');
+    expect(find.byType(CustomPlanPage), findsOneWidget);
   });
 
-  testWidgets('the custom form (drawer entry) still generates plans', (tester) async {
+  testWidgets('the custom form (opened from the chat) still generates plans', (tester) async {
     tall(tester);
     final s = services();
     await s.store.acceptSafety(blocked: false);

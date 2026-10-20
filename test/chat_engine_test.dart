@@ -253,4 +253,100 @@ void main() {
       expect(planOf(r), isNull);
     });
   });
+
+  group('app intents (§4.2)', () {
+    test('library: plain, by category; plan requests and swaps are not library asks', () async {
+      for (final t in ['看看动作库', '有哪些动作', '浏览动作库']) {
+        final (r, _) = await talk([t]);
+        expect(r.single.action, '@library', reason: t);
+      }
+      final (a, _) = await talk(['有哪些拉伸动作']);
+      expect(a.single.action, '@library:stretch');
+      final (b, _) = await talk(['力量动作有哪些']);
+      expect(b.single.action, '@library:strength');
+      final (c, _) = await talk(['看看核心动作']);
+      expect(c.single.action, '@library:core');
+      final (d, _) = await talk(['睡前拉伸 10 分钟']);
+      expect(d.single.action, isNull);
+      expect(planOf(d.single), isNotNull);
+    });
+
+    test('history: nothing yet; otherwise the last workout, this week and 再来一次', () async {
+      final (none, _) = await talk(['上次练了什么']);
+      expect(none.single.messages.single.text, contains('还没有训练记录'));
+      expect(planOf(none.single), isNull);
+
+      final now = DateTime(2026, 10, 22, 20); // a Thursday
+      final core = planOf((await talk(['在家 15 分钟练核心，徒手'])).$1.last)!;
+      final s = ChatState(
+        now: now,
+        lastPlan: core,
+        history: [
+          WorkoutLog(title: '核心激活', at: DateTime(2026, 10, 21, 19), minutes: 15, completed: 8, total: 8),
+          WorkoutLog(title: '肩颈放松', at: DateTime(2026, 10, 19, 12), minutes: 9, completed: 3, total: 6),
+          WorkoutLog(title: '更早的', at: DateTime(2026, 10, 12, 12), minutes: 20, completed: 6, total: 6),
+        ],
+      );
+      for (final t in ['上次练了什么', '训练记录', '这周练了多少']) {
+        final r = await engine.reply(t, s);
+        final m = r.messages.single;
+        expect(m.text, contains('昨天的「核心激活」'), reason: t);
+        expect(m.text, contains('这周练了 2 次，一共约 24 分钟'), reason: t);
+        expect(m.options.single.label, '再来一次');
+        expect(m.options.single.value, '上次那个');
+      }
+      // Blocked by the safety check: no 再来一次.
+      final blocked = await engine.reply('训练记录', s.copyWith(safetyBlocked: true));
+      expect(blocked.messages.single.options, isEmpty);
+    });
+
+    test('appearance, voice and chimes change through the conversation', () async {
+      Future<String?> act(String t, [ChatState s = const ChatState()]) async => (await engine.reply(t, s)).action;
+      expect(await act('换浅色'), '@appearance:light');
+      expect(await act('深色模式'), '@appearance:dark');
+      expect(await act('跟随系统'), '@appearance:system');
+      final same = await engine.reply('换深色', const ChatState(appearance: 'dark'));
+      expect(same.messages.single.text, contains('现在就是深色'));
+      expect(await act('关掉语音'), '@voice:off');
+      expect(await act('打开语音'), '@voice:on');
+      expect(await act('静音'), '@voice:mute');
+      expect(await act('打开提示音'), '@chimes:on');
+      expect(await act('关掉提示音'), '@chimes:off');
+    });
+
+    test('settings, the form, the safety re-check; 深蹲 is still a move', () async {
+      Future<String?> act(String t) async => (await engine.reply(t, const ChatState())).action;
+      expect(await act('设置'), '@settings');
+      expect(await act('关于'), '@settings');
+      expect(await act('自己选条件'), '@custom');
+      expect(await act('用表单'), '@custom');
+      expect(await act('重新做安全确认'), '@safety');
+      final (r, _) = await talk(['在家 20 分钟练深蹲']);
+      expect(r.single.action, isNull);
+    });
+
+    test('你能做什么: a short explanation with four discovery options', () async {
+      final r = await engine.reply('你能做什么', const ChatState());
+      final m = r.messages.single;
+      expect(m.options, hasLength(4));
+      expect(m.options.map((o) => o.label), containsAll(['看看动作库', '自己选条件', '换浅色']));
+      expect(m.options.first.value, '@library');
+    });
+
+    test('not understood: says what it can do and offers discovery chips', () async {
+      final (r, _) = await talk(['讲个笑话']);
+      expect(r.single.messages.single.text, contains('我只会帮你安排训练'));
+      expect(r.single.suggestions, contains('你能做什么'));
+    });
+
+    test('discovery chips by state (§4.3)', () {
+      final first = discoverySuggestions(returning: false);
+      expect(first, hasLength(5));
+      expect(first.last, '你能做什么');
+      final back = discoverySuggestions(returning: true);
+      expect(back.take(2), ['上次那个', '上次练了什么']);
+      expect(back, contains('看看动作库'));
+      expect(discoverySuggestions(returning: true, blocked: true), isNot(contains('上次那个')));
+    });
+  });
 }

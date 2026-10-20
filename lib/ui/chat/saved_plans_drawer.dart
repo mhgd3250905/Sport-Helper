@@ -20,7 +20,11 @@ class SavedPlansDrawer extends StatelessWidget {
     required this.onShow,
     required this.onStart,
     this.footer = const [],
+    this.onCompose,
   });
+
+  /// The empty state's 「去排一套」: close the drawer, focus the chat input.
+  final VoidCallback? onCompose;
 
   final AppStore store;
   final ExerciseLibrary library;
@@ -73,7 +77,7 @@ class SavedPlansDrawer extends StatelessWidget {
                       ),
                     ),
                     if (store.savedPlans.isEmpty)
-                      const SliverToBoxAdapter(child: _Empty())
+                      SliverToBoxAdapter(child: _Empty(onCompose: onCompose))
                     else
                       SliverPadding(
                         padding: const EdgeInsets.fromLTRB(SfSpace.x4, 0, SfSpace.x4, SfSpace.x4),
@@ -164,12 +168,15 @@ class SavedPlansDrawer extends StatelessWidget {
 }
 
 class _Empty extends StatelessWidget {
-  const _Empty();
+  const _Empty({this.onCompose});
+  final VoidCallback? onCompose;
   @override
-  Widget build(BuildContext context) => const SfEmptyState(
+  Widget build(BuildContext context) => SfEmptyState(
     icon: SfGlyph.bookmark,
     title: '还没有保存的计划',
     body: '在计划卡片上点「保存」，下次在这里一键开始，或者直接说「上次那个」。',
+    action: onCompose == null ? null : '去排一套',
+    onAction: onCompose,
   );
 }
 

@@ -231,6 +231,49 @@ class OptionPill extends StatelessWidget {
   }
 }
 
+/// The opening line without a bubble (§2.1): 早上好 / 晚上好… in large type
+/// floating in the sky, the invitation under it in muted body text. It is
+/// still a message: later ones push it up.
+class GreetingBlock extends StatelessWidget {
+  const GreetingBlock({super.key, required this.text});
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final i = text.indexOf('\n');
+    final head = i < 0 ? text : text.substring(0, i);
+    final rest = i < 0 ? '' : text.substring(i + 1);
+    return Padding(
+      key: const ValueKey('greeting'),
+      padding: const EdgeInsets.fromLTRB(SfSpace.x2, SfSpace.x6, SfSpace.x2, SfSpace.x1),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(head, style: SfType.greeting),
+          if (rest.isNotEmpty) ...[
+            const SizedBox(height: SfSpace.x1),
+            Text(rest, style: SfType.body.copyWith(color: SfColors.muted)),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+/// The chips that open a feature (not plan requests) and their glyphs:
+/// the shape says what tapping does (§4.3).
+const chipGlyphs = <String, SfGlyph>{
+  '看看动作库': SfGlyph.grid,
+  '浏览动作库': SfGlyph.grid,
+  '动作库': SfGlyph.grid,
+  '上次练了什么': SfGlyph.clock,
+  '我的计划': SfGlyph.bookmark,
+  '换浅色': SfGlyph.contrast,
+  '换深色': SfGlyph.contrast,
+  '你能做什么': SfGlyph.sparkle,
+  '自己选条件': SfGlyph.sliders,
+};
+
 /// "今天 13:40" between sittings.
 class TimeMark extends StatelessWidget {
   const TimeMark(this.at, {super.key, required this.now});
@@ -356,9 +399,18 @@ class SuggestionStrip extends StatelessWidget {
               color: SfColors.isDark ? SfColors.surface : SfColors.surface,
               shape: StadiumBorder(side: SfColors.cardEdge),
             ),
-            child: Text(
-              items[i],
-              style: TextStyle(color: SfColors.muted, fontSize: 14, height: 1.2, fontWeight: FontWeight.w500),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (chipGlyphs[items[i]] case final g?) ...[
+                  SfIcon(g, size: 16, color: SfColors.accentText),
+                  const SizedBox(width: 6),
+                ],
+                Text(
+                  items[i],
+                  style: TextStyle(color: SfColors.muted, fontSize: 14, height: 1.2, fontWeight: FontWeight.w500),
+                ),
+              ],
             ),
           ),
           ),
@@ -376,8 +428,11 @@ class ChatInputBar extends StatefulWidget {
     required this.onSend,
     this.onPlans,
     this.enabled = true,
+    this.focusNode,
   });
 
+  /// Lets the page put the cursor here (the drawer's 「去排一套」).
+  final FocusNode? focusNode;
   final void Function(String) onSend;
   final VoidCallback? onPlans;
   final bool enabled;
@@ -388,12 +443,13 @@ class ChatInputBar extends StatefulWidget {
 
 class _ChatInputBarState extends State<ChatInputBar> {
   final _text = TextEditingController();
-  final _focus = FocusNode();
+  final _ownFocus = FocusNode();
+  FocusNode get _focus => widget.focusNode ?? _ownFocus;
 
   @override
   void dispose() {
     _text.dispose();
-    _focus.dispose();
+    _ownFocus.dispose();
     super.dispose();
   }
 

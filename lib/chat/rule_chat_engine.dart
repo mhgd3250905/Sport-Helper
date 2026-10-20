@@ -14,6 +14,21 @@ import 'chat_models.dart';
 import 'slot_parser.dart';
 
 const defaultSuggestions = ['办公室 10 分钟肩颈放松', '在家 20 分钟练核心', '睡前拉伸 10 分钟', '跑步前热身'];
+
+/// Chips that open a feature rather than ask for a plan
+/// (docs/design-audit-2026-10-19.md §4.3); the chat draws them with an icon.
+const discoveryChips = ['看看动作库', '上次练了什么', '我的计划', '换浅色', '换深色', '你能做什么', '自己选条件'];
+
+/// The chips under a quiet chat, by state (§4.3): first visit → plan
+/// examples + 你能做什么; returning → 上次那个 / 上次练了什么 first, then
+/// examples and the library; blocked by the safety check → the library.
+List<String> discoverySuggestions({required bool returning, bool blocked = false}) {
+  if (blocked) return const ['看看动作库', '你能做什么'];
+  if (returning) {
+    return const ['上次那个', '上次练了什么', '办公室 10 分钟肩颈放松', '在家 20 分钟练核心', '看看动作库'];
+  }
+  return const [...defaultSuggestions, '你能做什么'];
+}
 const planSuggestions = ['再短一点', '难一点', '换掉第 2 个', '换一套'];
 
 class RuleChatEngine implements ChatEngine {
@@ -56,18 +71,14 @@ class RuleChatEngine implements ChatEngine {
       );
     }
 
+    final intent = _appIntent(t, s);
+    if (intent != null) return intent;
+
     if (_any(t, ['上次那个', '上次的', '上一次', '老样子', '再来一次', '再来一遍', '跟上次一样', '上回那个'])) {
       return _recallLast(s);
     }
     if (_any(t, ['我的计划', '保存的', '存的计划', '收藏', '已保存', '我存的'])) {
       return _listSaved(s);
-    }
-    if (_any(t, ['动作库', '有哪些动作', '所有动作', '看看动作'])) {
-      return ChatReply(
-        messages: const [BotMessage('打开动作库，点动作就能看示范。')],
-        state: s,
-        action: '@library',
-      );
     }
 
     final slots = parser.parse(t, asked: s.pending == null ? null : s.asked.lastOrNull);
@@ -110,26 +121,32 @@ class RuleChatEngine implements ChatEngine {
       return ChatReply(
         messages: const [BotMessage('你好！说说想练什么、在哪儿、有多少时间，我给你排一套。')],
         state: s,
-        suggestions: _suggestions(s),
+        suggestions: _discover(s),
       );
     }
     if (_any(t, ['谢谢', '多谢', '感谢', 'thx', 'thanks'])) {
       return ChatReply(
         messages: const [BotMessage('不客气。练完记得喝点水。')],
         state: s,
-        suggestions: _suggestions(s),
+        suggestions: _discover(s),
       );
     }
     if (_any(t, ['你能做什么', '你会什么', '怎么用', '能干嘛', '能干什么', '帮助', '你是谁'])) {
       return ChatReply(
-        messages: const [
+        messages: [
           BotMessage(
-            '我是你的训练助手：告诉我目标、场景和时间，我排一套带示范和语音的计划。\n'
-            '排好后可以说「再短一点」「难一点」「换掉第 2 个」，满意就点「保存」，下次说「上次那个」就能调出来。',
+            '我是你的训练助手：告诉我目标、场景和时间，我排一套带示范和语音的计划，'
+            '排好后可以说「再短一点」「难一点」「换掉第 2 个」。\n'
+            '另外，看动作示范、查训练记录、换外观、关语音，也都直接跟我说。',
+            options: [
+              const ChatOption('看看动作库', '@library'),
+              ChatOption(s.history.isEmpty ? '我的计划' : '上次练了什么'),
+              const ChatOption('自己选条件', '@custom'),
+              ChatOption(s.appearance == 'light' ? '换深色' : '换浅色'),
+            ],
           ),
         ],
         state: s,
-        suggestions: _suggestions(s),
       );
     }
 
@@ -150,11 +167,155 @@ class RuleChatEngine implements ChatEngine {
       );
     }
     return ChatReply(
-      messages: const [BotMessage('这个我帮不上忙，我只负责帮你安排训练。今天想怎么练？')],
+      messages: const [BotMessage('我只会帮你安排训练：说说想练什么、在哪儿、有多少时间就行。也可以点下面的试试。')],
       state: s,
-      suggestions: _suggestions(s),
+      suggestions: _discover(s),
     );
   }
+
+  // ---------------------------------------------------------------- app
+
+  static const _categoryWords = {
+    '力量': ExerciseCategory.strength,
+    '核心': ExerciseCategory.core,
+    '有氧': ExerciseCategory.cardio,
+    '灵活': ExerciseCategory.mobility,
+    '活动度': ExerciseCategory.mobility,
+    '拉伸': ExerciseCategory.stretch,
+  };
+
+  /// Things the app does rather than plans (§4.2): open the library (by
+  /// category), answer from the workout history, switch the appearance or
+  /// the voice, open settings / the form, redo the safety check. Null when
+  /// [t] asks for none of them.
+  ChatReply? _appIntent(String t, ChatState s) {
+    // Library: 「动作库」「看看动作」「有哪些拉伸动作」「力量动作有哪些」.
+    final catLib = RegExp('(看看|看下|看一下|有哪些|有什么|浏览|列出|所有|全部)?(力量|核心|有氧|灵活|活动度|拉伸)?的?动作(库|有哪些|有什么|示范)?');
+    final m = catLib.firstMatch(t);
+    final libraryAsk = t.contains('动作库') ||
+        (m != null && (m.group(1) != null || m.group(3) != null) && !t.contains('换'));
+    if (libraryAsk) {
+      final word = m?.group(2);
+      final cat = word == null ? null : _categoryWords[word];
+      return ChatReply(
+        messages: [BotMessage(cat == null ? '打开动作库，点动作就能看示范。' : '打开动作库里的${cat.zh}动作，点一个看示范。')],
+        state: s,
+        action: cat == null ? '@library' : '@library:${cat.name}',
+      );
+    }
+
+    // History: 「上次练了什么」「训练记录」「这周练了多少」.
+    if (_any(t, ['练了什么', '练过什么', '训练记录', '运动记录', '历史记录', '练了多少', '练了几次', '练了多久', '这周练了', '本周练了'])) {
+      return _history(s);
+    }
+
+    // Appearance.
+    String? look;
+    if (_any(t, ['跟随系统'])) {
+      look = 'system';
+    } else if (_any(t, ['浅色', '亮色', '白色模式', '日间模式', '白天模式'])) {
+      look = 'light';
+    } else if (_any(t, ['深色', '暗色', '黑色模式', '夜间模式', '深空'])) {
+      look = 'dark';
+    }
+    if (look != null) {
+      final name = const {'light': '浅色', 'dark': '深色', 'system': '跟随系统'}[look]!;
+      final back = look == 'dark' ? '浅色' : '深色';
+      return ChatReply(
+        messages: [
+          BotMessage(s.appearance == look ? '现在就是$name外观。' : '好，换成$name了。想换回来就说「换$back」。'),
+        ],
+        state: s.copyWith(appearance: look),
+        suggestions: _discover(s),
+        action: '@appearance:$look',
+      );
+    }
+
+    // Voice and chimes.
+    final off = _any(t, ['关', '不要', '别', '停']);
+    if (_any(t, ['静音'])) {
+      return _setting(s, '@voice:mute', '好，语音和提示音都关了。想听的时候说「打开语音」。');
+    }
+    if (_any(t, ['提示音', '滴滴声', '提示声'])) {
+      return off
+          ? _setting(s, '@chimes:off', '好，提示音关了。')
+          : _setting(s, '@chimes:on', '好，提示音开了。');
+    }
+    if (_any(t, ['语音', '播报', '说话']) && (off || _any(t, ['开', '打开', '恢复']))) {
+      return off
+          ? _setting(s, '@voice:off', '好，语音教练先不说话了，提示音还在。想听就说「打开语音」。')
+          : _setting(s, '@voice:on', '好，语音教练回来了。');
+    }
+
+    // Safety re-check, settings, the form.
+    if (_any(t, ['安全确认', '重新确认'])) {
+      return ChatReply(messages: const [], state: s.copyWith(clearPending: true), action: '@safety');
+    }
+    if (t == '设置' || t == '关于' || _any(t, ['打开设置', '去设置', '设置页', '关于本应用', '素材署名', '许可'])) {
+      return ChatReply(messages: const [BotMessage('打开设置。')], state: s, action: '@settings');
+    }
+    if (_any(t, ['自己选条件', '自定义', '用表单', '手动选', '自己选'])) {
+      return ChatReply(
+        messages: const [BotMessage('打开自定义计划，自己选目标、器械和时长。')],
+        state: s,
+        action: '@custom',
+      );
+    }
+    return null;
+  }
+
+  ChatReply _setting(ChatState s, String action, String text) => ChatReply(
+    messages: [BotMessage(text)],
+    state: s,
+    suggestions: _discover(s),
+    action: action,
+  );
+
+  ChatReply _history(ChatState s) {
+    final h = s.history;
+    if (h.isEmpty) {
+      return ChatReply(
+        messages: const [BotMessage('还没有训练记录。练完一次，我就帮你记下来。')],
+        state: s,
+        suggestions: _discover(s),
+      );
+    }
+    final now = s.now ?? DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final monday = today.subtract(Duration(days: now.weekday - 1));
+    final week = h.where((e) => !e.at.isBefore(monday)).toList();
+    final minutes = week.fold<int>(0, (a, e) => a + e.minutes);
+    final last = h.first;
+    final day = DateTime(last.at.year, last.at.month, last.at.day);
+    final ago = switch (today.difference(day).inDays) {
+      0 => '今天',
+      1 => '昨天',
+      2 => '前天',
+      final d when d < 7 => '$d 天前',
+      _ => '${last.at.month}月${last.at.day}日',
+    };
+    final how = last.finished
+        ? '练完了，${last.minutes < 1 ? '不到 1' : last.minutes} 分钟'
+        : '完成了 ${last.completed}/${last.total} 个动作';
+    final lines = [
+      '上次是$ago的「${last.title}」，$how。',
+      week.isEmpty ? '这周还没练过。' : '这周练了 ${week.length} 次，一共约 $minutes 分钟。',
+    ];
+    final again = s.lastPlan != null && !s.safetyBlocked;
+    return ChatReply(
+      messages: [
+        BotMessage(lines.join('\n'), options: again ? const [ChatOption('再来一次', '上次那个')] : const []),
+      ],
+      state: s,
+      suggestions: again ? const [] : _discover(s),
+    );
+  }
+
+  /// §4.3 chips for this state.
+  List<String> _discover(ChatState s) => discoverySuggestions(
+    returning: s.lastPlan != null || s.saved.isNotEmpty || s.history.isNotEmpty,
+    blocked: s.safetyBlocked,
+  );
 
   // ---------------------------------------------------------------- plans
 
@@ -183,7 +344,7 @@ class RuleChatEngine implements ChatEngine {
           BotMessage('这次没排出来：${r.issues.take(1).join()}。换个说法或者放宽一点条件试试？'),
         ],
         state: s.copyWith(clearPending: true),
-        suggestions: _suggestions(s),
+        suggestions: _discover(s),
       );
     }
     final lines = <String>[
@@ -458,7 +619,7 @@ class RuleChatEngine implements ChatEngine {
       return ChatReply(
         messages: const [BotMessage('还没有练过的计划。先说说今天想怎么练？')],
         state: s,
-        suggestions: defaultSuggestions,
+        suggestions: _discover(s),
       );
     }
     if (s.safetyBlocked) return _blocked(s);
@@ -471,7 +632,7 @@ class RuleChatEngine implements ChatEngine {
       return ChatReply(
         messages: const [BotMessage('还没有保存的计划。练得顺手的计划，点卡片上的「保存」就能存下来。')],
         state: s,
-        suggestions: _suggestions(s),
+        suggestions: _discover(s),
       );
     }
     final list = s.saved.toList()..sort((a, b) => b.touchedAt.compareTo(a.touchedAt));
@@ -511,10 +672,6 @@ class RuleChatEngine implements ChatEngine {
 
   // ---------------------------------------------------------------- utils
 
-  List<String> _suggestions(ChatState s) => [
-    if (s.lastPlan != null || s.saved.isNotEmpty) '上次那个',
-    ...defaultSuggestions,
-  ].take(4).toList();
 
   List<String> _names(TrainingPlan p) => [
     for (final i in p.items) ?lib.tryGet(i.exerciseId)?.name,
