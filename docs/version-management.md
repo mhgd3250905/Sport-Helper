@@ -17,21 +17,21 @@
 | 默认包版本 | 开发分支 `0.1.0+2`，来自 [pubspec.yaml](../pubspec.yaml)：versionName `0.1.0`、versionCode `2`；主线上一交付包仍为 `0.1.0+1` |
 | 关于页显示 | 开发分支 `0.1.0+2 (MVP)`，来自 [about_page.dart](../lib/ui/about_page.dart) 的独立常量，尚未自动读取包版本 |
 | 资源版本 | 93 个动作包为 `1.1.0`；公共包 `_common` 为 `1.0.0`；格式版本仍为 `1`，见 [小包规范](drill-pack-spec.md) 与 [索引](../assets/packs/index.json) |
-| 交付状态 | M7 包已取包待反馈；接入分支新 debug 包仅本地保存，尚未安装或上传，身份见下表 |
-| 验收状态 | 接入分支 App 156 项、SDK 96 项测试及 Android debug 构建通过；真机与 Play Console 待办。M7 完整真机及 release 待验保持不变 |
+| 交付状态 | M7 包已取包待反馈；接入分支新 debug 包已覆盖安装到真机，未上传，身份见下表 |
+| 验收状态 | 接入分支 App 156 项、SDK 96 项测试及 Android debug 构建通过；Android 16 一轮完整训练的出声、后台/锁屏、保存/重启通过，见 [真机记录](trainer-device-check-2026-10-20.md)。通知可见性/其他中断与 Play Console 待办，release 待验保持不变 |
 
 Git 标签、App 包版本与资源版本分别管理。`m7` 不代表 Android versionCode 为 7；用户此前已取的包是 `0.1.0+1`，当前分支新构建为 `0.1.0+2`。构建命令曾尝试覆盖版本号用于 release，但没有形成可交付 release 包，不能登记为已交付版本。
 
-## 接入分支测试包（未做真机验收）
+## 接入分支测试包（真机主链路已验）
 
 | 项目 | 记录 |
 | --- | --- |
-| 文件 | `.buildlog/install/SmartFit-ugk-trainer-0.1.0+2-debug.apk`，仅本地忽略目录保存 |
+| 文件 | `.buildlog/install/SmartFit-ugk-trainer-0.1.0+2-debug.apk`，本地忽略目录保存，并已覆盖安装到 Android 16 真机 |
 | 大小 / 身份 | 203,720,356 bytes；`com.ugk.smartfit`，versionName `0.1.0`、versionCode `2`；minSdk 24、targetSdk 36；三 ABI |
 | SHA-256 | `7fd8c50b521090dd9bf60e2a332f266729c44bdab3e10936ff6de8e7bb4d24fd` |
 | SDK 固定提交 | `ea00ff7f2a4b7f46274b70708a45b435f269f993`，尚未推送，发布顺序见 [接入记录](ugk-trainer-integration.md) |
 | 验证 | debug 签名与旧包一致，ZIP/静音素材/通知图标及单份媒体播放服务和权限检查通过 |
-| 未完成 | 用户目前没有真机，语音/锁屏/后台/完成保存设备链路未验；Play Console 声明草稿未提交；未合 main 或推送 |
+| 真机结果 / 未完成 | 一轮自然完成 7/7、696 活动秒；出声/锁屏/后台/暂停/完成保存/重启读取/服务释放通过。通知可见性及其他系统中断未验；Play Console 声明草稿未提交；未合 main 或推送 |
 
 ## 源码里程碑台账
 

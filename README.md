@@ -14,6 +14,7 @@
 
 - [版本管理与台账](docs/version-management.md)：当前版本、里程碑 SHA、测试包身份、版本更新及交付规则的统一入口。
 - [本机验收记录](docs/acceptance.md)：各检查点的验证证据、环境和待验清单。
+- [ugk_trainer 真机记录](docs/trainer-device-check-2026-10-20.md)：`0.1.0+2` 在 Android 16 上的一轮完整训练、锁屏/后台、保存与重启验证，含未覆盖范围。
 - [阶段交接记录](docs/HANDOVER.md)：角色与约束，以及明确标记的历史交接内容。
 
 ## 目录

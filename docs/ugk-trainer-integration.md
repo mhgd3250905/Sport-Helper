@@ -1,6 +1,6 @@
 # SmartFit 接入 ugk_trainer
 
-2026-10-20，分支 `feat/ugk-trainer-integration`，开发包 `0.1.0+2`。尚未合入或推送 main，未完成真机验收。
+2026-10-20，分支 `feat/ugk-trainer-integration`，开发包 `0.1.0+2`。尚未合入或推送 main；完整训练主链路已在 Android 16 真机通过，范围见 [真机记录](trainer-device-check-2026-10-20.md)。
 
 ## 依赖与包端修复
 
@@ -40,7 +40,7 @@
 
 SDK：`flutter analyze --no-pub` 无问题；`flutter test --no-pub --reporter expanded` 96 项通过。App：`flutter analyze --no-pub` 无问题；`flutter test --no-pub --concurrency=2 --reporter expanded` 156 项通过；`flutter build apk --debug --no-pub`、`flutter build web --release --no-pub` 均成功（Web 提示 CupertinoIcons 字体未打包，未阻断构建）。合并 manifest 检查通过：单个 `mediaPlayback` 服务、3 项所需权限、`exported=false`、`stopWithTask=true`。APK ZIP 完整性、SDK 静音素材和通知图标检查通过，签名验证通过，证书与上一测试包相同。
 
-新包仅保存在 `.buildlog/install/SmartFit-ugk-trainer-0.1.0+2-debug.apk`，未安装、未上传、未公开发布。大小 203,720,356 bytes；包名 `com.ugk.smartfit`，versionName `0.1.0`、versionCode `2`，minSdk 24、targetSdk 36，三 ABI。SHA-256：`7fd8c50b521090dd9bf60e2a332f266729c44bdab3e10936ff6de8e7bb4d24fd`。debug 签名证书 SHA-256：`3761270a4764157f0e389014a9e5b800b05403bfddce0f4f7f8c039f6a53bdc7`。
+新包保存在 `.buildlog/install/SmartFit-ugk-trainer-0.1.0+2-debug.apk`，已按用户安排覆盖安装到真机，未清除数据、未上传或公开发布。大小 203,720,356 bytes；包名 `com.ugk.smartfit`，versionName `0.1.0`、versionCode `2`，minSdk 24、targetSdk 36，三 ABI。SHA-256：`7fd8c50b521090dd9bf60e2a332f266729c44bdab3e10936ff6de8e7bb4d24fd`。debug 签名证书 SHA-256：`3761270a4764157f0e389014a9e5b800b05403bfddce0f4f7f8c039f6a53bdc7`。
 
 日志在本机忽略目录 `.buildlog/trainer-final-tests.log`、`trainer-sdk-tests.log`、`trainer-android-debug.log`。这些是本次分支的自动化结果，与设备验收分别记录，详见 [acceptance.md](acceptance.md)。
 
@@ -48,11 +48,11 @@ SDK：`flutter analyze --no-pub` 无问题；`flutter test --no-pub --reporter e
 
 ## 待验门槛
 
-用户已明确目前没有真机。以下全部保留未验证，不以 Flutter 测试或构建成功替代：
+用户随后连接了 Android 16 真机。本次使用实际「睡前放松」7 动作、每项 2 组的计划自然跑完 696 活动秒，没有跳过或提前结束。用户确认实际出声及锁屏语音正常；后台返回、暂停/继续、单条完整结果保存、旧历史保留、重启后界面读取与服务/唤醒锁释放已通过。详见 [真机记录](trainer-device-check-2026-10-20.md)。以下保持待验：
 
-- 从真实模板完整完成一次训练，人工听语音、计次/换侧/休息时序，确认示范视频与镜像。
-- 手动锁屏、后台、恢复、音频中断及耳机拔出；确认通知和服务在训练结束后停止。
-- 完成后查看记录，重启 App 再核对，保存失败重试不新增重复记录。
+- 全部语音逐句复听、所有节奏类型与镜像逐帧核对；当前仅真实模板的一轮训练，不能替代全部动作验收。
+- 来电/闹钟、真实耳机拔出、离线断网及耗电/发热。保存失败重试已覆盖自动化，未在真机制造存储失败。
+- 当前设备通知 app-op 为 ignore，未申请通知权限；通知抽屉/锁屏可见性未验，也未用 ADB 授权。本次前台服务与锁屏语音本身正常。
 - 确认 Play Console 应用及权限，录制演示，审阅声明后提交。
 
-真机验收通过、依赖远端可获取并经开哥同意后，才能合入 main 并推送。没有创建新发布标签，release 正式签名仍沿用原待办。
+依赖远端可获取、Play Console 声明和上述范围按发布目标处理并经开哥同意后，才能合入 main 并推送。没有创建新发布标签，release 正式签名仍沿用原待办。
