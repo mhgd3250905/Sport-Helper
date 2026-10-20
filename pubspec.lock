@@ -558,8 +558,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: ea00ff7f2a4b7f46274b70708a45b435f269f993
-      resolved-ref: ea00ff7f2a4b7f46274b70708a45b435f269f993
+      ref: 9407bf3afab547868d7079d3bc6833a4b1d94147
+      resolved-ref: 9407bf3afab547868d7079d3bc6833a4b1d94147
       url: "https://github.com/mhgd3250905/ugk-3d-pose-sdk.git"
     source: git
     version: "0.1.2"
@@ -567,8 +567,8 @@ packages:
     dependency: "direct main"
     description:
       path: "packages/ugk_trainer"
-      ref: ea00ff7f2a4b7f46274b70708a45b435f269f993
-      resolved-ref: ea00ff7f2a4b7f46274b70708a45b435f269f993
+      ref: 9407bf3afab547868d7079d3bc6833a4b1d94147
+      resolved-ref: 9407bf3afab547868d7079d3bc6833a4b1d94147
       url: "https://github.com/mhgd3250905/ugk-3d-pose-sdk.git"
     source: git
     version: "0.1.0"
