@@ -7,8 +7,8 @@
 | 项目 | 当前事实 / 事实来源 |
 | --- | --- |
 | 主线与合并 | 本机维护 `main`；PR #1、#2、#3 及 `feat/ugk-trainer-integration` 已合入并推送 |
-| 当前源码状态 | main 已合入训练接入；后续本地分支 `fix/chat-keyboard-reopen`，运行提交 `aea8791`、App `0.1.0+3`，待开哥同意后合并推送，见 [后续修复](ugk-trainer-integration.md#后续修复2026-10-20) |
-| 共享训练依赖 | 本地分支固定 SDK 来源修复 `9407bf3`，尚未发布；单次本机 Git 映射的严格锁解析通过。包版本仍为 `ugk_coach 0.1.2` / `ugk_trainer 0.1.0`；远端 main 基线为 `ea00ff7` |
+| 当前源码状态 | 训练接入及后续 `fix/chat-keyboard-reopen` 已经开哥授权合入并推送 main，运行提交 `aea8791`、App `0.1.0+3`；最新 HEAD 以 Git 查询为准，见 [后续修复](ugk-trainer-integration.md#后续修复2026-10-20) |
+| 共享训练依赖 | 固定 SDK 来源修复 `9407bf3` 已合入并推送 SDK main；GitHub 全新克隆确认可获取，App 严格锁解析通过且依赖文件无变化。包版本仍为 `ugk_coach 0.1.2` / `ugk_trainer 0.1.0` |
 | 源码里程碑 | `m7-aesthetic-v2` → `d0b1c7ef6198a469a7f0a7cedcaa7c9f2512dbe7` |
 | 上一阶段文档整理前主线快照 | `d0b1c7ef6198a469a7f0a7cedcaa7c9f2512dbe7`；后续 HEAD 由 Git 查询，不把本表固定 SHA 写成永远最新的 HEAD |
 | PR #3 合并提交 | `a5997ef7aef2695b24cab3f4b330543bbb2c7027` |

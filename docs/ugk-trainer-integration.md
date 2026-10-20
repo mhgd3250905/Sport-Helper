@@ -62,9 +62,9 @@ SDK 与 SmartFit main 已按用户同意依次合入并推送，依赖远端可�
 
 ## 后续修复（2026-10-20）
 
-本轮源码在 SmartFit `fix/chat-keyboard-reopen`，运行提交 `aea879127ab0b7dbbc0b7f3463e1a45330916783`；SDK 在 `fix/catalog-repseconds-source@9407bf3afab547868d7079d3bc6833a4b1d94147`。两仓均为本地成果，尚未合入 main、未推送，等待开哥同意。合并时先推送 SDK，确认远端可获取后再合入、推送 App。
+本轮 SmartFit `fix/chat-keyboard-reopen`（运行提交 `aea879127ab0b7dbbc0b7f3463e1a45330916783`，验收文档 `35fe1f8`）和 SDK `fix/catalog-repseconds-source@9407bf3afab547868d7079d3bc6833a4b1d94147` 已经开哥授权，依次快进合入并推送两仓 main。合并代码与已验源码一致，本次仅更新合并状态记录，没有重新构建或替换已测 APK。
 
-SDK `Rhythm.fromJson` 将显式 `source=repSeconds` 映射为 `RhythmSource.repSeconds`，其余仍为 catalog。四项新增回归覆盖真实目录解析、与直接派生节奏一致、1–12 次语音报数、计时剂量退回 `timedHold` 和其他来源不变；修前 3 失败、1 通过，修后包全量 **100 项通过**、`flutter analyze --no-pub` 无问题。包版本仍为 `ugk_trainer 0.1.0` / `ugk_coach 0.1.2`。App 两个 Git 依赖和 lock 固定到相同新 SHA；当前联调仅在单次命令中以本机 Git 仓库解析该未发布提交，严格锁文件解析通过，没有 path override、全局 Git 配置变更或 hosted 依赖升级。远端可获取性须在获准推送后核实。
+SDK `Rhythm.fromJson` 将显式 `source=repSeconds` 映射为 `RhythmSource.repSeconds`，其余仍为 catalog。四项新增回归覆盖真实目录解析、与直接派生节奏一致、1–12 次语音报数、计时剂量退回 `timedHold` 和其他来源不变；修前 3 失败、1 通过，修后包全量 **100 项通过**、`flutter analyze --no-pub` 无问题。包版本仍为 `ugk_trainer 0.1.0` / `ugk_coach 0.1.2`。App 两个 Git 依赖和 lock 固定到相同新 SHA；最初联调在单次命令中以本机 Git 仓库解析当时未发布的提交，严格锁文件解析通过，没有 path override、全局 Git 配置变更或 hosted 依赖升级。授权合并后，先推送 SDK main 到 `9407bf3`，从 GitHub 全新克隆确认该 SHA、来源修复代码和 `packages/ugk_trainer/pubspec.yaml` 可获取；未使用 URL 映射的 App `flutter pub get --enforce-lockfile` 再次成功，pubspec 和 lock 无变化，再推送 App main。
 
 主页键盘故障时微信输入法报告已显示，但实际 IME frame 只有 `[0,2771][1280,2772]` 的 1px。Dart 焦点重建与输入类型实验均未通过真机复验，已移除，最终输入组件与原 main 一致。仅重启微信输入法服务、保留默认输入法和全部数据后，IME 恢复为 1136px；用户以手指收起重开并输入，确认“现在正常”。本机 ADB 模拟文字输入能再次触发空键盘/顶端候选状态，不能再用它代替软件键盘验收，也未据此认定所有同类故障的根因。
 

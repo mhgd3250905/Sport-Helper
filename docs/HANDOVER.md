@@ -2,7 +2,7 @@
 
 ## 当前交接入口（2026-10-20）
 
-后续修复在本地 `fix/chat-keyboard-reopen`，App `0.1.0+3`，Git 依赖固定到 SDK `9407bf3`（`fix/catalog-repseconds-source`），两仓均待开哥同意后合并、推送。SDK 目录节奏识别 `source=repSeconds`，100 项测试及分析通过。主页键盘通过重启微信输入法服务恢复，用户手动复验正常；未保留无效 App 输入补丁。详见 [后续修复记录](ugk-trainer-integration.md#后续修复2026-10-20)。以下为已合并的 `0.1.0+2` 接入基线。
+后续分支 `fix/chat-keyboard-reopen` 与 SDK `fix/catalog-repseconds-source` 已经开哥授权依次合入并推送两仓 `main`。App `0.1.0+3`，Git 依赖固定到已发布的 SDK `9407bf3`；GitHub 全新克隆及严格锁文件解析通过。SDK 目录节奏识别 `source=repSeconds`，100 项测试及分析通过。主页键盘通过重启微信输入法服务恢复，用户手动复验正常；未保留无效 App 输入补丁。详见 [后续修复记录](ugk-trainer-integration.md#后续修复2026-10-20)。以下为已合并的 `0.1.0+2` 接入基线。
 
 `feat/ugk-trainer-integration` 已经用户同意合入并推送 `main`，接入检查点 `04112472a1ab8f07cebc1e7feb00604a56796b56`，当前 App 版本 `0.1.0+2`。SDK 修复 `ea00ff7` 已先合入并推送其 `main`，远端依赖可获取；迁移、验证范围与发布记录见 [接入记录](ugk-trainer-integration.md)。Android 16 真机同一包自然跑完 7 动作、每项 2 组、696 活动秒；出声、后台/锁屏、暂停、保存/重启读取、服务释放通过，见 [真机记录](trainer-device-check-2026-10-20.md)。通知可见性、其他系统中断与 Play Console 声明仍待处理。下段版本与交付说明保留的是上一阶段 M7 状态。
 
