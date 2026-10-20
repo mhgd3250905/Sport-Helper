@@ -562,7 +562,7 @@ packages:
       resolved-ref: ea00ff7f2a4b7f46274b70708a45b435f269f993
       url: "https://github.com/mhgd3250905/ugk-3d-pose-sdk.git"
     source: git
-    version: "0.0.0"
+    version: "0.1.2"
   ugk_trainer:
     dependency: "direct main"
     description:
@@ -571,7 +571,7 @@ packages:
       resolved-ref: ea00ff7f2a4b7f46274b70708a45b435f269f993
       url: "https://github.com/mhgd3250905/ugk-3d-pose-sdk.git"
     source: git
-    version: "0.0.0"
+    version: "0.1.0"
   uuid:
     dependency: transitive
     description:
