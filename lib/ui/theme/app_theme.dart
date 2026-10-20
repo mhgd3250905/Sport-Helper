@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'tokens.dart';
+import 'transitions.dart';
 
 /// Material theme built from the tokens, so stock widgets (app bars,
 /// switches, dialogs, sheets, snack bars, chips) already look like ours.
@@ -49,6 +50,12 @@ ThemeData buildTheme([SfPalette p = SfPalette.dark]) {
       titleSpacing: 4,
       titleTextStyle: label.copyWith(fontSize: 20, fontWeight: FontWeight.w700, height: 1.3),
       systemOverlayStyle: _overlay(p),
+    ),
+    // M2: one push / pop for every plain page on every platform.
+    pageTransitionsTheme: PageTransitionsTheme(
+      builders: {
+        for (final p in TargetPlatform.values) p: const SfPageTransitionsBuilder(),
+      },
     ),
     bottomSheetTheme: BottomSheetThemeData(
       backgroundColor: p.surface,
