@@ -9,8 +9,8 @@ class AiCoachConfig {
   final String token;
   bool get enabled => token.trim().isNotEmpty;
 
-  static const baseUrl = 'https://ugk-ai-proxy.294851575.workers.dev/v1';
-  static const model = 'deepseek-v4.1-flash-1017';
+  static const baseUrl = 'https://api.uuugk.win/v1';
+  static const model = 'deepseek-v4-flash-0731';
 
   coach.OpenAiCompatibleClient createClient({required String deviceId}) =>
       coach.OpenAiCompatibleClient(

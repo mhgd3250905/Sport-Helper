@@ -113,9 +113,9 @@ void main() {
       addTearDown(client.close);
       expect(
         client.config.baseUrl,
-        'https://ugk-ai-proxy.294851575.workers.dev/v1',
+        'https://api.uuugk.win/v1',
       );
-      expect(client.model, 'deepseek-v4.1-flash-1017');
+      expect(client.model, 'deepseek-v4-flash-0731');
       expect(client.config.maxRetries, 0);
       expect(client.config.timeout, const Duration(seconds: 45));
       expect(client.config.maxTokens, 6000);

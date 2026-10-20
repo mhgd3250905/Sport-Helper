@@ -1,7 +1,7 @@
 name: smartfit
 description: "智能健身助手 — 描述训练场景，按模板生成训练计划，预渲染动作跟练。"
 publish_to: 'none'
-version: 0.1.0+4
+version: 0.1.0+5
 
 environment:
   sdk: ^3.12.0
