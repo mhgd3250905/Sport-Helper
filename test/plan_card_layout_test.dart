@@ -95,11 +95,24 @@ void main() {
     // bottom row at its right end, level with 保存 (no 详情, no start pill
     // under the hero).
     await tester.tap(toggle);
-    for (var i = 0; i < 6; i++) {
-      await tester.pump(const Duration(milliseconds: 60));
+    await tester.pump();
+    // Mid-unfold (~100 ms of 320): the ▶ has faded out where it was (it
+    // never slides over the rows), thumbnails are in flight and no row
+    // text is showing yet.
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(tester.takeException(), isNull);
+    expect(_startOpacity(tester), lessThan(.02));
+    expect(find.byKey(const ValueKey('fly-0')), findsOneWidget);
+    for (var i = 0; i < plan.items.length; i++) {
+      expect(_textOpacity(tester, i), 0, reason: 'row $i text before thumbnails land');
+    }
+    for (var f = 0; f < 16; f++) {
+      await tester.pump(const Duration(milliseconds: 16));
       expect(tester.takeException(), isNull);
+      _expectNoOverlap(tester, plan.items.length);
     }
     await tester.pumpAndSettle();
+    expect(_startOpacity(tester), 1);
     expect(tester.getSize(card).height, greaterThan(PlanCard.setHeight + 48.0 * plan.items.length));
     final save = find.byKey(ValueKey('plan-save-${plan.id}'));
     expect(save, findsOneWidget);
@@ -122,10 +135,18 @@ void main() {
 
     // Collapse back to the compact 240 px card.
     await tester.tap(toggle);
-    await tester.pump(const Duration(milliseconds: 100));
-    expect(tester.takeException(), isNull);
+    await tester.pump();
+    // Folding: ▶ is gone within ~60 ms; text leaves before thumbnails move.
+    await tester.pump(const Duration(milliseconds: 60));
+    expect(_startOpacity(tester), lessThan(.02));
+    for (var f = 0; f < 14; f++) {
+      await tester.pump(const Duration(milliseconds: 16));
+      expect(tester.takeException(), isNull);
+      _expectNoOverlap(tester, plan.items.length);
+    }
     await tester.pumpAndSettle();
     expect(tester.getSize(card).height, PlanCard.setHeight);
+    expect(_startOpacity(tester), 1);
     expect(tester.getRect(start).topLeft - tester.getRect(card).topLeft, startRect.topLeft - cardRect.topLeft);
 
     // The card itself opens the plan page, where every move is listed.
@@ -192,4 +213,33 @@ void main() {
     expect(tester.getSize(card).height, PlanCard.setHeight);
     await tester.pumpWidget(const SizedBox());
   });
+}
+
+double _startOpacity(WidgetTester tester) =>
+    tester.widget<Opacity>(find.byKey(const ValueKey('plan-start-fade'))).opacity;
+
+/// Row [i]'s name/dose opacity (0 when the details are folded away).
+double _textOpacity(WidgetTester tester, int i) {
+  final f = find.descendant(of: find.byKey(ValueKey('plan-row-$i')), matching: find.byKey(const ValueKey('row-text')));
+  if (f.evaluate().isEmpty) return 0;
+  return tester.widget<FadeTransition>(f).opacity.value;
+}
+
+/// No flying thumbnail is ever over a row's visible text.
+void _expectNoOverlap(WidgetTester tester, int rows) {
+  final flyers = <Rect>[];
+  for (var k = 0; k < rows; k++) {
+    final f = find.byKey(ValueKey('fly-$k'));
+    if (f.evaluate().isEmpty) continue;
+    flyers.add(tester.getRect(find.descendant(of: f, matching: find.byType(ClipRRect)).first));
+  }
+  if (flyers.isEmpty) return;
+  for (var i = 0; i < rows; i++) {
+    if (_textOpacity(tester, i) <= 0) continue;
+    final text = tester.getRect(
+        find.descendant(of: find.byKey(ValueKey('plan-row-$i')), matching: find.byKey(const ValueKey('row-text'))));
+    for (final r in flyers) {
+      expect(r.deflate(.5).overlaps(text), isFalse, reason: 'thumbnail over row $i text');
+    }
+  }
 }

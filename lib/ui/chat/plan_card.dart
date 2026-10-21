@@ -25,13 +25,16 @@ import 'expand_route.dart';
 ///
 /// The one start control is an icon-only round ▶ (Semantics 「开始训练」)
 /// anchored to the card's bottom-right corner: at the end of the bottom
-/// row when compact, on the 保存 row when unfolded; it rides the card's
-/// edge as the height animates, so there is never a second start.
+/// row when compact, on the 保存 row when unfolded; there is never a
+/// second start.
 ///
-/// Unfolding is an in-card shared-element move: each strip thumbnail flies
-/// into its row's thumbnail (moves hidden behind +N emerge from the chip),
-/// ~30 ms apart, and each row's text fades / slides in after its thumbnail
-/// lands; collapsing mirrors it. Reduced motion: a plain cross-fade.
+/// Unfolding ([_Timeline]): one clip grows the card; the visible strip
+/// thumbnails fly on straight lines into their rows (transform only,
+/// ~20 ms apart), moves hidden behind +N fade in place, rows' text fades
+/// up only after every thumbnail has landed; ▶ / 保存 fade out and back in
+/// at their slots instead of travelling. Animated cutouts hold their still
+/// cover during the move. Collapsing mirrors it. Reduced motion: a plain
+/// cross-fade.
 class PlanCard extends StatefulWidget {
   const PlanCard({
     super.key,
@@ -67,33 +70,54 @@ class PlanCard extends StatefulWidget {
 }
 
 /// Timeline of the unfold on one linear controller value t ∈ [0, 1]
-/// (expand 380 ms; collapse plays it backwards in 280 ms, so the rows'
-/// text leaves first and the thumbnails gather last).
+/// (expand 320 ms; collapse plays it backwards in 240 ms).
+///
+/// Order, so nothing ever overlaps mid-flight:
+/// 1. ▶ (and the +N chip) fade / shrink out where they are (first ~80 ms);
+///    the clip starts growing at once and has revealed every destination
+///    row before a thumbnail arrives there;
+/// 2. only the visible strip thumbnails fly, on straight lines, ~20 ms
+///    apart; no row text is visible yet, so they never cross text;
+/// 3. once the last one has landed, the rows' text fades up (top first);
+/// 4. ▶ and 保存 fade / scale in at the bottom row's slots.
+/// Collapsing mirrors it: text, ▶ and 保存 are gone before any thumbnail
+/// moves.
 class _Timeline {
-  const _Timeline(this.flyers);
+  const _Timeline({required this.flyers, required this.rows});
   final int flyers;
+  final int rows;
 
-  static const flight = .5;
+  static const expandMs = 320;
+  static const collapseMs = 240;
+  static const flight = .42;
 
-  /// Per-item stagger: 30 ms of 380, tightened so the last one starts by .35.
-  double get _stagger => flyers <= 1 ? 0 : math.min(30 / 380, .35 / (flyers - 1));
+  double get _stagger => flyers <= 1 ? 0 : math.min(20 / expandMs, .18 / (flyers - 1));
   double flyStart(int k) => k * _stagger;
 
-  /// Thumbnail k's flight progress (0 → 1), emphasized.
-  double fly(int k, double t) {
-    final s = flyStart(k);
-    return ((t - s) / flight).clamp(0.0, 1.0);
+  /// When the last thumbnail has landed (≤ .6).
+  double get landed => flyers == 0 ? .3 : flyStart(flyers - 1) + flight;
+
+  /// Thumbnail k's flight progress (0 → 1).
+  double fly(int k, double t) => ((t - flyStart(k)) / flight).clamp(0.0, 1.0);
+
+  /// Row [i]'s text (and the hero row's thumbnail): after every flyer has
+  /// landed, top row first.
+  Interval text(int i) {
+    final step = rows <= 1 ? 0.0 : math.min(.025, .15 / (rows - 1));
+    final b = landed + i * step;
+    return Interval(b, math.min(1, b + .25), curve: SfMotion.standard);
   }
 
-  /// Row text after its thumbnail lands (k = -1: the hero's row, early).
-  Interval text(int k) {
-    if (k < 0) return const Interval(.12, .45, curve: SfMotion.standard);
-    final b = math.min(flyStart(k) + flight * .8, .8);
-    return Interval(b, math.min(1, b + .3), curve: SfMotion.standard);
-  }
+  /// Rows whose move hid behind +N: their thumbnail fades in place (nothing
+  /// flies over those rows, they sit under every destination).
+  static const inPlace = Interval(.25, .55, curve: SfMotion.standard);
 
-  /// The card height: emphasized decelerate over the first 70 %.
-  static const height = Interval(0, .7, curve: Cubic(.05, .7, .1, 1));
+  /// The card height (clip): emphasized decelerate over the first half.
+  static const height = Interval(0, .5, curve: Cubic(.05, .7, .1, 1));
+
+  /// ▶ / +N leaving, and ▶ / 保存 / note arriving.
+  static const out = Interval(0, .25, curve: Curves.easeIn);
+  static const arrive = Interval(.8, 1, curve: SfMotion.standard);
 }
 
 /// 1 only once the controller rests at 1: the rows' own thumbnails take
@@ -117,11 +141,38 @@ class _PlanCardState extends State<PlanCard> with SingleTickerProviderStateMixin
 
   late final AnimationController _expand = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 380),
-    reverseDuration: const Duration(milliseconds: 280),
-  );
+    duration: const Duration(milliseconds: _Timeline.expandMs),
+    reverseDuration: const Duration(milliseconds: _Timeline.collapseMs),
+  )..addStatusListener(_onStatus);
   late final Animation<double> _height = CurvedAnimation(parent: _expand, curve: _Timeline.height);
   bool _expanded = false;
+
+  /// True while the card unfolds / folds: animated cutouts show their still
+  /// cover meanwhile (no WebP frame decoding during the move).
+  bool _moving = false;
+  bool _precached = false;
+
+  void _onStatus(AnimationStatus s) {
+    final moving = s == AnimationStatus.forward || s == AnimationStatus.reverse;
+    if (moving != _moving && mounted) setState(() => _moving = moving);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_precached) return;
+    _precached = true;
+    // Decode every thumbnail (and the still cutouts) up front, so the first
+    // unfold never decodes an image mid-flight.
+    for (final i in widget.plan.items) {
+      final e = widget.library.tryGet(i.exerciseId);
+      if (e == null) continue;
+      final paths = [sfPoster(e), if (SfCutouts.has(e)) SfCutouts.asset(e, still: true)];
+      for (final a in paths) {
+        precacheImage(AssetImage(a), context, onError: (_, _) {});
+      }
+    }
+  }
 
   @override
   void dispose() {
@@ -169,9 +220,10 @@ class _PlanCardState extends State<PlanCard> with SingleTickerProviderStateMixin
     // The strip: the moves after the hero, as many as fit before the ▶.
     final rest = [for (var i = 1; i < items.length; i++) i];
     final fit = _SetBody.fitCount(innerW);
-    final shownCount = rest.length <= fit ? rest.length : fit - 1;
+    final shownCount = single ? 0 : (rest.length <= fit ? rest.length : fit - 1);
     final more = rest.length - shownCount;
-    final timeline = _Timeline(rest.length);
+    final cues = single ? (moves.firstOrNull?.cues ?? const <String>[]) : const <String>[];
+    final timeline = _Timeline(flyers: shownCount, rows: single ? cues.length : items.length);
 
     final toggle = _ExpandToggle(
       key: ValueKey('plan-expand-${p.id}'),
@@ -191,6 +243,7 @@ class _PlanCardState extends State<PlanCard> with SingleTickerProviderStateMixin
             duration: duration,
             tags: [gearText, if (moves.firstOrNull case final e?) e.category.zh, levelZh(p.level)],
             landing: widget.landing,
+            still: _moving,
           )
         : _SetBody(
             cover: lib.tryGet(items.first.exerciseId) ?? moves.firstOrNull,
@@ -199,34 +252,45 @@ class _PlanCardState extends State<PlanCard> with SingleTickerProviderStateMixin
             title: p.title,
             meta: [duration, '${items.length} 个动作', gearText].join(' · '),
             landing: widget.landing,
+            still: _moving,
             thumbs: stripThumbs,
-            // The +N chip fades as its moves leave it, returns as they gather.
+            // The +N chip fades in place (its moves fade into their rows).
             chip: reduced
                 ? stripThumbs
-                : ReverseAnimation(CurvedAnimation(parent: _expand, curve: const Interval(0, .22))),
+                : ReverseAnimation(CurvedAnimation(parent: _expand, curve: _Timeline.out)),
           );
 
     final atEnd = _expand.drive(const _AtEnd());
-    Animation<double> textOf(int k) =>
-        reduced ? _expand : CurvedAnimation(parent: _expand, curve: timeline.text(k));
+    Animation<double> textOf(int i) =>
+        reduced ? _expand : CurvedAnimation(parent: _expand, curve: timeline.text(i));
+    final arrive = reduced ? _expand : CurvedAnimation(parent: _expand, curve: _Timeline.arrive);
     final details = _Details(
       t: _expand,
       height: _height,
+      fade: arrive,
       reduced: reduced,
       rows: [
         if (single)
-          for (final (i, c) in (moves.firstOrNull?.cues ?? const <String>[]).indexed)
-            _CueRow(index: i + 1, text: c, anim: textOf(-1), reduced: reduced)
+          for (final (i, c) in cues.indexed)
+            _CueRow(index: i + 1, text: c, anim: textOf(i), reduced: reduced)
         else
           for (var i = 0; i < items.length; i++)
             _MoveRow(
+              key: ValueKey('plan-row-$i'),
               index: i + 1,
               item: circuit[i] ? items[i].copyWith(sets: 1) : items[i],
               exercise: lib.tryGet(items[i].exerciseId),
-              text: textOf(i - 1),
-              // Rows after the hero receive a flyer; their own thumbnail
-              // shows once it has landed. The hero's row just fades in.
-              thumb: reduced || i == 0 ? textOf(i - 1) : atEnd,
+              text: textOf(i),
+              // Rows 1…shown receive a flyer and show their own thumbnail
+              // once it has landed; the hero's row arrives with its text;
+              // rows hidden behind +N fade in place.
+              thumb: reduced
+                  ? _expand
+                  : i == 0
+                  ? textOf(0)
+                  : i <= shownCount
+                  ? atEnd
+                  : CurvedAnimation(parent: _expand, curve: _Timeline.inPlace),
               reduced: reduced,
             ),
       ],
@@ -243,7 +307,7 @@ class _PlanCardState extends State<PlanCard> with SingleTickerProviderStateMixin
             boxed: true,
           ),
           const Spacer(),
-          // The ▶ lands here (it is laid over the card, anchored bottom-right).
+          // The ▶ appears here (it is laid over the card, anchored bottom-right).
           const SizedBox(width: _PlayButton.size),
         ],
       ),
@@ -254,48 +318,81 @@ class _PlanCardState extends State<PlanCard> with SingleTickerProviderStateMixin
       onTap: () => widget.onStart(() => rectOf(_card.currentContext)),
     );
 
-    // Flyers: strip slot (or the +N chip) → row thumbnail, in card coords.
-    Rect stripSlot(int k) => Rect.fromLTWH(
+    // Flyers: strip slot → row thumbnail, in card coords; each one is a
+    // fixed-size row thumbnail moved only by a transform (no layout).
+    Offset stripSlot(int k) => Offset(
       SfSpace.x1 + k * (_SetBody.thumb + _SetBody.gap),
       compactH - _SetBody.stripHeight + _SetBody.stripTop + (_SetBody.stripHeight - _SetBody.stripTop - _SetBody.thumb) / 2,
-      _SetBody.thumb,
-      _SetBody.thumb,
     );
-    Rect rowSlot(int i) => Rect.fromLTWH(
+    Offset rowSlot(int i) => Offset(
       _Details.pad + _MoveRow.indexWidth,
       compactH + _Details.pad + _MoveRow.height * i + (_MoveRow.height - _MoveRow.thumbSize) / 2,
-      _MoveRow.thumbSize,
-      _MoveRow.thumbSize,
     );
-    final flyers = single || reduced
+    final flyerThumbs = [
+      for (var k = 0; k < shownCount; k++)
+        RepaintBoundary(child: _MoveRow.thumbFor(lib.tryGet(items[rest[k]].exerciseId))),
+    ];
+    final flyers = single || reduced || shownCount == 0
         ? const SizedBox.shrink()
         : Positioned.fill(
             child: IgnorePointer(
-              child: RepaintBoundary(
-                child: AnimatedBuilder(
-                  animation: _expand,
-                  builder: (context, _) {
-                    final t = _expand.value;
-                    if (t <= 0 || t >= 1) return const SizedBox.shrink();
-                    return Stack(
-                      clipBehavior: Clip.hardEdge,
-                      children: [
-                        for (var k = 0; k < rest.length; k++)
-                          _flyer(
-                            key: ValueKey('fly-$k'),
-                            exercise: lib.tryGet(items[rest[k]].exerciseId),
-                            from: stripSlot(math.min(k, shownCount)),
-                            to: rowSlot(rest[k]),
-                            p: timeline.fly(k, t),
-                            fromChip: k >= shownCount,
-                          ),
-                      ],
-                    );
-                  },
+              // Clipped to the card's current height: a thumbnail is only
+              // ever seen inside the part already revealed.
+              child: ClipRect(
+                child: RepaintBoundary(
+                  child: AnimatedBuilder(
+                    animation: _expand,
+                    builder: (context, _) {
+                      final t = _expand.value;
+                      if (t <= 0 || t >= 1) return const SizedBox.shrink();
+                      return Stack(
+                        children: [
+                          for (var k = 0; k < shownCount; k++)
+                            _flyer(
+                              key: ValueKey('fly-$k'),
+                              child: flyerThumbs[k],
+                              from: stripSlot(k),
+                              to: rowSlot(rest[k]),
+                              p: timeline.fly(k, t),
+                            ),
+                        ],
+                      );
+                    },
+                  ),
                 ),
               ),
             ),
           );
+
+    // ▶ never travels over the rows: it fades / shrinks out at its folded
+    // slot, and back in at the open one (and the reverse on fold).
+    final collapsedRight = single ? 0.0 : SfSpace.x1;
+    final collapsedBottom = single ? 0.0 : 1.0;
+    final play = AnimatedBuilder(
+      animation: _expand,
+      builder: (context, child) {
+        final t = _expand.value;
+        final open = t >= .5;
+        final double o = reduced
+            ? (t < .5 ? 1 - 2 * t : 2 * t - 1).clamp(0.0, 1.0)
+            : open
+            ? _Timeline.arrive.transform(t)
+            : 1 - _Timeline.out.transform(t);
+        return Positioned(
+          right: open ? _Details.pad : collapsedRight,
+          bottom: open ? _Details.footerBottom : collapsedBottom,
+          child: IgnorePointer(
+            ignoring: o < .5,
+            child: Opacity(
+              key: const ValueKey('plan-start-fade'),
+              opacity: o,
+              child: reduced || o == 1 ? child : Transform.scale(scale: .7 + .3 * o, child: child),
+            ),
+          ),
+        );
+      },
+      child: start,
+    );
 
     Widget card = SfGlassSurface(
       radius: SfRadius.lg,
@@ -322,7 +419,7 @@ class _PlanCardState extends State<PlanCard> with SingleTickerProviderStateMixin
                         scale: 1,
                         haptic: SfHaptic.selection,
                         onTap: widget.onOpen,
-                        child: body,
+                        child: RepaintBoundary(child: body),
                       ),
                     ),
                     if (single)
@@ -336,26 +433,7 @@ class _PlanCardState extends State<PlanCard> with SingleTickerProviderStateMixin
             ],
           ),
           flyers,
-          // ▶ rides the card's bottom-right corner: end of the strip when
-          // compact, end of the 保存 row when open. Reduced motion: it
-          // dips out and back in instead of travelling.
-          AnimatedBuilder(
-            animation: _height,
-            builder: (context, child) {
-              final k = reduced ? (_expand.value > 0 ? 1.0 : 0.0) : _height.value;
-              final collapsedRight = single ? 0.0 : SfSpace.x1;
-              final collapsedBottom = single ? 0.0 : 1.0;
-              final right = collapsedRight + (_Details.pad - collapsedRight) * k;
-              final bottom = collapsedBottom + (_Details.footerBottom - collapsedBottom) * k;
-              var w = child!;
-              if (reduced) {
-                final v = _expand.value;
-                w = Opacity(opacity: (v < .5 ? 1 - 2 * v : 2 * v - 1).clamp(0.0, 1.0), child: w);
-              }
-              return Positioned(right: right, bottom: bottom, child: w);
-            },
-            child: start,
-          ),
+          play,
         ],
       ),
     );
@@ -396,37 +474,25 @@ class _PlanCardState extends State<PlanCard> with SingleTickerProviderStateMixin
     );
   }
 
-  /// One flying thumbnail at flight progress [p]: x on the emphasized
-  /// curve, y on a softer one (a slight arc), size and corner interpolated.
-  /// Moves from behind +N fade in as they leave the chip (and out as they
-  /// gather back into it).
-  Widget _flyer({
-    required Key key,
-    required Exercise? exercise,
-    required Rect from,
-    required Rect to,
-    required double p,
-    required bool fromChip,
-  }) {
-    final px = Curves.easeInOutCubicEmphasized.transform(p);
-    final py = Curves.easeInOutCubic.transform(p);
-    final w = from.width + (to.width - from.width) * px;
-    final r = Rect.fromLTWH(
-      from.left + (to.left - from.left) * px,
-      from.top + (to.top - from.top) * py,
-      w,
-      w,
+  /// One flying thumbnail at flight progress [p]: a straight line on the
+  /// emphasized curve, growing from the strip size to the row size. Moved
+  /// by a transform only.
+  Widget _flyer({required Key key, required Widget child, required Offset from, required Offset to, required double p}) {
+    final e = Curves.easeInOutCubicEmphasized.transform(p);
+    const s0 = _SetBody.thumb / _MoveRow.thumbSize;
+    final o = Offset.lerp(from, to, e)!;
+    final s = s0 + (1 - s0) * e;
+    return Positioned(
+      key: key,
+      left: 0,
+      top: 0,
+      width: _MoveRow.thumbSize,
+      height: _MoveRow.thumbSize,
+      child: Transform(
+        transform: Matrix4.translationValues(o.dx, o.dy, 0)..scaleByDouble(s, s, 1, 1),
+        child: child,
+      ),
     );
-    final radius = (SfRadius.xs + 2) * (w / _SetBody.thumb);
-    Widget thumb = ClipRRect(
-      borderRadius: BorderRadius.circular(radius),
-      child: _Media(exercise: exercise),
-    );
-    if (fromChip) {
-      final o = (p / .35).clamp(0.0, 1.0);
-      thumb = Opacity(opacity: o, child: Transform.scale(scale: .6 + .4 * o, child: thumb));
-    }
-    return Positioned.fromRect(key: key, rect: r, child: thumb);
   }
 }
 
@@ -438,6 +504,7 @@ class _Details extends StatelessWidget {
   const _Details({
     required this.t,
     required this.height,
+    required this.fade,
     required this.reduced,
     required this.rows,
     required this.footer,
@@ -445,6 +512,9 @@ class _Details extends StatelessWidget {
   });
   final Animation<double> t;
   final Animation<double> height;
+
+  /// Note and the 保存 row: in at the end, out first on fold.
+  final Animation<double> fade;
   final bool reduced;
   final List<Widget> rows;
   final Widget footer;
@@ -460,7 +530,6 @@ class _Details extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final late = CurvedAnimation(parent: t, curve: reduced ? Curves.linear : const Interval(.55, 1));
     Widget content = Padding(
       padding: const EdgeInsets.fromLTRB(pad, pad, pad, 0),
       child: Column(
@@ -470,14 +539,14 @@ class _Details extends StatelessWidget {
           ...rows,
           if (note != null)
             FadeTransition(
-              opacity: late,
+              opacity: fade,
               child: Padding(
                 padding: const EdgeInsets.only(top: SfSpace.x1),
                 child: Text(note!, style: SfType.caption),
               ),
             ),
           FadeTransition(
-            opacity: late,
+            opacity: fade,
             child: Container(
               margin: const EdgeInsets.only(top: SfSpace.x2),
               padding: const EdgeInsets.only(top: footerTop, bottom: footerBottom),
@@ -598,9 +667,10 @@ class _CueRow extends StatelessWidget {
 
 /// A row's text arriving: fade + a short slide from the left (none under
 /// reduced motion, where the whole details block fades instead).
-Widget _rowIn({required Animation<double> anim, required bool reduced, required Widget child}) => reduced
+Widget _rowIn({Key? key, required Animation<double> anim, required bool reduced, required Widget child}) => reduced
     ? child
     : FadeTransition(
+        key: key,
         opacity: anim,
         child: SlideTransition(
           position: Tween(begin: const Offset(-.04, 0), end: Offset.zero).animate(anim),
@@ -610,9 +680,12 @@ Widget _rowIn({required Animation<double> anim, required bool reduced, required 
 
 /// The cover image on its stage colour; settles from 1.04 as a card lands.
 class _Media extends StatelessWidget {
-  const _Media({required this.exercise, this.landing = false, this.cutout = false});
+  const _Media({required this.exercise, this.landing = false, this.cutout = false, this.still = false});
   final Exercise? exercise;
   final bool landing;
+
+  /// Show the cutout's still cover (while the card unfolds / folds).
+  final bool still;
 
   /// The keyed figure straight on the glass (no stage box), when [exercise]
   /// has one ([SfCutouts]); otherwise the boxed cover as before.
@@ -629,7 +702,7 @@ class _Media extends StatelessWidget {
         curve: SfMotion.standard,
         builder: (_, k, img) => k == 1 ? img! : Transform.scale(scale: k, child: img),
         child: Image.asset(
-          SfCutouts.asset(e, still: reduced),
+          SfCutouts.asset(e, still: reduced || still),
           fit: BoxFit.contain,
           gaplessPlayback: true,
           semanticLabel: e.name,
@@ -670,7 +743,9 @@ class _ExerciseBody extends StatelessWidget {
     required this.duration,
     required this.tags,
     this.landing = false,
+    this.still = false,
   });
+  final bool still;
   final Exercise? exercise;
   final PlanItem item;
   final String fallbackName;
@@ -688,7 +763,7 @@ class _ExerciseBody extends StatelessWidget {
         AspectRatio(
           aspectRatio: 1,
           child: SfCutouts.has(e)
-              ? _Media(exercise: e, landing: landing, cutout: true)
+              ? _Media(exercise: e, landing: landing, cutout: true, still: still)
               : ClipRRect(
                   borderRadius: BorderRadius.circular(SfRadius.lg - 6),
                   child: _Media(exercise: e, landing: landing),
@@ -786,7 +861,9 @@ class _SetBody extends StatelessWidget {
     required this.thumbs,
     required this.chip,
     this.landing = false,
+    this.still = false,
   });
+  final bool still;
   final Exercise? cover;
   final List<Exercise?> shown;
   final int more;
@@ -830,7 +907,7 @@ class _SetBody extends StatelessWidget {
                       right: SfSpace.x4,
                       top: SfSpace.x1,
                       bottom: 50,
-                      child: _Media(exercise: cover, landing: landing, cutout: true),
+                      child: _Media(exercise: cover, landing: landing, cutout: true, still: still),
                     ),
                     Positioned(
                       left: SfSpace.x4,
@@ -945,6 +1022,7 @@ class _Thumb extends StatelessWidget {
 
 class _MoveRow extends StatelessWidget {
   const _MoveRow({
+    super.key,
     required this.index,
     required this.item,
     required this.exercise,
@@ -967,6 +1045,12 @@ class _MoveRow extends StatelessWidget {
   static const indexWidth = 20.0;
   static const thumbSize = 40.0;
 
+  /// The row's thumbnail (also what flies in from the strip).
+  static Widget thumbFor(Exercise? e) => ClipRRect(
+    borderRadius: BorderRadius.circular((SfRadius.xs + 2) * thumbSize / _SetBody.thumb),
+    child: SizedBox.square(dimension: thumbSize, child: _Media(exercise: e)),
+  );
+
   @override
   Widget build(BuildContext context) => SizedBox(
     height: height,
@@ -980,16 +1064,11 @@ class _MoveRow extends StatelessWidget {
             child: Text('$index', style: SfType.label.copyWith(color: SfColors.muted, fontFeatures: SfType.tabular)),
           ),
         ),
-        FadeTransition(
-          opacity: thumb,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular((SfRadius.xs + 2) * thumbSize / _SetBody.thumb),
-            child: SizedBox.square(dimension: thumbSize, child: _Media(exercise: exercise)),
-          ),
-        ),
+        FadeTransition(opacity: thumb, child: thumbFor(exercise)),
         const SizedBox(width: SfSpace.x3),
         Expanded(
           child: _rowIn(
+            key: const ValueKey('row-text'),
             anim: text,
             reduced: reduced,
             child: Row(
