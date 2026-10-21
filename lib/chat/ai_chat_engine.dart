@@ -22,8 +22,9 @@ class AiChatEngine
     required this.client,
     this.memoryStore,
     bool enableUserMemory = true,
-    // Default ten Agent steps can each use the 120-second HTTP budget.
-    this.turnTimeout = const Duration(seconds: 1230),
+    // Agent owns its 360-second total budget, retries and request timeouts.
+    // This outer guard leaves time for its admitted local fallback to finish.
+    this.turnTimeout = const Duration(seconds: 390),
   }) : _initialMemoryEnabled = enableUserMemory;
 
   final RuleChatEngine local;
@@ -97,8 +98,8 @@ class AiChatEngine
 
   Future<void> clearMemory() async {
     await agent.clearMemory();
-    // The SDK treats usage/storage failures as best effort. Verify the local
-    // boundary before telling the user that durable memory has been removed.
+    // The SDK awaits durable storage and throws on failure. Also verify the
+    // App storage boundary before confirming removal to the user.
     if ((await agent.memoryStore.load()).isNotEmpty) {
       throw StateError('AI memory could not be cleared from local storage');
     }
@@ -241,6 +242,11 @@ class AiChatEngine
           text: fallback.messages.map((m) => m.text).join('\n'),
           plan: plan == null ? null : restorePlan(plan, fallback.state.request),
           fallbackReason: coach.FallbackReason.timeout,
+          error: const coach.AgentRequestFailed(
+            coach.AgentFailureKind.turnTimeout,
+            errorClass: coach.RequestErrorClass.timeout,
+            attempts: 0,
+          ),
           records: result.records,
           steps: result.steps,
           reads: result.reads,
@@ -306,10 +312,7 @@ class AiChatEngine
             ).copyWith(description: input, equipment: turn.slots.equipment);
       final fallback = accepted.status == coach.TurnStatus.fallback;
       final text = [
-        if (fallback)
-          accepted.fallbackReason == coach.FallbackReason.rateLimited
-              ? '预设方案 · AI 请求较多，请稍后再试。'
-              : '预设方案 · AI 暂时不可用，先用本地模板继续。',
+        if (fallback) _fallbackNotice(accepted),
         if (accepted.text.isNotEmpty) accepted.text,
         if (fallback && turn.fallbackReply?.state.plan != null && plan == null)
           '当前模板未通过安全检查，请调整条件或自己选条件。',
@@ -361,6 +364,29 @@ class AiChatEngine
       timer.cancel();
       if (_pending == turn) _pending = null;
     }
+  }
+
+  String _fallbackNotice(coach.CoachTurnResult result) {
+    final error = result.error;
+    if (error is coach.AgentRequestFailed) {
+      return switch (error.kind) {
+        coach.AgentFailureKind.retriesExhausted =>
+          error.errorClass == coach.RequestErrorClass.rateLimited
+              ? '预设方案 · AI 请求较多，重试后仍未成功，请稍后再试。'
+              : '预设方案 · AI 重试后仍未成功，先用本地模板继续。',
+        coach.AgentFailureKind.nonRetryable => '预设方案 · AI 暂时无法处理这条请求，先用本地模板继续。',
+        coach.AgentFailureKind.turnTimeout => '预设方案 · AI 思考超时，先用本地模板继续。',
+      };
+    }
+    if (error is coach.AgentStalled) {
+      return '预设方案 · AI 暂时没能继续完成，先用本地模板继续。';
+    }
+    if (error is coach.AgentStepLimitExceeded) {
+      return '预设方案 · AI 暂时没能完成这次请求，先用本地模板继续。';
+    }
+    return result.fallbackReason == coach.FallbackReason.rateLimited
+        ? '预设方案 · AI 请求较多，请稍后再试。'
+        : '预设方案 · AI 暂时不可用，先用本地模板继续。';
   }
 
   ChatReply _admitLocalCards(ChatReply reply) => ChatReply(

@@ -22,18 +22,7 @@ class ChatController extends ChangeNotifier {
     DateTime Function()? clock,
   }) : _clock = clock ?? DateTime.now {
     if (engine case final ProgressChatEngine progress) {
-      _progressSubscription = progress.events.listen((event) {
-        if (!typing) return;
-        progressLabel = switch (event.kind) {
-          coach.AgentEventKind.reading ||
-          coach.AgentEventKind.listing => '正在查动作库',
-          coach.AgentEventKind.checking => '正在核对计划',
-          coach.AgentEventKind.memory => '正在整理训练偏好',
-          coach.AgentEventKind.thinking => progressLabel ?? '正在思考回复',
-          coach.AgentEventKind.done => null,
-        };
-        notifyListeners();
-      });
+      _progressSubscription = progress.events.listen(_onProgress);
     }
   }
 
@@ -49,7 +38,52 @@ class ChatController extends ChangeNotifier {
   bool typing = false;
   String? progressLabel;
   StreamSubscription<coach.AgentEvent>? _progressSubscription;
+  String? _progressTurnId;
+  final Set<String> _finishedProgressTurns = {};
+  bool _progressEnded = true;
   ChatState _state = const ChatState();
+
+  void _onProgress(coach.AgentEvent event) {
+    if (!typing ||
+        _progressEnded ||
+        _finishedProgressTurns.contains(event.turnId)) {
+      return;
+    }
+    if (_progressTurnId != null && _progressTurnId != event.turnId) return;
+    _progressTurnId ??= event.turnId;
+    if (event.kind == coach.AgentEventKind.done) {
+      _endProgress();
+    } else {
+      progressLabel = switch (event.kind) {
+        coach.AgentEventKind.reading ||
+        coach.AgentEventKind.listing => '正在查动作库',
+        coach.AgentEventKind.checking => '正在核对计划',
+        coach.AgentEventKind.memory => '正在整理训练偏好',
+        coach.AgentEventKind.retrying =>
+          event.reason == coach.RequestErrorClass.contextTooLong
+              ? '正在整理上下文，继续思考…'
+              : '网络不稳，正在重试（${event.attempt}/${event.maxAttempts}）…',
+        coach.AgentEventKind.slow => '还在想…',
+        coach.AgentEventKind.thinking => progressLabel ?? '正在思考回复',
+        coach.AgentEventKind.done => null,
+      };
+    }
+    notifyListeners();
+  }
+
+  void _endProgress() {
+    final turnId = _progressTurnId;
+    if (turnId != null) {
+      _finishedProgressTurns.add(turnId);
+      // The SDK suppresses cancelled events; retain only recent UI turns too.
+      if (_finishedProgressTurns.length > 64) {
+        _finishedProgressTurns.remove(_finishedProgressTurns.first);
+      }
+    }
+    _progressTurnId = null;
+    _progressEnded = true;
+    progressLabel = null;
+  }
 
   /// Index into [safetyQuestions] while the safety talk runs (-1 = waiting
   /// for "我已了解"); null when no safety talk is open.
@@ -120,9 +154,9 @@ class ChatController extends ChangeNotifier {
   void cancelRequest() {
     if (!typing) return;
     _replyEpoch++;
-    if (engine case final ManagedChatEngine managed) managed.cancelPending();
     typing = false;
-    progressLabel = null;
+    _endProgress();
+    if (engine case final ManagedChatEngine managed) managed.cancelPending();
     suggestions = _defaults();
     notifyListeners();
     unawaited(_persist());
@@ -131,12 +165,12 @@ class ChatController extends ChangeNotifier {
   /// Starts a fresh SDK conversation while retaining saved plans and safety.
   Future<void> newConversation() async {
     _replyEpoch++;
+    typing = false;
+    _endProgress();
     if (engine case final ManagedChatEngine managed) {
       managed.cancelPending();
       managed.reset();
     }
-    typing = false;
-    progressLabel = null;
     _state = const ChatState();
     _safetyStep = null;
     _safetyMessageId = null;
@@ -187,13 +221,14 @@ class ChatController extends ChangeNotifier {
     }
     final epoch = ++_replyEpoch;
     typing = true;
-    progressLabel = null;
+    _endProgress();
+    _progressEnded = false;
     notifyListeners();
     final reply = await engine.reply(t, _context);
     if (replyDelay > Duration.zero) await Future<void>.delayed(replyDelay);
     if (epoch != _replyEpoch) return;
     typing = false;
-    progressLabel = null;
+    _endProgress();
     _state = reply.state;
     if (reply.aiTurn) _replace(userMessage.copyWith(aiVisible: true));
     for (final m in reply.messages) {
@@ -363,9 +398,9 @@ class ChatController extends ChangeNotifier {
 
   void _beginSafety({required bool firstRun}) {
     _replyEpoch++;
-    if (engine case final ManagedChatEngine managed) managed.cancelPending();
     typing = false;
-    progressLabel = null;
+    _endProgress();
+    if (engine case final ManagedChatEngine managed) managed.cancelPending();
     unawaited(store.beginSafetyCheck());
     if (firstRun) {
       messages.clear();
@@ -493,6 +528,8 @@ class ChatController extends ChangeNotifier {
   @override
   void dispose() {
     _replyEpoch++;
+    typing = false;
+    _endProgress();
     unawaited(_progressSubscription?.cancel());
     if (engine case final ManagedChatEngine managed) managed.cancelPending();
     _actions.close();

@@ -10,6 +10,7 @@ import 'package:smartfit/chat/chat_controller.dart';
 import 'package:smartfit/chat/rule_chat_engine.dart';
 import 'package:smartfit/core/storage/local_state_storage.dart';
 import 'package:smartfit/data/app_store.dart';
+import 'package:smartfit/domain/exercise.dart';
 import 'package:smartfit/domain/plan_generator.dart';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
 
@@ -34,21 +35,22 @@ class _Files implements LocalStateStorage {
 
 /// Observe the public request contract, never credentials or raw responses.
 class _ObservedClient implements coach.LlmClient {
-  _ObservedClient(this.inner, this.requestTimes);
+  _ObservedClient(this.inner, this.requestTimes, this.requestFile);
   final coach.OpenAiCompatibleClient inner;
   final List<DateTime> requestTimes;
+  final File requestFile;
   final requests = <coach.LlmRequest>[];
   final responseProtocol = <Map<String, Object?>>[];
 
-  // Keep a full ten-step budget below the Worker's 30 requests / 10 minutes.
-  // Wait between cases, outside the measured turn, and reuse the same UUID.
+  // Reserve twelve requests before a case under the 30 / 10 minute quota.
+  // This pacing is outside measured turns; Agent owns all in-turn retries.
   Future<void> waitForTurnBudget() async {
     while (true) {
       final cutoff = DateTime.now().toUtc().subtract(
         const Duration(minutes: 10),
       );
       requestTimes.removeWhere((time) => time.isBefore(cutoff));
-      if (requestTimes.length < 20) return;
+      if (requestTimes.length < 18) return;
       stdout.writeln('SMOKE_RATE_WAIT waiting for the existing device budget');
       await Future<void>.delayed(const Duration(seconds: 30));
     }
@@ -64,10 +66,16 @@ class _ObservedClient implements coach.LlmClient {
     coach.CancelToken? cancel,
   }) async {
     requests.add(request);
-    requestTimes.add(DateTime.now().toUtc());
+    final index = requests.length;
+    final at = DateTime.now().toUtc();
+    requestTimes.add(at);
+    requestFile.writeAsStringSync(
+      '${jsonEncode({'at': at.toIso8601String(), 'requestIndex': index})}\n',
+      mode: FileMode.append,
+    );
     final response = await inner.complete(request, cancel: cancel);
     responseProtocol.add({
-      'requestIndex': requests.length,
+      'requestIndex': index,
       'reasoningPresent': response.reasoning != null,
       'reasoningLength': response.reasoning?.length,
     });
@@ -88,7 +96,7 @@ void main() {
   const live = bool.fromEnvironment('SMARTFIT_RUN_LIVE');
   const memoryOnly = bool.fromEnvironment('SMARTFIT_SMOKE_MEMORY_ONLY');
   test(
-    'real Worker CoachAgent first multi-step smoke',
+    'real Worker CoachAgent 0.3.2 six-case smoke',
     () async {
       const key = String.fromEnvironment('SMARTFIT_AI_TOKEN');
       expect(
@@ -120,11 +128,20 @@ void main() {
       final transport = const AiCoachConfig(
         token: key,
       ).createClient(deviceId: deviceId);
+      expect(transport.config.maxRetries, 0);
       final previousRequests = <DateTime>[];
       for (final previous in Directory(
         '.buildlog/skill-agent-smoke',
       ).listSync()) {
         if (previous is! Directory) continue;
+        final previousCalls = File('${previous.path}/requests.jsonl');
+        if (previousCalls.existsSync()) {
+          for (final line in previousCalls.readAsLinesSync()) {
+            final call = jsonDecode(line) as Map<String, dynamic>;
+            previousRequests.add(DateTime.parse(call['at'] as String));
+          }
+          continue;
+        }
         final previousEvents = File('${previous.path}/events.jsonl');
         if (!previousEvents.existsSync()) continue;
         for (final line in previousEvents.readAsLinesSync()) {
@@ -134,7 +151,11 @@ void main() {
           }
         }
       }
-      final client = _ObservedClient(transport, previousRequests);
+      final client = _ObservedClient(
+        transport,
+        previousRequests,
+        File('${root.path}/requests.jsonl'),
+      );
       final engine = AiChatEngine(
         local: RuleChatEngine(
           lib: library,
@@ -155,6 +176,21 @@ void main() {
         replyDelay: Duration.zero,
       )..start();
       final events = <Map<String, Object?>>[];
+      await File('${root.path}/metadata.json').writeAsString(
+        jsonEncode({
+          'sdkRef': 'b26e4fda807b6ef3db15a61ba30c67fb51dce5e1',
+          'sdkVersion': '0.3.2',
+          'appVersion': '0.1.0+8',
+          'memoryOnly': memoryOnly,
+          'maxSteps': engine.agent.maxSteps,
+          'maxRequestRetries': engine.agent.maxRequestRetries,
+          'requestTimeoutMs': engine.agent.requestTimeout.inMilliseconds,
+          'turnTimeoutMs': engine.agent.turnTimeout.inMilliseconds,
+          'outerGuardMs': engine.turnTimeout.inMilliseconds,
+          'llmMaxRetries': transport.config.maxRetries,
+        }),
+        flush: true,
+      );
       final eventFile = File('${root.path}/events.jsonl');
       final subscription = engine.events.listen((event) {
         final e = <String, Object?>{
@@ -164,6 +200,10 @@ void main() {
           'step': event.step,
           'path': event.path,
           'status': event.status?.name,
+          'attempt': event.attempt,
+          'maxAttempts': event.maxAttempts,
+          'reason': event.reason?.name,
+          'delayMs': event.delay?.inMilliseconds,
         };
         events.add(e);
         eventFile.writeAsStringSync(
@@ -171,7 +211,7 @@ void main() {
           mode: FileMode.append,
         );
         stdout.writeln(
-          'AGENT_PROGRESS ${jsonEncode({'kind': event.kind.name, 'step': event.step, 'path': event.path})}',
+          'AGENT_PROGRESS ${jsonEncode({'kind': event.kind.name, 'step': event.step, 'path': event.path, 'attempt': event.attempt, 'maxAttempts': event.maxAttempts, 'reason': event.reason?.name})}',
         );
       });
       final results = <Map<String, Object?>>[];
@@ -201,22 +241,19 @@ void main() {
           return;
         }
         final sent = client.requests.skip(before).toList();
-        // Agent commits its in-memory view before the asynchronous store write
-        // completes. Wait briefly for that write before checking durability.
-        var memoryEntries = await store.aiMemoryStore.load();
+        // 0.3.2 confirms each memory tool only after its save Future completes.
+        final memoryEntries = await store.aiMemoryStore.load();
         if (memory) {
           final committed = await engine.agent.memory();
-          for (
-            var attempt = 0;
-            attempt < 40 &&
-                jsonEncode(memoryEntries.map((e) => e.toJson()).toList()) !=
-                    jsonEncode(committed.map((e) => e.toJson()).toList());
-            attempt++
-          ) {
-            await Future<void>.delayed(const Duration(milliseconds: 50));
-            memoryEntries = await store.aiMemoryStore.load();
+          if (jsonEncode(memoryEntries.map((e) => e.toJson()).toList()) !=
+              jsonEncode(committed.map((e) => e.toJson()).toList())) {
+            failures.add('$id: durable memory differs from confirmed snapshot');
           }
         }
+        final turnEvents = events.skip(eventBefore).toList();
+        final retryEvents = turnEvents
+            .where((e) => e['kind'] == coach.AgentEventKind.retrying.name)
+            .toList();
         final system = sent.isEmpty ? '' : sent.first.messages.first.content;
         final memoryAt = system.indexOf('# 用户记忆（');
         final memorySummary = memoryAt < 0 ? '' : system.substring(memoryAt);
@@ -236,7 +273,21 @@ void main() {
           'fallback': r.status == coach.TurnStatus.fallback,
           'fallbackReason': r.fallbackReason?.name,
           'error': r.error?.toString(),
+          if (r.error case final coach.AgentRequestFailed error) ...{
+            'failureKind': error.kind.name,
+            'requestErrorClass': error.errorClass?.name,
+            'failedAttempts': error.attempts,
+          },
+          if (r.error case final coach.AgentStalled error)
+            'stalledReason': error.why,
           'steps': r.steps,
+          'httpRequests': sent.length,
+          'retrying': retryEvents.isNotEmpty,
+          'retryCount': retryEvents.length,
+          'retryEvents': retryEvents,
+          'slow': turnEvents.any(
+            (e) => e['kind'] == coach.AgentEventKind.slow.name,
+          ),
           'reads': r.reads,
           'submissions': r.submissions,
           'usage': {...r.usage.toJson(), 'totalTokens': r.usage.totalTokens},
@@ -245,6 +296,8 @@ void main() {
               {
                 'outcome': _callLabel(record.outcome),
                 'httpAttempts': record.httpAttempts,
+                'step': record.attempt,
+                'retry': record.retry,
                 'latencyMs': record.latency.inMilliseconds,
                 'usage': record.usage.toJson(),
                 'issues': record.issueCodes,
@@ -267,7 +320,7 @@ void main() {
                     },
               ],
           ],
-          'events': events.skip(eventBefore).toList(),
+          'events': turnEvents,
           'text': r.text,
           'actions': r.actions?.items.map((a) => a.id).toList(),
           'planTitle': plan?.title,
@@ -296,8 +349,14 @@ void main() {
         if (id == 'actions' && r.actions == null) {
           failures.add('actions: no ValidatedActions');
         }
-        if (id == 'core' && r.plan == null) {
-          failures.add('core: no ValidatedPlan');
+        if ([
+              'core',
+              'back-protection',
+              'memory-on-plan',
+              'memory-off-plan',
+            ].contains(id) &&
+            (r.plan == null || plan == null)) {
+          failures.add('$id: no delivered ValidatedPlan');
         }
         if (id == 'remember' &&
             (!memoryEntries.any((e) => e.kind == coach.MemoryKind.level) ||
@@ -306,13 +365,29 @@ void main() {
                 ))) {
           failures.add('remember: no durable level/equipment memories');
         }
-        if (id == 'memory-on-plan' && !memorySummary.contains('哑铃')) {
-          failures.add('enabled: memory not in system');
+        if (id == 'memory-on-plan' &&
+            (!memorySummary.contains('哑铃') ||
+                !memorySummary.contains('新手') ||
+                plan?.level != 1 ||
+                !itemIds.any(
+                  (id) => library[id].equipment.contains(Equipment.dumbbell),
+                ))) {
+          failures.add(
+            'enabled: memory not applied in request and delivered plan',
+          );
         }
         if (id == 'memory-off-plan' &&
-            (tools.contains('remember') ||
-                tools.contains('forget') ||
-                memorySummary.isNotEmpty)) {
+            (sent.any(
+                  (request) =>
+                      request.tools.any(
+                        (t) => t.name == 'remember' || t.name == 'forget',
+                      ) ||
+                      request.messages.first.content.contains('# 用户记忆（'),
+                ) ||
+                itemIds.any(
+                  (id) => library[id].equipment.contains(Equipment.dumbbell),
+                ) ||
+                memoryEntries.length != 2)) {
           failures.add('disabled: remembered-only information in cold request');
         }
         if (id == 'back-protection' &&

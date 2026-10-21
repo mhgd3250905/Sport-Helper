@@ -14,6 +14,7 @@ class AiCoachConfig {
 
   coach.OpenAiCompatibleClient createClient({required String deviceId}) =>
       coach.OpenAiCompatibleClient(
+        // Retry individual steps in CoachAgent, without transport retries.
         config: coach.LlmConfig.ugkWorker.copyWith(maxRetries: 0),
         auth: coach.UgkWorkerAuth(
           appKey: token.trim(),

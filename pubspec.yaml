@@ -1,7 +1,7 @@
 name: smartfit
 description: "智能健身助手 — 描述训练场景，按模板生成训练计划，预渲染动作跟练。"
 publish_to: 'none'
-version: 0.1.0+7
+version: 0.1.0+8
 
 environment:
   sdk: ^3.12.0
@@ -15,11 +15,11 @@ dependencies:
     git:
       url: https://github.com/mhgd3250905/ugk-3d-pose-sdk.git
       path: packages/ugk_trainer
-      ref: 43dfef637144a1e08b5eda5ed743db0671ba5a8d
+      ref: b26e4fda807b6ef3db15a61ba30c67fb51dce5e1
   ugk_coach:
     git:
       url: https://github.com/mhgd3250905/ugk-3d-pose-sdk.git
-      ref: 43dfef637144a1e08b5eda5ed743db0671ba5a8d
+      ref: b26e4fda807b6ef3db15a61ba30c67fb51dce5e1
   shared_preferences: 2.5.6
   webview_flutter: 4.14.1
   webview_flutter_android: 4.14.1

@@ -176,6 +176,180 @@ void main() {
     },
   );
 
+  testWidgets(
+    'retry and slow progress use SDK counters and stay closed after done',
+    (tester) async {
+      tall(tester);
+      final (chat, engine, app) = await setup();
+      await showChat(tester, chat, app);
+      final pending = chat.send('给我排计划');
+      for (final attempt in [1, 4]) {
+        engine.eventBus.add(
+          coach.AgentEvent(
+            'retry-turn',
+            coach.AgentEventKind.retrying,
+            step: 2,
+            attempt: attempt,
+            maxAttempts: 4,
+          ),
+        );
+        await tester.pump();
+        expect(find.text('网络不稳，正在重试（$attempt/4）…'), findsOneWidget);
+      }
+      // Context compression has its own one-retry budget in the SDK.
+      engine.eventBus.add(
+        const coach.AgentEvent(
+          'retry-turn',
+          coach.AgentEventKind.retrying,
+          attempt: 1,
+          maxAttempts: 1,
+          reason: coach.RequestErrorClass.contextTooLong,
+        ),
+      );
+      await tester.pump();
+      expect(find.text('正在整理上下文，继续思考…'), findsOneWidget);
+      expect(find.text('网络不稳，正在重试（1/1）…'), findsNothing);
+      engine.eventBus.add(
+        const coach.AgentEvent(
+          'retry-turn',
+          coach.AgentEventKind.slow,
+          step: 2,
+        ),
+      );
+      await tester.pump();
+      expect(find.text('还在想…'), findsOneWidget);
+      expect(find.text('正在整理上下文，继续思考…'), findsNothing);
+      expect(
+        tester.widget<ChatInputBar>(find.byType(ChatInputBar)).enabled,
+        isFalse,
+      );
+      expect(find.byKey(const ValueKey('chat-cancel')), findsOneWidget);
+
+      engine.eventBus.add(
+        const coach.AgentEvent(
+          'retry-turn',
+          coach.AgentEventKind.done,
+          status: coach.TurnStatus.ok,
+        ),
+      );
+      engine.eventBus.add(
+        const coach.AgentEvent(
+          'retry-turn',
+          coach.AgentEventKind.slow,
+          step: 3,
+        ),
+      );
+      await tester.pump();
+      expect(chat.typing, isTrue);
+      expect(chat.progressLabel, isNull);
+      expect(find.text('还在想…'), findsNothing);
+      engine.pending.single.complete(
+        ChatReply(
+          messages: const [BotMessage('计划准备好了')],
+          state: engine.states.single,
+        ),
+      );
+      await pending;
+      engine.eventBus.add(
+        const coach.AgentEvent(
+          'retry-turn',
+          coach.AgentEventKind.retrying,
+          attempt: 4,
+          maxAttempts: 4,
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(chat.progressLabel, isNull);
+      expect(find.byType(TypingBubble), findsNothing);
+      expect(find.text('计划准备好了'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'cancelled and reset turn events cannot overwrite the next request',
+    (tester) async {
+      tall(tester);
+      final (chat, engine, app) = await setup();
+      await showChat(tester, chat, app);
+      final cancelled = chat.send('第一条请求');
+      engine.eventBus.add(
+        const coach.AgentEvent('cancelled-turn', coach.AgentEventKind.slow),
+      );
+      await tester.pump();
+      await tester.tap(find.byKey(const ValueKey('chat-cancel')));
+      await tester.pump();
+      expect(chat.progressLabel, isNull);
+
+      final reset = chat.send('第二条请求');
+      engine.eventBus.add(
+        const coach.AgentEvent(
+          'cancelled-turn',
+          coach.AgentEventKind.retrying,
+          attempt: 4,
+          maxAttempts: 4,
+        ),
+      );
+      engine.eventBus.add(
+        const coach.AgentEvent('cancelled-turn', coach.AgentEventKind.done),
+      );
+      expect(chat.progressLabel, isNull);
+      engine.eventBus.add(
+        const coach.AgentEvent('reset-turn', coach.AgentEventKind.checking),
+      );
+      await tester.pump();
+      expect(find.text('正在核对计划'), findsOneWidget);
+      await tester.tap(find.byKey(const ValueKey('chat-new-conversation')));
+      await tester.pumpAndSettle();
+      expect(chat.progressLabel, isNull);
+      expect(chat.typing, isFalse);
+      expect(engine.resets, 1);
+
+      final current = chat.send('新对话的请求');
+      for (final oldTurn in ['cancelled-turn', 'reset-turn']) {
+        engine.eventBus.add(
+          coach.AgentEvent(oldTurn, coach.AgentEventKind.slow),
+        );
+        engine.eventBus.add(
+          coach.AgentEvent(oldTurn, coach.AgentEventKind.done),
+        );
+      }
+      expect(chat.progressLabel, isNull);
+      engine.eventBus.add(
+        const coach.AgentEvent(
+          'current-turn',
+          coach.AgentEventKind.retrying,
+          attempt: 2,
+          maxAttempts: 4,
+        ),
+      );
+      engine.eventBus.add(
+        const coach.AgentEvent('reset-turn', coach.AgentEventKind.done),
+      );
+      await tester.pump();
+      expect(find.text('网络不稳，正在重试（2/4）…'), findsOneWidget);
+      engine.pending[2].complete(
+        ChatReply(
+          messages: const [BotMessage('当前回复')],
+          state: engine.states[2],
+        ),
+      );
+      await current;
+      for (var index = 0; index < 2; index++) {
+        engine.pending[index].complete(
+          ChatReply(
+            messages: const [BotMessage('迟到的旧回复')],
+            state: engine.states[index],
+          ),
+        );
+      }
+      await Future.wait([cancelled, reset]);
+      await tester.pumpAndSettle();
+      expect(find.text('当前回复'), findsOneWidget);
+      expect(find.text('迟到的旧回复'), findsNothing);
+      expect(chat.progressLabel, isNull);
+    },
+  );
+
   test(
     'one pending turn disables duplicates; cancel hides late replies',
     () async {
