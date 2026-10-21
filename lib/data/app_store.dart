@@ -67,7 +67,7 @@ class AppStore extends ChangeNotifier {
 
   /// 外观: 'dark' (深空), 'light' (白色无边空间) or 'system' (default since the
   /// light-stage media landed, §6.3; a stored choice is kept).
-  String appearance = 'system';
+  String appearance = const String.fromEnvironment('SF_APPEARANCE', defaultValue: 'system');
   static const appearances = ['dark', 'light', 'system'];
 
   /// The liquid-glass quality the adaptive scope settled on last run
