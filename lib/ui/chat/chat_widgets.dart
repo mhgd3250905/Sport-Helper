@@ -225,11 +225,21 @@ class OptionPill extends StatelessWidget {
         : SfColors.isDark
         ? SfColors.thumb
         : SfColors.surface;
+    // Dark (round 5): an open choice reads as a button — glass fill + rim.
+    final idle = SfColors.isDark && enabled && !chosen && !dimmed;
     return SfPressable(
       semanticLabel: label,
       onTap: enabled ? onTap : null,
       haptic: SfHaptic.selection,
-      child: AnimatedContainer(
+      child: idle
+          ? SfControlFace(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Text(
+                label,
+                style: TextStyle(color: fg, fontSize: 14, height: 1.35, fontWeight: FontWeight.w500),
+              ),
+            )
+          : AnimatedContainer(
         duration: SfMotion.medium,
         constraints: const BoxConstraints(minHeight: 36),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
@@ -387,8 +397,9 @@ class SuggestionStrip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (items.isEmpty) return const SizedBox(height: SfSpace.x1);
+    final dark = SfColors.isDark;
     return SizedBox(
-      height: 48,
+      height: dark ? 52 : 48,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.fromLTRB(SfSpace.x4, SfSpace.x1, SfSpace.x4, SfSpace.x2),
@@ -412,9 +423,10 @@ class SuggestionStrip extends StatelessWidget {
           // Liquid glass: discovery chips are controls, so they float on
           // glass over the colour field (standard quality).
           child: SfGlassSurface(
-            radius: 18,
-            height: 36,
+            radius: dark ? 20 : 18,
+            height: dark ? SfControlInk.minHeight : 36,
             padding: const EdgeInsets.symmetric(horizontal: 14),
+            control: true,
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -424,7 +436,7 @@ class SuggestionStrip extends StatelessWidget {
                 ],
                 Text(
                   items[i],
-                  style: TextStyle(color: SfColors.text.withValues(alpha: .78), fontSize: 14, height: 1.2, fontWeight: FontWeight.w500),
+                  style: TextStyle(color: SfColors.text.withValues(alpha: dark ? .95 : .78), fontSize: 14, height: 1.2, fontWeight: FontWeight.w500),
                 ),
               ],
             ),
@@ -505,7 +517,15 @@ class _ChatInputBarState extends State<ChatInputBar> {
                         tooltip: '我的计划',
                         semanticLabel: '我的计划',
                         onTap: widget.onPlans,
-                        child: Center(child: SfIcon(SfGlyph.bookmark, size: 21, color: SfColors.muted)),
+                        child: Center(
+                          child: SfColors.isDark
+                              ? SfControlFace(
+                                  circle: true,
+                                  padding: EdgeInsets.zero,
+                                  child: SfIcon(SfGlyph.bookmark, size: 19, color: SfColors.text.withValues(alpha: .9)),
+                                )
+                              : SfIcon(SfGlyph.bookmark, size: 21, color: SfColors.muted),
+                        ),
                       ),
                     )
                   else

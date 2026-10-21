@@ -6,6 +6,7 @@ import 'package:flutter/rendering.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
 import 'tokens.dart';
+import 'widgets.dart' show SfControlInk, SfPressedScope;
 
 /// Liquid glass, the SmartFit way (docs/liquid-glass-plan.md).
 ///
@@ -111,7 +112,13 @@ class SfGlassSurface extends StatelessWidget {
     this.width,
     this.height,
     this.quality = SfGlass.control,
+    this.control = false,
   });
+
+  /// A tappable control (quick-reply chip). Dark: painted with
+  /// [SfControlInk] (tinted fill, top highlight, 40 % rim) and following
+  /// the pressed state, so idle reads as a button. Light: unchanged.
+  final bool control;
 
   /// Circle / capsule when null with a fixed size; otherwise a rounded
   /// superellipse with this corner radius.
@@ -139,6 +146,38 @@ class SfGlassSurface extends StatelessWidget {
       child: child,
     );
     if (!SfColors.isDark) return glass;
+    if (control) {
+      final down = SfPressedScope.of(context);
+      final side = SfControlInk.side(down);
+      return Stack(
+        fit: StackFit.passthrough,
+        children: [
+          glass,
+          Positioned.fill(
+            child: IgnorePointer(
+              child: AnimatedContainer(
+                key: const ValueKey('sf-control-face'),
+                duration: down ? SfMotion.press : SfMotion.release,
+                curve: Curves.easeOut,
+                decoration: ShapeDecoration(
+                  shape: radius == null
+                      ? StadiumBorder(side: side)
+                      : RoundedSuperellipseBorder(borderRadius: BorderRadius.circular(radius!), side: side),
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    stops: const [0, .5],
+                    colors: down
+                        ? const [SfControlInk.pressedTop, SfControlInk.pressedFill]
+                        : const [SfControlInk.fillTop, SfControlInk.fill],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+    }
     // Dark: a calm hairline rim so clear glass still has an edge on the
     // neutral sky (light mode unchanged).
     return Stack(

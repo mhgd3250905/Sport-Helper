@@ -186,6 +186,7 @@ class _PlanCardState extends State<PlanCard> with SingleTickerProviderStateMixin
             color: widget.saved ? SfColors.accentText : SfColors.text,
             label: widget.saved ? '已保存' : '保存',
             onPressed: widget.saved ? null : widget.onSave,
+            boxed: true,
           ),
           const Spacer(),
           SfPressable(
@@ -194,13 +195,15 @@ class _PlanCardState extends State<PlanCard> with SingleTickerProviderStateMixin
             onTap: widget.onOpen,
             child: ConstrainedBox(
               constraints: const BoxConstraints(minHeight: 44),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text('详情', style: SfType.callout.copyWith(fontSize: 14, color: SfColors.muted)),
-                  const SizedBox(width: 2),
-                  SfIcon(SfGlyph.chevronRight, size: 16, color: SfColors.muted, strokeWidth: 2),
-                ],
+              child: _darkPill(
+                Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text('详情', style: SfType.callout.copyWith(fontSize: 14, color: SfColors.isDark ? SfColors.text : SfColors.muted)),
+                      const SizedBox(width: 2),
+                      SfIcon(SfGlyph.chevronRight, size: 16, color: SfColors.isDark ? SfColors.text : SfColors.muted, strokeWidth: 2),
+                    ],
+                ),
               ),
             ),
           ),
@@ -372,7 +375,8 @@ class _ExpandToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final fg = onMedia ? Colors.white : SfColors.muted;
+    final glass = SfColors.isDark && !onMedia;
+    final fg = onMedia ? Colors.white : glass ? SfColors.text : SfColors.muted;
     final label = expanded ? '收起' : '展开';
     return SfPressable(
       semanticLabel: expanded ? '收起详情' : '展开详情',
@@ -382,13 +386,11 @@ class _ExpandToggle extends StatelessWidget {
       child: ConstrainedBox(
         constraints: const BoxConstraints(minHeight: 44, minWidth: 44),
         child: Center(
-          child: DecoratedBox(
-            decoration: ShapeDecoration(
-              color: onMedia ? const Color(0x66000000) : SfColors.text.withValues(alpha: SfColors.isDark ? .10 : .06),
-              shape: const StadiumBorder(),
-            ),
+          child: _toggleFace(
+            glass: glass,
+            onMedia: onMedia,
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(10, 5, 7, 5),
+              padding: glass ? const EdgeInsets.fromLTRB(12, 9, 9, 9) : const EdgeInsets.fromLTRB(10, 5, 7, 5),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -409,6 +411,23 @@ class _ExpandToggle extends StatelessWidget {
     );
   }
 }
+
+/// Dark only: [child] as an idle glass pill; light returns it as is.
+Widget _darkPill(Widget child) => SfColors.isDark
+    ? Center(widthFactor: 1, child: SfControlFace(padding: const EdgeInsets.fromLTRB(14, 0, 10, 0), child: child))
+    : child;
+
+/// Dark on the glass card: the idle control face; otherwise the quiet tonal
+/// pill (light) or the scrim pill over media.
+Widget _toggleFace({required bool glass, required bool onMedia, required Widget child}) => glass
+    ? SfControlFace(padding: EdgeInsets.zero, minHeight: 0, child: child)
+    : DecoratedBox(
+        decoration: ShapeDecoration(
+          color: onMedia ? const Color(0x66000000) : SfColors.text.withValues(alpha: SfColors.isDark ? .10 : .06),
+          shape: const StadiumBorder(),
+        ),
+        child: child,
+      );
 
 class _CueRow extends StatelessWidget {
   const _CueRow({required this.index, required this.text});
