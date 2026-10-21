@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
 import 'tokens.dart';
@@ -18,10 +20,62 @@ abstract final class SfGlass {
   /// since the test renderer cannot run the glass shaders.
   static GlassQuality? qualityOverride;
 
-  /// iOS 27 `glassEffect(.regular)` for the palette in effect.
+  /// iOS 27 `glassEffect(.regular)` for the palette in effect. These
+  /// presets lean on the Impeller-native material (frost, rim light) and
+  /// switch the 2D Fresnel rim off, so they are only used where the
+  /// premium shader actually runs.
   static LiquidGlassSettings get material => SfColors.isDark
       ? LiquidGlassSettings.ios27Dark
       : LiquidGlassSettings.ios27Light;
+
+  /// The single-pass (Skia / Web / standard) material: the package's own
+  /// calibrated light/dark variants with the Fresnel rim and the specular
+  /// kept on, so the capsule reads as a lens (bright upper-left rim, soft
+  /// body) instead of a flat frosted pill.
+  static LiquidGlassSettings get standardMaterial => SfColors.isDark
+      ? const LiquidGlassSettings(
+          thickness: 14,
+          blur: 6,
+          glassColor: Color.fromRGBO(255, 255, 255, 0.07),
+          lightAngle: 2.356,
+          lightIntensity: 0.9,
+          ambientStrength: 0.08,
+          refractiveIndex: 1.2,
+          saturation: 1.5,
+          chromaticAberration: 0.01,
+          fresnelStrength: 1.1,
+        )
+      : const LiquidGlassSettings(
+          thickness: 16,
+          blur: 7,
+          glassColor: Color.fromRGBO(255, 255, 255, 0.30),
+          lightAngle: 2.356,
+          lightIntensity: 1.0,
+          ambientStrength: 0.18,
+          refractiveIndex: 1.2,
+          saturation: 1.4,
+          chromaticAberration: 0.02,
+          fresnelStrength: 1.0,
+          edgeAbsorption: 0.04,
+        );
+
+  /// The material for a surface drawn at [q]: the iOS 27 preset only where
+  /// the premium (Impeller) shader can run; the web is capped at standard.
+  static LiquidGlassSettings materialFor(GlassQuality q) =>
+      (!kIsWeb && q == GlassQuality.premium) ? material : standardMaterial;
+
+  /// The persisted adaptive tier to start from. `minimal` is never carried
+  /// across launches (one slow session must not pin a good device, or the
+  /// web, to flat frost for good): the monitor can still drop to it this
+  /// session. The web starts at standard, its ceiling.
+  static GlassQuality? initialQuality(String? persisted) {
+    final q = parse(persisted);
+    if (q == null || q == GlassQuality.minimal) {
+      return kIsWeb ? GlassQuality.standard : null;
+    }
+    if (kIsWeb && q == GlassQuality.premium) return GlassQuality.standard;
+    return q;
+  }
 
   /// Persistent bars (the chat input): premium when the device allows it.
   static const bar = GlassQuality.premium;
@@ -72,10 +126,11 @@ class SfGlassSurface extends StatelessWidget {
     final LiquidShape shape = radius == null
         ? const LiquidOval()
         : LiquidRoundedSuperellipse(borderRadius: radius!);
+    final q = SfGlass.resolve(quality);
     return GlassContainer(
       useOwnLayer: true,
-      settings: SfGlass.material,
-      quality: SfGlass.resolve(quality),
+      settings: SfGlass.materialFor(q),
+      quality: q,
       shape: shape,
       width: width,
       height: height,
@@ -116,20 +171,34 @@ class SfGlassField extends StatelessWidget {
         ),
       ),
     );
+    if (player) {
+      return IgnorePointer(
+        child: RepaintBoundary(
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              pool(const Alignment(-1.1, 1.05), 1.0, accent, dark ? .22 : .20),
+              pool(const Alignment(1.15, .55), .9, dark ? coolDark : coolLight, dark ? .26 : .30),
+            ],
+          ),
+        ),
+      );
+    }
+    // Chat: more depth and contrast so the glass has something to bend —
+    // a deep jade pool bottom-left, a sky pool right under the chips, a
+    // faint jade band across the input zone and a cool wash up top. Light
+    // mode uses deeper, more saturated stops (pale pools vanish on paper).
+    const skyDeep = Color(0xFF3F6FB0);
     return IgnorePointer(
       child: RepaintBoundary(
         child: Stack(
           fit: StackFit.expand,
           children: [
-            pool(const Alignment(-1.1, 1.05), 1.0, accent, dark ? .22 : .20),
-            pool(
-              const Alignment(1.15, .55),
-              .9,
-              dark ? coolDark : coolLight,
-              dark ? .26 : .30,
-            ),
-            if (!player)
-              pool(const Alignment(.2, -.35), .8, accent, dark ? .07 : .06),
+            pool(const Alignment(-1.0, 1.0), 1.15, accent, dark ? .42 : .38),
+            pool(const Alignment(1.1, .72), .95, dark ? coolDark : skyDeep, dark ? .48 : .30),
+            pool(const Alignment(.15, .98), .55, dark ? const Color(0xFF7FE0C0) : accent, dark ? .20 : .22),
+            pool(const Alignment(-.9, -.55), .9, dark ? coolDark : coolLight, dark ? .18 : .34),
+            pool(const Alignment(.85, -1.0), .7, accent, dark ? .12 : .14),
           ],
         ),
       ),
@@ -227,12 +296,40 @@ class _SfToastHostState extends State<_SfToastHost> with SingleTickerProviderSta
               icon: widget.icon,
               type: GlassToastType.success,
               dismissible: false,
-              settings: SfGlass.material,
+              settings: SfGlass.materialFor(SfGlass.resolve(SfGlass.control)),
               quality: SfGlass.resolve(SfGlass.control),
             ),
           ),
         ),
       ),
     );
+  }
+}
+
+/// Reports its child's laid-out size after each layout where it changed
+/// (used to pad scrolling content under a floating glass dock).
+class SfMeasureSize extends SingleChildRenderObjectWidget {
+  const SfMeasureSize({super.key, required this.onSize, super.child});
+  final ValueChanged<Size> onSize;
+
+  @override
+  RenderObject createRenderObject(BuildContext context) => _RenderMeasureSize(onSize);
+
+  @override
+  void updateRenderObject(BuildContext context, RenderObject renderObject) => (renderObject as _RenderMeasureSize).onSize = onSize;
+}
+
+class _RenderMeasureSize extends RenderProxyBox {
+  _RenderMeasureSize(this.onSize);
+  ValueChanged<Size> onSize;
+  Size? _last;
+
+  @override
+  void performLayout() {
+    super.performLayout();
+    if (size == _last) return;
+    _last = size;
+    final s = size;
+    WidgetsBinding.instance.addPostFrameCallback((_) => onSize(s));
   }
 }

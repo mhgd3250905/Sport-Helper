@@ -44,7 +44,10 @@ Future<void> main() async {
       // / minimal; the settled tier is kept so the next launch starts there.
       adaptiveQuality: true,
       adaptiveConfig: GlassAdaptiveScopeConfig(
-        initialQuality: SfGlass.parse(store.glassQuality),
+        initialQuality: SfGlass.initialQuality(store.glassQuality),
+        // The web's ceiling is standard; keep it there rather than letting a
+        // slow first frame drop the shader for the whole session.
+        minQuality: kIsWeb ? GlassQuality.standard : GlassQuality.minimal,
         onQualityChanged: (_, to) => store.setGlassQuality(to.name),
       ),
       child: SmartFitApp(services: services),

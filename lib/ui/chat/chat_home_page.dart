@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
 import '../../app/services.dart';
 import '../../chat/chat_controller.dart';
@@ -40,6 +41,11 @@ class _ChatHomePageState extends State<ChatHomePage> {
   late ChatController _chat;
   StreamSubscription<String>? _actions;
   final _scroll = ScrollController();
+
+  /// Height of the floating glass dock (chips + input, incl. the bottom
+  /// safe area); the conversation reserves it as bottom padding so the
+  /// newest message can always scroll clear of the glass.
+  double _dockHeight = 112;
   final _scaffold = GlobalKey<ScaffoldState>();
   final _input = FocusNode();
 
@@ -189,24 +195,55 @@ class _ChatHomePageState extends State<ChatHomePage> {
             child: Stack(
               fit: StackFit.expand,
               children: [
-                // Liquid glass needs something to refract: a soft colour
-                // field under the chips and the input bar.
-                const SfGlassField(),
-                SafeArea(
+                // Liquid glass on a real refraction source: the colour field
+                // and the conversation are one capture surface
+                // (GlassBackgroundSource) inside a LiquidGlassScope, and the
+                // chips + input float above it, so messages and the plan
+                // card scroll *under* the glass instead of stopping above it.
+                LiquidGlassScope(
                   child: ListenableBuilder(
                     listenable: _chat,
-                    builder: (context, _) => Column(
+                    builder: (context, _) => Stack(
+                      fit: StackFit.expand,
                       children: [
-                        Expanded(child: _messages()),
-                        SuggestionStrip(
-                          items: _chat.typing ? const [] : _chat.suggestions,
-                          onTap: _send,
+                        Positioned.fill(
+                          child: GlassBackgroundSource(
+                            child: Stack(
+                              fit: StackFit.expand,
+                              children: [
+                                const SfGlassField(),
+                                SafeArea(bottom: false, child: _messages()),
+                              ],
+                            ),
+                          ),
                         ),
-                        ChatInputBar(
-                          focusNode: _input,
-                          onSend: _send,
-                          enabled: !_chat.typing,
-                          onPlans: () => _scaffold.currentState?.openDrawer(),
+                        Positioned(
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          child: SfMeasureSize(
+                            onSize: (s) {
+                              if ((s.height - _dockHeight).abs() > .5) setState(() => _dockHeight = s.height);
+                            },
+                            child: SafeArea(
+                              top: false,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  SuggestionStrip(
+                                    items: _chat.typing ? const [] : _chat.suggestions,
+                                    onTap: _send,
+                                  ),
+                                  ChatInputBar(
+                                    focusNode: _input,
+                                    onSend: _send,
+                                    enabled: !_chat.typing,
+                                    onPlans: () => _scaffold.currentState?.openDrawer(),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -273,7 +310,7 @@ class _ChatHomePageState extends State<ChatHomePage> {
           child: ListView.builder(
             controller: _scroll,
             reverse: true,
-            padding: const EdgeInsets.fromLTRB(SfSpace.x4, 48, SfSpace.x4, SfSpace.x3),
+            padding: EdgeInsets.fromLTRB(SfSpace.x4, 48, SfSpace.x4, _dockHeight + SfSpace.x3),
             itemCount: reversed.length,
             itemBuilder: (_, i) => reversed[i],
             findChildIndexCallback: (key) {
