@@ -11,7 +11,7 @@
 
 ## 版本与验收入口
 
-当前开发分支 `feat/smartfit-coach-tools`，功能开发版本 `0.1.0+6`，接入 `ugk_coach 0.2.0` 工具会话接口。`ugk_coach` 与 `ugk_trainer 0.1.4` 的 git 依赖共同固定到 SDK main commit `09a392bc0b736e6a23eef71d55d86108660e0e59`。当前代码、测试和模拟器 Worker 冷烟的验收结果以 [版本台账](docs/version-management.md) 与 [验收记录](docs/acceptance.md) 为准；本轮尚无真机通过结论。完成验证并经开哥同意后，才合入并推送 `main`。
+当前主线 `main`，功能开发版本 `0.1.0+6`（来自 `feat/smartfit-coach-tools`），接入 `ugk_coach 0.2.0` 工具会话接口。`ugk_coach` 与 `ugk_trainer 0.1.4` 的 git 依赖共同固定到 SDK main commit `09a392bc0b736e6a23eef71d55d86108660e0e59`。当前代码、测试和模拟器 Worker 冷烟的验收结果以 [版本台账](docs/version-management.md) 与 [验收记录](docs/acceptance.md) 为准；本轮尚无真机通过结论。本阶段核心链路已验证，2026-10-21 经开哥授权合入 `main`，合并提交 `f83642e`；实际问答体验由用户后续安装 APK 继续测试。
 
 `+6` 长期持有一个 `CoachSession`，关闭 AI 界面保留会话，「新对话」取消进行中的请求并调用 `reset()`。纯文字显示气泡；`show_actions` 仅以 `ValidatedActions` 显示动作卡，`show_plan` 仅以 `ValidatedPlan` 显示计划卡，可保存或交给 `ugk_trainer` 开练。持久化卡片恢复时重新过 SDK 门禁，模型原始输出不进入渲染层。请求期间禁用发送，显示等待与取消入口；单次 HTTP 超时 120 秒、HTTP 重试为 0，门禁最多重交 2 次，整轮保护超时 365 秒。
 

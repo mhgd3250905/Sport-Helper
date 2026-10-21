@@ -2,7 +2,7 @@
 
 ## 当前交接入口（2026-10-21 工具会话接入）
 
-当前开发分支 `feat/smartfit-coach-tools`，功能开发版本 `0.1.0+6`。`ugk_coach 0.2.0` 与 `ugk_trainer 0.1.4` 的 git 依赖都固定到 SDK main commit `09a392bc0b736e6a23eef71d55d86108660e0e59`。App 改用 SDK README 的 `CoachSession` 工具会话接口，取代旧 `CoachAssistant.ask()` JSON 信封聊天。本轮不修改 SDK 代码或 pub 缓存，不在 App 复制、内嵌或 patch SDK。
+当前主线 `main`（原开发分支 `feat/smartfit-coach-tools`），功能开发版本 `0.1.0+6`。`ugk_coach 0.2.0` 与 `ugk_trainer 0.1.4` 的 git 依赖都固定到 SDK main commit `09a392bc0b736e6a23eef71d55d86108660e0e59`。App 改用 SDK README 的 `CoachSession` 工具会话接口，取代旧 `CoachAssistant.ask()` JSON 信封聊天。本轮不修改 SDK 代码或 pub 缓存，不在 App 复制、内嵌或 patch SDK。
 
 BaseURL `https://api.uuugk.win/v1`，模型 `deepseek-v4-flash-0731`。App Key 只通过 `--dart-define=SMARTFIT_AI_TOKEN` 注入，沿用原设备 UUID；SDK `UgkWorkerAuth` 只发送 `X-App-Key` / `X-Device-Id`，无 `Authorization`。UUIDv4 首次持久化成功才启用 AI，配置缺失或标识存储失败使用本地引擎。服务器执行每设备 30 次 / 10 分钟限流。
 
@@ -12,7 +12,7 @@ BaseURL `https://api.uuugk.win/v1`，模型 `deepseek-v4-flash-0731`。App Key �
 
 profile 使用 SDK `09a392b` 的 smartfit，随包 `assets/coach/smartfit.json` 与上游一致；AI 目录由 SDK `DrillPackAdapter` 从实际 93 个随包动作构造，profile 备注中的全库 142 动作不代表 App 全部可用。每轮 `CoachContext` 带已知用户水平、时长、保护部位及场景/器械；水平和时长冲突会打回模型重交。请求发送当前输入、本轮条件、用户明确采用的当前计划与该会话模型历史（含工具调用与门禁反馈）；本地操作消息、已存计划列表和训练历史不自动上传。
 
-本次分析、App 测试、打包及模拟器 Worker 冷烟的结果由 [版本台账](version-management.md) 与 [验收记录](acceptance.md) 记录，尚未完成的检查不能标通过。本轮用户无可用真机，不写真机通过结论；模拟器已分别完成一次 `show_actions` 和一次 `show_plan` 的 Worker 首轮冷烟；核心功能链路已验，用户后续安装 APK 做真实问答体验。旧 `+5` 等真机记录只作历史证据。完成验证后，合入并推送 `main` 仍须开哥同意。
+本次分析、App 测试、打包及模拟器 Worker 冷烟的结果由 [版本台账](version-management.md) 与 [验收记录](acceptance.md) 记录，尚未完成的检查不能标通过。本轮用户无可用真机，不写真机通过结论；模拟器已分别完成一次 `show_actions` 和一次 `show_plan` 的 Worker 首轮冷烟；核心功能链路已验，用户后续安装 APK 做真实问答体验。旧 `+5` 等真机记录只作历史证据。2026-10-21 开哥已授权合并推送，功能以 `f83642e` 合入 `main`，合并树与已验分支完全一致。后续只需跟进用户安装 APK 后的体验反馈。
 
 ## 上一阶段 AI 接入（0.1.0+5，历史）
 

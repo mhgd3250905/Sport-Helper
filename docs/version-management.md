@@ -6,8 +6,8 @@
 
 | 项目 | 当前事实 / 事实来源 |
 | --- | --- |
-| 主线与合并 | 本机维护 `main`；PR #1、#2、#3 及 `feat/ugk-trainer-integration` 已合入并推送 |
-| 当前开发状态 / 运行源码 | 开发分支 `feat/smartfit-coach-tools`，功能开发版本 `0.1.0+6`，源码 `9e94bb513751def6306f8e63313050efd632ccb9`；尚未合 main 或推送。分支从旧 AI 本地收束 `f8799ef` 延续，此前主线见 [后续修复](ugk-trainer-integration.md#后续修复2026-10-20) |
+| 主线与合并 | 本机维护 `main`；PR #1、#2、#3 及 `feat/ugk-trainer-integration` 已合入并推送；工具会话 `feat/smartfit-coach-tools` 经开哥授权以 `f83642e` 合入 |
+| 当前开发状态 / 运行源码 | 主线 `main`（原开发分支 `feat/smartfit-coach-tools`），功能开发版本 `0.1.0+6`，源码 `9e94bb513751def6306f8e63313050efd632ccb9`；已获开哥授权合并推送，合并提交 `f83642eb06260c22cb891931acc02ce908ad538d`，其树与已验分支一致。分支从旧 AI 本地收束 `f8799ef` 延续，此前主线见 [后续修复](ugk-trainer-integration.md#后续修复2026-10-20) |
 | 共享训练依赖 | 两项 git 依赖固定 SDK main `09a392bc0b736e6a23eef71d55d86108660e0e59`：`ugk_coach 0.2.0` / `ugk_trainer 0.1.4`；远端 main 已核对，`flutter pub get --enforce-lockfile` 通过。未修改 SDK 或 pub 缓存 |
 | 源码里程碑 | `m7-aesthetic-v2` → `d0b1c7ef6198a469a7f0a7cedcaa7c9f2512dbe7` |
 | 上一阶段文档整理前主线快照 | `d0b1c7ef6198a469a7f0a7cedcaa7c9f2512dbe7`；后续 HEAD 由 Git 查询，不把本表固定 SHA 写成永远最新的 HEAD |
@@ -31,7 +31,7 @@ Git 标签、App 包版本与资源版本分别管理。`m7` 不代表 Android v
 | SHA-256 | `7469c492cdc400ba2648dfb837394334ce6c6a507f12c3019d2cce26f787e59b` |
 | 自动化 / 构建 | `flutter test --no-pub` 195 项通过；`flutter analyze --no-pub` 无问题；debug 构建成功 |
 | Worker | API35 模拟器，两个新 SDK 会话各首轮请求：动作卡 22.5 秒、计划卡 32.4 秒，均通过门禁，未发生重交或回落；不推断服务端物理冷启动 |
-| 验收边界 | 按用户后续确认，本阶段只验本次 SDK 新功能跑通，核心链路通过；实际问答体验由用户安装 APK 后继续测试。完整真机/训练/声音不在本轮结论内，合 main / 推送仍须开哥批准 |
+| 验收边界 | 按用户后续确认，本阶段只验本次 SDK 新功能跑通，核心链路通过；实际问答体验由用户安装 APK 后继续测试。完整真机/训练/声音不在本轮结论内，2026-10-21 已获开哥授权合并推送，后续跟进 APK 体验反馈 |
 
 ## AI 阶段本地收束（2026-10-21）
 

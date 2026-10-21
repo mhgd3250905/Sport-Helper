@@ -2,7 +2,7 @@
 
 ## 工具会话（0.1.0+6，核心功能已验，2026-10-21）
 
-分支 `feat/smartfit-coach-tools`，运行源码 `9e94bb513751def6306f8e63313050efd632ccb9`，包版本 `0.1.0+6`。两个 git 依赖固定 SDK main `09a392bc0b736e6a23eef71d55d86108660e0e59`（`ugk_coach 0.2.0`、`ugk_trainer 0.1.4`），远端 main 已核对；SDK 工作区和 pub git 缓存均未修改。现有 smartfit profile 与该 SDK JSON 内容一致，AI 目录仍只含实际随包 93 动作。
+当前主线 `main`（原分支 `feat/smartfit-coach-tools`），运行源码 `9e94bb513751def6306f8e63313050efd632ccb9`，包版本 `0.1.0+6`。两个 git 依赖固定 SDK main `09a392bc0b736e6a23eef71d55d86108660e0e59`（`ugk_coach 0.2.0`、`ugk_trainer 0.1.4`），远端 main 已核对；SDK 工作区和 pub git 缓存均未修改。现有 smartfit profile 与该 SDK JSON 内容一致，AI 目录仍只含实际随包 93 动作。
 
 | 检查 | 本轮结果 |
 | --- | --- |
@@ -30,7 +30,7 @@
 | 重启恢复 | 原 AI 计划与已保存状态保留；卡片重新通过 SDK 门禁，SDK 新进程会话 turnCount 为 0 |
 | 从恢复的原 AI 计划卡点击开始 | 已进入 `ugk_trainer`；显示「靠墙天使」、10 次、准备倒计时和 1/3 进度，示范素材可见 |
 
-用户随后明确本阶段只需确保本次 SDK 新功能跑通，真实问答体验由用户后续安装 APK 验证。按此范围，本轮核心功能验收通过；没有本轮真机结论，也未验证完整训练、声音实听、锁屏/通知或系统中断。模拟器首次进入 trainer 时 ADB shell 失去响应；保留数据重启并改用软件图形后恢复，重新点击原卡已进入播放器，无 App 或 SDK 修改。测试结束时该模拟器已停止。未合 main、未推送，等待开哥同意。
+用户随后明确本阶段只需确保本次 SDK 新功能跑通，真实问答体验由用户后续安装 APK 验证。按此范围，本轮核心功能验收通过；没有本轮真机结论，也未验证完整训练、声音实听、锁屏/通知或系统中断。模拟器首次进入 trainer 时 ADB shell 失去响应；保留数据重启并改用软件图形后恢复，重新点击原卡已进入播放器，无 App 或 SDK 修改。测试结束时该模拟器已停止。2026-10-21 开哥授权合并推送，已以 `f83642eb06260c22cb891931acc02ce908ad538d` 合入 `main`。合并树与已验分支 `193f67d` 完全一致（tree `df972079e5c301aa4244640d4f792855426aed07`），复用本节已绑定源码的 195 项测试与核心冷烟证据；后续状态更新仅改文档。
 
 本机忽略证据：`.buildlog/coach-tools-final-all-tests.log`、`coach-tools-final-analyze.log`、`coach-tools-lock-verify.log`、`coach-tools-smoke-build.log`、`coach-tools-turn-*.json`，以及 `coach-tools-actions.png`、`coach-tools-action-details.png`、`coach-tools-plan.png`、`coach-tools-restored.png`、`coach-tools-player-core.png`。不提交原始设备日志、调试服务地址、密钥或 APK。
 
