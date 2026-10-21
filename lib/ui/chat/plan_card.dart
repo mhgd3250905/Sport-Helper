@@ -32,8 +32,9 @@ import 'expand_route.dart';
 ///
 /// Unfolding ([_Timeline]): one clip grows the card; the visible strip
 /// thumbnails fly on straight lines into their rows (transform only,
-/// ~20 ms apart), moves hidden behind +N fade in place, rows' text fades
-/// up only after every thumbnail has landed; ▶ / 保存 fade out and back in
+/// ~40 ms apart, one curve with the height), moves hidden behind +N fade
+/// in place, each row's text rises in once its thumbnail is nearly home
+/// and nothing will cross it; ▶ / 保存 fade out and back in
 /// at their slots instead of travelling. Animated cutouts hold their still
 /// cover during the move. Collapsing mirrors it. Reduced motion: a plain
 /// cross-fade.
@@ -72,64 +73,158 @@ class PlanCard extends StatefulWidget {
 }
 
 /// Timeline of the unfold on one linear controller value t ∈ [0, 1]
-/// (expand 320 ms; collapse plays it backwards in 240 ms).
+/// (expand 550 ms; collapse 450 ms with its own, mirrored choreography,
+/// so folding is not a rewind at the wrong speed).
 ///
-/// Order, so nothing ever overlaps mid-flight:
-/// 1. ▶ (and the +N chip) fade / shrink out where they are (first ~80 ms);
-///    the clip starts growing at once and has revealed every destination
-///    row before a thumbnail arrives there;
-/// 2. only the visible strip thumbnails fly, on straight lines, ~20 ms
-///    apart; no row text is visible yet, so they never cross text;
-/// 3. once the last one has landed, the rows' text fades up (top first);
-/// 4. ▶ and 保存 fade / scale in at the bottom row's slots.
-/// Collapsing mirrors it: text, ▶ and 保存 are gone before any thumbnail
-/// moves.
+/// Everything that moves (card height, hero → row 1, strip → rows) rides
+/// one curve, [motion], so the image and the clip travel together.
+///
+/// Expand (ms of 550):
+/// * 0–100 ▶ / +N fade out; 0–120 folded title out;
+/// * 0–420 height and the hero's morph into row 1's thumbnail;
+/// * strip thumbnails follow ~40 ms apart, 380 ms each (all down by 500);
+/// * the header fades in (180 ms) as soon as the hero has left its band;
+/// * each row's text fades + rises 8 px (200 ms) once its own thumbnail is
+///   ~80 % landed and no flyer will cross it again ([_Timeline.new]
+///   samples the paths, so nothing ever overlaps), row by row;
+/// * 370–550 ▶ / 保存 / note fade in at their slots.
+/// Collapse (ms of 450): text, header, ▶, 保存 out in the first 110 ms; then
+/// height, hero and strip return on the same curve (110–450, strip ~15 ms
+/// apart); the folded title and ▶ come back over the last 150 ms.
 class _Timeline {
-  const _Timeline({required this.flyers, required this.rows});
-  final int flyers;
-  final int rows;
+  _Timeline({
+    required this.flyers,
+    required this.rows,
+    Rect Function(int k, double e)? flyerRect,
+    List<Rect> Function(int row)? rowText,
+    Rect? headerBand,
+  }) {
+    final own = <double>[];
+    for (var i = 0; i < rows; i++) {
+      // A row's own thumbnail ~80 % landed (rows behind +N: mid fade).
+      own.add(
+        i < flyers ? _landMs(i, .8) : (flyers == 0 ? 160.0 + 40 * i : 260.0),
+      );
+    }
+    double clearAfter(List<Rect> zones) {
+      if (flyerRect == null || flyers == 0) return 0;
+      var last = -1.0;
+      for (var ms = 0.0; ms <= expandMs; ms += 2) {
+        for (var k = 0; k < flyers; k++) {
+          final r = flyerRect(k, _e(k, ms)).inflate(1);
+          if (zones.any(r.overlaps)) last = ms;
+        }
+      }
+      return last + 2;
+    }
 
-  static const expandMs = 320;
-  static const collapseMs = 240;
-  static const flight = .42;
-
-  double get _stagger =>
-      flyers <= 1 ? 0 : math.min(20 / expandMs, .18 / (flyers - 1));
-  double flyStart(int k) => k * _stagger;
-
-  /// When the last thumbnail has landed (≤ .6).
-  double get landed => flyers == 0 ? .3 : flyStart(flyers - 1) + flight;
-
-  /// Thumbnail k's flight progress (0 → 1).
-  double fly(int k, double t) => ((t - flyStart(k)) / flight).clamp(0.0, 1.0);
-
-  /// Row [i]'s text (and the hero row's thumbnail): after every flyer has
-  /// landed, top row first.
-  Interval text(int i) {
-    final step = rows <= 1 ? 0.0 : math.min(.025, .15 / (rows - 1));
-    final b = landed + i * step;
-    return Interval(b, math.min(1, b + .25), curve: SfMotion.standard);
+    _textMs = [
+      for (var i = 0; i < rows; i++)
+        math.min(
+          expandMs - 150.0,
+          math.max(own[i], rowText == null ? 0 : clearAfter(rowText(i))),
+        ),
+    ];
+    _headerMs = headerBand == null
+        ? 0
+        : math.min(expandMs - 150.0, clearAfter([headerBand]));
   }
 
-  /// Rows whose move hid behind +N: their thumbnail fades in place (nothing
-  /// flies over those rows, they sit under every destination).
-  static const inPlace = Interval(.25, .55, curve: SfMotion.standard);
+  final int flyers;
+  final int rows;
+  late final List<double> _textMs;
+  late final double _headerMs;
 
-  /// The card height (clip): emphasized decelerate over the first half.
-  static const height = Interval(0, .5, curve: Cubic(.05, .7, .1, 1));
+  static const expandMs = 550;
+  static const collapseMs = 450;
 
-  /// ▶ / +N leaving, and ▶ / 保存 / note arriving.
-  static const out = Interval(0, .25, curve: Curves.easeIn);
-  static const arrive = Interval(.8, 1, curve: SfMotion.standard);
+  /// The one curve for size and position: a smooth standard decelerate.
+  static const Curve motion = Curves.fastOutSlowIn;
+  static const Curve _fade = Curves.easeInOut;
 
-  /// The folded title (and the hero's scrim) leave in the first ~40 ms,
-  /// while the hero has barely started to move; on fold they return last.
-  static const titleOut = Interval(0, .12, curve: Curves.easeIn);
+  static const _heroMs = 420.0;
+  static const _flightMs = 380.0;
+  static const _textFadeMs = 200.0;
 
-  /// The unfolded header (title + meta) comes in once the hero has dropped
-  /// below it into row 1 (≈ t .32), so the two never overlap; on fold it
-  /// is gone before the hero lifts off.
-  static const header = Interval(.36, .66, curve: SfMotion.standard);
+  /// Expand: strip flyers' stagger (flyer 0 is the hero).
+  double get _stagger => flyers <= 1 ? 0 : math.min(40.0, 120.0 / (flyers - 1));
+  double _start(int k) => k * _stagger;
+  double _dur(int k) => k == 0 ? _heroMs : _flightMs;
+  double _p(int k, double ms) => ((ms - _start(k)) / _dur(k)).clamp(0.0, 1.0);
+  double _e(int k, double ms) => motion.transform(_p(k, ms));
+  double _landMs(int k, double e) {
+    for (var ms = 0.0; ms <= expandMs; ms += 2) {
+      if (_e(k, ms) >= e) return ms;
+    }
+    return expandMs.toDouble();
+  }
+
+  /// Collapse: everything but text waits [_holdMs]; strip ~15 ms apart.
+  static const _holdMs = 110.0;
+  static const _backMs = collapseMs - _holdMs;
+  double get _backStagger =>
+      flyers <= 1 ? 0 : math.min(15.0, 45.0 / (flyers - 1));
+
+  static double _in(double ms, double a, double d, [Curve c = _fade]) =>
+      c.transform(((ms - a) / d).clamp(0.0, 1.0));
+
+  static double _fwd(double t) => t * expandMs;
+  static double _bk(double t) => (1 - t) * collapseMs;
+
+  /// Card height / clip progress.
+  static double height(double t, bool back) => back
+      ? 1 - motion.transform(((_bk(t) - _holdMs) / _backMs).clamp(0.0, 1.0))
+      : motion.transform((_fwd(t) / _heroMs).clamp(0.0, 1.0));
+
+  /// Flyer [k]'s eased position (0 at its folded slot, 1 in its row).
+  double fly(int k, double t, bool back) {
+    if (!back) return _e(k, _fwd(t));
+    final st = k * _backStagger;
+    final d = _backMs - _backStagger * (flyers - 1);
+    final p = ((_bk(t) - _holdMs - st) / d).clamp(0.0, 1.0);
+    return 1 - motion.transform(p);
+  }
+
+  /// The folded title (and the hero's scrim): 1 folded.
+  static double title(double t, bool back) =>
+      back ? _in(_bk(t), collapseMs - 140, 140) : 1 - _in(_fwd(t), 0, 120);
+
+  /// ▶ / +N at their folded slots: 1 folded.
+  static double folded(double t, bool back) => back
+      ? _in(_bk(t), collapseMs - 150, 150)
+      : 1 - _in(_fwd(t), 0, 100, Curves.easeIn);
+
+  /// ▶ / 保存 / note at their open slots.
+  static double open(double t, bool back) => back
+      ? 1 - _in(_bk(t), 0, 100, Curves.easeIn)
+      : _in(_fwd(t), 370, 180, Curves.easeOut);
+
+  /// Rows whose move hid behind +N: their thumbnail fades in place.
+  static double inPlace(double t, bool back) =>
+      back ? 1 - _in(_bk(t), _holdMs, 150) : _in(_fwd(t), 160, 240);
+
+  /// The unfolded header (title + meta).
+  double header(double t, bool back) => back
+      ? 1 - _in(_bk(t), 0, _holdMs, Curves.easeIn)
+      : _in(_fwd(t), _headerMs, 180, Curves.easeOut);
+
+  /// Row [i]'s number, name and dose.
+  double text(int i, double t, bool back) => back
+      ? 1 - _in(_bk(t), 0, _holdMs, Curves.easeIn)
+      : _in(
+          _fwd(t),
+          _textMs[i],
+          math.min(_textFadeMs, expandMs - _textMs[i]),
+          Curves.easeOut,
+        );
+}
+
+/// An animatable from a plain function of t (read at evaluation time).
+class _Fn extends Animatable<double> {
+  const _Fn(this.f);
+  final double Function(double t) f;
+  @override
+  double transform(double t) => f(t);
 }
 
 /// Reduced motion: the height jumps at once (the content cross-fades).
@@ -251,11 +346,14 @@ class _PlanCardState extends State<PlanCard>
     duration: const Duration(milliseconds: _Timeline.expandMs),
     reverseDuration: const Duration(milliseconds: _Timeline.collapseMs),
   )..addStatusListener(_onStatus);
-  late final Animation<double> _height = CurvedAnimation(
-    parent: _expand,
-    curve: _Timeline.height,
+  late final Animation<double> _height = _expand.drive(
+    _Fn((t) => _Timeline.height(t, _back)),
   );
   bool _expanded = false;
+
+  /// Which choreography is playing: the collapse has its own (chosen when
+  /// a fold starts from rest; an interrupted move just plays back).
+  bool _back = false;
 
   /// True while the card unfolds / folds: animated cutouts show their still
   /// cover meanwhile (no WebP frame decoding during the move).
@@ -295,6 +393,7 @@ class _PlanCardState extends State<PlanCard>
 
   void _toggle() {
     setState(() => _expanded = !_expanded);
+    if (!_expand.isAnimating) _back = !_expanded;
     if (SfMotion.reduced(context)) {
       _expand.animateTo(
         _expanded ? 1 : 0,
@@ -354,12 +453,6 @@ class _PlanCardState extends State<PlanCard>
     final cues = single
         ? (moves.firstOrNull?.cues ?? const <String>[])
         : const <String>[];
-    // Flyers: on a set the hero is flyer 0 (into row 1), the visible strip
-    // thumbnails are flyers 1…shown (into rows 2…), ~20 ms apart.
-    final timeline = _Timeline(
-      flyers: single ? 0 : shownCount + 1,
-      rows: single ? cues.length : items.length,
-    );
     final cover = single
         ? null
         : (lib.tryGet(items.first.exerciseId) ?? moves.firstOrNull);
@@ -368,6 +461,74 @@ class _PlanCardState extends State<PlanCard>
     // The unfolded set's header: title + meta on the left, 收起 on the right.
     final headerH = math.max(_Header.minHeight, textScale * 40 + 16);
     final meta = [duration, '${items.length} 个动作', gearText].join(' · ');
+
+    // Flyers: strip slot → row thumbnail, in card-content coords; each one
+    // is a fixed-size row thumbnail moved only by a transform (no layout).
+    Offset stripSlot(int k) => Offset(
+      SfSpace.x1 + k * (_SetBody.thumb + _SetBody.gap),
+      compactH -
+          _SetBody.stripHeight +
+          _SetBody.stripTop +
+          (_SetBody.stripHeight - _SetBody.stripTop - _SetBody.thumb) / 2,
+    );
+    Offset rowSlot(int i) => Offset(
+      _Details.pad + _MoveRow.indexWidth,
+      headerH +
+          _MoveRow.height * i +
+          (_MoveRow.height - _MoveRow.thumbSize) / 2,
+    );
+    // The hero's folded frame (the cutout's box, or the boxed cover) and
+    // its landing slot, row 1's thumbnail.
+    final heroH = compactH - _SetBody.stripHeight;
+    final heroFrom = fused
+        ? Rect.fromLTWH(
+            SfSpace.x4,
+            SfSpace.x1,
+            innerW - 2 * SfSpace.x4,
+            heroH - SfSpace.x1 - _SetBody.fusedTitleRoom,
+          )
+        : Rect.fromLTWH(0, 0, innerW, heroH);
+    final heroTo = rowSlot(0) & const Size.square(_MoveRow.thumbSize);
+    Rect flyerRect(int k, double e) {
+      if (k == 0) return Rect.lerp(heroFrom, heroTo, e)!;
+      final o = Offset.lerp(stripSlot(k - 1), rowSlot(rest[k - 1]), e)!;
+      const s0 = _SetBody.thumb / _MoveRow.thumbSize;
+      return o & Size.square(_MoveRow.thumbSize * (s0 + (1 - s0) * e));
+    }
+
+    // Flyers: on a set the hero is flyer 0 (into row 1), the visible strip
+    // thumbnails are flyers 1…shown (into rows 2…). Each row's text and the
+    // header wait until no flyer will cross them.
+    final timeline = single
+        ? _Timeline(flyers: 0, rows: cues.length)
+        : _Timeline(
+            flyers: shownCount + 1,
+            rows: items.length,
+            flyerRect: flyerRect,
+            rowText: (i) {
+              final top = headerH + _MoveRow.height * i;
+              return [
+                Rect.fromLTWH(
+                  _Details.pad,
+                  top,
+                  _MoveRow.indexWidth,
+                  _MoveRow.height,
+                ),
+                Rect.fromLTRB(
+                  _Details.pad +
+                      _MoveRow.indexWidth +
+                      _MoveRow.thumbSize +
+                      SfSpace.x3,
+                  top,
+                  innerW - _Details.pad,
+                  top + _MoveRow.height,
+                ),
+              ];
+            },
+            headerBand: Rect.fromLTWH(0, 0, innerW, headerH - 2),
+          );
+    Animation<double> anim(double Function(double t, bool back) f) =>
+        _expand.drive(_Fn((t) => f(t, _back)));
 
     final stripThumbs = reduced
         ? ReverseAnimation(
@@ -415,20 +576,13 @@ class _PlanCardState extends State<PlanCard>
             // row 1 (reduced motion: it fades with the rest of the body).
             hero: stripThumbs,
             // The +N chip fades in place (its moves fade into their rows).
-            chip: reduced
-                ? stripThumbs
-                : ReverseAnimation(
-                    CurvedAnimation(parent: _expand, curve: _Timeline.out),
-                  ),
+            chip: reduced ? stripThumbs : anim(_Timeline.folded),
           );
 
     final atEnd = _expand.drive(const _AtEnd());
-    Animation<double> textOf(int i) => reduced
-        ? _expand
-        : CurvedAnimation(parent: _expand, curve: timeline.text(i));
-    final arrive = reduced
-        ? _expand
-        : CurvedAnimation(parent: _expand, curve: _Timeline.arrive);
+    Animation<double> textOf(int i) =>
+        reduced ? _expand : anim((t, b) => timeline.text(i, t, b));
+    final arrive = reduced ? _expand : anim(_Timeline.open);
     final details = _Details(
       t: _expand,
       height: _height,
@@ -442,19 +596,14 @@ class _PlanCardState extends State<PlanCard>
               key: const ValueKey('plan-header-fade'),
               opacity: reduced
                   ? kAlwaysCompleteAnimation
-                  : CurvedAnimation(parent: _expand, curve: _Timeline.header),
+                  : anim(timeline.header),
               child: SlideTransition(
-                position: Tween(
-                  begin: const Offset(0, .12),
-                  end: Offset.zero,
-                ).animate(
-                  reduced
-                      ? kAlwaysCompleteAnimation
-                      : CurvedAnimation(
-                          parent: _expand,
-                          curve: _Timeline.header,
-                        ),
-                ),
+                position: Tween(begin: const Offset(0, .12), end: Offset.zero)
+                    .animate(
+                      reduced
+                          ? kAlwaysCompleteAnimation
+                          : anim(timeline.header),
+                    ),
                 child: _Header(
                   key: const ValueKey('plan-header'),
                   height: headerH,
@@ -486,7 +635,7 @@ class _PlanCardState extends State<PlanCard>
                   ? _expand
                   : i <= shownCount
                   ? atEnd
-                  : CurvedAnimation(parent: _expand, curve: _Timeline.inPlace),
+                  : anim(_Timeline.inPlace),
               reduced: reduced,
             ),
       ],
@@ -514,31 +663,6 @@ class _PlanCardState extends State<PlanCard>
       onTap: () => widget.onStart(() => rectOf(_card.currentContext)),
     );
 
-    // Flyers: strip slot → row thumbnail, in card-content coords; each one
-    // is a fixed-size row thumbnail moved only by a transform (no layout).
-    Offset stripSlot(int k) => Offset(
-      SfSpace.x1 + k * (_SetBody.thumb + _SetBody.gap),
-      compactH -
-          _SetBody.stripHeight +
-          _SetBody.stripTop +
-          (_SetBody.stripHeight - _SetBody.stripTop - _SetBody.thumb) / 2,
-    );
-    Offset rowSlot(int i) => Offset(
-      _Details.pad + _MoveRow.indexWidth,
-      headerH + _MoveRow.height * i + (_MoveRow.height - _MoveRow.thumbSize) / 2,
-    );
-    // The hero's folded frame (the cutout's box, or the boxed cover) and
-    // its landing slot, row 1's thumbnail.
-    final heroH = compactH - _SetBody.stripHeight;
-    final heroFrom = fused
-        ? Rect.fromLTWH(
-            SfSpace.x4,
-            SfSpace.x1,
-            innerW - 2 * SfSpace.x4,
-            heroH - SfSpace.x1 - _SetBody.fusedTitleRoom,
-          )
-        : Rect.fromLTWH(0, 0, innerW, heroH);
-    final heroTo = rowSlot(0) & const Size.square(_MoveRow.thumbSize);
     final flyerThumbs = [
       for (var k = 0; k < shownCount; k++)
         RepaintBoundary(
@@ -556,8 +680,8 @@ class _PlanCardState extends State<PlanCard>
         final double o = reduced
             ? (t < .5 ? 1 - 2 * t : 2 * t - 1).clamp(0.0, 1.0)
             : open
-            ? _Timeline.arrive.transform(t)
-            : 1 - _Timeline.out.transform(t);
+            ? _Timeline.open(t, _back)
+            : _Timeline.folded(t, _back);
         final face = IgnorePointer(
           ignoring: o < .5,
           child: Opacity(
@@ -644,8 +768,8 @@ class _PlanCardState extends State<PlanCard>
                   stage: stage,
                   from: heroFrom,
                   to: heroTo,
-                  p: timeline.fly(0, t),
-                  scrim: 1 - _Timeline.titleOut.transform(t),
+                  e: timeline.fly(0, t, _back),
+                  scrim: _Timeline.title(t, _back),
                 );
               },
             );
@@ -653,9 +777,7 @@ class _PlanCardState extends State<PlanCard>
         animation: _expand,
         builder: (context, child) {
           final t = _expand.value;
-          final o = reduced
-              ? stripThumbs.value
-              : 1 - _Timeline.titleOut.transform(t);
+          final o = reduced ? stripThumbs.value : _Timeline.title(t, _back);
           if (o <= 0) return const SizedBox.shrink();
           return Positioned(
             left: SfSpace.x4,
@@ -703,7 +825,7 @@ class _PlanCardState extends State<PlanCard>
                               child: flyerThumbs[k],
                               from: stripSlot(k),
                               to: rowSlot(rest[k]),
-                              p: timeline.fly(k + 1, t),
+                              e: timeline.fly(k + 1, t, _back),
                             ),
                         ],
                       );
@@ -820,17 +942,12 @@ class _PlanCardState extends State<PlanCard>
     required SfPalette stage,
     required Rect from,
     required Rect to,
-    required double p,
+    required double e,
     required double scrim,
   }) {
-    final e = Curves.easeInOutCubicEmphasized.transform(p);
     final r = Rect.lerp(from, to, e)!;
-    final radius = lerpDouble(
-      fused ? 0 : SfRadius.lg - 6,
-      _MoveRow.radius,
-      e,
-    )!;
-    final poster = fused ? ((p - .55) / .45).clamp(0.0, 1.0) : 1.0;
+    final radius = lerpDouble(fused ? 0 : SfRadius.lg - 6, _MoveRow.radius, e)!;
+    final poster = fused ? ((e - .6) / .4).clamp(0.0, 1.0) : 1.0;
     return Positioned.fromRect(
       key: const ValueKey('fly-hero'),
       rect: r,
@@ -841,7 +958,10 @@ class _PlanCardState extends State<PlanCard>
             fit: StackFit.expand,
             children: [
               if (poster > 0)
-                Opacity(opacity: poster, child: _Media(exercise: cover)),
+                Opacity(
+                  opacity: poster,
+                  child: _Media(exercise: cover),
+                ),
               if (fused && poster < 1 && cover != null)
                 Opacity(
                   opacity: 1 - poster,
@@ -869,9 +989,8 @@ class _PlanCardState extends State<PlanCard>
     required Widget child,
     required Offset from,
     required Offset to,
-    required double p,
+    required double e,
   }) {
-    final e = Curves.easeInOutCubicEmphasized.transform(p);
     const s0 = _SetBody.thumb / _MoveRow.thumbSize;
     final o = Offset.lerp(from, to, e)!;
     final s = s0 + (1 - s0) * e;
@@ -1203,7 +1322,7 @@ class _CueRow extends StatelessWidget {
   );
 }
 
-/// A row's text arriving: fade + a short slide from the left (none under
+/// A row's text arriving: fade + an 8 px rise (none under
 /// reduced motion, where the whole details block fades instead).
 Widget _rowIn({
   Key? key,
@@ -1215,11 +1334,12 @@ Widget _rowIn({
     : FadeTransition(
         key: key,
         opacity: anim,
-        child: SlideTransition(
-          position: Tween(
-            begin: const Offset(-.04, 0),
-            end: Offset.zero,
-          ).animate(anim),
+        child: AnimatedBuilder(
+          animation: anim,
+          builder: (context, child) => Transform.translate(
+            offset: Offset(0, 8 * (1 - anim.value)),
+            child: child,
+          ),
           child: child,
         ),
       );
@@ -1571,7 +1691,6 @@ Widget _heroScrim(SfPalette stage) => DecoratedBox(
     ),
   ),
 );
-
 
 class _HeroTitle extends StatelessWidget {
   const _HeroTitle({
