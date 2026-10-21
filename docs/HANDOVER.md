@@ -1,6 +1,22 @@
 # 智能健身助手（SmartFit）交接说明
 
-## 当前交接入口（2026-10-21 工具会话接入）
+## 当前交接入口（2026-10-21 Skill Agent 核心功能通过，待合并）
+
+当前开发分支 `feat/smartfit-skill-agent`，功能开发版本 `0.1.0+7`，接入基线为 SDK main `1f8be6e` 的 `ugk_coach 0.3.0`。`AiChatEngine` 将长期会话入口从 `CoachSession` 换为 `CoachAgent`，保留 `CoachTurnResult` 和 typed 卡片交付；SDK 内部按需读取 skill 文件，调用 `check_plan` 后经门禁交付 `show_actions` / `show_plan`。`maxSteps` 使用默认 10，记账穷举处理新增的 `CallOutcome.toolStep`。
+
+BaseURL、模型、App Key 与设备标识规则沿用上一阶段：`https://api.uuugk.win/v1`、`deepseek-v4-flash-0731`，只发送 `X-App-Key` / `X-Device-Id`，无 `Authorization`；密钥仅由 `--dart-define=SMARTFIT_AI_TOKEN` 注入。每次 HTTP 超时 120 秒且不重试，门禁最多重交 2 次；整轮保护超时提高到 1230 秒，以容纳多步请求。等待时禁用重复发送、可取消，并按 `agent.events` 的 `reading` / `checking` 分别显示「正在查动作库」/「正在核对计划」。取消结果不显示，关闭界面保留会话，「新对话」取消并 `reset()`。
+
+本机记忆由 App 的 `LocalUserMemoryStore` 实现 `UserMemoryStore.load/save`，整表保存在独立键 `smartfit.ai-memory.v1`，不与设备 UUID、聊天和计划混存。`enableUserMemory` 默认开；设置页「AI 记忆」开关持久化并即时同步 Agent，关闭后不再读取或新增记忆，原记忆保留。「清除记忆」调用 SDK `clearMemory()` 后复读本机存储确认已空；保存或清除失败须提示重试，不能假称成功。开关和清除保留当前聊天与已保存计划；验证关闭后不再引用本机记忆时，先开「新对话」隔离旧消息与 App 已解析条件。记忆开启时，其摘要会随 AI 请求发送。
+
+纯文字使用 SDK 接纳后的文字结果显示气泡，动作卡和计划卡分别只接 `ValidatedActions` / `ValidatedPlan`，保存或交给 `ugk_trainer` 的流程不变；持久化卡片恢复时重新过门禁。模型原始输出、未接纳工具参数与中间读取结果不得进入渲染层。失败继续回落原有本地模板并标「预设方案」，模板同样经门禁；每轮 `CoachContext` 继续带用户水平、时长、保护部位及场景/器械。AI 目录仍来自实际随包 93 个动作。
+
+首次真实 Worker 暴露 SDK 的 `reasoning_content` 续传缺口及响应缺失/null 时也需空字段的协议边界，已在 SDK 独立分支 `fix/coach-agent-reasoning-replay` 修复并推送 `43dfef637144a1e08b5eda5ed743db0671ba5a8d`。SDK coach 304 项、trainer 126 项测试和两包分析通过；App `5743073691547d44aec891ab6d4a45b5b3fa381b` 暂固定该 commit，217 项测试、分析与锁文件检查通过。App 和 pub 缓存不改 SDK 代码。六类真实 Worker 核心验证已通过（前三按关闭记忆行为等价复用，后三在当前 SDK 实测），成功和失败均记录在 [多步验证记录](coach-agent-smoke-2026-10-21.md)，尚未合入任一 main。
+
+六类核心验证及记录已完成，剩余工作是按 SDK 修改规则经开哥同意合入 SDK main，确认 App 固定的 commit 已在 SDK main 上后合 App main 并推送。App 的测试、包身份和本轮记录由 [版本台账](version-management.md) 与 [验收记录](acceptance.md) 统一维护。旧 `+6` 的合并授权与核心验证仅适用于上一阶段，本轮须通过并取得开哥同意后再合 main 推送。
+
+## 上一阶段工具会话接入（0.1.0+6，历史）
+
+以下保留该阶段交接状态与验证证据，不代表 `+7` Skill Agent 已通过或已合并。
 
 当前主线 `main`（原开发分支 `feat/smartfit-coach-tools`），功能开发版本 `0.1.0+6`。`ugk_coach 0.2.0` 与 `ugk_trainer 0.1.4` 的 git 依赖都固定到 SDK main commit `09a392bc0b736e6a23eef71d55d86108660e0e59`。App 改用 SDK README 的 `CoachSession` 工具会话接口，取代旧 `CoachAssistant.ask()` JSON 信封聊天。本轮不修改 SDK 代码或 pub 缓存，不在 App 复制、内嵌或 patch SDK。
 
@@ -16,7 +32,7 @@ profile 使用 SDK `09a392b` 的 smartfit，随包 `assets/coach/smartfit.json` 
 
 ## 上一阶段 AI 接入（0.1.0+5，历史）
 
-下列记录描述 `+5` 的旧版 JSON 信封实现与 2026-10-21 文档收束，不代表当前 `+6` 工具会话的源码或验收状态。当时开发分支 `feat/smartfit-ai-replies`，待验版本 `0.1.0+5`。BaseURL `https://api.uuugk.win/v1`、模型 `deepseek-v4-flash-0731`，沿用原 App Key 与原设备 UUID，通过 `X-App-Key` / `X-Device-Id` 发送，无 `Authorization`。随包 93 个动作的计划经严格校验后可保存和开练；断网、超时、限流或最终校验失败回退本地。旧实现上传 AI 可见相关轮次与显式当前计划/训练条件，已存计划及训练历史不自动上传。随机设备标识首次持久化成功才启用 AI，服务器执行每设备 30 次 / 10 分钟限流。
+下列记录描述 `+5` 的旧版 JSON 信封实现与 2026-10-21 文档收束，不代表 `+6` 工具会话或 `+7` Skill Agent 的源码与验收状态。当时开发分支 `feat/smartfit-ai-replies`，待验版本 `0.1.0+5`。BaseURL `https://api.uuugk.win/v1`、模型 `deepseek-v4-flash-0731`，沿用原 App Key 与原设备 UUID，通过 `X-App-Key` / `X-Device-Id` 发送，无 `Authorization`。随包 93 个动作的计划经严格校验后可保存和开练；断网、超时、限流或最终校验失败回退本地。旧实现上传 AI 可见相关轮次与显式当前计划/训练条件，已存计划及训练历史不自动上传。随机设备标识首次持久化成功才启用 AI，服务器执行每设备 30 次 / 10 分钟限流。
 
 `+5` 源码 `e549e0f84aa9118ef20752b8926c7b8c602a7e0f`，6 项接口/UUID/鉴权配置测试及分析通过；旧源全量 180 项本轮未重跑。debug 包已保留数据覆盖安装，签名与旧包相同，ZIP/profile 打包检查通过。新地址通用问答通过；三次计划请求分别 43,447 / 41,589 / 41,952 ms 因上游 `tencent:AbortError` 回退本地，第三次已极简为 3 动作 / 3 分钟，新接口计划生成未通过。已提示本地模板且继续可用。429 仅自动化验证不重试与提示，没有实际刷第 31 次请求。
 
