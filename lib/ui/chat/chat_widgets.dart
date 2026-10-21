@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../chat/chat_models.dart';
+import '../theme/glass.dart';
 import '../theme/sf_icons.dart';
 import '../theme/tokens.dart';
 import '../theme/widgets.dart';
@@ -24,6 +25,7 @@ class Appear extends StatefulWidget {
     this.shift = 0,
     this.duration = SfMotion.appear,
     this.scaleFrom = .98,
+    this.curve = SfMotion.standard,
   });
   final bool animate;
   final Duration delay;
@@ -35,6 +37,10 @@ class Appear extends StatefulWidget {
   final double shift;
   final Duration duration;
   final double scaleFrom;
+
+  /// The landing curve: [SfMotion.enter] (emphasized decelerate) for the
+  /// user's own line, [SfMotion.spring] for a glass card's soft overshoot.
+  final Curve curve;
   @override
   State<Appear> createState() => _AppearState();
 }
@@ -61,11 +67,7 @@ class _AppearState extends State<Appear> with SingleTickerProviderStateMixin {
     final start = widget.delay.inMicroseconds / total.inMicroseconds;
     _t = CurvedAnimation(
       parent: _c,
-      curve: Interval(
-        start,
-        1,
-        curve: _still ? Curves.easeOut : SfMotion.standard,
-      ),
+      curve: Interval(start, 1, curve: _still ? Curves.easeOut : widget.curve),
     );
     _c.forward();
   }
@@ -82,10 +84,14 @@ class _AppearState extends State<Appear> with SingleTickerProviderStateMixin {
     child: widget.child,
     builder: (_, child) {
       final v = _t.value;
-      if (v >= 1) return child!;
-      if (_still) return Opacity(opacity: v, child: child);
+      // Done when the controller is (a spring curve passes 1 on the way).
+      if (identical(_t, kAlwaysCompleteAnimation) || _c.isCompleted) {
+        return child!;
+      }
+      final o = v.clamp(0.0, 1.0);
+      if (_still) return Opacity(opacity: o, child: child);
       return Opacity(
-        opacity: v,
+        opacity: o,
         child: Transform.translate(
           offset: Offset(widget.shift * (1 - v), widget.rise * (1 - v)),
           child: Transform.scale(
@@ -107,9 +113,10 @@ BorderRadius bubbleRadius({required bool user}) => BorderRadius.only(
   bottomRight: Radius.circular(user ? SfRadius.tail : SfRadius.lg),
 );
 
-/// A tonal bubble floating in the sky: the assistant on the surface tone
-/// (white card on light), the user one step lighter and neutral; no glass,
-/// no stroke. Colour is kept for what you can do, not for who spoke.
+/// A plain text bubble is content, not a control: flat at z = 0 — a solid
+/// fill, no glass, no shadow, no rim. The user's line is jade-tinted, the
+/// assistant's neutral grey; only interactive parts (cards, chips, the
+/// input bar) are raised liquid glass.
 class _Bubble extends StatelessWidget {
   const _Bubble({required this.user, required this.child, this.padding});
   final bool user;
@@ -117,27 +124,17 @@ class _Bubble extends StatelessWidget {
   final EdgeInsetsGeometry? padding;
 
   @override
-  Widget build(BuildContext context) {
-    final r = bubbleRadius(user: user);
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: user ? SfColors.userBubble : SfColors.assistantBubble,
-        borderRadius: r,
-        // Light: white on near-white needs the hairline as well as the
-        // faint ink shadow (§6.2); dark: the tone step carries it.
-        border: user || SfColors.isDark
-            ? null
-            : Border.fromBorderSide(SfColors.cardEdge),
-        boxShadow: user ? null : SfColors.cardShadow,
-      ),
-      child: Padding(
-        padding:
-            padding ??
-            const EdgeInsets.fromLTRB(SfSpace.x4, 10, SfSpace.x4, 11),
-        child: child,
-      ),
-    );
-  }
+  Widget build(BuildContext context) => DecoratedBox(
+    decoration: BoxDecoration(
+      color: user ? SfColors.userBubble : SfColors.assistantBubble,
+      borderRadius: bubbleRadius(user: user),
+    ),
+    child: Padding(
+      padding:
+          padding ?? const EdgeInsets.fromLTRB(SfSpace.x4, 10, SfSpace.x4, 11),
+      child: child,
+    ),
+  );
 }
 
 /// "1/4　问题" → ('1/4', '问题'); null for any other text.
@@ -242,27 +239,45 @@ class OptionPill extends StatelessWidget {
     final bg = chosen
         ? SfColors.accentSoft
         : SfColors.isDark
-        ? SfColors.surfaceHigh
-        : SfColors.background;
+        ? SfColors.thumb
+        : SfColors.surface;
+    // Dark (round 5): an open choice reads as a button — glass fill + rim.
+    final idle = SfColors.isDark && enabled && !chosen && !dimmed;
     return SfPressable(
       semanticLabel: label,
       onTap: enabled ? onTap : null,
       haptic: SfHaptic.selection,
-      child: AnimatedContainer(
-        duration: SfMotion.medium,
-        constraints: const BoxConstraints(minHeight: 36),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        decoration: ShapeDecoration(color: bg, shape: const StadiumBorder()),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: fg,
-            fontSize: 14,
-            height: 1.35,
-            fontWeight: chosen ? FontWeight.w600 : FontWeight.w500,
-          ),
-        ),
-      ),
+      child: idle
+          ? SfControlFace(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Text(
+                label,
+                style: TextStyle(
+                  color: fg,
+                  fontSize: 14,
+                  height: 1.35,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            )
+          : AnimatedContainer(
+              duration: SfMotion.medium,
+              constraints: const BoxConstraints(minHeight: 36),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              decoration: ShapeDecoration(
+                color: bg,
+                shape: const StadiumBorder(),
+              ),
+              child: Text(
+                label,
+                style: TextStyle(
+                  color: fg,
+                  fontSize: 14,
+                  height: 1.35,
+                  fontWeight: chosen ? FontWeight.w600 : FontWeight.w500,
+                ),
+              ),
+            ),
     );
   }
 }
@@ -438,8 +453,9 @@ class SuggestionStrip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (items.isEmpty) return const SizedBox(height: SfSpace.x1);
+    final dark = SfColors.isDark;
     return SizedBox(
-      height: 48,
+      height: dark ? 52 : 48,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.fromLTRB(
@@ -465,13 +481,13 @@ class SuggestionStrip extends StatelessWidget {
             semanticLabel: items[i],
             haptic: SfHaptic.selection,
             onTap: () => onTap(items[i]),
-            child: Container(
+            // Liquid glass: discovery chips are controls, so they float on
+            // glass over the colour field (standard quality).
+            child: SfGlassSurface(
+              radius: dark ? 20 : 18,
+              height: dark ? SfControlInk.minHeight : 36,
               padding: const EdgeInsets.symmetric(horizontal: 14),
-              alignment: Alignment.center,
-              decoration: ShapeDecoration(
-                color: SfColors.isDark ? SfColors.surface : SfColors.surface,
-                shape: StadiumBorder(side: SfColors.cardEdge),
-              ),
+              control: true,
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -482,7 +498,7 @@ class SuggestionStrip extends StatelessWidget {
                   Text(
                     items[i],
                     style: TextStyle(
-                      color: SfColors.muted,
+                      color: SfColors.text.withValues(alpha: dark ? .95 : .78),
                       fontSize: 14,
                       height: 1.2,
                       fontWeight: FontWeight.w500,
@@ -544,17 +560,13 @@ class _ChatInputBarState extends State<ChatInputBar> {
     final ready = _text.text.trim().isNotEmpty && widget.enabled;
     return Padding(
       padding: const EdgeInsets.fromLTRB(SfSpace.x3, 0, SfSpace.x3, SfSpace.x3),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(26),
-          boxShadow: SfColors.cardShadow,
-        ),
+      // Liquid glass: the input is the chat's persistent bar, so it gets
+      // the premium material when the device allows (adaptive ceiling).
+      child: SfGlassSurface(
+        radius: 26,
+        quality: SfGlass.bar,
         child: Material(
-          color: SfColors.surface,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(26),
-            side: SfColors.cardEdge,
-          ),
+          type: MaterialType.transparency,
           child: ConstrainedBox(
             constraints: const BoxConstraints(minHeight: 52),
             child: Padding(
@@ -572,11 +584,21 @@ class _ChatInputBarState extends State<ChatInputBar> {
                         semanticLabel: '我的计划',
                         onTap: widget.onPlans,
                         child: Center(
-                          child: SfIcon(
-                            SfGlyph.bookmark,
-                            size: 21,
-                            color: SfColors.muted,
-                          ),
+                          child: SfColors.isDark
+                              ? SfControlFace(
+                                  circle: true,
+                                  padding: EdgeInsets.zero,
+                                  child: SfIcon(
+                                    SfGlyph.bookmark,
+                                    size: 19,
+                                    color: SfColors.text.withValues(alpha: .9),
+                                  ),
+                                )
+                              : SfIcon(
+                                  SfGlyph.bookmark,
+                                  size: 21,
+                                  color: SfColors.muted,
+                                ),
                         ),
                       ),
                     )
@@ -634,7 +656,7 @@ class _ChatInputBarState extends State<ChatInputBar> {
                             shape: BoxShape.circle,
                             color: ready
                                 ? SfColors.accent
-                                : SfColors.surfaceHigh,
+                                : SfColors.text.withValues(alpha: .08),
                           ),
                           // M9: the arrow grows into place as the disc
                           // turns accent; reduced motion: colour only.

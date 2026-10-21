@@ -90,8 +90,16 @@ class AppStore extends ChangeNotifier {
 
   /// 外观: 'dark' (深空), 'light' (白色无边空间) or 'system' (default since the
   /// light-stage media landed, §6.3; a stored choice is kept).
-  String appearance = 'system';
+  String appearance = const String.fromEnvironment(
+    'SF_APPEARANCE',
+    defaultValue: 'system',
+  );
   static const appearances = ['dark', 'light', 'system'];
+
+  /// The liquid-glass quality the adaptive scope settled on last run
+  /// ('premium' | 'standard' | 'minimal'), so the next launch starts there
+  /// instead of re-benchmarking from standard. Null until measured.
+  String? glassQuality;
 
   /// How many chat messages are kept on the device.
   static const chatLogLimit = 60;
@@ -114,6 +122,9 @@ class AppStore extends ChangeNotifier {
         );
       }
       starfield = j['starfield'] != false;
+      if (j['glassQuality'] is String) {
+        glassQuality = j['glassQuality'] as String;
+      }
       aiMemoryEnabled = j['aiMemoryEnabled'] != false;
       if (appearances.contains(j['appearance'])) {
         appearance = j['appearance'] as String;
@@ -171,14 +182,15 @@ class AppStore extends ChangeNotifier {
     'starfield': starfield,
     'aiMemoryEnabled': aiMemoryEnabled,
     'appearance': appearance,
+    'glassQuality': ?glassQuality,
     'savedPlans': [for (final p in savedPlans) p.toJson()],
     'chat': chatLog.length > chatLogLimit
         ? chatLog.sublist(chatLog.length - chatLogLimit)
         : chatLog,
   });
 
-  Future<void> _save() async {
-    notifyListeners();
+  Future<void> _save({bool notify = true}) async {
+    if (notify) notifyListeners();
     try {
       await _enqueueWrite(() => _storage.write(key, _encodeState()));
     } on Object {
@@ -257,6 +269,14 @@ class AppStore extends ChangeNotifier {
     aiMemoryEnabled = enabled;
     notifyListeners();
     return _enqueueWrite(() => _storage.write(key, _encodeState()));
+  }
+
+  /// Silent because adaptive quality can settle during a frame. Keep writes
+  /// in the same queue as settings and completed trainer sessions.
+  Future<void> setGlassQuality(String quality) {
+    if (quality == glassQuality) return Future.value();
+    glassQuality = quality;
+    return _save(notify: false);
   }
 
   Future<void> setAppearance(String a) {

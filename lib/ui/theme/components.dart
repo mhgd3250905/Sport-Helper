@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'glass.dart';
 import 'sf_icons.dart';
 import 'tokens.dart';
 import 'widgets.dart';
@@ -365,41 +366,11 @@ class SfEmptyState extends StatelessWidget {
   );
 }
 
-/// The one toast: a surface capsule with a check, floating above the input
-/// (hairline on light), on the motion tokens (M18: in 280 ms with an 8 px
-/// rise, out 180 ms; reduced motion: the fade only). Replaces default
-/// snack bars.
+/// The one toast: a liquid-glass capsule with the accent check, floating
+/// above the input (M18: in with an 8 px rise, out fast; reduced motion:
+/// the fade only). Replaces default snack bars.
 void showSfToast(BuildContext context, String text, {SfGlyph icon = SfGlyph.checkCircle, double bottom = 96}) {
-  final m = ScaffoldMessenger.maybeOf(context);
-  if (m == null) return;
-  final still = SfMotion.reduced(context);
-  m
-    ..hideCurrentSnackBar()
-    ..showSnackBar(
-      snackBarAnimationStyle: const AnimationStyle(duration: SfMotion.medium, reverseDuration: SfMotion.fast),
-      SnackBar(
-        behavior: SnackBarBehavior.floating,
-        margin: EdgeInsets.fromLTRB(SfSpace.x6, 0, SfSpace.x6, bottom),
-        backgroundColor: SfColors.isDark ? SfColors.surfaceHigh : SfColors.surface,
-        elevation: 0,
-        shape: StadiumBorder(side: SfColors.isDark ? BorderSide.none : BorderSide(color: SfColors.line)),
-        padding: const EdgeInsets.symmetric(horizontal: SfSpace.x4, vertical: SfSpace.x3),
-        duration: const Duration(seconds: 2),
-        content: TweenAnimationBuilder<double>(
-          tween: Tween(begin: still ? 0 : 8, end: 0),
-          duration: SfMotion.medium,
-          curve: SfMotion.standard,
-          builder: (_, dy, row) => Transform.translate(offset: Offset(0, dy), child: row),
-          child: Row(
-            children: [
-              SfIcon(icon, size: 18, color: SfColors.accentText, filled: true),
-              const SizedBox(width: SfSpace.x2),
-              Expanded(child: Text(text, style: SfType.callout.copyWith(fontSize: 14))),
-            ],
-          ),
-        ),
-      ),
-    );
+  showSfGlassToast(context, text, bottom: bottom, icon: SfIcon(icon, size: 18, color: SfColors.accentText, filled: true));
 }
 
 /// Pass-through for children that cross-fade on change (names, labels,

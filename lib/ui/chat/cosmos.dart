@@ -123,7 +123,7 @@ class SkyFill extends StatelessWidget {
           center: const Alignment(.9, -.95),
           radius: 1.1,
           colors: palette.isDark
-              ? const [Color(0x1A5B6CA8), Color(0x005B6CA8)]
+              ? const [Color(0x0AFFFFFF), Color(0x00FFFFFF)] // neutral lift, no blue
               : const [Color(0x0F9DB8AC), Color(0x009DB8AC)],
         ),
       ),

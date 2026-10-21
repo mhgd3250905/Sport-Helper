@@ -42,9 +42,13 @@ class SfPressable extends StatefulWidget {
     this.toggled,
     this.selected,
     this.semanticHint,
+    this.expanded,
   });
   final Widget child;
   final VoidCallback? onTap;
+
+  /// Disclosure control: exposes expanded / collapsed (TalkBack state).
+  final bool? expanded;
   final String? semanticLabel;
 
   /// Switch-like control: exposes the toggled state (TalkBack "on/off")
@@ -137,6 +141,7 @@ class _SfPressableState extends State<SfPressable> {
       button: widget.toggled == null,
       toggled: widget.toggled,
       selected: widget.selected,
+      expanded: widget.expanded,
       enabled: enabled,
       label: widget.semanticLabel,
       hint: widget.semanticHint,
@@ -155,6 +160,81 @@ class _SfPressableState extends State<SfPressable> {
 }
 
 /// A stadium face whose fill deepens while pressed.
+/// Dark-mode ink for idle tappable controls (round 5, user feedback: in
+/// dark the idle buttons read as bare text). A tinted white fill with a
+/// soft top highlight and a rim bright enough for WCAG 1.4.11 (≥ 3:1 for
+/// the control boundary against the sky, the glass card and the assistant
+/// bubble; see test/dark_controls_contrast_test.dart). Light mode never
+/// uses these.
+abstract final class SfControlInk {
+  /// Fill, top (with highlight) → body.
+  static const fillTop = Color(0x24FFFFFF); // 14 %
+  static const fill = Color(0x17FFFFFF); // 9 %
+  static const pressedTop = Color(0x3DFFFFFF); // 24 %
+  static const pressedFill = Color(0x2EFFFFFF); // 18 %
+
+  /// The rim. 40 % white: the 20–28 % range measured < 3:1 on the sky.
+  static const rim = Color(0x66FFFFFF);
+  static const pressedRim = Color(0x8CFFFFFF);
+  static const rimWidth = 1.0;
+
+  /// Visible height of a dark idle pill.
+  static const minHeight = 40.0;
+
+  static BorderSide side(bool down) => BorderSide(color: down ? pressedRim : rim, width: rimWidth);
+}
+
+/// Paints [SfControlInk] behind an idle control in dark mode (capsule when
+/// [radius] is null) and follows [SfPressedScope] for the pressed state.
+/// In light mode it returns [child] untouched, so light output is unchanged.
+class SfControlFace extends StatelessWidget {
+  const SfControlFace({
+    super.key,
+    required this.child,
+    this.radius,
+    this.padding = const EdgeInsets.symmetric(horizontal: 14),
+    this.minHeight = SfControlInk.minHeight,
+    this.circle = false,
+  });
+  final Widget child;
+  final double? radius;
+  final EdgeInsetsGeometry padding;
+  final double minHeight;
+  final bool circle;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!SfColors.isDark) return child;
+    final down = SfPressedScope.of(context);
+    final side = SfControlInk.side(down);
+    final ShapeBorder shape = circle
+        ? CircleBorder(side: side)
+        : radius == null
+        ? StadiumBorder(side: side)
+        : RoundedRectangleBorder(borderRadius: BorderRadius.circular(radius!), side: side);
+    return AnimatedContainer(
+      key: const ValueKey('sf-control-face'),
+      duration: down ? SfMotion.press : SfMotion.release,
+      curve: Curves.easeOut,
+      constraints: BoxConstraints(minHeight: minHeight, minWidth: circle ? minHeight : 0),
+      padding: padding,
+      alignment: circle ? Alignment.center : null,
+      decoration: ShapeDecoration(
+        shape: shape,
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          stops: const [0, .5],
+          colors: down
+              ? const [SfControlInk.pressedTop, SfControlInk.pressedFill]
+              : const [SfControlInk.fillTop, SfControlInk.fill],
+        ),
+      ),
+      child: child,
+    );
+  }
+}
+
 class _Face extends StatelessWidget {
   const _Face({required this.color, required this.pressedColor, required this.child, this.border});
   final Color color;
@@ -269,7 +349,7 @@ class SfSecondaryButton extends StatelessWidget {
           pressedColor: SfColors.isDark
               ? Color.lerp(fill, Colors.white, .05)!
               : SfColors.surfaceHigh,
-          border: SfColors.isDark ? null : BorderSide(color: SfColors.line),
+          border: SfColors.isDark ? SfControlInk.side(false) : BorderSide(color: SfColors.line),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: SfSpace.x5),
             child: Row(
@@ -302,6 +382,7 @@ class SfTextAction extends StatelessWidget {
     this.icon,
     this.iconFilled = false,
     this.color,
+    this.boxed = false,
   });
   final String label;
   final VoidCallback? onPressed;
@@ -309,9 +390,24 @@ class SfTextAction extends StatelessWidget {
   final bool iconFilled;
   final Color? color;
 
+  /// Dark only: draw it as an idle glass pill ([SfControlFace]) while it
+  /// is tappable. Light is unchanged.
+  final bool boxed;
+
   @override
   Widget build(BuildContext context) {
     final fg = onPressed == null ? SfColors.faint : (color ?? SfColors.muted);
+    final pill = boxed && SfColors.isDark && onPressed != null;
+    final row = Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (icon != null) ...[
+          SfIcon(icon!, size: 18, filled: iconFilled, color: fg),
+          const SizedBox(width: 6),
+        ],
+        Text(label, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, height: 1.2, color: fg)),
+      ],
+    );
     return SfPressable(
       semanticLabel: label,
       onTap: onPressed,
@@ -319,16 +415,12 @@ class SfTextAction extends StatelessWidget {
         constraints: const BoxConstraints(minHeight: 44),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: SfSpace.x1),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (icon != null) ...[
-                SfIcon(icon!, size: 18, filled: iconFilled, color: fg),
-                const SizedBox(width: 6),
-              ],
-              Text(label, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, height: 1.2, color: fg)),
-            ],
-          ),
+          child: pill
+              ? Center(
+                  widthFactor: 1,
+                  child: SfControlFace(padding: const EdgeInsets.symmetric(horizontal: 14), child: row),
+                )
+              : row,
         ),
       ),
     );
@@ -376,7 +468,11 @@ class SfCircleButton extends StatelessWidget {
             decoration: BoxDecoration(
               color: down ? Color.lerp(bg, SfColors.isDark ? Colors.white : Colors.black, .06) : bg,
               shape: BoxShape.circle,
-              border: SfColors.isDark || fill != null ? null : Border.all(color: SfColors.line),
+              border: SfColors.isDark
+                  ? (fill == null && onPressed != null ? Border.fromBorderSide(SfControlInk.side(down)) : null)
+                  : fill != null
+                  ? null
+                  : Border.all(color: SfColors.line),
             ),
             alignment: Alignment.center,
             child: AnimatedSwitcher(

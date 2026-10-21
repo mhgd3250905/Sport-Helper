@@ -103,6 +103,10 @@ void main() {
       // Skipping all work no longer creates a completion/save offer. The
       // exact started snapshot can still be saved from its own plan card.
       expect(s.chat.messages.last.options, isEmpty);
+      final expand = find.byKey(ValueKey('plan-expand-${modified.id}'));
+      await tester.ensureVisible(expand);
+      await tester.tap(expand);
+      await tester.pumpAndSettle();
       final save = find.byKey(ValueKey('plan-save-${modified.id}'));
       await tester.ensureVisible(save);
       await tester.tap(save);

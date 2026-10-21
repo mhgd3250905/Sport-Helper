@@ -210,6 +210,8 @@ void main() {
     expect(plan.templateId, 'office-relax');
 
     // Save from the card.
+    await tester.tap(find.byKey(ValueKey('plan-expand-${plan.id}')));
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(ValueKey('plan-save-${plan.id}')));
     await tester.pumpAndSettle();
     expect(s.store.savedPlans.single.plan.id, plan.id);
@@ -280,6 +282,8 @@ void main() {
     await tester.pumpWidget(SmartFitApp(services: s));
     await tester.pumpAndSettle();
     await say(tester, '在家 15 分钟练核心，徒手');
+    await tester.tap(find.byKey(ValueKey('plan-expand-${s.chat.currentPlan!.id}')));
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(ValueKey('plan-save-${s.chat.currentPlan!.id}')));
     await tester.pumpAndSettle();
     final saved = s.store.savedPlans.single;
@@ -337,6 +341,8 @@ void main() {
 
     await say(tester, '在家 15 分钟练核心，徒手');
     final plan = s.chat.currentPlan!;
+    await tester.tap(find.byKey(ValueKey('plan-expand-${plan.id}')));
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(ValueKey('plan-save-${plan.id}')));
     await tester.pumpAndSettle();
     await say(tester, '讲个笑话');

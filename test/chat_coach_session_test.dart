@@ -605,6 +605,11 @@ void main() {
       expect(find.text('给你一套轻松的计划。'), findsOneWidget);
       expect(find.byType(ValidatedPlanCard), findsOneWidget);
       expect(find.byType(PlanCard), findsOneWidget);
+      final expand = find.byKey(ValueKey('plan-expand-${validated.plan.id}'));
+      await tester.ensureVisible(expand);
+      await tester.tap(expand);
+      await tester.pumpAndSettle();
+      expect(find.text('给你一套轻松的计划。'), findsOneWidget);
       final save = find.byWidgetPredicate(
         (widget) => widget is SfTextAction && widget.label == '保存',
       );

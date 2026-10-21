@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:ugk_trainer/ugk_trainer.dart' show SessionResult;
 
 import '../../app/services.dart';
@@ -15,6 +16,7 @@ import '../library_page.dart';
 import '../plan_page.dart';
 import '../player_page.dart';
 import '../theme/app_theme.dart';
+import '../theme/glass.dart';
 import '../theme/sf_icons.dart';
 import '../theme/tokens.dart';
 import '../theme/widgets.dart';
@@ -42,6 +44,11 @@ class _ChatHomePageState extends State<ChatHomePage> {
   late ChatController _chat;
   StreamSubscription<String>? _actions;
   final _scroll = ScrollController();
+
+  /// Height of the floating glass dock (chips + input, incl. the bottom
+  /// safe area); the conversation reserves it as bottom padding so the
+  /// newest message can always scroll clear of the glass.
+  double _dockHeight = 112;
   final _scaffold = GlobalKey<ScaffoldState>();
   final _input = FocusNode();
 
@@ -200,39 +207,95 @@ class _ChatHomePageState extends State<ChatHomePage> {
           listenable: s.store,
           builder: (context, _) => CosmosBackground(
             animate: s.store.starfield,
-            child: SafeArea(
-              child: ListenableBuilder(
-                listenable: _chat,
-                builder: (context, _) => Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: SfSpace.x4,
-                      ),
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: SfTextAction(
-                          key: const ValueKey('chat-new-conversation'),
-                          label: '新对话',
-                          icon: SfGlyph.sparkle,
-                          onPressed: () => unawaited(_chat.newConversation()),
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                // Liquid glass on a real refraction source: the colour field
+                // and the conversation are one capture surface
+                // (GlassBackgroundSource) inside a LiquidGlassScope, and the
+                // chips + input float above it, so messages and the plan
+                // card scroll *under* the glass instead of stopping above it.
+                LiquidGlassScope(
+                  child: ListenableBuilder(
+                    listenable: _chat,
+                    builder: (context, _) => Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        Positioned.fill(
+                          child: GlassBackgroundSource(
+                            child: Stack(
+                              fit: StackFit.expand,
+                              children: [
+                                const SfGlassField(),
+                                SafeArea(
+                                  bottom: false,
+                                  child: Column(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: SfSpace.x4,
+                                        ),
+                                        child: Align(
+                                          alignment: Alignment.centerRight,
+                                          child: SfTextAction(
+                                            key: const ValueKey(
+                                              'chat-new-conversation',
+                                            ),
+                                            label: '新对话',
+                                            icon: SfGlyph.sparkle,
+                                            onPressed: () => unawaited(
+                                              _chat.newConversation(),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Expanded(child: _messages()),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
-                      ),
+                        Positioned(
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          child: SfMeasureSize(
+                            onSize: (s) {
+                              if (mounted &&
+                                  (s.height - _dockHeight).abs() > .5) {
+                                setState(() => _dockHeight = s.height);
+                              }
+                            },
+                            child: SafeArea(
+                              top: false,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  SuggestionStrip(
+                                    items: _chat.typing
+                                        ? const []
+                                        : _chat.suggestions,
+                                    onTap: _send,
+                                  ),
+                                  ChatInputBar(
+                                    focusNode: _input,
+                                    onSend: _send,
+                                    enabled: !_chat.typing,
+                                    onPlans: () =>
+                                        _scaffold.currentState?.openDrawer(),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                    Expanded(child: _messages()),
-                    SuggestionStrip(
-                      items: _chat.typing ? const [] : _chat.suggestions,
-                      onTap: _send,
-                    ),
-                    ChatInputBar(
-                      focusNode: _input,
-                      onSend: _send,
-                      enabled: !_chat.typing,
-                      onPlans: () => _scaffold.currentState?.openDrawer(),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
+              ],
             ),
           ),
         ),
@@ -270,15 +333,32 @@ class _ChatHomePageState extends State<ChatHomePage> {
                   scaleFrom: 1,
                   child: GreetingBlock(text: m.text),
                 )
+              // Entrances: the user's line springs up out of the input bar
+              // (8 px, .96 → 1, 280 ms, emphasized decelerate); the
+              // assistant's words fade and rise one after another; a glass
+              // card lands a beat later on a soft spring from .97.
               : Appear(
                   animate: !_seen.contains(m.id),
                   delay: !_seen.contains(m.id) && !m.isUser && !still
-                      ? SfMotion.replyStagger * queued++
+                      ? SfMotion.replyStagger * queued++ +
+                            (m.isPlan ? SfMotion.replyStagger : Duration.zero)
                       : Duration.zero,
                   anchor: m.isUser
                       ? Alignment.bottomRight
                       : Alignment.bottomLeft,
-                  child: _message(m, fresh: !_seen.contains(m.id)),
+                  rise: m.isUser ? 8 : (m.isPlan ? 14 : 10),
+                  scaleFrom: m.isUser ? .96 : (m.isPlan ? .97 : .98),
+                  duration: m.isUser
+                      ? SfMotion.medium
+                      : (m.isPlan
+                            ? const Duration(milliseconds: 520)
+                            : SfMotion.appear),
+                  curve: m.isUser
+                      ? SfMotion.enter
+                      : (m.isPlan ? SfMotion.spring : SfMotion.standard),
+                  child: RepaintBoundary(
+                    child: _message(m, fresh: !_seen.contains(m.id)),
+                  ),
                 ),
         ),
       );
@@ -305,11 +385,11 @@ class _ChatHomePageState extends State<ChatHomePage> {
           child: ListView.builder(
             controller: _scroll,
             reverse: true,
-            padding: const EdgeInsets.fromLTRB(
+            padding: EdgeInsets.fromLTRB(
               SfSpace.x4,
               48,
               SfSpace.x4,
-              SfSpace.x3,
+              _dockHeight + SfSpace.x3,
             ),
             itemCount: reversed.length,
             itemBuilder: (_, i) => reversed[i],

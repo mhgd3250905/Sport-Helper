@@ -115,8 +115,8 @@ class SfPalette {
 
   static const dark = SfPalette(
     brightness: Brightness.dark,
-    skyTop: Color(0xFF0D1017),
-    skyBottom: Color(0xFF060709),
+    skyTop: Color(0xFF121315), // deep neutral (round 4: no blue cast)
+    skyBottom: Color(0xFF0B0B0D),
     dust: Color(0xFFDDE3F2),
     background: Color(0xFF0B0C10),
     surface: Color(0xFF15171C),
@@ -136,8 +136,8 @@ class SfPalette {
     thumb: Color(0xFF2A2D34),
     scrim: Color(0xA6000000),
     track: Color(0x1FFFFFFF),
-    userBubble: Color(0xFF23262D),
-    assistantBubble: Color(0xE015171C),
+    userBubble: Color(0xFF1D5243), // jade, solid (flat, z = 0); clear of the sky
+    assistantBubble: Color(0xFF2A2C31), // neutral grey, solid; clear of the sky
     shadow: Color(0x00000000),
   );
 
@@ -164,8 +164,8 @@ class SfPalette {
     thumb: Color(0xFFFFFFFF),
     scrim: Color(0x8C000000),
     track: Color(0x14000000),
-    userBubble: Color(0xFFE5E9E6),
-    assistantBubble: Color(0xFFFFFFFF),
+    userBubble: Color(0xFFDCEFE6), // light jade tint, solid (flat, z = 0)
+    assistantBubble: Color(0xFFE9ECEA), // neutral light grey, solid
     shadow: Color(0x121D2B25),
   );
 }
