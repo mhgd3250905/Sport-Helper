@@ -1,14 +1,28 @@
 # 智能健身助手（SmartFit）交接说明
 
-## 当前交接入口（2026-10-21 文档收束）
+## 当前交接入口（2026-10-21 工具会话接入）
 
-当前开发分支 `feat/smartfit-ai-replies`，待验版本 `0.1.0+5`。最新 BaseURL `https://api.uuugk.win/v1`、模型 `deepseek-v4-flash-0731`，沿用原 App Key 与原设备 UUID，通过 `X-App-Key` / `X-Device-Id` 发送，无 `Authorization`。随包 93 个动作的计划经严格校验后可保存和开练；断网、超时、限流或最终校验失败回退本地。仅上传 AI 可见相关轮次与显式当前计划/训练条件，已存计划及训练历史不自动上传。随机设备标识首次持久化成功才启用 AI，服务器执行每设备 30 次 / 10 分钟限流。
+当前开发分支 `feat/smartfit-coach-tools`，功能开发版本 `0.1.0+6`。`ugk_coach 0.2.0` 与 `ugk_trainer 0.1.4` 的 git 依赖都固定到 SDK main commit `09a392bc0b736e6a23eef71d55d86108660e0e59`。App 改用 SDK README 的 `CoachSession` 工具会话接口，取代旧 `CoachAssistant.ask()` JSON 信封聊天。本轮不修改 SDK 代码或 pub 缓存，不在 App 复制、内嵌或 patch SDK。
+
+BaseURL `https://api.uuugk.win/v1`，模型 `deepseek-v4-flash-0731`。App Key 只通过 `--dart-define=SMARTFIT_AI_TOKEN` 注入，沿用原设备 UUID；SDK `UgkWorkerAuth` 只发送 `X-App-Key` / `X-Device-Id`，无 `Authorization`。UUIDv4 首次持久化成功才启用 AI，配置缺失或标识存储失败使用本地引擎。服务器执行每设备 30 次 / 10 分钟限流。
+
+`AiChatEngine` 在 App 生命周期内长期持有一个 `CoachSession`；关闭 AI 界面不清会话，「新对话」取消请求并调用 `reset()`。等待时禁用发送，重复调用由 SDK 返回 `busy`；显示等待态和取消入口，用户主动取消或 reset 作废的结果不显示。首轮出计划可能 75–120 秒，单次 HTTP 超时 120 秒、HTTP 重试 0 次；门禁最多要求重交 2 次，整轮保护超时 365 秒。
+
+纯文字进气泡，`show_actions` 仅以 `ValidatedActions` 显示动作卡并打开本地动作详情；`show_plan` 仅以 `ValidatedPlan` 显示可保存、可由 `ugk_trainer` 开练的计划卡。模型原始输出不得进渲染层，本地持久化卡片恢复时重过 SDK 门禁。断网、超时、限流或门禁最终失败回落原有 `RuleChatEngine` / `TemplatePlanGenerator` 并标「预设方案」；模板计划同样经 `admitTemplate`，不合格不显示计划卡。
+
+profile 使用 SDK `09a392b` 的 smartfit，随包 `assets/coach/smartfit.json` 与上游一致；AI 目录由 SDK `DrillPackAdapter` 从实际 93 个随包动作构造，profile 备注中的全库 142 动作不代表 App 全部可用。每轮 `CoachContext` 带已知用户水平、时长、保护部位及场景/器械；水平和时长冲突会打回模型重交。请求发送当前输入、本轮条件、用户明确采用的当前计划与该会话模型历史（含工具调用与门禁反馈）；本地操作消息、已存计划列表和训练历史不自动上传。
+
+本次分析、App 测试、打包及模拟器 Worker 冷烟的结果由 [版本台账](version-management.md) 与 [验收记录](acceptance.md) 记录，尚未完成的检查不能标通过。本轮用户无可用真机，不写真机通过结论；模拟器已分别完成一次 `show_actions` 和一次 `show_plan` 的 Worker 首轮冷烟；核心功能链路已验，用户后续安装 APK 做真实问答体验。旧 `+5` 等真机记录只作历史证据。完成验证后，合入并推送 `main` 仍须开哥同意。
+
+## 上一阶段 AI 接入（0.1.0+5，历史）
+
+下列记录描述 `+5` 的旧版 JSON 信封实现与 2026-10-21 文档收束，不代表当前 `+6` 工具会话的源码或验收状态。当时开发分支 `feat/smartfit-ai-replies`，待验版本 `0.1.0+5`。BaseURL `https://api.uuugk.win/v1`、模型 `deepseek-v4-flash-0731`，沿用原 App Key 与原设备 UUID，通过 `X-App-Key` / `X-Device-Id` 发送，无 `Authorization`。随包 93 个动作的计划经严格校验后可保存和开练；断网、超时、限流或最终校验失败回退本地。旧实现上传 AI 可见相关轮次与显式当前计划/训练条件，已存计划及训练历史不自动上传。随机设备标识首次持久化成功才启用 AI，服务器执行每设备 30 次 / 10 分钟限流。
 
 `+5` 源码 `e549e0f84aa9118ef20752b8926c7b8c602a7e0f`，6 项接口/UUID/鉴权配置测试及分析通过；旧源全量 180 项本轮未重跑。debug 包已保留数据覆盖安装，签名与旧包相同，ZIP/profile 打包检查通过。新地址通用问答通过；三次计划请求分别 43,447 / 41,589 / 41,952 ms 因上游 `tencent:AbortError` 回退本地，第三次已极简为 3 动作 / 3 分钟，新接口计划生成未通过。已提示本地模板且继续可用。429 仅自动化验证不重试与提示，没有实际刷第 31 次请求。
 
 实际 UI 已保存旧 `+4` 接口生成的「办公室肩颈放松」10 动作原始 AI 计划，从原卡开练、暂停并于 34 活动秒提前结束；重启后已存计划 2 条、历史 4 条，原 AI 计划与部分 SessionResult 保留，原设备标识未变、前台服务已释放。2026-10-20 收尾时手机已从抽屉返回原 AI 计划卡，已保存状态可见，没有活动前台服务；这不是 2026-10-21 重新读取的设备状态。该局部流程不代表完整训练、`+5` 声音实听或新地址 AI 生成链路通过。包身份见 [版本台账](version-management.md)，观察见 [验收记录](acceptance.md)；待服务器恢复生成后再验新地址，目前不申请合并，合 main / 推送等待开哥新批准。
 
-本次只对齐文档与台账。阶段基线为 `main@0a40a45859378a93450c7d89cd355909613f99d5`，收束前 HEAD 为 `4cbadb0c5be786d16694ff1e7fbd2f3cb453925c`；已测运行源码与 APK 仍绑定 `e549e0f84aa9118ef20752b8926c7b8c602a7e0f`，两者之间仅文档变化。验证命令与适用性见 [验收记录](acceptance.md#验证来源与源码绑定)。没有重新调用接口、构建、安装或推送；下一步是代理端恢复后重验新地址计划生成。
+该次收束只对齐文档与台账。阶段基线为 `main@0a40a45859378a93450c7d89cd355909613f99d5`，收束前 HEAD 为 `4cbadb0c5be786d16694ff1e7fbd2f3cb453925c`；当时已测运行源码与 APK 仍绑定 `e549e0f84aa9118ef20752b8926c7b8c602a7e0f`，两者之间仅文档变化。验证命令与适用性见 [验收记录](acceptance.md#验证来源与源码绑定)。该次没有重新调用接口、构建、安装或推送；当时待办是代理端恢复后重验新地址计划生成。
 
 旧 `0.1.0+4` / `cc16f530944cf4f6034365aa111528536978ecc3` 的分析及全量 180 项测试通过，旧地址实机曾约 21 秒成功生成 AI 计划，随后追问回落本地，旧包不再作为最终待验包。以下保留此前 `0.1.0+3` 主线与 `0.1.0+2` 训练接入证据。
 

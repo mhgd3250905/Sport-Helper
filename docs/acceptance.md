@@ -1,6 +1,40 @@
 # 本机验收记录
 
-## AI 新接口（0.1.0+5，待验）
+## 工具会话（0.1.0+6，核心功能已验，2026-10-21）
+
+分支 `feat/smartfit-coach-tools`，运行源码 `9e94bb513751def6306f8e63313050efd632ccb9`，包版本 `0.1.0+6`。两个 git 依赖固定 SDK main `09a392bc0b736e6a23eef71d55d86108660e0e59`（`ugk_coach 0.2.0`、`ugk_trainer 0.1.4`），远端 main 已核对；SDK 工作区和 pub git 缓存均未修改。现有 smartfit profile 与该 SDK JSON 内容一致，AI 目录仍只含实际随包 93 动作。
+
+| 检查 | 本轮结果 |
+| --- | --- |
+| `flutter pub get --enforce-lockfile` | 通过，两项依赖的固定 ref 与 resolved-ref 一致；其余依赖版本保持 |
+| `flutter test --no-pub` | 195 项通过。含 24 项工具引擎回归、9 项会话/卡片组件回归，以及既有 App/训练/存储回归；不与旧版本测试数叠加 |
+| `flutter analyze --no-pub` | 无问题 |
+| `tools/coach/build_debug.ps1 -AppKeyFile '<本机文件>'` | debug 构建成功，仅经 dart-define 注入密钥；本轮源码与上述 commit 一致 |
+| APK | `.buildlog/install/SmartFit-coach-tools-0.1.0+6-debug.apk`；229,742,403 bytes；SHA-256 `7469c492cdc400ba2648dfb837394334ce6c6a507f12c3019d2cce26f787e59b`；已安装 API35 x86_64 模拟器 |
+
+测试覆盖真实 loopback HTTP 工具协议、无 Authorization、持久 UUID、门禁全部错误反馈及最多两次重交、原始无效输出不显示、断网/超时/429 的「预设方案」、模板门禁、水平/时长/保护部位条件、busy、取消与 reset 的迟到结果、当前计划上下文、保存 ID 唯一性、卡片恢复重验和页面关闭保留会话。SDK 新 trainer 只统计实际完成工作，跳过动作计 0；两处旧测试已据此更新，仍核对记录保存和编辑计划快照独立保存。
+
+配置为 BaseURL `https://api.uuugk.win/v1`、模型 `deepseek-v4-flash-0731`；单次请求 120 秒、HTTP 不自动重试，门禁最多重交 2 次，总保护超时 365 秒。模型给出的重复计划 ID 只在通过门禁后替换为独立 App ID，替换后再次经 SDK `admitTemplate` 取得 `ValidatedPlan`；不修改计划动作或剂量，不修改 SDK。
+
+### 模拟器真实 Worker 首轮冷烟
+
+环境为 API35 `sdk_gphone64_x86_64`。每种工具均从 SDK 空会话首轮发起；这是 App / SDK 会话冷启动记录，未证明远端 Worker 实例或上游模型缓存处于冷态。通过调试 VM 延时调用真实 `ChatController`，卡片/详情/保存/开练另用实际界面核对；测试安全确认采用模拟器的合成「无禁忌」状态，不代表真实用户健康状态。
+
+| 请求与操作 | 观察 |
+| --- | --- |
+| 新手、办公室、徒手、保护膝，展示两个站姿肩颈动作 | 22.5 秒；`TurnStatus.ok` / `TurnOutcome.model`，submissions 1、HTTP 1；返回 `h-wall-angel` / `o-stand-sidebend`，仅 `ValidatedActions` 进入动作卡 |
+| 点击「靠墙天使」动作卡 | 打开同名动作详情，展示本地示范素材、要领和注意事项 |
+| 实际点击「新对话」 | SDK turnCount 清为 0，当前计划为空，旧卡清除，安全确认保留 |
+| 新手、办公室、徒手、保护膝，3 分钟、3 动作计划 | 32.4 秒；`TurnStatus.ok` / `TurnOutcome.model`，submissions 1、HTTP 1；生成「办公室肩颈放松」，App ID `ai-1792550089320914-81abb71a`，3 个动作；仅 `ValidatedPlan` 进入计划卡 |
+| 实际点击计划保存 | 已存数量 0→1 |
+| 重启恢复 | 原 AI 计划与已保存状态保留；卡片重新通过 SDK 门禁，SDK 新进程会话 turnCount 为 0 |
+| 从恢复的原 AI 计划卡点击开始 | 已进入 `ugk_trainer`；显示「靠墙天使」、10 次、准备倒计时和 1/3 进度，示范素材可见 |
+
+用户随后明确本阶段只需确保本次 SDK 新功能跑通，真实问答体验由用户后续安装 APK 验证。按此范围，本轮核心功能验收通过；没有本轮真机结论，也未验证完整训练、声音实听、锁屏/通知或系统中断。模拟器首次进入 trainer 时 ADB shell 失去响应；保留数据重启并改用软件图形后恢复，重新点击原卡已进入播放器，无 App 或 SDK 修改。测试结束时该模拟器已停止。未合 main、未推送，等待开哥同意。
+
+本机忽略证据：`.buildlog/coach-tools-final-all-tests.log`、`coach-tools-final-analyze.log`、`coach-tools-lock-verify.log`、`coach-tools-smoke-build.log`、`coach-tools-turn-*.json`，以及 `coach-tools-actions.png`、`coach-tools-action-details.png`、`coach-tools-plan.png`、`coach-tools-restored.png`、`coach-tools-player-core.png`。不提交原始设备日志、调试服务地址、密钥或 APK。
+
+## AI 新接口（0.1.0+5，历史待验）
 
 分支 `feat/smartfit-ai-replies`，待验版本 `0.1.0+5`，源码 `e549e0f84aa9118ef20752b8926c7b8c602a7e0f`。BaseURL 为 `https://api.uuugk.win/v1`，模型 `deepseek-v4-flash-0731`。APK `.buildlog/install/SmartFit-ai-proxy-0.1.0+5-debug.apk`，203,741,474 bytes，SHA-256 `f3ac1f4276f82c629bb254065d5bc3108d4181a5531679fed7a7d2f90d2a14a4`；debug 签名与旧包相同，ZIP/profile 打包检查通过，已覆盖安装并保留旧数据。6 项 endpoint/UUID/header 配置测试及分析通过；旧源全量 180 项本轮未重跑。尚未完成本次验收，合 main 与推送等待新的用户授权。
 

@@ -7,20 +7,31 @@
 | 项目 | 当前事实 / 事实来源 |
 | --- | --- |
 | 主线与合并 | 本机维护 `main`；PR #1、#2、#3 及 `feat/ugk-trainer-integration` 已合入并推送 |
-| 当前开发状态 / 运行源码 | 开发分支 `feat/smartfit-ai-replies`，待验版本 `0.1.0+5`，源码 `e549e0f84aa9118ef20752b8926c7b8c602a7e0f`；尚未合 main 或推送，等待新的用户授权。此前主线运行提交 `aea8791`、App `0.1.0+3`，见 [后续修复](ugk-trainer-integration.md#后续修复2026-10-20) |
-| 共享训练依赖 | 固定 SDK 来源修复 `9407bf3` 已合入并推送 SDK main；GitHub 全新克隆确认可获取，App 严格锁解析通过且依赖文件无变化。包版本仍为 `ugk_coach 0.1.2` / `ugk_trainer 0.1.0` |
+| 当前开发状态 / 运行源码 | 开发分支 `feat/smartfit-coach-tools`，功能开发版本 `0.1.0+6`，源码 `9e94bb513751def6306f8e63313050efd632ccb9`；尚未合 main 或推送。分支从旧 AI 本地收束 `f8799ef` 延续，此前主线见 [后续修复](ugk-trainer-integration.md#后续修复2026-10-20) |
+| 共享训练依赖 | 两项 git 依赖固定 SDK main `09a392bc0b736e6a23eef71d55d86108660e0e59`：`ugk_coach 0.2.0` / `ugk_trainer 0.1.4`；远端 main 已核对，`flutter pub get --enforce-lockfile` 通过。未修改 SDK 或 pub 缓存 |
 | 源码里程碑 | `m7-aesthetic-v2` → `d0b1c7ef6198a469a7f0a7cedcaa7c9f2512dbe7` |
 | 上一阶段文档整理前主线快照 | `d0b1c7ef6198a469a7f0a7cedcaa7c9f2512dbe7`；后续 HEAD 由 Git 查询，不把本表固定 SHA 写成永远最新的 HEAD |
 | PR #3 合并提交 | `a5997ef7aef2695b24cab3f4b330543bbb2c7027` |
 | PR #3 已测源 | `7ef80d75331a150b6a258ef3ba0c27832fd1e54b`；合并树相同，至上述主线快照只增加 3 份文档 |
 | Android 身份 | `com.ugk.smartfit`，App 名「智能健身助手」 |
-| 默认包版本 | 新接口待验版本 `0.1.0+5`：versionName `0.1.0`、versionCode `5`，APK 身份见下表。主线为 `0.1.0+3`，原完整训练测试包为 `0.1.0+2` |
-| 关于页版本 | 新接口目标为 `0.1.0+5 (MVP)`；独立常量见 [about_page.dart](../lib/ui/about_page.dart)，尚未自动读取包版本 |
+| 默认包版本 | 工具会话待验版本 `0.1.0+6`：versionName `0.1.0`、versionCode `6`，APK 身份见下表。主线为 `0.1.0+3`，原完整训练测试包为 `0.1.0+2` |
+| 关于页版本 | `0.1.0+6 (MVP)`；独立常量见 [about_page.dart](../lib/ui/about_page.dart)，尚未自动读取包版本 |
 | 资源版本 | 93 个动作包为 `1.1.0`；公共包 `_common` 为 `1.0.0`；格式版本仍为 `1`，见 [小包规范](drill-pack-spec.md) 与 [索引](../assets/packs/index.json) |
-| 交付状态 | AI `0.1.0+5` debug 包已覆盖安装，保留旧数据；旧 `+4` 包仅作历史记录。此前 `+3` 包见 [后续修复](ugk-trainer-integration.md#后续修复2026-10-20) |
-| 验收状态 | `+5` 的 6 项配置测试及分析通过，旧源全量 180 项此前通过、本轮未重跑。新地址问答通过，三次计划请求均上游失败回退本地；旧 `+4` AI 计划在 `+5` 的保存/局部启动/提前结束/重启保留已观察，新接口计划生成未通过，未完成验收。见 [验收记录](acceptance.md) |
+| 交付状态 | `0.1.0+6` debug 包已构建并安装模拟器，本机保留；用户明确无真机，未上传。旧 `+5/+4` 仅为历史记录 |
+| 验收状态 | 195 项测试与分析通过；模拟器真实 Worker `show_actions` 22.5 秒、`show_plan` 32.4 秒，均首轮通过且 HTTP 1 次；动作详情、计划保存/恢复和原卡进入 trainer 已观察。本阶段核心功能通过，用户后续安装 APK 做真实问答体验，见 [验收记录](acceptance.md) |
 
-Git 标签、App 包版本与资源版本分别管理。`m7` 不代表 Android versionCode 为 7；此前为 `+1` M7、`+2` 训练接入、`+3` 目录节奏修复、`+4` 旧 AI 地址测试；当前新接口待验版本为 `0.1.0+5`。构建命令曾尝试覆盖版本号用于 release，但没有形成可交付 release 包，不能登记为已交付版本。
+Git 标签、App 包版本与资源版本分别管理。`m7` 不代表 Android versionCode 为 7；此前为 `+1` M7、`+2` 训练接入、`+3` 目录节奏修复、`+4` 旧 AI 地址、`+5` 新地址 JSON 信封测试；当前工具会话版本为 `0.1.0+6`。没有形成可交付 release 包。
+
+## 工具会话版本（0.1.0+6）
+
+| 项目 | 记录 |
+| --- | --- |
+| 源码 | `9e94bb513751def6306f8e63313050efd632ccb9`；后续文档提交不改变该运行源码 |
+| APK | `.buildlog/install/SmartFit-coach-tools-0.1.0+6-debug.apk`，229,742,403 bytes |
+| SHA-256 | `7469c492cdc400ba2648dfb837394334ce6c6a507f12c3019d2cce26f787e59b` |
+| 自动化 / 构建 | `flutter test --no-pub` 195 项通过；`flutter analyze --no-pub` 无问题；debug 构建成功 |
+| Worker | API35 模拟器，两个新 SDK 会话各首轮请求：动作卡 22.5 秒、计划卡 32.4 秒，均通过门禁，未发生重交或回落；不推断服务端物理冷启动 |
+| 验收边界 | 按用户后续确认，本阶段只验本次 SDK 新功能跑通，核心链路通过；实际问答体验由用户安装 APK 后继续测试。完整真机/训练/声音不在本轮结论内，合 main / 推送仍须开哥批准 |
 
 ## AI 阶段本地收束（2026-10-21）
 
