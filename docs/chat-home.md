@@ -1,6 +1,6 @@
 # 对话式主界面
 
-主界面只有一段对话：漂在无边的空间里（默认跟随系统，可切换深空或浅色「白色无边空间」，保留已有外观选择），没有标题栏和边框。视觉规范见 [design-language.md](design-language.md)。助手可回复文字、动作卡或计划卡：动作卡点开看详情，计划卡可开始训练或保存。当前分支 `feat/smartfit-coach-032` / `0.1.0+8` 接入 SDK 0.3.2，核心功能已验证、待合并批准。旧 `+7` 证据不替代本轮，App main 仍为 `+6`。AI 未配置或最终失败使用标明「预设方案」的本地模板。
+主界面只有一段对话：漂在无边的空间里（默认跟随系统，可切换深空或浅色「白色无边空间」，保留已有外观选择），没有标题栏和边框。视觉规范见 [design-language.md](design-language.md)。助手可回复文字、动作卡或计划卡：动作卡点开详情，计划卡可开练或保存。当前 main 版本 `0.1.0+8` 接入 SDK 0.3.2，2026-10-21 经开哥授权合入 `ebb0840`，已推送 origin/main 并核对远端一致。旧 `+7` 功能随本次进入主线，旧证据不替代本轮独立验证。AI 最终失败使用「预设方案」。
 
 当前里程碑与验收边界见 [版本管理与台账](version-management.md)。可以直接说「看看动作库」「上次练了什么」「换浅色」「关闭语音」「设置」「重新安全确认」或「自己选条件」；抽屉仅保留已存计划、动作库与设置。这些本地操作和安全门禁优先于 AI，不把模型回复直接当成操作指令。下方截图保留原对话首页的视觉记录，不是本次 AI 真机证据。
 
@@ -25,7 +25,7 @@ lib/ui/chat/                   cosmos（背景）、chat_widgets（气泡/选项
 lib/ui/theme/                  设计 token（颜色/字号/间距/圆角/动效）、Material 主题与 SfPaletteScope、图标、按钮金字塔
 ```
 
-## AI 接入（0.1.0+8 / SDK 0.3.2，核心已验，待合并批准）
+## AI 接入（0.1.0+8 / SDK 0.3.2，核心已验，已合入并推送 main）
 
 `ugk_coach 0.3.2` 与 `ugk_trainer 0.1.4` 的 git ref 均固定 SDK main `b26e4fda807b6ef3db15a61ba30c67fb51dce5e1`。保留 `CoachAgent`、`CoachTurnResult` 和 typed 卡片边界；Agent 读 skill、核对后交付 `show_actions/show_plan`。默认最多 100 逻辑步，同一步重试不占新步骤；`CallOutcome` 没有新增枚举，重试记录使用 `UsageRecord.retry`。BaseURL、模型及鉴权仍为 `https://api.uuugk.win/v1`、`deepseek-v4-flash-0731`、`X-App-Key/X-Device-Id`，App Key 仅经 dart-define 注入，无 Authorization。
 
@@ -93,4 +93,4 @@ App 生命周期内长期持有一个 `CoachSession`，关闭 AI 界面不清空
 
 ## 本轮核心验证
 
-`+8` 的六条新交互均 ok、无回落，真实覆盖重试恢复、slow、记忆持久化与隔离；独立 show_actions 严格补验 4 步、72.908 秒通过，App 接收原准入动作对象，未误交付计划。原六条脚本的臀桥无卡断言失败及 exit 1 如实保留。按 SDK 合法问答契约与补充卡片证据，本轮核心功能已验证；完整指标见 [0.3.2 验证记录](coach-032-smoke-2026-10-21.md)。App main 合并仍待开哥批准。
+`+8` 的六条新交互均 ok、无回落，真实覆盖重试恢复、slow、记忆持久化与隔离；独立 show_actions 严格补验 4 步、72.908 秒通过，App 接收原准入动作对象，未误交付计划。原六条脚本的臀桥无卡断言失败及 exit 1 如实保留。2026-10-21 开哥授权以 `ebb0840` 合 main，合并树等于审核分支 `f0ebafc`，运行源码、测试和 APK 保持 `b393044`，本次未重跑；已推送 origin/main 并核对远端一致。完整指标见 [0.3.2 验证记录](coach-032-smoke-2026-10-21.md)。

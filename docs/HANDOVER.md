@@ -1,16 +1,16 @@
 # 智能健身助手（SmartFit）交接说明
 
-## 当前交接入口（2026-10-21，0.1.0+8 / SDK 0.3.2，核心已验，待合并批准）
+## 当前交接入口（2026-10-21，0.1.0+8 / SDK 0.3.2，已合入并推送 main）
 
-当前分支 `feat/smartfit-coach-032` 从未合的 `+7` 继续，版本 `0.1.0+8`，两项 git ref 固定 SDK main `b26e4fda807b6ef3db15a61ba30c67fb51dce5e1`。App `b39304488e964b22a65501363a15140b5d0ca235` 的 224 项测试、分析、锁文件与 debug 构建通过。六条全新交互均 ok、无回落，记忆三轮有效；另以显式问题严格验证 show_actions，4 步 / 4 请求 / 72.908 秒通过，App 使用同一准入动作对象。原臀桥合法文字导致的严格脚本断言失败和 exit 1 保留，未改写为原脚本全通过。运行代码及 APK 未变，核心功能已验证，App main 仍为 `fd640bb` 的 `+6`，合并待开哥批准。详见 [0.3.2 记录](coach-032-smoke-2026-10-21.md)。
+2026-10-21 开哥明确批准后，`feat/smartfit-coach-032@f0ebafc6257347e62533d98fb5d57f0706ddf6e9` 已以 `ebb0840f479acdf0bdc8a46e41f30eff055a0c1b` 合入 main，版本 `0.1.0+8`，合并树与审核分支一致；已推送 origin/main 并核对远端一致。两项 SDK ref 保持 `b26e4fda807b6ef3db15a61ba30c67fb51dce5e1`，运行源码、224 项测试与 APK 仍绑定 `b39304488e964b22a65501363a15140b5d0ca235`。六条新交互及独立严格动作卡补验通过，原臀桥合法文字导致的脚本断言失败 / exit 1 保留；本次不重新冒烟或改写数据。详见 [0.3.2 记录](coach-032-smoke-2026-10-21.md)。
 
 SDK 默认 100 步、单次 60 秒、整轮 360 秒、每步最多 4 次重试、30 秒慢提示；客户端 `maxRetries=0`，App 外保护 390 秒。新增 `retrying` 序号进度、`contextTooLong` 的整理上下文提示和 `slow`「还在想…」。最终回落区分 `AgentFailureKind` 三类和 `AgentStalled`，保留「预设方案」与 typed 卡片门禁，内部异常不显示。
 
-记忆逐条等待持久化成功后才确认，已确认事实在之后取消/reset 时保留；未确认的迟到保存由 SDK 补偿。`clearMemory()` 保存失败会抛错，不能先提示已清除。关闭和清除保留当前聊天，隔离验证须新对话。本轮已全部新跑六条指定问题并补充严格动作卡证据；取得开哥同意后再合 App main。版本和包身份由 [版本台账](version-management.md) 与 [验收记录](acceptance.md) 维护。
+记忆逐条等待持久化成功后才确认，已确认事实在之后取消/reset 时保留；未确认的迟到保存由 SDK 补偿。`clearMemory()` 保存失败会抛错，不能先提示已清除。关闭和清除保留当前聊天，隔离验证须新对话。六条指定问题和补充卡片证据已独立完成，并已获准合入 App main；已核对远端 main 合并结果。版本和包身份由 [版本台账](version-management.md) 与 [验收记录](acceptance.md) 维护。
 
-## 上一阶段 Skill Agent（0.1.0+7，历史分支已验，未合 App main）
+## 上一阶段 Skill Agent（0.1.0+7，未单独合并，功能随 +8 入主线）
 
-以下保留 `+7` 当时的源码、参数与验收，不描述当前 `+8`。其中「SDK 待合 main」是历史时点；SDK 0.3.2 现已进入 main，App 的 `+7` 分支仍未合并。
+以下保留 `+7` 当时的源码、参数与验收，不描述当前 `+8`。其中「SDK 待合 main」和 App 待审批均是历史时点；`+7` 未独立合并，其功能已随 `+8` 进入 main。
 
 当前开发分支 `feat/smartfit-skill-agent`，功能开发版本 `0.1.0+7`，接入基线为 SDK main `1f8be6e` 的 `ugk_coach 0.3.0`。`AiChatEngine` 将长期会话入口从 `CoachSession` 换为 `CoachAgent`，保留 `CoachTurnResult` 和 typed 卡片交付；SDK 内部按需读取 skill 文件，调用 `check_plan` 后经门禁交付 `show_actions` / `show_plan`。`maxSteps` 使用默认 10，记账穷举处理新增的 `CallOutcome.toolStep`。
 
@@ -22,7 +22,7 @@ BaseURL、模型、App Key 与设备标识规则沿用上一阶段：`https://ap
 
 首次真实 Worker 暴露 SDK 的 `reasoning_content` 续传缺口及响应缺失/null 时也需空字段的协议边界，当时在 SDK 独立分支 `fix/coach-agent-reasoning-replay` 修复并推送 `43dfef637144a1e08b5eda5ed743db0671ba5a8d`。SDK coach 304 项、trainer 126 项测试和两包分析通过；App `5743073691547d44aec891ab6d4a45b5b3fa381b` 当时固定该 commit，217 项测试、分析与锁文件检查通过。App 和 pub 缓存不改 SDK 代码。六类真实 Worker 核心验证在该阶段通过（前三按关闭记忆行为等价复用，后三在 `43dfef6` 实测），记录见 [历史多步验证](coach-agent-smoke-2026-10-21.md)；当时两仓修复均待审批，现状以顶部 `+8` 入口为准。
 
-`+7` 当时完成六类分组验证后等待两仓批准；之后 SDK 0.3.2 已集成进入 main，App `+7` 未合并。当前应按顶部 `+8` 独立终验流程继续，不能沿用旧批准待办或直接复用旧结果。各包身份和阶段证据由 [版本台账](version-management.md) 与 [验收记录](acceptance.md) 维护。
+`+7` 当时完成分组验证后等待两仓批准。现 SDK 0.3.2 已进入 main，App 的这些功能也随独立完成终验的 `+8` 合入；不把旧待办套用为当前审批状态。各历史包身份及证据继续由 [版本台账](version-management.md) 与 [验收记录](acceptance.md) 维护。
 
 ## 上一阶段工具会话接入（0.1.0+6，历史）
 
