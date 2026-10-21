@@ -1,5 +1,12 @@
 # Liquid glass — plan (phase 1: spec + two-screen prototype)
 
+> Integration review (2026-10-21, App `0.1.0+9`): chat and plan-card glass
+> now retain main's CoachAgent and validated-card flow. The training screen
+> uses `ugk_trainer.TrainerPlayer`; only its App background gains the colour
+> field. The local-player glass controls and player screenshots below describe
+> the earlier prototype, not the integrated player. See [PR #4 review](pr4-local-review.md)
+> for the tested source, fixes, screenshots and remaining device checks.
+
 Branch `feat/liquid-glass` on top of `feat/aesthetic-v2` (PR #3). Package
 `liquid_glass_widgets` **1.14.0** (pinned exactly). The iOS 26/27 rule holds
 everywhere: **glass is only the navigation and control layer; content stays
