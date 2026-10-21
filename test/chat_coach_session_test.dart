@@ -23,13 +23,17 @@ import 'package:ugk_coach/ugk_coach.dart' as coach;
 import 'app_flow_test.dart' show services, tall;
 import 'support.dart';
 
-class _SessionEngine implements ManagedChatEngine, RestorableChatEngine {
+class _SessionEngine
+    implements ManagedChatEngine, RestorableChatEngine, ProgressChatEngine {
   _SessionEngine(this.gate);
   final coach.ToolGate gate;
   final pending = <Completer<ChatReply>>[];
   final states = <ChatState>[];
   int cancellations = 0;
   int resets = 0;
+  final eventBus = StreamController<coach.AgentEvent>.broadcast(sync: true);
+  @override
+  Stream<coach.AgentEvent> get events => eventBus.stream;
   @override
   String get id => 'test-session';
   @override
@@ -45,7 +49,7 @@ class _SessionEngine implements ManagedChatEngine, RestorableChatEngine {
   @override
   void reset() => resets++;
   @override
-  void dispose() {}
+  void dispose() => unawaited(eventBus.close());
   @override
   coach.ValidatedActions? restoreActions(List<String> ids) => gate.check('', [
     coach.LlmToolCall(
@@ -118,6 +122,7 @@ void main() {
       replyDelay: Duration.zero,
     )..start();
     addTearDown(chat.dispose);
+    addTearDown(engine.dispose);
     return (chat, engine, app);
   }
 
@@ -133,6 +138,42 @@ void main() {
         home: ChatHomePage(controller: chat),
       ),
     ),
+  );
+
+  testWidgets(
+    'Agent progress shows reading and checking, cancellation hides late events',
+    (tester) async {
+      tall(tester);
+      final (chat, engine, app) = await setup();
+      await showChat(tester, chat, app);
+      final pending = chat.send('给我排计划');
+      engine.eventBus.add(
+        const coach.AgentEvent('turn', coach.AgentEventKind.reading, step: 1),
+      );
+      await tester.pump();
+      expect(find.text('正在查动作库'), findsOneWidget);
+      engine.eventBus.add(
+        const coach.AgentEvent('turn', coach.AgentEventKind.checking, step: 2),
+      );
+      await tester.pump();
+      expect(find.text('正在核对计划'), findsOneWidget);
+      await tester.tap(find.byKey(const ValueKey('chat-cancel')));
+      await tester.pump();
+      engine.eventBus.add(
+        const coach.AgentEvent('turn', coach.AgentEventKind.reading, step: 3),
+      );
+      expect(chat.progressLabel, isNull);
+      engine.pending.single.complete(
+        ChatReply(
+          messages: const [BotMessage('迟到')],
+          state: engine.states.single,
+        ),
+      );
+      await pending;
+      await tester.pumpAndSettle();
+      expect(find.text('迟到'), findsNothing);
+      expect(find.text('正在查动作库'), findsNothing);
+    },
   );
 
   test(
@@ -290,7 +331,7 @@ void main() {
       final pending = chat.send('排个计划');
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 450));
-      expect(find.text('首轮生成计划可能需要 75–120 秒'), findsOneWidget);
+      expect(find.text('助理会分步查动作和核对计划，可能需要几分钟'), findsOneWidget);
       expect(
         tester.widget<ChatInputBar>(find.byType(ChatInputBar)).enabled,
         isFalse,

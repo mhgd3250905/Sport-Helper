@@ -437,6 +437,11 @@ abstract interface class ManagedChatEngine implements ChatEngine {
   void dispose();
 }
 
+/// Typed SDK progress only; intermediate model output never enters the UI.
+abstract interface class ProgressChatEngine implements ChatEngine {
+  Stream<coach.AgentEvent> get events;
+}
+
 /// Re-admits stored card IDs/plans through the current SDK and profile.
 abstract interface class RestorableChatEngine implements ChatEngine {
   coach.ValidatedActions? restoreActions(List<String> ids);

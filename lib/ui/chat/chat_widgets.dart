@@ -344,8 +344,9 @@ class TimeMark extends StatelessWidget {
 
 /// Three soft dots while the assistant "thinks".
 class TypingBubble extends StatefulWidget {
-  const TypingBubble({super.key, this.onCancel});
+  const TypingBubble({super.key, this.onCancel, this.progressLabel});
   final VoidCallback? onCancel;
+  final String? progressLabel;
   @override
   State<TypingBubble> createState() => _TypingBubbleState();
 }
@@ -410,9 +411,9 @@ class _TypingBubbleState extends State<TypingBubble>
           ),
           if (widget.onCancel != null) ...[
             const SizedBox(height: SfSpace.x3),
-            Text('正在准备回复…', style: SfType.body),
+            Text(widget.progressLabel ?? '正在准备回复…', style: SfType.body),
             const SizedBox(height: SfSpace.x1),
-            Text('首轮生成计划可能需要 75–120 秒', style: SfType.caption),
+            Text('助理会分步查动作和核对计划，可能需要几分钟', style: SfType.caption),
             SfTextAction(
               key: const ValueKey('chat-cancel'),
               label: '取消',
