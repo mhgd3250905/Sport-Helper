@@ -2,6 +2,8 @@
 // a set is 240 px, one move is 130 px; the move list lives on the plan page
 // (no in-chat 展开全部), and save / start stay reachable; the icon-only ▶
 // sits at the card's bottom-right (strip end folded, 保存 row unfolded).
+// Unfolding a set drops the hero: it morphs into row 1's thumbnail and the
+// card becomes a compact header + the list.
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smartfit/chat/chat_models.dart';
@@ -193,10 +195,15 @@ void main() {
     // Mid-unfold (~100 ms of 320): the ▶ has faded out where it was (it
     // never slides over the rows), thumbnails are in flight and no row
     // text is showing yet.
-    await tester.pump(const Duration(milliseconds: 100));
+    // One frame in, the hero has just lifted off (still nearly full size).
+    await tester.pump(const Duration(milliseconds: 16));
+    final heroRects = [_heroRect(tester)!];
+    _expectNoOverlap(tester, plan.items.length);
+    await tester.pump(const Duration(milliseconds: 84));
     expect(tester.takeException(), isNull);
     expect(_startOpacity(tester), lessThan(.02));
     expect(find.byKey(const ValueKey('fly-0')), findsOneWidget);
+    if (_heroRect(tester) case final r?) heroRects.add(r);
     for (var i = 0; i < plan.items.length; i++) {
       expect(
         _textOpacity(tester, i),
@@ -208,13 +215,56 @@ void main() {
       await tester.pump(const Duration(milliseconds: 16));
       expect(tester.takeException(), isNull);
       _expectNoOverlap(tester, plan.items.length);
+      if (_heroRect(tester) case final r?) heroRects.add(r);
     }
     await tester.pumpAndSettle();
     expect(_startOpacity(tester), 1);
-    expect(
-      tester.getSize(card).height,
-      greaterThan(PlanCard.setHeight + 48.0 * plan.items.length),
+    // The hero is gone: it became row 1's thumbnail. Mid-flight its frame
+    // only ever shrank and closed in on that slot, ending on it.
+    expect(find.byKey(const ValueKey('plan-hero')), findsNothing);
+    expect(find.byKey(const ValueKey('fly-hero')), findsNothing);
+    final row0 = tester.getRect(
+      find
+          .descendant(
+            of: find.byKey(const ValueKey('plan-row-0')),
+            matching: find.byType(ClipRRect),
+          )
+          .first,
     );
+    expect(row0.size, const Size.square(40));
+    expect(heroRects.first.width, greaterThan(150));
+    for (var i = 1; i < heroRects.length; i++) {
+      expect(
+        heroRects[i].width,
+        lessThanOrEqualTo(heroRects[i - 1].width + .01),
+      );
+      expect(
+        (heroRects[i].center - row0.center).distance,
+        lessThanOrEqualTo((heroRects[i - 1].center - row0.center).distance + .01),
+      );
+    }
+    expect((heroRects.last.center - row0.center).distance, lessThan(4));
+    expect(heroRects.last.width, closeTo(40, 2));
+    // Header + rows only: no hero, no gap (r8 was > 240 + 48 per row).
+    final n = plan.items.length;
+    final openH = tester.getSize(card).height;
+    expect(openH, lessThan(PlanCard.setHeight + 48.0 * n));
+    expect(openH, greaterThanOrEqualTo(12 + 56 + 48.0 * n + 70));
+    expect(openH, lessThanOrEqualTo(12 + 56 + 48.0 * n + 110));
+    // The header carries the title (once) at the card's top.
+    final title = find.descendant(of: card, matching: find.text(plan.title));
+    expect(title, findsOneWidget);
+    expect(
+      tester.getRect(title).top - tester.getRect(card).top,
+      lessThan(40),
+    );
+    expect(
+      tester.getRect(title).bottom,
+      lessThanOrEqualTo(row0.top),
+    );
+    // Last row fully inside the card, above the 保存 row.
+    final lastRow = tester.getRect(find.byKey(ValueKey('plan-row-${n - 1}')));
+    expect(lastRow.bottom, lessThanOrEqualTo(tester.getRect(card).bottom));
     final save = find.byKey(ValueKey('plan-save-${plan.id}'));
     expect(save, findsOneWidget);
     expect(find.byKey(ValueKey('plan-details-${plan.id}')), findsNothing);
@@ -333,8 +383,9 @@ void main() {
     await tester.pumpAndSettle();
     expect(
       tester.getSize(card).height,
-      greaterThan(PlanCard.setHeight + 48.0 * plan.items.length),
+      greaterThan(56 + 48.0 * plan.items.length),
     );
+    expect(find.byKey(const ValueKey('plan-hero')), findsNothing);
     final r = tester.getRect(card),
         sr = tester.getRect(find.byKey(ValueKey('plan-start-${plan.id}')));
     expect(r.right - sr.right, lessThan(16));
@@ -360,9 +411,24 @@ double _textOpacity(WidgetTester tester, int i) {
   return tester.widget<FadeTransition>(f).opacity.value;
 }
 
-/// No flying thumbnail is ever over a row's visible text.
+Rect? _heroRect(WidgetTester tester) {
+  final f = find.byKey(const ValueKey('fly-hero'));
+  if (f.evaluate().isEmpty) return null;
+  return tester.getRect(
+    find.descendant(of: f, matching: find.byType(ClipRRect)).first,
+  );
+}
+
+double _headerOpacity(WidgetTester tester) {
+  final f = find.byKey(const ValueKey('plan-header-fade'));
+  if (f.evaluate().isEmpty) return 0;
+  return tester.widget<FadeTransition>(f).opacity.value;
+}
+
+/// No flying thumbnail (nor the hero) is ever over a row's visible text or
+/// the visible header.
 void _expectNoOverlap(WidgetTester tester, int rows) {
-  final flyers = <Rect>[];
+  final flyers = <Rect>[?_heroRect(tester)];
   for (var k = 0; k < rows; k++) {
     final f = find.byKey(ValueKey('fly-$k'));
     if (f.evaluate().isEmpty) continue;
@@ -373,6 +439,17 @@ void _expectNoOverlap(WidgetTester tester, int rows) {
     );
   }
   if (flyers.isEmpty) return;
+  if (_headerOpacity(tester) > 0) {
+    final header = tester.getRect(
+      find.descendant(
+        of: find.byKey(const ValueKey('plan-header')),
+        matching: find.byType(Column),
+      ).first,
+    );
+    for (final r in flyers) {
+      expect(r.deflate(.5).overlaps(header), isFalse, reason: 'over header');
+    }
+  }
   for (var i = 0; i < rows; i++) {
     if (_textOpacity(tester, i) <= 0) continue;
     final text = tester.getRect(
