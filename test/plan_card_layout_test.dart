@@ -1,7 +1,7 @@
 // Chat cards have fixed, compact heights by type (like link-share cards):
 // a set is 240 px, one move is 130 px; the move list lives on the plan page
-// (no in-chat 展开全部), and save / start stay reachable; start sits at the
-// end of the bottom line, details are the card itself.
+// (no in-chat 展开全部), and save / start stay reachable; the icon-only ▶
+// sits at the card's bottom-right (strip end folded, 保存 row unfolded).
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smartfit/chat/chat_models.dart';
@@ -65,7 +65,7 @@ void main() {
     expect(start, findsOneWidget);
     final startNode = find.bySemanticsLabel('开始训练');
     expect(startNode, findsOneWidget);
-    expect(tester.getSemantics(startNode), containsSemantics(label: '开始训练', isButton: true, hasTapAction: true));
+    expect(tester.getSemantics(startNode), isSemantics(label: '开始训练', isButton: true, hasTapAction: true));
     // One bottom row: thumbnails (+N) then 开始训练 at its right end; no
     // separate 详情 entry on the compact card.
     expect(find.descendant(of: card, matching: find.text('详情')), findsNothing);
@@ -73,6 +73,10 @@ void main() {
     final cardRect = tester.getRect(card);
     final startRect = tester.getRect(start);
     expect(startRect.height, greaterThanOrEqualTo(44));
+    // Icon-only round ▶: no visible text, the label lives in Semantics.
+    expect(find.descendant(of: start, matching: find.text('开始训练')), findsNothing);
+    expect(tester.getSize(find.descendant(of: start, matching: find.byKey(const ValueKey('start-disc')))).width,
+        greaterThanOrEqualTo(48));
     expect(cardRect.right - startRect.right, lessThan(16));
     expect(cardRect.bottom - startRect.bottom, lessThan(16));
     if (plan.items.length > 5) {
@@ -86,16 +90,28 @@ void main() {
       hasTapAction: true, hasFocusAction: true, hasExpandedState: true, isExpanded: false, isFocusable: true,
     ));
 
-    // Expand in place: the full list and 保存 appear; the card grows; the
-    // one 开始训练 stays put (no second start, no 详情 row).
+    // Expand in place: thumbnails fly into the rows mid-way without
+    // errors; then the full list and 保存 appear and the one ▶ sits on the
+    // bottom row at its right end, level with 保存 (no 详情, no start pill
+    // under the hero).
     await tester.tap(toggle);
+    for (var i = 0; i < 6; i++) {
+      await tester.pump(const Duration(milliseconds: 60));
+      expect(tester.takeException(), isNull);
+    }
     await tester.pumpAndSettle();
     expect(tester.getSize(card).height, greaterThan(PlanCard.setHeight + 48.0 * plan.items.length));
-    expect(find.byKey(ValueKey('plan-save-${plan.id}')), findsOneWidget);
+    final save = find.byKey(ValueKey('plan-save-${plan.id}'));
+    expect(save, findsOneWidget);
     expect(find.byKey(ValueKey('plan-details-${plan.id}')), findsNothing);
+    expect(find.descendant(of: card, matching: find.text('详情')), findsNothing);
     expect(start, findsOneWidget);
-    // Same spot on the card (the chat may scroll as the card grows).
-    expect(tester.getRect(start).topLeft - tester.getRect(card).topLeft, startRect.topLeft - cardRect.topLeft);
+    expect(find.bySemanticsLabel('开始训练'), findsOneWidget);
+    final open = tester.getRect(card), sr = tester.getRect(start), sv = tester.getRect(save);
+    expect(open.right - sr.right, lessThan(16));
+    expect(open.bottom - sr.bottom, lessThan(16));
+    expect((sr.center.dy - sv.center.dy).abs(), lessThan(4));
+    expect(sv.left - open.left, lessThan(24));
     expect(tester.getSemantics(toggle), matchesSemantics(
       label: '收起详情', isButton: true, hasEnabledState: true, isEnabled: true,
       hasTapAction: true, hasFocusAction: true, hasExpandedState: true, isExpanded: true, isFocusable: true,
@@ -106,8 +122,11 @@ void main() {
 
     // Collapse back to the compact 240 px card.
     await tester.tap(toggle);
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(tester.takeException(), isNull);
     await tester.pumpAndSettle();
     expect(tester.getSize(card).height, PlanCard.setHeight);
+    expect(tester.getRect(start).topLeft - tester.getRect(card).topLeft, startRect.topLeft - cardRect.topLeft);
 
     // The card itself opens the plan page, where every move is listed.
     await tester.tap(find.byKey(ValueKey('plan-open-${plan.id}')));
@@ -145,6 +164,32 @@ void main() {
     await tester.pumpAndSettle();
     expect(s.store.savedPlans.single.plan.id, 'single-move');
     expect(find.text('已保存'), findsOneWidget);
+    await tester.pumpWidget(const SizedBox());
+  });
+
+  testWidgets('reduced motion: unfold is a plain cross-fade, same end state', (tester) async {
+    tall(tester);
+    tester.platformDispatcher.accessibilityFeaturesTestValue = const FakeAccessibilityFeatures(disableAnimations: true);
+    addTearDown(tester.platformDispatcher.clearAccessibilityFeaturesTestValue);
+    final s = services();
+    await s.store.acceptSafety(blocked: false);
+    s.chat.start();
+    await s.chat.send('在家 15 分钟练核心，徒手');
+    final plan = s.chat.currentPlan!;
+    await tester.pumpWidget(SmartFitApp(services: s));
+    await tester.pumpAndSettle();
+    final card = find.byType(PlanCard);
+    await tester.tap(find.byKey(ValueKey('plan-expand-${plan.id}')));
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(tester.takeException(), isNull);
+    await tester.pumpAndSettle();
+    expect(tester.getSize(card).height, greaterThan(PlanCard.setHeight + 48.0 * plan.items.length));
+    final r = tester.getRect(card), sr = tester.getRect(find.byKey(ValueKey('plan-start-${plan.id}')));
+    expect(r.right - sr.right, lessThan(16));
+    expect(r.bottom - sr.bottom, lessThan(16));
+    await tester.tap(find.byKey(ValueKey('plan-expand-${plan.id}')));
+    await tester.pumpAndSettle();
+    expect(tester.getSize(card).height, PlanCard.setHeight);
     await tester.pumpWidget(const SizedBox());
   });
 }
