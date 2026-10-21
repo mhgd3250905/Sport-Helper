@@ -11,7 +11,11 @@
 
 ## 版本与验收入口
 
-当前主线版本 `0.1.0+8`，**2026-10-21 经开哥授权，已以 `ebb0840f479acdf0bdc8a46e41f30eff055a0c1b` 合入 main**，已推送 origin/main 并核对远端一致。合并树与审核分支 `feat/smartfit-coach-032@f0ebafc6257347e62533d98fb5d57f0706ddf6e9` 完全一致；两项 git ref 固定 SDK main `b26e4fda807b6ef3db15a61ba30c67fb51dce5e1`。运行源码、224 项测试和 APK 仍绑定 `b39304488e964b22a65501363a15140b5d0ca235`，未重新构建或冒烟。六条真实交互均 ok、无回落，独立动作卡严格补验通过；原臀桥合法文字导致的脚本断言失败 / exit 1 保留。完整证据见 [0.3.2 记录](docs/coach-032-smoke-2026-10-21.md)、[版本台账](docs/version-management.md) 与 [验收记录](docs/acceptance.md)。
+当前主线为 `0.1.0+9` / Liquid Glass。2026-10-21 经开哥授权审核、修复并合并 [PR #4](https://github.com/mhgd3250905/Sport-Helper/pull/4)，合并提交 `561ea8cc69efa38d07c03169c257e8fa4116bc72`。237 项测试、分析 0 issue、Web 与 Android debug 构建通过，实际浏览器验证深浅色计划卡及共享训练流程。保留 CoachAgent 0.3.2 和 SDK 门禁，修复大字体溢出。截图、包身份和未测设备性能边界见 [PR #4 审核记录](docs/pr4-local-review.md)。以下 `+8` 数据描述之前的 SDK 接入验收，不替代当前 UI 版本。
+
+### SDK 0.3.2 接入阶段（0.1.0+8，历史）
+
+SDK 接入阶段版本 `0.1.0+8`，**2026-10-21 经开哥授权，已以 `ebb0840f479acdf0bdc8a46e41f30eff055a0c1b` 合入 main**，已推送 origin/main 并核对远端一致。合并树与审核分支 `feat/smartfit-coach-032@f0ebafc6257347e62533d98fb5d57f0706ddf6e9` 完全一致；两项 git ref 固定 SDK main `b26e4fda807b6ef3db15a61ba30c67fb51dce5e1`。运行源码、224 项测试和 APK 仍绑定 `b39304488e964b22a65501363a15140b5d0ca235`，未重新构建或冒烟。六条真实交互均 ok、无回落，独立动作卡严格补验通过；原臀桥合法文字导致的脚本断言失败 / exit 1 保留。完整证据见 [0.3.2 记录](docs/coach-032-smoke-2026-10-21.md)、[版本台账](docs/version-management.md) 与 [验收记录](docs/acceptance.md)。
 
 App 生命周期内长期持有一个 `CoachAgent`，关闭 AI 界面保留会话，「新对话」取消并 `reset()`；请求中禁用发送并可取消，作废结果不显示。纯文字、动作卡与计划卡仍只用 SDK 接纳的文字、`ValidatedActions`、`ValidatedPlan`，恢复卡片重新过门禁。SDK 默认最多 100 逻辑步、单次请求 60 秒、整轮 360 秒、每步最多 4 次重试，30 秒发慢提示；客户端 `maxRetries=0`，重试由 Agent 负责，App 外保护为 390 秒。`reading/checking` 显示查库/核对计划，`retrying` 显示重试序号，`contextTooLong` 单独提示整理上下文，`slow` 显示「还在想…」。最终失败按重试用尽、不可重试、整轮超时或空转区分「预设方案」文案，不展示内部异常。
 

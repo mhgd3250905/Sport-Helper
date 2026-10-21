@@ -2,6 +2,8 @@
 
 审核对象：[Liquid Glass 聊天首页与计划卡片改版（深浅色）](https://github.com/mhgd3250905/Sport-Helper/pull/4)。用户明确授权审核并合并。完成冲突处理和下述修复后，本次 AI 结论为可合并；未向 GitHub 提交独立 review 或评论，平台合并状态以 PR 为准。
 
+最终结果：PR 状态已核对为 MERGED，最终 head `67d1a731281ea5b865e6d5fd2fb2253e0a464795`、目标基线 `530686e224adf34d1e748cde35b4fb5575d6fe3d`，GitHub 合并提交 `561ea8cc69efa38d07c03169c257e8fa4116bc72`。本地主线已快进同步，合并整个树等于最终 PR head；本次后续只同步文档台账，运行代码和上述 APK 不变。
+
 ## 固定版本
 
 | 项目 | SHA / 状态 |

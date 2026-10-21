@@ -6,23 +6,34 @@
 
 | 项目 | 当前事实 / 事实来源 |
 | --- | --- |
-| 主线与合并 | 2026-10-21 经开哥授权，以 `ebb0840f479acdf0bdc8a46e41f30eff055a0c1b` 合入 main，版本 `0.1.0+8`；已推送 origin/main 并核对远端一致。旧 `+7` 未单独合并，其功能随本次进入主线 |
-| 审核分支 / 运行源码 | `feat/smartfit-coach-032@f0ebafc6257347e62533d98fb5d57f0706ddf6e9`，合并树与其完全一致。运行源码、测试及 APK 继续绑定 `b39304488e964b22a65501363a15140b5d0ca235`，不为合并重跑烟测或改包 |
+| 主线与合并 | 2026-10-21 经开哥授权审核修复 PR #4，以 `561ea8cc69efa38d07c03169c257e8fa4116bc72` 合入并推送 main，版本 `0.1.0+9`；合并树与最终 PR head 一致 |
+| 审核分支 / 运行源码 | `feat/liquid-glass@67d1a731281ea5b865e6d5fd2fb2253e0a464795`；已测运行源码 `829381ffa19b737a6c146c8c73b33394937665b1`，其后仅审核文档及截图，APK 与代码不变 |
 | 共享训练依赖 | `ugk_coach 0.3.2` / `ugk_trainer 0.1.4` 的 git ref 均固定 SDK main 具体提交 `b26e4fda807b6ef3db15a61ba30c67fb51dce5e1`；不使用 path 或分支名。App 不复制、内嵌或 patch SDK，不修改 pub 缓存 |
 | 源码里程碑 | `m7-aesthetic-v2` → `d0b1c7ef6198a469a7f0a7cedcaa7c9f2512dbe7` |
 | 上一阶段文档整理前主线快照 | `d0b1c7ef6198a469a7f0a7cedcaa7c9f2512dbe7`；后续 HEAD 由 Git 查询，不把本表固定 SHA 写成永远最新的 HEAD |
 | PR #3 合并提交 | `a5997ef7aef2695b24cab3f4b330543bbb2c7027` |
 | PR #3 已测源 | `7ef80d75331a150b6a258ef3ba0c27832fd1e54b`；合并树相同，至上述主线快照只增加 3 份文档 |
 | Android 身份 | `com.ugk.smartfit`，App 名「智能健身助手」 |
-| 默认包版本 | 当前 main 版本 `0.1.0+8`：versionName `0.1.0`、versionCode `8`；`pubspec.yaml` 与关于页同步。旧 `+7`、`+6` 等包身份各自保留 |
-| 关于页版本 | `0.1.0+8 (MVP)`；独立常量见 [about_page.dart](../lib/ui/about_page.dart)，尚未自动读取包版本 |
+| 默认包版本 | 当前 main `0.1.0+9`：versionName `0.1.0`、versionCode `9`；pubspec 与关于页同步，旧 +8 等身份保留为历史 |
+| 关于页版本 | `0.1.0+9 (MVP)`；独立常量见 [about_page.dart](../lib/ui/about_page.dart) |
 | 资源版本 | 93 个动作包为 `1.1.0`；公共包 `_common` 为 `1.0.0`；格式版本仍为 `1`，见 [小包规范](drill-pack-spec.md) 与 [索引](../assets/packs/index.json) |
-| 交付状态 | `+8` debug APK 已在本机保留并登记身份，尚无本轮真机验收；旧 `+7` 只作历史 |
-| 验收状态 | App `b393044` 的 224 项测试、分析、锁文件与 debug 构建通过；六条新交互均 ok、无回落，独立严格动作卡补验通过。原六条脚本因合法文字无卡而失败的断言 / exit 1 不改写；本轮核心已验，见 [0.3.2 记录](coach-032-smoke-2026-10-21.md) |
+| 交付状态 | +9 debug APK 已复制到本机安装目录，208,025,947 bytes；本轮无新增真机帧率或持续训练测量 |
+| 验收状态 | 237 测试、分析 0 issue、严格锁文件、Web/Android 构建通过；真实浏览器正式着色器深浅色计划/保存/新对话及 SDK 播放器提前结束返回通过，见 [PR #4 审核](pr4-local-review.md) |
 
-Git 标签、App 包版本与资源版本分别管理。`m7` 不代表 Android versionCode 为 7；此前为 `+1` M7、`+2` 训练接入、`+3` 目录节奏修复、`+4/+5` JSON 信封、`+6` 工具会话、`+7` 首次 Skill Agent 分支；当前 SDK 0.3.2 接入开发版本为 `0.1.0+8`。没有形成可交付 release 包。
+Git 标签、App 包版本与资源版本分别管理。`m7` 不代表 Android versionCode 为 7；此前为 `+1` M7、`+2` 训练接入、`+3` 目录节奏修复、`+4/+5` JSON 信封、`+6` 工具会话、`+7` 首次 Skill Agent 分支；SDK 0.3.2 接入阶段为 `0.1.0+8`，当前 UI 主线为 `0.1.0+9`。没有形成可交付 release 包。
 
-## SDK 0.3.2 接入（0.1.0+8，核心已验，已合入并推送 main）
+## Liquid Glass（0.1.0+9，PR #4 已审核合并）
+
+| 项目 | 当前 +9 debug 包身份 |
+| --- | --- |
+| 源码 / 合并 | 已测 `829381ffa19b737a6c146c8c73b33394937665b1`；最终 PR head `67d1a73`；GitHub 合并 `561ea8c`，整树一致 |
+| APK | `.buildlog/install/SmartFit-liquid-glass-0.1.0+9-debug.apk`，主项目本机忽略目录保留 |
+| 字节数 / SHA-256 | 208,025,947 bytes；`46f5ffc77b64774ef7cb2ee2634d0ab3a819a4367521becca0168cba9875de16` |
+| Android 身份 | `com.ugk.smartfit`，versionName `0.1.0`、versionCode `9`，minSdk `24`、targetSdk `36`，debug |
+| 日志 / 审核 | 隔离副本 `.buildlog/pr4-tests-final.log`、`pr4-analyze-final.log`、`pr4-web-build.log`、`pr4-android-debug-build.log`；[审核与截图](pr4-local-review.md) |
+| 边界 | 大字体溢出已修复，AI/门禁和共享播放器保留；没有新增真实 Worker 或 Android 真机性能结论，旧 +8 的六条数据不改写 |
+
+## SDK 0.3.2 接入（0.1.0+8，历史，已合入并推送 main）
 
 沿用 SDK 默认 `maxSteps=100`、`requestTimeout=60s`、`turnTimeout=360s`、`maxRequestRetries=4`、`slowAfter=30s`；客户端 `maxRetries=0`，Agent 负责步级重试，App 外保护为 390 秒。`retrying` 显示 n/max，`contextTooLong` 的 1/1 特例显示整理上下文，`slow` 显示「还在想…」。回落区分三种 `AgentFailureKind` 和 `AgentStalled`，不渲染异常。
 
