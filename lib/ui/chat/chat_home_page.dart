@@ -187,8 +187,15 @@ class _ChatHomePageState extends State<ChatHomePage> {
           onStart: (p, from) => _fromDrawer(() => _start(p.plan, from: from)),
           // Nothing saved yet: close the drawer and put the cursor in the chat.
           onCompose: () => _fromDrawer(() async => _input.requestFocus()),
-          // §4: two quiet rows; the form now opens from the chat (「自己选条件」).
+          // Session and App actions stay in the drawer; the conversation has
+          // no persistent header. The form opens from 「自己选条件」.
           footer: [
+            DrawerEntry(
+              key: const ValueKey('chat-new-conversation'),
+              icon: SfGlyph.sparkle,
+              label: '新对话',
+              onTap: () => _fromDrawer(_chat.newConversation),
+            ),
             DrawerEntry(
               key: const ValueKey('drawer-library'),
               icon: SfGlyph.grid,
@@ -227,32 +234,7 @@ class _ChatHomePageState extends State<ChatHomePage> {
                               fit: StackFit.expand,
                               children: [
                                 const SfGlassField(),
-                                SafeArea(
-                                  bottom: false,
-                                  child: Column(
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: SfSpace.x4,
-                                        ),
-                                        child: Align(
-                                          alignment: Alignment.centerRight,
-                                          child: SfTextAction(
-                                            key: const ValueKey(
-                                              'chat-new-conversation',
-                                            ),
-                                            label: '新对话',
-                                            icon: SfGlyph.sparkle,
-                                            onPressed: () => unawaited(
-                                              _chat.newConversation(),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      Expanded(child: _messages()),
-                                    ],
-                                  ),
-                                ),
+                                SafeArea(bottom: false, child: _messages()),
                               ],
                             ),
                           ),

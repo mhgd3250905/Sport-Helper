@@ -298,6 +298,10 @@ void main() {
       );
       await tester.pump();
       expect(find.text('正在核对计划'), findsOneWidget);
+      await tester.tap(find.byKey(const ValueKey('open-plans')));
+      // The pending reply keeps its typing animation running behind the drawer.
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 350));
       await tester.tap(find.byKey(const ValueKey('chat-new-conversation')));
       await tester.pumpAndSettle();
       expect(chat.progressLabel, isNull);
@@ -552,6 +556,9 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('会话仍在'), findsOneWidget);
       expect(engine.resets, 0);
+      expect(find.byKey(const ValueKey('chat-new-conversation')), findsNothing);
+      await tester.tap(find.byKey(const ValueKey('open-plans')));
+      await tester.pumpAndSettle();
       await tester.tap(find.byKey(const ValueKey('chat-new-conversation')));
       await tester.pumpAndSettle();
       expect(find.text('会话仍在'), findsNothing);

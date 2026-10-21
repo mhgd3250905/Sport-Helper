@@ -190,6 +190,9 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('还在想…').hitTestable(), findsOneWidget);
       final newChat = find.byKey(const ValueKey('chat-new-conversation'));
+      expect(newChat, findsNothing);
+      await tester.tap(find.byKey(const ValueKey('open-plans')));
+      await tester.pumpAndSettle();
       expect(newChat.hitTestable(), findsOneWidget);
       await tester.tap(newChat);
       await tester.pumpAndSettle();

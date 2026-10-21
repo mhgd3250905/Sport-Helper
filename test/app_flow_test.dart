@@ -355,11 +355,12 @@ void main() {
     await tester.pumpAndSettle();
     expect(s.chat.messages.last.plan?.id, plan.id); // shown again as a card
 
-    // §4: the drawer keeps two rows (动作库 · 设置); the form opens from the chat.
+    // New conversation is in the drawer; the form opens from the chat.
     await tester.tap(find.byKey(const ValueKey('open-plans')));
     await tester.pumpAndSettle();
     expect(find.byKey(const ValueKey('drawer-library')), findsOneWidget);
     expect(find.byKey(const ValueKey('drawer-about')), findsOneWidget);
+    expect(find.byKey(const ValueKey('chat-new-conversation')), findsOneWidget);
     expect(find.byKey(const ValueKey('drawer-custom')), findsNothing);
     await tester.tap(find.byKey(const ValueKey('drawer-library')));
     await tester.pumpAndSettle();
