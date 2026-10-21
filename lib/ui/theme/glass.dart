@@ -128,7 +128,7 @@ class SfGlassSurface extends StatelessWidget {
         ? const LiquidOval()
         : LiquidRoundedSuperellipse(borderRadius: radius!);
     final q = SfGlass.resolve(quality);
-    return GlassContainer(
+    final glass = GlassContainer(
       useOwnLayer: true,
       settings: SfGlass.materialFor(q),
       quality: q,
@@ -137,6 +137,29 @@ class SfGlassSurface extends StatelessWidget {
       height: height,
       padding: padding,
       child: child,
+    );
+    if (!SfColors.isDark) return glass;
+    // Dark: a calm hairline rim so clear glass still has an edge on the
+    // neutral sky (light mode unchanged).
+    return Stack(
+      fit: StackFit.passthrough,
+      children: [
+        glass,
+        Positioned.fill(
+          child: IgnorePointer(
+            child: DecoratedBox(
+              decoration: ShapeDecoration(
+                shape: radius == null
+                    ? const StadiumBorder(side: BorderSide(color: Color(0x1FFFFFFF), width: .8))
+                    : RoundedSuperellipseBorder(
+                        borderRadius: BorderRadius.circular(radius!),
+                        side: const BorderSide(color: Color(0x1FFFFFFF), width: .8),
+                      ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -190,6 +213,22 @@ class SfGlassField extends StatelessWidget {
     // faint jade band across the input zone and a cool wash up top. Light
     // mode uses deeper, more saturated stops (pale pools vanish on paper).
     const skyDeep = Color(0xFF3F6FB0);
+    // Dark (round 4): no jade/sky field — the colour pools read muddy on a
+    // deep sky. Two near-invisible neutral lifts keep a little for the glass
+    // to bend; the rim hairline (SfGlassSurface) does the rest.
+    if (dark) {
+      return IgnorePointer(
+        child: RepaintBoundary(
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              pool(const Alignment(0, 1.1), 1.1, Colors.white, .045),
+              pool(const Alignment(-.8, -.9), .9, Colors.white, .025),
+            ],
+          ),
+        ),
+      );
+    }
     return IgnorePointer(
       child: RepaintBoundary(
         child: Stack(

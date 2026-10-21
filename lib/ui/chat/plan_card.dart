@@ -140,7 +140,7 @@ class _PlanCardState extends State<PlanCard> with SingleTickerProviderStateMixin
       key: ValueKey('plan-expand-${p.id}'),
       expanded: _expanded,
       turns: _t,
-      onMedia: !single,
+      onMedia: !single && !SfCutouts.has(moves.firstOrNull),
       onTap: _toggle,
     );
     final Widget body = single
@@ -433,13 +433,33 @@ class _CueRow extends StatelessWidget {
 
 /// The cover image on its stage colour; settles from 1.04 as a card lands.
 class _Media extends StatelessWidget {
-  const _Media({required this.exercise, this.landing = false});
+  const _Media({required this.exercise, this.landing = false, this.cutout = false});
   final Exercise? exercise;
   final bool landing;
+
+  /// The keyed figure straight on the glass (no stage box), when [exercise]
+  /// has one ([SfCutouts]); otherwise the boxed cover as before.
+  final bool cutout;
 
   @override
   Widget build(BuildContext context) {
     final e = exercise;
+    if (cutout && e != null && SfCutouts.has(e)) {
+      final reduced = SfMotion.reduced(context);
+      return TweenAnimationBuilder<double>(
+        tween: Tween(begin: landing && !reduced ? 1.04 : 1, end: 1),
+        duration: const Duration(milliseconds: 600),
+        curve: SfMotion.standard,
+        builder: (_, k, img) => k == 1 ? img! : Transform.scale(scale: k, child: img),
+        child: Image.asset(
+          SfCutouts.asset(e, still: reduced),
+          fit: BoxFit.contain,
+          gaplessPlayback: true,
+          semanticLabel: e.name,
+          errorBuilder: (_, _, _) => const SizedBox.shrink(),
+        ),
+      );
+    }
     return Stack(
       fit: StackFit.expand,
       children: [
@@ -489,10 +509,12 @@ class _ExerciseBody extends StatelessWidget {
       children: [
         AspectRatio(
           aspectRatio: 1,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(SfRadius.lg - 6),
-            child: _Media(exercise: e, landing: landing),
-          ),
+          child: SfCutouts.has(e)
+              ? _Media(exercise: e, landing: landing, cutout: true)
+              : ClipRRect(
+                  borderRadius: BorderRadius.circular(SfRadius.lg - 6),
+                  child: _Media(exercise: e, landing: landing),
+                ),
         ),
         const SizedBox(width: SfSpace.x3),
         Expanded(
@@ -589,6 +611,11 @@ class _SetBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final cover = moves.firstOrNull;
     final stage = sfStageFor(cover);
+    // A keyed figure stands straight on the glass: no stage box, no scrim,
+    // the title in the page's own ink under it.
+    final fused = SfCutouts.has(cover);
+    final titleColor = fused ? SfColors.text : stage.onStage;
+    final metaColor = fused ? SfColors.muted : stage.onStageMuted;
     final rest = moves.skip(1).toList();
     final shown = rest.take(_maxThumbs).toList();
     final more = rest.length - shown.length;
@@ -596,7 +623,26 @@ class _SetBody extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Expanded(
-          child: ClipRRect(
+          child: fused
+              ? Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Positioned(
+                      left: SfSpace.x4,
+                      right: SfSpace.x4,
+                      top: SfSpace.x1,
+                      bottom: 50,
+                      child: _Media(exercise: cover, landing: landing, cutout: true),
+                    ),
+                    Positioned(
+                      left: SfSpace.x4,
+                      right: 84,
+                      bottom: SfSpace.x3,
+                      child: _HeroTitle(title: title, meta: meta, titleColor: titleColor, metaColor: metaColor),
+                    ),
+                  ],
+                )
+              : ClipRRect(
             borderRadius: BorderRadius.circular(SfRadius.lg - 6),
             child: Stack(
               fit: StackFit.expand,
@@ -617,25 +663,7 @@ class _SetBody extends StatelessWidget {
                   left: SfSpace.x4,
                   right: 84,
                   bottom: SfSpace.x3,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        title,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(color: stage.onStage, fontSize: 19, height: 1.25, fontWeight: FontWeight.w700),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        meta,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(color: stage.onStageMuted, fontSize: 13, height: 1.35, fontWeight: FontWeight.w500),
-                      ),
-                    ],
-                  ),
+                  child: _HeroTitle(title: title, meta: meta, titleColor: titleColor, metaColor: metaColor),
                 ),
               ],
             ),
@@ -685,6 +713,35 @@ class _SetBody extends StatelessWidget {
       ],
     );
   }
+}
+
+class _HeroTitle extends StatelessWidget {
+  const _HeroTitle({required this.title, required this.meta, required this.titleColor, required this.metaColor});
+  final String title;
+  final String meta;
+  final Color titleColor;
+  final Color metaColor;
+
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Text(
+        title,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(color: titleColor, fontSize: 19, height: 1.25, fontWeight: FontWeight.w700),
+      ),
+      const SizedBox(height: 2),
+      Text(
+        meta,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(color: metaColor, fontSize: 13, height: 1.35, fontWeight: FontWeight.w500),
+      ),
+    ],
+  );
 }
 
 class _Thumb extends StatelessWidget {

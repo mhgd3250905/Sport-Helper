@@ -139,7 +139,11 @@ void main() {
       await s.store.acceptSafety(blocked: false);
       s.chat.start();
       await s.chat.send('在家 15 分钟练核心，徒手');
-      final first = s.library[s.chat.currentPlan!.blocks.first.items.first.exerciseId];
+      // The hero move stands on the glass as a theme-neutral keyed cutout
+      // (round 4); the strip's thumbnails carry the theme-matched covers.
+      final items = s.chat.currentPlan!.items.toList();
+      final hero = s.library[items.first.exerciseId];
+      final first = s.library[items[1].exerciseId];
       expect(s.store.appearance, 'system');
 
       tester.platformDispatcher.platformBrightnessTestValue = Brightness.dark;
@@ -148,6 +152,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(SfColors.isDark, isTrue);
       expect(_assetsIn(tester), contains(first.media.poster));
+      expect(_assetsIn(tester), contains('assets/cutouts/${hero.id}-cover.webp'));
 
       tester.platformDispatcher.platformBrightnessTestValue = Brightness.light;
       await tester.pumpAndSettle();

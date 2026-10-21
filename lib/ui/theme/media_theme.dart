@@ -20,3 +20,20 @@ String sfVideo(Exercise e) => sfUsesLight(e) ? e.media.lightVideo! : e.media.vid
 
 /// The web player's variant ('light' → `demo-light.mp4`), or null.
 String? sfVariant(Exercise e) => sfUsesLight(e) ? 'light' : null;
+
+/// Chroma-keyed figures (Pose-Hub green-screen masters → alpha WebP, see
+/// tools/media/build_cutouts.py) for the moves whose figure stands straight
+/// on the glass plan card, with no stage box. Only these two so far.
+abstract final class SfCutouts {
+  /// Animated cutouts play; off in the test harness (an endless animated
+  /// image never lets the frame scheduler settle) and under reduced motion.
+  static bool animate = true;
+
+  static const _ids = {'h-catcow-quad', 'w-dead-bug'};
+
+  static bool has(Exercise? e) => e != null && _ids.contains(e.id);
+
+  /// The alpha figure for [e]: animated WebP, or its still cover.
+  static String asset(Exercise e, {bool still = false}) =>
+      still || !animate ? 'assets/cutouts/${e.id}-cover.webp' : 'assets/cutouts/${e.id}.webp';
+}
