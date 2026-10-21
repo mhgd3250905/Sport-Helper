@@ -1,6 +1,6 @@
 # 对话式主界面
 
-主界面只有一段对话：漂在无边的空间里（默认跟随系统，可切换深空或浅色「白色无边空间」，保留已有外观选择），没有标题栏和边框。视觉规范见 [design-language.md](design-language.md)（2026-10-19 按 HipLab 设计纪律重做）。助手可回复文字、动作卡或计划卡：动作卡点开看详情，计划卡点「开始训练」进入现有跟练，「保存」后可复用。当前开发分支 `feat/smartfit-skill-agent`、功能开发版本 `0.1.0+7` 接入 `ugk_coach 0.3.0` 的 `CoachAgent`；真实 Worker 多步核心验证通过，待合并。未配置时保留本地规则与模板；AI 调用失败时回落并标「预设方案」。
+主界面只有一段对话：漂在无边的空间里（默认跟随系统，可切换深空或浅色「白色无边空间」，保留已有外观选择），没有标题栏和边框。视觉规范见 [design-language.md](design-language.md)。助手可回复文字、动作卡或计划卡：动作卡点开看详情，计划卡可开始训练或保存。当前分支 `feat/smartfit-coach-032` / `0.1.0+8` 接入 SDK 0.3.2，核心功能已验证、待合并批准。旧 `+7` 证据不替代本轮，App main 仍为 `+6`。AI 未配置或最终失败使用标明「预设方案」的本地模板。
 
 当前里程碑与验收边界见 [版本管理与台账](version-management.md)。可以直接说「看看动作库」「上次练了什么」「换浅色」「关闭语音」「设置」「重新安全确认」或「自己选条件」；抽屉仅保留已存计划、动作库与设置。这些本地操作和安全门禁优先于 AI，不把模型回复直接当成操作指令。下方截图保留原对话首页的视觉记录，不是本次 AI 真机证据。
 
@@ -25,19 +25,19 @@ lib/ui/chat/                   cosmos（背景）、chat_widgets（气泡/选项
 lib/ui/theme/                  设计 token（颜色/字号/间距/圆角/动效）、Material 主题与 SfPaletteScope、图标、按钮金字塔
 ```
 
-## AI 接入（0.1.0+7 Skill Agent，核心功能通过，待合并）
+## AI 接入（0.1.0+8 / SDK 0.3.2，核心已验，待合并批准）
 
-接入基线为 SDK main `1f8be6e` 的 `ugk_coach 0.3.0`，入口由 `CoachSession` 换成 `CoachAgent`，`CoachTurnResult` 和 typed 卡片边界不变。Agent 内部执行多步循环，按需读取动作库 skill 文件、核对计划，再经门禁交付 `show_actions` / `show_plan`；`maxSteps` 保持 SDK 默认 10，`CallOutcome.toolStep` 作为中间调用结果记账。BaseURL、模型和鉴权仍为 `https://api.uuugk.win/v1`、`deepseek-v4-flash-0731`、`X-App-Key` / `X-Device-Id`；App Key 只通过 `--dart-define` 注入，不带 `Authorization`。
+`ugk_coach 0.3.2` 与 `ugk_trainer 0.1.4` 的 git ref 均固定 SDK main `b26e4fda807b6ef3db15a61ba30c67fb51dce5e1`。保留 `CoachAgent`、`CoachTurnResult` 和 typed 卡片边界；Agent 读 skill、核对后交付 `show_actions/show_plan`。默认最多 100 逻辑步，同一步重试不占新步骤；`CallOutcome` 没有新增枚举，重试记录使用 `UsageRecord.retry`。BaseURL、模型及鉴权仍为 `https://api.uuugk.win/v1`、`deepseek-v4-flash-0731`、`X-App-Key/X-Device-Id`，App Key 仅经 dart-define 注入，无 Authorization。
 
-`AiChatEngine` 在 App 生命周期内长期持有一个 Agent；关闭 AI 界面不清空，「新对话」取消当前请求并 `reset()`，旧结果晚到也不回写。请求期间禁用发送，重复发送仍由 SDK 返回 `busy`。订阅 `agent.events`，`reading` 显示「正在查动作库」，`checking` 显示「正在核对计划」；等待时保留取消入口，`cancelled` 不显示。HTTP 单次超时 120 秒、重试 0 次，门禁最多重交 2 次；多步整轮保护超时为 1230 秒。
+`AiChatEngine` 长期持有 Agent；关闭界面保留会话，「新对话」取消并 reset，作废结果不回写。请求中禁用发送、保留取消入口，`cancelled` 不显示。`reading/checking` 显示查库/核对计划；`retrying` 显示「网络不稳，正在重试（n/max）…」，上下文过长的 1/1 特例显示「正在整理上下文，继续思考…」；`slow` 显示「还在想…」。SDK 单次请求 60 秒、整轮 360 秒、每步最多 4 次重试，30 秒发慢提示；客户端 `maxRetries=0` 避免双层重试，App 外保护 390 秒，门禁最多重交 2 次。
 
 纯文字只使用 SDK 接纳后的文字结果显示气泡；动作卡只接 `ValidatedActions`，计划卡只接 `ValidatedPlan`，保存、恢复和交给 `ugk_trainer` 的边界保持不变。模型原始输出、未接纳工具参数与中间读取结果不进入渲染层；恢复持久化卡片时重新过 SDK 门禁。失败仍回落本地模板并标「预设方案」，回落计划也要通过 `admitTemplate`。每轮 `CoachContext` 继续传入用户水平、时长、保护部位及场景/器械；AI 动作目录仍为实际随包 93 个动作。
 
-App 实现 `LocalUserMemoryStore`，以 `load/save` 整表读写本机独立键 `smartfit.ai-memory.v1`；`enableUserMemory` 默认开启，设置页「AI 记忆」开关随 App 状态持久化并即时同步运行中的 Agent。关闭不删除已保存记忆，SDK 停止提供记忆工具、记忆 skill 和记忆摘要；「清除记忆」调用 SDK `clearMemory()`，并确认持久化内容已空才显示成功，读写失败提示重试。
+App 实现 `LocalUserMemoryStore`，以 `load/save` 整表读写独立本机键 `smartfit.ai-memory.v1`；`enableUserMemory` 默认开启，开关持久化并即时同步 Agent。SDK 每条记忆工具等待真正保存成功才确认；已确认事实在后续取消/reset 时保留，未确认的迟到写入按 SDK 契约补偿。关闭保留原记忆；清除等待 `clearMemory()`，保存失败会抛错，成功后复读存储确认已空才提示成功。
 
 开关和清除均保留当前聊天与已保存计划。当前对话已明确说过的条件仍属于对话上下文，因此验证关闭后不再引用本机记忆时，要先开「新对话」隔离旧消息和 App 已解析条件；新对话本身不删除本机记忆。记忆开启时摘要随请求上传；普通 App 操作、已存计划列表和训练历史仍不自动上传。UUID 保持独立键 `smartfit.device-id.v1`，不随清除记忆改变。
 
-首次真实 Worker 暴露 SDK 的推理续传和缺失/null 推理也需空字段的协议边界，已在 SDK 独立分支 `fix/coach-agent-reasoning-replay` 修复。App 临时固定完整提交 `43dfef637144a1e08b5eda5ed743db0671ba5a8d`，SDK coach 304 项、trainer 126 项测试通过，App 217 项测试与分析通过；两仓 main 尚未合并。App 不内嵌或 patch SDK，也不修改 pub 缓存。六类核心验证已通过（前三按关闭记忆行为等价复用，后三在当前 SDK 实测），逐轮结果见 [多步验证记录](coach-agent-smoke-2026-10-21.md)，包身份以 [版本台账](version-management.md) 为准。
+最终失败按重试用尽、不可重试、整轮超时或空转显示不同「预设方案」提示，异常与原始输出不进 UI。SDK 0.3.2 已在 main，App 不 patch SDK。App `b39304488e964b22a65501363a15140b5d0ca235` 的 224 项测试、分析、锁文件及 debug 构建通过。六条新交互均 ok、无回落，显式动作卡独立严格补验也通过。原臀桥合法文字导致的脚本无卡断言失败 / exit 1 保留，不称原脚本全通过。完整记录见 [0.3.2 验证](coach-032-smoke-2026-10-21.md)，旧 `+7` 仅属 [历史](coach-agent-smoke-2026-10-21.md)。
 
 ## 上一阶段 AI 接入（0.1.0+6 工具会话，历史）
 
@@ -93,4 +93,4 @@ App 生命周期内长期持有一个 `CoachSession`，关闭 AI 界面不清空
 
 ## 本轮核心验证
 
-`+7` 已完成相关测试、SDK 协议与记忆指令修复，并验证核心计划、臀桥动作卡、护腰练腿、记下条件、后续计划参考及关闭记忆后的隔离。最终采用的六条记录均无回落，数值和分组复验依据见 [验收记录](acceptance.md)；经开哥同意后再合 main 并推送。旧 `+6`、`+4/+5` 与 `+2` 的记录各自保留，不代替本次 Skill Agent 多步链路验收。
+`+8` 的六条新交互均 ok、无回落，真实覆盖重试恢复、slow、记忆持久化与隔离；独立 show_actions 严格补验 4 步、72.908 秒通过，App 接收原准入动作对象，未误交付计划。原六条脚本的臀桥无卡断言失败及 exit 1 如实保留。按 SDK 合法问答契约与补充卡片证据，本轮核心功能已验证；完整指标见 [0.3.2 验证记录](coach-032-smoke-2026-10-21.md)。App main 合并仍待开哥批准。
