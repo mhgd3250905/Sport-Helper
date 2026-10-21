@@ -6,9 +6,9 @@
 
 | 项目 | 当前事实 / 事实来源 |
 | --- | --- |
-| 主线与合并 | 2026-10-21 经开哥授权审核修复 PR #4，以 `561ea8cc69efa38d07c03169c257e8fa4116bc72` 合入并推送 main，版本 `0.1.0+9`；合并树与最终 PR head 一致 |
-| 审核分支 / 运行源码 | `feat/liquid-glass@67d1a731281ea5b865e6d5fd2fb2253e0a464795`；已测运行源码 `829381ffa19b737a6c146c8c73b33394937665b1`，其后仅审核文档及截图，APK 与代码不变 |
-| 共享训练依赖 | `ugk_coach 0.3.2` / `ugk_trainer 0.1.4` 的 git ref 均固定 SDK main 具体提交 `b26e4fda807b6ef3db15a61ba30c67fb51dce5e1`；不使用 path 或分支名。App 不复制、内嵌或 patch SDK，不修改 pub 缓存 |
+| 主线与合并 | 2026-10-21 经开哥批准，SDK 0.3.3 及顶部栏移除以 `f80db2804d6cb9791817463cd1cd5250b32a0e84` 合入并推送 main，合并树与验收分支 `3388bd1` 一致；后续仅更新文档 |
+| 验收分支 / 运行源码 | `feat/coach-033-speed@3388bd1edc86c43b5b5e8297cacd4b3ac19c644b`；已测运行源码 `158f4ac0d2cf7bfed0ac37d63ec6bd66eb0e5537`，包含无顶部栏 UI，代码及 APK 不变 |
+| 共享训练依赖 | App main 的 `ugk_coach 0.3.3` / `ugk_trainer 0.1.4` 均固定 SDK main `fc5e456c44d76b872eb812597ffb5f67bc66bce3`。不使用 path 或分支名，不复制或 patch SDK、不修改 pub 缓存 |
 | 源码里程碑 | `m7-aesthetic-v2` → `d0b1c7ef6198a469a7f0a7cedcaa7c9f2512dbe7` |
 | 上一阶段文档整理前主线快照 | `d0b1c7ef6198a469a7f0a7cedcaa7c9f2512dbe7`；后续 HEAD 由 Git 查询，不把本表固定 SHA 写成永远最新的 HEAD |
 | PR #3 合并提交 | `a5997ef7aef2695b24cab3f4b330543bbb2c7027` |
@@ -17,10 +17,26 @@
 | 默认包版本 | 当前 main `0.1.0+9`：versionName `0.1.0`、versionCode `9`；pubspec 与关于页同步，旧 +8 等身份保留为历史 |
 | 关于页版本 | `0.1.0+9 (MVP)`；独立常量见 [about_page.dart](../lib/ui/about_page.dart) |
 | 资源版本 | 93 个动作包为 `1.1.0`；公共包 `_common` 为 `1.0.0`；格式版本仍为 `1`，见 [小包规范](drill-pack-spec.md) 与 [索引](../assets/packs/index.json) |
-| 交付状态 | +9 debug APK 已复制到本机安装目录，208,025,947 bytes；本轮无新增真机帧率或持续训练测量 |
-| 验收状态 | 237 测试、分析 0 issue、严格锁文件、Web/Android 构建通过；真实浏览器正式着色器深浅色计划/保存/新对话及 SDK 播放器提前结束返回通过，见 [PR #4 审核](pr4-local-review.md) |
+| 交付状态 | SDK 0.3.3 / +9 debug APK 已构建并另名保存，208,043,503 bytes；未将真机已装的 UI +10 降级 |
+| 验收状态 | SDK 0.3.3 分支完整 237 测试、分析 0 issue、严格锁文件及 Android debug 构建通过；复用已核对源码与原始哈希的六条真实 Worker，180.430 秒 / 74,130 token / 0 回落，见 [0.3.3 报告](coach-033-smoke-2026-10-21.md) |
 
 Git 标签、App 包版本与资源版本分别管理。`m7` 不代表 Android versionCode 为 7；此前为 `+1` M7、`+2` 训练接入、`+3` 目录节奏修复、`+4/+5` JSON 信封、`+6` 工具会话、`+7` 首次 Skill Agent 分支；SDK 0.3.2 接入阶段为 `0.1.0+8`，当前 UI 主线为 `0.1.0+9`。没有形成可交付 release 包。
+
+## SDK 0.3.3 提速接入（0.1.0+9，已合 main 并推送）
+
+`feat/coach-033-speed@3388bd1` / 运行源码 `158f4ac0d2cf7bfed0ac37d63ec6bd66eb0e5537`；两项 SDK ref 均为 `fc5e456c44d76b872eb812597ffb5f67bc66bce3`，版本及关于页遵从本次指定 `0.1.0+9`。全量 237 项、分析 0 问题和 debug 构建通过，六条真实 Worker 复用依据与逐条耗时/token 见 [0.3.3 报告](coach-033-smoke-2026-10-21.md)。2026-10-21 开哥批准后已以 `f80db2804d6cb9791817463cd1cd5250b32a0e84` 合入并推送 main，包含无顶部栏修改；合并树与验收分支完全一致，后续仅更新文档。
+
+APK `.buildlog/install/SmartFit-coach-0.3.3-0.1.0+9-debug.apk`，208,043,503 bytes，SHA-256 `1eb0ebb16266e335069579c6a4f6bb42e5ce88e86fa848cf0541d73938778b26`；`com.ugk.smartfit`、versionName `0.1.0`、versionCode `9`、minSdk `24`、targetSdk `36`、debuggable。由上述源码注入原本机 dart-define 构建，后续仅验收文档；独立命名，未覆盖旧 UI +9 包。真机当前已装 +10，本次未安装。
+
+日志 `.buildlog/coach-033-full-tests.log`、`coach-033-analyze.log`、`coach-033-pub-strict.log`、`coach-033-debug-build.log`。没有重复运行已核验相同代码的 Worker，也未改 SDK 仓库或 pub 缓存。
+
+## 顶部栏移除（0.1.0+10，UI 调整分支）
+
+`fix/chat-without-top-bar` 按真机反馈去掉聊天顶部「新对话」栏，入口移至左下角抽屉。运行源码 `89ffa8f7bea2f42a7afd28eade9fc13b7c4ba856`；237 项测试、分析 0 issue、Android debug 构建通过。该 UI 调整现已随上方 SDK 0.3.3 一起合 main，版本按新任务为 `+9`；本节 `+10` APK 仍是原先真机交付。
+
+APK `.buildlog/install/SmartFit-ui-no-top-bar-0.1.0+10-debug.apk`，208,029,103 bytes，SHA-256 `94e7402e3e48b262a934f78d78f560b7fbec8272c74d005d08d22a43bddd8896`；`com.ugk.smartfit`、versionName `0.1.0`、versionCode `10`、minSdk `24`、targetSdk `36`、debug。沿用现有 dart-define 构建配置，密钥不入仓库。
+
+2026-10-21 已在连接的真机从 `+9` 覆盖升级，未清空数据；前台启动正常，截图确认顶部栏已消失、原聊天保留。新对话的取消/reset 及键盘可达性由现有回归测试覆盖。日志 `.buildlog/no-top-bar-tests.log`、`no-top-bar-analyze.log`、`no-top-bar-build.log`；真机截图仅保留在本机 `.buildlog/no-top-bar-device.png`。
 
 ## Liquid Glass（0.1.0+9，PR #4 已审核合并）
 

@@ -592,30 +592,9 @@ class _PlanCardState extends State<PlanCard>
       topPad: single ? _Details.pad : 0,
       header: single
           ? null
-          : FadeTransition(
-              key: const ValueKey('plan-header-fade'),
-              opacity: reduced
-                  ? kAlwaysCompleteAnimation
-                  : anim(timeline.header),
-              child: SlideTransition(
-                position: Tween(begin: const Offset(0, .12), end: Offset.zero)
-                    .animate(
-                      reduced
-                          ? kAlwaysCompleteAnimation
-                          : anim(timeline.header),
-                    ),
-                child: _Header(
-                  key: const ValueKey('plan-header'),
-                  height: headerH,
-                  title: p.title,
-                  meta: meta,
-                  // At rest unfolded the header is the way into the plan
-                  // page (the folded body is gone).
-                  openKey: ValueKey('plan-open-${p.id}'),
-                  onOpen: widget.onOpen,
-                ),
-              ),
-            ),
+          // The header is overlaid with the toggle in one Row, so the text
+          // gives the button its actual width at every system text size.
+          : SizedBox(height: headerH),
       rows: [
         if (single)
           for (final (i, c) in cues.indexed)
@@ -861,9 +840,15 @@ class _PlanCardState extends State<PlanCard>
                   height: compactH,
                   child: Offstage(
                     offstage: t >= 1,
-                    child: IgnorePointer(
-                      ignoring: t > 0,
-                      child: ExcludeSemantics(excluding: t > 0, child: child!),
+                    child: ExcludeFocus(
+                      excluding: t > 0,
+                      child: IgnorePointer(
+                        ignoring: t > 0,
+                        child: ExcludeSemantics(
+                          excluding: t > 0,
+                          child: child!,
+                        ),
+                      ),
                     ),
                   ),
                 );
@@ -874,9 +859,21 @@ class _PlanCardState extends State<PlanCard>
             titleLayer,
             stripLayer,
             Positioned(
+              left: 0,
               right: SfSpace.x1,
-              top: (headerH - 44) / 2,
-              child: toggle,
+              top: 0,
+              child: _Header(
+                key: const ValueKey('plan-header'),
+                height: headerH,
+                title: p.title,
+                meta: meta,
+                openKey: ValueKey('plan-open-${p.id}'),
+                onOpen: widget.onOpen,
+                progress: _expand,
+                fade: reduced ? _expand : anim(timeline.header),
+                reduced: reduced,
+                toggle: toggle,
+              ),
             ),
             play,
           ],
@@ -1126,66 +1123,100 @@ class _Header extends StatelessWidget {
     required this.meta,
     required this.openKey,
     required this.onOpen,
+    required this.progress,
+    required this.fade,
+    required this.reduced,
+    required this.toggle,
   });
   final double height;
   final String title;
   final String meta;
   final Key openKey;
   final VoidCallback onOpen;
+  final Animation<double> progress;
+  final Animation<double> fade;
+  final bool reduced;
+  final Widget toggle;
 
   static const minHeight = 56.0;
 
   @override
-  Widget build(BuildContext context) => SfPressable(
-    key: openKey,
-    semanticLabel: '计划详情：$title',
-    scale: 1,
-    haptic: SfHaptic.selection,
-    onTap: onOpen,
-    child: SizedBox(
-      height: height,
-      child: Padding(
-        // Clear of the 收起 pill (44 px tap box + its inset).
-        padding: const EdgeInsets.fromLTRB(
-          _Details.pad,
-          0,
-          44 + SfSpace.x1 + SfSpace.x3,
-          0,
-        ),
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                title,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: SfColors.text,
-                  fontSize: 17,
-                  height: 1.25,
-                  fontWeight: FontWeight.w700,
+  Widget build(BuildContext context) => SizedBox(
+    height: height,
+    child: Row(
+      children: [
+        Expanded(
+          child: AnimatedBuilder(
+            animation: progress,
+            builder: (context, child) {
+              if (progress.value == 0) return const SizedBox.shrink();
+              final inactive = progress.value < 1;
+              return ExcludeFocus(
+                excluding: inactive,
+                child: IgnorePointer(
+                  ignoring: inactive,
+                  child: ExcludeSemantics(excluding: inactive, child: child!),
+                ),
+              );
+            },
+            child: FadeTransition(
+              key: const ValueKey('plan-header-fade'),
+              opacity: fade,
+              child: SlideTransition(
+                position: Tween(
+                  begin: const Offset(0, .12),
+                  end: Offset.zero,
+                ).animate(reduced ? kAlwaysCompleteAnimation : fade),
+                child: SfPressable(
+                  key: openKey,
+                  semanticLabel: '计划详情：$title',
+                  scale: 1,
+                  haptic: SfHaptic.selection,
+                  onTap: onOpen,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: _Details.pad),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            title,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: SfColors.text,
+                              fontSize: 17,
+                              height: 1.25,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            meta,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: SfColors.muted,
+                              fontSize: 12.5,
+                              height: 1.35,
+                              fontWeight: FontWeight.w500,
+                              fontFeatures: SfType.tabular,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
               ),
-              const SizedBox(height: 2),
-              Text(
-                meta,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: SfColors.muted,
-                  fontSize: 12.5,
-                  height: 1.35,
-                  fontWeight: FontWeight.w500,
-                  fontFeatures: SfType.tabular,
-                ),
-              ),
-            ],
+            ),
           ),
         ),
-      ),
+        const SizedBox(width: SfSpace.x3),
+        toggle,
+      ],
     ),
   );
 }

@@ -1,0 +1,70 @@
+{
+  "sdkRef": "fc5e456c44d76b872eb812597ffb5f67bc66bce3",
+  "sdkVersion": "0.3.3",
+  "evidenceMode": "reused_actual_smartfit_runtime_verified_identical",
+  "originalSdkCheckout": "3a23ba0803a05efc1519efac3a231fc480e8ba1a",
+  "originalAppCheckout": "530686e224adf34d1e748cde35b4fb5575d6fe3d",
+  "appUpgradeBase": "acab6032da8ab2699486f9affcb3f6e54ba6adc5",
+  "verifiedAppSource": "158f4ac0d2cf7bfed0ac37d63ec6bd66eb0e5537",
+  "originalRun": "2026-10-21T12-44-51.876219Z",
+  "sourceReport": "https://github.com/mhgd3250905/ugk-3d-pose-sdk/blob/fc5e456c44d76b872eb812597ffb5f67bc66bce3/docs/evidence/coach-033-smoke.json",
+  "sdkRuntimeTree": "04d499a0816f6e03cf5ef8a504879149d7f55f4a",
+  "trainerRuntimeTree": "4758f2a9d89ea2f4a8820df27c853d620f4afbb7",
+  "originalResultSha256": "bfdbbf32279c226565775af6ec224a592021257327e306eb6b0026357b5fcc9f",
+  "cases": [
+    {
+      "id": "core",
+      "question": "在家 15 分钟练核心，徒手",
+      "steps": 1,
+      "elapsedMs": 32993,
+      "totalTokens": 9622,
+      "fallback": false
+    },
+    {
+      "id": "actions",
+      "question": "臀桥怎么做",
+      "steps": 1,
+      "elapsedMs": 25397,
+      "totalTokens": 8733,
+      "fallback": false
+    },
+    {
+      "id": "back-protection",
+      "question": "我腰不太舒服，想练腿 20 分钟",
+      "steps": 1,
+      "elapsedMs": 36306,
+      "totalTokens": 10634,
+      "fallback": false
+    },
+    {
+      "id": "remember",
+      "question": "我是新手，家里有哑铃",
+      "steps": 3,
+      "elapsedMs": 27206,
+      "totalTokens": 25638,
+      "fallback": false
+    },
+    {
+      "id": "memory-on-plan",
+      "question": "请给我排一个15分钟的居家力量训练计划",
+      "steps": 1,
+      "elapsedMs": 28616,
+      "totalTokens": 9911,
+      "fallback": false
+    },
+    {
+      "id": "memory-off-plan",
+      "question": "请给我排一个15分钟的居家力量训练计划",
+      "steps": 1,
+      "elapsedMs": 29912,
+      "totalTokens": 9592,
+      "fallback": false
+    }
+  ],
+  "totals": {
+    "steps": 8,
+    "elapsedMs": 180430,
+    "totalTokens": 74130,
+    "fallbacks": 0
+  }
+}

@@ -344,6 +344,10 @@ void main() {
         (body['tools'] as List).map((t) => (t as Map)['function']['name']),
         containsAll(['show_actions', 'show_plan']),
       );
+      expect(
+        (body['tools'] as List).map((t) => (t as Map)['function']['name']),
+        isNot(contains('check_plan')),
+      );
     }
     final history = gateway.bodies.last['messages'] as List;
     expect(history.where((m) => m['role'] == 'tool'), isNotEmpty);
@@ -379,7 +383,7 @@ void main() {
       final subscription = ai.agent.events.listen(events.add);
       addTearDown(subscription.cancel);
 
-      final reply = await ai.reply('在家 10 分钟练全身，徒手', const ChatState());
+      final reply = await ai.reply('先检查再排：在家 10 分钟练全身，徒手', const ChatState());
       final result = ai.lastResult!;
       expect(result.status, coach.TurnStatus.ok);
       expect(result.plan, isA<coach.ValidatedPlan>());
@@ -403,7 +407,7 @@ void main() {
         result.records.map((r) => r.id),
       );
       expect(
-        result.records.every((r) => r.promptVersion.startsWith('agent-v1-')),
+        result.records.every((r) => r.promptVersion.startsWith('agent-v2-')),
         isTrue,
       );
       expect(reply.messages, hasLength(1));
@@ -468,7 +472,7 @@ void main() {
         planResponse(),
       ], latency: Duration.zero);
       final ai = engine(client);
-      final reply = await ai.reply('在家 10 分钟练全身，徒手', const ChatState());
+      final reply = await ai.reply('先检查再排：在家 10 分钟练全身，徒手', const ChatState());
       expect(ai.lastResult!.status, coach.TurnStatus.ok);
       expect(ai.lastResult!.steps, 4);
       expect(ai.lastResult!.submissions, 1);
