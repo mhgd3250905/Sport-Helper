@@ -18,13 +18,15 @@ import 'expand_route.dart';
 /// the media inside stays opaque and rounded.
 ///
 /// * one move → [_ExerciseBody], 130 px: a square preview on the left,
-///   name · dose · tags · one cue on the right, 「开始」 bottom-right;
+///   name · dose · one cue on the right, tags and 「▶ 开始训练」 sharing
+///   the bottom line;
 /// * a set → [_SetBody], 240 px: the first move as the hero with title,
-///   duration and move count over it, a row of thumbnails for the other
-///   moves (five, then +N), 「开始」 on the hero.
+///   duration and move count over it, one bottom row with the other moves
+///   as thumbnails (as many as fit, then +N) and 「▶ 开始训练」 at its end.
 ///
-/// Tapping the card opens the plan page (every move, swaps); 保存 stays on
-/// the card as a small pill. The full move list lives on the plan page.
+/// One row of controls at most: the start pill is the only action on the
+/// compact card (展开 aside). Tapping the card opens the plan page (every
+/// move, swaps); 展开 unfolds the list in place with 保存 under it.
 class PlanCard extends StatefulWidget {
   const PlanCard({
     super.key,
@@ -131,9 +133,8 @@ class _PlanCardState extends State<PlanCard> with SingleTickerProviderStateMixin
     final width = (MediaQuery.sizeOf(context).width - 32).clamp(280.0, 400.0);
     final reduced = SfMotion.reduced(context);
 
-    final start = _StartDisc(
+    final start = _StartPill(
       key: ValueKey('plan-start-${p.id}'),
-      size: single ? 48 : 56,
       onTap: () => widget.onStart(() => rectOf(_card.currentContext)),
     );
     final toggle = _ExpandToggle(
@@ -188,25 +189,6 @@ class _PlanCardState extends State<PlanCard> with SingleTickerProviderStateMixin
             onPressed: widget.saved ? null : widget.onSave,
             boxed: true,
           ),
-          const Spacer(),
-          SfPressable(
-            key: ValueKey('plan-details-${p.id}'),
-            semanticLabel: '计划详情',
-            onTap: widget.onOpen,
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(minHeight: 44),
-              child: _darkPill(
-                Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text('详情', style: SfType.callout.copyWith(fontSize: 14, color: SfColors.isDark ? SfColors.text : SfColors.muted)),
-                      const SizedBox(width: 2),
-                      SfIcon(SfGlyph.chevronRight, size: 16, color: SfColors.isDark ? SfColors.text : SfColors.muted, strokeWidth: 2),
-                    ],
-                ),
-              ),
-            ),
-          ),
         ],
       ),
     );
@@ -237,12 +219,15 @@ class _PlanCardState extends State<PlanCard> with SingleTickerProviderStateMixin
                     child: body,
                   ),
                 ),
+                // 开始训练 closes the bottom line in both layouts; it stays
+                // put while the card unfolds (only the thumbnails hand over
+                // to the list), so there is never a second start.
                 if (single) ...[
                   Positioned(right: 0, top: 0, child: toggle),
-                  Positioned(right: SfSpace.x1, bottom: SfSpace.x1, child: start),
+                  Positioned(right: 0, bottom: 0, child: start),
                 ] else ...[
                   Positioned(right: SfSpace.x1, top: SfSpace.x1, child: toggle),
-                  Positioned(right: SfSpace.x3, bottom: _SetBody.stripHeight + SfSpace.x3, child: start),
+                  Positioned(right: SfSpace.x1, bottom: 1, child: start),
                 ],
               ],
             ),
@@ -290,7 +275,8 @@ class _PlanCardState extends State<PlanCard> with SingleTickerProviderStateMixin
 }
 
 /// The in-place details: the full move list (or a move's cues), notes and
-/// the 保存 · 详情 footer. Height grows on [t]; the contents cross-fade in
+/// the 保存 footer (details live on the card itself: tapping it opens the
+/// plan page). Height grows on [t]; the contents cross-fade in
 /// and the rows follow each other ~25 ms apart. Reduced motion: no height
 /// move, fade only.
 class _Details extends StatelessWidget {
@@ -412,11 +398,6 @@ class _ExpandToggle extends StatelessWidget {
   }
 }
 
-/// Dark only: [child] as an idle glass pill; light returns it as is.
-Widget _darkPill(Widget child) => SfColors.isDark
-    ? Center(widthFactor: 1, child: SfControlFace(padding: const EdgeInsets.fromLTRB(14, 0, 10, 0), child: child))
-    : child;
-
 /// Dark on the glass card: the idle control face; otherwise the quiet tonal
 /// pill (light) or the scrim pill over media.
 Widget _toggleFace({required bool glass, required bool onMedia, required Widget child}) => glass
@@ -502,7 +483,8 @@ class _Media extends StatelessWidget {
   }
 }
 
-/// One move: square preview left; name, dose, tags, one cue right.
+/// One move: square preview left; name, dose, one cue right, tags on the
+/// bottom line beside 开始训练.
 class _ExerciseBody extends StatelessWidget {
   const _ExerciseBody({
     required this.exercise,
@@ -558,22 +540,22 @@ class _ExerciseBody extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: SfType.label.copyWith(fontFeatures: SfType.tabular),
                 ),
-                const SizedBox(height: 6),
+                if (cue.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    cue,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: SfType.caption.copyWith(color: SfColors.muted),
+                  ),
+                ],
+                const Spacer(),
+                // Tags share the bottom line with 开始训练 (its 44 px tap
+                // box sits on the card's bottom edge; centres line up).
                 Padding(
-                  padding: const EdgeInsets.only(right: 52), // clear of 开始
+                  padding: const EdgeInsets.only(right: _StartPill.reserve, bottom: 7),
                   child: _Tags(tags),
                 ),
-                const Spacer(),
-                if (cue.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.only(right: 56),
-                    child: Text(
-                      cue,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: SfType.caption.copyWith(color: SfColors.muted),
-                    ),
-                  ),
               ],
             ),
           ),
@@ -624,7 +606,8 @@ class _SetBody extends StatelessWidget {
   final bool landing;
 
   static const stripHeight = 52.0;
-  static const _maxThumbs = 5;
+  static const _thumb = 36.0;
+  static const _gap = 6.0;
 
   @override
   Widget build(BuildContext context) {
@@ -636,8 +619,6 @@ class _SetBody extends StatelessWidget {
     final titleColor = fused ? SfColors.text : stage.onStage;
     final metaColor = fused ? SfColors.muted : stage.onStageMuted;
     final rest = moves.skip(1).toList();
-    final shown = rest.take(_maxThumbs).toList();
-    final more = rest.length - shown.length;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -655,7 +636,7 @@ class _SetBody extends StatelessWidget {
                     ),
                     Positioned(
                       left: SfSpace.x4,
-                      right: 84,
+                      right: SfSpace.x4,
                       bottom: SfSpace.x3,
                       child: _HeroTitle(title: title, meta: meta, titleColor: titleColor, metaColor: metaColor),
                     ),
@@ -680,7 +661,7 @@ class _SetBody extends StatelessWidget {
                 ),
                 Positioned(
                   left: SfSpace.x4,
-                  right: 84,
+                  right: SfSpace.x4,
                   bottom: SfSpace.x3,
                   child: _HeroTitle(title: title, meta: meta, titleColor: titleColor, metaColor: metaColor),
                 ),
@@ -694,20 +675,24 @@ class _SetBody extends StatelessWidget {
           opacity: stripFade,
           child: LayoutBuilder(
             builder: (context, c) {
-              const gap = 6.0;
-              final slots = shown.length + (more > 0 ? 1 : 0);
-              final size = slots == 0 ? 0.0 : ((c.maxWidth - gap * (_maxThumbs)) / (_maxThumbs + 1)).clamp(28.0, 40.0);
+              // The row ends in 开始训练 (laid over it by the card): the
+              // thumbnails take what is left — as many as fit, the last
+              // slot turning into +N when some don't.
+              final room = c.maxWidth - _StartPill.reserve - SfSpace.x1;
+              final fit = ((room + _gap) / (_thumb + _gap)).floor().clamp(1, 99);
+              final shown = rest.length <= fit ? rest : rest.take(fit - 1).toList();
+              final more = rest.length - shown.length;
               return Padding(
-                padding: const EdgeInsets.only(top: 6),
+                padding: const EdgeInsets.only(top: 6, left: SfSpace.x1),
                 child: Row(
                   children: [
                     for (final e in shown) ...[
-                      _Thumb(size: size, child: _Media(exercise: e)),
-                      const SizedBox(width: gap),
+                      _Thumb(size: _thumb, child: _Media(exercise: e)),
+                      const SizedBox(width: _gap),
                     ],
                     if (more > 0)
                       _Thumb(
-                        size: size,
+                        size: _thumb,
                         child: ColoredBox(
                           color: SfColors.text.withValues(alpha: SfColors.isDark ? .12 : .07),
                           child: Center(
@@ -718,10 +703,6 @@ class _SetBody extends StatelessWidget {
                           ),
                         ),
                       ),
-                    const Spacer(),
-                    Text('详情', style: SfType.callout.copyWith(fontSize: 13, color: SfColors.muted)),
-                    SfIcon(SfGlyph.chevronRight, size: 15, color: SfColors.muted, strokeWidth: 2),
-                    const SizedBox(width: SfSpace.x1),
                   ],
                 ),
               );
@@ -810,14 +791,17 @@ class _MoveRow extends StatelessWidget {
   );
 }
 
-/// 「开始」: the card's one prominent action and the app's one raised
-/// element (HipLab rule R2): the accent lit from above, a deeper edge of
-/// itself, a tight contact shadow — no glow, no gradient halo. It sinks
-/// while held. Drawn with the dark accent on the dark stage.
-class _StartDisc extends StatelessWidget {
-  const _StartDisc({super.key, required this.onTap, this.size = 56});
+/// 「▶ 开始训练」: the card's one prominent action and the app's one raised
+/// element (HipLab rule R2): a compact accent pill, lit from above, a
+/// deeper edge of itself, a tight contact shadow — no glow, no halo. It
+/// sinks while held. 40 px tall in a 44 px tap box. Drawn with the dark
+/// accent on the dark stage.
+class _StartPill extends StatelessWidget {
+  const _StartPill({super.key, required this.onTap});
   final VoidCallback onTap;
-  final double size;
+
+  /// Width the bottom line keeps clear for the pill (pill + breathing room).
+  static const reserve = 116.0;
 
   @override
   Widget build(BuildContext context) {
@@ -830,24 +814,34 @@ class _StartDisc extends StatelessWidget {
       tooltip: '开始训练',
       onTap: onTap,
       haptic: SfHaptic.medium,
-      child: Builder(
-        builder: (context) => SfTactile(
-          key: const ValueKey('start-disc'),
-          style: SfTactileStyle.accent(dark: dark, color: accent),
-          pressed: SfPressedScope.of(context),
-          circle: true,
-          child: SizedBox.square(
-            dimension: size,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SfIcon(SfGlyph.play, size: size * .32, filled: true, color: on),
-                const SizedBox(height: 1),
-                Text(
-                  '开始',
-                  style: TextStyle(color: on, fontSize: size < 52 ? 10.5 : 12, height: 1.15, fontWeight: FontWeight.w700),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: 44, minWidth: 44),
+        child: Center(
+          widthFactor: 1,
+          heightFactor: 1,
+          child: Builder(
+            builder: (context) => SfTactile(
+              key: const ValueKey('start-disc'),
+              style: SfTactileStyle.accent(dark: dark, color: accent),
+              pressed: SfPressedScope.of(context),
+              radius: 20,
+              child: SizedBox(
+                height: 40,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(13, 0, 16, 0),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SfIcon(SfGlyph.play, size: 14, filled: true, color: on),
+                      const SizedBox(width: 5),
+                      Text(
+                        '开始训练',
+                        style: TextStyle(color: on, fontSize: 14, height: 1.2, fontWeight: FontWeight.w700),
+                      ),
+                    ],
+                  ),
                 ),
-              ],
+              ),
             ),
           ),
         ),
@@ -855,4 +849,3 @@ class _StartDisc extends StatelessWidget {
     );
   }
 }
-

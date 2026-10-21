@@ -1,6 +1,7 @@
 // Chat cards have fixed, compact heights by type (like link-share cards):
 // a set is 240 px, one move is 130 px; the move list lives on the plan page
-// (no in-chat 展开全部), and save / start / details stay reachable.
+// (no in-chat 展开全部), and save / start stay reachable; start sits at the
+// end of the bottom line, details are the card itself.
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smartfit/chat/chat_models.dart';
@@ -60,10 +61,23 @@ void main() {
     final card = find.byType(PlanCard);
     expect(find.descendant(of: card, matching: find.text(plan.title)), findsOneWidget);
     expect(find.descendant(of: card, matching: find.textContaining('${plan.items.length} 个动作')), findsOneWidget);
-    if (plan.items.length > 6) {
-      expect(find.descendant(of: card, matching: find.text('+${plan.items.length - 6}')), findsOneWidget);
+    final start = find.byKey(ValueKey('plan-start-${plan.id}'));
+    expect(start, findsOneWidget);
+    final startNode = find.bySemanticsLabel('开始训练');
+    expect(startNode, findsOneWidget);
+    expect(tester.getSemantics(startNode), containsSemantics(label: '开始训练', isButton: true, hasTapAction: true));
+    // One bottom row: thumbnails (+N) then 开始训练 at its right end; no
+    // separate 详情 entry on the compact card.
+    expect(find.descendant(of: card, matching: find.text('详情')), findsNothing);
+    expect(find.byKey(ValueKey('plan-details-${plan.id}')), findsNothing);
+    final cardRect = tester.getRect(card);
+    final startRect = tester.getRect(start);
+    expect(startRect.height, greaterThanOrEqualTo(44));
+    expect(cardRect.right - startRect.right, lessThan(16));
+    expect(cardRect.bottom - startRect.bottom, lessThan(16));
+    if (plan.items.length > 5) {
+      expect(find.descendant(of: card, matching: find.textContaining(RegExp(r'^\+\d+$'))), findsOneWidget);
     }
-    expect(find.byKey(ValueKey('plan-start-${plan.id}')), findsOneWidget);
     // Collapsed by default: the move list and 保存 are folded away.
     expect(find.byKey(ValueKey('plan-save-${plan.id}')), findsNothing);
     final toggle = find.byKey(ValueKey('plan-expand-${plan.id}'));
@@ -72,12 +86,16 @@ void main() {
       hasTapAction: true, hasFocusAction: true, hasExpandedState: true, isExpanded: false, isFocusable: true,
     ));
 
-    // Expand in place: the full list, 保存 and 详情 appear; the card grows.
+    // Expand in place: the full list and 保存 appear; the card grows; the
+    // one 开始训练 stays put (no second start, no 详情 row).
     await tester.tap(toggle);
     await tester.pumpAndSettle();
     expect(tester.getSize(card).height, greaterThan(PlanCard.setHeight + 48.0 * plan.items.length));
     expect(find.byKey(ValueKey('plan-save-${plan.id}')), findsOneWidget);
-    expect(find.byKey(ValueKey('plan-details-${plan.id}')), findsOneWidget);
+    expect(find.byKey(ValueKey('plan-details-${plan.id}')), findsNothing);
+    expect(start, findsOneWidget);
+    // Same spot on the card (the chat may scroll as the card grows).
+    expect(tester.getRect(start).topLeft - tester.getRect(card).topLeft, startRect.topLeft - cardRect.topLeft);
     expect(tester.getSemantics(toggle), matchesSemantics(
       label: '收起详情', isButton: true, hasEnabledState: true, isEnabled: true,
       hasTapAction: true, hasFocusAction: true, hasExpandedState: true, isExpanded: true, isFocusable: true,
@@ -113,7 +131,12 @@ void main() {
     final card = find.byType(PlanCard);
     expect(tester.getSize(card).height, PlanCard.exerciseHeight);
     expect(find.descendant(of: card, matching: find.textContaining('2 组 × 12 次')), findsOneWidget);
-    expect(find.byKey(const ValueKey('plan-start-single-move')), findsOneWidget);
+    final start = find.byKey(const ValueKey('plan-start-single-move'));
+    expect(start, findsOneWidget);
+    // 开始训练 bottom-right inside the content; no separate start row.
+    final r = tester.getRect(card), sr = tester.getRect(start);
+    expect(r.right - sr.right, lessThan(12));
+    expect(r.bottom - sr.bottom, lessThan(12));
 
     await tester.tap(find.byKey(const ValueKey('plan-expand-single-move')));
     await tester.pumpAndSettle();
