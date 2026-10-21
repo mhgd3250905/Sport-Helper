@@ -15,11 +15,11 @@ dependencies:
     git:
       url: https://github.com/mhgd3250905/ugk-3d-pose-sdk.git
       path: packages/ugk_trainer
-      ref: 029af4a1e735b5f1c3f1ee5cef6c82aad8a1c3f4
+      ref: 712cb7b3d636a5314c5aa08211c822928a0af4f4
   ugk_coach:
     git:
       url: https://github.com/mhgd3250905/ugk-3d-pose-sdk.git
-      ref: 029af4a1e735b5f1c3f1ee5cef6c82aad8a1c3f4
+      ref: 712cb7b3d636a5314c5aa08211c822928a0af4f4
   shared_preferences: 2.5.6
   webview_flutter: 4.14.1
   webview_flutter_android: 4.14.1

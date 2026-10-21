@@ -34,9 +34,26 @@ class _Files implements LocalStateStorage {
 
 /// Observe the public request contract, never credentials or raw responses.
 class _ObservedClient implements coach.LlmClient {
-  _ObservedClient(this.inner);
+  _ObservedClient(this.inner, this.requestTimes);
   final coach.OpenAiCompatibleClient inner;
+  final List<DateTime> requestTimes;
   final requests = <coach.LlmRequest>[];
+  final responseProtocol = <Map<String, Object?>>[];
+
+  // Keep a full ten-step budget below the Worker's 30 requests / 10 minutes.
+  // Wait between cases, outside the measured turn, and reuse the same UUID.
+  Future<void> waitForTurnBudget() async {
+    while (true) {
+      final cutoff = DateTime.now().toUtc().subtract(
+        const Duration(minutes: 10),
+      );
+      requestTimes.removeWhere((time) => time.isBefore(cutoff));
+      if (requestTimes.length < 20) return;
+      stdout.writeln('SMOKE_RATE_WAIT waiting for the existing device budget');
+      await Future<void>.delayed(const Duration(seconds: 30));
+    }
+  }
+
   @override
   String get model => inner.model;
   @override
@@ -45,9 +62,16 @@ class _ObservedClient implements coach.LlmClient {
   Future<coach.LlmResponse> complete(
     coach.LlmRequest request, {
     coach.CancelToken? cancel,
-  }) {
+  }) async {
     requests.add(request);
-    return inner.complete(request, cancel: cancel);
+    requestTimes.add(DateTime.now().toUtc());
+    final response = await inner.complete(request, cancel: cancel);
+    responseProtocol.add({
+      'requestIndex': requests.length,
+      'reasoningPresent': response.reasoning != null,
+      'reasoningLength': response.reasoning?.length,
+    });
+    return response;
   }
 }
 
@@ -95,7 +119,21 @@ void main() {
       final transport = const AiCoachConfig(
         token: key,
       ).createClient(deviceId: deviceId);
-      final client = _ObservedClient(transport);
+      final previousRequests = <DateTime>[];
+      for (final previous in Directory(
+        '.buildlog/skill-agent-smoke',
+      ).listSync()) {
+        if (previous is! Directory) continue;
+        final previousEvents = File('${previous.path}/events.jsonl');
+        if (!previousEvents.existsSync()) continue;
+        for (final line in previousEvents.readAsLinesSync()) {
+          final e = jsonDecode(line) as Map<String, dynamic>;
+          if (e['kind'] == 'thinking') {
+            previousRequests.add(DateTime.parse(e['at'] as String));
+          }
+        }
+      }
+      final client = _ObservedClient(transport, previousRequests);
       final engine = AiChatEngine(
         local: RuleChatEngine(
           lib: library,
@@ -143,6 +181,7 @@ void main() {
         bool memory = false,
         bool reset = true,
       }) async {
+        await client.waitForTurnBudget();
         engine.enableUserMemory = memory;
         await store.setAiMemoryEnabled(memory);
         if (reset) await chat.newConversation();
@@ -210,6 +249,22 @@ void main() {
                 'issues': record.issueCodes,
                 'errorKind': record.errorKind,
               },
+          ],
+          'responseProtocol': client.responseProtocol
+              .where((p) => (p['requestIndex'] as int) > before)
+              .toList(),
+          'assistantProtocol': [
+            for (final request in sent)
+              [
+                for (final message in request.messages)
+                  if (message.role == coach.LlmRole.assistant)
+                    {
+                      'reasoningPresent': message.toJson().containsKey(
+                        'reasoning_content',
+                      ),
+                      'reasoningLength': message.reasoning?.length,
+                    },
+              ],
           ],
           'events': events.skip(eventBefore).toList(),
           'text': r.text,
