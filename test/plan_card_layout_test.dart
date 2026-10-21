@@ -64,7 +64,32 @@ void main() {
       expect(find.descendant(of: card, matching: find.text('+${plan.items.length - 6}')), findsOneWidget);
     }
     expect(find.byKey(ValueKey('plan-start-${plan.id}')), findsOneWidget);
+    // Collapsed by default: the move list and 保存 are folded away.
+    expect(find.byKey(ValueKey('plan-save-${plan.id}')), findsNothing);
+    final toggle = find.byKey(ValueKey('plan-expand-${plan.id}'));
+    expect(tester.getSemantics(toggle), matchesSemantics(
+      label: '展开详情', isButton: true, hasEnabledState: true, isEnabled: true,
+      hasTapAction: true, hasFocusAction: true, hasExpandedState: true, isExpanded: false, isFocusable: true,
+    ));
+
+    // Expand in place: the full list, 保存 and 详情 appear; the card grows.
+    await tester.tap(toggle);
+    await tester.pumpAndSettle();
+    expect(tester.getSize(card).height, greaterThan(PlanCard.setHeight + 48.0 * plan.items.length));
     expect(find.byKey(ValueKey('plan-save-${plan.id}')), findsOneWidget);
+    expect(find.byKey(ValueKey('plan-details-${plan.id}')), findsOneWidget);
+    expect(tester.getSemantics(toggle), matchesSemantics(
+      label: '收起详情', isButton: true, hasEnabledState: true, isEnabled: true,
+      hasTapAction: true, hasFocusAction: true, hasExpandedState: true, isExpanded: true, isFocusable: true,
+    ));
+    await tester.tap(find.byKey(ValueKey('plan-save-${plan.id}')));
+    await tester.pumpAndSettle();
+    expect(s.store.savedPlans.single.plan.id, plan.id);
+
+    // Collapse back to the compact 240 px card.
+    await tester.tap(toggle);
+    await tester.pumpAndSettle();
+    expect(tester.getSize(card).height, PlanCard.setHeight);
 
     // The card itself opens the plan page, where every move is listed.
     await tester.tap(find.byKey(ValueKey('plan-open-${plan.id}')));
@@ -90,6 +115,9 @@ void main() {
     expect(find.descendant(of: card, matching: find.textContaining('2 组 × 12 次')), findsOneWidget);
     expect(find.byKey(const ValueKey('plan-start-single-move')), findsOneWidget);
 
+    await tester.tap(find.byKey(const ValueKey('plan-expand-single-move')));
+    await tester.pumpAndSettle();
+    expect(tester.getSize(card).height, greaterThan(PlanCard.exerciseHeight));
     await tester.tap(find.byKey(const ValueKey('plan-save-single-move')));
     await tester.pumpAndSettle();
     expect(s.store.savedPlans.single.plan.id, 'single-move');

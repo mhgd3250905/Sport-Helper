@@ -25,6 +25,7 @@ class Appear extends StatefulWidget {
     this.shift = 0,
     this.duration = SfMotion.appear,
     this.scaleFrom = .98,
+    this.curve = SfMotion.standard,
   });
   final bool animate;
   final Duration delay;
@@ -36,6 +37,10 @@ class Appear extends StatefulWidget {
   final double shift;
   final Duration duration;
   final double scaleFrom;
+
+  /// The landing curve: [SfMotion.enter] (emphasized decelerate) for the
+  /// user's own line, [SfMotion.spring] for a glass card's soft overshoot.
+  final Curve curve;
   @override
   State<Appear> createState() => _AppearState();
 }
@@ -60,7 +65,7 @@ class _AppearState extends State<Appear> with SingleTickerProviderStateMixin {
     final total = widget.delay + run;
     _c.duration = total;
     final start = widget.delay.inMicroseconds / total.inMicroseconds;
-    _t = CurvedAnimation(parent: _c, curve: Interval(start, 1, curve: _still ? Curves.easeOut : SfMotion.standard));
+    _t = CurvedAnimation(parent: _c, curve: Interval(start, 1, curve: _still ? Curves.easeOut : widget.curve));
     _c.forward();
   }
 
@@ -76,10 +81,12 @@ class _AppearState extends State<Appear> with SingleTickerProviderStateMixin {
     child: widget.child,
     builder: (_, child) {
       final v = _t.value;
-      if (v >= 1) return child!;
-      if (_still) return Opacity(opacity: v, child: child);
+      // Done when the controller is (a spring curve passes 1 on the way).
+      if (identical(_t, kAlwaysCompleteAnimation) || _c.isCompleted) return child!;
+      final o = v.clamp(0.0, 1.0);
+      if (_still) return Opacity(opacity: o, child: child);
       return Opacity(
-        opacity: v,
+        opacity: o,
         child: Transform.translate(
           offset: Offset(widget.shift * (1 - v), widget.rise * (1 - v)),
           child: Transform.scale(

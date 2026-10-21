@@ -286,11 +286,23 @@ class _ChatHomePageState extends State<ChatHomePage> {
                   scaleFrom: 1,
                   child: GreetingBlock(text: m.text),
                 )
+              // Entrances: the user's line springs up out of the input bar
+              // (8 px, .96 → 1, 280 ms, emphasized decelerate); the
+              // assistant's words fade and rise one after another; a glass
+              // card lands a beat later on a soft spring from .97.
               : Appear(
                   animate: !_seen.contains(m.id),
-                  delay: !_seen.contains(m.id) && !m.isUser && !still ? SfMotion.replyStagger * queued++ : Duration.zero,
+                  delay: !_seen.contains(m.id) && !m.isUser && !still
+                      ? SfMotion.replyStagger * queued++ + (m.isPlan ? SfMotion.replyStagger : Duration.zero)
+                      : Duration.zero,
                   anchor: m.isUser ? Alignment.bottomRight : Alignment.bottomLeft,
-                  child: _message(m, fresh: !_seen.contains(m.id)),
+                  rise: m.isUser ? 8 : (m.isPlan ? 14 : 10),
+                  scaleFrom: m.isUser ? .96 : (m.isPlan ? .97 : .98),
+                  duration: m.isUser
+                      ? SfMotion.medium
+                      : (m.isPlan ? const Duration(milliseconds: 520) : SfMotion.appear),
+                  curve: m.isUser ? SfMotion.enter : (m.isPlan ? SfMotion.spring : SfMotion.standard),
+                  child: RepaintBoundary(child: _message(m, fresh: !_seen.contains(m.id))),
                 ),
         ),
       );

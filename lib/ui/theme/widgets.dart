@@ -42,9 +42,13 @@ class SfPressable extends StatefulWidget {
     this.toggled,
     this.selected,
     this.semanticHint,
+    this.expanded,
   });
   final Widget child;
   final VoidCallback? onTap;
+
+  /// Disclosure control: exposes expanded / collapsed (TalkBack state).
+  final bool? expanded;
   final String? semanticLabel;
 
   /// Switch-like control: exposes the toggled state (TalkBack "on/off")
@@ -137,6 +141,7 @@ class _SfPressableState extends State<SfPressable> {
       button: widget.toggled == null,
       toggled: widget.toggled,
       selected: widget.selected,
+      expanded: widget.expanded,
       enabled: enabled,
       label: widget.semanticLabel,
       hint: widget.semanticHint,
