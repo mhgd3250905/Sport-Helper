@@ -24,7 +24,7 @@ class _Memory implements LocalStateStorage {
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final (lib, catalog, _) = await AppServices.loadContent();
+  final (lib, catalog, _, _) = await AppServices.loadContent();
   final store = AppStore(_Memory());
   final shot = Uri.base.queryParameters['shot'] ?? 'shell';
   final services = AppServices(

@@ -65,7 +65,10 @@ class _AppearState extends State<Appear> with SingleTickerProviderStateMixin {
     final total = widget.delay + run;
     _c.duration = total;
     final start = widget.delay.inMicroseconds / total.inMicroseconds;
-    _t = CurvedAnimation(parent: _c, curve: Interval(start, 1, curve: _still ? Curves.easeOut : widget.curve));
+    _t = CurvedAnimation(
+      parent: _c,
+      curve: Interval(start, 1, curve: _still ? Curves.easeOut : widget.curve),
+    );
     _c.forward();
   }
 
@@ -82,7 +85,9 @@ class _AppearState extends State<Appear> with SingleTickerProviderStateMixin {
     builder: (_, child) {
       final v = _t.value;
       // Done when the controller is (a spring curve passes 1 on the way).
-      if (identical(_t, kAlwaysCompleteAnimation) || _c.isCompleted) return child!;
+      if (identical(_t, kAlwaysCompleteAnimation) || _c.isCompleted) {
+        return child!;
+      }
       final o = v.clamp(0.0, 1.0);
       if (_still) return Opacity(opacity: o, child: child);
       return Opacity(
@@ -125,7 +130,8 @@ class _Bubble extends StatelessWidget {
       borderRadius: bubbleRadius(user: user),
     ),
     child: Padding(
-      padding: padding ?? const EdgeInsets.fromLTRB(SfSpace.x4, 10, SfSpace.x4, 11),
+      padding:
+          padding ?? const EdgeInsets.fromLTRB(SfSpace.x4, 10, SfSpace.x4, 11),
       child: child,
     ),
   );
@@ -161,7 +167,14 @@ class MessageBubble extends StatelessWidget {
         children: [
           if (_step(message.text) case (final step, final rest)) ...[
             // 安全确认 1/4: the step as a caption over the question.
-            Text(step, style: SfType.caption.copyWith(color: SfColors.muted, letterSpacing: .6, fontFeatures: SfType.tabular)),
+            Text(
+              step,
+              style: SfType.caption.copyWith(
+                color: SfColors.muted,
+                letterSpacing: .6,
+                fontFeatures: SfType.tabular,
+              ),
+            ),
             const SizedBox(height: 2),
             Text(rest, style: SfType.body),
           ] else if (message.text.isNotEmpty)
@@ -190,7 +203,10 @@ class MessageBubble extends StatelessWidget {
     );
     return Align(
       alignment: user ? Alignment.centerRight : Alignment.centerLeft,
-      child: ConstrainedBox(constraints: BoxConstraints(maxWidth: maxW), child: bubble),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: maxW),
+        child: bubble,
+      ),
     );
   }
 }
@@ -236,24 +252,32 @@ class OptionPill extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Text(
                 label,
-                style: TextStyle(color: fg, fontSize: 14, height: 1.35, fontWeight: FontWeight.w500),
+                style: TextStyle(
+                  color: fg,
+                  fontSize: 14,
+                  height: 1.35,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             )
           : AnimatedContainer(
-        duration: SfMotion.medium,
-        constraints: const BoxConstraints(minHeight: 36),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        decoration: ShapeDecoration(color: bg, shape: const StadiumBorder()),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: fg,
-            fontSize: 14,
-            height: 1.35,
-            fontWeight: chosen ? FontWeight.w600 : FontWeight.w500,
-          ),
-        ),
-      ),
+              duration: SfMotion.medium,
+              constraints: const BoxConstraints(minHeight: 36),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              decoration: ShapeDecoration(
+                color: bg,
+                shape: const StadiumBorder(),
+              ),
+              child: Text(
+                label,
+                style: TextStyle(
+                  color: fg,
+                  fontSize: 14,
+                  height: 1.35,
+                  fontWeight: chosen ? FontWeight.w600 : FontWeight.w500,
+                ),
+              ),
+            ),
     );
   }
 }
@@ -272,7 +296,12 @@ class GreetingBlock extends StatelessWidget {
     final rest = i < 0 ? '' : text.substring(i + 1);
     return Padding(
       key: const ValueKey('greeting'),
-      padding: const EdgeInsets.fromLTRB(SfSpace.x2, SfSpace.x6, SfSpace.x2, SfSpace.x1),
+      padding: const EdgeInsets.fromLTRB(
+        SfSpace.x2,
+        SfSpace.x6,
+        SfSpace.x2,
+        SfSpace.x1,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -311,7 +340,8 @@ class TimeMark extends StatelessWidget {
   Widget build(BuildContext context) {
     final today = DateTime(now.year, now.month, now.day);
     final day = DateTime(at.year, at.month, at.day);
-    final hm = '${at.hour.toString().padLeft(2, '0')}:${at.minute.toString().padLeft(2, '0')}';
+    final hm =
+        '${at.hour.toString().padLeft(2, '0')}:${at.minute.toString().padLeft(2, '0')}';
     final d = today.difference(day).inDays;
     final label = switch (d) {
       0 => '今天 $hm',
@@ -320,19 +350,24 @@ class TimeMark extends StatelessWidget {
     };
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: SfSpace.x3),
-      child: Center(child: Text(label, style: SfType.caption.copyWith(letterSpacing: .4))),
+      child: Center(
+        child: Text(label, style: SfType.caption.copyWith(letterSpacing: .4)),
+      ),
     );
   }
 }
 
 /// Three soft dots while the assistant "thinks".
 class TypingBubble extends StatefulWidget {
-  const TypingBubble({super.key});
+  const TypingBubble({super.key, this.onCancel, this.progressLabel});
+  final VoidCallback? onCancel;
+  final String? progressLabel;
   @override
   State<TypingBubble> createState() => _TypingBubbleState();
 }
 
-class _TypingBubbleState extends State<TypingBubble> with SingleTickerProviderStateMixin {
+class _TypingBubbleState extends State<TypingBubble>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _c = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 1100),
@@ -362,25 +397,46 @@ class _TypingBubbleState extends State<TypingBubble> with SingleTickerProviderSt
     child: _Bubble(
       user: false,
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 17),
-      child: AnimatedBuilder(
-        animation: _c,
-        builder: (_, _) => Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            for (var i = 0; i < 3; i++) ...[
-              if (i > 0) const SizedBox(width: 6),
-              Opacity(
-                opacity: .3 + .7 * _pulse((_c.value - i * .18) % 1),
-                child: SizedBox.square(
-                  dimension: 6,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(color: SfColors.muted, shape: BoxShape.circle),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          AnimatedBuilder(
+            animation: _c,
+            builder: (_, _) => Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                for (var i = 0; i < 3; i++) ...[
+                  if (i > 0) const SizedBox(width: 6),
+                  Opacity(
+                    opacity: .3 + .7 * _pulse((_c.value - i * .18) % 1),
+                    child: SizedBox.square(
+                      dimension: 6,
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: SfColors.muted,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-              ),
-            ],
+                ],
+              ],
+            ),
+          ),
+          if (widget.onCancel != null) ...[
+            const SizedBox(height: SfSpace.x3),
+            Text(widget.progressLabel ?? '正在准备回复…', style: SfType.body),
+            const SizedBox(height: SfSpace.x1),
+            Text('助理会分步查动作和核对计划，可能需要几分钟', style: SfType.caption),
+            SfTextAction(
+              key: const ValueKey('chat-cancel'),
+              label: '取消',
+              icon: SfGlyph.stop,
+              onPressed: widget.onCancel,
+            ),
           ],
-        ),
+        ],
       ),
     ),
   );
@@ -402,7 +458,12 @@ class SuggestionStrip extends StatelessWidget {
       height: dark ? 52 : 48,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.fromLTRB(SfSpace.x4, SfSpace.x1, SfSpace.x4, SfSpace.x2),
+        padding: const EdgeInsets.fromLTRB(
+          SfSpace.x4,
+          SfSpace.x1,
+          SfSpace.x4,
+          SfSpace.x2,
+        ),
         itemCount: items.length,
         separatorBuilder: (_, _) => const SizedBox(width: SfSpace.x2),
         // M6: a new batch arrives chip by chip (40 ms apart), sliding 8 px
@@ -416,31 +477,36 @@ class SuggestionStrip extends StatelessWidget {
           shift: 8,
           scaleFrom: 1,
           child: SfPressable(
-          key: ValueKey('suggestion-$i'),
-          semanticLabel: items[i],
-          haptic: SfHaptic.selection,
-          onTap: () => onTap(items[i]),
-          // Liquid glass: discovery chips are controls, so they float on
-          // glass over the colour field (standard quality).
-          child: SfGlassSurface(
-            radius: dark ? 20 : 18,
-            height: dark ? SfControlInk.minHeight : 36,
-            padding: const EdgeInsets.symmetric(horizontal: 14),
-            control: true,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (chipGlyphs[items[i]] case final g?) ...[
-                  SfIcon(g, size: 16, color: SfColors.accentText),
-                  const SizedBox(width: 6),
+            key: ValueKey('suggestion-$i'),
+            semanticLabel: items[i],
+            haptic: SfHaptic.selection,
+            onTap: () => onTap(items[i]),
+            // Liquid glass: discovery chips are controls, so they float on
+            // glass over the colour field (standard quality).
+            child: SfGlassSurface(
+              radius: dark ? 20 : 18,
+              height: dark ? SfControlInk.minHeight : 36,
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              control: true,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (chipGlyphs[items[i]] case final g?) ...[
+                    SfIcon(g, size: 16, color: SfColors.accentText),
+                    const SizedBox(width: 6),
+                  ],
+                  Text(
+                    items[i],
+                    style: TextStyle(
+                      color: SfColors.text.withValues(alpha: dark ? .95 : .78),
+                      fontSize: 14,
+                      height: 1.2,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
                 ],
-                Text(
-                  items[i],
-                  style: TextStyle(color: SfColors.text.withValues(alpha: dark ? .95 : .78), fontSize: 14, height: 1.2, fontWeight: FontWeight.w500),
-                ),
-              ],
+              ),
             ),
-          ),
           ),
         ),
       ),
@@ -522,9 +588,17 @@ class _ChatInputBarState extends State<ChatInputBar> {
                               ? SfControlFace(
                                   circle: true,
                                   padding: EdgeInsets.zero,
-                                  child: SfIcon(SfGlyph.bookmark, size: 19, color: SfColors.text.withValues(alpha: .9)),
+                                  child: SfIcon(
+                                    SfGlyph.bookmark,
+                                    size: 19,
+                                    color: SfColors.text.withValues(alpha: .9),
+                                  ),
                                 )
-                              : SfIcon(SfGlyph.bookmark, size: 21, color: SfColors.muted),
+                              : SfIcon(
+                                  SfGlyph.bookmark,
+                                  size: 21,
+                                  color: SfColors.muted,
+                                ),
                         ),
                       ),
                     )
@@ -538,18 +612,28 @@ class _ChatInputBarState extends State<ChatInputBar> {
                       minLines: 1,
                       maxLines: 4,
                       textInputAction: TextInputAction.send,
-                      style: TextStyle(color: SfColors.text, fontSize: 16, height: 1.5),
+                      style: TextStyle(
+                        color: SfColors.text,
+                        fontSize: 16,
+                        height: 1.5,
+                      ),
                       decoration: InputDecoration(
                         // Keep the whole capsule's input area tappable,
                         // including the space above and below the text.
                         isDense: true,
-                        contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 14,
+                        ),
                         filled: false,
                         border: InputBorder.none,
                         enabledBorder: InputBorder.none,
                         focusedBorder: InputBorder.none,
                         hintText: '说说想怎么练…',
-                        hintStyle: TextStyle(color: SfColors.faint, fontSize: 16, height: 1.5),
+                        hintStyle: TextStyle(
+                          color: SfColors.faint,
+                          fontSize: 16,
+                          height: 1.5,
+                        ),
                       ),
                       onChanged: (_) => setState(() {}),
                       onSubmitted: (_) => _submit(),
@@ -570,20 +654,26 @@ class _ChatInputBarState extends State<ChatInputBar> {
                           height: 36,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: ready ? SfColors.accent : SfColors.text.withValues(alpha: .08),
+                            color: ready
+                                ? SfColors.accent
+                                : SfColors.text.withValues(alpha: .08),
                           ),
                           // M9: the arrow grows into place as the disc
                           // turns accent; reduced motion: colour only.
                           child: Center(
                             child: AnimatedScale(
-                              scale: ready || SfMotion.reduced(context) ? 1 : .84,
+                              scale: ready || SfMotion.reduced(context)
+                                  ? 1
+                                  : .84,
                               duration: SfMotion.fast,
                               curve: SfMotion.standard,
                               child: SfIcon(
                                 SfGlyph.arrowUp,
                                 size: 18,
                                 strokeWidth: 2.2,
-                                color: ready ? SfColors.onAccent : SfColors.faint,
+                                color: ready
+                                    ? SfColors.onAccent
+                                    : SfColors.faint,
                               ),
                             ),
                           ),

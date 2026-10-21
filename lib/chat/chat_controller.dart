@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:ugk_coach/ugk_coach.dart' as coach;
 
 import '../data/app_store.dart';
 import '../domain/plan.dart';
@@ -19,7 +20,11 @@ class ChatController extends ChangeNotifier {
     required this.store,
     this.replyDelay = const Duration(milliseconds: 450),
     DateTime Function()? clock,
-  }) : _clock = clock ?? DateTime.now;
+  }) : _clock = clock ?? DateTime.now {
+    if (engine case final ProgressChatEngine progress) {
+      _progressSubscription = progress.events.listen(_onProgress);
+    }
+  }
 
   final ChatEngine engine;
   final AppStore store;
@@ -31,7 +36,54 @@ class ChatController extends ChangeNotifier {
   final List<ChatMessage> messages = [];
   List<String> suggestions = discoverySuggestions(returning: false);
   bool typing = false;
+  String? progressLabel;
+  StreamSubscription<coach.AgentEvent>? _progressSubscription;
+  String? _progressTurnId;
+  final Set<String> _finishedProgressTurns = {};
+  bool _progressEnded = true;
   ChatState _state = const ChatState();
+
+  void _onProgress(coach.AgentEvent event) {
+    if (!typing ||
+        _progressEnded ||
+        _finishedProgressTurns.contains(event.turnId)) {
+      return;
+    }
+    if (_progressTurnId != null && _progressTurnId != event.turnId) return;
+    _progressTurnId ??= event.turnId;
+    if (event.kind == coach.AgentEventKind.done) {
+      _endProgress();
+    } else {
+      progressLabel = switch (event.kind) {
+        coach.AgentEventKind.reading ||
+        coach.AgentEventKind.listing => '正在查动作库',
+        coach.AgentEventKind.checking => '正在核对计划',
+        coach.AgentEventKind.memory => '正在整理训练偏好',
+        coach.AgentEventKind.retrying =>
+          event.reason == coach.RequestErrorClass.contextTooLong
+              ? '正在整理上下文，继续思考…'
+              : '网络不稳，正在重试（${event.attempt}/${event.maxAttempts}）…',
+        coach.AgentEventKind.slow => '还在想…',
+        coach.AgentEventKind.thinking => progressLabel ?? '正在思考回复',
+        coach.AgentEventKind.done => null,
+      };
+    }
+    notifyListeners();
+  }
+
+  void _endProgress() {
+    final turnId = _progressTurnId;
+    if (turnId != null) {
+      _finishedProgressTurns.add(turnId);
+      // The SDK suppresses cancelled events; retain only recent UI turns too.
+      if (_finishedProgressTurns.length > 64) {
+        _finishedProgressTurns.remove(_finishedProgressTurns.first);
+      }
+    }
+    _progressTurnId = null;
+    _progressEnded = true;
+    progressLabel = null;
+  }
 
   /// Index into [safetyQuestions] while the safety talk runs (-1 = waiting
   /// for "我已了解"); null when no safety talk is open.
@@ -60,7 +112,14 @@ class ChatController extends ChangeNotifier {
     }
     for (final j in store.chatLog) {
       try {
-        messages.add(ChatMessage.fromJson(j));
+        messages.add(
+          ChatMessage.fromJson(
+            j,
+            restoreWith: engine is RestorableChatEngine
+                ? engine as RestorableChatEngine
+                : null,
+          ),
+        );
       } on Object {
         // Skip a message an older build wrote differently.
       }
@@ -74,16 +133,57 @@ class ChatController extends ChangeNotifier {
     }
     final last = messages.isEmpty ? null : messages.last.at;
     if (last == null || _clock().difference(last) > const Duration(hours: 6)) {
-      _bot(BotMessage(
-        '${greetingFor(_clock())}\n${messages.isEmpty ? '说说今天想怎么练？' : '欢迎回来，今天想怎么练？'}',
-        greeting: true,
-      ));
+      _bot(
+        BotMessage(
+          '${greetingFor(_clock())}\n${messages.isEmpty ? '说说今天想怎么练？' : '欢迎回来，今天想怎么练？'}',
+          greeting: true,
+        ),
+      );
     }
     suggestions = _defaults();
     notifyListeners();
   }
 
-  static final _none = ChatMessage(id: '', role: ChatRole.user, at: DateTime(2000));
+  static final _none = ChatMessage(
+    id: '',
+    role: ChatRole.user,
+    at: DateTime(2000),
+  );
+
+  /// Cancels this turn immediately; a late transport response cannot add cards.
+  void cancelRequest() {
+    if (!typing) return;
+    _replyEpoch++;
+    typing = false;
+    _endProgress();
+    if (engine case final ManagedChatEngine managed) managed.cancelPending();
+    suggestions = _defaults();
+    notifyListeners();
+    unawaited(_persist());
+  }
+
+  /// Starts a fresh SDK conversation while retaining saved plans and safety.
+  Future<void> newConversation() async {
+    _replyEpoch++;
+    typing = false;
+    _endProgress();
+    if (engine case final ManagedChatEngine managed) {
+      managed.cancelPending();
+      managed.reset();
+    }
+    _state = const ChatState();
+    _safetyStep = null;
+    _safetyMessageId = null;
+    messages.clear();
+    if (!store.safetyAccepted) {
+      _beginSafety(firstRun: true);
+    } else {
+      _bot(BotMessage('${greetingFor(_clock())}\n说说今天想怎么练？', greeting: true));
+      suggestions = _defaults();
+    }
+    notifyListeners();
+    await _persist();
+  }
 
   ChatState get _context => _state.copyWith(
     safetyBlocked: !store.trainingAllowed,
@@ -91,18 +191,28 @@ class ChatController extends ChangeNotifier {
     lastPlan: store.lastPlan,
     history: [
       for (final h in store.history)
-        WorkoutLog(title: h.title, at: h.at, minutes: h.minutes, completed: h.completed, total: h.total),
+        WorkoutLog(
+          title: h.title,
+          at: h.at,
+          minutes: h.minutes,
+          completed: h.completed,
+          total: h.total,
+        ),
     ],
     appearance: store.appearance,
-    systemLight: PlatformDispatcher.instance.platformBrightness == Brightness.light,
+    systemLight:
+        PlatformDispatcher.instance.platformBrightness == Brightness.light,
     now: _clock(),
+    recentMessages: List.unmodifiable(
+      messages.skip(messages.length > 20 ? messages.length - 20 : 0),
+    ),
   );
 
   /// The user typed [text] (or tapped a chip / option labelled [label]).
   Future<void> send(String text, {String? label}) async {
     final t = text.trim();
     if (t.isEmpty || typing) return;
-    _user(label ?? t);
+    final userMessage = _user(label ?? t);
     if (inSafetyCheck) {
       _bot(const BotMessage('先把上面的安全确认做完，再帮你排计划。'));
       notifyListeners();
@@ -111,14 +221,18 @@ class ChatController extends ChangeNotifier {
     }
     final epoch = ++_replyEpoch;
     typing = true;
+    _endProgress();
+    _progressEnded = false;
     notifyListeners();
     final reply = await engine.reply(t, _context);
     if (replyDelay > Duration.zero) await Future<void>.delayed(replyDelay);
     if (epoch != _replyEpoch) return;
     typing = false;
+    _endProgress();
     _state = reply.state;
+    if (reply.aiTurn) _replace(userMessage.copyWith(aiVisible: true));
     for (final m in reply.messages) {
-      _bot(m);
+      _bot(m, aiVisible: reply.aiTurn);
     }
     // A question with its own options doesn't need the chips too.
     final asks = reply.messages.any((m) => m.options.isNotEmpty);
@@ -163,10 +277,13 @@ class ChatController extends ChangeNotifier {
   }
 
   Future<void> choose(ChatMessage m, int index) async {
-    if (!isActive(m) || index < 0 || index >= m.options.length || typing) return;
+    if (!isActive(m) || index < 0 || index >= m.options.length || typing) {
+      return;
+    }
     final o = m.options[index];
     // Links (动作库, 全部计划) stay tappable; answers lock.
-    final isLink = o.isCommand &&
+    final isLink =
+        o.isCommand &&
         !o.value.startsWith('@save:') &&
         !o.value.startsWith('@saved:') &&
         !o.value.startsWith('@safety');
@@ -211,13 +328,27 @@ class ChatController extends ChangeNotifier {
   /// Called right before the player opens: becomes "上次那个".
   Future<bool> started(TrainingPlan p) async {
     if (!store.trainingAllowed) return false;
+    final card = messages.where((m) => m.plan?.id == p.id).lastOrNull;
+    final request = card?.request ?? requestForPlan(p);
+    if (p.source == 'ai') {
+      final managed = engine;
+      if (managed is! RestorableChatEngine ||
+          managed.restorePlan(p, request) == null) {
+        return false;
+      }
+    }
     final saved = store.savedFor(p);
     if (saved != null) await store.touchPlan(saved.id);
     await store.rememberPlan(p);
     if (!store.trainingAllowed) return false;
-    final card = messages.where((m) => m.plan?.id == p.id).lastOrNull;
-    final request = card?.request ?? requestForPlan(p);
-    _state = _state.copyWith(clearPending: true, plan: p, request: request);
+    _state = _state.copyWith(
+      clearPending: true,
+      plan: p,
+      request: request,
+      coachContext: Slots.fromRequest(
+        request,
+      ).merge(Slots(avoid: _state.coachContext?.avoid ?? const {})),
+    );
     // A plan edited in its detail page is a distinct version. Keep that
     // exact snapshot so the post-workout save offer survives a restart.
     if (card == null) _bot(BotMessage('', plan: p, request: request));
@@ -237,10 +368,12 @@ class ChatController extends ChangeNotifier {
         ? '这次先到这儿。想换个更轻松的，跟我说「简单点」。'
         : '完成了 $completed/$total 个动作，已经不错了。';
     final offer = completed > 0 && !isSaved(p);
-    _bot(BotMessage(
-      offer ? '$text\n要把这套存下来，下次直接用吗？' : text,
-      options: offer ? [ChatOption('保存这套', '@save:${p.id}')] : const [],
-    ));
+    _bot(
+      BotMessage(
+        offer ? '$text\n要把这套存下来，下次直接用吗？' : text,
+        options: offer ? [ChatOption('保存这套', '@save:${p.id}')] : const [],
+      ),
+    );
     suggestions = _defaults();
     notifyListeners();
     unawaited(_persist());
@@ -266,6 +399,8 @@ class ChatController extends ChangeNotifier {
   void _beginSafety({required bool firstRun}) {
     _replyEpoch++;
     typing = false;
+    _endProgress();
+    if (engine case final ManagedChatEngine managed) managed.cancelPending();
     unawaited(store.beginSafetyCheck());
     if (firstRun) {
       messages.clear();
@@ -274,7 +409,10 @@ class ChatController extends ChangeNotifier {
       _bot(const BotMessage('好，重新做一次安全确认。'));
     }
     _safetyMessageId = _bot(
-      const BotMessage(safetyDisclaimer, options: [ChatOption('我已了解', '@safety:ack')]),
+      const BotMessage(
+        safetyDisclaimer,
+        options: [ChatOption('我已了解', '@safety:ack')],
+      ),
     ).id;
     _safetyStep = -1;
     suggestions = const [];
@@ -302,10 +440,15 @@ class ChatController extends ChangeNotifier {
 
   void _askSafety(int i) {
     _safetyStep = i;
-    _safetyMessageId = _bot(BotMessage(
-      safetyQuestionText(i),
-      options: const [ChatOption('否', '@safety:no'), ChatOption('是', '@safety:yes')],
-    )).id;
+    _safetyMessageId = _bot(
+      BotMessage(
+        safetyQuestionText(i),
+        options: const [
+          ChatOption('否', '@safety:no'),
+          ChatOption('是', '@safety:yes'),
+        ],
+      ),
+    ).id;
   }
 
   Future<void> _finishSafety({required int? blockedBy}) async {
@@ -316,10 +459,12 @@ class ChatController extends ChangeNotifier {
       _bot(const BotMessage(safetyAllClear));
       suggestions = _defaults();
     } else {
-      _bot(BotMessage(
-        safetyBlockedText(blockedBy),
-        options: const [ChatOption('浏览动作库', '@library')],
-      ));
+      _bot(
+        BotMessage(
+          safetyBlockedText(blockedBy),
+          options: const [ChatOption('浏览动作库', '@library')],
+        ),
+      );
       suggestions = const ['浏览动作库'];
     }
   }
@@ -327,27 +472,42 @@ class ChatController extends ChangeNotifier {
   // ------------------------------------------------------------ helpers
 
   List<String> _defaults() => discoverySuggestions(
-    returning: store.lastPlan != null || store.savedPlans.isNotEmpty || store.history.isNotEmpty,
+    returning:
+        store.lastPlan != null ||
+        store.savedPlans.isNotEmpty ||
+        store.history.isNotEmpty,
     blocked: store.safetyBlocked,
   );
 
-  ChatMessage _user(String text) => _add(ChatMessage(
-    id: _id(),
-    role: ChatRole.user,
-    at: _clock(),
-    text: text,
-  ));
+  ChatMessage _user(String text) => _add(
+    ChatMessage(id: _id(), role: ChatRole.user, at: _clock(), text: text),
+  );
 
-  ChatMessage _bot(BotMessage m) => _add(ChatMessage(
-    id: _id(),
-    role: ChatRole.assistant,
-    at: _clock(),
-    text: m.text,
-    options: m.options,
-    plan: m.plan,
-    request: m.request,
-    greeting: m.greeting,
-  ));
+  ChatMessage _bot(BotMessage m, {bool aiVisible = false}) {
+    var plan = m.plan;
+    var validatedPlan = m.validatedPlan;
+    if (plan != null && plan.source == 'ai' && validatedPlan == null) {
+      if (engine case final RestorableChatEngine restorable) {
+        validatedPlan = restorable.restorePlan(plan, m.request);
+      }
+      if (validatedPlan == null) plan = null;
+    }
+    return _add(
+      ChatMessage(
+        id: _id(),
+        role: ChatRole.assistant,
+        at: _clock(),
+        text: m.text,
+        options: m.options,
+        plan: plan,
+        validatedPlan: validatedPlan,
+        actions: m.actions,
+        request: m.request,
+        greeting: m.greeting,
+        aiVisible: aiVisible,
+      ),
+    );
+  }
 
   ChatMessage _add(ChatMessage m) {
     messages.add(m);
@@ -361,12 +521,17 @@ class ChatController extends ChangeNotifier {
 
   String _id() => 'm${_clock().microsecondsSinceEpoch}-${_seq++}';
 
-  Future<void> _persist() =>
-      store.setChatLog([for (final m in messages) m.toJson().cast<String, dynamic>()]);
+  Future<void> _persist() => store.setChatLog([
+    for (final m in messages) m.toJson().cast<String, dynamic>(),
+  ]);
 
   @override
   void dispose() {
     _replyEpoch++;
+    typing = false;
+    _endProgress();
+    unawaited(_progressSubscription?.cancel());
+    if (engine case final ManagedChatEngine managed) managed.cancelPending();
     _actions.close();
     super.dispose();
   }

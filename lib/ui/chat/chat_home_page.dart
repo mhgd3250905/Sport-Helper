@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
+import 'package:ugk_trainer/ugk_trainer.dart' show SessionResult;
 
 import '../../app/services.dart';
 import '../../chat/chat_controller.dart';
@@ -19,11 +20,13 @@ import '../theme/glass.dart';
 import '../theme/sf_icons.dart';
 import '../theme/tokens.dart';
 import '../theme/widgets.dart';
+import 'action_card.dart';
 import 'chat_widgets.dart';
 import 'cosmos.dart';
 import 'expand_route.dart';
 import 'plan_card.dart';
 import 'saved_plans_drawer.dart';
+import 'validated_plan_card.dart';
 
 /// The home screen: one conversation floating in an endless sky. No app
 /// bar, no borders; the plans drawer opens from the input's left icon.
@@ -110,17 +113,21 @@ class _ChatHomePageState extends State<ChatHomePage> {
       return;
     }
     if (!await _chat.started(p)) return;
-    final before = s.store.history.length;
     if (!mounted) return;
-    await Navigator.of(context).push(CardExpandRoute<void>(
-      origin: from,
-      settings: const RouteSettings(name: 'player'),
-      builder: (_) => PlayerPage(plan: p),
-    ));
+    final result = await Navigator.of(context).push(
+      CardExpandRoute<SessionResult>(
+        origin: from,
+        settings: const RouteSettings(name: 'player'),
+        builder: (_) => PlayerPage(plan: p),
+      ),
+    );
     if (!mounted) return;
-    if (s.store.history.length > before) {
-      final h = s.store.history.first;
-      _chat.finished(p, completed: h.completed, total: h.total);
+    if (result != null) {
+      _chat.finished(
+        p,
+        completed: result.completedExercises,
+        total: result.totalExercises,
+      );
     }
   }
 
@@ -130,11 +137,11 @@ class _ChatHomePageState extends State<ChatHomePage> {
     _toast('已保存为「${saved.name}」');
   }
 
-  Future<void> _details(ChatMessage m) async {
+  Future<void> _details(ChatMessage m, {TrainingPlan? validatedPlan}) async {
     final plan = await Navigator.of(context).push<TrainingPlan>(
       MaterialPageRoute(
         builder: (_) => PlanPage(
-          plan: m.plan!,
+          plan: validatedPlan ?? m.plan!,
           request: m.request,
           returnPlanOnStart: true,
         ),
@@ -150,7 +157,13 @@ class _ChatHomePageState extends State<ChatHomePage> {
 
   Future<void> _send(String text, {String? label}) async {
     if (_scroll.hasClients && _scroll.offset > 0) {
-      unawaited(_scroll.animateTo(0, duration: const Duration(milliseconds: 300), curve: Curves.easeOut));
+      unawaited(
+        _scroll.animateTo(
+          0,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        ),
+      );
     }
     await _chat.send(text, label: label);
   }
@@ -164,7 +177,9 @@ class _ChatHomePageState extends State<ChatHomePage> {
         key: _scaffold,
         backgroundColor: SfColors.skyBottom,
         resizeToAvoidBottomInset: true,
-        drawerScrimColor: SfColors.isDark ? const Color(0x99000000) : const Color(0x4D121614),
+        drawerScrimColor: SfColors.isDark
+            ? const Color(0x99000000)
+            : const Color(0x4D121614),
         drawer: SavedPlansDrawer(
           store: s.store,
           library: s.library,
@@ -212,7 +227,32 @@ class _ChatHomePageState extends State<ChatHomePage> {
                               fit: StackFit.expand,
                               children: [
                                 const SfGlassField(),
-                                SafeArea(bottom: false, child: _messages()),
+                                SafeArea(
+                                  bottom: false,
+                                  child: Column(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: SfSpace.x4,
+                                        ),
+                                        child: Align(
+                                          alignment: Alignment.centerRight,
+                                          child: SfTextAction(
+                                            key: const ValueKey(
+                                              'chat-new-conversation',
+                                            ),
+                                            label: '新对话',
+                                            icon: SfGlyph.sparkle,
+                                            onPressed: () => unawaited(
+                                              _chat.newConversation(),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Expanded(child: _messages()),
+                                    ],
+                                  ),
+                                ),
                               ],
                             ),
                           ),
@@ -223,7 +263,10 @@ class _ChatHomePageState extends State<ChatHomePage> {
                           bottom: 0,
                           child: SfMeasureSize(
                             onSize: (s) {
-                              if ((s.height - _dockHeight).abs() > .5) setState(() => _dockHeight = s.height);
+                              if (mounted &&
+                                  (s.height - _dockHeight).abs() > .5) {
+                                setState(() => _dockHeight = s.height);
+                              }
                             },
                             child: SafeArea(
                               top: false,
@@ -231,14 +274,17 @@ class _ChatHomePageState extends State<ChatHomePage> {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   SuggestionStrip(
-                                    items: _chat.typing ? const [] : _chat.suggestions,
+                                    items: _chat.typing
+                                        ? const []
+                                        : _chat.suggestions,
                                     onTap: _send,
                                   ),
                                   ChatInputBar(
                                     focusNode: _input,
                                     onSend: _send,
                                     enabled: !_chat.typing,
-                                    onPlans: () => _scaffold.currentState?.openDrawer(),
+                                    onPlans: () =>
+                                        _scaffold.currentState?.openDrawer(),
                                   ),
                                 ],
                               ),
@@ -268,7 +314,8 @@ class _ChatHomePageState extends State<ChatHomePage> {
     for (var i = 0; i < msgs.length; i++) {
       final m = msgs[i];
       final prev = i == 0 ? null : msgs[i - 1];
-      if (prev == null || m.at.difference(prev.at) > const Duration(minutes: 45)) {
+      if (prev == null ||
+          m.at.difference(prev.at) > const Duration(minutes: 45)) {
         rows.add(TimeMark(m.at, now: now));
       }
       final sameSide = prev != null && prev.isUser == m.isUser;
@@ -293,36 +340,57 @@ class _ChatHomePageState extends State<ChatHomePage> {
               : Appear(
                   animate: !_seen.contains(m.id),
                   delay: !_seen.contains(m.id) && !m.isUser && !still
-                      ? SfMotion.replyStagger * queued++ + (m.isPlan ? SfMotion.replyStagger : Duration.zero)
+                      ? SfMotion.replyStagger * queued++ +
+                            (m.isPlan ? SfMotion.replyStagger : Duration.zero)
                       : Duration.zero,
-                  anchor: m.isUser ? Alignment.bottomRight : Alignment.bottomLeft,
+                  anchor: m.isUser
+                      ? Alignment.bottomRight
+                      : Alignment.bottomLeft,
                   rise: m.isUser ? 8 : (m.isPlan ? 14 : 10),
                   scaleFrom: m.isUser ? .96 : (m.isPlan ? .97 : .98),
                   duration: m.isUser
                       ? SfMotion.medium
-                      : (m.isPlan ? const Duration(milliseconds: 520) : SfMotion.appear),
-                  curve: m.isUser ? SfMotion.enter : (m.isPlan ? SfMotion.spring : SfMotion.standard),
-                  child: RepaintBoundary(child: _message(m, fresh: !_seen.contains(m.id))),
+                      : (m.isPlan
+                            ? const Duration(milliseconds: 520)
+                            : SfMotion.appear),
+                  curve: m.isUser
+                      ? SfMotion.enter
+                      : (m.isPlan ? SfMotion.spring : SfMotion.standard),
+                  child: RepaintBoundary(
+                    child: _message(m, fresh: !_seen.contains(m.id)),
+                  ),
                 ),
         ),
       );
     }
     if (_chat.typing) {
-      rows.add(const Padding(
-        key: ValueKey('typing'),
-        padding: EdgeInsets.only(top: SfSpace.x4),
-        child: TypingBubble(),
-      ));
+      rows.add(
+        Padding(
+          key: ValueKey('typing'),
+          padding: EdgeInsets.only(top: SfSpace.x4),
+          child: TypingBubble(
+            onCancel: _chat.cancelRequest,
+            progressLabel: _chat.progressLabel,
+          ),
+        ),
+      );
     }
     final reversed = rows.reversed.toList();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _seen.addAll(msgs.map((m) => m.id)));
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => _seen.addAll(msgs.map((m) => m.id)),
+    );
     return Stack(
       children: [
         BackdropGroup(
           child: ListView.builder(
             controller: _scroll,
             reverse: true,
-            padding: EdgeInsets.fromLTRB(SfSpace.x4, 48, SfSpace.x4, _dockHeight + SfSpace.x3),
+            padding: EdgeInsets.fromLTRB(
+              SfSpace.x4,
+              48,
+              SfSpace.x4,
+              _dockHeight + SfSpace.x3,
+            ),
             itemCount: reversed.length,
             itemBuilder: (_, i) => reversed[i],
             findChildIndexCallback: (key) {
@@ -341,7 +409,10 @@ class _ChatHomePageState extends State<ChatHomePage> {
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [SfColors.skyTop, SfColors.skyTop.withValues(alpha: 0)],
+                  colors: [
+                    SfColors.skyTop,
+                    SfColors.skyTop.withValues(alpha: 0),
+                  ],
                 ),
               ),
             ),
@@ -351,19 +422,51 @@ class _ChatHomePageState extends State<ChatHomePage> {
     );
   }
 
-  Widget _message(ChatMessage m, {bool fresh = false}) => m.isPlan
-      ? PlanCard(
-          plan: m.plan!,
-          landing: fresh,
-          library: AppServices.of(context).library,
-          saved: _chat.isSaved(m.plan!),
-          onStart: (from) => _start(m.plan!, from: from),
-          onSave: () => _save(m.plan!),
-          onOpen: () => _details(m),
-        )
-      : MessageBubble(
-    message: m,
-    optionsActive: _chat.isActive(m),
-    onOption: (i) => _chat.choose(m, i),
-  );
+  Widget _message(ChatMessage m, {bool fresh = false}) {
+    final library = AppServices.of(context).library;
+    final hasText = m.text.isNotEmpty || m.options.isNotEmpty;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (hasText)
+          MessageBubble(
+            message: m,
+            optionsActive: !_chat.typing && _chat.isActive(m),
+            onOption: (i) => _chat.choose(m, i),
+          ),
+        if (m.actions case final actions?) ...[
+          if (hasText) const SizedBox(height: SfSpace.x3),
+          ActionCard(
+            actions: actions,
+            library: library,
+            onOpen: (exercise) => showExerciseDetails(context, exercise),
+          ),
+        ],
+        if (m.validatedPlan case final validated?) ...[
+          if (hasText) const SizedBox(height: SfSpace.x3),
+          ValidatedPlanCard(
+            validatedPlan: validated,
+            library: library,
+            landing: fresh,
+            isSaved: _chat.isSaved,
+            onStart: (plan, from) => _start(plan, from: from),
+            onSave: _save,
+            onOpen: (plan) => _details(m, validatedPlan: plan),
+          ),
+        ] else if (m.isPlan && m.plan!.source != 'ai') ...[
+          if (hasText) const SizedBox(height: SfSpace.x3),
+          PlanCard(
+            plan: m.plan!,
+            landing: fresh,
+            library: library,
+            saved: _chat.isSaved(m.plan!),
+            onStart: (from) => _start(m.plan!, from: from),
+            onSave: () => _save(m.plan!),
+            onOpen: () => _details(m),
+          ),
+        ],
+      ],
+    );
+  }
 }

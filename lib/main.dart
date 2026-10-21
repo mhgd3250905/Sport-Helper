@@ -1,10 +1,15 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
+import 'package:ugk_coach/ugk_coach.dart' as coach;
 
 import 'app/services.dart';
+import 'app/device_identity.dart';
 import 'core/storage/local_state_storage.dart';
 import 'data/app_store.dart';
 import 'ui/chat/chat_home_page.dart';
@@ -16,7 +21,9 @@ import 'voice/just_audio_output.dart';
 /// The bundled font's licence on the 开源软件许可 page.
 void registerFontLicense() {
   LicenseRegistry.addLicense(() async* {
-    final text = await rootBundle.loadString('assets/licenses/NotoSansSC-OFL.txt');
+    final text = await rootBundle.loadString(
+      'assets/licenses/NotoSansSC-OFL.txt',
+    );
     yield LicenseEntryWithLineBreaks(const ['Noto Sans SC'], text);
   });
 }
@@ -26,15 +33,28 @@ Future<void> main() async {
   registerFontLicense();
   // Pre-warm the glass shaders before the first frame (no white flash).
   await LiquidGlassWidgets.initialize();
-  final (lib, catalog, voices) = await AppServices.loadContent();
-  final store = AppStore(SharedPreferencesLocalStateStorage());
+  final (lib, catalog, voices, coachCatalog) = await AppServices.loadContent();
+  final coachProfile = coach.CoachProfile.fromJson(
+    jsonDecode(await rootBundle.loadString('assets/coach/smartfit.json')),
+  );
+  final storage = SharedPreferencesLocalStateStorage();
+  final store = AppStore(storage);
   await store.load();
+  String? deviceId;
+  try {
+    deviceId = await DeviceIdentity(storage).loadOrCreate();
+  } on Object {
+    // No persisted identifier means no proxy call; offline training still works.
+  }
   final services = AppServices(
     library: lib,
     catalog: catalog,
     store: store,
     voiceLibrary: voices,
     voiceOutput: JustAudioVoiceOutput(),
+    coachCatalog: coachCatalog,
+    coachProfile: coachProfile,
+    deviceId: deviceId,
   );
   runApp(
     LiquidGlassWidgets.wrap(
@@ -66,6 +86,12 @@ class SmartFitApp extends StatefulWidget {
 }
 
 class _SmartFitAppState extends State<SmartFitApp> {
+  @override
+  void dispose() {
+    unawaited(widget.services.dispose());
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) => AppScope(
     services: widget.services,

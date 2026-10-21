@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smartfit/chat/chat_controller.dart';
@@ -9,6 +11,19 @@ import 'package:smartfit/main.dart';
 import 'package:smartfit/ui/player_page.dart';
 
 import 'app_flow_test.dart' show MemoryStorage, services, tall;
+
+class _ObservedStorage extends MemoryStorage {
+  Completer<void>? _nextWrite;
+
+  Future<void> get nextWrite => (_nextWrite = Completer<void>()).future;
+
+  @override
+  Future<void> write(String key, String value) async {
+    await super.write(key, value);
+    _nextWrite?.complete();
+    _nextWrite = null;
+  }
+}
 
 const _original = TrainingPlan(
   id: 'details-original',
@@ -82,12 +97,19 @@ void main() {
         await tester.pump(const Duration(milliseconds: 50));
       }
       expect(s.store.history, hasLength(1));
-      expect(s.store.history.single.completed, 1);
+      expect(s.store.history.single.completed, 0);
       await tester.tap(find.byKey(const ValueKey('finish')));
       await tester.pumpAndSettle();
-      final offer = s.chat.messages.last;
-      expect(offer.options.single.value, '@save:${modified.id}');
-      await s.chat.choose(offer, 0);
+      // Skipping all work no longer creates a completion/save offer. The
+      // exact started snapshot can still be saved from its own plan card.
+      expect(s.chat.messages.last.options, isEmpty);
+      final expand = find.byKey(ValueKey('plan-expand-${modified.id}'));
+      await tester.ensureVisible(expand);
+      await tester.tap(expand);
+      await tester.pumpAndSettle();
+      final save = find.byKey(ValueKey('plan-save-${modified.id}'));
+      await tester.ensureVisible(save);
+      await tester.tap(save);
       await tester.pumpAndSettle();
       expect(s.store.savedPlans, hasLength(2));
       expect(s.store.savedFor(_original)!.plan.exerciseIds, {
@@ -101,7 +123,7 @@ void main() {
   test(
     'the actual started snapshot and its save offer survive a restart',
     () async {
-      final mem = MemoryStorage();
+      final mem = _ObservedStorage();
       final s = services();
       final store = AppStore(mem);
       await store.acceptSafety(blocked: false);
@@ -131,7 +153,11 @@ void main() {
         ],
       );
       expect(await c.started(modified), isTrue);
+      final finishedSaved = mem.nextWrite;
       c.finished(modified, completed: 1, total: 1);
+      // finished() deliberately persists asynchronously; restart only once
+      // its queued storage write has completed.
+      await finishedSaved;
 
       final loaded = AppStore(mem);
       await loaded.load();

@@ -14,7 +14,7 @@ import 'package:smartfit/domain/plan.dart';
 import 'package:smartfit/ui/plan_page.dart';
 import 'package:smartfit/ui/player_page.dart';
 import 'package:smartfit/ui/theme.dart';
-import 'package:smartfit/ui/theme/countdown.dart';
+import 'package:ugk_trainer/ugk_trainer.dart' show TrainerCountdownRing;
 
 import 'app_flow_test.dart' show services, tall;
 
@@ -73,10 +73,9 @@ void main() {
         await tester.tap(find.byKey(const ValueKey('skip')));
         await tester.pump();
       }
-      // The player clock is a real Stopwatch: let real time pass, then tick.
-      await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 400)));
-      await tester.pump(const Duration(milliseconds: 60));
-      double ring() => tester.widget<SfCountdownRing>(find.byType(SfCountdownRing)).progress.value;
+      // ugk_trainer uses clock.stopwatch: widget-test time is deterministic.
+      await tester.pump(const Duration(milliseconds: 400));
+      double ring() => tester.widget<TrainerCountdownRing>(find.byType(TrainerCountdownRing)).progress.value;
       expect(ring(), greaterThan(0.01));
       await tester.tap(find.byKey(const ValueKey('pause')));
       await tester.pump();
@@ -86,7 +85,7 @@ void main() {
       expect(find.byKey(const ValueKey('tag-paused')), findsOneWidget);
       await tester.pump(const Duration(seconds: 1));
       expect(ring(), lessThan(0.001), reason: 'still paused: the ring does not move');
-      expect(tester.widget<SfCountdownRing>(find.byType(SfCountdownRing)).dim, isTrue);
+      expect(tester.widget<TrainerCountdownRing>(find.byType(TrainerCountdownRing)).dim, isTrue);
       await tester.pumpWidget(const SizedBox());
     });
   }

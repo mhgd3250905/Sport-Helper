@@ -1,5 +1,69 @@
 # 智能健身助手（SmartFit）交接说明
 
+## 当前交接入口（2026-10-21，0.1.0+8 / SDK 0.3.2，已合入并推送 main）
+
+2026-10-21 开哥明确批准后，`feat/smartfit-coach-032@f0ebafc6257347e62533d98fb5d57f0706ddf6e9` 已以 `ebb0840f479acdf0bdc8a46e41f30eff055a0c1b` 合入 main，版本 `0.1.0+8`，合并树与审核分支一致；已推送 origin/main 并核对远端一致。两项 SDK ref 保持 `b26e4fda807b6ef3db15a61ba30c67fb51dce5e1`，运行源码、224 项测试与 APK 仍绑定 `b39304488e964b22a65501363a15140b5d0ca235`。六条新交互及独立严格动作卡补验通过，原臀桥合法文字导致的脚本断言失败 / exit 1 保留；本次不重新冒烟或改写数据。详见 [0.3.2 记录](coach-032-smoke-2026-10-21.md)。
+
+SDK 默认 100 步、单次 60 秒、整轮 360 秒、每步最多 4 次重试、30 秒慢提示；客户端 `maxRetries=0`，App 外保护 390 秒。新增 `retrying` 序号进度、`contextTooLong` 的整理上下文提示和 `slow`「还在想…」。最终回落区分 `AgentFailureKind` 三类和 `AgentStalled`，保留「预设方案」与 typed 卡片门禁，内部异常不显示。
+
+记忆逐条等待持久化成功后才确认，已确认事实在之后取消/reset 时保留；未确认的迟到保存由 SDK 补偿。`clearMemory()` 保存失败会抛错，不能先提示已清除。关闭和清除保留当前聊天，隔离验证须新对话。六条指定问题和补充卡片证据已独立完成，并已获准合入 App main；已核对远端 main 合并结果。版本和包身份由 [版本台账](version-management.md) 与 [验收记录](acceptance.md) 维护。
+
+## 上一阶段 Skill Agent（0.1.0+7，未单独合并，功能随 +8 入主线）
+
+以下保留 `+7` 当时的源码、参数与验收，不描述当前 `+8`。其中「SDK 待合 main」和 App 待审批均是历史时点；`+7` 未独立合并，其功能已随 `+8` 进入 main。
+
+当前开发分支 `feat/smartfit-skill-agent`，功能开发版本 `0.1.0+7`，接入基线为 SDK main `1f8be6e` 的 `ugk_coach 0.3.0`。`AiChatEngine` 将长期会话入口从 `CoachSession` 换为 `CoachAgent`，保留 `CoachTurnResult` 和 typed 卡片交付；SDK 内部按需读取 skill 文件，调用 `check_plan` 后经门禁交付 `show_actions` / `show_plan`。`maxSteps` 使用默认 10，记账穷举处理新增的 `CallOutcome.toolStep`。
+
+BaseURL、模型、App Key 与设备标识规则沿用上一阶段：`https://api.uuugk.win/v1`、`deepseek-v4-flash-0731`，只发送 `X-App-Key` / `X-Device-Id`，无 `Authorization`；密钥仅由 `--dart-define=SMARTFIT_AI_TOKEN` 注入。每次 HTTP 超时 120 秒且不重试，门禁最多重交 2 次；整轮保护超时提高到 1230 秒，以容纳多步请求。等待时禁用重复发送、可取消，并按 `agent.events` 的 `reading` / `checking` 分别显示「正在查动作库」/「正在核对计划」。取消结果不显示，关闭界面保留会话，「新对话」取消并 `reset()`。
+
+本机记忆由 App 的 `LocalUserMemoryStore` 实现 `UserMemoryStore.load/save`，整表保存在独立键 `smartfit.ai-memory.v1`，不与设备 UUID、聊天和计划混存。`enableUserMemory` 默认开；设置页「AI 记忆」开关持久化并即时同步 Agent，关闭后不再读取或新增记忆，原记忆保留。「清除记忆」调用 SDK `clearMemory()` 后复读本机存储确认已空；保存或清除失败须提示重试，不能假称成功。开关和清除保留当前聊天与已保存计划；验证关闭后不再引用本机记忆时，先开「新对话」隔离旧消息与 App 已解析条件。记忆开启时，其摘要会随 AI 请求发送。
+
+纯文字使用 SDK 接纳后的文字结果显示气泡，动作卡和计划卡分别只接 `ValidatedActions` / `ValidatedPlan`，保存或交给 `ugk_trainer` 的流程不变；持久化卡片恢复时重新过门禁。模型原始输出、未接纳工具参数与中间读取结果不得进入渲染层。失败继续回落原有本地模板并标「预设方案」，模板同样经门禁；每轮 `CoachContext` 继续带用户水平、时长、保护部位及场景/器械。AI 目录仍来自实际随包 93 个动作。
+
+首次真实 Worker 暴露 SDK 的 `reasoning_content` 续传缺口及响应缺失/null 时也需空字段的协议边界，当时在 SDK 独立分支 `fix/coach-agent-reasoning-replay` 修复并推送 `43dfef637144a1e08b5eda5ed743db0671ba5a8d`。SDK coach 304 项、trainer 126 项测试和两包分析通过；App `5743073691547d44aec891ab6d4a45b5b3fa381b` 当时固定该 commit，217 项测试、分析与锁文件检查通过。App 和 pub 缓存不改 SDK 代码。六类真实 Worker 核心验证在该阶段通过（前三按关闭记忆行为等价复用，后三在 `43dfef6` 实测），记录见 [历史多步验证](coach-agent-smoke-2026-10-21.md)；当时两仓修复均待审批，现状以顶部 `+8` 入口为准。
+
+`+7` 当时完成分组验证后等待两仓批准。现 SDK 0.3.2 已进入 main，App 的这些功能也随独立完成终验的 `+8` 合入；不把旧待办套用为当前审批状态。各历史包身份及证据继续由 [版本台账](version-management.md) 与 [验收记录](acceptance.md) 维护。
+
+## 上一阶段工具会话接入（0.1.0+6，历史）
+
+以下保留该阶段交接状态与验证证据，不代表 `+7` Skill Agent 已通过或已合并。
+
+当前主线 `main`（原开发分支 `feat/smartfit-coach-tools`），功能开发版本 `0.1.0+6`。`ugk_coach 0.2.0` 与 `ugk_trainer 0.1.4` 的 git 依赖都固定到 SDK main commit `09a392bc0b736e6a23eef71d55d86108660e0e59`。App 改用 SDK README 的 `CoachSession` 工具会话接口，取代旧 `CoachAssistant.ask()` JSON 信封聊天。本轮不修改 SDK 代码或 pub 缓存，不在 App 复制、内嵌或 patch SDK。
+
+BaseURL `https://api.uuugk.win/v1`，模型 `deepseek-v4-flash-0731`。App Key 只通过 `--dart-define=SMARTFIT_AI_TOKEN` 注入，沿用原设备 UUID；SDK `UgkWorkerAuth` 只发送 `X-App-Key` / `X-Device-Id`，无 `Authorization`。UUIDv4 首次持久化成功才启用 AI，配置缺失或标识存储失败使用本地引擎。服务器执行每设备 30 次 / 10 分钟限流。
+
+`AiChatEngine` 在 App 生命周期内长期持有一个 `CoachSession`；关闭 AI 界面不清会话，「新对话」取消请求并调用 `reset()`。等待时禁用发送，重复调用由 SDK 返回 `busy`；显示等待态和取消入口，用户主动取消或 reset 作废的结果不显示。首轮出计划可能 75–120 秒，单次 HTTP 超时 120 秒、HTTP 重试 0 次；门禁最多要求重交 2 次，整轮保护超时 365 秒。
+
+纯文字进气泡，`show_actions` 仅以 `ValidatedActions` 显示动作卡并打开本地动作详情；`show_plan` 仅以 `ValidatedPlan` 显示可保存、可由 `ugk_trainer` 开练的计划卡。模型原始输出不得进渲染层，本地持久化卡片恢复时重过 SDK 门禁。断网、超时、限流或门禁最终失败回落原有 `RuleChatEngine` / `TemplatePlanGenerator` 并标「预设方案」；模板计划同样经 `admitTemplate`，不合格不显示计划卡。
+
+profile 使用 SDK `09a392b` 的 smartfit，随包 `assets/coach/smartfit.json` 与上游一致；AI 目录由 SDK `DrillPackAdapter` 从实际 93 个随包动作构造，profile 备注中的全库 142 动作不代表 App 全部可用。每轮 `CoachContext` 带已知用户水平、时长、保护部位及场景/器械；水平和时长冲突会打回模型重交。请求发送当前输入、本轮条件、用户明确采用的当前计划与该会话模型历史（含工具调用与门禁反馈）；本地操作消息、已存计划列表和训练历史不自动上传。
+
+本次分析、App 测试、打包及模拟器 Worker 冷烟的结果由 [版本台账](version-management.md) 与 [验收记录](acceptance.md) 记录，尚未完成的检查不能标通过。本轮用户无可用真机，不写真机通过结论；模拟器已分别完成一次 `show_actions` 和一次 `show_plan` 的 Worker 首轮冷烟；核心功能链路已验，用户后续安装 APK 做真实问答体验。旧 `+5` 等真机记录只作历史证据。2026-10-21 开哥已授权合并推送，功能以 `f83642e` 合入 `main`，合并树与已验分支完全一致。后续只需跟进用户安装 APK 后的体验反馈。
+
+## 上一阶段 AI 接入（0.1.0+5，历史）
+
+下列记录描述 `+5` 的旧版 JSON 信封实现与 2026-10-21 文档收束，不代表 `+6` 工具会话或 `+7` Skill Agent 的源码与验收状态。当时开发分支 `feat/smartfit-ai-replies`，待验版本 `0.1.0+5`。BaseURL `https://api.uuugk.win/v1`、模型 `deepseek-v4-flash-0731`，沿用原 App Key 与原设备 UUID，通过 `X-App-Key` / `X-Device-Id` 发送，无 `Authorization`。随包 93 个动作的计划经严格校验后可保存和开练；断网、超时、限流或最终校验失败回退本地。旧实现上传 AI 可见相关轮次与显式当前计划/训练条件，已存计划及训练历史不自动上传。随机设备标识首次持久化成功才启用 AI，服务器执行每设备 30 次 / 10 分钟限流。
+
+`+5` 源码 `e549e0f84aa9118ef20752b8926c7b8c602a7e0f`，6 项接口/UUID/鉴权配置测试及分析通过；旧源全量 180 项本轮未重跑。debug 包已保留数据覆盖安装，签名与旧包相同，ZIP/profile 打包检查通过。新地址通用问答通过；三次计划请求分别 43,447 / 41,589 / 41,952 ms 因上游 `tencent:AbortError` 回退本地，第三次已极简为 3 动作 / 3 分钟，新接口计划生成未通过。已提示本地模板且继续可用。429 仅自动化验证不重试与提示，没有实际刷第 31 次请求。
+
+实际 UI 已保存旧 `+4` 接口生成的「办公室肩颈放松」10 动作原始 AI 计划，从原卡开练、暂停并于 34 活动秒提前结束；重启后已存计划 2 条、历史 4 条，原 AI 计划与部分 SessionResult 保留，原设备标识未变、前台服务已释放。2026-10-20 收尾时手机已从抽屉返回原 AI 计划卡，已保存状态可见，没有活动前台服务；这不是 2026-10-21 重新读取的设备状态。该局部流程不代表完整训练、`+5` 声音实听或新地址 AI 生成链路通过。包身份见 [版本台账](version-management.md)，观察见 [验收记录](acceptance.md)；待服务器恢复生成后再验新地址，目前不申请合并，合 main / 推送等待开哥新批准。
+
+该次收束只对齐文档与台账。阶段基线为 `main@0a40a45859378a93450c7d89cd355909613f99d5`，收束前 HEAD 为 `4cbadb0c5be786d16694ff1e7fbd2f3cb453925c`；当时已测运行源码与 APK 仍绑定 `e549e0f84aa9118ef20752b8926c7b8c602a7e0f`，两者之间仅文档变化。验证命令与适用性见 [验收记录](acceptance.md#验证来源与源码绑定)。该次没有重新调用接口、构建、安装或推送；当时待办是代理端恢复后重验新地址计划生成。
+
+旧 `0.1.0+4` / `cc16f530944cf4f6034365aa111528536978ecc3` 的分析及全量 180 项测试通过，旧地址实机曾约 21 秒成功生成 AI 计划，随后追问回落本地，旧包不再作为最终待验包。以下保留此前 `0.1.0+3` 主线与 `0.1.0+2` 训练接入证据。
+
+后续分支 `fix/chat-keyboard-reopen` 与 SDK `fix/catalog-repseconds-source` 已经开哥授权依次合入并推送两仓 `main`。App `0.1.0+3`，Git 依赖固定到已发布的 SDK `9407bf3`；GitHub 全新克隆及严格锁文件解析通过。SDK 目录节奏识别 `source=repSeconds`，100 项测试及分析通过。主页键盘通过重启微信输入法服务恢复，用户手动复验正常；未保留无效 App 输入补丁。详见 [后续修复记录](ugk-trainer-integration.md#后续修复2026-10-20)。以下为已合并的 `0.1.0+2` 接入基线。
+
+`feat/ugk-trainer-integration` 已经用户同意合入并推送 `main`，接入检查点 `04112472a1ab8f07cebc1e7feb00604a56796b56`，当前 App 版本 `0.1.0+2`。SDK 修复 `ea00ff7` 已先合入并推送其 `main`，远端依赖可获取；迁移、验证范围与发布记录见 [接入记录](ugk-trainer-integration.md)。Android 16 真机同一包自然跑完 7 动作、每项 2 组、696 活动秒；出声、后台/锁屏、暂停、保存/重启读取、服务释放通过，见 [真机记录](trainer-device-check-2026-10-20.md)。通知可见性、其他系统中断与 Play Console 声明仍待处理。下段版本与交付说明保留的是上一阶段 M7 状态。
+
+上一阶段 M7 记录：当时源码里程碑 `m7-aesthetic-v2`，PR #1、#2、#3 均已合并；App 包版本为 `0.1.0+1`，动作包 1.1.0、公共包 1.0.0。当前版本状态以 [版本管理与台账](version-management.md) 为准，验证结果与未通过项以 [本机验收记录](acceptance.md) 为准。
+
+该阶段的 M7 Android debug 测试包已本地交付，用户已取包，当时个人远程验证结果待反馈；未上传、未公开发布，也未在该阶段再次安装手机。release 尚无成功交付记录，正式签名与完整真机验收保持待办，不能标记 `m3-local-verified`。下列引述按时间保存阶段记录；文末 M1/M2 路径、旧待办和“当前 main”只描述原始交接时点。
+
+## 阶段记录（历史）
+
+> 美学 v2 检查点（2026-10-20）：PR #3 已合入 `main@a5997ef`，里程碑 `m7-aesthetic-v2`。对话入口、共享控件与动效统一，93 个动作均有浅色媒体；动作包版本 1.1.0，公共包 1.0.0。五项审核意见全部修复并复验：静态分析 0 issue、144 项测试、5 项独立复现/无障碍检查、资源校验 0 errors、Web release 与 Android debug 构建通过。合并树与审核源 `7ef80d7` 完全一致，详见 [PR #3 本机审核记录](pr3-local-review.md)。本次没有更新手机；真机媒体、系统中断与 release 验收继续待办。
+
 > 输入与设备检查点（2026-10-19）：`m6-input-focus` 修复对话输入框上下留白点不到的问题，新增 4 项回归，全量 102 项测试及 Web release / Android debug 构建通过；已覆盖安装到小米 Android 16，用户确认输入测试通过。目前手机为搜狗输入法，USB 调试保持连接。完整媒体、系统中断及 release 验收仍见 [acceptance.md](acceptance.md)。
 
 > 最新本机复验（2026-10-19）：PR #1 已合入 main（`adafcf9`，`m4-drill-packs`）；PR #2 已改 base 为 main，本机修复安全入口、保存复用约束与小屏交互后，98 项测试、截图检查及 Web release / Android debug 构建通过。见 [PR #2 审核记录](pr2-local-review.md) 和 [验收记录](acceptance.md)。下文保留各阶段历史；Android 真机与 release 签名尚未验收，`m3-local-verified` 未打。
@@ -10,8 +74,10 @@
 
 > 本机接手更新（2026-10-19）：已从 `6c2c1d3` 开始推进；本机 Flutter 3.44.7 / Dart 3.12.2 静态分析无问题，修复后 31 项测试通过。修复提前结束误记全部完成、暂停未冻结视频及暂停跳过的历史记录边界，补齐真实语音时序测试。检查点 `m3-local-tests`；真机未连接，模拟器和 release 构建因系统可用提交内存不足失败，尚未产出 APK。完整记录与待验清单见 [acceptance.md](acceptance.md)；`m3-local-verified` 仍待完整验收。下文保留原始交接记录。
 
+## 原始 M1/M2 交接存档
+
 > 交接日期：2026-10-19 · 交出方：Hark 云端沙盒 · 接手方：用户本机（从此为 **main 主线**）
-> 仓库：https://github.com/mhgd3250905/Sport-Helper · 当前 `main` = `b386d03` · tags：`m1-core`、`m2-voice-docs`
+> 仓库：https://github.com/mhgd3250905/Sport-Helper · 交接时 `main` = `b386d03` · 当时 tags：`m1-core`、`m2-voice-docs`
 
 ## 0. 角色与分工（从本次交接起生效）
 
@@ -37,7 +103,7 @@
 | 发布 | 不上架、不花钱；完全离线、无账号 |
 | 版本管理 | 每个成果节点 commit + tag（`mN-xxx`） |
 
-## 3. 当前完成度（M1 + M2）
+## 3. 交接时完成度（M1 + M2，历史）
 
 - **动作库 93 个**（`assets/library/exercises.json`，生成文件）
   - 46 个：Pose-Hub v0.2.0 深色成片（经 HipLab 冻结版本）
@@ -80,7 +146,7 @@ flutter build apk --release
 
 首次验收建议路径：安全确认 → 输入「办公室 10 分钟放松肩颈」看匹配 → 选「哑铃全身力量」看训练小组 → 进入跟练，检查视频封面→首帧切换、计时、组×次数、休息、换侧、语音 → 动作库翻看力量类视频 → 关于页署名。
 
-## 6. 已知问题 / 待办（建议优先级）
+## 6. 交接时问题 / 待办（历史，不代表当前状态）
 
 **P0（本机首日）**
 1. 在本机跑 `flutter test`，修掉真实失败（沙盒从未成功运行过测试）。

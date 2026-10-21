@@ -2,7 +2,8 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smartfit/domain/exercise.dart';
-import 'package:smartfit/domain/plan.dart';
+import 'package:ugk_coach/ugk_coach.dart' as coach;
+import 'package:smartfit/voice/voice_library.dart';
 import 'package:smartfit/domain/plan_generator.dart';
 import 'package:smartfit/domain/scenario.dart';
 import 'package:smartfit/domain/session.dart';
@@ -36,20 +37,55 @@ void main() {
   final exercises = loadLibrary();
   final catalog = loadCatalog();
   final voices = loadVoices();
-  final script = SessionScript(lib: voices, exercises: exercises);
+  final script = SessionScript(source: voices);
+
+  group('App voice preference adapter', () {
+    test('saved follow-App settings resolve to the trainer clip language', () {
+      final saved = {
+        'voice': false,
+        'chimes': true,
+        'language': 'app',
+        'volume': .4,
+      };
+      final settings = VoiceSettings.fromJson(saved);
+      final trainer = settings.toTrainerSettings();
+      expect(settings.toJson(), saved);
+      expect(trainer.language, 'zh');
+      expect(trainer.voice, isFalse);
+      expect(trainer.chimes, isTrue);
+      expect(trainer.volume, .4);
+    });
+
+    test('unavailable selected voice keeps chimes without partial speech', () {
+      final output = RecordingVoiceOutput();
+      final settings = const VoiceSettings(language: VoiceLanguage.en);
+      expect(settings.toTrainerSettings().language, 'en');
+      final queue = VoiceQueue(
+        output: output,
+        lib: voices,
+        settings: settings.toTrainerSettings(),
+      );
+      queue.submit(
+        const VoiceCue(0, ['chime.tick', 'n.3'], CuePriority.count),
+        0,
+      );
+      expect(output.chimes, [voices.asset('chime.tick')]);
+      expect(output.spoken, isEmpty);
+    });
+  });
 
   SessionRunner runner() {
-    const first = PlanItem(
+    const first = coach.PlanItem(
       exerciseId: 'h-squat',
-      mode: DoseMode.time,
+      mode: coach.DoseMode.time,
       sets: 1,
       workSeconds: 30,
       perSide: false,
       restSeconds: 10,
     );
-    const second = PlanItem(
+    const second = coach.PlanItem(
       exerciseId: 'w-dead-bug',
-      mode: DoseMode.time,
+      mode: coach.DoseMode.time,
       sets: 1,
       workSeconds: 30,
       perSide: false,
@@ -170,8 +206,7 @@ void main() {
     /// countdown (with margin), and nothing runs past the phase.
     void checkPhase(String where, SessionPhase phase, List<VoiceCue> cues) {
       final spans = [
-        for (final c in cues)
-          (c, c.at, c.at + voices.total(c.clips)),
+        for (final c in cues) (c, c.at, c.at + voices.total(c.clips)),
       ]..sort((a, b) => a.$2.compareTo(b.$2));
       for (var i = 1; i < spans.length; i++) {
         expect(
@@ -182,61 +217,100 @@ void main() {
       }
       if (phase.kind == PhaseKind.done) return;
       final countdown = cues
-          .where((c) => c.priority == CuePriority.count && c.clips.contains('chime.tick'))
+          .where(
+            (c) =>
+                c.priority == CuePriority.count &&
+                c.clips.contains('chime.tick'),
+          )
           .map((c) => c.at)
           .fold<double?>(null, (m, t) => m == null || t < m ? t : m);
       for (final (c, _, end) in spans) {
-        expect(end, lessThanOrEqualTo(phase.seconds + 1e-9), reason: '$where: $c runs past the phase');
-        if (countdown != null && !c.clips.contains('chime.tick') &&
-            (c.priority == CuePriority.coach || c.priority == CuePriority.info)) {
-          expect(end, lessThanOrEqualTo(countdown - countdownMargin + 1e-9),
-              reason: '$where: $c would be cut by the countdown');
+        expect(
+          end,
+          lessThanOrEqualTo(phase.seconds + 1e-9),
+          reason: '$where: $c runs past the phase',
+        );
+        if (countdown != null &&
+            !c.clips.contains('chime.tick') &&
+            (c.priority == CuePriority.coach ||
+                c.priority == CuePriority.info)) {
+          expect(
+            end,
+            lessThanOrEqualTo(countdown - countdownMargin + 1e-9),
+            reason: '$where: $c would be cut by the countdown',
+          );
         }
       }
     }
 
-    test('every template at every level: no overlap, no cut, pack lines used', () async {
-      final generator = TemplatePlanGenerator(lib: exercises, catalog: catalog);
-      final used = <String>{};
-      for (final template in catalog.templates) {
-        for (final level in [1, 2, 3]) {
-          final result = await generator.generate(
-            ScenarioRequest(
-              templateId: template.id,
-              scene: template.scenes.first,
-              equipment: template.equipment.map(Equipment.byName).toSet(),
-              minutes: template.minutes,
-              level: level,
-            ),
-          );
-          if (result.plan == null) continue;
-          final builder = SessionBuilder(exercises);
-          final phases = builder.phases(result.plan!);
-          for (var i = 0; i < phases.length; i++) {
-            for (final bySkip in [false, true]) {
-              final cues = script.cues(
-                phases[i],
-                planSeconds: builder.planSeconds(result.plan!),
-                bySkip: bySkip,
-              );
-              checkPhase('${template.id} L$level #$i ${phases[i]}', phases[i], cues);
-              for (final c in cues) {
-                for (final k in c.clips) {
-                  expect(File(voices.asset(k)).existsSync(), isTrue, reason: k);
-                  if (k.contains('/')) used.add(k.substring(k.indexOf('/') + 1));
+    test(
+      'every template at every level: no overlap, no cut, pack lines used',
+      () async {
+        final generator = TemplatePlanGenerator(
+          lib: exercises,
+          catalog: catalog,
+        );
+        final used = <String>{};
+        for (final template in catalog.templates) {
+          for (final level in [1, 2, 3]) {
+            final result = await generator.generate(
+              ScenarioRequest(
+                templateId: template.id,
+                scene: template.scenes.first,
+                equipment: template.equipment.map(Equipment.byName).toSet(),
+                minutes: template.minutes,
+                level: level,
+              ),
+            );
+            if (result.plan == null) continue;
+            final builder = SessionBuilder(exercises);
+            final phases = builder.phases(result.plan!);
+            for (var i = 0; i < phases.length; i++) {
+              for (final bySkip in [false, true]) {
+                final cues = script.cues(
+                  phases[i],
+                  planSeconds: builder.planSeconds(result.plan!),
+                  bySkip: bySkip,
+                );
+                checkPhase(
+                  '${template.id} L$level #$i ${phases[i]}',
+                  phases[i],
+                  cues,
+                );
+                for (final c in cues) {
+                  for (final k in c.clips) {
+                    expect(
+                      File(voices.asset(k)).existsSync(),
+                      isTrue,
+                      reason: k,
+                    );
+                    if (k.contains('/')) {
+                      used.add(k.substring(k.indexOf('/') + 1));
+                    }
+                  }
                 }
               }
             }
           }
         }
-      }
-      expect(used, containsAll(['intro', 'cue1', 'cue2', 'rest', 'finish', 'side_switch']));
-    });
+        expect(
+          used,
+          containsAll([
+            'intro',
+            'cue1',
+            'cue2',
+            'rest',
+            'finish',
+            'side_switch',
+          ]),
+        );
+      },
+    );
 
     test('second side of a timed move speaks its side_switch line', () {
-      const item = PlanItem(
+      const item = coach.PlanItem(
         exerciseId: 'h-couch-stretch',
-        mode: DoseMode.time,
+        mode: coach.DoseMode.time,
         sets: 1,
         workSeconds: 30,
         perSide: true,
@@ -263,34 +337,38 @@ void main() {
       expect(said(Side.left).first, 'chime.start');
     });
 
-    test('the rest after a move names it as finished, unless it was skipped', () {
-      const next = PlanItem(
-        exerciseId: 'w-dead-bug',
-        mode: DoseMode.time,
-        sets: 1,
-        workSeconds: 30,
-        perSide: false,
-        restSeconds: 10,
-      );
-      const rest = SessionPhase(
-        kind: PhaseKind.rest,
-        seconds: 15,
-        exerciseId: 'w-dead-bug',
-        item: next,
-        nextExerciseId: 'w-dead-bug',
-        nextItem: next,
-        doneExerciseId: 'h-squat',
-        sets: 1,
-        set: 1,
-      );
-      List<String> said({required bool bySkip}) => [
-        for (final c in script.cues(rest, planSeconds: 300, bySkip: bySkip)) ...c.clips,
-      ];
-      expect(said(bySkip: false), contains('h-squat/finish'));
-      expect(said(bySkip: false), contains('p.next'));
-      expect(said(bySkip: true), isNot(contains('h-squat/finish')));
-      expect(said(bySkip: true), contains('p.rest'));
-    });
+    test(
+      'the rest after a move names it as finished, unless it was skipped',
+      () {
+        const next = coach.PlanItem(
+          exerciseId: 'w-dead-bug',
+          mode: coach.DoseMode.time,
+          sets: 1,
+          workSeconds: 30,
+          perSide: false,
+          restSeconds: 10,
+        );
+        const rest = SessionPhase(
+          kind: PhaseKind.rest,
+          seconds: 15,
+          exerciseId: 'w-dead-bug',
+          item: next,
+          nextExerciseId: 'w-dead-bug',
+          nextItem: next,
+          doneExerciseId: 'h-squat',
+          sets: 1,
+          set: 1,
+        );
+        List<String> said({required bool bySkip}) => [
+          for (final c in script.cues(rest, planSeconds: 300, bySkip: bySkip))
+            ...c.clips,
+        ];
+        expect(said(bySkip: false), contains('h-squat/finish'));
+        expect(said(bySkip: false), contains('p.next'));
+        expect(said(bySkip: true), isNot(contains('h-squat/finish')));
+        expect(said(bySkip: true), contains('p.rest'));
+      },
+    );
   });
 
   group('session runner', () {
@@ -351,7 +429,7 @@ void main() {
       final queue = VoiceQueue(
         output: output,
         lib: voices,
-        settings: const VoiceSettings(),
+        settings: const VoiceSettings().toTrainerSettings(),
       );
       queue.submit(const VoiceCue(0, ['p.slow'], CuePriority.coach), 0);
       queue.submit(const VoiceCue(0, ['p.half'], CuePriority.info), .1);
@@ -377,7 +455,7 @@ void main() {
       final queue = VoiceQueue(
         output: output,
         lib: voices,
-        settings: const VoiceSettings(),
+        settings: const VoiceSettings().toTrainerSettings(),
       );
       queue.submit(const VoiceCue(0, ['n.1'], CuePriority.count), 0);
       queue.submit(const VoiceCue(0, ['p.half'], CuePriority.info), .1);
@@ -393,7 +471,7 @@ void main() {
       final queue = VoiceQueue(
         output: output,
         lib: voices,
-        settings: const VoiceSettings(voice: false),
+        settings: const VoiceSettings(voice: false).toTrainerSettings(),
       );
       queue.submit(
         const VoiceCue(0, ['chime.tick', 'n.3'], CuePriority.count),

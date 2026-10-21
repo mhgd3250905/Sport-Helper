@@ -2,8 +2,12 @@ import 'dart:convert';
 
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter/widgets.dart';
+import 'package:ugk_coach/ugk_coach.dart' as coach;
+import 'package:ugk_trainer/ugk_trainer.dart';
 
 import '../chat/chat_controller.dart';
+import '../chat/ai_chat_engine.dart';
+import '../chat/ai_coach_config.dart';
 import '../chat/chat_models.dart';
 import '../chat/rule_chat_engine.dart';
 import '../data/app_store.dart';
@@ -11,9 +15,6 @@ import '../domain/exercise.dart';
 import '../domain/plan_generator.dart';
 import '../domain/template.dart';
 import '../packs/drill_pack.dart';
-import '../voice/session_script.dart';
-import '../voice/voice_library.dart';
-import '../voice/voice_queue.dart';
 
 /// Everything pages need, created once at start-up.
 class AppServices {
@@ -23,31 +24,87 @@ class AppServices {
     required this.store,
     required this.voiceLibrary,
     required this.voiceOutput,
+    this.coachCatalog,
+    this.coachProfile,
+    this.aiConfig = const AiCoachConfig.fromEnvironment(),
+    this.deviceId,
+    this.memoryStore,
     this.chatReplyDelay = const Duration(milliseconds: 450),
   }) : templates = TemplatePlanGenerator(lib: library, catalog: catalog);
 
   final ExerciseLibrary library;
   final TemplateCatalog catalog;
   final AppStore store;
-  final VoiceLibrary voiceLibrary;
+  final VoiceSource voiceLibrary;
   final VoiceOutput voiceOutput;
+  final coach.Catalog? coachCatalog;
+  final coach.CoachProfile? coachProfile;
+  final AiCoachConfig aiConfig;
+  final String? deviceId;
+  final coach.UserMemoryStore? memoryStore;
+  coach.UserMemoryStore get userMemoryStore =>
+      memoryStore ?? store.aiMemoryStore;
 
-  /// MVP: fixed templates only. An AI generator plugs in behind the same
-  /// interface later (see AiPlanGenerator).
+  Future<void> setAiMemoryEnabled(bool enabled) async {
+    final engine = chatEngine;
+    if (engine is AiChatEngine) engine.enableUserMemory = enabled;
+    await store.setAiMemoryEnabled(enabled);
+  }
+
+  Future<void> clearAiMemory() async {
+    final engine = chatEngine;
+    if (engine is AiChatEngine) {
+      await engine.clearMemory();
+    } else {
+      await userMemoryStore.save([]);
+      if ((await userMemoryStore.load()).isNotEmpty) {
+        throw StateError('AI memory could not be cleared from local storage');
+      }
+    }
+  }
+
+  /// Manual forms stay deterministic; AI enters through the chat engine.
   final TemplatePlanGenerator templates;
   PlanGenerator get generator => templates;
 
-  VoiceQueue voiceQueue() {
-    voiceOutput.volume = store.voice.volume;
-    return VoiceQueue(output: voiceOutput, lib: voiceLibrary, settings: store.voice);
+  TrainerVoice trainerVoice() => TrainerVoice(
+    source: voiceLibrary,
+    output: voiceOutput,
+    settings: store.voice.toTrainerSettings(),
+  );
+
+  /// The output belongs to the App, so page navigation never destroys it.
+  Future<void> dispose() async {
+    chat.dispose();
+    if (chatEngine case final ManagedChatEngine managed) managed.dispose();
+    final output = voiceOutput;
+    if (output is JustAudioVoiceOutput) {
+      await output.dispose();
+    } else {
+      await output.end();
+    }
   }
 
-  SessionScript script() => SessionScript(lib: voiceLibrary, exercises: library);
+  /// No token means the original offline engine; a token never goes to storage.
+  late final ChatEngine chatEngine = _createChatEngine();
 
-  /// What answers in the chat home.
-  /// Rules + templates today; a model-backed [ChatEngine] later, with the
-  /// same plan validation.
-  late final ChatEngine chatEngine = RuleChatEngine(lib: library, templates: templates);
+  ChatEngine _createChatEngine() {
+    final local = RuleChatEngine(lib: library, templates: templates);
+    final catalog = coachCatalog;
+    final profile = coachProfile;
+    final id = deviceId;
+    if (!aiConfig.enabled || catalog == null || profile == null || id == null) {
+      return local;
+    }
+    return AiChatEngine(
+      local: local,
+      catalog: catalog,
+      profile: profile,
+      client: aiConfig.createClient(deviceId: id),
+      memoryStore: userMemoryStore,
+      enableUserMemory: store.aiMemoryEnabled,
+    );
+  }
 
   /// The "typing" pause before a reply (zero in tests and screenshots).
   final Duration chatReplyDelay;
@@ -62,7 +119,9 @@ class AppServices {
   /// The exercise library and the voice lines both come from the drill
   /// packs (assets/packs/, docs/drill-pack-spec.md); templates stay
   /// app-specific (assets/library/templates.json).
-  static Future<(ExerciseLibrary, TemplateCatalog, VoiceLibrary)>
+  static Future<
+    (ExerciseLibrary, TemplateCatalog, DrillPackVoiceSource, coach.Catalog)
+  >
   loadContent() async {
     final packs = await PackSet.load(rootBundle.loadString);
     final cat = TemplateCatalog.fromJson(
@@ -72,7 +131,14 @@ class AppServices {
     return (
       ExerciseLibrary.fromPacks(packs),
       cat,
-      VoiceLibrary.fromPacks(packs),
+      DrillPackVoiceSource.fromPacks(
+        common: packs.common.json,
+        packs: {for (final p in packs.exercises) p.id: p.json},
+      ),
+      const coach.DrillPackAdapter().build(
+        version: 'smartfit-bundled-1.1.0',
+        packs: {for (final p in packs.exercises) p.id: p.json},
+      ),
     );
   }
 

@@ -1,3 +1,4 @@
+import 'package:ugk_trainer/ugk_trainer.dart' show TrainerCountdownRing;
 // The motion list of docs/design-audit-2026-10-19.md §5 as assertions:
 // the countdown ring repaints on its own, the last seconds breathe (not
 // under reduced motion), plain pages push sideways (cross-fade under
@@ -96,16 +97,16 @@ void main() {
     final s = services();
     await tester.pumpWidget(AppScope(services: s, child: MaterialApp(theme: buildTheme(), home: const PlayerPage(plan: _hold))));
     await tester.pump();
-    final ring = tester.widget<SfCountdownRing>(find.byType(SfCountdownRing));
+    final ring = tester.widget<TrainerCountdownRing>(find.byType(TrainerCountdownRing));
     final before = ring.progress.value;
     await tester.pump(const Duration(milliseconds: 300));
     // Same notifier, advanced: the painter listens, the page need not.
-    expect(tester.widget<SfCountdownRing>(find.byType(SfCountdownRing)).progress, same(ring.progress));
+    expect(tester.widget<TrainerCountdownRing>(find.byType(TrainerCountdownRing)).progress, same(ring.progress));
     expect(ring.progress.value, greaterThan(before));
     // Pausing dims the ring.
     await tester.tap(find.byKey(const ValueKey('pause')));
     await tester.pump();
-    expect(tester.widget<SfCountdownRing>(find.byType(SfCountdownRing)).dim, isTrue);
+    expect(tester.widget<TrainerCountdownRing>(find.byType(TrainerCountdownRing)).dim, isTrue);
     await tester.pumpWidget(const SizedBox());
   });
 
