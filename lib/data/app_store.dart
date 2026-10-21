@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:ugk_trainer/ugk_trainer.dart' show SessionResult;
 
+import '../app/user_memory_store.dart';
 import '../core/storage/local_state_storage.dart';
 import '../domain/plan.dart';
 import '../domain/saved_plan.dart';
@@ -51,6 +52,13 @@ class AppStore extends ChangeNotifier {
 
   static const key = 'smartfit.state.v1';
   final LocalStateStorage _storage;
+
+  /// Memories have their own key and survive disabling the capability.
+  late final LocalUserMemoryStore aiMemoryStore = LocalUserMemoryStore(
+    _storage,
+  );
+
+  bool aiMemoryEnabled = true;
 
   bool safetyAccepted = false;
 
@@ -106,6 +114,7 @@ class AppStore extends ChangeNotifier {
         );
       }
       starfield = j['starfield'] != false;
+      aiMemoryEnabled = j['aiMemoryEnabled'] != false;
       if (appearances.contains(j['appearance'])) {
         appearance = j['appearance'] as String;
       }
@@ -160,6 +169,7 @@ class AppStore extends ChangeNotifier {
       for (final r in updatedSessions ?? _sessions.values) r.toJson(),
     ],
     'starfield': starfield,
+    'aiMemoryEnabled': aiMemoryEnabled,
     'appearance': appearance,
     'savedPlans': [for (final p in savedPlans) p.toJson()],
     'chat': chatLog.length > chatLogLimit
@@ -239,6 +249,14 @@ class AppStore extends ChangeNotifier {
   Future<void> setStarfield(bool on) {
     starfield = on;
     return _save();
+  }
+
+  /// Change this immediately for the running agent; persist failures reach the
+  /// settings UI so it can explain that the preference needs another save.
+  Future<void> setAiMemoryEnabled(bool enabled) {
+    aiMemoryEnabled = enabled;
+    notifyListeners();
+    return _enqueueWrite(() => _storage.write(key, _encodeState()));
   }
 
   Future<void> setAppearance(String a) {

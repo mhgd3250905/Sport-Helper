@@ -13,21 +13,27 @@ import 'rule_chat_engine.dart';
 import 'slot_parser.dart';
 
 /// One SDK session for the app lifetime. Only admitted results cross into UI.
-class AiChatEngine implements ManagedChatEngine, RestorableChatEngine {
+class AiChatEngine
+    implements ManagedChatEngine, RestorableChatEngine, ProgressChatEngine {
   AiChatEngine({
     required this.local,
     required this.catalog,
     required this.profile,
     required this.client,
-    // Three 120-second submissions can be needed for gate corrections.
-    this.turnTimeout = const Duration(seconds: 365),
-  });
+    this.memoryStore,
+    bool enableUserMemory = true,
+    // Agent owns its 360-second total budget, retries and request timeouts.
+    // This outer guard leaves time for its admitted local fallback to finish.
+    this.turnTimeout = const Duration(seconds: 390),
+  }) : _initialMemoryEnabled = enableUserMemory;
 
   final RuleChatEngine local;
   final coach.Catalog catalog;
   final coach.CoachProfile profile;
   final coach.LlmClient client;
   final Duration turnTimeout;
+  final coach.UserMemoryStore? memoryStore;
+  final bool _initialMemoryEnabled;
   final usage = coach.MemoryUsageSink();
   final _random = Random.secure();
   coach.CoachTurnResult? lastResult;
@@ -37,12 +43,14 @@ class AiChatEngine implements ManagedChatEngine, RestorableChatEngine {
   Future<coach.CoachTurnResult>? _sdkPending;
   bool _disposed = false;
 
-  late final session = coach.CoachSession(
+  late final agent = coach.CoachAgent(
     client: _CancellableClient(client),
     catalog: () => catalog,
     profile: profile,
     maxResubmits: 2,
     usage: usage,
+    memoryStore: memoryStore,
+    enableUserMemory: _initialMemoryEnabled,
     extraRules: [
       (plan, _, context) {
         final mapped = TrainingPlan.fromJson(plan.toJson());
@@ -79,8 +87,26 @@ class AiChatEngine implements ManagedChatEngine, RestorableChatEngine {
     },
   );
 
+  /// Transitional alias for diagnostics and existing App integrations.
+  coach.CoachAgent get session => agent;
+
   @override
-  String get id => 'ugk_coach:smartfit:tools';
+  Stream<coach.AgentEvent> get events => agent.events;
+
+  bool get enableUserMemory => agent.enableUserMemory;
+  set enableUserMemory(bool value) => agent.enableUserMemory = value;
+
+  Future<void> clearMemory() async {
+    await agent.clearMemory();
+    // The SDK awaits durable storage and throws on failure. Also verify the
+    // App storage boundary before confirming removal to the user.
+    if ((await agent.memoryStore.load()).isNotEmpty) {
+      throw StateError('AI memory could not be cleared from local storage');
+    }
+  }
+
+  @override
+  String get id => 'ugk_coach:smartfit:agent';
 
   @override
   void cancelPending() {
@@ -107,6 +133,7 @@ class AiChatEngine implements ManagedChatEngine, RestorableChatEngine {
     _disposed = true;
     cancelPending();
     session.reset();
+    unawaited(agent.dispose());
     if (client is coach.OpenAiCompatibleClient) {
       (client as coach.OpenAiCompatibleClient).close();
     }
@@ -215,6 +242,15 @@ class AiChatEngine implements ManagedChatEngine, RestorableChatEngine {
           text: fallback.messages.map((m) => m.text).join('\n'),
           plan: plan == null ? null : restorePlan(plan, fallback.state.request),
           fallbackReason: coach.FallbackReason.timeout,
+          error: const coach.AgentRequestFailed(
+            coach.AgentFailureKind.turnTimeout,
+            errorClass: coach.RequestErrorClass.timeout,
+            attempts: 0,
+          ),
+          records: result.records,
+          steps: result.steps,
+          reads: result.reads,
+          submissions: result.submissions,
         );
         turn.fallbackReply = fallback;
       } else {
@@ -228,9 +264,7 @@ class AiChatEngine implements ManagedChatEngine, RestorableChatEngine {
       lastFallbackReason = accepted.fallbackReason;
       lastOutcome = switch (accepted.status) {
         coach.TurnStatus.ok =>
-          accepted.submissions > 1
-              ? coach.TurnOutcome.rewritten
-              : coach.TurnOutcome.model,
+          accepted.records.lastOrNull?.turnOutcome ?? coach.TurnOutcome.model,
         coach.TurnStatus.fallback => coach.TurnOutcome.fallback,
         _ => coach.TurnOutcome.error,
       };
@@ -278,10 +312,7 @@ class AiChatEngine implements ManagedChatEngine, RestorableChatEngine {
             ).copyWith(description: input, equipment: turn.slots.equipment);
       final fallback = accepted.status == coach.TurnStatus.fallback;
       final text = [
-        if (fallback)
-          accepted.fallbackReason == coach.FallbackReason.rateLimited
-              ? '预设方案 · AI 请求较多，请稍后再试。'
-              : '预设方案 · AI 暂时不可用，先用本地模板继续。',
+        if (fallback) _fallbackNotice(accepted),
         if (accepted.text.isNotEmpty) accepted.text,
         if (fallback && turn.fallbackReply?.state.plan != null && plan == null)
           '当前模板未通过安全检查，请调整条件或自己选条件。',
@@ -333,6 +364,29 @@ class AiChatEngine implements ManagedChatEngine, RestorableChatEngine {
       timer.cancel();
       if (_pending == turn) _pending = null;
     }
+  }
+
+  String _fallbackNotice(coach.CoachTurnResult result) {
+    final error = result.error;
+    if (error is coach.AgentRequestFailed) {
+      return switch (error.kind) {
+        coach.AgentFailureKind.retriesExhausted =>
+          error.errorClass == coach.RequestErrorClass.rateLimited
+              ? '预设方案 · AI 请求较多，重试后仍未成功，请稍后再试。'
+              : '预设方案 · AI 重试后仍未成功，先用本地模板继续。',
+        coach.AgentFailureKind.nonRetryable => '预设方案 · AI 暂时无法处理这条请求，先用本地模板继续。',
+        coach.AgentFailureKind.turnTimeout => '预设方案 · AI 思考超时，先用本地模板继续。',
+      };
+    }
+    if (error is coach.AgentStalled) {
+      return '预设方案 · AI 暂时没能继续完成，先用本地模板继续。';
+    }
+    if (error is coach.AgentStepLimitExceeded) {
+      return '预设方案 · AI 暂时没能完成这次请求，先用本地模板继续。';
+    }
+    return result.fallbackReason == coach.FallbackReason.rateLimited
+        ? '预设方案 · AI 请求较多，请稍后再试。'
+        : '预设方案 · AI 暂时不可用，先用本地模板继续。';
   }
 
   ChatReply _admitLocalCards(ChatReply reply) => ChatReply(
@@ -457,8 +511,10 @@ class _Turn {
     level: slots.level,
     minutes: slots.minutes,
     goal: slots.goal,
-    notes: [if (state.plan case final plan?)
-      '用户当前明确采用的训练计划，调整请以此为基础：${jsonEncode(plan.toJson())}'],
+    notes: [
+      if (state.plan case final plan?)
+        '用户当前明确采用的训练计划，调整请以此为基础：${jsonEncode(plan.toJson())}',
+    ],
   );
 }
 

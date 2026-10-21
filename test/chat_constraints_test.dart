@@ -16,6 +16,24 @@ void main() {
   final templates = TemplatePlanGenerator(lib: lib, catalog: loadCatalog());
   final engine = RuleChatEngine(lib: lib, templates: templates);
 
+  test(
+    'casual back discomfort is retained as a protection constraint',
+    () async {
+      final reply = await engine.reply('我腰不太舒服，想练腿 20 分钟', const ChatState());
+      final slots = reply.state.pending ?? reply.state.coachContext;
+      expect(reply.state.request?.avoid ?? slots?.avoid, contains('腰'));
+      for (final message in reply.messages) {
+        if (message.plan case final plan?) {
+          expect(plan.avoid, contains('腰'));
+          expect(
+            plan.items.any((i) => lib[i.exerciseId].cautions.contains('腰')),
+            isFalse,
+          );
+        }
+      }
+    },
+  );
+
   for (final text in [
     '膝盖不太好，在家20分钟练臀腿，徒手',
     '腰不太好，在家20分钟练核心，徒手',

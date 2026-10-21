@@ -28,6 +28,7 @@ class AppServices {
     this.coachProfile,
     this.aiConfig = const AiCoachConfig.fromEnvironment(),
     this.deviceId,
+    this.memoryStore,
     this.chatReplyDelay = const Duration(milliseconds: 450),
   }) : templates = TemplatePlanGenerator(lib: library, catalog: catalog);
 
@@ -40,6 +41,27 @@ class AppServices {
   final coach.CoachProfile? coachProfile;
   final AiCoachConfig aiConfig;
   final String? deviceId;
+  final coach.UserMemoryStore? memoryStore;
+  coach.UserMemoryStore get userMemoryStore =>
+      memoryStore ?? store.aiMemoryStore;
+
+  Future<void> setAiMemoryEnabled(bool enabled) async {
+    final engine = chatEngine;
+    if (engine is AiChatEngine) engine.enableUserMemory = enabled;
+    await store.setAiMemoryEnabled(enabled);
+  }
+
+  Future<void> clearAiMemory() async {
+    final engine = chatEngine;
+    if (engine is AiChatEngine) {
+      await engine.clearMemory();
+    } else {
+      await userMemoryStore.save([]);
+      if ((await userMemoryStore.load()).isNotEmpty) {
+        throw StateError('AI memory could not be cleared from local storage');
+      }
+    }
+  }
 
   /// Manual forms stay deterministic; AI enters through the chat engine.
   final TemplatePlanGenerator templates;
@@ -71,9 +93,17 @@ class AppServices {
     final catalog = coachCatalog;
     final profile = coachProfile;
     final id = deviceId;
-    if (!aiConfig.enabled || catalog == null || profile == null || id == null) return local;
-    return AiChatEngine(local: local, catalog: catalog, profile: profile,
-      client: aiConfig.createClient(deviceId: id));
+    if (!aiConfig.enabled || catalog == null || profile == null || id == null) {
+      return local;
+    }
+    return AiChatEngine(
+      local: local,
+      catalog: catalog,
+      profile: profile,
+      client: aiConfig.createClient(deviceId: id),
+      memoryStore: userMemoryStore,
+      enableUserMemory: store.aiMemoryEnabled,
+    );
   }
 
   /// The "typing" pause before a reply (zero in tests and screenshots).
@@ -89,7 +119,9 @@ class AppServices {
   /// The exercise library and the voice lines both come from the drill
   /// packs (assets/packs/, docs/drill-pack-spec.md); templates stay
   /// app-specific (assets/library/templates.json).
-  static Future<(ExerciseLibrary, TemplateCatalog, DrillPackVoiceSource, coach.Catalog)>
+  static Future<
+    (ExerciseLibrary, TemplateCatalog, DrillPackVoiceSource, coach.Catalog)
+  >
   loadContent() async {
     final packs = await PackSet.load(rootBundle.loadString);
     final cat = TemplateCatalog.fromJson(

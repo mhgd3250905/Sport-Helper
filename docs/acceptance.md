@@ -1,6 +1,72 @@
 # 本机验收记录
 
-## 工具会话（0.1.0+6，核心功能已验，2026-10-21）
+## SDK 0.3.2 接入（0.1.0+8，核心已验，待合并批准，2026-10-21）
+
+当前分支 `feat/smartfit-coach-032`，版本 `0.1.0+8`；两项 git ref 固定 SDK main `b26e4fda807b6ef3db15a61ba30c67fb51dce5e1`。App main 仍是 `fd640bb` 的 `+6`。自动化、APK 与真实交互绑定运行源码 `b39304488e964b22a65501363a15140b5d0ca235`。六条全新交互均 ok、无回落，独立 show_actions 严格补验通过；原脚本因臀桥合法文字无卡而 exit 1 的事实保留，不声明原脚本全通过。本轮核心功能已验证。
+
+| 检查 | 本轮状态 |
+| --- | --- |
+| 依赖解析 / 严格锁文件 | 通过；`.buildlog/coach-032-lock-verify.log` |
+| App 全量测试 | 224 项通过；`.buildlog/coach-032-tests.log` |
+| 静态分析 / debug 构建 | 分析 0 issue、debug 构建成功；`.buildlog/coach-032-analyze.log` / `coach-032-build.log` |
+| APK 身份 | `.buildlog/install/SmartFit-coach-0.3.2-0.1.0+8-debug.apk`，203,937,142 bytes；SHA-256 `a8746c2a04348855dc43cd9b402a9733cc827edda1f72d7d35070bf818dee4d7`；`com.ugk.smartfit`、versionName `0.1.0`、versionCode `8`、minSdk `24`、targetSdk `36`，debug |
+| APK 资产核对 | 与 `+7` 比对，1,167 条 pack entries 无缺失，程序 kernel 更新 |
+| 六条真实 Worker | 全部固定 `b26e4fd` 全新完成，39 步、43 请求、384,013 token，均 ok、无回落；臀桥第 3 步 badResponse 重试 4 次后恢复，关闭记忆计划触发 slow。原严格脚本保留唯一 `actions: no ValidatedActions` / exit 1，不能记为脚本全通过 |
+| 记忆三轮 | 实际保存 level / equipment 两条且 durable snapshot 相等；新对话排计划首请求含记忆摘要、难度 1、含哑铃卧推/划船；关闭后全轮无摘要/工具、无哑铃动作、原条目保留 |
+| 动作卡独立补验 | 显式展示「脚踩椅面臀桥」：4 步 / 4 HTTP / 72.908 秒 / 20,109 token，ok、无重试/slow/回落；actions 与 App 卡片均为 `w-feet-on-chair-bridge`，使用同一准入对象，未交付计划。独立 verdict 空失败、exit 0，不覆盖原六条 verdict |
+| 源码与证据边界 | 相对 `b393044`，lib/assets/pubspec/lock 无变化；补验只调整 harness，APK 和 224 项测试来源不变。完整记录见 [0.3.2 验证](coach-032-smoke-2026-10-21.md) |
+| App 合并与交付 | 核心已验，合 main 待开哥同意；无本轮真机或完整训练通过结论 |
+
+本轮核对 SDK 默认 100 逻辑步、单次请求 60 秒、整轮 360 秒、每步最多 4 次重试及 30 秒慢提示，客户端不另重试，App 外保护 390 秒。新增重试序号、整理上下文及「还在想…」进度；最终失败分类回落，内部异常不进入渲染。记忆逐条持久化确认、已确认事实取消后保留，清除失败抛错；typed 动作/计划门禁和取消不显示继续保持。
+
+## 首次 Skill Agent（0.1.0+7，历史分支已验，未合 App main）
+
+以下只记录 `+7` 当时的验证与包身份，不代表 `+8` / SDK 0.3.2 已终验。所述旧 SDK main `1d1aad8` 及待审批状态为历史时点；当前 SDK main 已为本轮固定的 0.3.2。旧 `+7` App 分支仍未合入 main。
+
+历史分支 `feat/smartfit-skill-agent`，包版本 `0.1.0+7`，运行源码 `5743073691547d44aec891ab6d4a45b5b3fa381b`；`ugk_coach 0.3.0` / `ugk_trainer 0.1.4` 当时按 SDK 规则第 4 条临时固定修复 `43dfef637144a1e08b5eda5ed743db0671ba5a8d`。SDK 分支完成推理字段续传、空字段及记忆开启指令修复。当时 SDK main 为 `1d1aad86f516bd7121cc73c71d623043f1042dc3`，修复待批；现 SDK 0.3.2 已在 main，不能把此旧审批状态当作当前待办。App 不复制、内嵌或 patch SDK，不改 pub 缓存；`712cb7b` / `029af4a` 的旧包与源码继续单列。
+
+| 检查 | 当前结果与边界 |
+| --- | --- |
+| 依赖解析 / 锁文件 | 当前 `43dfef6` 的 `flutter pub get --enforce-lockfile` 通过；日志 `.buildlog/skill-agent-43-lock-verify.log` |
+| SDK 独立修复验证 | `43dfef637144a1e08b5eda5ed743db0671ba5a8d`：coach 304 项、trainer 126 项测试通过，两包分析均 0 issue；已推送修复分支，未合 SDK main |
+| App 全量测试 / 分析 | 绑定 App `5743073` / SDK `43dfef6`，217 项通过、分析 0 issue；日志 `.buildlog/skill-agent-43-tests.log` / `skill-agent-43-analyze.log` |
+| Android debug 构建 | 固定当前 ref 后构建成功，仅以 dart-define 注入密钥；日志 `.buildlog/skill-agent-43-build.log` |
+| 当前 APK 身份 | `.buildlog/install/SmartFit-skill-agent-0.1.0+7-debug.apk`，229,903,158 bytes；SHA-256 `9d35b899e59b60f613f65d230431f1c4f0368da07b8c0f61a79daebed0946e19`；`com.ugk.smartfit`、versionName `0.1.0`、versionCode `7`、minSdk 24、targetSdk 36，debug |
+| 真实 Worker 多步 | 前三轮关闭记忆案例按与 `712cb7b` 的等价性复用；当前记忆写入、后续参考及关闭后隔离三轮均通过，六类核心功能通过，最终采用的六条记录均无回落。逐轮证据见 [CoachAgent 首次真实 Worker 验证](coach-agent-smoke-2026-10-21.md) |
+| 交付与合并 | 当前 debug 包已在本机保留，无本轮真机或完整训练通过结论；SDK 和 App main 合并推送均待相应验证通过并取得开哥同意 |
+
+本轮实现将 `CoachSession` 换为 `CoachAgent`，`maxSteps` 保持默认 10，HTTP 单次 120 秒、不自动重试，App 整轮保护超时 1230 秒；订阅 `reading` / `checking` 分别显示「正在查动作库」/「正在核对计划」。重复发送禁用、取消及新对话作废结果不显示；纯文字仅用 SDK 接纳结果，动作与计划分别只以 `ValidatedActions` / `ValidatedPlan` 进入渲染、保存和 trainer，失败仍使用标明「预设方案」的本地模板。
+
+记忆由 App 实现 `UserMemoryStore.load/save`，独立本机键 `smartfit.ai-memory.v1`；「AI 记忆」开关持久化并即时同步 Agent，「清除记忆」调用 SDK 后复读本机存储确认成功，失败有提示。关闭和清除保留当前聊天与计划，因此真实关闭记忆验证需先开「新对话」隔离旧消息及已解析条件。当前 `43dfef6` 已在真实 Worker 3 步、35.372 秒、11,487 token 后完成 `level=新手` / `equipment=家里有哑铃` 的实际本机保存和文字确认；后续计划实际使用哑铃、难度 1；关闭后无记忆摘要/工具且计划无哑铃，原记忆仍在本机，两轮均通过。
+
+`+7` 固定 `43dfef6` 后的依赖检查、217 项测试、分析和 debug 构建通过。该提交只改记忆开启指令，关闭记忆 system/tools SHA 与 `712cb7b` 相同，故当时复用前三条并新跑记忆三条。这一分组复验规则不适用于改变了预算、重试及持久化的 SDK 0.3.2；当前 `+8` 六条必须重新执行。旧 `+6/+7` 的成功不代替顶部本轮终验。
+
+### 推理字段第二版修复阶段（`712cb7b`，历史）
+
+| 检查 | 第二版阶段结果 |
+| --- | --- |
+| 源码 / SDK | App `a7cfe04550c8c8cac867b105470d66c96744858d`；SDK `712cb7b3d636a5314c5aa08211c822928a0af4f4` |
+| 自动化 / 构建 | App 217 项、分析 0 issue、严格锁文件与 debug 构建通过，日志 `.buildlog/skill-agent-712-tests.log` / `skill-agent-712-analyze.log` / `skill-agent-712-lock-verify.log` / `skill-agent-712-build.log`；SDK coach 299 项、trainer 126 项与两包分析 0 issue |
+| 历史 APK 身份 | `.buildlog/install/SmartFit-skill-agent-712cb7b-0.1.0+7-debug.apk`，229,902,535 bytes；SHA-256 `2f513b380d9ba091c989fd5dff79bbded45f947b70ef36d185970c23d9b8cca8`；包 metadata 与当前 `+7` 相同，旧摘要不作当前包身份 |
+| Worker 边界 | 前三轮关闭记忆案例通过；第四轮仅给出计划，未调用 `remember`、本机仍空，促使当前记忆指令修复。前三轮依关闭记忆系统/工具 SHA 等价复用，详细记录见 [真实 Worker 验证](coach-agent-smoke-2026-10-21.md) |
+
+### 第一版 SDK 修复阶段（`029af4a`，历史）
+
+此阶段绑定 App `0a8fada86b504964551bc58f8854837162210e6c` / SDK `029af4a1e735b5f1c3f1ee5cef6c82aad8a1c3f4`，不作为第二版 `712cb7b` 的终验。SDK 第一版 coach 291 项、trainer 126 项测试及两包分析 0 issue；App 结果如下。
+
+| 检查 | 第一版阶段结果 |
+| --- | --- |
+| 依赖解析 / 锁文件 | `flutter pub get --enforce-lockfile` 通过，日志 `.buildlog/skill-agent-fixed-lock-verify.log` |
+| App 全量 / 分析 | 217 项通过、0 issue，日志 `.buildlog/skill-agent-final-tests.log` / `skill-agent-final-analyze.log` |
+| Android debug 构建 | `tools/coach/build_debug.ps1 -AppKeyFile '<本机文件>'` 成功，仅以 dart-define 注入密钥；日志 `.buildlog/skill-agent-debug-build.log` |
+| 历史 APK 身份 | 已另名保存 `.buildlog/install/SmartFit-skill-agent-029af4a-0.1.0+7-debug.apk`，203,909,858 bytes；SHA-256 `35b07c8ae6b59a82d9bb6f2883999143841ed17fec0dd4da7294114ef2b7b326`；`com.ugk.smartfit`、versionName `0.1.0`、versionCode `7`、minSdk 24、targetSdk 36，debug。该摘要只属于第一版历史包 |
+| Worker 边界 | 核心计划多步请求通过；臀桥第三步 HTTP 400 暴露缺失/null 推理内容也须显式回传空字段，未完成全部六轮 |
+
+SDK main `1f8be6e` 阶段曾完成 215 项全量及后续 28 项定向回归，日志为 `.buildlog/skill-agent-tests.log`、`skill-agent-settings-progress-tests.log`。这些开发阶段结果与第一版 217 项全量存在重叠，不累加，也不代替当前修复的终验。
+
+## 工具会话（0.1.0+6，历史核心功能已验，2026-10-21）
+
+以下保留上一阶段源码、包与模拟器证据，其 HTTP 次数、耗时与通过结论只适用于 `+6`。
 
 当前主线 `main`（原分支 `feat/smartfit-coach-tools`），运行源码 `9e94bb513751def6306f8e63313050efd632ccb9`，包版本 `0.1.0+6`。两个 git 依赖固定 SDK main `09a392bc0b736e6a23eef71d55d86108660e0e59`（`ugk_coach 0.2.0`、`ugk_trainer 0.1.4`），远端 main 已核对；SDK 工作区和 pub git 缓存均未修改。现有 smartfit profile 与该 SDK JSON 内容一致，AI 目录仍只含实际随包 93 动作。
 

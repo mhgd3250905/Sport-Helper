@@ -288,7 +288,10 @@ class _ChatHomePageState extends State<ChatHomePage> {
         Padding(
           key: ValueKey('typing'),
           padding: EdgeInsets.only(top: SfSpace.x4),
-          child: TypingBubble(onCancel: _chat.cancelRequest),
+          child: TypingBubble(
+            onCancel: _chat.cancelRequest,
+            progressLabel: _chat.progressLabel,
+          ),
         ),
       );
     }
