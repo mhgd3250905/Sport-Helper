@@ -22,6 +22,14 @@
 
 Git 标签、App 包版本与资源版本分别管理。`m7` 不代表 Android versionCode 为 7；此前为 `+1` M7、`+2` 训练接入、`+3` 目录节奏修复、`+4/+5` JSON 信封、`+6` 工具会话、`+7` 首次 Skill Agent 分支；SDK 0.3.2 接入阶段为 `0.1.0+8`，当前 UI 主线为 `0.1.0+9`。没有形成可交付 release 包。
 
+## 顶部栏移除（0.1.0+10，UI 调整分支）
+
+`fix/chat-without-top-bar` 按真机反馈去掉聊天顶部「新对话」栏，入口移至左下角抽屉。运行源码 `89ffa8f7bea2f42a7afd28eade9fc13b7c4ba856`；237 项测试、分析 0 issue、Android debug 构建通过。主线仍为上方 `+9`，本轮 UI 调整尚未合 main。
+
+APK `.buildlog/install/SmartFit-ui-no-top-bar-0.1.0+10-debug.apk`，208,029,103 bytes，SHA-256 `94e7402e3e48b262a934f78d78f560b7fbec8272c74d005d08d22a43bddd8896`；`com.ugk.smartfit`、versionName `0.1.0`、versionCode `10`、minSdk `24`、targetSdk `36`、debug。沿用现有 dart-define 构建配置，密钥不入仓库。
+
+2026-10-21 已在连接的真机从 `+9` 覆盖升级，未清空数据；前台启动正常，截图确认顶部栏已消失、原聊天保留。新对话的取消/reset 及键盘可达性由现有回归测试覆盖。日志 `.buildlog/no-top-bar-tests.log`、`no-top-bar-analyze.log`、`no-top-bar-build.log`；真机截图仅保留在本机 `.buildlog/no-top-bar-device.png`。
+
 ## Liquid Glass（0.1.0+9，PR #4 已审核合并）
 
 | 项目 | 当前 +9 debug 包身份 |
