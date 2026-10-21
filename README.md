@@ -1,16 +1,25 @@
 # 智能健身助手 SmartFit
 
-描述训练场景 → 按模板生成规范训练计划 → 用预渲染动作直接展示训练小组 → 跟练（计时 / 组 × 次数 / 休息 / 换侧 / 语音播报）。
+描述训练场景 → AI 回复与生成规范训练计划（异常时回退本地模板）→ 用预渲染动作直接展示训练小组 → 跟练（计时 / 组 × 次数 / 休息 / 换侧 / 语音播报）。
 
-主界面是一段对话（[docs/chat-home.md](docs/chat-home.md)）：说想怎么练，助手追问一两句后回一张计划卡片，点「开始训练」直接跟练，「保存」后下次说「上次那个」或从左下角抽屉一键开始。
+主界面是一段对话（[docs/chat-home.md](docs/chat-home.md)）：说想怎么练，助手可回复文字、动作演示卡或计划卡片。动作卡点开看详情；计划卡点「开始训练」直接跟练，「保存」后下次说「上次那个」或从左下角抽屉一键开始。
 
 - 包名 `com.ugk.smartfit`（与 `com.ugk.hiplab` 同族），App 名「智能健身助手」
 - Flutter（沙盒 3.47.6 / Dart 3.13，`sdk: ^3.12.0`，与 HipLab 3.44.7 兼容），Android 先行，iOS 同代码库
-- 完全离线、无账号、不联网（WebView 只连本机回环地址播放内置视频）
+- 无账号，训练记录和已保存计划保存在本机；WebView 通过本机回环地址播放内置视频。
+- 启用 AI 时，当前输入、本轮训练条件、用户明确采用的当前计划和同一 `CoachSession` 内的模型对话（含工具调用与门禁反馈）经 `https://api.uuugk.win/v1` 发送给 AI 服务，并携带本机随机生成的设备标识；已存计划与训练历史不自动上传。服务器按每设备每 10 分钟最多 30 次请求限流，429 会提示并使用「预设方案」；断网、超时或门禁最终失败也使用原有本地模板。
 
 ## 版本与验收入口
 
-最近的里程碑标签为 `m7-aesthetic-v2`，PR #1、#2、#3 及共享训练接入均已合并并推送。后续目录 `repSeconds` 来源修复及 App 依赖更新已经开哥授权合入并推送两仓 `main`，当前包版本 `0.1.0+3`，SDK 固定提交 `9407bf3` 已在 GitHub 确认可获取。主页键盘已通过重启微信输入法服务恢复，用户确认收起重开和输入正常；无效的 App 输入实验已移除。详见 [接入及后续修复记录](docs/ugk-trainer-integration.md)。release 构建、正式签名和完整设备验收仍未完成。
+当前开发分支 `feat/smartfit-coach-tools`，功能开发版本 `0.1.0+6`，接入 `ugk_coach 0.2.0` 工具会话接口。`ugk_coach` 与 `ugk_trainer 0.1.4` 的 git 依赖共同固定到 SDK main commit `09a392bc0b736e6a23eef71d55d86108660e0e59`。当前代码、测试和模拟器 Worker 冷烟的验收结果以 [版本台账](docs/version-management.md) 与 [验收记录](docs/acceptance.md) 为准；本轮尚无真机通过结论。完成验证并经开哥同意后，才合入并推送 `main`。
+
+`+6` 长期持有一个 `CoachSession`，关闭 AI 界面保留会话，「新对话」取消进行中的请求并调用 `reset()`。纯文字显示气泡；`show_actions` 仅以 `ValidatedActions` 显示动作卡，`show_plan` 仅以 `ValidatedPlan` 显示计划卡，可保存或交给 `ugk_trainer` 开练。持久化卡片恢复时重新过 SDK 门禁，模型原始输出不进入渲染层。请求期间禁用发送，显示等待与取消入口；单次 HTTP 超时 120 秒、HTTP 重试为 0，门禁最多重交 2 次，整轮保护超时 365 秒。
+
+历史 `0.1.0+5`（`feat/smartfit-ai-replies`）使用旧版 JSON 信封接口，源码 `e549e0f84aa9118ef20752b8926c7b8c602a7e0f`；接口 `https://api.uuugk.win/v1`，模型 `deepseek-v4-flash-0731`。当时 debug 包已覆盖安装并保留旧数据，6 项接口/UUID/鉴权配置测试及分析通过；旧源全量 180 项测试该轮未重跑。新地址实机通用问答通过，但三次计划生成均因上游 `tencent:AbortError` 回退本地模板，新接口计划生成未通过。`+5` 实际界面已验证旧 `+4` AI 计划的保存、局部启动/暂停/提前结束及重启保留；这不代表新地址生成链路或完整训练通过。2026-10-21 的该次文档收束沿用 2026-10-20 对应源码记录，不是 `+6` 工具接入的验证证据。
+
+旧 `0.1.0+4` / `cc16f530944cf4f6034365aa111528536978ecc3` 的分析及 180 项测试通过；旧地址实机曾约 21 秒成功生成 AI 计划，随后追问回落本地。服务调整中，这些记录不代表新地址与 `+5` 已验证通过。
+
+此前主线为 `0.1.0+3`：PR #1、#2、#3、共享训练接入及 `repSeconds` 来源修复均已合并推送，SDK 固定 `9407bf3`；最近里程碑标签仍为 `m7-aesthetic-v2`。键盘恢复及旧训练证据见 [接入及后续修复记录](docs/ugk-trainer-integration.md)。release 构建、正式签名和完整设备验收仍未完成；`0.1.0+2` 的完整训练不能替代新 AI 包验收。
 
 - [版本管理与台账](docs/version-management.md)：当前版本、里程碑 SHA、测试包身份、版本更新及交付规则的统一入口。
 - [本机验收记录](docs/acceptance.md)：各检查点的验证证据、环境和待验清单。
@@ -20,13 +29,13 @@
 ## 目录
 
 ```
-lib/domain/      纯规则：exercise / plan(TrainingPlan v1) / template / scenario(描述匹配) /
-                 plan_generator(模板生成 + AI 预留接口) / plan_validator / session(SDK 计划及节奏适配)
+lib/domain/      训练领域：exercise / plan(TrainingPlan v1) / template / scenario(描述匹配) /
+                 plan_generator(本地模板生成) / plan_validator / session(SDK 计划及节奏适配)
 lib/voice/       ugk_trainer 导出入口；App 语言偏好与素材测试适配，训练语音由 SDK 负责
 lib/core/        复制自 HipLab（媒体播放 WebView、本地存储、屏幕常亮），文件头注明来源
-lib/chat/        对话：ChatEngine 接口 + RuleChatEngine（关键词/槽位 + 模板 + 校验）、SlotParser、
+lib/chat/        对话：ChatEngine 接口、AI 回复与本地规则回退、SlotParser、
                  ChatController（会话、开场安全确认、保存计划、本地历史）、safety_script（免责声明与 4 问）
-lib/ui/chat/     对话主界面：星尘背景、色调气泡、计划卡片、已存计划抽屉
+lib/ui/chat/     对话主界面：星尘背景、色调气泡、ValidatedActions 动作卡、ValidatedPlan 计划卡、已存计划抽屉
 lib/ui/          训练计划(训练小组) → 跟练 → 动作库 / 设置；custom_plan_page = 原表单（对话「自己选条件」）
 lib/packs/       动作小包读取（与 App 无关，可整体拷走）
 assets/packs/    动作小包：每个动作一个文件夹 <id>/{pack.json, cover.jpg, demo.mp4, voice/zh/*.m4a}，
@@ -43,6 +52,16 @@ docs/            评估报告、验收清单、风险、计划 schema、截图
 ```
 
 ## 构建
+
+AI debug 包通过 `--dart-define=SMARTFIT_AI_TOKEN` 注入 Worker App Key，不把密钥写入源码、资产或仓库：
+
+```powershell
+flutter build apk --debug --dart-define=SMARTFIT_AI_TOKEN='<Worker App Key>'
+```
+
+当前模型为 `deepseek-v4-flash-0731`，BaseURL 为 `https://api.uuugk.win/v1`。App 使用 SDK `LlmConfig.ugkWorker` 和 `UgkWorkerAuth`，沿用原 App Key 和原设备 UUID，只发送 `X-App-Key` 与 `X-Device-Id` 鉴权头，不发送 `Authorization`。设备 UUIDv4 首次成功持久化后才启用 AI；密钥未配置或设备标识存储失败时使用本地引擎。首轮出计划可能等待 75–120 秒；每次 HTTP 最多等 120 秒，不自动重试，门禁判定不合格时最多让模型重交 2 次，整轮 365 秒后取消并回落本地。用户主动取消及新对话作废的旧结果不显示。
+
+profile 使用 SDK `09a392b` 的 `profiles/smartfit.json`，随包副本为 `assets/coach/smartfit.json`。AI 目录由 SDK `DrillPackAdapter` 从实际随包 93 个动作构造；profile 备注中的全库 142 个动作不代表 App 已加载全库。每轮 `CoachContext` 传入已知的用户水平、时长、保护部位及场景/器械条件；水平和时长与模型计划冲突时由门禁要求重交。SDK 代码只在 SDK 仓库修改，App 不复制、内嵌或 patch SDK，也不改 pub 缓存；本次仅接入 App，未修改 SDK。
 
 ```bash
 flutter pub get

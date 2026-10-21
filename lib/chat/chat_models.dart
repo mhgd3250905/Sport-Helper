@@ -3,6 +3,8 @@
 /// today, a language model later) behind [ChatEngine].
 library;
 
+import 'package:ugk_coach/ugk_coach.dart' as coach;
+
 import '../domain/exercise.dart';
 import '../domain/plan.dart';
 import '../domain/saved_plan.dart';
@@ -13,7 +15,13 @@ enum ChatRole { user, assistant }
 /// One finished (or ended) workout, as the chat sees it: what 「上次练了
 /// 什么」「这周练了多少」 answer from.
 class WorkoutLog {
-  const WorkoutLog({required this.title, required this.at, required this.minutes, required this.completed, required this.total});
+  const WorkoutLog({
+    required this.title,
+    required this.at,
+    required this.minutes,
+    required this.completed,
+    required this.total,
+  });
   final String title;
   final DateTime at;
   final int minutes;
@@ -46,8 +54,11 @@ class ChatMessage {
     this.options = const [],
     this.chosen,
     this.plan,
+    this.validatedPlan,
+    this.actions,
     this.request,
     this.greeting = false,
+    this.aiVisible = false,
   });
 
   final String id;
@@ -61,16 +72,22 @@ class ChatMessage {
 
   /// A plan card (assistant only) and the request it was made for.
   final TrainingPlan? plan;
+  final coach.ValidatedPlan? validatedPlan;
+  final coach.ValidatedActions? actions;
   final ScenarioRequest? request;
 
   /// The opening line, set as large type in the sky instead of a bubble
   /// (first line = 早上好 / 晚上好…, the rest = the invitation).
   final bool greeting;
 
+  /// Only completed AI turns are eligible for subsequent model history.
+  /// Local commands, records and safety answers are never shared implicitly.
+  final bool aiVisible;
+
   bool get isUser => role == ChatRole.user;
   bool get isPlan => plan != null;
 
-  ChatMessage copyWith({int? chosen}) => ChatMessage(
+  ChatMessage copyWith({int? chosen, bool? aiVisible}) => ChatMessage(
     id: id,
     role: role,
     at: at,
@@ -78,8 +95,11 @@ class ChatMessage {
     options: options,
     chosen: chosen ?? this.chosen,
     plan: plan,
+    validatedPlan: validatedPlan,
+    actions: actions,
     request: request,
     greeting: greeting,
+    aiVisible: aiVisible ?? this.aiVisible,
   );
 
   Map<String, Object?> toJson() => {
@@ -90,28 +110,52 @@ class ChatMessage {
     if (options.isNotEmpty) 'options': [for (final o in options) o.toJson()],
     'chosen': ?chosen,
     'plan': ?plan?.toJson(),
+    if (validatedPlan != null || plan?.source == 'ai') 'isAiPlan': true,
+    if (actions != null)
+      'actionIds': [for (final item in actions!.items) item.id],
     'request': ?(request == null ? null : requestToJson(request!)),
     if (greeting) 'greeting': true,
+    if (aiVisible) 'aiVisible': true,
   };
 
-  factory ChatMessage.fromJson(Map<String, dynamic> j) => ChatMessage(
-    id: j['id'] as String,
-    role: j['role'] == 'user' ? ChatRole.user : ChatRole.assistant,
-    at: DateTime.tryParse(j['at'] as String? ?? '') ?? DateTime(2026),
-    text: j['text'] as String? ?? '',
-    options: [
-      for (final o in j['options'] as List? ?? const [])
-        ChatOption.fromJson(Map<String, dynamic>.from(o as Map)),
-    ],
-    chosen: (j['chosen'] as num?)?.toInt(),
-    greeting: j['greeting'] == true,
-    plan: j['plan'] is Map
-        ? TrainingPlan.fromJson(Map<String, dynamic>.from(j['plan'] as Map))
-        : null,
-    request: j['request'] is Map
+  factory ChatMessage.fromJson(
+    Map<String, dynamic> j, {
+    RestorableChatEngine? restoreWith,
+  }) {
+    final request = j['request'] is Map
         ? requestFromJson(Map<String, dynamic>.from(j['request'] as Map))
-        : null,
-  );
+        : null;
+    var plan = j['plan'] is Map
+        ? TrainingPlan.fromJson(Map<String, dynamic>.from(j['plan'] as Map))
+        : null;
+    coach.ValidatedPlan? validatedPlan;
+    if (plan != null && (j['isAiPlan'] == true || plan.source == 'ai')) {
+      validatedPlan = restoreWith?.restorePlan(plan, request);
+      // Stored AI data is untrusted until the current SDK admits it again.
+      if (validatedPlan == null) plan = null;
+    }
+    final actionIds = j['actionIds'];
+    final actions = actionIds is List && actionIds.every((id) => id is String)
+        ? restoreWith?.restoreActions(actionIds.cast<String>())
+        : null;
+    return ChatMessage(
+      id: j['id'] as String,
+      role: j['role'] == 'user' ? ChatRole.user : ChatRole.assistant,
+      at: DateTime.tryParse(j['at'] as String? ?? '') ?? DateTime(2026),
+      text: j['text'] as String? ?? '',
+      options: [
+        for (final o in j['options'] as List? ?? const [])
+          ChatOption.fromJson(Map<String, dynamic>.from(o as Map)),
+      ],
+      chosen: (j['chosen'] as num?)?.toInt(),
+      greeting: j['greeting'] == true,
+      aiVisible: j['aiVisible'] == true,
+      plan: plan,
+      validatedPlan: validatedPlan,
+      actions: actions,
+      request: request,
+    );
+  }
 }
 
 Map<String, Object?> requestToJson(ScenarioRequest r) => {
@@ -130,7 +174,8 @@ ScenarioRequest requestFromJson(Map<String, dynamic> j) => ScenarioRequest(
   goal: j['goal'] as String?,
   scene: j['scene'] as String? ?? 'home',
   equipment: {
-    for (final e in j['equipment'] as List? ?? const []) Equipment.byName(e as String),
+    for (final e in j['equipment'] as List? ?? const [])
+      Equipment.byName(e as String),
   },
   minutes: (j['minutes'] as num?)?.toInt() ?? 10,
   level: (j['level'] as num?)?.toInt() ?? 1,
@@ -142,9 +187,8 @@ ScenarioRequest requestFromJson(Map<String, dynamic> j) => ScenarioRequest(
 ScenarioRequest requestForPlan(TrainingPlan p) => ScenarioRequest(
   goal: p.goal,
   scene: p.scene,
-  equipment: {
-    for (final e in p.equipment) Equipment.byName(e),
-  }..removeWhere((e) => e == Equipment.none),
+  equipment: {for (final e in p.equipment) Equipment.byName(e)}
+    ..removeWhere((e) => e == Equipment.none),
   minutes: p.targetMinutes,
   level: p.level,
   avoid: p.avoid,
@@ -177,6 +221,16 @@ class Slots {
   final Set<String> focus;
   final String description;
 
+  factory Slots.fromRequest(ScenarioRequest request) => Slots(
+    goal: request.goal,
+    scene: request.scene,
+    minutes: request.minutes,
+    equipment: request.equipment,
+    level: request.level,
+    avoid: request.avoid,
+    description: request.description,
+  );
+
   bool get isEmpty =>
       goal == null &&
       scene == null &&
@@ -193,34 +247,42 @@ class Slots {
     minutes: o.minutes ?? minutes,
     equipment: o.equipment == null
         ? equipment
-        : (o.equipment!.isEmpty ? <Equipment>{} : {...?equipment, ...o.equipment!}),
+        : (o.equipment!.isEmpty
+              ? <Equipment>{}
+              : {...?equipment, ...o.equipment!}),
     level: o.level ?? level,
     avoid: {...avoid, ...o.avoid},
     focus: {...focus, ...o.focus},
-    description: [description, o.description].where((d) => d.isNotEmpty).join('，'),
+    description: [
+      description,
+      o.description,
+    ].where((d) => d.isNotEmpty).join('，'),
   );
 
-  Slots copyWith({String? goal, int? minutes, Set<Equipment>? equipment}) => Slots(
-    goal: goal ?? this.goal,
-    scene: scene,
-    minutes: minutes ?? this.minutes,
-    equipment: equipment ?? this.equipment,
-    level: level,
-    avoid: avoid,
-    focus: focus,
-    description: description,
-  );
+  Slots copyWith({String? goal, int? minutes, Set<Equipment>? equipment}) =>
+      Slots(
+        goal: goal ?? this.goal,
+        scene: scene,
+        minutes: minutes ?? this.minutes,
+        equipment: equipment ?? this.equipment,
+        level: level,
+        avoid: avoid,
+        focus: focus,
+        description: description,
+      );
 
   ScenarioRequest toRequest({String? fallbackGoal}) => ScenarioRequest(
     description: description,
     goal: goal ?? fallbackGoal,
     scene: scene ?? 'home',
     equipment: equipment ?? const {},
-    minutes: minutes ?? switch (goal) {
-      'warmup' => 6,
-      'cooldown' => 8,
-      _ => 10,
-    },
+    minutes:
+        minutes ??
+        switch (goal) {
+          'warmup' => 6,
+          'cooldown' => 8,
+          _ => 10,
+        },
     level: level ?? 1,
     avoid: avoid,
   );
@@ -236,6 +298,8 @@ class Slots {
 class ChatState {
   const ChatState({
     this.pending,
+    this.coachContext,
+    this.recentMessages = const [],
     this.asked = const [],
     this.plan,
     this.request,
@@ -250,6 +314,10 @@ class ChatState {
 
   /// A plan request still waiting for an answer to a follow-up question.
   final Slots? pending;
+
+  /// Explicit constraints and recent chat for the SDK; workout logs stay local.
+  final Slots? coachContext;
+  final List<ChatMessage> recentMessages;
 
   /// Slots already asked about for [pending] ('goal', 'minutes', 'equipment').
   final List<String> asked;
@@ -275,13 +343,16 @@ class ChatState {
   final bool systemLight;
 
   /// The light theme is in effect (chooses 「换深色」 vs 「换浅色」).
-  bool get looksLight => appearance == 'light' || (appearance == 'system' && systemLight);
+  bool get looksLight =>
+      appearance == 'light' || (appearance == 'system' && systemLight);
 
   /// The clock for 「这周」 (null = now).
   final DateTime? now;
 
   ChatState copyWith({
     Slots? pending,
+    Slots? coachContext,
+    List<ChatMessage>? recentMessages,
     bool clearPending = false,
     List<String>? asked,
     TrainingPlan? plan,
@@ -295,6 +366,8 @@ class ChatState {
     DateTime? now,
   }) => ChatState(
     pending: clearPending ? null : (pending ?? this.pending),
+    coachContext: coachContext ?? this.coachContext,
+    recentMessages: recentMessages ?? this.recentMessages,
     asked: clearPending ? const [] : (asked ?? this.asked),
     plan: plan ?? this.plan,
     request: request ?? this.request,
@@ -311,11 +384,21 @@ class ChatState {
 /// One assistant bubble the engine wants to show (ids and times are added
 /// by the controller).
 class BotMessage {
-  const BotMessage(this.text, {this.options = const [], this.plan, this.request, this.greeting = false});
+  const BotMessage(
+    this.text, {
+    this.options = const [],
+    this.plan,
+    this.validatedPlan,
+    this.actions,
+    this.request,
+    this.greeting = false,
+  });
   final bool greeting;
   final String text;
   final List<ChatOption> options;
   final TrainingPlan? plan;
+  final coach.ValidatedPlan? validatedPlan;
+  final coach.ValidatedActions? actions;
   final ScenarioRequest? request;
 }
 
@@ -325,6 +408,7 @@ class ChatReply {
     required this.state,
     this.suggestions = const [],
     this.action,
+    this.aiTurn = false,
   });
 
   final List<BotMessage> messages;
@@ -335,6 +419,7 @@ class ChatReply {
 
   /// A command for the app to run after showing the reply (`@library`…).
   final String? action;
+  final bool aiTurn;
 }
 
 /// Turns what the user typed into assistant replies. [RuleChatEngine] is
@@ -343,4 +428,17 @@ class ChatReply {
 abstract interface class ChatEngine {
   String get id;
   Future<ChatReply> reply(String text, ChatState state);
+}
+
+/// Engines with an in-flight request owned by the home conversation.
+abstract interface class ManagedChatEngine implements ChatEngine {
+  void cancelPending();
+  void reset();
+  void dispose();
+}
+
+/// Re-admits stored card IDs/plans through the current SDK and profile.
+abstract interface class RestorableChatEngine implements ChatEngine {
+  coach.ValidatedActions? restoreActions(List<String> ids);
+  coach.ValidatedPlan? restorePlan(TrainingPlan plan, ScenarioRequest? request);
 }

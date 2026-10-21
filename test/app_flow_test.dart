@@ -88,9 +88,10 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('跳过这个动作'));
     await tester.pumpAndSettle();
-    expect(find.text('训练完成！'), findsOneWidget);
+    expect(find.text('今天先到这里'), findsOneWidget);
     expect(s.store.history, hasLength(1));
-    expect(s.store.history.single.completed, 1);
+    // ugk_trainer records only completed work, never skipped exercises.
+    expect(s.store.history.single.completed, 0);
     expect(s.store.history.single.total, 1);
     await tester.pumpWidget(const SizedBox());
   });
