@@ -1,7 +1,8 @@
 param(
   [Parameter(Mandatory = $true)][string]$AppKeyFile,
   [string]$FlutterCommand = 'flutter',
-  [string]$SmokeLog = '.buildlog/skill-agent-live.log'
+  [string]$SmokeLog = '.buildlog/skill-agent-live.log',
+  [switch]$MemoryOnly
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
@@ -20,7 +21,9 @@ try {
   if ($directory -and -not (Test-Path -LiteralPath $directory)) {
     New-Item -ItemType Directory -Path $directory -Force | Out-Null
   }
-  & $FlutterCommand test --no-pub 'tools/coach/worker_agent_smoke.dart' '--dart-define=SMARTFIT_RUN_LIVE=true' $define --reporter expanded *> $SmokeLog
+  $smokeOptions = @('--dart-define=SMARTFIT_RUN_LIVE=true')
+  if ($MemoryOnly) { $smokeOptions += '--dart-define=SMARTFIT_SMOKE_MEMORY_ONLY=true' }
+  & $FlutterCommand test --no-pub 'tools/coach/worker_agent_smoke.dart' @smokeOptions $define --reporter expanded *> $SmokeLog
   $runExit = $LASTEXITCODE
 } finally {
   $appKey = $null

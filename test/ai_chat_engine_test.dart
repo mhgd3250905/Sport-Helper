@@ -661,11 +661,12 @@ void main() {
   test(
     'cancelling a multistep turn suppresses late output, events and staged memory writes',
     () async {
+      const stagedFact = '家里有两只8公斤哑铃';
       final memory = coach.InMemoryUserMemoryStore();
       final started = Completer<void>();
       final late = Completer<Object>();
       final client = coach.FakeLlmClient([
-        tool('remember', {'kind': 'equipment', 'text': '家里有哑铃'}),
+        tool('remember', {'kind': 'equipment', 'text': stagedFact}),
         (coach.LlmRequest _) {
           started.complete();
           return late.future;
@@ -676,7 +677,7 @@ void main() {
       final events = <coach.AgentEvent>[];
       final subscription = ai.agent.events.listen(events.add);
       addTearDown(subscription.cancel);
-      final pending = ai.reply('记下我家里有哑铃', const ChatState());
+      final pending = ai.reply('记下$stagedFact', const ChatState());
       await started.future;
       expect(memory.entries, isEmpty);
       ai.cancelPending();
@@ -697,7 +698,11 @@ void main() {
       expect(requestText(client.requests.last), isNot(contains('迟到的记忆确认')));
       expect(
         client.requests.last.messages.first.content,
-        isNot(contains('家里有哑铃')),
+        isNot(contains(stagedFact)),
+      );
+      expect(
+        client.requests.last.messages.first.content,
+        isNot(contains('# 用户记忆（')),
       );
     },
   );

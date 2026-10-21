@@ -86,6 +86,7 @@ String _callLabel(coach.CallOutcome outcome) => switch (outcome) {
 
 void main() {
   const live = bool.fromEnvironment('SMARTFIT_RUN_LIVE');
+  const memoryOnly = bool.fromEnvironment('SMARTFIT_SMOKE_MEMORY_ONLY');
   test(
     'real Worker CoachAgent first multi-step smoke',
     () async {
@@ -322,16 +323,22 @@ void main() {
       }
 
       try {
-        await run('core', '在家 15 分钟练核心，徒手');
-        await run('actions', '臀桥怎么做');
-        await run('back-protection', '我腰不太舒服，想练腿 20 分钟');
+        if (!memoryOnly) {
+          await run('core', '在家 15 分钟练核心，徒手');
+          await run('actions', '臀桥怎么做');
+          await run('back-protection', '我腰不太舒服，想练腿 20 分钟');
+        }
         await run('remember', '我是新手，家里有哑铃', memory: true);
         // A fresh chat removes explicit Slots/history. The durable memory store
         // alone must provide remembered facts, then disappear when disabled.
         await run('memory-on-plan', '请给我排一个15分钟的居家力量训练计划', memory: true);
         await run('memory-off-plan', '请给我排一个15分钟的居家力量训练计划');
         await File('${root.path}/verdict.json').writeAsString(
-          jsonEncode({'failures': failures, 'maxSteps': engine.agent.maxSteps}),
+          jsonEncode({
+            'failures': failures,
+            'maxSteps': engine.agent.maxSteps,
+            'memoryOnly': memoryOnly,
+          }),
           flush: true,
         );
         stdout.writeln('SMOKE_REPORT ${root.path}/results.json');
