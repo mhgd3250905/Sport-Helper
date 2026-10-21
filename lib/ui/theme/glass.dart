@@ -34,35 +34,35 @@ abstract final class SfGlass {
   /// body) instead of a flat frosted pill.
   static LiquidGlassSettings get standardMaterial => SfColors.isDark
       ? const LiquidGlassSettings(
-          thickness: 14,
-          blur: 6,
-          glassColor: Color.fromRGBO(255, 255, 255, 0.07),
+          thickness: 24,
+          blur: 1.2,
+          glassColor: Color.fromRGBO(255, 255, 255, 0.02),
           lightAngle: 2.356,
-          lightIntensity: 0.9,
-          ambientStrength: 0.08,
-          refractiveIndex: 1.2,
-          saturation: 1.5,
-          chromaticAberration: 0.01,
-          fresnelStrength: 1.1,
+          lightIntensity: 1.1,
+          ambientStrength: 0.03,
+          refractiveIndex: 1.4,
+          saturation: 1.15,
+          chromaticAberration: 0.03,
+          fresnelStrength: 1.3,
         )
       : const LiquidGlassSettings(
-          thickness: 16,
-          blur: 7,
-          glassColor: Color.fromRGBO(255, 255, 255, 0.30),
+          thickness: 24,
+          blur: 1.5,
+          glassColor: Color.fromRGBO(255, 255, 255, 0.06),
           lightAngle: 2.356,
-          lightIntensity: 1.0,
-          ambientStrength: 0.18,
-          refractiveIndex: 1.2,
-          saturation: 1.4,
-          chromaticAberration: 0.02,
-          fresnelStrength: 1.0,
-          edgeAbsorption: 0.04,
+          lightIntensity: 1.2,
+          ambientStrength: 0.05,
+          refractiveIndex: 1.4,
+          saturation: 1.1,
+          chromaticAberration: 0.03,
+          fresnelStrength: 1.2,
+          edgeAbsorption: 0.02,
         );
 
   /// The material for a surface drawn at [q]: the iOS 27 preset only where
   /// the premium (Impeller) shader can run; the web is capped at standard.
   static LiquidGlassSettings materialFor(GlassQuality q) =>
-      (!kIsWeb && q == GlassQuality.premium) ? material : standardMaterial;
+      standardMaterial; // clear glass everywhere (user, 2026-10-21)
 
   /// The persisted adaptive tier to start from. `minimal` is never carried
   /// across launches (one slow session must not pin a good device, or the
