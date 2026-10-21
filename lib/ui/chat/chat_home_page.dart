@@ -18,11 +18,13 @@ import '../theme/app_theme.dart';
 import '../theme/sf_icons.dart';
 import '../theme/tokens.dart';
 import '../theme/widgets.dart';
+import 'action_card.dart';
 import 'chat_widgets.dart';
 import 'cosmos.dart';
 import 'expand_route.dart';
 import 'plan_card.dart';
 import 'saved_plans_drawer.dart';
+import 'validated_plan_card.dart';
 
 /// The home screen: one conversation floating in an endless sky. No app
 /// bar, no borders; the plans drawer opens from the input's left icon.
@@ -128,11 +130,11 @@ class _ChatHomePageState extends State<ChatHomePage> {
     _toast('已保存为「${saved.name}」');
   }
 
-  Future<void> _details(ChatMessage m) async {
+  Future<void> _details(ChatMessage m, {TrainingPlan? validatedPlan}) async {
     final plan = await Navigator.of(context).push<TrainingPlan>(
       MaterialPageRoute(
         builder: (_) => PlanPage(
-          plan: m.plan!,
+          plan: validatedPlan ?? m.plan!,
           request: m.request,
           returnPlanOnStart: true,
         ),
@@ -203,6 +205,20 @@ class _ChatHomePageState extends State<ChatHomePage> {
                 listenable: _chat,
                 builder: (context, _) => Column(
                   children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: SfSpace.x4,
+                      ),
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: SfTextAction(
+                          key: const ValueKey('chat-new-conversation'),
+                          label: '新对话',
+                          icon: SfGlyph.sparkle,
+                          onPressed: () => unawaited(_chat.newConversation()),
+                        ),
+                      ),
+                    ),
                     Expanded(child: _messages()),
                     SuggestionStrip(
                       items: _chat.typing ? const [] : _chat.suggestions,
@@ -269,10 +285,10 @@ class _ChatHomePageState extends State<ChatHomePage> {
     }
     if (_chat.typing) {
       rows.add(
-        const Padding(
+        Padding(
           key: ValueKey('typing'),
           padding: EdgeInsets.only(top: SfSpace.x4),
-          child: TypingBubble(),
+          child: TypingBubble(onCancel: _chat.cancelRequest),
         ),
       );
     }
@@ -323,19 +339,51 @@ class _ChatHomePageState extends State<ChatHomePage> {
     );
   }
 
-  Widget _message(ChatMessage m, {bool fresh = false}) => m.isPlan
-      ? PlanCard(
-          plan: m.plan!,
-          landing: fresh,
-          library: AppServices.of(context).library,
-          saved: _chat.isSaved(m.plan!),
-          onStart: (from) => _start(m.plan!, from: from),
-          onSave: () => _save(m.plan!),
-          onOpen: () => _details(m),
-        )
-      : MessageBubble(
-          message: m,
-          optionsActive: _chat.isActive(m),
-          onOption: (i) => _chat.choose(m, i),
-        );
+  Widget _message(ChatMessage m, {bool fresh = false}) {
+    final library = AppServices.of(context).library;
+    final hasText = m.text.isNotEmpty || m.options.isNotEmpty;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (hasText)
+          MessageBubble(
+            message: m,
+            optionsActive: !_chat.typing && _chat.isActive(m),
+            onOption: (i) => _chat.choose(m, i),
+          ),
+        if (m.actions case final actions?) ...[
+          if (hasText) const SizedBox(height: SfSpace.x3),
+          ActionCard(
+            actions: actions,
+            library: library,
+            onOpen: (exercise) => showExerciseDetails(context, exercise),
+          ),
+        ],
+        if (m.validatedPlan case final validated?) ...[
+          if (hasText) const SizedBox(height: SfSpace.x3),
+          ValidatedPlanCard(
+            validatedPlan: validated,
+            library: library,
+            landing: fresh,
+            isSaved: _chat.isSaved,
+            onStart: (plan, from) => _start(plan, from: from),
+            onSave: _save,
+            onOpen: (plan) => _details(m, validatedPlan: plan),
+          ),
+        ] else if (m.isPlan && m.plan!.source != 'ai') ...[
+          if (hasText) const SizedBox(height: SfSpace.x3),
+          PlanCard(
+            plan: m.plan!,
+            landing: fresh,
+            library: library,
+            saved: _chat.isSaved(m.plan!),
+            onStart: (from) => _start(m.plan!, from: from),
+            onSave: () => _save(m.plan!),
+            onOpen: () => _details(m),
+          ),
+        ],
+      ],
+    );
+  }
 }

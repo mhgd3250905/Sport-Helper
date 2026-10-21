@@ -14,26 +14,10 @@ class AiCoachConfig {
 
   coach.OpenAiCompatibleClient createClient({required String deviceId}) =>
       coach.OpenAiCompatibleClient(
-        config: const coach.LlmConfig(
-          baseUrl: baseUrl,
-          model: model,
-          maxTokens: 6000,
-          timeout: Duration(seconds: 45),
-          maxRetries: 0,
+        config: coach.LlmConfig.ugkWorker.copyWith(maxRetries: 0),
+        auth: coach.UgkWorkerAuth(
+          appKey: token.trim(),
+          deviceId: () async => deviceId,
         ),
-        auth: _ProxyAuth(appKey: token.trim(), deviceId: deviceId),
       );
-}
-
-class _ProxyAuth implements coach.AuthProvider {
-  const _ProxyAuth({required this.appKey, required this.deviceId});
-
-  final String appKey;
-  final String deviceId;
-
-  @override
-  Future<Map<String, String>> headers() async => {
-    'X-App-Key': appKey,
-    'X-Device-Id': deviceId,
-  };
 }

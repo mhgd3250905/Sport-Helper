@@ -111,13 +111,10 @@ void main() {
         token: ' fixture-app-key ',
       ).createClient(deviceId: 'ea2c6891-654f-431b-a1f4-11a9a3e03bea');
       addTearDown(client.close);
-      expect(
-        client.config.baseUrl,
-        'https://api.uuugk.win/v1',
-      );
+      expect(client.config.baseUrl, 'https://api.uuugk.win/v1');
       expect(client.model, 'deepseek-v4-flash-0731');
       expect(client.config.maxRetries, 0);
-      expect(client.config.timeout, const Duration(seconds: 45));
+      expect(client.config.timeout, const Duration(seconds: 120));
       expect(client.config.maxTokens, 6000);
       final headers = await client.auth.headers();
       expect(headers, {

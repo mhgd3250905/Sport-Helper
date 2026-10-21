@@ -97,12 +97,15 @@ void main() {
         await tester.pump(const Duration(milliseconds: 50));
       }
       expect(s.store.history, hasLength(1));
-      expect(s.store.history.single.completed, 1);
+      expect(s.store.history.single.completed, 0);
       await tester.tap(find.byKey(const ValueKey('finish')));
       await tester.pumpAndSettle();
-      final offer = s.chat.messages.last;
-      expect(offer.options.single.value, '@save:${modified.id}');
-      await s.chat.choose(offer, 0);
+      // Skipping all work no longer creates a completion/save offer. The
+      // exact started snapshot can still be saved from its own plan card.
+      expect(s.chat.messages.last.options, isEmpty);
+      final save = find.byKey(ValueKey('plan-save-${modified.id}'));
+      await tester.ensureVisible(save);
+      await tester.tap(save);
       await tester.pumpAndSettle();
       expect(s.store.savedPlans, hasLength(2));
       expect(s.store.savedFor(_original)!.plan.exerciseIds, {

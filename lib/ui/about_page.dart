@@ -5,7 +5,7 @@ import '../app/services.dart';
 import '../chat/safety_script.dart' show disclaimerText;
 import 'theme.dart';
 
-const appVersion = '0.1.0+5 (MVP)';
+const appVersion = '0.1.0+6 (MVP)';
 
 class AboutPage extends StatelessWidget {
   const AboutPage({super.key});
