@@ -2,7 +2,7 @@
 
 ## 顶部栏移除（0.1.0+10，调整分支，2026-10-21）
 
-`fix/chat-without-top-bar` / 运行源码 `89ffa8f` 去掉顶部动作栏，新对话移至左下角抽屉；237 项测试、分析 0 issue 与 Android debug 构建通过。真机已覆盖安装 `+10`，前台截图确认顶部栏消失、原聊天保留；未清空数据。当前 main 仍为 `+9`，包身份与证据见 [版本台账](version-management.md#顶部栏移除0010ui-调整分支)。
+`fix/chat-without-top-bar` / 运行源码 `89ffa8f` 去掉顶部动作栏，新对话移至左下角抽屉；237 项测试、分析 0 issue 与 Android debug 构建通过。真机已覆盖安装 `+10`，前台截图确认顶部栏消失、原聊天保留；未清空数据。当前 main 仍为 `+9`，包身份与证据见 [版本台账](version-management.md)。
 
 ## Liquid Glass（0.1.0+9，PR #4 已审核合并，2026-10-21）
 
