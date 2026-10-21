@@ -1,13 +1,13 @@
 # 版本管理与台账
 
-更新日期：2026-10-21（Asia/Shanghai）。本文件是源码里程碑、App 包版本与交付包身份的统一台账；验收证据及待验清单以 [acceptance.md](acceptance.md) 为准，角色与历史交接见 [HANDOVER.md](HANDOVER.md)。
+更新日期：2026-10-22（Asia/Shanghai）。本文件是源码里程碑、App 包版本与交付包身份的统一台账；验收证据及待验清单以 [acceptance.md](acceptance.md) 为准，角色与历史交接见 [HANDOVER.md](HANDOVER.md)。
 
 ## 当前版本
 
 | 项目 | 当前事实 / 事实来源 |
 | --- | --- |
-| 主线与合并 | 2026-10-21 经开哥批准，SDK 0.3.3 及顶部栏移除以 `f80db2804d6cb9791817463cd1cd5250b32a0e84` 合入并推送 main，合并树与验收分支 `3388bd1` 一致；后续仅更新文档 |
-| 验收分支 / 运行源码 | `feat/coach-033-speed@3388bd1edc86c43b5b5e8297cacd4b3ac19c644b`；已测运行源码 `158f4ac0d2cf7bfed0ac37d63ec6bd66eb0e5537`，包含无顶部栏 UI，代码及 APK 不变 |
+| 主线与合并 | 2026-10-22 按开哥授权修复并通过审核，PR #5 以 `172366c6527d999b7817d97fe386e442f70f0e20` 合入 main；合并树与已测 head 完全一致，本地已快进同步 |
+| 验收分支 / 运行源码 | `feat/ui-polish@f92cbc936a123b77bc43d2a23987d928596eaefd`；计划卡展开动画、标题布局与键盘焦点修复，保留 SDK 0.3.3 和无顶部栏界面 |
 | 共享训练依赖 | App main 的 `ugk_coach 0.3.3` / `ugk_trainer 0.1.4` 均固定 SDK main `fc5e456c44d76b872eb812597ffb5f67bc66bce3`。不使用 path 或分支名，不复制或 patch SDK、不修改 pub 缓存 |
 | 源码里程碑 | `m7-aesthetic-v2` → `d0b1c7ef6198a469a7f0a7cedcaa7c9f2512dbe7` |
 | 上一阶段文档整理前主线快照 | `d0b1c7ef6198a469a7f0a7cedcaa7c9f2512dbe7`；后续 HEAD 由 Git 查询，不把本表固定 SHA 写成永远最新的 HEAD |
@@ -17,8 +17,8 @@
 | 默认包版本 | 当前 main `0.1.0+9`：versionName `0.1.0`、versionCode `9`；pubspec 与关于页同步，旧 +8 等身份保留为历史 |
 | 关于页版本 | `0.1.0+9 (MVP)`；独立常量见 [about_page.dart](../lib/ui/about_page.dart) |
 | 资源版本 | 93 个动作包为 `1.1.0`；公共包 `_common` 为 `1.0.0`；格式版本仍为 `1`，见 [小包规范](drill-pack-spec.md) 与 [索引](../assets/packs/index.json) |
-| 交付状态 | SDK 0.3.3 / +9 debug APK 已构建并另名保存，208,043,503 bytes；未将真机已装的 UI +10 降级 |
-| 验收状态 | SDK 0.3.3 分支完整 237 测试、分析 0 issue、严格锁文件及 Android debug 构建通过；复用已核对源码与原始哈希的六条真实 Worker，180.430 秒 / 74,130 token / 0 回落，见 [0.3.3 报告](coach-033-smoke-2026-10-21.md) |
+| 交付状态 | PR #5 仅编译验证，未交付或安装新 APK。此前 SDK 0.3.3 / +9 debug APK 仍为 208,043,503 bytes，不含 PR #5；未将真机已装的 UI +10 降级 |
+| 验收状态 | PR #5 全量 253 测试、分析 0 issue、严格锁文件、Web/Android debug 构建及浏览器交互通过，见 [审核记录](pr5-local-review.md)。AI 链路未改；此前六条 Worker 的身份与复用边界仍见 [0.3.3 报告](coach-033-smoke-2026-10-21.md) |
 
 Git 标签、App 包版本与资源版本分别管理。`m7` 不代表 Android versionCode 为 7；此前为 `+1` M7、`+2` 训练接入、`+3` 目录节奏修复、`+4/+5` JSON 信封、`+6` 工具会话、`+7` 首次 Skill Agent 分支；SDK 0.3.2 接入阶段为 `0.1.0+8`，当前 UI 主线为 `0.1.0+9`。没有形成可交付 release 包。
 

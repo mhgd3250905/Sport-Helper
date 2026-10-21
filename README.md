@@ -11,6 +11,8 @@
 
 ## 版本与验收入口
 
+2026-10-22 已按开哥授权修复、通过审核并合并 [PR #5](https://github.com/mhgd3250905/Sport-Helper/pull/5)，合并提交 `172366c6527d999b7817d97fe386e442f70f0e20`。计划卡展开后大图过渡到首行动作缩略图，标题与收起按钮适配大字体，隐藏卡片退出键盘焦点。253 项测试、分析 0 issue、Web/Android debug 构建及浏览器交互通过；SDK 0.3.3 与顶部栏改动保留。本轮未交付或安装新 APK，[审核、截图与边界](docs/pr5-local-review.md)。
+
 SDK 0.3.3 已于 2026-10-21 经开哥批准，以 `f80db2804d6cb9791817463cd1cd5250b32a0e84` 合入并推送 App main，合并树与验收分支 `feat/coach-033-speed@3388bd1` 一致。两项 git ref 固定为 SDK main `fc5e456c44d76b872eb812597ffb5f67bc66bce3`，按要求使用 `0.1.0+9`，包含顶部栏移除。完整 237 项测试与分析 0 问题；六条真实 Worker 记录已核对为相同运行代码并复用，共 180.430 秒、74,130 token，均无回落。[可转发的六条记录](docs/coach-033-smoke-2026-10-21.md)。
 
 此前 Liquid Glass UI 于 2026-10-21 经开哥授权审核、修复并合并 [PR #4](https://github.com/mhgd3250905/Sport-Helper/pull/4)，合并提交 `561ea8cc69efa38d07c03169c257e8fa4116bc72`。当时 237 项测试、分析 0 issue、Web 与 Android debug 构建通过，实际浏览器验证深浅色计划卡及共享训练流程；保留 CoachAgent 0.3.2 和 SDK 门禁，修复大字体溢出。截图、包身份和未测设备性能边界见 [PR #4 审核记录](docs/pr4-local-review.md)。以下 `+8` 数据描述之前的 SDK 接入验收，不替代当前版本。

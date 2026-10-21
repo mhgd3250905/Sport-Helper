@@ -1,5 +1,11 @@
 # 本机验收记录
 
+## 计划卡片展开与可访问性（PR #5 已审核合并，2026-10-22）
+
+开哥授权本机修复、通过审核后合并。已测运行源码 / PR 最终 head `f92cbc936a123b77bc43d2a23987d928596eaefd`，目标 main `d4b3e76bf10474ae6c49d8b9f376fa842e16840b`。两项 P2（标题与收起按钮重叠、隐藏详情按钮仍能 Tab/Enter 激活）已关闭；保留原展开/收起节奏和共享元素过渡。全量 253 项测试通过，新增 16 项覆盖窄屏、随包字体、三档字号、深浅色、减少动效及键盘反向操作；分析 0 issue、严格锁文件、Web release 与 Android debug 编译通过。
+
+正式 Web 入口以独立本地 origin 和模板生成计划，已验证展开、保存、详情、切深色、进入共享 SDK 播放器、暂停/提前结束并返回；控制台 0 errors / 0 warnings。GitHub 已提交 [APPROVED review](https://github.com/mhgd3250905/Sport-Helper/pull/5#pullrequestreview-5602560196)，合并提交 `172366c6527d999b7817d97fe386e442f70f0e20` 的整个文件树与已测 head 一致，本地主线已快进同步。SDK 0.3.3 固定依赖、顶部栏移除和 AI 链路保留；没有新增 Worker 请求、真机体验或性能结论，也没有交付/安装新 APK。完整证据与截图见 [PR #5 审核记录](pr5-local-review.md)。
+
 ## SDK 0.3.3 提速接入（0.1.0+9，已合 main 并推送，2026-10-21）
 
 `feat/coach-033-speed` / 运行源码 `158f4ac0d2cf7bfed0ac37d63ec6bd66eb0e5537`，coach / trainer 均固定 SDK main `fc5e456c44d76b872eb812597ffb5f67bc66bce3`。完整 237 项测试、分析 0 问题、严格锁文件检查通过。此前 56 项只验了隔离旧 UI 树，本次已补全量。六条真实 Worker 与最终 SDK 运行代码、当前 App 的 AI 链路一致，按要求复用，合计 180.430 秒、74,130 token、无回落；没有重复请求或改写成新跑结果。
