@@ -2,10 +2,12 @@ param(
   [Parameter(Mandatory = $true)][string]$AppKeyFile,
   [string]$FlutterCommand = 'flutter',
   [string]$SmokeLog = '.buildlog/skill-agent-live.log',
-  [switch]$MemoryOnly
+  [switch]$MemoryOnly,
+  [switch]$ActionsOnly
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+if ($MemoryOnly -and $ActionsOnly) { throw 'Choose only one smoke mode.' }
 $appKey = $null
 $define = $null
 $content = $null
@@ -23,6 +25,7 @@ try {
   }
   $smokeOptions = @('--dart-define=SMARTFIT_RUN_LIVE=true')
   if ($MemoryOnly) { $smokeOptions += '--dart-define=SMARTFIT_SMOKE_MEMORY_ONLY=true' }
+  if ($ActionsOnly) { $smokeOptions += '--dart-define=SMARTFIT_SMOKE_ACTIONS_ONLY=true' }
   & $FlutterCommand test --no-pub 'tools/coach/worker_agent_smoke.dart' @smokeOptions $define --reporter expanded *> $SmokeLog
   $runExit = $LASTEXITCODE
 } finally {

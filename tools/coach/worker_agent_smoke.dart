@@ -95,9 +95,17 @@ String _callLabel(coach.CallOutcome outcome) => switch (outcome) {
 void main() {
   const live = bool.fromEnvironment('SMARTFIT_RUN_LIVE');
   const memoryOnly = bool.fromEnvironment('SMARTFIT_SMOKE_MEMORY_ONLY');
+  const actionsOnly = bool.fromEnvironment('SMARTFIT_SMOKE_ACTIONS_ONLY');
   test(
-    'real Worker CoachAgent 0.3.2 six-case smoke',
+    actionsOnly
+        ? 'real Worker CoachAgent 0.3.2 explicit action-card supplement'
+        : 'real Worker CoachAgent 0.3.2 six-case smoke',
     () async {
+      expect(
+        memoryOnly && actionsOnly,
+        isFalse,
+        reason: 'Choose only one smoke mode.',
+      );
       const key = String.fromEnvironment('SMARTFIT_AI_TOKEN');
       expect(
         key.trim(),
@@ -182,6 +190,7 @@ void main() {
           'sdkVersion': '0.3.2',
           'appVersion': '0.1.0+8',
           'memoryOnly': memoryOnly,
+          'actionsOnly': actionsOnly,
           'maxSteps': engine.agent.maxSteps,
           'maxRequestRetries': engine.agent.maxRequestRetries,
           'requestTimeoutMs': engine.agent.requestTimeout.inMilliseconds,
@@ -228,6 +237,7 @@ void main() {
         if (reset) await chat.newConversation();
         final before = client.requests.length;
         final eventBefore = events.length;
+        final messageBefore = chat.messages.length;
         final started = DateTime.now().toUtc();
         final watch = Stopwatch()..start();
         stdout.writeln(
@@ -261,6 +271,15 @@ void main() {
             ? <String>[]
             : sent.first.tools.map((t) => t.name).toList();
         final plan = chat.currentPlan;
+        final appActionCards = chat.messages
+            .skip(messageBefore)
+            .where((message) => message.actions != null)
+            .toList();
+        final appUsesAdmittedActions =
+            r.actions != null &&
+            appActionCards.any(
+              (message) => identical(message.actions, r.actions),
+            );
         final itemIds =
             plan?.items.map((i) => i.exerciseId).toList() ?? <String>[];
         final result = <String, Object?>{
@@ -323,6 +342,14 @@ void main() {
           'events': turnEvents,
           'text': r.text,
           'actions': r.actions?.items.map((a) => a.id).toList(),
+          if (id == 'actions-card') ...{
+            'appActionsCardCount': appActionCards.length,
+            'appUsesAdmittedActions': appUsesAdmittedActions,
+            'appActions': [
+              for (final message in appActionCards)
+                message.actions!.items.map((a) => a.id).toList(),
+            ],
+          },
           'planTitle': plan?.title,
           'planId': plan?.id,
           'planLevel': plan?.level,
@@ -346,8 +373,27 @@ void main() {
         if (r.status != coach.TurnStatus.ok) {
           failures.add('$id: ${r.status.name} ${r.fallbackReason?.name}');
         }
-        if (id == 'actions' && r.actions == null) {
-          failures.add('actions: no ValidatedActions');
+        // "How do I do this?" may finish with an admitted text explanation.
+        // Only the explicit actions-card supplement requires a display card.
+        if (id == 'actions' && r.actions == null && r.text.trim().isEmpty) {
+          failures.add('actions: no accepted explanation or ValidatedActions');
+        }
+        if (id == 'actions-card') {
+          final actions = r.actions;
+          if (actions == null ||
+              actions.items.isEmpty ||
+              !actions.items.any((a) => a.id == 'w-feet-on-chair-bridge')) {
+            failures.add('actions-card: missing requested ValidatedActions');
+          }
+          if (r.fallbackReason != null) {
+            failures.add('actions-card: unexpected fallback');
+          }
+          if (r.plan != null || plan != null) {
+            failures.add('actions-card: unexpected plan');
+          }
+          if (!appUsesAdmittedActions) {
+            failures.add('actions-card: App did not receive admitted actions');
+          }
         }
         if ([
               'core',
@@ -398,21 +444,26 @@ void main() {
       }
 
       try {
-        if (!memoryOnly) {
-          await run('core', '在家 15 分钟练核心，徒手');
-          await run('actions', '臀桥怎么做');
-          await run('back-protection', '我腰不太舒服，想练腿 20 分钟');
+        if (actionsOnly) {
+          await run('actions-card', '给我看看「脚踩椅面臀桥」的动作演示卡。');
+        } else {
+          if (!memoryOnly) {
+            await run('core', '在家 15 分钟练核心，徒手');
+            await run('actions', '臀桥怎么做');
+            await run('back-protection', '我腰不太舒服，想练腿 20 分钟');
+          }
+          await run('remember', '我是新手，家里有哑铃', memory: true);
+          // A fresh chat removes explicit Slots/history. The durable memory store
+          // alone must provide remembered facts, then disappear when disabled.
+          await run('memory-on-plan', '请给我排一个15分钟的居家力量训练计划', memory: true);
+          await run('memory-off-plan', '请给我排一个15分钟的居家力量训练计划');
         }
-        await run('remember', '我是新手，家里有哑铃', memory: true);
-        // A fresh chat removes explicit Slots/history. The durable memory store
-        // alone must provide remembered facts, then disappear when disabled.
-        await run('memory-on-plan', '请给我排一个15分钟的居家力量训练计划', memory: true);
-        await run('memory-off-plan', '请给我排一个15分钟的居家力量训练计划');
         await File('${root.path}/verdict.json').writeAsString(
           jsonEncode({
             'failures': failures,
             'maxSteps': engine.agent.maxSteps,
             'memoryOnly': memoryOnly,
+            'actionsOnly': actionsOnly,
           }),
           flush: true,
         );
