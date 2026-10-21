@@ -98,8 +98,8 @@ void main() {
   const actionsOnly = bool.fromEnvironment('SMARTFIT_SMOKE_ACTIONS_ONLY');
   test(
     actionsOnly
-        ? 'real Worker CoachAgent 0.3.2 explicit action-card supplement'
-        : 'real Worker CoachAgent 0.3.2 six-case smoke',
+        ? 'real Worker CoachAgent 0.3.3 explicit action-card supplement'
+        : 'real Worker CoachAgent 0.3.3 six-case smoke',
     () async {
       expect(
         memoryOnly && actionsOnly,
@@ -186,9 +186,9 @@ void main() {
       final events = <Map<String, Object?>>[];
       await File('${root.path}/metadata.json').writeAsString(
         jsonEncode({
-          'sdkRef': 'b26e4fda807b6ef3db15a61ba30c67fb51dce5e1',
-          'sdkVersion': '0.3.2',
-          'appVersion': '0.1.0+8',
+          'sdkRef': 'fc5e456c44d76b872eb812597ffb5f67bc66bce3',
+          'sdkVersion': '0.3.3',
+          'appVersion': '0.1.0+9',
           'memoryOnly': memoryOnly,
           'actionsOnly': actionsOnly,
           'maxSteps': engine.agent.maxSteps,
