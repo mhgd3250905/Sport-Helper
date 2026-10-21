@@ -11,6 +11,8 @@
 
 ## 版本与验收入口
 
+SDK 0.3.3 升级分支 `feat/coach-033-speed` 已将两项 git ref 固定为 SDK main `fc5e456c44d76b872eb812597ffb5f67bc66bce3`，按要求使用 `0.1.0+9`，保留顶部栏移除。完整 237 项测试与分析 0 问题；六条真实 Worker 记录已核对为相同运行代码并复用，共 180.430 秒、74,130 token，均无回落。[可转发的六条记录](docs/coach-033-smoke-2026-10-21.md)；App main 合并及推送待开哥批准。
+
 当前主线为 `0.1.0+9` / Liquid Glass。2026-10-21 经开哥授权审核、修复并合并 [PR #4](https://github.com/mhgd3250905/Sport-Helper/pull/4)，合并提交 `561ea8cc69efa38d07c03169c257e8fa4116bc72`。237 项测试、分析 0 issue、Web 与 Android debug 构建通过，实际浏览器验证深浅色计划卡及共享训练流程。保留 CoachAgent 0.3.2 和 SDK 门禁，修复大字体溢出。截图、包身份和未测设备性能边界见 [PR #4 审核记录](docs/pr4-local-review.md)。以下 `+8` 数据描述之前的 SDK 接入验收，不替代当前 UI 版本。
 
 ### SDK 0.3.2 接入阶段（0.1.0+8，历史）
