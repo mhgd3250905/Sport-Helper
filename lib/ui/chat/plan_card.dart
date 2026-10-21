@@ -4,20 +4,25 @@ import '../../domain/exercise.dart';
 import '../../domain/plan.dart';
 import '../../domain/session.dart';
 import '../theme.dart' show levelZh;
+import '../theme/glass.dart';
 import '../theme/sf_icons.dart';
 import '../theme/tokens.dart';
 import '../theme/media_theme.dart';
 import '../theme/widgets.dart';
 import 'expand_route.dart';
 
-/// The assistant's plan reply, one card with one prominent action:
+/// The assistant's plan reply: a compact, fixed-height card (like a link
+/// share in a messenger), raised on liquid glass because it is tappable;
+/// the media inside stays opaque and rounded.
 ///
-/// * a cover stage (the first move's render on its own dark stage) with
-///   the title and the meta line laid over its lower edge, and the accent
-///   「开始」 disc in the corner — the card's only accent;
-/// * the numbered moves (so "换掉第 3 个" has something to point at), four
-///   shown, the rest behind 展开全部;
-/// * a quiet footer: 保存 · 详情 (tertiary text actions).
+/// * one move → [_ExerciseBody], 130 px: a square preview on the left,
+///   name · dose · tags · one cue on the right, 「开始」 bottom-right;
+/// * a set → [_SetBody], 240 px: the first move as the hero with title,
+///   duration and move count over it, a row of thumbnails for the other
+///   moves (five, then +N), 「开始」 on the hero.
+///
+/// Tapping the card opens the plan page (every move, swaps); 保存 stays on
+/// the card as a small pill. The full move list lives on the plan page.
 class PlanCard extends StatefulWidget {
   const PlanCard({
     super.key,
@@ -44,41 +49,23 @@ class PlanCard extends StatefulWidget {
   /// Details (the plan page: preview, every move, swaps).
   final VoidCallback onOpen;
 
+  /// Fixed card heights by type.
+  static const exerciseHeight = 130.0;
+  static const setHeight = 240.0;
+
   @override
   State<PlanCard> createState() => _PlanCardState();
 }
 
 class _PlanCardState extends State<PlanCard> {
-  static const _collapsed = 4;
-  bool _expanded = false;
   final _card = GlobalKey();
-
-  /// Rows past the first four fade in 30 ms apart when the list opens.
-  Widget _rowIn(int i, Widget row) {
-    if (i < _collapsed) return row;
-    return TweenAnimationBuilder<double>(
-      key: ValueKey('row-in-$i'),
-      tween: Tween(begin: 0, end: 1),
-      duration: SfMotion.medium + Duration(milliseconds: 30 * (i - _collapsed)),
-      builder: (_, v, child) {
-        final total = 280 + 30 * (i - _collapsed);
-        final start = 30 * (i - _collapsed) / total;
-        final o = v <= start ? 0.0 : SfMotion.standard.transform((v - start) / (1 - start));
-        return Opacity(opacity: o, child: child);
-      },
-      child: row,
-    );
-  }
+  static const _inset = 6.0;
 
   @override
   Widget build(BuildContext context) {
     final p = widget.plan;
     final lib = widget.library;
     final items = p.items.toList();
-    final circuit = [
-      for (final b in p.blocks)
-        for (final _ in b.items) b.type == BlockType.circuit,
-    ];
     final moves = [for (final i in items) lib.tryGet(i.exerciseId)].whereType<Exercise>().toList();
     // Only gear people may not have; mat / chair / wall count as at hand.
     const extra = {Equipment.band, Equipment.dumbbell, Equipment.slider};
@@ -88,127 +75,73 @@ class _PlanCardState extends State<PlanCard> {
     final gearText = gear.isEmpty ? '徒手' : gear.map((q) => q.zh).join('、');
     final secs = SessionBuilder(lib).planSeconds(p);
     final minutes = (secs / 60).round();
-    final meta = [
-      minutes < 1 ? '不到 1 分钟' : '$minutes 分钟',
-      '${items.length} 个动作',
-      gearText,
-      levelZh(p.level),
-    ].join(' · ');
-    final shown = _expanded ? items.length : items.length.clamp(0, _collapsed);
+    final duration = minutes < 1 ? '不到 1 分钟' : '$minutes 分钟';
+    final single = items.length == 1;
+    final height = single ? PlanCard.exerciseHeight : PlanCard.setHeight;
     final width = (MediaQuery.sizeOf(context).width - 32).clamp(280.0, 400.0);
+
+    final start = _StartDisc(
+      key: ValueKey('plan-start-${p.id}'),
+      size: single ? 48 : 56,
+      onTap: () => widget.onStart(() => rectOf(_card.currentContext)),
+    );
+    final save = _SavePill(
+      key: ValueKey('plan-save-${p.id}'),
+      saved: widget.saved,
+      onMedia: !single,
+      onTap: widget.saved ? null : widget.onSave,
+    );
+    final Widget body = single
+        ? _ExerciseBody(
+            exercise: moves.firstOrNull,
+            item: items.first,
+            fallbackName: p.title,
+            duration: duration,
+            tags: [gearText, if (moves.firstOrNull case final e?) e.category.zh, levelZh(p.level)],
+            landing: widget.landing,
+          )
+        : _SetBody(
+            moves: moves,
+            title: p.title,
+            meta: [duration, '${items.length} 个动作', gearText].join(' · '),
+            landing: widget.landing,
+          );
 
     return Align(
       alignment: Alignment.centerLeft,
       child: SizedBox(
         key: _card,
         width: width,
-        child: SfPanel(
-          padding: EdgeInsets.zero,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+        height: height,
+        // Raised: the card is a control, so it floats on the same clear
+        // glass as the chips and the bar. Nothing glass is nested inside.
+        child: SfGlassSurface(
+          radius: SfRadius.lg,
+          width: width,
+          height: height,
+          padding: const EdgeInsets.all(_inset),
+          child: Stack(
+            fit: StackFit.expand,
             children: [
-              Padding(
-                padding: const EdgeInsets.all(SfSpace.x2),
-                child: _CoverStage(
-                  landing: widget.landing,
-                  cover: moves.firstOrNull,
-                  title: p.title,
-                  meta: meta,
-                  onOpen: widget.onOpen,
-                  start: _StartDisc(
-                    key: ValueKey('plan-start-${p.id}'),
-                    onTap: () => widget.onStart(() => rectOf(_card.currentContext)),
-                  ),
+              // The whole card opens the plan page; start and save sit on
+              // top as their own buttons (own semantics nodes).
+              Positioned.fill(
+                child: SfPressable(
+                  key: ValueKey('plan-open-${p.id}'),
+                  semanticLabel: '计划详情：${p.title}',
+                  scale: 1,
+                  haptic: SfHaptic.selection,
+                  onTap: widget.onOpen,
+                  child: body,
                 ),
               ),
-              // M8: the list grows on the container curve and the extra rows
-              // fade in one after another; reduced motion: no height move.
-              Padding(
-                padding: const EdgeInsets.fromLTRB(SfSpace.x4, SfSpace.x2, SfSpace.x4, 0),
-                child: AnimatedSize(
-                  duration: SfMotion.reduced(context) ? Duration.zero : SfMotion.medium,
-                  curve: SfMotion.container,
-                  alignment: Alignment.topCenter,
-                  child: Column(
-                    children: [
-                      for (var i = 0; i < shown; i++)
-                        _rowIn(
-                          i,
-                          _MoveRow(
-                            index: i + 1,
-                            item: circuit[i] ? items[i].copyWith(sets: 1) : items[i],
-                            exercise: lib.tryGet(items[i].exerciseId),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-              ),
-              if (items.length > _collapsed || p.notes.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(SfSpace.x3, 2, SfSpace.x4, 0),
-                  child: Row(
-                    children: [
-                      if (items.length > _collapsed)
-                        _ExpandAction(
-                          key: ValueKey('plan-expand-${p.id}'),
-                          expanded: _expanded,
-                          label: _expanded ? '收起' : '展开全部 ${items.length} 个动作',
-                          onPressed: () => setState(() => _expanded = !_expanded),
-                        ),
-                      const Spacer(),
-                      if (p.notes.isNotEmpty)
-                        Flexible(
-                          flex: 4,
-                          child: Text(
-                            '已按你的情况调整 ${p.notes.length} 处',
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            textAlign: TextAlign.right,
-                            style: SfType.caption,
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(SfSpace.x2, SfSpace.x1, SfSpace.x2, SfSpace.x1),
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border(top: BorderSide(color: SfColors.isDark ? SfColors.surfaceHigh : SfColors.line)),
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: SfSpace.x2),
-                  child: Row(
-                    children: [
-                      SfTextAction(
-                        key: ValueKey('plan-save-${p.id}'),
-                        icon: SfGlyph.bookmark,
-                        iconFilled: widget.saved,
-                        color: widget.saved ? SfColors.accentText : SfColors.text,
-                        label: widget.saved ? '已保存' : '保存',
-                        onPressed: widget.saved ? null : widget.onSave,
-                      ),
-                      const Spacer(),
-                      SfPressable(
-                        key: ValueKey('plan-open-${p.id}'),
-                        semanticLabel: '计划详情',
-                        onTap: widget.onOpen,
-                        child: ConstrainedBox(
-                          constraints: const BoxConstraints(minHeight: 44),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text('详情', style: SfType.callout.copyWith(fontSize: 14, color: SfColors.muted)),
-                              const SizedBox(width: 2),
-                              SfIcon(SfGlyph.chevronRight, size: 16, color: SfColors.muted, strokeWidth: 2),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+              if (single) ...[
+                Positioned(right: 2, top: 0, child: save),
+                Positioned(right: SfSpace.x1, bottom: SfSpace.x1, child: start),
+              ] else ...[
+                Positioned(right: SfSpace.x1, top: SfSpace.x1, child: save),
+                Positioned(right: SfSpace.x3, bottom: _SetBody.stripHeight + SfSpace.x3, child: start),
+              ],
             ],
           ),
         ),
@@ -217,108 +150,309 @@ class _PlanCardState extends State<PlanCard> {
   }
 }
 
-/// The first move's render on its dark stage, title and meta over the
-/// lower edge (a scrim keeps them readable), the start disc in the corner.
-class _CoverStage extends StatelessWidget {
-  const _CoverStage({
-    this.landing = false,
-    required this.cover,
-    required this.title,
-    required this.meta,
-    required this.start,
-    required this.onOpen,
-  });
+/// The cover image on its stage colour; settles from 1.04 as a card lands.
+class _Media extends StatelessWidget {
+  const _Media({required this.exercise, this.landing = false});
+  final Exercise? exercise;
   final bool landing;
-  final Exercise? cover;
-  final String title;
-  final String meta;
-  final Widget start;
-  final VoidCallback onOpen;
 
   @override
   Widget build(BuildContext context) {
-    // The stage is the colour the cover is baked on; title and meta take
-    // that stage's ink (dark ink on the light stage, white on the dark).
-    final stage = sfStageFor(cover);
-    return ClipRRect(
-    borderRadius: BorderRadius.circular(SfRadius.lg - SfSpace.x2),
-    child: AspectRatio(
-      aspectRatio: 16 / 11,
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          ColoredBox(color: stage.mediaStage),
-          if (cover != null)
-            GestureDetector(
-              onTap: onOpen,
-              child: TweenAnimationBuilder<double>(
-                // M7: once, as the card lands, the cover settles into place.
-                tween: Tween(begin: landing && !SfMotion.reduced(context) ? 1.04 : 1, end: 1),
-                duration: const Duration(milliseconds: 600),
-                curve: SfMotion.standard,
-                builder: (_, k, img) => k == 1 ? img! : Transform.scale(scale: k, child: img),
-                child: Image.asset(
-                  sfPoster(cover!),
-                  fit: BoxFit.cover,
-                  alignment: const Alignment(0, -.15),
-                  errorBuilder: (_, _, _) => const SizedBox.shrink(),
-                ),
-              ),
-            ),
-          // Lower scrim: transparent → stage, under the text only.
-          IgnorePointer(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  stops: const [.38, 1],
-                  colors: [stage.mediaStage.withValues(alpha: 0), stage.mediaStage.withValues(alpha: .92)],
-                ),
-              ),
+    final e = exercise;
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        ColoredBox(color: sfStageFor(e).mediaStage),
+        if (e != null)
+          TweenAnimationBuilder<double>(
+            // M7: once, as the card lands, the cover settles into place.
+            tween: Tween(begin: landing && !SfMotion.reduced(context) ? 1.04 : 1, end: 1),
+            duration: const Duration(milliseconds: 600),
+            curve: SfMotion.standard,
+            builder: (_, k, img) => k == 1 ? img! : Transform.scale(scale: k, child: img),
+            child: Image.asset(
+              sfPoster(e),
+              fit: BoxFit.cover,
+              alignment: const Alignment(0, -.15),
+              errorBuilder: (_, _, _) => const SizedBox.shrink(),
             ),
           ),
-          Positioned(
-            left: SfSpace.x4,
-            right: 96,
-            bottom: SfSpace.x4,
-            child: IgnorePointer(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    title,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: stage.onStage,
-                      fontSize: 22,
-                      height: 1.25,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  const SizedBox(height: SfSpace.x1),
-                  Text(
-                    meta,
+      ],
+    );
+  }
+}
+
+/// One move: square preview left; name, dose, tags, one cue right.
+class _ExerciseBody extends StatelessWidget {
+  const _ExerciseBody({
+    required this.exercise,
+    required this.item,
+    required this.fallbackName,
+    required this.duration,
+    required this.tags,
+    this.landing = false,
+  });
+  final Exercise? exercise;
+  final PlanItem item;
+  final String fallbackName;
+  final String duration;
+  final List<String> tags;
+  final bool landing;
+
+  @override
+  Widget build(BuildContext context) {
+    final e = exercise;
+    final cue = e == null || e.cues.isEmpty ? '' : e.cues.first;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        AspectRatio(
+          aspectRatio: 1,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(SfRadius.lg - 6),
+            child: _Media(exercise: e, landing: landing),
+          ),
+        ),
+        const SizedBox(width: SfSpace.x3),
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(0, SfSpace.x1, 0, SfSpace.x1),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 64), // clear of 保存
+                  child: Text(
+                    e?.name ?? fallbackName,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: stage.onStageMuted,
-                      fontSize: 13,
-                      height: 1.4,
-                      fontWeight: FontWeight.w500,
+                    style: SfType.callout.copyWith(fontWeight: FontWeight.w700, fontSize: 16),
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '${item.doseText()} · $duration',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: SfType.label.copyWith(fontFeatures: SfType.tabular),
+                ),
+                const SizedBox(height: 6),
+                Padding(
+                  padding: const EdgeInsets.only(right: 52), // clear of 开始
+                  child: _Tags(tags),
+                ),
+                const Spacer(),
+                if (cue.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 56),
+                    child: Text(
+                      cue,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: SfType.caption.copyWith(color: SfColors.muted),
                     ),
                   ),
-                ],
-              ),
+              ],
             ),
           ),
-          Positioned(right: SfSpace.x3, bottom: SfSpace.x3, child: start),
+        ),
+      ],
+    );
+  }
+}
+
+/// Small flat tags (equipment · body part · level); one line, clipped.
+class _Tags extends StatelessWidget {
+  const _Tags(this.tags);
+  final List<String> tags;
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+    height: 22,
+    child: ClipRect(
+      child: Wrap(
+        spacing: SfSpace.x1,
+        clipBehavior: Clip.hardEdge,
+        children: [
+          for (final t in tags)
+            DecoratedBox(
+              decoration: ShapeDecoration(
+                color: SfColors.text.withValues(alpha: SfColors.isDark ? .10 : .06),
+                shape: const StadiumBorder(),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                child: Text(t, style: TextStyle(fontSize: 11.5, height: 1.3, fontWeight: FontWeight.w500, color: SfColors.muted)),
+              ),
+            ),
         ],
       ),
     ),
   );
+}
+
+/// A set: the first move as the hero (title, duration, move count over its
+/// lower edge), the other moves as a strip of thumbnails under it.
+class _SetBody extends StatelessWidget {
+  const _SetBody({required this.moves, required this.title, required this.meta, this.landing = false});
+  final List<Exercise> moves;
+  final String title;
+  final String meta;
+  final bool landing;
+
+  static const stripHeight = 52.0;
+  static const _maxThumbs = 5;
+
+  @override
+  Widget build(BuildContext context) {
+    final cover = moves.firstOrNull;
+    final stage = sfStageFor(cover);
+    final rest = moves.skip(1).toList();
+    final shown = rest.take(_maxThumbs).toList();
+    final more = rest.length - shown.length;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Expanded(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(SfRadius.lg - 6),
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                _Media(exercise: cover, landing: landing),
+                // Lower scrim: transparent → stage, under the text only.
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      stops: const [.35, 1],
+                      colors: [stage.mediaStage.withValues(alpha: 0), stage.mediaStage.withValues(alpha: .92)],
+                    ),
+                  ),
+                ),
+                Positioned(
+                  left: SfSpace.x4,
+                  right: 84,
+                  bottom: SfSpace.x3,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(color: stage.onStage, fontSize: 19, height: 1.25, fontWeight: FontWeight.w700),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        meta,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(color: stage.onStageMuted, fontSize: 13, height: 1.35, fontWeight: FontWeight.w500),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        SizedBox(
+          height: stripHeight,
+          child: LayoutBuilder(
+            builder: (context, c) {
+              const gap = 6.0;
+              final slots = shown.length + (more > 0 ? 1 : 0);
+              final size = slots == 0 ? 0.0 : ((c.maxWidth - gap * (_maxThumbs)) / (_maxThumbs + 1)).clamp(28.0, 40.0);
+              return Padding(
+                padding: const EdgeInsets.only(top: 6),
+                child: Row(
+                  children: [
+                    for (final e in shown) ...[
+                      _Thumb(size: size, child: _Media(exercise: e)),
+                      const SizedBox(width: gap),
+                    ],
+                    if (more > 0)
+                      _Thumb(
+                        size: size,
+                        child: ColoredBox(
+                          color: SfColors.text.withValues(alpha: SfColors.isDark ? .12 : .07),
+                          child: Center(
+                            child: Text(
+                              '+$more',
+                              style: SfType.label.copyWith(fontWeight: FontWeight.w600, fontFeatures: SfType.tabular),
+                            ),
+                          ),
+                        ),
+                      ),
+                    const Spacer(),
+                    Text('详情', style: SfType.callout.copyWith(fontSize: 13, color: SfColors.muted)),
+                    SfIcon(SfGlyph.chevronRight, size: 15, color: SfColors.muted, strokeWidth: 2),
+                    const SizedBox(width: SfSpace.x1),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _Thumb extends StatelessWidget {
+  const _Thumb({required this.size, required this.child});
+  final double size;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => ClipRRect(
+    borderRadius: BorderRadius.circular(SfRadius.xs + 2),
+    child: SizedBox.square(dimension: size, child: child),
+  );
+}
+
+/// 保存 / 已保存: a small flat pill (not glass — never glass in glass). On
+/// the hero it sits on a dark scrim so it reads over any picture.
+class _SavePill extends StatelessWidget {
+  const _SavePill({super.key, required this.saved, required this.onMedia, required this.onTap});
+  final bool saved;
+  final bool onMedia;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final label = saved ? '已保存' : '保存';
+    final fg = onMedia ? Colors.white : (saved ? SfColors.accentText : SfColors.muted);
+    return SfPressable(
+      semanticLabel: label,
+      onTap: onTap,
+      haptic: SfHaptic.selection,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: 44, minWidth: 44),
+        child: Center(
+          child: DecoratedBox(
+            decoration: ShapeDecoration(
+              color: onMedia ? const Color(0x66000000) : Colors.transparent,
+              shape: const StadiumBorder(),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SfIcon(SfGlyph.bookmark, size: 14, filled: saved, color: fg),
+                  const SizedBox(width: 3),
+                  Text(label, style: TextStyle(color: fg, fontSize: 12.5, height: 1.2, fontWeight: FontWeight.w600)),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 
@@ -327,10 +461,9 @@ class _CoverStage extends StatelessWidget {
 /// itself, a tight contact shadow — no glow, no gradient halo. It sinks
 /// while held. Drawn with the dark accent on the dark stage.
 class _StartDisc extends StatelessWidget {
-  const _StartDisc({super.key, required this.onTap});
+  const _StartDisc({super.key, required this.onTap, this.size = 56});
   final VoidCallback onTap;
-
-  static const _size = 68.0;
+  final double size;
 
   @override
   Widget build(BuildContext context) {
@@ -350,15 +483,15 @@ class _StartDisc extends StatelessWidget {
           pressed: SfPressedScope.of(context),
           circle: true,
           child: SizedBox.square(
-            dimension: _size,
+            dimension: size,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                SfIcon(SfGlyph.play, size: 22, filled: true, color: on),
+                SfIcon(SfGlyph.play, size: size * .32, filled: true, color: on),
                 const SizedBox(height: 1),
                 Text(
                   '开始',
-                  style: TextStyle(color: on, fontSize: 12.5, height: 1.15, fontWeight: FontWeight.w700),
+                  style: TextStyle(color: on, fontSize: size < 52 ? 10.5 : 12, height: 1.15, fontWeight: FontWeight.w700),
                 ),
               ],
             ),
@@ -369,86 +502,3 @@ class _StartDisc extends StatelessWidget {
   }
 }
 
-class _MoveRow extends StatelessWidget {
-  const _MoveRow({required this.index, required this.item, required this.exercise});
-  final int index;
-  final PlanItem item;
-  final Exercise? exercise;
-
-  @override
-  Widget build(BuildContext context) => SizedBox(
-    height: 48,
-    child: Row(
-      children: [
-        SizedBox(
-          width: 20,
-          child: Text(
-            '$index',
-            style: SfType.label.copyWith(color: SfColors.muted, fontFeatures: SfType.tabular),
-          ),
-        ),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(SfRadius.xs + 2),
-          child: SizedBox.square(
-            dimension: 36,
-            child: ColoredBox(
-              color: sfStageFor(exercise).mediaStage,
-              child: exercise == null
-                  ? null
-                  : Image.asset(
-                      sfPoster(exercise!),
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, _, _) => const SizedBox.shrink(),
-                    ),
-            ),
-          ),
-        ),
-        const SizedBox(width: SfSpace.x3),
-        Expanded(
-          child: Text(
-            exercise?.name ?? item.exerciseId,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: SfType.callout,
-          ),
-        ),
-        const SizedBox(width: SfSpace.x2),
-        Text(item.doseText(), style: SfType.label.copyWith(fontFeatures: SfType.tabular)),
-      ],
-    ),
-  );
-}
-
-/// 展开全部 / 收起 with a chevron that turns over (180°) as the list opens.
-class _ExpandAction extends StatelessWidget {
-  const _ExpandAction({super.key, required this.expanded, required this.label, required this.onPressed});
-  final bool expanded;
-  final String label;
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) => SfPressable(
-    semanticLabel: label,
-    onTap: onPressed,
-    haptic: SfHaptic.selection,
-    child: ConstrainedBox(
-      constraints: const BoxConstraints(minHeight: 44),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: SfSpace.x1),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(label, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, height: 1.2, color: SfColors.muted)),
-            const SizedBox(width: 2),
-            AnimatedRotation(
-              turns: expanded ? -.25 : .25,
-              duration: SfMotion.reduced(context) ? Duration.zero : SfMotion.medium,
-              curve: SfMotion.container,
-              child: SfIcon(SfGlyph.chevronRight, size: 16, color: SfColors.muted, strokeWidth: 2),
-            ),
-          ],
-        ),
-      ),
-    ),
-  );
-}

@@ -101,9 +101,10 @@ BorderRadius bubbleRadius({required bool user}) => BorderRadius.only(
   bottomRight: Radius.circular(user ? SfRadius.tail : SfRadius.lg),
 );
 
-/// A tonal bubble floating in the sky: the assistant on the surface tone
-/// (white card on light), the user one step lighter and neutral; no glass,
-/// no stroke. Colour is kept for what you can do, not for who spoke.
+/// A plain text bubble is content, not a control: flat at z = 0 — a solid
+/// fill, no glass, no shadow, no rim. The user's line is jade-tinted, the
+/// assistant's neutral grey; only interactive parts (cards, chips, the
+/// input bar) are raised liquid glass.
 class _Bubble extends StatelessWidget {
   const _Bubble({required this.user, required this.child, this.padding});
   final bool user;
@@ -111,23 +112,16 @@ class _Bubble extends StatelessWidget {
   final EdgeInsetsGeometry? padding;
 
   @override
-  Widget build(BuildContext context) {
-    final r = bubbleRadius(user: user);
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: user ? SfColors.userBubble : SfColors.assistantBubble,
-        borderRadius: r,
-        // Light: white on near-white needs the hairline as well as the
-        // faint ink shadow (§6.2); dark: the tone step carries it.
-        border: user || SfColors.isDark ? null : Border.fromBorderSide(SfColors.cardEdge),
-        boxShadow: user ? null : SfColors.cardShadow,
-      ),
-      child: Padding(
-        padding: padding ?? const EdgeInsets.fromLTRB(SfSpace.x4, 10, SfSpace.x4, 11),
-        child: child,
-      ),
-    );
-  }
+  Widget build(BuildContext context) => DecoratedBox(
+    decoration: BoxDecoration(
+      color: user ? SfColors.userBubble : SfColors.assistantBubble,
+      borderRadius: bubbleRadius(user: user),
+    ),
+    child: Padding(
+      padding: padding ?? const EdgeInsets.fromLTRB(SfSpace.x4, 10, SfSpace.x4, 11),
+      child: child,
+    ),
+  );
 }
 
 /// "1/4　问题" → ('1/4', '问题'); null for any other text.
@@ -222,8 +216,8 @@ class OptionPill extends StatelessWidget {
     final bg = chosen
         ? SfColors.accentSoft
         : SfColors.isDark
-        ? SfColors.surfaceHigh
-        : SfColors.background;
+        ? SfColors.thumb
+        : SfColors.surface;
     return SfPressable(
       semanticLabel: label,
       onTap: enabled ? onTap : null,

@@ -136,8 +136,8 @@ class SfPalette {
     thumb: Color(0xFF2A2D34),
     scrim: Color(0xA6000000),
     track: Color(0x1FFFFFFF),
-    userBubble: Color(0xFF23262D),
-    assistantBubble: Color(0xE015171C),
+    userBubble: Color(0xFF1B3830), // dark jade, solid (flat, z = 0)
+    assistantBubble: Color(0xFF23262D), // dark grey, solid
     shadow: Color(0x00000000),
   );
 
@@ -164,8 +164,8 @@ class SfPalette {
     thumb: Color(0xFFFFFFFF),
     scrim: Color(0x8C000000),
     track: Color(0x14000000),
-    userBubble: Color(0xFFE5E9E6),
-    assistantBubble: Color(0xFFFFFFFF),
+    userBubble: Color(0xFFDCEFE6), // light jade tint, solid (flat, z = 0)
+    assistantBubble: Color(0xFFE9ECEA), // neutral light grey, solid
     shadow: Color(0x121D2B25),
   );
 }

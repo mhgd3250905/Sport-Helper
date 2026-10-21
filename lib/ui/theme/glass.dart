@@ -10,7 +10,8 @@ import 'tokens.dart';
 /// Liquid glass, the SmartFit way (docs/liquid-glass-plan.md).
 ///
 /// Glass is only the navigation and control layer: bars, chips, floating
-/// buttons, sheets, toasts. Content (plan cards, lists, the video) stays
+/// buttons, sheets, toasts, and the chat's tappable cards (raised). Text
+/// bubbles, lists and the video stay flat and
 /// opaque. Every glass surface goes through [SfGlassSurface] so the
 /// material (iOS 27 regular, light or dark to match the palette) and the
 /// quality policy live in one place.
