@@ -2,6 +2,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:ugk_trainer/engine.dart';
 
 import '../packs/drill_pack.dart';
+import 'voice_asset_bundle.dart';
 
 enum VoiceLanguage {
   app('app', '跟随 App'),
@@ -19,23 +20,48 @@ enum VoiceLanguage {
   String get clipLanguage => this == en ? 'en' : 'zh';
 }
 
-/// Compatibility view for existing content fixtures. All clip lookup,
-/// phrase construction and duration rules belong to ugk_trainer.
+/// Uses ugk_trainer's meanings and phrase construction, with optional bundled
+/// speech paths and measured lengths for the selected encoding variant.
 class VoiceLibrary extends VoiceSource {
-  VoiceLibrary._(this.source);
+  VoiceLibrary._(this.source, [this.bundle]);
 
-  factory VoiceLibrary.fromPacks(PackSet packs) => VoiceLibrary._(
-    DrillPackVoiceSource.fromPacks(
-      common: packs.common.json,
-      packs: {for (final p in packs.exercises) p.id: p.json},
-      root: packs.common.folder.substring(
-        0,
-        packs.common.folder.lastIndexOf('/'),
+  factory VoiceLibrary.fromPacks(PackSet packs, {VoiceAssetBundle? bundle}) {
+    if (bundle != null) {
+      final expected = <String>{};
+      for (final pack in [packs.common, ...packs.exercises]) {
+        for (final line in pack.lines) {
+          for (final language in line.text.keys) {
+            final key = pack.isCommon ? line.id : lineKey(pack.id, line.id);
+            if (bundle.clip(key, language) == null) {
+              throw FormatException('Missing bundled speech: $key/$language');
+            }
+            expected.add('$key/$language');
+          }
+        }
+      }
+      final actual = {
+        for (final entry in bundle.clips.entries)
+          for (final language in entry.value.keys) '${entry.key}/$language',
+      };
+      if (actual.length != expected.length || !actual.containsAll(expected)) {
+        throw const FormatException('Speech bundle does not match drill packs');
+      }
+    }
+    return VoiceLibrary._(
+      DrillPackVoiceSource.fromPacks(
+        common: packs.common.json,
+        packs: {for (final p in packs.exercises) p.id: p.json},
+        root: packs.common.folder.substring(
+          0,
+          packs.common.folder.lastIndexOf('/'),
+        ),
       ),
-    ),
-  );
+      bundle,
+    );
+  }
 
   final DrillPackVoiceSource source;
+  final VoiceAssetBundle? bundle;
   static final empty = VoiceLibrary._(DrillPackVoiceSource.empty);
 
   static String lineKey(String packId, String lineId) =>
@@ -43,8 +69,9 @@ class VoiceLibrary extends VoiceSource {
 
   static Future<VoiceLibrary> load() async {
     try {
-      return VoiceLibrary._(
-        await DrillPackVoiceSource.load(rootBundle.loadString),
+      return VoiceLibrary.fromPacks(
+        await PackSet.load(rootBundle.loadString),
+        bundle: await VoiceAssetBundle.load(rootBundle.loadString),
       );
     } on Object {
       return empty;
@@ -52,18 +79,26 @@ class VoiceLibrary extends VoiceSource {
   }
 
   @override
-  Set<String> get languages => source.languages;
+  Set<String> get languages => bundle?.languages ?? source.languages;
   @override
-  bool has(String key, {String lang = 'zh'}) => source.has(key, lang: lang);
+  bool has(String key, {String lang = 'zh'}) =>
+      key.startsWith('chime.') || bundle == null
+      ? source.has(key, lang: lang)
+      : bundle!.clip(key, lang) != null;
   @override
-  double seconds(String key, {String lang = 'zh'}) =>
-      source.seconds(key, lang: lang);
+  double seconds(String key, {String lang = 'zh'}) {
+    final clip = bundle?.clip(key, lang);
+    return clip != null
+        ? clip.milliseconds / 1000
+        : source.seconds(key, lang: lang);
+  }
+
   @override
   double total(Iterable<String> keys, {String lang = 'zh'}) =>
-      source.total(keys, lang: lang);
+      super.total(keys, lang: lang);
   @override
   String asset(String key, {String lang = 'zh'}) =>
-      source.asset(key, lang: lang);
+      bundle?.clip(key, lang)?.asset ?? source.asset(key, lang: lang);
   @override
   String? line(String key, {String lang = 'zh'}) =>
       source.line(key, lang: lang);

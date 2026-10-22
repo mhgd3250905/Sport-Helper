@@ -46,16 +46,56 @@ def seal(d: Path, errors: list) -> dict:
     return pack
 
 
+def speech_bundle_directories(root: Path, repo: Path):
+    """An optional encoded voice bundle replaces original speech in the APK.
+
+    Original pack files/checksums stay intact for reuse and later re-encoding.
+    The pack index pins the selected manifest; never infer a profile merely
+    from a directory happening to exist.
+    """
+    index_path = root / 'index.json'
+    selected = P.read_json(index_path).get('voiceBundle') if index_path.exists() else None
+    if selected is None:
+        return None
+    manifest_path = (repo / selected['asset']).resolve()
+    if not manifest_path.is_relative_to((repo / 'assets').resolve()):
+        raise ValueError('voiceBundle must be an application asset')
+    if (manifest_path.stat().st_size != selected['bytes']
+            or P.sha256(manifest_path) != selected['sha256']):
+        raise ValueError('Selected voiceBundle manifest size/sha256 mismatch')
+    manifest = P.read_json(manifest_path)
+    if manifest.get('schema_version') != 1 or not manifest.get('clips'):
+        raise ValueError('Unsupported/empty voiceBundle manifest')
+    paths = [manifest_path]
+    for clip in manifest['clips']:
+        original = (root / clip['pack'] / 'voice' / clip['lang'] / f'{clip["line"]}.m4a').resolve()
+        if (not original.is_relative_to(root.resolve())
+                or clip['source']['asset'] != original.relative_to(repo).as_posix()
+                or P.sha256(original) != clip['source']['sha256']):
+            raise ValueError('voiceBundle source changed; convert the updated originals before packaging')
+        path = (repo / clip['asset']).resolve()
+        if not path.is_relative_to(manifest_path.parent) or path == manifest_path:
+            raise ValueError('voiceBundle speech must be inside its versioned root')
+        if path.stat().st_size != clip['bytes'] or P.sha256(path) != clip['sha256']:
+            raise ValueError(f'voiceBundle clip size/sha256 mismatch: {clip["asset"]}')
+        paths.append(path)
+    return sorted({p.parent.relative_to(repo).as_posix() for p in paths})
+
+
 def pubspec_block(root: Path, repo: Path, dirs) -> list[str]:
     rel = root.relative_to(repo).as_posix()
+    speech_dirs = speech_bundle_directories(root, repo)
     out = [BEGIN, f'    - {rel}/']
     for d in dirs:
         pack = P.read_json(d / 'pack.json')
         out.append(f'    - {rel}/{d.name}/')
         if pack.get('chimes'):
             out.append(f'    - {rel}/{d.name}/chime/')
-        for lang in (pack.get('voice') or {}).get('languages', []):
-            out.append(f'    - {rel}/{d.name}/voice/{lang}/')
+        if speech_dirs is None:
+            for lang in (pack.get('voice') or {}).get('languages', []):
+                out.append(f'    - {rel}/{d.name}/voice/{lang}/')
+    for directory in speech_dirs or []:
+        out.append(f'    - {directory}/')
     out.append(END)
     return out
 
@@ -77,6 +117,7 @@ def main():
     ap.add_argument('--pubspec', help='rewrite the generated asset block of this pubspec.yaml')
     a = ap.parse_args()
     root = Path(a.root).resolve()
+    existing_index = P.read_json(root / 'index.json') if (root / 'index.json').exists() else {}
     dirs = P.pack_dirs(root)
     errors, entries, total = [], [], 0
     for d in dirs:
@@ -94,6 +135,8 @@ def main():
         'common': P.COMMON_ID,
         'packs': entries,
     }
+    if 'voiceBundle' in existing_index:
+        index['voiceBundle'] = existing_index['voiceBundle']
     P.write_json(root / 'index.json', index)
     if a.pubspec:
         repo = Path(a.pubspec).resolve().parent

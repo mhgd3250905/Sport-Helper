@@ -1033,5 +1033,10 @@
    "bytes": 385043,
    "sha256": "d2c36ea6b18b8c8ed1f570b9e76d0d06e08b817b497e6a338125a40871911103"
   }
- ]
+ ],
+ "voiceBundle": {
+  "asset": "assets/voice_lc32/v1/manifest.json",
+  "bytes": 337431,
+  "sha256": "5ebcf4211e44ca17930c8426a33bb3df932db0929d5caebd123b0e2d81c756c4"
+ }
 }

@@ -17,6 +17,8 @@ import '../domain/plan.dart';
 import '../domain/plan_generator.dart';
 import '../domain/template.dart';
 import '../packs/drill_pack.dart';
+import '../voice/voice_asset_bundle.dart';
+import '../voice/voice_library.dart';
 import 'training_media_config.dart';
 
 /// Everything pages need, created once at start-up.
@@ -164,9 +166,7 @@ class AppServices {
   /// The exercise library and the voice lines both come from the drill
   /// packs (assets/packs/, docs/drill-pack-spec.md); templates stay
   /// app-specific (assets/library/templates.json).
-  static Future<
-    (ExerciseLibrary, TemplateCatalog, DrillPackVoiceSource, coach.Catalog)
-  >
+  static Future<(ExerciseLibrary, TemplateCatalog, VoiceLibrary, coach.Catalog)>
   loadContent({TrainingMediaRepository? media}) async {
     final packs = await PackSet.load(rootBundle.loadString);
     final manifest =
@@ -202,9 +202,9 @@ class AppServices {
           ),
       ]),
       cat,
-      DrillPackVoiceSource.fromPacks(
-        common: packs.common.json,
-        packs: {for (final p in packs.exercises) p.id: p.json},
+      VoiceLibrary.fromPacks(
+        packs,
+        bundle: await VoiceAssetBundle.load(rootBundle.loadString),
       ),
       const coach.DrillPackAdapter().build(
         version: 'smartfit-pose-hub-${manifest['version']}',

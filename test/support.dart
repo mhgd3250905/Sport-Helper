@@ -5,6 +5,7 @@ import 'package:smartfit/domain/exercise.dart';
 import 'package:smartfit/domain/template.dart';
 import 'package:smartfit/packs/drill_pack.dart';
 import 'package:smartfit/voice/voice_library.dart';
+import 'package:smartfit/voice/voice_asset_bundle.dart';
 
 /// The bundled drill packs, read straight from assets/packs (tests run from
 /// the package root).
@@ -41,7 +42,13 @@ ExerciseLibrary loadLibrary() => ExerciseLibrary([
     Exercise.fromPack(pack, mediaOverride: ExerciseMedia.fromPoseHub(pack)),
 ]);
 
-VoiceLibrary loadVoices() => VoiceLibrary.fromPacks(loadPacksSync());
+VoiceLibrary loadVoices() => VoiceLibrary.fromPacks(
+  loadPacksSync(),
+  bundle: VoiceAssetBundle.fromJson(
+    jsonDecode(File(VoiceAssetBundle.manifestAsset).readAsStringSync())
+        as Map<String, dynamic>,
+  ),
+);
 
 TemplateCatalog loadCatalog() => TemplateCatalog.fromJson(
   jsonDecode(File('assets/library/templates.json').readAsStringSync())

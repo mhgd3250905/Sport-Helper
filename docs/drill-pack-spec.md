@@ -112,6 +112,22 @@ assets/packs/
 
 App 启动读 `index.json` → 逐个读 `pack.json`。`bytes` 是包内全部文件之和，可用于下载/缓存（以后按需下载小包时用）。
 
+### 可选的安装包语音变体（2026-10-22）
+
+SmartFit 的索引可额外声明 `voiceBundle: {asset, bytes, sha256}`，固定独立语音清单。
+当前为 `assets/voice_lc32/v1/manifest.json`，695 条 AAC-LC / 32kbps / 22.05kHz / 单声道。
+清单逐条记录 `pack/line/lang/asset/bytes/sha256/decoded_ms/duration_ms/source`。
+`source` 固定原文件路径与 SHA-256；`decoded_ms` 是新文件完整解码的调度时长。
+
+原 `pack.json`、`files`、台词和语音文件保持源素材含义，原件仍可供其他 App 拷贝使用。
+SmartFit 的 `VoiceLibrary` 仅覆盖新语音的路径与时长，语义、台词、数字拼接和播放队列继续使用共用 `ugk_trainer`。
+提示音仍读 `_common/chime/`，不在这 695 条转换内。
+
+`build_packs.py` 生成 assets 段时会读取并保留 `voiceBundle`，验证清单、目标和原件的哈希，
+只打包所选版本的语音目录。没有该字段时保留原有打包行为。
+新原件或清单不匹配时拒绝生成，不能带着旧 LC 声音发布新台词。
+以后更新原素材须生成新变体并重新固定索引中的清单 bytes/SHA-256，再生成 pubspec；不能把旧变体直接覆盖成新来源。
+
 ## 4. 工具
 
 | 命令 | 作用 |
