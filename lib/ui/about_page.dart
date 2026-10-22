@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
 import '../app/services.dart';
+import '../app/training_media_config.dart';
 import '../chat/safety_script.dart' show disclaimerText;
 import 'theme.dart';
 import 'training_media_settings.dart';
 
-const appVersion = '0.1.0+11 (MVP)';
+const appVersion = TrainingMediaConfig.isInternal
+    ? '0.1.0+12 (内测)'
+    : '0.1.0+12 (MVP)';
 
 class AboutPage extends StatelessWidget {
   const AboutPage({super.key});

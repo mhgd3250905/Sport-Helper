@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ugk_trainer/ugk_trainer.dart';
 
 import '../app/services.dart';
+import '../app/training_media_config.dart';
 import 'theme.dart';
 
 class TrainingMediaSettings extends StatefulWidget {
@@ -155,7 +156,12 @@ class _TrainingMediaSettingsState extends State<TrainingMediaSettings> {
               onPressed: () => _clear(repository),
             ),
             if (repository.allowPending)
-              Text('开发预览：包含待审核动作', style: SfType.caption),
+              Text(
+                TrainingMediaConfig.isInternal
+                    ? '内测预览：包含待审核动作'
+                    : '开发预览：包含待审核动作',
+                style: SfType.caption,
+              ),
           ],
         );
       },

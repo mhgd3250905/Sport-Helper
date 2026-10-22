@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+import 'package:ugk_trainer/ugk_trainer.dart' show TrainingMediaPreviewPolicy;
 
 /// Public distribution endpoints, supplied by the build environment.
 /// Each URL points at v0.3.0-app/; its sibling v0.3.0/ holds the videos.
@@ -8,7 +8,10 @@ abstract final class TrainingMediaConfig {
   static const videoRoot = 'assets/training_media/v0.3.0/realistic/dark';
 
   static const includePending =
-      kDebugMode && bool.fromEnvironment('SMARTFIT_INCLUDE_PENDING_MEDIA');
+      TrainingMediaPreviewPolicy.enabled &&
+      bool.fromEnvironment('SMARTFIT_INCLUDE_PENDING_MEDIA');
+  static const isInternal =
+      String.fromEnvironment('FLUTTER_APP_FLAVOR') == 'internal';
 
   static List<Uri> get baseUrls => [
     for (final value in const [
@@ -22,7 +25,8 @@ abstract final class TrainingMediaConfig {
     final uri = Uri.parse(value.endsWith('/') ? value : '$value/');
     if (!uri.hasAuthority ||
         uri.userInfo.isNotEmpty ||
-        (uri.scheme != 'https' && !(kDebugMode && uri.scheme == 'http'))) {
+        (uri.scheme != 'https' &&
+            !(TrainingMediaPreviewPolicy.enabled && uri.scheme == 'http'))) {
       throw const FormatException('Invalid training media endpoint');
     }
     return uri;
