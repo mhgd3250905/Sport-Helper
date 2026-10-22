@@ -65,6 +65,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.19.1"
+  connectivity_plus:
+    dependency: transitive
+    description:
+      name: connectivity_plus
+      sha256: d7749fd36d8b404a4935612b94eca7c3ce3705377ab678e24ff2a4301436f741
+      url: "https://pub.dev"
+    source: hosted
+    version: "7.3.2"
+  connectivity_plus_platform_interface:
+    dependency: transitive
+    description:
+      name: connectivity_plus_platform_interface
+      sha256: "3c09627c536d22fd24691a905cdd8b14520de69da52c7a97499c8be5284a32ed"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.0"
   crypto:
     dependency: transitive
     description:
@@ -309,6 +325,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.18.0"
+  nm:
+    dependency: transitive
+    description:
+      name: nm
+      sha256: "2ae480aa3379716b8bb58dfebb168e2919394c92b629efaaa0baaa5d140786e6"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.6.0"
   objective_c:
     dependency: transitive
     description:
@@ -574,8 +598,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: fc5e456c44d76b872eb812597ffb5f67bc66bce3
-      resolved-ref: fc5e456c44d76b872eb812597ffb5f67bc66bce3
+      ref: df90e7cb3f53c919927542056dcdfd6c0a600a66
+      resolved-ref: df90e7cb3f53c919927542056dcdfd6c0a600a66
       url: "https://github.com/mhgd3250905/ugk-3d-pose-sdk.git"
     source: git
     version: "0.3.3"
@@ -583,11 +607,11 @@ packages:
     dependency: "direct main"
     description:
       path: "packages/ugk_trainer"
-      ref: fc5e456c44d76b872eb812597ffb5f67bc66bce3
-      resolved-ref: fc5e456c44d76b872eb812597ffb5f67bc66bce3
+      ref: df90e7cb3f53c919927542056dcdfd6c0a600a66
+      resolved-ref: df90e7cb3f53c919927542056dcdfd6c0a600a66
       url: "https://github.com/mhgd3250905/ugk-3d-pose-sdk.git"
     source: git
-    version: "0.1.4"
+    version: "0.1.5"
   uuid:
     dependency: transitive
     description:

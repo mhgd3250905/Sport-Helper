@@ -39,7 +39,13 @@ enum Equipment {
 }
 
 /// Floor positions need a mat and are left out at the office.
-const floorPositions = {'supine', 'prone', 'quadruped', 'kneeling', 'side_lying'};
+const floorPositions = {
+  'supine',
+  'prone',
+  'quadruped',
+  'kneeling',
+  'side_lying',
+};
 
 class Dose {
   const Dose({
@@ -75,6 +81,7 @@ class ExerciseMedia {
     this.lightVideo,
     this.lightPoster,
   });
+
   /// Pack id; the WebView player plays `/packs/<id>/demo.mp4`.
   final String id;
 
@@ -92,6 +99,19 @@ class ExerciseMedia {
   bool get hasLight => lightVideo != null && lightPoster != null;
 
   String get playerId => id;
+
+  factory ExerciseMedia.fromPoseHub(
+    DrillPack p, {
+    String version = '0.3.0',
+  }) => ExerciseMedia(
+    id: p.id,
+    video: 'assets/training_media/v$version/realistic/dark/${p.id}.mp4',
+    poster:
+        'assets/training_media/v$version-app/common-lossy/covers/${p.id}.webp',
+    loopSeconds: p.media!.loopSeconds,
+    posterSeconds: 0,
+    source: 'Pose-Hub $version',
+  );
 
   factory ExerciseMedia.fromPack(DrillPack p) {
     final m = p.media!;
@@ -156,7 +176,7 @@ class Exercise {
 
   bool get isFloor => floorPositions.contains(position);
 
-  factory Exercise.fromPack(DrillPack p) {
+  factory Exercise.fromPack(DrillPack p, {ExerciseMedia? mediaOverride}) {
     final j = p.json;
     final dose = Map<String, dynamic>.from(j['defaultDose'] as Map);
     return Exercise(
@@ -176,13 +196,14 @@ class Exercise {
       cues: List<String>.from((j['cues'] as Map)['zh'] as List),
       cautions: List<String>.from(j['cautions'] as List),
       alternative: j['alternative'] as String?,
-      media: ExerciseMedia.fromPack(p),
+      media: mediaOverride ?? ExerciseMedia.fromPack(p),
     );
   }
 }
 
 class ExerciseLibrary {
-  ExerciseLibrary(List<Exercise> list) : _byId = {for (final e in list) e.id: e};
+  ExerciseLibrary(List<Exercise> list)
+    : _byId = {for (final e in list) e.id: e};
 
   final Map<String, Exercise> _byId;
 
@@ -193,7 +214,6 @@ class ExerciseLibrary {
   Exercise operator [](String id) =>
       _byId[id] ?? (throw ArgumentError('Unknown exercise id: $id'));
 
-  factory ExerciseLibrary.fromPacks(PackSet packs) => ExerciseLibrary([
-    for (final p in packs.exercises) Exercise.fromPack(p),
-  ]);
+  factory ExerciseLibrary.fromPacks(PackSet packs) =>
+      ExerciseLibrary([for (final p in packs.exercises) Exercise.fromPack(p)]);
 }

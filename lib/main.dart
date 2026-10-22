@@ -10,6 +10,9 @@ import 'package:ugk_coach/ugk_coach.dart' as coach;
 
 import 'app/services.dart';
 import 'app/device_identity.dart';
+import 'app/training_media_config.dart';
+import 'package:ugk_trainer/ugk_trainer.dart'
+    show TrainingMediaRepository, TrainingMediaScope;
 import 'core/storage/local_state_storage.dart';
 import 'data/app_store.dart';
 import 'ui/chat/chat_home_page.dart';
@@ -33,13 +36,23 @@ Future<void> main() async {
   registerFontLicense();
   // Pre-warm the glass shaders before the first frame (no white flash).
   await LiquidGlassWidgets.initialize();
-  final (lib, catalog, voices, coachCatalog) = await AppServices.loadContent();
+  final media = await TrainingMediaRepository.create(
+    manifestAsset: TrainingMediaConfig.manifestAsset,
+    baseUrls: TrainingMediaConfig.baseUrls,
+    allowPending: TrainingMediaConfig.includePending,
+  );
+  await media.availableActionIds();
+  await media.canDownload();
+  final (lib, catalog, voices, coachCatalog) = await AppServices.loadContent(
+    media: media,
+  );
   final coachProfile = coach.CoachProfile.fromJson(
     jsonDecode(await rootBundle.loadString('assets/coach/smartfit.json')),
   );
   final storage = SharedPreferencesLocalStateStorage();
   final store = AppStore(storage);
   await store.load();
+  media.wifiOnly = store.mediaWifiOnly;
   String? deviceId;
   try {
     deviceId = await DeviceIdentity(storage).loadOrCreate();
@@ -55,6 +68,7 @@ Future<void> main() async {
     coachCatalog: coachCatalog,
     coachProfile: coachProfile,
     deviceId: deviceId,
+    media: media,
   );
   runApp(
     LiquidGlassWidgets.wrap(
@@ -70,7 +84,10 @@ Future<void> main() async {
         minQuality: kIsWeb ? GlassQuality.standard : GlassQuality.minimal,
         onQualityChanged: (_, to) => store.setGlassQuality(to.name),
       ),
-      child: SmartFitApp(services: services),
+      child: TrainingMediaScope(
+        repository: media,
+        child: SmartFitApp(services: services),
+      ),
     ),
   );
 }

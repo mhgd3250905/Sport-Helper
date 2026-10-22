@@ -2,6 +2,7 @@
     <!-- WebView plays bundled clips through a loopback HTTP server (same as HipLab).
          Android requires INTERNET for local sockets; no remote service is used. -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <application
         android:label="智能健身助手"
         android:name="${applicationName}"

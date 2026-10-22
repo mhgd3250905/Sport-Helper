@@ -19,6 +19,7 @@ class ChatController extends ChangeNotifier {
     required this.engine,
     required this.store,
     this.replyDelay = const Duration(milliseconds: 450),
+    this.prepareReply,
     DateTime Function()? clock,
   }) : _clock = clock ?? DateTime.now {
     if (engine case final ProgressChatEngine progress) {
@@ -31,6 +32,7 @@ class ChatController extends ChangeNotifier {
 
   /// A short "typing" pause so replies don't snap in (0 in tests).
   final Duration replyDelay;
+  final Future<void> Function()? prepareReply;
   final DateTime Function() _clock;
 
   final List<ChatMessage> messages = [];
@@ -224,6 +226,14 @@ class ChatController extends ChangeNotifier {
     _endProgress();
     _progressEnded = false;
     notifyListeners();
+    if (prepareReply case final prepare?) {
+      try {
+        await prepare();
+      } on Object {
+        // Media availability cannot prevent text or a training plan.
+      }
+      if (epoch != _replyEpoch) return;
+    }
     final reply = await engine.reply(t, _context);
     if (replyDelay > Duration.zero) await Future<void>.delayed(replyDelay);
     if (epoch != _replyEpoch) return;

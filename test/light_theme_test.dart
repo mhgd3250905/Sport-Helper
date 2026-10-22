@@ -1,10 +1,11 @@
-// Light theme (docs/design-audit-2026-10-19.md §6): light-stage media in
-// the light theme, symmetric contrast, follow-system default and switching.
+// Light and dark App themes share realistic-dark training media. Optional
+// light variants remain an interface; contrast and theme switching still hold.
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smartfit/chat/chat_models.dart';
 import 'package:smartfit/chat/rule_chat_engine.dart';
 import 'package:smartfit/data/app_store.dart';
+import 'package:smartfit/domain/exercise.dart';
 import 'package:smartfit/domain/plan_generator.dart';
 import 'package:smartfit/main.dart';
 import 'package:smartfit/ui/exercise_video.dart';
@@ -30,47 +31,86 @@ Iterable<String> _assetsIn(WidgetTester tester) => tester
 void main() {
   tearDown(() => SfColors.palette = SfPalette.dark);
 
-  group('light-stage media', () {
+  group('shared realistic-dark media in both App themes', () {
     final lib = loadLibrary();
 
-    test('every drill has a light render on the #EFEFEF stage', () {
+    test('the full fixture uses versioned videos and bundled lossy covers', () {
       expect(lib.length, 93);
       for (final e in lib.all) {
-        expect(e.media.hasLight, isTrue, reason: e.id);
-        expect(e.media.lightVideo, endsWith('/demo-light.mp4'));
-        expect(e.media.lightPoster, endsWith('/cover-light.jpg'));
+        expect(
+          e.media.video,
+          'assets/training_media/v0.3.0/realistic/dark/${e.id}.mp4',
+        );
+        expect(
+          e.media.poster,
+          'assets/training_media/v0.3.0-app/common-lossy/covers/${e.id}.webp',
+        );
+        expect(e.media.hasLight, isFalse, reason: e.id);
+        expect(e.media.lightVideo, isNull);
+        expect(e.media.lightPoster, isNull);
       }
-      expect(SfPalette.light.mediaStage, const Color(0xFFEFEFEF));
     });
 
-    test('the theme picks the matching cover, clip, player variant and stage', () {
+    test('both themes pick the same dark render, cover and stage', () {
       final e = lib['h-squat'];
-      SfColors.palette = SfPalette.light;
-      expect(sfPoster(e), e.media.lightPoster);
-      expect(sfVideo(e), e.media.lightVideo);
-      expect(sfVariant(e), 'light');
-      expect(sfStageFor(e).mediaStage, const Color(0xFFEFEFEF));
-      SfColors.palette = SfPalette.dark;
-      expect(sfPoster(e), e.media.poster);
-      expect(sfVideo(e), e.media.video);
-      expect(sfVariant(e), isNull);
-      expect(sfStageFor(e).mediaStage, const Color(0xFF101013));
+      for (final palette in [SfPalette.light, SfPalette.dark]) {
+        SfColors.palette = palette;
+        expect(sfPoster(e), e.media.poster);
+        expect(sfVideo(e), e.media.video);
+        expect(sfVariant(e), isNull);
+        expect(sfStageFor(e).mediaStage, const Color(0xFF101013));
+      }
     });
 
-    testWidgets('a demonstration shows the light poster on the light stage', (tester) async {
-      final e = lib['h-squat'];
-      SfColors.palette = SfPalette.light;
-      await tester.pumpWidget(MaterialApp(
-        theme: buildTheme(SfPalette.light),
-        home: Center(child: SizedBox(width: 300, child: ExerciseVideo(exercise: e, playing: false))),
-      ));
-      expect(_assetsIn(tester), contains(e.media.lightPoster));
-      expect(_assetsIn(tester), isNot(contains(e.media.poster)));
-      final stage = tester.widgetList<ColoredBox>(
-        find.descendant(of: find.byType(ExerciseVideo), matching: find.byType(ColoredBox)),
-      );
-      expect(stage.first.color, const Color(0xFFEFEFEF));
-    });
+    test(
+      'optional light media fields remain available for a later package',
+      () {
+        const futureMedia = ExerciseMedia(
+          id: 'future',
+          video: 'realistic/dark/future.mp4',
+          poster: 'covers/future.webp',
+          loopSeconds: 4,
+          posterSeconds: 0,
+          source: 'future',
+          lightVideo: 'realistic/light/future.mp4',
+          lightPoster: 'light-covers/future.webp',
+        );
+        expect(futureMedia.hasLight, isTrue);
+        expect(futureMedia.lightVideo, 'realistic/light/future.mp4');
+        expect(futureMedia.lightPoster, 'light-covers/future.webp');
+      },
+    );
+
+    testWidgets(
+      'a demonstration previews the bundled cover in the light App theme',
+      (tester) async {
+        final e = lib['h-squat'];
+        SfColors.palette = SfPalette.light;
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: buildTheme(SfPalette.light),
+            home: Center(
+              child: SizedBox(
+                width: 300,
+                child: ExerciseVideo(exercise: e, playing: false),
+              ),
+            ),
+          ),
+        );
+        expect(_assetsIn(tester), contains(e.media.poster));
+        expect(
+          _assetsIn(tester).where((path) => path.startsWith('assets/packs/')),
+          isEmpty,
+        );
+        final stage = tester.widgetList<ColoredBox>(
+          find.descendant(
+            of: find.byType(ExerciseVideo),
+            matching: find.byType(ColoredBox),
+          ),
+        );
+        expect(stage.first.color, const Color(0xFF101013));
+      },
+    );
   });
 
   group('contrast (WCAG AA) in both themes', () {
@@ -78,21 +118,43 @@ void main() {
       final name = p.isDark ? 'dark' : 'light';
       test('$name: text, muted and accent text on every page level', () {
         for (final bg in [p.background, p.surface, p.skyTop, p.skyBottom]) {
-          expect(contrast(p.text, bg), greaterThanOrEqualTo(7), reason: '$name text');
-          expect(contrast(p.muted, bg), greaterThanOrEqualTo(4.5), reason: '$name muted');
-          expect(contrast(p.accentText, bg), greaterThanOrEqualTo(4.5), reason: '$name accentText');
+          expect(
+            contrast(p.text, bg),
+            greaterThanOrEqualTo(7),
+            reason: '$name text',
+          );
+          expect(
+            contrast(p.muted, bg),
+            greaterThanOrEqualTo(4.5),
+            reason: '$name muted',
+          );
+          expect(
+            contrast(p.accentText, bg),
+            greaterThanOrEqualTo(4.5),
+            reason: '$name accentText',
+          );
         }
         expect(contrast(p.text, p.userBubble), greaterThanOrEqualTo(7));
         expect(contrast(p.text, p.assistantBubble), greaterThanOrEqualTo(7));
-        expect(contrast(p.onAccent, p.accent), greaterThanOrEqualTo(3), reason: '$name onAccent (large/bold)');
+        expect(
+          contrast(p.onAccent, p.accent),
+          greaterThanOrEqualTo(3),
+          reason: '$name onAccent (large/bold)',
+        );
       });
 
       test('$name: titles over the media stage', () {
         expect(contrast(p.onStage, p.mediaStage), greaterThanOrEqualTo(7));
-        expect(contrast(p.onStageMuted, p.mediaStage), greaterThanOrEqualTo(4.5));
+        expect(
+          contrast(p.onStageMuted, p.mediaStage),
+          greaterThanOrEqualTo(4.5),
+        );
         // Media tags (已暂停, 换侧) are white on the scrim, over either stage.
         final tag = Color.alphaBlend(p.scrim, p.mediaStage);
-        expect(contrast(const Color(0xFFFFFFFF), tag), greaterThanOrEqualTo(4.5));
+        expect(
+          contrast(const Color(0xFFFFFFFF), tag),
+          greaterThanOrEqualTo(4.5),
+        );
       });
     }
 
@@ -109,16 +171,41 @@ void main() {
   });
 
   group('switching', () {
-    test('「你能做什么」 offers the opposite of the look in effect, follow-system included', () async {
-      final lib = loadLibrary();
-      final engine = RuleChatEngine(lib: lib, templates: TemplatePlanGenerator(lib: lib, catalog: loadCatalog()));
-      Future<List<String>> labels(ChatState s) async =>
-          [for (final o in (await engine.reply('你能做什么', s)).messages.first.options) o.label];
-      expect(await labels(const ChatState(appearance: 'system', systemLight: true)), contains('换深色'));
-      expect(await labels(const ChatState(appearance: 'system')), contains('换浅色'));
-      expect(await labels(const ChatState(appearance: 'light')), contains('换深色'));
-      expect(await labels(const ChatState(appearance: 'dark', systemLight: true)), contains('换浅色'));
-    });
+    test(
+      '「你能做什么」 offers the opposite of the look in effect, follow-system included',
+      () async {
+        final lib = loadLibrary();
+        final engine = RuleChatEngine(
+          lib: lib,
+          templates: TemplatePlanGenerator(lib: lib, catalog: loadCatalog()),
+        );
+        Future<List<String>> labels(ChatState s) async => [
+          for (final o in (await engine.reply(
+            '你能做什么',
+            s,
+          )).messages.first.options)
+            o.label,
+        ];
+        expect(
+          await labels(
+            const ChatState(appearance: 'system', systemLight: true),
+          ),
+          contains('换深色'),
+        );
+        expect(
+          await labels(const ChatState(appearance: 'system')),
+          contains('换浅色'),
+        );
+        expect(
+          await labels(const ChatState(appearance: 'light')),
+          contains('换深色'),
+        );
+        expect(
+          await labels(const ChatState(appearance: 'dark', systemLight: true)),
+          contains('换浅色'),
+        );
+      },
+    );
 
     test('a new install follows the system; a stored choice is kept', () async {
       final fresh = AppStore(MemoryStorage());
@@ -133,53 +220,61 @@ void main() {
       expect(again.appearance, 'dark');
     });
 
-    testWidgets('follow-system tracks the platform, and the plan card swaps its cover', (tester) async {
-      tall(tester);
-      final s = services();
-      await s.store.acceptSafety(blocked: false);
-      s.chat.start();
-      await s.chat.send('在家 15 分钟练核心，徒手');
-      // The hero move stands on the glass as a theme-neutral keyed cutout
-      // (round 4); the strip's thumbnails carry the theme-matched covers.
-      final items = s.chat.currentPlan!.items.toList();
-      final hero = s.library[items.first.exerciseId];
-      final first = s.library[items[1].exerciseId];
-      expect(s.store.appearance, 'system');
+    testWidgets(
+      'follow-system tracks the platform and keeps the bundled plan covers',
+      (tester) async {
+        tall(tester);
+        final s = services();
+        await s.store.acceptSafety(blocked: false);
+        s.chat.start();
+        await s.chat.send('在家 15 分钟练核心，徒手');
+        // Hero and strip previews use the same bundled release covers in
+        // either theme, independently of video download availability.
+        final items = s.chat.currentPlan!.items.toList();
+        final hero = s.library[items.first.exerciseId];
+        final first = s.library[items[1].exerciseId];
+        expect(s.store.appearance, 'system');
 
-      tester.platformDispatcher.platformBrightnessTestValue = Brightness.dark;
-      addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
-      await tester.pumpWidget(SmartFitApp(services: s));
-      await tester.pumpAndSettle();
-      expect(SfColors.isDark, isTrue);
-      expect(_assetsIn(tester), contains(first.media.poster));
-      expect(_assetsIn(tester), contains('assets/cutouts/${hero.id}-cover.webp'));
+        tester.platformDispatcher.platformBrightnessTestValue = Brightness.dark;
+        addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
+        await tester.pumpWidget(SmartFitApp(services: s));
+        await tester.pumpAndSettle();
+        expect(SfColors.isDark, isTrue);
+        expect(_assetsIn(tester), contains(first.media.poster));
+        expect(_assetsIn(tester), contains(hero.media.poster));
+        expect(
+          _assetsIn(tester).where((path) => path.startsWith('assets/cutouts/')),
+          isEmpty,
+        );
 
-      tester.platformDispatcher.platformBrightnessTestValue = Brightness.light;
-      await tester.pumpAndSettle();
-      expect(SfColors.isDark, isFalse);
-      expect(_assetsIn(tester), contains(first.media.lightPoster));
-      expect(_assetsIn(tester), isNot(contains(first.media.poster)));
+        tester.platformDispatcher.platformBrightnessTestValue =
+            Brightness.light;
+        await tester.pumpAndSettle();
+        expect(SfColors.isDark, isFalse);
+        expect(_assetsIn(tester), contains(first.media.poster));
+        expect(_assetsIn(tester), contains(hero.media.poster));
 
-      // 「换深色」 in the conversation overrides the system.
-      await tester.enterText(find.byKey(const ValueKey('chat-input')), '换深色');
-      await tester.pump();
-      await tester.tap(find.byKey(const ValueKey('chat-send')));
-      await tester.pumpAndSettle();
-      expect(s.store.appearance, 'dark');
-      expect(SfColors.isDark, isTrue);
-      expect(_assetsIn(tester), contains(first.media.poster));
+        // 「换深色」 in the conversation overrides the system.
+        await tester.enterText(find.byKey(const ValueKey('chat-input')), '换深色');
+        await tester.pump();
+        await tester.tap(find.byKey(const ValueKey('chat-send')));
+        await tester.pumpAndSettle();
+        expect(s.store.appearance, 'dark');
+        expect(SfColors.isDark, isTrue);
+        expect(_assetsIn(tester), contains(first.media.poster));
 
-      // 「换浅色」 back: the light renders return without losing the chat.
-      final messages = s.chat.messages.length;
-      await tester.enterText(find.byKey(const ValueKey('chat-input')), '换浅色');
-      await tester.pump();
-      await tester.tap(find.byKey(const ValueKey('chat-send')));
-      await tester.pumpAndSettle();
-      expect(s.store.appearance, 'light');
-      expect(SfColors.isDark, isFalse);
-      expect(_assetsIn(tester), contains(first.media.lightPoster));
-      expect(s.chat.messages.length, greaterThan(messages));
-      await tester.pumpWidget(const SizedBox());
-    });
+        // 「换浅色」 back: the shared covers remain without losing the chat.
+        final messages = s.chat.messages.length;
+        await tester.enterText(find.byKey(const ValueKey('chat-input')), '换浅色');
+        await tester.pump();
+        await tester.tap(find.byKey(const ValueKey('chat-send')));
+        await tester.pumpAndSettle();
+        expect(s.store.appearance, 'light');
+        expect(SfColors.isDark, isFalse);
+        expect(_assetsIn(tester), contains(first.media.poster));
+        expect(s.chat.messages.length, greaterThan(messages));
+        await tester.pumpWidget(const SizedBox());
+      },
+    );
   });
 }

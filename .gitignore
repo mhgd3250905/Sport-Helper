@@ -57,3 +57,4 @@ android/key.properties
 *.apk
 *.aab
 /test/_shots/
+pubspec_overrides.yaml

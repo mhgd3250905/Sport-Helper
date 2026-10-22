@@ -103,6 +103,10 @@ class _ChatHomePageState extends State<ChatHomePage> {
   /// the chat afterwards; the summary and the save offer follow.
   Future<void> _start(TrainingPlan p, {OriginRect? from}) async {
     final s = AppServices.of(context);
+    if (p.items.any((item) => !s.library.contains(item.exerciseId))) {
+      _toast('计划包含尚未可用的动作，暂时无法开始；已保存计划仍保留。');
+      return;
+    }
     if (!s.store.trainingAllowed) {
       _toast(
         s.store.safetyAccepted
@@ -114,6 +118,7 @@ class _ChatHomePageState extends State<ChatHomePage> {
     }
     if (!await _chat.started(p)) return;
     if (!mounted) return;
+    s.prefetchPlan(p);
     final result = await Navigator.of(context).push(
       CardExpandRoute<SessionResult>(
         origin: from,

@@ -70,8 +70,8 @@ class _LibraryPageState extends State<LibraryPage> {
                   ? SfEmptyState(
                       key: ValueKey('empty-$_cat'),
                       icon: SfGlyph.grid,
-                      title: '这一类还没有动作',
-                      body: '动作库会随动作包更新，先看看别的分类。',
+                      title: lib.length == 0 ? '暂时没有已审核的动作' : '这一类还没有动作',
+                      body: '动作库会随已审核动作包更新；已保存计划和训练记录仍保留。',
                       action: '看全部',
                       onAction: () => setState(() => _cat = null),
                     )

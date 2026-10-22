@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/services.dart' show rootBundle;
@@ -12,9 +13,11 @@ import '../chat/chat_models.dart';
 import '../chat/rule_chat_engine.dart';
 import '../data/app_store.dart';
 import '../domain/exercise.dart';
+import '../domain/plan.dart';
 import '../domain/plan_generator.dart';
 import '../domain/template.dart';
 import '../packs/drill_pack.dart';
+import 'training_media_config.dart';
 
 /// Everything pages need, created once at start-up.
 class AppServices {
@@ -30,13 +33,43 @@ class AppServices {
     this.deviceId,
     this.memoryStore,
     this.chatReplyDelay = const Duration(milliseconds: 450),
-  }) : templates = TemplatePlanGenerator(lib: library, catalog: catalog);
+    this.media,
+  }) : templates = TemplatePlanGenerator(
+         lib: library,
+         catalog: catalog,
+         preferredExerciseIds: () => media?.isOffline == true
+             ? media!.readyActionIds
+             : const <String>{},
+         onGenerated: media == null
+             ? null
+             : (plan) => unawaited(
+                 media
+                     .prefetchActions(plan.items.map((item) => item.exerciseId))
+                     .catchError((Object _) {}),
+               ),
+       );
 
   final ExerciseLibrary library;
   final TemplateCatalog catalog;
   final AppStore store;
   final VoiceSource voiceLibrary;
   final VoiceOutput voiceOutput;
+  final TrainingMediaRepository? media;
+  String? _prefetchedPlan;
+
+  void _prefetchChatPlan() => prefetchPlan(chat.currentPlan);
+
+  /// Start downloads without delaying navigation, the clock or voice output.
+  void prefetchPlan(TrainingPlan? plan) {
+    final repository = media;
+    if (repository == null || plan == null) return;
+    final ids = plan.items.map((item) => item.exerciseId).toSet();
+    final signature = '${plan.id}/${ids.join(',')}';
+    if (_prefetchedPlan == signature) return;
+    _prefetchedPlan = signature;
+    unawaited(repository.prefetchActions(ids).catchError((Object _) {}));
+  }
+
   final coach.Catalog? coachCatalog;
   final coach.CoachProfile? coachProfile;
   final AiCoachConfig aiConfig;
@@ -76,6 +109,7 @@ class AppServices {
   /// The output belongs to the App, so page navigation never destroys it.
   Future<void> dispose() async {
     chat.dispose();
+    media?.dispose();
     if (chatEngine case final ManagedChatEngine managed) managed.dispose();
     final output = voiceOutput;
     if (output is JustAudioVoiceOutput) {
@@ -110,11 +144,22 @@ class AppServices {
   final Duration chatReplyDelay;
 
   /// The home conversation lives as long as the app (pages come and go).
-  late final ChatController chat = ChatController(
-    engine: chatEngine,
-    store: store,
-    replyDelay: chatReplyDelay,
-  );
+  late final ChatController chat = _createChat();
+
+  ChatController _createChat() {
+    final controller = ChatController(
+      engine: chatEngine,
+      store: store,
+      replyDelay: chatReplyDelay,
+      prepareReply: media == null
+          ? null
+          : () async {
+              await media!.canDownload();
+            },
+    );
+    if (media != null) controller.addListener(_prefetchChatPlan);
+    return controller;
+  }
 
   /// The exercise library and the voice lines both come from the drill
   /// packs (assets/packs/, docs/drill-pack-spec.md); templates stay
@@ -122,22 +167,48 @@ class AppServices {
   static Future<
     (ExerciseLibrary, TemplateCatalog, DrillPackVoiceSource, coach.Catalog)
   >
-  loadContent() async {
+  loadContent({TrainingMediaRepository? media}) async {
     final packs = await PackSet.load(rootBundle.loadString);
+    final manifest =
+        jsonDecode(
+              await rootBundle.loadString(TrainingMediaConfig.manifestAsset),
+            )
+            as Map<String, dynamic>;
+    final allowed = media != null
+        ? media.visibleActions.map((a) => a.id).toSet()
+        : {
+            for (final action in manifest['actions'] as List)
+              if ((action as Map)['releaseEligible'] == true ||
+                  TrainingMediaConfig.includePending)
+                action['id'] as String,
+          };
+    final visiblePacks = [
+      for (final p in packs.exercises)
+        if (allowed.contains(p.id)) p,
+    ];
     final cat = TemplateCatalog.fromJson(
       jsonDecode(await rootBundle.loadString('assets/library/templates.json'))
           as Map<String, dynamic>,
     );
     return (
-      ExerciseLibrary.fromPacks(packs),
+      ExerciseLibrary([
+        for (final p in visiblePacks)
+          Exercise.fromPack(
+            p,
+            mediaOverride: ExerciseMedia.fromPoseHub(
+              p,
+              version: manifest['version'] as String,
+            ),
+          ),
+      ]),
       cat,
       DrillPackVoiceSource.fromPacks(
         common: packs.common.json,
         packs: {for (final p in packs.exercises) p.id: p.json},
       ),
       const coach.DrillPackAdapter().build(
-        version: 'smartfit-bundled-1.1.0',
-        packs: {for (final p in packs.exercises) p.id: p.json},
+        version: 'smartfit-pose-hub-${manifest['version']}',
+        packs: {for (final p in visiblePacks) p.id: p.json},
       ),
     );
   }

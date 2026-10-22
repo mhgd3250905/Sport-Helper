@@ -1,0 +1,56 @@
+{
+  "releaseVersion": "0.3.0",
+  "mainCommit": "41b1922459e36cd4ff2947828135b755465d0613",
+  "mainManifestSha256": "5997a445f33cffac00dd4d9b213c7887d67e776fbb2ee9940e4f7c44c88c0e8d",
+  "bundledSubmanifests": [
+    "packages/builtin.json",
+    "packages/realistic-dark.json"
+  ],
+  "groups": {
+    "covers": {
+      "files": 189,
+      "bytes": 1402854
+    },
+    "manifests": {
+      "files": 3,
+      "bytes": 132592
+    },
+    "thumbs": {
+      "files": 189,
+      "bytes": 312112
+    },
+    "videos": {
+      "files": 32,
+      "bytes": 13035872
+    }
+  },
+  "bundle": {
+    "files": 413,
+    "bytes": 14883430
+  },
+  "bundleInventorySha256": "c5c300ab1e2a1537832cd0c107ff757c39644e1427f35953d9c3663670856028",
+  "sourceInputs": {
+    "files": 414,
+    "inventorySha256": "e5e87e47b6efa72154e5d66a2132371bc1d1c83fc21a86e694b52a4afb330d7e",
+    "unchangedAfterBuild": true
+  },
+  "protectedPackFilesInventorySha256": "2620fbf64231de34eb7bb7832cdf11c58f2870e94a687a28e5f70a90613e81f1",
+  "legacyPackMediaRemaining": 0,
+  "cutoutsBundled": false,
+  "validatedOutput": true,
+  "baselineApk": {
+    "file": "app-debug.apk",
+    "bytes": 208066987,
+    "sha256": "c44c43c7c54438212806c3b952a559757de1484c0cfad5af4e773fe6488c2c00",
+    "legacyPackMedia": {
+      "files": 372,
+      "bytes": 21982553,
+      "compressedBytes": 21982553
+    },
+    "cutouts": {
+      "files": 4,
+      "bytes": 1751856,
+      "compressedBytes": 1751856
+    }
+  }
+}

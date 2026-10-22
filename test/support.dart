@@ -18,7 +18,8 @@ PackSet loadPacksSync() {
   if (_packs != null) return _packs!;
   final root = PackSet.defaultRoot;
   final index =
-      jsonDecode(File('$root/index.json').readAsStringSync()) as Map<String, dynamic>;
+      jsonDecode(File('$root/index.json').readAsStringSync())
+          as Map<String, dynamic>;
   final packs = [
     for (final e in index['packs'] as List)
       DrillPack.fromJson(
@@ -27,13 +28,18 @@ PackSet loadPacksSync() {
         folder: '$root/${e['id']}',
       ),
   ];
-  return _packs = PackSet(
-    packs.firstWhere((p) => p.isCommon),
-    [for (final p in packs) if (!p.isCommon) p],
-  );
+  return _packs = PackSet(packs.firstWhere((p) => p.isCommon), [
+    for (final p in packs)
+      if (!p.isCommon) p,
+  ]);
 }
 
-ExerciseLibrary loadLibrary() => ExerciseLibrary.fromPacks(loadPacksSync());
+/// Keep the full metadata fixture while resolving media through the release
+/// manifest layout. The old pack media paths remain historical metadata only.
+ExerciseLibrary loadLibrary() => ExerciseLibrary([
+  for (final pack in loadPacksSync().exercises)
+    Exercise.fromPack(pack, mediaOverride: ExerciseMedia.fromPoseHub(pack)),
+]);
 
 VoiceLibrary loadVoices() => VoiceLibrary.fromPacks(loadPacksSync());
 

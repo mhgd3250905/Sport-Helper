@@ -3,6 +3,7 @@
 
     python3 tools/packs/validate_packs.py                 # assets/packs of this repo
     python3 tools/packs/validate_packs.py --root path/to/packs --decode
+    python3 tools/packs/validate_packs.py --on-demand-media --decode
 
 Checks every pack folder and index.json: required fields and allowed values,
 ids, versions, cue count (1–3), voice roles (side_switch exactly when the
@@ -13,8 +14,17 @@ index.json matches the folders. --decode also decodes every clip and fails
 when the recorded length differs from the real one by more than 50 ms.
 
 Standard library only (+ ffmpeg for --decode). Exit status 1 on any error.
+
+The default remains the complete, self-contained pack contract. The explicit
+--on-demand-media mode validates this App's migrated layout: only missing legacy
+demo/cover references are replaced by the verified Pose Hub bundle and the App's
+fromPoseHub wiring. Pack metadata, sealing/index, voice/chimes and stray-file
+checks remain enabled. New bundle integrity is checked against the build report;
+the builder's --verify-only additionally checks the read-only source release.
 """
 import argparse
+import hashlib
+import re
 import sys
 from pathlib import Path
 
@@ -155,7 +165,110 @@ def check_voice(r, d, p, decode):
     return seen
 
 
-def check_files(r, d, p):
+def on_demand_replacements(r, root, packs):
+    """Fail closed unless the App's exact replacement layout is evidenced.
+
+    This is deliberately App-specific, not a general missing-file exemption.
+    Runtime mapping is also covered by on_demand_media_integration_test.dart.
+    """
+    app = root.parent.parent
+    try:
+        if root != app / 'assets' / 'packs':
+            raise ValueError('requires the App assets/packs layout')
+        media_root = app / 'assets' / 'training_media'
+        manifests = list(media_root.glob('v*-app/app-manifest.json'))
+        if len(manifests) != 1:
+            raise ValueError('expected one bundled app-manifest.json')
+        main_path = manifests[0]
+        manifest = P.read_json(main_path)
+        version = manifest['version']
+        if not P.SEMVER_RE.fullmatch(version) or main_path.parent.name != f'v{version}-app':
+            raise ValueError('media release version/path mismatch')
+        actions = {a['id'] for a in manifest['actions']}
+        if len(actions) != len(manifest['actions']) or any(not P.ID_RE.fullmatch(a) for a in actions):
+            raise ValueError('invalid/duplicate media action ids')
+        package_files = {}
+        for pid in ('builtin', 'realistic-dark'):
+            package = manifest['packages'][pid]
+            reference = package['manifest']
+            if reference['path'] != f'packages/{pid}.json':
+                raise ValueError(f'{pid}: unexpected submanifest path')
+            subpath = main_path.parent / reference['path']
+            if subpath.stat().st_size != reference['bytes'] or P.sha256(subpath) != reference['sha256']:
+                raise ValueError(f'{pid}: submanifest size/sha256 mismatch')
+            files = P.read_json(subpath)['files']
+            ids = package['actionIds']
+            expected = {f'../v{version}/realistic/dark/{action}.mp4' for action in ids}
+            if (package['kind'] != 'video' or not set(ids) <= actions
+                    or len(set(ids)) != len(ids) or len(files) != package['fileCount']
+                    or len(files) != len(expected) or {f['path'] for f in files} != expected
+                    or any(type(f['bytes']) is not int or f['bytes'] <= 0
+                           or not re.fullmatch(r'[0-9a-f]{64}', str(f['sha256'])) for f in files)
+                    or sum(f['bytes'] for f in files) != package['totalBytes']):
+                raise ValueError(f'{pid}: media action/file index mismatch')
+            package_files[pid] = {f['path']: f for f in files}
+        builtin = package_files['builtin']
+        downloadable = package_files['realistic-dark']
+        if any(downloadable[path] != builtin[path] for path in builtin.keys() & downloadable.keys()):
+            raise ValueError('builtin/realistic-dark integrity metadata differs')
+        full = builtin | downloadable
+        expected_assets = {
+            main_path.relative_to(media_root).as_posix(),
+            *(f'v{version}-app/packages/{pid}.json' for pid in package_files),
+            *(f'v{version}/realistic/dark/{Path(path).name}' for path in builtin),
+            *(f'v{version}-app/common-lossy/{group}/{action}.webp'
+              for group in ('covers', 'thumbs') for action in actions),
+        }
+        actual = {f.relative_to(media_root).as_posix(): f
+                  for f in media_root.rglob('*') if f.is_file()}
+        if set(actual) != expected_assets or any(f.is_symlink() for f in actual.values()):
+            raise ValueError('bundled media inventory differs from the manifests')
+        for path, entry in builtin.items():
+            f = main_path.parent / path
+            if f.stat().st_size != entry['bytes'] or P.sha256(f) != entry['sha256']:
+                raise ValueError(f'{path}: builtin size/sha256 mismatch')
+        report = P.read_json(app / 'tools/media/builtin-assets-report.json')
+        inventory = ''.join(sorted(f'{rel}\0{f.stat().st_size}\0{P.sha256(f)}\n'
+                                   for rel, f in actual.items()))
+        if (report['releaseVersion'] != version or report['mainManifestSha256'] != P.sha256(main_path)
+                or report['bundleInventorySha256'] != hashlib.sha256(inventory.encode()).hexdigest()):
+            raise ValueError('media build report integrity mismatch; rebuild/verify the bundle')
+        # Verify declared Flutter asset directories, including every lossy image.
+        pubspec = (app / 'pubspec.yaml').read_text(encoding='utf-8')
+        declared = set(re.findall(r'^    - ([^\s#]+)\s*$', pubspec, re.MULTILINE))
+        if any(f'{f.parent.relative_to(app).as_posix()}/' not in declared for f in actual.values()):
+            raise ValueError('replacement media directory missing from pubspec assets')
+        # Narrow source witnesses: removing/changing the actual mapping must
+        # fail this mode instead of silently overlooking absent legacy media.
+        def dart(path):
+            return re.sub(r'/\*.*?\*/|//[^\n]*', '', path.read_text(encoding='utf-8'), flags=re.DOTALL)
+        services = dart(app / 'lib/app/services.dart')
+        exercise = dart(app / 'lib/domain/exercise.dart')
+        mapping = exercise.split('factory ExerciseMedia.fromPoseHub(', 1)[1].split('factory ExerciseMedia.fromPack(', 1)[0]
+        if (not re.search(r"mediaOverride:\s*ExerciseMedia\.fromPoseHub\(\s*p,\s*version:\s*manifest\['version'\]\s+as\s+String,?\s*\)", services)
+                or "'assets/training_media/v$version/realistic/dark/${p.id}.mp4'" not in mapping
+                or "'assets/training_media/v$version-app/common-lossy/covers/${p.id}.webp'" not in mapping
+                or not re.search(r'media:\s*mediaOverride\s*\?\?\s*ExerciseMedia\.fromPack\(p\)', exercise)):
+            raise ValueError('App fromPoseHub replacement mapping is not wired')
+        replacements = {}
+        for pid, pack in packs.items():
+            if pack.get('kind') != 'exercise':
+                continue
+            if f'../v{version}/realistic/dark/{pid}.mp4' not in full:
+                raise ValueError(f'{pid}: missing replacement action/video')
+            media = pack.get('media') or {}
+            light = media.get('light') or {}
+            legacy = {media.get('video'), media.get('cover'), light.get('video'), light.get('cover')} - {None}
+            if not legacy <= {'demo.mp4', 'cover.jpg', 'demo-light.mp4', 'cover-light.jpg'}:
+                raise ValueError(f'{pid}: unrecognized migrated media reference')
+            replacements[pid] = legacy
+        return replacements
+    except (OSError, ValueError, TypeError, KeyError, IndexError) as error:
+        r.err('on-demand-media', str(error))
+        return {}
+
+
+def check_files(r, d, p, migrated=()):
     pid = d.name
     listed = set(P.listed_files(p))
     files = p.get('files') or {}
@@ -166,7 +279,11 @@ def check_files(r, d, p):
     for rel, meta in files.items():
         f = d / rel
         if not f.is_file():
-            r.err(pid, f'missing file {rel}')
+            if rel not in migrated:
+                r.err(pid, f'missing file {rel}')
+            elif (type(meta.get('bytes')) is not int or meta['bytes'] <= 0
+                  or not re.fullmatch(r'[0-9a-f]{64}', str(meta.get('sha256', '')))):
+                r.err(pid, f'{rel}: invalid migrated sealing metadata')
         elif f.stat().st_size != meta.get('bytes') or P.sha256(f) != meta.get('sha256'):
             r.err(pid, f'{rel} changed since sealing (size/sha256)')
     for f in d.rglob('*'):
@@ -180,11 +297,14 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--root', default=str(P.packs_root(ROOT)))
     ap.add_argument('--decode', action='store_true', help='decode every clip and compare lengths')
+    ap.add_argument('--on-demand-media', action='store_true',
+                    help='validate this App migration with verified replacement assets; default requires complete packs')
     a = ap.parse_args()
     root = Path(a.root).resolve()
     r = Report()
     dirs = P.pack_dirs(root)
     packs = {d.name: P.read_json(d / 'pack.json') for d in dirs}
+    migrated = on_demand_replacements(r, root, packs) if a.on_demand_media else {}
     all_ids = set(packs)
     if P.COMMON_ID not in packs:
         r.err(P.COMMON_ID, 'common pack missing')
@@ -203,7 +323,7 @@ def main():
             for c in CHIME_NEEDS:
                 if c not in (p.get('chimes') or {}):
                     r.err(d.name, f'chime {c!r} missing')
-        check_files(r, d, p)
+        check_files(r, d, p, migrated.get(d.name, ()))
     idx_path = root / 'index.json'
     if not idx_path.is_file():
         r.err('index.json', 'missing (run build_packs.py)')

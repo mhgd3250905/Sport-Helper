@@ -13,9 +13,15 @@ import 'theme.dart';
 /// The generated plan as training groups: one live preview on top (the
 /// selected move loops), every move below with its dose and key point.
 class PlanPage extends StatefulWidget {
-  const PlanPage({super.key, required this.plan, this.request, this.returnPlanOnStart = false});
+  const PlanPage({
+    super.key,
+    required this.plan,
+    this.request,
+    this.returnPlanOnStart = false,
+  });
   final TrainingPlan plan;
   final ScenarioRequest? request;
+
   /// Chat details return the edited plan so the home owns the workout
   /// and its completion summary, just like the card's start button.
   final bool returnPlanOnStart;
@@ -42,36 +48,58 @@ class _PlanPageState extends State<PlanPage> {
       mode: d.mode,
       sets: item.sets,
       reps: d.mode == DoseMode.reps ? (item.reps ?? d.reps) : null,
-      workSeconds: d.mode == DoseMode.time ? (item.workSeconds ?? d.seconds) : null,
+      workSeconds: d.mode == DoseMode.time
+          ? (item.workSeconds ?? d.seconds)
+          : null,
       perSide: alt.unilateral,
       restSeconds: item.restSeconds,
       replacedFrom: e.id,
     );
     blocks[bi] = blocks[bi].copyWith(items: items);
-    final updated = _plan.copyWith(blocks: blocks, notes: [..._plan.notes, '手动把「${e.name}」换成「${alt.name}」']);
-    final request = widget.request ?? ScenarioRequest(
-      scene: _plan.scene,
-      equipment: _plan.equipment.map(Equipment.byName).toSet(),
-      level: _plan.level,
-      avoid: _plan.avoid,
+    final updated = _plan.copyWith(
+      blocks: blocks,
+      notes: [..._plan.notes, '手动把「${e.name}」换成「${alt.name}」'],
     );
+    final request =
+        widget.request ??
+        ScenarioRequest(
+          scene: _plan.scene,
+          equipment: _plan.equipment.map(Equipment.byName).toSet(),
+          level: _plan.level,
+          avoid: _plan.avoid,
+        );
     final issues = PlanValidator(s.library).validate(updated, request);
     if (alt.level > request.level + 1) issues.add('替代动作难度偏高');
     if (issues.isNotEmpty) {
-      showSfToast(context, '暂不能替换：${issues.first}', icon: SfGlyph.info, bottom: 24);
+      showSfToast(
+        context,
+        '暂不能替换：${issues.first}',
+        icon: SfGlyph.info,
+        bottom: 24,
+      );
       return;
     }
     setState(() {
-      _plan = updated.copyWith(id: '${updated.id.split('~').first}~${DateTime.now().microsecondsSinceEpoch}');
+      _plan = updated.copyWith(
+        id: '${updated.id.split('~').first}~${DateTime.now().microsecondsSinceEpoch}',
+      );
       _selected = alt.id;
     });
     s.store.rememberPlan(_plan);
+    s.prefetchPlan(_plan);
   }
 
   @override
   Widget build(BuildContext context) {
     final s = AppServices.of(context);
     final lib = s.library;
+    if (_plan.items.isEmpty ||
+        _plan.items.any((item) => !lib.contains(item.exerciseId))) {
+      return const Scaffold(
+        appBar: SfTopBar(title: '计划详情'),
+        body: Center(child: Text('计划包含尚未可用的动作。已保存计划仍保留。')),
+      );
+    }
     final seconds = SessionBuilder(lib).planSeconds(_plan);
     final count = _plan.items.length;
     final selected = lib.tryGet(_selected ?? _plan.items.first.exerciseId);
@@ -85,7 +113,12 @@ class _PlanPageState extends State<PlanPage> {
       appBar: SfTopBar(title: _plan.title, caption: meta),
       bottomNavigationBar: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(SfSpace.x4, SfSpace.x2, SfSpace.x4, SfSpace.x3),
+          padding: const EdgeInsets.fromLTRB(
+            SfSpace.x4,
+            SfSpace.x2,
+            SfSpace.x4,
+            SfSpace.x3,
+          ),
           child: SfPrimaryButton(
             key: const ValueKey('start'),
             icon: SfGlyph.play,
@@ -94,7 +127,9 @@ class _PlanPageState extends State<PlanPage> {
               if (!s.store.trainingAllowed) {
                 showSfToast(
                   context,
-                  s.store.safetyAccepted ? '根据你的安全确认，暂不开始训练；可以在动作库里看示范。' : '请先在对话里完成安全确认，再开始训练。',
+                  s.store.safetyAccepted
+                      ? '根据你的安全确认，暂不开始训练；可以在动作库里看示范。'
+                      : '请先在对话里完成安全确认，再开始训练。',
                   icon: SfGlyph.shield,
                   bottom: 24,
                 );
@@ -104,9 +139,12 @@ class _PlanPageState extends State<PlanPage> {
                 Navigator.of(context).pop(_plan);
                 return;
               }
+              s.prefetchPlan(_plan);
               setState(() => _previewOn = false); // free the preview WebView
               await Navigator.of(context).push(
-                MaterialPageRoute<void>(builder: (_) => PlayerPage(plan: _plan)),
+                MaterialPageRoute<void>(
+                  builder: (_) => PlayerPage(plan: _plan),
+                ),
               );
               if (mounted) setState(() => _previewOn = true);
             },
@@ -114,11 +152,19 @@ class _PlanPageState extends State<PlanPage> {
         ),
       ),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(SfSpace.x4, 0, SfSpace.x4, SfSpace.x6),
+        padding: const EdgeInsets.fromLTRB(
+          SfSpace.x4,
+          0,
+          SfSpace.x4,
+          SfSpace.x6,
+        ),
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: SfSpace.x1),
-            child: Text(_plan.summary, style: SfType.body.copyWith(fontSize: 15, color: SfColors.muted)),
+            child: Text(
+              _plan.summary,
+              style: SfType.body.copyWith(fontSize: 15, color: SfColors.muted),
+            ),
           ),
           const SizedBox(height: SfSpace.x4),
           if (selected != null) ...[
@@ -139,7 +185,12 @@ class _PlanPageState extends State<PlanPage> {
                       key: ValueKey(selected.id),
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(selected.name, style: SfType.title.copyWith(fontWeight: FontWeight.w800)),
+                        Text(
+                          selected.name,
+                          style: SfType.title.copyWith(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
                         const SizedBox(height: 2),
                         Text(selected.muscles.join('、'), style: SfType.label),
                         const SizedBox(height: SfSpace.x2),
@@ -149,11 +200,22 @@ class _PlanPageState extends State<PlanPage> {
                           children: [
                             Padding(
                               padding: const EdgeInsets.only(top: 2),
-                              child: SfIcon(SfGlyph.subtitles, size: 18, color: SfColors.faint),
+                              child: SfIcon(
+                                SfGlyph.subtitles,
+                                size: 18,
+                                color: SfColors.faint,
+                              ),
                             ),
                             const SizedBox(width: SfSpace.x2),
                             Expanded(
-                              child: Text(selected.cue, style: SfType.body.copyWith(fontSize: 15, height: 1.55, color: SfColors.muted)),
+                              child: Text(
+                                selected.cue,
+                                style: SfType.body.copyWith(
+                                  fontSize: 15,
+                                  height: 1.55,
+                                  color: SfColors.muted,
+                                ),
+                              ),
                             ),
                           ],
                         ),
@@ -171,27 +233,50 @@ class _PlanPageState extends State<PlanPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('已按你的情况调整', style: SfType.label.copyWith(fontWeight: FontWeight.w600)),
+                  Text(
+                    '已按你的情况调整',
+                    style: SfType.label.copyWith(fontWeight: FontWeight.w600),
+                  ),
                   const SizedBox(height: SfSpace.x1),
-                  for (final n in _plan.notes) Text('· $n', style: SfType.label.copyWith(height: 1.6)),
+                  for (final n in _plan.notes)
+                    Text('· $n', style: SfType.label.copyWith(height: 1.6)),
                 ],
               ),
             ),
           ],
           for (var bi = 0; bi < _plan.blocks.length; bi++) ...[
             _blockHeader(_plan.blocks[bi]),
-            for (var ii = 0; ii < _plan.blocks[bi].items.length; ii++) _itemTile(bi, ii, lib),
+            for (var ii = 0; ii < _plan.blocks[bi].items.length; ii++)
+              _itemTile(bi, ii, lib),
           ],
           const SizedBox(height: SfSpace.x3),
           for (final n in _plan.safetyNotes)
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: SfSpace.x1, vertical: 2),
+              padding: const EdgeInsets.symmetric(
+                horizontal: SfSpace.x1,
+                vertical: 2,
+              ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Padding(padding: const EdgeInsets.only(top: 2), child: SfIcon(SfGlyph.shield, size: 14, color: SfColors.faint)),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 2),
+                    child: SfIcon(
+                      SfGlyph.shield,
+                      size: 14,
+                      color: SfColors.faint,
+                    ),
+                  ),
                   const SizedBox(width: SfSpace.x2),
-                  Expanded(child: Text(n, style: SfType.caption.copyWith(color: SfColors.muted, height: 1.6))),
+                  Expanded(
+                    child: Text(
+                      n,
+                      style: SfType.caption.copyWith(
+                        color: SfColors.muted,
+                        height: 1.6,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -235,17 +320,27 @@ class _PlanPageState extends State<PlanPage> {
               decoration: BoxDecoration(
                 color: sel ? SfColors.accentSoft : SfColors.surface,
                 borderRadius: BorderRadius.circular(SfRadius.lg),
-                border: Border.all(color: sel ? SfColors.accent.withValues(alpha: .5) : (SfColors.isDark ? Colors.transparent : SfColors.line)),
+                border: Border.all(
+                  color: sel
+                      ? SfColors.accent.withValues(alpha: .5)
+                      : (SfColors.isDark ? Colors.transparent : SfColors.line),
+                ),
               ),
               child: Row(
                 children: [
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(SfRadius.lg - SfSpace.x2),
+                    borderRadius: BorderRadius.circular(
+                      SfRadius.lg - SfSpace.x2,
+                    ),
                     child: SizedBox.square(
                       dimension: 60,
                       child: ColoredBox(
                         color: sfStageFor(e).mediaStage,
-                        child: Image.asset(sfPoster(e), fit: BoxFit.cover, errorBuilder: (_, _, _) => const SizedBox.shrink()),
+                        child: Image.asset(
+                          sfPoster(e),
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                        ),
                       ),
                     ),
                   ),
@@ -254,10 +349,27 @@ class _PlanPageState extends State<PlanPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(e.name, style: SfType.callout.copyWith(fontWeight: FontWeight.w600)),
+                        Text(
+                          e.name,
+                          style: SfType.callout.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                         const SizedBox(height: 2),
-                        Text(dose, style: SfType.label.copyWith(color: SfColors.accentText, fontWeight: FontWeight.w600, fontFeatures: SfType.tabular)),
-                        Text('${e.category.zh} · ${e.muscles.join('、')}', maxLines: 1, overflow: TextOverflow.ellipsis, style: SfType.caption.copyWith(color: SfColors.muted)),
+                        Text(
+                          dose,
+                          style: SfType.label.copyWith(
+                            color: SfColors.accentText,
+                            fontWeight: FontWeight.w600,
+                            fontFeatures: SfType.tabular,
+                          ),
+                        ),
+                        Text(
+                          '${e.category.zh} · ${e.muscles.join('、')}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: SfType.caption.copyWith(color: SfColors.muted),
+                        ),
                       ],
                     ),
                   ),

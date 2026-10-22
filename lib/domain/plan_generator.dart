@@ -46,12 +46,19 @@ class TemplatePlanGenerator implements PlanGenerator {
     required this.lib,
     required this.catalog,
     this.matcher = const DescriptionMatcher(),
+    this.preferredExerciseIds,
+    this.onGenerated,
     DateTime Function()? now,
   }) : _now = now ?? DateTime.now;
 
   final ExerciseLibrary lib;
   final TemplateCatalog catalog;
   final DescriptionMatcher matcher;
+
+  /// Available local media while offline. Safety and equipment filters still
+  /// take precedence; an empty set leaves the existing selection unchanged.
+  final Set<String> Function()? preferredExerciseIds;
+  final void Function(TrainingPlan)? onGenerated;
   final DateTime Function() _now;
 
   @override
@@ -83,6 +90,14 @@ class TemplatePlanGenerator implements PlanGenerator {
       final hits = t.keywords.where(r.description.contains).length;
       s += 12.0 * hits;
       s -= (t.minutes - r.minutes).abs() * 0.8;
+      final preferred = preferredExerciseIds?.call() ?? const <String>{};
+      final ids = [
+        for (final b in t.blocks)
+          for (final i in b.items) i.exerciseId,
+      ];
+      if (preferred.isNotEmpty && ids.isNotEmpty) {
+        s += 20 * ids.where(preferred.contains).length / ids.length;
+      }
       if (r.level < t.minLevel || r.level > t.maxLevel) s -= 10;
       out.add((t, s));
     }
@@ -102,10 +117,12 @@ class TemplatePlanGenerator implements PlanGenerator {
   @override
   Future<GenerationResult> generate(ScenarioRequest request) async {
     final r = matcher.apply(request.description, request);
-    final t = (r.templateId != null ? catalog.byId(r.templateId!) : null) ??
+    final t =
+        (r.templateId != null ? catalog.byId(r.templateId!) : null) ??
         rank(r).first.$1;
     final plan = fromTemplate(t, r);
     final issues = PlanValidator(lib).validate(plan, r);
+    if (issues.isEmpty) onGenerated?.call(plan);
     return GenerationResult(issues.isEmpty ? plan : null, issues: issues);
   }
 
@@ -167,6 +184,13 @@ class TemplatePlanGenerator implements PlanGenerator {
     final e = lib.tryGet(item.exerciseId);
     if (e == null) return null;
     final why = blockerFor(e, r);
+    final preferred = preferredExerciseIds?.call() ?? const <String>{};
+    if (why == null && preferred.isNotEmpty && !preferred.contains(e.id)) {
+      final local = _similar(e, r, sofar, onlyIds: preferred);
+      if (local == null) return item;
+      notes.add('离线优先使用已有示范：「${e.name}」换成「${local.name}」');
+      return _itemForAlternative(item, e, local);
+    }
     if (why == null) return item;
     // Walk the alternative chain, then any same-category move that fits.
     final tried = <String>{e.id};
@@ -182,25 +206,37 @@ class TemplatePlanGenerator implements PlanGenerator {
       return null;
     }
     notes.add('「${e.name}」换成「${alt.name}」（$why）');
+    return _itemForAlternative(item, e, alt);
+  }
+
+  PlanItem _itemForAlternative(PlanItem item, Exercise e, Exercise alt) {
     final d = alt.dose;
     return PlanItem(
       exerciseId: alt.id,
       mode: d.mode,
       sets: item.sets,
       reps: d.mode == DoseMode.reps ? (item.reps ?? d.reps) : null,
-      workSeconds: d.mode == DoseMode.time ? (item.workSeconds ?? d.seconds) : null,
+      workSeconds: d.mode == DoseMode.time
+          ? (item.workSeconds ?? d.seconds)
+          : null,
       perSide: alt.unilateral,
       restSeconds: item.restSeconds,
       replacedFrom: e.id,
     );
   }
 
-  Exercise? _similar(Exercise e, ScenarioRequest r, List<PlanItem> sofar) {
+  Exercise? _similar(
+    Exercise e,
+    ScenarioRequest r,
+    List<PlanItem> sofar, {
+    Set<String>? onlyIds,
+  }) {
     final used = {for (final i in sofar) i.exerciseId};
     final candidates = lib.all
         .where(
           (c) =>
               c.id != e.id &&
+              (onlyIds == null || onlyIds.contains(c.id)) &&
               !used.contains(c.id) &&
               c.category == e.category &&
               c.scenes.contains(r.scene) &&
@@ -210,6 +246,11 @@ class TemplatePlanGenerator implements PlanGenerator {
     if (candidates.isEmpty) return null;
     int overlap(Exercise c) => c.muscles.where(e.muscles.contains).length;
     candidates.sort((a, b) {
+      final preferred = preferredExerciseIds?.call() ?? const <String>{};
+      final ready = (preferred.contains(b.id) ? 1 : 0).compareTo(
+        preferred.contains(a.id) ? 1 : 0,
+      );
+      if (ready != 0) return ready;
       final o = overlap(b).compareTo(overlap(a));
       return o != 0 ? o : a.level.compareTo(b.level);
     });
@@ -227,9 +268,15 @@ class TemplatePlanGenerator implements PlanGenerator {
     if (f == 1.0) return i;
     final sets = level == 3 && i.sets >= 2 ? i.sets + 1 : i.sets;
     return i.mode == DoseMode.reps
-        ? i.copyWith(reps: math.max(5, ((i.reps ?? 10) * f).round()), sets: sets)
+        ? i.copyWith(
+            reps: math.max(5, ((i.reps ?? 10) * f).round()),
+            sets: sets,
+          )
         : i.copyWith(
-            workSeconds: math.max(15, ((i.workSeconds ?? 30) * f / 5).round() * 5),
+            workSeconds: math.max(
+              15,
+              ((i.workSeconds ?? 30) * f / 5).round() * 5,
+            ),
             sets: sets,
           );
   }
@@ -256,13 +303,23 @@ class TemplatePlanGenerator implements PlanGenerator {
     }
     return _similar(e, r, [
       for (final id in exclude)
-        PlanItem(exerciseId: id, mode: DoseMode.time, sets: 1, perSide: false, restSeconds: 0),
+        PlanItem(
+          exerciseId: id,
+          mode: DoseMode.time,
+          sets: 1,
+          perSide: false,
+          restSeconds: 0,
+        ),
     ]);
   }
 
   /// Grow or shrink the plan toward [minutes]: circuit rounds first, then
   /// sets of main-block items, then hold lengths; within ±15 % or 6 steps.
-  TrainingPlan _fitDuration(TrainingPlan plan, int minutes, List<String> notes) {
+  TrainingPlan _fitDuration(
+    TrainingPlan plan,
+    int minutes,
+    List<String> notes,
+  ) {
     final target = minutes * 60.0;
     var p = plan;
     final start = _seconds(p);
@@ -279,9 +336,7 @@ class TemplatePlanGenerator implements PlanGenerator {
     }
     final end = _seconds(p);
     if ((end - start).abs() > 60) {
-      notes.add(
-        '按你选的 $minutes 分钟调整了组数/轮数（约 ${(end / 60).round()} 分钟）',
-      );
+      notes.add('按你选的 $minutes 分钟调整了组数/轮数（约 ${(end / 60).round()} 分钟）');
     }
     return p;
   }

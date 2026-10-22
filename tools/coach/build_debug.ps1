@@ -1,7 +1,8 @@
 param(
   [Parameter(Mandatory = $true)][string]$AppKeyFile,
   [string]$FlutterCommand = 'flutter',
-  [string]$BuildLog = '.buildlog/ai-debug-build.log'
+  [string]$BuildLog = '.buildlog/ai-debug-build.log',
+  [string[]]$DartDefines = @()
 )
 
 Set-StrictMode -Version Latest
@@ -28,7 +29,8 @@ try {
   if ($logDirectory -and -not (Test-Path -LiteralPath $logDirectory)) {
     New-Item -ItemType Directory -Path $logDirectory -Force | Out-Null
   }
-  & $FlutterCommand build apk --debug --no-pub $define *> $BuildLog
+  $extraDefines = @($DartDefines | ForEach-Object { '--dart-define=' + $_ })
+  & $FlutterCommand build apk --debug --no-pub $define @extraDefines *> $BuildLog
   $buildStatus = $LASTEXITCODE
 } finally {
   # Never echo the key, command argument, or source file contents.

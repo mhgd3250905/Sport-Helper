@@ -1,0 +1,67 @@
+{
+  "buildMode": "debug, universal APK (same ABI set)",
+  "before": {
+    "file": "app-debug.apk",
+    "bytes": 208066987,
+    "sha256": "c44c43c7c54438212806c3b952a559757de1484c0cfad5af4e773fe6488c2c00",
+    "trainingMedia": {
+      "files": 0,
+      "bytes": 0,
+      "compressedBytes": 0
+    },
+    "legacyMedia": {
+      "files": 372,
+      "bytes": 21982553,
+      "compressedBytes": 21982553
+    },
+    "cutouts": {
+      "files": 4,
+      "bytes": 1751856,
+      "compressedBytes": 1751856
+    },
+    "videos": {
+      "files": 186,
+      "bytes": 20157732,
+      "compressedBytes": 20157732
+    },
+    "nativeLibraries": {
+      "files": 10,
+      "bytes": 123885504,
+      "compressedBytes": 123885504
+    }
+  },
+  "after": {
+    "file": "SmartFit-media-0.1.0+11-debug.apk",
+    "bytes": 199556721,
+    "sha256": "147b1dece85a81c1e303d98904db4d6c42c12ded820098b12b0d7e6e8e744b22",
+    "trainingMedia": {
+      "files": 413,
+      "bytes": 14883430,
+      "compressedBytes": 14772925
+    },
+    "legacyMedia": {
+      "files": 0,
+      "bytes": 0,
+      "compressedBytes": 0
+    },
+    "cutouts": {
+      "files": 0,
+      "bytes": 0,
+      "compressedBytes": 0
+    },
+    "videos": {
+      "files": 32,
+      "bytes": 13035872,
+      "compressedBytes": 13035872
+    },
+    "nativeLibraries": {
+      "files": 10,
+      "bytes": 123885504,
+      "compressedBytes": 123885504
+    }
+  },
+  "apkBytesSaved": 8510266,
+  "mediaBytesSaved": 8850979,
+  "mediaBeforeBytes": 23734409,
+  "apkInventoryAndMediaHashesVerified": true
+}

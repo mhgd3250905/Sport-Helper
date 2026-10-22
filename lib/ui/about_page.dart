@@ -4,8 +4,9 @@ import 'package:flutter/services.dart' show rootBundle;
 import '../app/services.dart';
 import '../chat/safety_script.dart' show disclaimerText;
 import 'theme.dart';
+import 'training_media_settings.dart';
 
-const appVersion = '0.1.0+9 (MVP)';
+const appVersion = '0.1.0+11 (MVP)';
 
 class AboutPage extends StatelessWidget {
   const AboutPage({super.key});
@@ -78,6 +79,10 @@ class AboutPage extends StatelessWidget {
                 ],
               ),
             ),
+            if (s.media != null) ...[
+              const SfSectionTitle('动作素材'),
+              const SfPanel(child: TrainingMediaSettings()),
+            ],
             const SfSectionTitle('AI 记忆'),
             const SfPanel(child: _AiMemorySettings()),
             const SfSectionTitle('隐私与 AI'),

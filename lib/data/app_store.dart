@@ -59,6 +59,7 @@ class AppStore extends ChangeNotifier {
   );
 
   bool aiMemoryEnabled = true;
+  bool mediaWifiOnly = true;
 
   bool safetyAccepted = false;
 
@@ -126,6 +127,7 @@ class AppStore extends ChangeNotifier {
         glassQuality = j['glassQuality'] as String;
       }
       aiMemoryEnabled = j['aiMemoryEnabled'] != false;
+      mediaWifiOnly = j['mediaWifiOnly'] != false;
       if (appearances.contains(j['appearance'])) {
         appearance = j['appearance'] as String;
       }
@@ -181,6 +183,7 @@ class AppStore extends ChangeNotifier {
     ],
     'starfield': starfield,
     'aiMemoryEnabled': aiMemoryEnabled,
+    'mediaWifiOnly': mediaWifiOnly,
     'appearance': appearance,
     'glassQuality': ?glassQuality,
     'savedPlans': [for (final p in savedPlans) p.toJson()],
@@ -282,6 +285,11 @@ class AppStore extends ChangeNotifier {
   Future<void> setAppearance(String a) {
     if (!appearances.contains(a)) return Future.value();
     appearance = a;
+    return _save();
+  }
+
+  Future<void> setMediaWifiOnly(bool value) {
+    mediaWifiOnly = value;
     return _save();
   }
 

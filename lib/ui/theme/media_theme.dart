@@ -8,7 +8,8 @@ import 'tokens.dart';
 bool sfUsesLight(Exercise e) => !SfColors.isDark && e.media.hasLight;
 
 /// The cover for the theme in effect.
-String sfPoster(Exercise e) => sfUsesLight(e) ? e.media.lightPoster! : e.media.poster;
+String sfPoster(Exercise e) =>
+    sfUsesLight(e) ? e.media.lightPoster! : e.media.poster;
 
 /// The stage colour behind [e]'s media: the colour its render is baked on.
 /// (Light stage = #EFEFEF, the light renders' background.)
@@ -16,7 +17,8 @@ SfPalette sfStageFor(Exercise? e) =>
     e != null && sfUsesLight(e) ? SfPalette.light : SfPalette.dark;
 
 /// The clip for the theme in effect.
-String sfVideo(Exercise e) => sfUsesLight(e) ? e.media.lightVideo! : e.media.video;
+String sfVideo(Exercise e) =>
+    sfUsesLight(e) ? e.media.lightVideo! : e.media.video;
 
 /// The web player's variant ('light' → `demo-light.mp4`), or null.
 String? sfVariant(Exercise e) => sfUsesLight(e) ? 'light' : null;
@@ -31,9 +33,13 @@ abstract final class SfCutouts {
 
   static const _ids = {'h-catcow-quad', 'w-dead-bug'};
 
-  static bool has(Exercise? e) => e != null && _ids.contains(e.id);
+  static bool has(Exercise? e) =>
+      e != null &&
+      !e.media.source.startsWith('Pose-Hub ') &&
+      _ids.contains(e.id);
 
   /// The alpha figure for [e]: animated WebP, or its still cover.
-  static String asset(Exercise e, {bool still = false}) =>
-      still || !animate ? 'assets/cutouts/${e.id}-cover.webp' : 'assets/cutouts/${e.id}.webp';
+  static String asset(Exercise e, {bool still = false}) => still || !animate
+      ? 'assets/cutouts/${e.id}-cover.webp'
+      : 'assets/cutouts/${e.id}.webp';
 }
