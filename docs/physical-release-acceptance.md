@@ -4,6 +4,9 @@
 
 待用包为独立 `internal` flavor 的 arm64 release，应用 ID `com.ugk.smartfit.internal`，名称“智能健身助手·内测”，与原 App 数据隔离。使用 release/AOT 编译、现有开发签名；待审核动作及 LAN HTTP 仅在此内测构建显式启用。生产 release 仍保留审核门禁和 HTTPS 限制。APK 哈希与字节以 [release 体积记录](release-size-2026-10-22.md) 为准。
 
+2026-10-22 语音选定 LC 后，新待验收包改为 `SmartFit-0.1.0+13-lc32-internal-arm64-v8a-release.apk`。
+对应哈希、体积及平台播放待验项见 [LC 全量转换记录](voice-lc32-release-2026-10-22.md)。请使用新包确认压缩后语音首尾与拼接节奏。
+
 ## 准备
 
 1. 连接 arm64 Android 真机并开启 USB 调试，在手机上授权。记录型号、Android 版本、APK SHA、安装时间及网络环境。
