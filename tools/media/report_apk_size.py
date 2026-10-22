@@ -67,7 +67,7 @@ def main():
               'mediaBeforeBytes': old_media,
               'apkInventoryAndMediaHashesVerified': True}
     encoded = json.dumps(report, indent=2) + '\n'
-    args.report.write_text(encoded, encoding='utf-8')
+    args.report.write_text(encoded, encoding='utf-8', newline='\n')
     print(encoded)
 
 
