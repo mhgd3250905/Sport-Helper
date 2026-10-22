@@ -1,0 +1,398 @@
+{
+  "unit": "bytes; MB = 1,000,000 bytes; occupancy = ZIP compressed bytes plus headers/signing/padding",
+  "debugUniversal": {
+    "file": "SmartFit-media-0.1.0+11-debug.apk",
+    "bytes": 199556721,
+    "sha256": "147b1dece85a81c1e303d98904db4d6c42c12ded820098b12b0d7e6e8e744b22",
+    "abis": [
+      "arm64-v8a",
+      "armeabi-v7a",
+      "x86_64"
+    ],
+    "groups": {
+      "flutterEngine": {
+        "files": 3,
+        "zipBytes": 108372244,
+        "uncompressedBytes": 108372244,
+        "percent": 54.31
+      },
+      "debugKernelAndSnapshots": {
+        "files": 3,
+        "zipBytes": 32263725,
+        "uncompressedBytes": 97773961,
+        "percent": 16.17
+      },
+      "trainingVoice": {
+        "files": 695,
+        "zipBytes": 15662531,
+        "uncompressedBytes": 15662531,
+        "percent": 7.85
+      },
+      "graphicsValidation": {
+        "files": 1,
+        "zipBytes": 15240080,
+        "uncompressedBytes": 15240080,
+        "percent": 7.64
+      },
+      "trainingMedia": {
+        "files": 413,
+        "zipBytes": 14772925,
+        "uncompressedBytes": 14883430,
+        "percent": 7.4
+      },
+      "androidCode": {
+        "files": 13,
+        "zipBytes": 7678078,
+        "uncompressedBytes": 19107792,
+        "percent": 3.85
+      },
+      "fonts": {
+        "files": 3,
+        "zipBytes": 3526238,
+        "uncompressedBytes": 6012872,
+        "percent": 1.77
+      },
+      "otherFiles": {
+        "files": 649,
+        "zipBytes": 1580966,
+        "uncompressedBytes": 3315917,
+        "percent": 0.79
+      },
+      "zipHeadersSigningPadding": {
+        "files": 0,
+        "zipBytes": 459934,
+        "uncompressedBytes": null,
+        "percent": 0.23
+      }
+    },
+    "topFiles": [
+      {
+        "path": "lib/x86_64/libflutter.so",
+        "zipBytes": 38828136,
+        "uncompressedBytes": 38828136
+      },
+      {
+        "path": "lib/arm64-v8a/libflutter.so",
+        "zipBytes": 37584608,
+        "uncompressedBytes": 37584608
+      },
+      {
+        "path": "lib/armeabi-v7a/libflutter.so",
+        "zipBytes": 31959500,
+        "uncompressedBytes": 31959500
+      },
+      {
+        "path": "assets/flutter_assets/kernel_blob.bin",
+        "zipBytes": 28023164,
+        "uncompressedBytes": 86667224
+      },
+      {
+        "path": "lib/arm64-v8a/libVkLayer_khronos_validation.so",
+        "zipBytes": 15240080,
+        "uncompressedBytes": 15240080
+      },
+      {
+        "path": "classes.dex",
+        "zipBytes": 4512877,
+        "uncompressedBytes": 10691324
+      },
+      {
+        "path": "assets/flutter_assets/isolate_snapshot_data",
+        "zipBytes": 4231946,
+        "uncompressedBytes": 11093091
+      },
+      {
+        "path": "classes13.dex",
+        "zipBytes": 2869259,
+        "uncompressedBytes": 7498284
+      },
+      {
+        "path": "assets/flutter_assets/assets/fonts/NotoSansSC.ttf",
+        "zipBytes": 2806168,
+        "uncompressedBytes": 4110060
+      },
+      {
+        "path": "assets/flutter_assets/assets/training_media/v0.3.0/realistic/dark/deltoids-A.mp4",
+        "zipBytes": 758939,
+        "uncompressedBytes": 758939
+      },
+      {
+        "path": "assets/flutter_assets/assets/training_media/v0.3.0/realistic/dark/rotator-cuff-A.mp4",
+        "zipBytes": 724340,
+        "uncompressedBytes": 724340
+      },
+      {
+        "path": "assets/flutter_assets/fonts/MaterialIcons-Regular.otf",
+        "zipBytes": 593046,
+        "uncompressedBytes": 1645184
+      }
+    ],
+    "mediaAndVoiceSourceHashesVerified": true
+  },
+  "productionArm64Release": {
+    "file": "SmartFit-0.1.0+12-production-arm64-v8a-release.apk",
+    "bytes": 55712099,
+    "sha256": "95f1ff9a9012f5550840473b194019ab7af21b5bee270e03da30202e9a5446da",
+    "abis": [
+      "arm64-v8a"
+    ],
+    "groups": {
+      "trainingVoice": {
+        "files": 695,
+        "zipBytes": 15662531,
+        "uncompressedBytes": 15662531,
+        "percent": 28.11
+      },
+      "trainingMedia": {
+        "files": 413,
+        "zipBytes": 14769392,
+        "uncompressedBytes": 14883430,
+        "percent": 26.51
+      },
+      "flutterEngine": {
+        "files": 1,
+        "zipBytes": 11581856,
+        "uncompressedBytes": 11581856,
+        "percent": 20.79
+      },
+      "compiledDartApp": {
+        "files": 1,
+        "zipBytes": 8455056,
+        "uncompressedBytes": 8455056,
+        "percent": 15.18
+      },
+      "fonts": {
+        "files": 3,
+        "zipBytes": 2815172,
+        "uncompressedBytes": 4370504,
+        "percent": 5.05
+      },
+      "otherFiles": {
+        "files": 477,
+        "zipBytes": 1044619,
+        "uncompressedBytes": 2781145,
+        "percent": 1.88
+      },
+      "androidCode": {
+        "files": 1,
+        "zipBytes": 1003093,
+        "uncompressedBytes": 2032612,
+        "percent": 1.8
+      },
+      "zipHeadersSigningPadding": {
+        "files": 0,
+        "zipBytes": 380380,
+        "uncompressedBytes": null,
+        "percent": 0.68
+      },
+      "debugKernelAndSnapshots": {
+        "files": 0,
+        "zipBytes": 0,
+        "uncompressedBytes": 0,
+        "percent": 0.0
+      },
+      "graphicsValidation": {
+        "files": 0,
+        "zipBytes": 0,
+        "uncompressedBytes": 0,
+        "percent": 0.0
+      }
+    },
+    "topFiles": [
+      {
+        "path": "lib/arm64-v8a/libflutter.so",
+        "zipBytes": 11581856,
+        "uncompressedBytes": 11581856
+      },
+      {
+        "path": "lib/arm64-v8a/libapp.so",
+        "zipBytes": 8455056,
+        "uncompressedBytes": 8455056
+      },
+      {
+        "path": "assets/flutter_assets/assets/fonts/NotoSansSC.ttf",
+        "zipBytes": 2697438,
+        "uncompressedBytes": 4110060
+      },
+      {
+        "path": "classes.dex",
+        "zipBytes": 1003093,
+        "uncompressedBytes": 2032612
+      },
+      {
+        "path": "assets/flutter_assets/assets/training_media/v0.3.0/realistic/dark/deltoids-A.mp4",
+        "zipBytes": 758939,
+        "uncompressedBytes": 758939
+      },
+      {
+        "path": "assets/flutter_assets/assets/training_media/v0.3.0/realistic/dark/rotator-cuff-A.mp4",
+        "zipBytes": 724340,
+        "uncompressedBytes": 724340
+      },
+      {
+        "path": "assets/flutter_assets/assets/training_media/v0.3.0/realistic/dark/h-chair-lat.mp4",
+        "zipBytes": 584128,
+        "uncompressedBytes": 584128
+      },
+      {
+        "path": "assets/flutter_assets/assets/training_media/v0.3.0/realistic/dark/h-incline-pushup.mp4",
+        "zipBytes": 539512,
+        "uncompressedBytes": 539512
+      },
+      {
+        "path": "assets/flutter_assets/assets/training_media/v0.3.0/realistic/dark/w-prone-swimmer.mp4",
+        "zipBytes": 507419,
+        "uncompressedBytes": 507419
+      },
+      {
+        "path": "assets/flutter_assets/assets/training_media/v0.3.0/realistic/dark/h-hip-gate.mp4",
+        "zipBytes": 506918,
+        "uncompressedBytes": 506918
+      },
+      {
+        "path": "assets/flutter_assets/assets/training_media/v0.3.0/realistic/dark/n-seated-squeeze.mp4",
+        "zipBytes": 497894,
+        "uncompressedBytes": 497894
+      },
+      {
+        "path": "assets/flutter_assets/assets/training_media/v0.3.0/realistic/dark/w-clamshell.mp4",
+        "zipBytes": 474349,
+        "uncompressedBytes": 474349
+      }
+    ],
+    "mediaAndVoiceSourceHashesVerified": true
+  },
+  "internalArm64Release": {
+    "file": "SmartFit-0.1.0+12-internal-arm64-v8a-release.apk",
+    "bytes": 55711995,
+    "sha256": "9c092f64b601bf60bf8f61ef7802c742248d1220d475ba8197de7b8a0638ac06",
+    "abis": [
+      "arm64-v8a"
+    ],
+    "groups": {
+      "trainingVoice": {
+        "files": 695,
+        "zipBytes": 15662531,
+        "uncompressedBytes": 15662531,
+        "percent": 28.11
+      },
+      "trainingMedia": {
+        "files": 413,
+        "zipBytes": 14769392,
+        "uncompressedBytes": 14883430,
+        "percent": 26.51
+      },
+      "flutterEngine": {
+        "files": 1,
+        "zipBytes": 11581856,
+        "uncompressedBytes": 11581856,
+        "percent": 20.79
+      },
+      "compiledDartApp": {
+        "files": 1,
+        "zipBytes": 8455056,
+        "uncompressedBytes": 8455056,
+        "percent": 15.18
+      },
+      "fonts": {
+        "files": 3,
+        "zipBytes": 2815172,
+        "uncompressedBytes": 4370504,
+        "percent": 5.05
+      },
+      "otherFiles": {
+        "files": 477,
+        "zipBytes": 1044517,
+        "uncompressedBytes": 2780821,
+        "percent": 1.87
+      },
+      "androidCode": {
+        "files": 1,
+        "zipBytes": 1003093,
+        "uncompressedBytes": 2032612,
+        "percent": 1.8
+      },
+      "zipHeadersSigningPadding": {
+        "files": 0,
+        "zipBytes": 380378,
+        "uncompressedBytes": null,
+        "percent": 0.68
+      },
+      "debugKernelAndSnapshots": {
+        "files": 0,
+        "zipBytes": 0,
+        "uncompressedBytes": 0,
+        "percent": 0.0
+      },
+      "graphicsValidation": {
+        "files": 0,
+        "zipBytes": 0,
+        "uncompressedBytes": 0,
+        "percent": 0.0
+      }
+    },
+    "topFiles": [
+      {
+        "path": "lib/arm64-v8a/libflutter.so",
+        "zipBytes": 11581856,
+        "uncompressedBytes": 11581856
+      },
+      {
+        "path": "lib/arm64-v8a/libapp.so",
+        "zipBytes": 8455056,
+        "uncompressedBytes": 8455056
+      },
+      {
+        "path": "assets/flutter_assets/assets/fonts/NotoSansSC.ttf",
+        "zipBytes": 2697438,
+        "uncompressedBytes": 4110060
+      },
+      {
+        "path": "classes.dex",
+        "zipBytes": 1003093,
+        "uncompressedBytes": 2032612
+      },
+      {
+        "path": "assets/flutter_assets/assets/training_media/v0.3.0/realistic/dark/deltoids-A.mp4",
+        "zipBytes": 758939,
+        "uncompressedBytes": 758939
+      },
+      {
+        "path": "assets/flutter_assets/assets/training_media/v0.3.0/realistic/dark/rotator-cuff-A.mp4",
+        "zipBytes": 724340,
+        "uncompressedBytes": 724340
+      },
+      {
+        "path": "assets/flutter_assets/assets/training_media/v0.3.0/realistic/dark/h-chair-lat.mp4",
+        "zipBytes": 584128,
+        "uncompressedBytes": 584128
+      },
+      {
+        "path": "assets/flutter_assets/assets/training_media/v0.3.0/realistic/dark/h-incline-pushup.mp4",
+        "zipBytes": 539512,
+        "uncompressedBytes": 539512
+      },
+      {
+        "path": "assets/flutter_assets/assets/training_media/v0.3.0/realistic/dark/w-prone-swimmer.mp4",
+        "zipBytes": 507419,
+        "uncompressedBytes": 507419
+      },
+      {
+        "path": "assets/flutter_assets/assets/training_media/v0.3.0/realistic/dark/h-hip-gate.mp4",
+        "zipBytes": 506918,
+        "uncompressedBytes": 506918
+      },
+      {
+        "path": "assets/flutter_assets/assets/training_media/v0.3.0/realistic/dark/n-seated-squeeze.mp4",
+        "zipBytes": 497894,
+        "uncompressedBytes": 497894
+      },
+      {
+        "path": "assets/flutter_assets/assets/training_media/v0.3.0/realistic/dark/w-clamshell.mp4",
+        "zipBytes": 474349,
+        "uncompressedBytes": 474349
+      }
+    ],
+    "mediaAndVoiceSourceHashesVerified": true
+  }
+}

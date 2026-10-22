@@ -1,7 +1,7 @@
-# 动作素材按需下载验收（2026-10-22，待开哥批准合并）
+# 动作素材按需下载验收（2026-10-22，已批准合并）
 
 App 分支 `feat/on-demand-media`，运行源码提交 `ee73bb112b9cf3cdaae7803628d0d9703b73ff24`。
-共享 SDK 分支 `feat/trainer-media-cache`，固定提交 `df90e7cb3f53c919927542056dcdfd6c0a600a66`（coach 0.3.3 / trainer 0.1.5）。两边均仅本地提交，未合入 main、未推送。
+共享 SDK 分支 `feat/trainer-media-cache`，固定提交 `df90e7cb3f53c919927542056dcdfd6c0a600a66`（coach 0.3.3 / trainer 0.1.5）。此验收完成后，开哥已批准先发布 SDK，再发布 App；两边均已合入并推送 main，App 节点 `8f1f3c56f12f3157ea6e1b63e9b89ea867290ba6`。后续独立内测 release、trainer 0.1.6 与语音统计另见 [release 记录](release-size-2026-10-22.md)，不改变此处 +11 历史包的哈希与测试范围。
 
 ## APK 与素材体积
 
@@ -85,4 +85,4 @@ python tools/media/serve_release.py --root E:/AII-3D/3D-Pose-Hub/release --contr
 )
 ```
 
-待开哥审阅本候选 APK 与记录后，再合并并推送 SDK main、App main。本阶段不代替素材审核或云端发布。Cockpit 本次进度同步两次返回 SERVICE_UNAVAILABLE，平台是否登记未获确认；没有重新 init、切换会话或猜测 revision。
+开哥已审阅并批准按 SDK → App 顺序合并推送，执行成功且远端 ref 已核对。本阶段不代替素材审核或云端发布。此验收期间 Cockpit 进度同步曾两次返回 SERVICE_UNAVAILABLE；后续服务恢复，使用原请求重放补登记并登记批准后的发布节点，没有重新 init、切换会话或猜测 revision。

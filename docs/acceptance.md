@@ -1,8 +1,12 @@
 # 本机验收记录
 
-## 动作素材精简与按需下载（0.1.0+11，待批准合并，2026-10-22）
+## release 分包与语音统计（0.1.0+12，2026-10-22）
 
-App `feat/on-demand-media` 运行源码 `ee73bb112b9cf3cdaae7803628d0d9703b73ff24`，共享 trainer 0.1.5 固定 SDK `df90e7cb3f53c919927542056dcdfd6c0a600a66`。两边仅本地提交，未合 main 或 push。素材 413 文件 / 14,883,430 B，APK 的旧视频/封面/cutout 均已排除，视频仅 32 段；同为通用三 ABI debug APK，208,066,987 B → 199,556,721 B。App 全量 265 项通过，最终 SDK trainer 144 项 / coach 377 项通过，静态分析与锁文件检查通过。断网封面降级、弱网先加载后启用、双地址 SHA 失败拒绝启用已有模拟器短流程和 HTTP/组件回归证据；计时语音继续运行由实际播放器组件测试验证。APK 与局域网服务待开哥验收，尚无真机长时播放结论；细节、哈希、配置和宿主模拟器限制见 [本轮完整记录](on-demand-media-acceptance.md)。
+开哥批准后已先推送 SDK main `df90e7c`，再推送 App main `8f1f3c5`。随后按明确选择增加隔离的 internal release，SDK trainer 0.1.6 `f684e02` 已先发布；App APK 运行源码为 `4fdf8ac`。生产 / 内测 arm64 release 均约 55.71 MB（55,712,099 / 55,711,995 B），较上轮 debug 通用包减少 72.08%；三 ABI 分包均已构建，调试 Kernel、VM snapshots、Vulkan 验证库均未打包。生产门禁与 HTTPS 限制保留，内测独立应用 ID。App 265 项测试、分析 0 issue；trainer 145 项及 AOT 编译策略矩阵 18/18 通过。695 条语音未改，原本已是 AAC 单声道，逐条时长/码率及低码率预算已交付。开哥确认目前没有真机，连续 >20 分钟真机训练仍未执行，不能记为已通过。详见 [release 记录](release-size-2026-10-22.md) 与 [待执行清单](physical-release-acceptance.md)。
+
+## 动作素材精简与按需下载（0.1.0+11，已批准合并，2026-10-22）
+
+App `feat/on-demand-media` 运行源码 `ee73bb112b9cf3cdaae7803628d0d9703b73ff24`，共享 trainer 0.1.5 固定 SDK `df90e7cb3f53c919927542056dcdfd6c0a600a66`。开哥批准后已按 SDK → App 顺序合 main 并推送，App 文档节点为 `8f1f3c5`。素材 413 文件 / 14,883,430 B，APK 的旧视频/封面/cutout 均已排除，视频仅 32 段；同为通用三 ABI debug APK，208,066,987 B → 199,556,721 B。App 全量 265 项通过，最终 SDK trainer 144 项 / coach 377 项通过，静态分析与锁文件检查通过。断网封面降级、弱网先加载后启用、双地址 SHA 失败拒绝启用已有模拟器短流程和 HTTP/组件回归证据；计时语音继续运行由实际播放器组件测试验证。尚无真机长时播放结论；细节、哈希、配置和宿主模拟器限制见 [本轮完整记录](on-demand-media-acceptance.md)。
 
 ## 计划卡片展开与可访问性（PR #5 已审核合并，2026-10-22）
 
