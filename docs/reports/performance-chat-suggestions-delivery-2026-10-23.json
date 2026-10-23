@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "date": "2026-10-23",
   "branch": "feat/performance-baseline",
-  "status": "installed-build21-awaiting-light-dark-chat-json",
+  "status": "build21-light120-valid-awaiting-dark-original-json",
   "sourceCommit": "c226177c6457843753bd776fe72387a85ac6cb03",
   "internalAPK": {
     "apk": "build/app/outputs/flutter-apk/app-arm64-v8a-internal-release.apk",
@@ -127,5 +127,24 @@
   "mergeApprovalReceived": false,
   "mergedMain": false,
   "pushed": false,
-  "brandRebased": false
+  "brandRebased": false,
+  "phoneConfirmation": {
+    "lightValidArchive": "docs/reports/performance-chat21-light-20261023T151159669121Z.json",
+    "lightSha256": "d17e18f46f5edd84cf9486d5f5f0845d5c98e37cf4bed5acfb579dffc6172f30",
+    "lightRasterSteady": {
+      "averageMs": 4.068388274336283,
+      "p90Ms": 4.863,
+      "p99Ms": 5.631,
+      "worstMs": 7.442,
+      "overBudgetFrames": 0,
+      "overBudgetRatio": 0.0
+    },
+    "lightActualRefreshRateHz": 120.00000762939453,
+    "excludedRefreshMismatchReport": "docs/reports/performance-chat21-light-20261023T150219567757Z.json",
+    "excludedReason": "60Hz labels and 16.666667ms budget cannot validate 120Hz over-budget count",
+    "darkPendingFile": "SmartFit-performance-20261023T152455149607Z.json",
+    "darkUiRoundedRasterP99Ms": 4.61,
+    "darkRawVerified": false,
+    "temporaryDisplayPreferenceRestored": true
+  }
 }
