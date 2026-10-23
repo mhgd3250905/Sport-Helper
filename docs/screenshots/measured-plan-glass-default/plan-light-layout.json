@@ -1,0 +1,25 @@
+{
+  "theme": "light",
+  "planCardLogicalBounds": {
+    "left": 16.0,
+    "top": 480.0,
+    "width": 358.0,
+    "height": 240.0
+  },
+  "suggestionStripLogicalBounds": {
+    "left": 0.0,
+    "top": 732.0,
+    "width": 390.0,
+    "height": 48.0
+  },
+  "inputBarLogicalBounds": {
+    "left": 0.0,
+    "top": 780.0,
+    "width": 390.0,
+    "height": 64.0
+  },
+  "suggestionBackdropFilters": 0,
+  "inputBackdropFilters": 2,
+  "inputBlur": 1.5,
+  "inputSaturation": 1.1
+}

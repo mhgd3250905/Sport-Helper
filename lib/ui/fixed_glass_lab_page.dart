@@ -234,6 +234,30 @@ class _FixedGlassLabPageState extends State<FixedGlassLabPage> {
               '所以两项记为 N/A，不创建空开关的归因数据。实际固定玻璃为输入框和建议条。',
               style: SfType.caption,
             ),
+            const SfSectionTitle('当前默认方案 · 两格复测'),
+            Text(
+              '计划卡会话仅将建议条改为静态仿玻璃，输入框保留真玻璃；普通聊天保持原材质。'
+              '这两格直接使用正式页面默认，不注入实验材质。每格 32 秒，完成后导出本轮 JSON。',
+              style: SfType.caption,
+            ),
+            SfPrimaryButton(
+              key: const ValueKey('fixed-glass-default-plan'),
+              label: '复测当前默认 · 计划卡 · 32 秒',
+              onPressed: _busy ? null : () => _sample('suggestions_static'),
+            ),
+            Text(
+              _result(cells[_cellId('suggestions_static')]),
+              style: SfType.caption,
+            ),
+            SfPrimaryButton(
+              key: const ValueKey('fixed-glass-default-chat'),
+              label: '复测当前默认 · 聊天 · 32 秒',
+              onPressed: _busy ? null : () => _sample('chat_baseline'),
+            ),
+            Text(
+              _result(cells[_cellId('chat_baseline')]),
+              style: SfType.caption,
+            ),
             const SfSectionTitle('固定配置 · 逐格采样'),
             for (final entry in fixedGlassConfigurations.entries)
               Padding(

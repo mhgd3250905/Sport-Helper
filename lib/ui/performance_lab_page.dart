@@ -170,6 +170,7 @@ class _PerformanceLabPageState extends State<PerformanceLabPage> {
           Text(
             '固定 72 条测试消息，使用正式聊天和计划卡组件，不读取或改写你的对话。'
             '每格自动滑动 32 秒，前 2 秒与稳态分开统计，再等待尾帧交付。'
+            '这八格保留固定控件原材质用于全局开关对照；当前默认的验收请使用“固定玻璃拆分”里的两格复测。'
             '请保持同一主题、屏幕方向、字体大小和设备状态。采样时不用手滑。',
             style: SfType.body,
           ),
@@ -507,16 +508,7 @@ class _PerformanceCaseRunnerState extends State<PerformanceCaseRunner>
       child: Stack(
         fit: StackFit.expand,
         children: [
-          IgnorePointer(
-            child: SfFixedGlassScope(
-              isPlanContext: widget.scenario == FrameScenario.planCardScroll,
-              policy: widget.fixedGlassPolicy,
-              child: ChatHomePage(
-                controller: widget.fixture.controller,
-                scrollController: _scroll,
-              ),
-            ),
-          ),
+          IgnorePointer(child: _conversation()),
           Positioned(
             left: SfSpace.x3,
             right: SfSpace.x3,
@@ -568,4 +560,22 @@ class _PerformanceCaseRunnerState extends State<PerformanceCaseRunner>
       ),
     ),
   );
+
+  Widget _conversation() {
+    final page = ChatHomePage(
+      controller: widget.fixture.controller,
+      scrollController: _scroll,
+    );
+    // These two acceptance cells exercise the actual page default, without a
+    // material override that could conceal a missing production integration.
+    if (widget.fixedGlassConfigurationId == 'suggestions_static' ||
+        widget.fixedGlassConfigurationId == 'chat_baseline') {
+      return page;
+    }
+    return SfFixedGlassScope(
+      isPlanContext: widget.scenario == FrameScenario.planCardScroll,
+      policy: widget.fixedGlassPolicy,
+      child: page,
+    );
+  }
 }

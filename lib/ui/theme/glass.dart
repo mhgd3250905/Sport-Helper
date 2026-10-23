@@ -254,8 +254,8 @@ class SfGlassSurface extends StatelessWidget {
   }
 }
 
-/// Fixed controls have a tight clip and their own paint boundary. Only an
-/// internal plan scope can change their material; ordinary chat stays baseline.
+/// Fixed controls have a tight clip and their own paint boundary. The page
+/// chooses its measured policy; ordinary chat stays on the baseline material.
 class SfFixedGlassSurface extends StatelessWidget {
   const SfFixedGlassSurface({
     super.key,
@@ -280,9 +280,7 @@ class SfFixedGlassSurface extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scope = PerformanceLab.buildEnabled
-        ? SfFixedGlassScope.maybeOf(context)
-        : null;
+    final scope = SfFixedGlassScope.maybeOf(context);
     final policy = scope?.isPlanContext == true
         ? scope!.policy
         : SfFixedGlassPolicy.baseline;

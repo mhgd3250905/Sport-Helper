@@ -1,18 +1,86 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:smartfit/app/services.dart';
 import 'package:smartfit/diagnostics/frame_recorder.dart';
 import 'package:smartfit/diagnostics/performance_fixture.dart';
 import 'package:smartfit/diagnostics/performance_report.dart';
 import 'package:smartfit/ui/chat/chat_home_page.dart';
+import 'package:smartfit/ui/chat/chat_widgets.dart';
 import 'package:smartfit/ui/chat/plan_card.dart';
 import 'package:smartfit/ui/exercise_video.dart';
 import 'package:smartfit/ui/performance_lab_page.dart';
 import 'package:smartfit/ui/theme.dart';
+import 'package:smartfit/ui/theme/fixed_glass_policy.dart';
+import 'package:smartfit/ui/theme/glass.dart';
 
 import 'app_flow_test.dart' show services, tall;
 
 void main() {
+  for (final plan in [true, false]) {
+    testWidgets('acceptance ${plan ? 'plan' : 'chat'} uses the page default', (
+      tester,
+    ) async {
+      tall(tester);
+      SfGlass.qualityOverride = GlassQuality.minimal;
+      addTearDown(() => SfGlass.qualityOverride = null);
+      final source = services();
+      final scenario = plan
+          ? FrameScenario.planCardScroll
+          : FrameScenario.longChatScroll;
+      final fixture = PerformanceFixture.create(
+        library: source.library,
+        scenario: scenario,
+        starfield: false,
+      );
+      final recorder = FrameRecorder(enabled: true);
+      await tester.pumpWidget(
+        MaterialApp(
+          home: PerformanceCaseRunner(
+            source: source,
+            fixture: fixture,
+            recorder: recorder,
+            variant: 'glass_on_stars_off',
+            scenario: scenario,
+            fixedGlassConfigurationId: plan
+                ? 'suggestions_static'
+                : 'chat_baseline',
+            fixedGlassPolicy: plan
+                ? SfFixedGlassPolicy.planCards
+                : SfFixedGlassPolicy.baseline,
+            variantLabel: 'current default',
+          ),
+        ),
+      );
+      await tester.pump(const Duration(milliseconds: 700));
+      expect(
+        find.ancestor(
+          of: find.byType(ChatHomePage),
+          matching: find.byType(SfFixedGlassScope),
+        ),
+        findsNothing,
+        reason: 'A benchmark override must not hide a missing page default.',
+      );
+      expect(
+        find.descendant(
+          of: find.byType(SuggestionStrip),
+          matching: find.byType(GlassContainer),
+        ),
+        plan ? findsNothing : findsWidgets,
+      );
+      expect(
+        find.descendant(
+          of: find.byType(ChatInputBar),
+          matching: find.byType(GlassContainer),
+        ),
+        findsOneWidget,
+      );
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox());
+      recorder.stop();
+    });
+  }
+
   testWidgets(
     'internal panel exposes eight cells and does not create real chat',
     (tester) async {

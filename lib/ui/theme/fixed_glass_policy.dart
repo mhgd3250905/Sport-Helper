@@ -16,6 +16,10 @@ class SfFixedGlassPolicy {
   }) : assert(blurScale == 1 || blurScale == .5);
 
   static const baseline = SfFixedGlassPolicy();
+
+  /// The phone comparison isolated the plan conversation's suggestion strip.
+  /// Keep the input's full material and leave ordinary chat on [baseline].
+  static const planCards = SfFixedGlassPolicy(suggestions: false);
   static const experimentIds = {
     'baseline',
     'input_static',
@@ -33,7 +37,7 @@ class SfFixedGlassPolicy {
   static SfFixedGlassPolicy? forConfiguration(String id) => switch (id) {
     'baseline' || 'baseline_prewarmed' || 'chat_baseline' => baseline,
     'input_static' => baseline.copyWith(input: false),
-    'suggestions_static' => baseline.copyWith(suggestions: false),
+    'suggestions_static' => planCards,
     'no_saturation' => baseline.copyWith(saturationEnabled: false),
     'half_blur' => baseline.copyWith(blurScale: .5),
     'no_saturation_half_blur' => baseline.copyWith(
@@ -98,8 +102,9 @@ class SfFixedGlassPolicy {
   int get hashCode => key.hashCode;
 }
 
-/// A page-local policy. Chat keeps its baseline even while a plan experiment
-/// has selected a different material in the internal controller.
+/// A page-local policy. Normal plan conversations use [SfFixedGlassPolicy.planCards]
+/// while ordinary chat keeps its baseline. Internal experiments can provide an
+/// explicit ancestor scope without changing the production default.
 class SfFixedGlassScope extends InheritedWidget {
   const SfFixedGlassScope({
     super.key,

@@ -17,6 +17,7 @@ import '../library_page.dart';
 import '../plan_page.dart';
 import '../player_page.dart';
 import '../theme/app_theme.dart';
+import '../theme/fixed_glass_policy.dart';
 import '../theme/glass.dart';
 import '../theme/sf_icons.dart';
 import '../theme/tokens.dart';
@@ -248,60 +249,63 @@ class _ChatHomePageState extends State<ChatHomePage> {
               children: [
                 // Cards paint a static face; the scrolling conversation is
                 // not a texture capture source. Only the internal legacy-card
-                // comparison restores that boundary. Fixed chips and input
-                // keep their glass material above the conversation.
+                // comparison restores that boundary. The fixed input keeps
+                // its glass; plan conversations use static suggestion chips.
                 LiquidGlassScope(
                   child: ListenableBuilder(
                     listenable: _chat,
-                    builder: (context, _) => Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        Positioned.fill(
-                          child: SfGlassBackgroundSource(
-                            child: Stack(
-                              fit: StackFit.expand,
-                              children: [
-                                const SfGlassField(),
-                                SafeArea(bottom: false, child: _messages()),
-                              ],
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          left: 0,
-                          right: 0,
-                          bottom: 0,
-                          child: SfMeasureSize(
-                            onSize: (s) {
-                              if (mounted &&
-                                  (s.height - _dockHeight).abs() > .5) {
-                                setState(() => _dockHeight = s.height);
-                              }
-                            },
-                            child: SafeArea(
-                              top: false,
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
+                    builder: (context, _) => _withMeasuredGlassDefault(
+                      context,
+                      Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          Positioned.fill(
+                            child: SfGlassBackgroundSource(
+                              child: Stack(
+                                fit: StackFit.expand,
                                 children: [
-                                  SuggestionStrip(
-                                    items: _chat.typing
-                                        ? const []
-                                        : _chat.suggestions,
-                                    onTap: _send,
-                                  ),
-                                  ChatInputBar(
-                                    focusNode: _input,
-                                    onSend: _send,
-                                    enabled: !_chat.typing,
-                                    onPlans: () =>
-                                        _scaffold.currentState?.openDrawer(),
-                                  ),
+                                  const SfGlassField(),
+                                  SafeArea(bottom: false, child: _messages()),
                                 ],
                               ),
                             ),
                           ),
-                        ),
-                      ],
+                          Positioned(
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            child: SfMeasureSize(
+                              onSize: (s) {
+                                if (mounted &&
+                                    (s.height - _dockHeight).abs() > .5) {
+                                  setState(() => _dockHeight = s.height);
+                                }
+                              },
+                              child: SafeArea(
+                                top: false,
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    SuggestionStrip(
+                                      items: _chat.typing
+                                          ? const []
+                                          : _chat.suggestions,
+                                      onTap: _send,
+                                    ),
+                                    ChatInputBar(
+                                      focusNode: _input,
+                                      onSend: _send,
+                                      enabled: !_chat.typing,
+                                      onPlans: () =>
+                                          _scaffold.currentState?.openDrawer(),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -310,6 +314,26 @@ class _ChatHomePageState extends State<ChatHomePage> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _withMeasuredGlassDefault(BuildContext context, Widget child) {
+    // The existing chat notification rebuild also covers newly received and
+    // cleared plans. Do not inspect messages from a scroll listener or ticker.
+    // An explicit experiment/screenshot scope must remain authoritative.
+    if (SfFixedGlassScope.maybeOf(context) != null) return child;
+    final hasPlanCards = _chat.messages.any(
+      (message) =>
+          !message.greeting &&
+          (message.validatedPlan != null ||
+              (message.isPlan && message.plan!.source != 'ai')),
+    );
+    return SfFixedGlassScope(
+      isPlanContext: hasPlanCards,
+      policy: hasPlanCards
+          ? SfFixedGlassPolicy.planCards
+          : SfFixedGlassPolicy.baseline,
+      child: child,
     );
   }
 

@@ -1,0 +1,141 @@
+{
+  "schemaVersion": 1,
+  "reviewDate": "2026-10-23",
+  "status": "visual-review-passed-awaiting-final-package-phone-regression",
+  "renderMethod": "Flutter widget test using normal SmartFitApp entry and real conversation components",
+  "harness": "test/fixed_glass_rendering_test.dart",
+  "entryInjectsFixedGlassScope": false,
+  "entrySetsExperimentPolicy": false,
+  "isDeviceScreenshot": false,
+  "isPerformanceMeasurement": false,
+  "physicalSize": [
+    1170,
+    2532
+  ],
+  "logicalSize": [
+    390,
+    844
+  ],
+  "devicePixelRatio": 3,
+  "glassQuality": "minimal",
+  "starfield": "existing static field, animation preference off; implementation unchanged",
+  "planConversationDefault": "only suggestions static; input keeps original true glass",
+  "scrollCards": "existing static material",
+  "backgroundCapture": false,
+  "checks": {
+    "defaultScreenshotTestsPassed": 2,
+    "suggestionBackdropFilters": 0,
+    "suggestionGlassContainers": 0,
+    "inputBackdropFilters": 2,
+    "inputOriginalBlurAndSaturation": true,
+    "scrollCardsHaveNoBackdropFilters": true,
+    "noBackgroundCaptureSource": true,
+    "differencesConfinedToSuggestionCapsules": true,
+    "planAndInputPixelsUnchangedFromPreviousBaseline": true,
+    "visualReview": "Labels legible; capsules keep their layout and light edge; static material is more opaque. Plan card, background and input match previous baseline pixels."
+  },
+  "phoneEvidenceScope": {
+    "packageVersion": "0.1.0+19",
+    "configuration": "suggestions_static",
+    "theme": "dark",
+    "rasterP99Ms": 5.119,
+    "rasterOverBudgetCount": 0,
+    "steadyFrames": 3603,
+    "lightThemePerformanceMeasuredByTheseImages": false,
+    "finalDefaultPackagePhoneRegressionPending": true
+  },
+  "images": [
+    {
+      "theme": "light",
+      "file": "plan-light-default.png",
+      "baseline": "../fixed-glass-experiment/plan-light-baseline.png",
+      "sizePixels": [
+        1170,
+        2532
+      ],
+      "sha256": "800ce67145cf4bea9901eee3530c8f151541b24159fcc8aea68c803542fa84bc",
+      "baselineSha256": "7488f304b25d5b122a0817dbcbe2fa0e3c60b99c238e3ea168d604736b438e07",
+      "differenceBoundsFromBaselinePixels": [
+        48,
+        2208,
+        1100,
+        2316
+      ],
+      "changedPixels": 96053,
+      "allDifferencesInsideSuggestionStrip": true,
+      "planCardPixelsUnchanged": true,
+      "inputBarPixelsUnchanged": true,
+      "layout": {
+        "theme": "light",
+        "planCardLogicalBounds": {
+          "left": 16.0,
+          "top": 480.0,
+          "width": 358.0,
+          "height": 240.0
+        },
+        "suggestionStripLogicalBounds": {
+          "left": 0.0,
+          "top": 732.0,
+          "width": 390.0,
+          "height": 48.0
+        },
+        "inputBarLogicalBounds": {
+          "left": 0.0,
+          "top": 780.0,
+          "width": 390.0,
+          "height": 64.0
+        },
+        "suggestionBackdropFilters": 0,
+        "inputBackdropFilters": 2,
+        "inputBlur": 1.5,
+        "inputSaturation": 1.1
+      }
+    },
+    {
+      "theme": "dark",
+      "file": "plan-dark-default.png",
+      "baseline": "../fixed-glass-experiment/plan-dark-baseline.png",
+      "sizePixels": [
+        1170,
+        2532
+      ],
+      "sha256": "f96c44cbd7d202651b35ed2aaac1fa9bd838e89fd8d22551472e2e4bb73edb29",
+      "baselineSha256": "aa38563c345663ee0993e225466d2ea555f0f599467efdb68088b69816abe215",
+      "differenceBoundsFromBaselinePixels": [
+        48,
+        2196,
+        1100,
+        2316
+      ],
+      "changedPixels": 105429,
+      "allDifferencesInsideSuggestionStrip": true,
+      "planCardPixelsUnchanged": true,
+      "inputBarPixelsUnchanged": true,
+      "layout": {
+        "theme": "dark",
+        "planCardLogicalBounds": {
+          "left": 16.0,
+          "top": 476.0,
+          "width": 358.0,
+          "height": 240.0
+        },
+        "suggestionStripLogicalBounds": {
+          "left": 0.0,
+          "top": 728.0,
+          "width": 390.0,
+          "height": 52.0
+        },
+        "inputBarLogicalBounds": {
+          "left": 0.0,
+          "top": 780.0,
+          "width": 390.0,
+          "height": 64.0
+        },
+        "suggestionBackdropFilters": 0,
+        "inputBackdropFilters": 2,
+        "inputBlur": 1.2,
+        "inputSaturation": 1.15
+      }
+    }
+  ]
+}

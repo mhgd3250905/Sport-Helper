@@ -2,6 +2,7 @@
 // appearance review candidates, not device screenshots or performance data.
 // Run serially with SF_FIXED_GLASS_SCREENSHOTS=1 and --update-goldens in an
 // internal build. The normal tests do not write files or start an emulator.
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -286,6 +287,101 @@ void main() {
   });
 
   for (final theme in ['light', 'dark']) {
+    testWidgets(
+      'measured default $theme plan screenshot',
+      (tester) async {
+        await _loadFonts();
+        tester.view.physicalSize = const Size(1170, 2532);
+        tester.view.devicePixelRatio = 3;
+        addTearDown(tester.view.reset);
+        final services = await _reviewServices(theme);
+
+        // Exercise the normal App entry. There is no injected fixed-glass
+        // scope or experiment policy: this must render the shipping default.
+        await tester.pumpWidget(
+          SmartFitApp(services: services, fontFamily: 'NotoSansSC'),
+        );
+        await tester.pumpAndSettle();
+        await _precache(tester);
+
+        final card = find.byType(PlanCard);
+        final suggestions = find.byType(SuggestionStrip);
+        final input = find.byType(ChatInputBar);
+        expect(card, findsOneWidget);
+        expect(suggestions, findsOneWidget);
+        expect(input, findsOneWidget);
+        expect(
+          find.descendant(of: card, matching: find.byType(BackdropFilter)),
+          findsNothing,
+        );
+        expect(
+          find.descendant(of: card, matching: find.byType(GlassContainer)),
+          findsNothing,
+        );
+        expect(
+          find.descendant(
+            of: suggestions,
+            matching: find.byType(SfFixedGlassSurface),
+          ),
+          findsNWidgets(4),
+        );
+        expect(
+          find.descendant(
+            of: suggestions,
+            matching: find.byType(BackdropFilter),
+          ),
+          findsNothing,
+        );
+        expect(
+          find.descendant(
+            of: suggestions,
+            matching: find.byType(GlassContainer),
+          ),
+          findsNothing,
+        );
+        final inputGlass = find.descendant(
+          of: input,
+          matching: find.byType(GlassContainer),
+        );
+        expect(inputGlass, findsOneWidget);
+        expect(
+          find.descendant(of: input, matching: find.byType(BackdropFilter)),
+          findsNWidgets(2),
+        );
+        final material = tester.widget<GlassContainer>(inputGlass).settings!;
+        expect(material.blur, theme == 'dark' ? 1.2 : 1.5);
+        expect(material.saturation, theme == 'dark' ? 1.15 : 1.1);
+        expect(find.byType(GlassBackgroundSource), findsNothing);
+        expect(tester.takeException(), isNull);
+
+        final out =
+            Platform.environment['SF_MEASURED_GLASS_SCREENSHOT_DIR'] ??
+            '${Directory.current.path}/docs/screenshots/'
+                'measured-plan-glass-default';
+        Directory(out).createSync(recursive: true);
+        Map<String, double> bounds(Finder finder) {
+          final rect = tester.getRect(finder);
+          return {
+            'left': rect.left,
+            'top': rect.top,
+            'width': rect.width,
+            'height': rect.height,
+          };
+        }
+
+        File('$out/plan-$theme-layout.json').writeAsStringSync(
+          '${const JsonEncoder.withIndent('  ').convert({'theme': theme, 'planCardLogicalBounds': bounds(card), 'suggestionStripLogicalBounds': bounds(suggestions), 'inputBarLogicalBounds': bounds(input), 'suggestionBackdropFilters': 0, 'inputBackdropFilters': 2, 'inputBlur': material.blur, 'inputSaturation': material.saturation})}\n',
+        );
+        await expectLater(
+          find.byType(MaterialApp).first,
+          matchesGoldenFile(Uri.file('$out/plan-$theme-default.png')),
+        );
+        await tester.pumpWidget(const SizedBox.shrink());
+        await tester.pumpAndSettle();
+      },
+      skip: Platform.environment['SF_MEASURED_GLASS_SCREENSHOTS'] != '1',
+    );
+
     testWidgets(
       'fixed glass $theme plan candidate screenshots',
       (tester) async {
