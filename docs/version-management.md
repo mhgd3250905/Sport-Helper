@@ -1,18 +1,36 @@
 # 版本管理与台账
 
-## 当前内测修复候选（2026-10-23，+15）
+更新日期：2026-10-23（Asia/Shanghai）。本文件区分当前保存版本、本地主线与历史交付；验收证据以 [acceptance.md](acceptance.md) 为准，交接入口见 [HANDOVER.md](HANDOVER.md)。
 
-`feat/voice-aac-comparison` 当前 `0.1.0+15`，修复 Android release JNI 存储签名缺陷。internal arm64 身份 `com.ugk.smartfit.internal` / versionCode `2015`，49,384,327B，SHA-256 `6ecdc72d0fb48c8b179e288009cfe8279a50be4bef1391ee7dfdedebf48249fb`。运行依赖/存储后端/用户数据均未迁移或清理；+13/+14 包不再推荐安装。298 测试、分析、三 ABI 最终 DEX 门禁通过，真机 AI/持久日志与 20 分钟训练待验，分支未合并/推送。详见 [修复报告](android-storage-jni-fix-2026-10-23.md)。
+## 当前保存版本（2026-10-23，+15 用户确认通过）
+
+开哥确认最近交付的 +15 测试通过，本次按要求先作本地版本保存并对齐台账。确认原话和证据范围见[验收记录](acceptance.md)，机器可读记录见[版本存档](reports/version-save-0.1.0+15-2026-10-23.json)。
+
+| 项目 | 当前保存事实 |
+| --- | --- |
+| App 版本 / 分支 | `0.1.0+15` / `feat/voice-aac-comparison` |
+| APK 运行源码 | `15079e6fc57be7c1e0d5b6c5f876784f183ce63e`；文档保存节点不冒充新的打包源码 |
+| 本地保存标签 | 注释标签 `smartfit-v0.1.0+15-internal-verified`，指向文档对齐后的保存节点；已有标签不移动 |
+| 本地主线 | `main@94d78cee9550dfbf470c7140e3729260d9b79f2d`，`0.1.0+12`；本次未合并或推送 |
+| 固定 SDK | 两项 App ref 均为 `f684e02f38e652633c23fa8946a53d02b6aa3ea2`，coach 0.3.3 / trainer 0.1.6；不表示 SDK 当前主线 HEAD |
+| 本轮功能 | 全量单声道 AAC-LC 32kbps / 22.05kHz、内测运行日志与文件导出、Android 存储 JNI keep 规则、持久化缓存修复和发布前 JNI 门禁 |
+| 关于页 | `0.1.0+15 (内测)`；pubspec、关于页与日志版本已核对一致 |
+| 交付包 | `.buildlog/install/SmartFit-0.1.0+15-storage-fix-internal-arm64-v8a-release.apk` |
+| 实际 Android 身份 | `com.ugk.smartfit.internal`，versionName `0.1.0`，versionCode `2015`，arm64-v8a，release / 非 debuggable，minSdk 24 / targetSdk 36 |
+| 字节数 / SHA-256 | 49,384,327B（49.38MB / 47.10MiB）；`6ecdc72d0fb48c8b179e288009cfe8279a50be4bef1391ee7dfdedebf48249fb` |
+| 签名与产物保留 | 沿用既有开发证书、v2 校验通过；本次不重建或改写已测 APK，没有新 +15 生产交付包 |
+| 既有验证 | 运行源码 Flutter 298 项、Python 3 项、分析 0 issue、严格锁文件、三 ABI 最终 DEX 门禁及媒体/语音哈希通过 |
+| 用户验收 / 待办 | 本次 +15 测试由开哥确认通过；未补写量化指标，连续 >20 分钟训练与 iOS 专项仍单列待验 |
+
+运行依赖、存储后端与用户数据未迁移或清理；+13/+14 包保留为历史，已因存储缺陷停止推荐。细节见 [Android 修复报告](android-storage-jni-fix-2026-10-23.md)。
 
 ## 上一内测候选（2026-10-23，+14 已由 +15 替代）
 
-`feat/voice-aac-comparison` 当前 `0.1.0+14`，关于页同步；internal arm64 包为 `com.ugk.smartfit.internal` / versionCode `2014`，49,384,327B，SHA-256 `c26b4a3a744566c354887cc7fd7822ebf31ed0080f918bfb702b874a53885710`。保留已选定的全量 AAC-LC，增加本机运行日志与手动导出；两项 SDK ref 仍固定 `f684e02f38e652633c23fa8946a53d02b6aa3ea2`。仅构建新内测候选，没有新建 +14 生产交付包；没有合并或推送。真机保存与持续训练待有设备时进行。详见 [日志交付及核验](internal-runtime-logs-2026-10-23.md)。以下台账保留原日期的历史快照。
+`feat/voice-aac-comparison` 当时为 `0.1.0+14`，internal arm64 包 `com.ugk.smartfit.internal` / versionCode `2014`，49,384,327B，SHA-256 `c26b4a3a744566c354887cc7fd7822ebf31ed0080f918bfb702b874a53885710`。增加本机运行日志后，用户日志暴露存储 JNI 混淆缺陷，现由 +15 替代；当时未合并/推送，也未交付 +14 生产包。原始核验见 [运行日志历史记录](internal-runtime-logs-2026-10-23.md)。
 
-更新日期：2026-10-22（Asia/Shanghai）。本文件是源码里程碑、App 包版本与交付包身份的统一台账；验收证据及待验清单以 [acceptance.md](acceptance.md) 为准，角色与历史交接见 [HANDOVER.md](HANDOVER.md)。
+## PR #5 与 M7 台账快照（2026-10-22，历史）
 
-## 当前版本
-
-| 项目 | 当前事实 / 事实来源 |
+| 项目 | 当时记录 / 事实来源 |
 | --- | --- |
 | 主线与合并 | 2026-10-22 按开哥授权修复并通过审核，PR #5 以 `172366c6527d999b7817d97fe386e442f70f0e20` 合入 main；合并树与已测 head 完全一致，本地已快进同步 |
 | 验收分支 / 运行源码 | `feat/ui-polish@f92cbc936a123b77bc43d2a23987d928596eaefd`；计划卡展开动画、标题布局与键盘焦点修复，保留 SDK 0.3.3 和无顶部栏界面 |
@@ -22,13 +40,13 @@
 | PR #3 合并提交 | `a5997ef7aef2695b24cab3f4b330543bbb2c7027` |
 | PR #3 已测源 | `7ef80d75331a150b6a258ef3ba0c27832fd1e54b`；合并树相同，至上述主线快照只增加 3 份文档 |
 | Android 身份 | `com.ugk.smartfit`，App 名「智能健身助手」 |
-| 默认包版本 | 当前 main `0.1.0+9`：versionName `0.1.0`、versionCode `9`；pubspec 与关于页同步，旧 +8 等身份保留为历史 |
+| 默认包版本 | 当时 main `0.1.0+9`：versionName `0.1.0`、versionCode `9`；pubspec 与关于页同步，旧 +8 等身份保留为历史 |
 | 关于页版本 | `0.1.0+9 (MVP)`；独立常量见 [about_page.dart](../lib/ui/about_page.dart) |
 | 资源版本 | 93 个动作包为 `1.1.0`；公共包 `_common` 为 `1.0.0`；格式版本仍为 `1`，见 [小包规范](drill-pack-spec.md) 与 [索引](../assets/packs/index.json) |
 | 交付状态 | PR #5 仅编译验证，未交付或安装新 APK。此前 SDK 0.3.3 / +9 debug APK 仍为 208,043,503 bytes，不含 PR #5；未将真机已装的 UI +10 降级 |
 | 验收状态 | PR #5 全量 253 测试、分析 0 issue、严格锁文件、Web/Android debug 构建及浏览器交互通过，见 [审核记录](pr5-local-review.md)。AI 链路未改；此前六条 Worker 的身份与复用边界仍见 [0.3.3 报告](coach-033-smoke-2026-10-21.md) |
 
-Git 标签、App 包版本与资源版本分别管理。`m7` 不代表 Android versionCode 为 7；此前为 `+1` M7、`+2` 训练接入、`+3` 目录节奏修复、`+4/+5` JSON 信封、`+6` 工具会话、`+7` 首次 Skill Agent 分支；SDK 0.3.2 接入阶段为 `0.1.0+8`，当前 UI 主线为 `0.1.0+9`。没有形成可交付 release 包。
+Git 标签、App 包版本与资源版本分别管理。`m7` 不代表 Android versionCode 为 7；该历史阶段依次为 `+1` M7、`+2` 训练接入、`+3` 目录节奏修复、`+4/+5` JSON 信封、`+6` 工具会话、`+7` 首次 Skill Agent 分支、`+8` SDK 0.3.2、`+9` UI 主线；当时尚无可交付 release 包。后续 +12/+13/+14/+15 release 以顶部当前台账及各阶段报告为准。
 
 ## SDK 0.3.3 提速接入（0.1.0+9，已合 main 并推送）
 
@@ -231,6 +249,7 @@ PR #3 合并提交与已测源的树均为 `029a952876a816ffa72f28def688cd62ba34
 5. 覆盖安装前核对包名、签名和版本兼容性，保留用户数据。正式 keystore 仅在本机管理，切换证书须另行安排迁移，不能把现有 debug 证书记为正式签名。
 6. 动作包版本按 [小包规范 §6](drill-pack-spec.md#6-版本规则) 更新；生成内容通过 `tools/` 重建并校验，不手改生成的文件清单与索引。
 7. 新验证结果先写验收记录，再更新本台账的状态和交接入口。APK、build 产物、密钥、keystore、`local.properties` 不入 Git；Snow CC BY 4.0 署名保留。
+8. 用户明确要求保存版本时可创建本地注释标签。本次 `smartfit-v0.1.0+15-internal-verified` 记录内测交付与用户确认，不代替生产发布、专项验收或主线合并；推送另按当次授权执行。
 
 查询当前主线、里程碑和本台账最近提交：
 

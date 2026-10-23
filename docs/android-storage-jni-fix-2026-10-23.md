@@ -1,5 +1,7 @@
 # Android 发布包存储 / AI 路由修复（+15）
 
+**2026-10-23 后续状态：开哥确认本次 +15 测试通过，已作本地版本保存。** 运行源码 `15079e6fc57be7c1e0d5b6c5f876784f183ce63e`，本地标签 `smartfit-v0.1.0+15-internal-verified`；确认原话与范围见[验收记录](acceptance.md)。本报告保留修复时的独立证据，模拟器尝试结果不改写成通过；连续训练与 iOS 专项仍单列。
+
 ## 手机日志确认的事实
 
 用户提供的 `SmartFit-runtime-20261023T004906692417Z.json` 来自 Android internal `0.1.0+14`，47 条连续事件覆盖北京时间 08:48:41–08:49:06。文件 SHA-256 为 `d305e5806a047f16aa01602b2446df999f52fc1fb78d73ea2118ae10cd15ce41`，原件未修改；摘要见 [手机日志分析](reports/phone-storage-failure-2026-10-23.json)。
@@ -35,12 +37,12 @@
 - 三个 internal release ABI 的 JNI 检查均通过。已保存 [+13 production 失败报告](reports/storage-jni-plus13-production-negative-2026-10-23.json)、[+14 失败报告](reports/storage-jni-plus14-negative-2026-10-23.json)、[+15 arm64 通过报告](reports/storage-jni-plus15-arm64-2026-10-23.json)。
 - 全部 695 段 AAC-LC、5 段提示音、413 份训练媒体的库存和哈希再次通过；[同口径包内占用](reports/apk-storage-fix-internal-size-2026-10-23.json)。
 - 创建了工作区内全新的独立 API29/API35 x86_64 AVD，所有 ADB 操作均指定这两个自建模拟器，未连接或操作用户手机、未改已有 AVD。模拟器能启动并安装 APK，但启动完整 App 后宿主模拟器进程退出（两种 release 包均出现，包含禁用 Vulkan 的尝试）；**没有完成模拟器运行验收**，不能据此声称 +15 真机 AI 请求或日志保存已通过。
-- 真机覆盖升级后，需用同一问题复测并导出日志，确认 `chat.engine.route=sdk / hasDeviceIdentity=true`、出现 `ai.request.* / ai.turn.end`、`persistenceFailed=false`，并重启后保留记录。20 分钟训练仍待有设备时验收。以上待验不使用此前网页结果替代。
+- 修复交付时的真机复测方法是：同一问题复测并导出日志，检查 `chat.engine.route=sdk / hasDeviceIdentity=true`、`ai.request.* / ai.turn.end`、`persistenceFailed=false` 及重启保留。此后开哥已确认本次测试通过；未收到新的逐项日志，本次不补写耗时、token 或重启指标。>20 分钟连续训练仍待专项验收，iOS 结果另行确认。
 
-## 交付候选
+## 已获用户通过确认的内测交付
 
 内测 arm64：`.buildlog/install/SmartFit-0.1.0+15-storage-fix-internal-arm64-v8a-release.apk`。
 
 `com.ugk.smartfit.internal` / `0.1.0` / versionCode **2015**，arm64-only，非 debuggable，v2 签名验证通过，证书与 +14 相同，可覆盖升级。**49,384,327B = 49.38MB**，SHA-256 `6ecdc72d0fb48c8b179e288009cfe8279a50be4bef1391ee7dfdedebf48249fb`。原 +13/+14 文件保留但不再建议安装。没有新建 +15 生产交付包。
 
-候选代码在 `feat/voice-aac-comparison`；仍待开哥验收同意后合并并推送，main 未改变。
+代码在 `feat/voice-aac-comparison`。开哥本次要求先保存版本并更新文档，已登记用户通过确认；本次未执行合并、推送或公开发布，main 未改变。

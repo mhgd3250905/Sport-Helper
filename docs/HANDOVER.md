@@ -1,14 +1,16 @@
 # 智能健身助手（SmartFit）交接说明
 
-## 当前修复候选（2026-10-23，+15 待真机验收）
+## 当前交接入口（2026-10-23，+15 用户确认通过并保存）
 
-用户手机 +14 日志确认：Key 已配置，设备标识存储抛 PlatformException，整个引擎走本地，0 AI 请求。交付 APK 独立证实 shared_preferences_android 2.5.0 的 JNI 参数被 R8 改名；+13 production 同样有此缺陷。已补官方六条 keep 规则、修复失败写入后读取脏缓存标识、增加发布 APK 的 JNI 门禁和原生错误码日志。+15 internal arm64 为 49,384,327B，298 测试/分析/三 ABI 门禁通过；独立模拟器完整 App 启动后宿主进程退出，运行验收未完成，不能冒充真机验证。新的候选与证据见 [Android 存储修复](android-storage-jni-fix-2026-10-23.md)。原 +14 由本候选替代，分支未合并/推送。
+开哥已反馈本次 +15 测试通过，并要求先保存版本、对齐文档和台账。运行源码固定 `15079e6fc57be7c1e0d5b6c5f876784f183ce63e`；保存标签为本地 `smartfit-v0.1.0+15-internal-verified`，分支 `feat/voice-aac-comparison`。internal arm64 APK 49,384,327B，SHA-256 `6ecdc72d0fb48c8b179e288009cfe8279a50be4bef1391ee7dfdedebf48249fb`；本次核对文件身份，沿用该源码的 298 测试、3 项 Python 测试及三 ABI JNI 门禁结果，不重建用户已测包。详见[本轮验收](acceptance.md)、[版本台账](version-management.md)及[版本保存记录](reports/version-save-0.1.0+15-2026-10-23.json)。
 
-## 当前内测分支（2026-10-23，待开哥验收）
+该版本包含全量 AAC-LC、内测运行日志、Android 存储 JNI 与失败写入缓存修复；旧 +13/+14 存储缺陷证据见 [Android 存储修复](android-storage-jni-fix-2026-10-23.md)。App 两项依赖仍固定 SDK `f684e02f38e652633c23fa8946a53d02b6aa3ea2`（coach 0.3.3 / trainer 0.1.6），不把它写成 SDK 当前主线 HEAD。本次只完成本地版本保存，App 本地 main 仍为 `94d78cee9550dfbf470c7140e3729260d9b79f2d` / +12，未合并或推送。连续 >20 分钟训练和 iOS 验收仍单列待办；用户的一般通过反馈不补写量化测试数据。
+
+## +14 运行日志阶段（2026-10-23，历史，已由 +15 替代）
 
 `feat/voice-aac-comparison` 已完成全量 695 段 AAC-LC 与 `0.1.0+14` 内测运行日志：设置里可保存 JSON 到手机文件；记录 AI/本地路由、请求与回退、素材、训练和语音关键节点。arm64 internal release 为 49,384,327B。全量 291 测试通过，后续日志关联修正的相关 29 项通过，分析 0 issue；网页实际生成 AI 计划并导出日志通过。没有手机可继续验收，Android 实际保存/iOS 与 20 分钟训练仍待验。详见 [运行日志交付](internal-runtime-logs-2026-10-23.md) 与 [语音交付](voice-lc32-release-2026-10-22.md)。本分支尚未合并/推送，等待开哥确认；下方为历史阶段记录。
 
-## 当前交接入口（2026-10-22，PR #5 已修复、通过审核并合 main）
+## PR #5 交接记录（2026-10-22，历史，已修复审核并合 main）
 
 计划卡展开精简与共享元素动画已合 main：最终已测 head `f92cbc936a123b77bc43d2a23987d928596eaefd`，合并提交 `172366c6527d999b7817d97fe386e442f70f0e20`，两者文件树完全一致。标题按收起按钮实际宽度让位，隐藏卡片隔离键盘焦点；253 项测试、分析 0 issue、严格锁文件、Web release / Android debug 构建及正式浏览器交互通过。GitHub review 为 APPROVED。保持 SDK 0.3.3 与无顶部栏界面，没有新交付 APK、设备安装或 Worker 请求；先前交付包不包含本次计划卡优化。下一步等待开哥安排，证据见 [PR #5 审核记录](pr5-local-review.md)。
 

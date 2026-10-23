@@ -1,5 +1,27 @@
 # 本机验收记录
 
+## +15 用户确认与版本保存（2026-10-23）
+
+开哥在本会话反馈：“我测试通过了 你先做一个版本保存 文档对齐台账更新”。关联最近交付的 `0.1.0+15` internal arm64 修复包，本轮状态更新为 **用户确认测试通过，保存本地版本**。
+
+| 项目 | 已核对结果 / 证据 |
+| --- | --- |
+| 运行源码 | `15079e6fc57be7c1e0d5b6c5f876784f183ce63e`，分支 `feat/voice-aac-comparison` |
+| 版本保存标签 | 本地注释标签 `smartfit-v0.1.0+15-internal-verified`；指向本次文档对齐节点，运行代码保持上述提交 |
+| 交付 APK | `SmartFit-0.1.0+15-storage-fix-internal-arm64-v8a-release.apk`，本机 `.buildlog/install/` 保留 |
+| 包身份 | `com.ugk.smartfit.internal` / versionName `0.1.0` / versionCode `2015`，arm64-v8a，release / 非 debuggable，minSdk 24 / targetSdk 36 |
+| 大小 / SHA-256 | 49,384,327B（49.38MB）；`6ecdc72d0fb48c8b179e288009cfe8279a50be4bef1391ee7dfdedebf48249fb`；本次重新读取文件核对一致 |
+| 固定依赖 | App 两项 SDK ref 均为 `f684e02f38e652633c23fa8946a53d02b6aa3ea2`，coach 0.3.3 / trainer 0.1.6；这是 App 固定依赖，不代表 SDK 当前主线 HEAD |
+| 已有自动化证据 | 运行源码的 Flutter 298 项、Python 3 项、分析 0 issue、严格锁文件、三 ABI release JNI 门禁和资源哈希通过，沿用[修复记录](android-storage-jni-fix-2026-10-23.md) |
+| 用户验收证据 | 当前会话的通过确认；本次没有新增逐项设备日志、耗时或 token 数字 |
+| 本次保存范围 | 文档、验收记录、台账和本地注释标签；未重建已测 APK，未合并或推送 |
+
+该确认不扩展为此前暂缓的连续 >20 分钟训练或 iOS 验收通过；这些仍按[连续训练清单](physical-release-acceptance.md)单独记录。+13/+14 的存储缺陷及旧失败证据保留，当前推荐包为 +15。机器可读存档见[版本保存记录](reports/version-save-0.1.0+15-2026-10-23.json)。
+
+## AAC-LC 与运行日志阶段（+13 → +15，2026-10-22–23）
+
+695 条语音已按开哥选择转换为单声道 AAC-LC 32kbps / 22.05kHz，原件不覆盖；动作素材按内置与下载组合保持 413 文件 / 14,883,430B。+14 增加运行日志，手机日志揭示存储 JNI 混淆使设备标识读取失败、整段走本地引擎。+15 补官方 Kotlin keep 规则、修复失败写入后的缓存标识读取，并增加最终 APK JNI 检查。阶段证据分别见[语音转换](voice-lc32-release-2026-10-22.md)、[运行日志](internal-runtime-logs-2026-10-23.md)和[Android 存储修复](android-storage-jni-fix-2026-10-23.md)；本次用户通过确认以本页顶部为准。
+
 ## release 分包与语音统计（0.1.0+12，2026-10-22）
 
 开哥批准后已先推送 SDK main `df90e7c`，再推送 App main `8f1f3c5`。随后按明确选择增加隔离的 internal release，SDK trainer 0.1.6 `f684e02` 已先发布；App APK 运行源码为 `4fdf8ac`。生产 / 内测 arm64 release 均约 55.71 MB（55,712,099 / 55,711,995 B），较上轮 debug 通用包减少 72.08%；三 ABI 分包均已构建，调试 Kernel、VM snapshots、Vulkan 验证库均未打包。生产门禁与 HTTPS 限制保留，内测独立应用 ID。App 265 项测试、分析 0 issue；trainer 145 项及 AOT 编译策略矩阵 18/18 通过。695 条语音未改，原本已是 AAC 单声道，逐条时长/码率及低码率预算已交付。开哥确认目前没有真机，连续 >20 分钟真机训练仍未执行，不能记为已通过。详见 [release 记录](release-size-2026-10-22.md) 与 [待执行清单](physical-release-acceptance.md)。

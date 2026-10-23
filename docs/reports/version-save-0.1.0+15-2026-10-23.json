@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "savedOn": "2026-10-23",
+  "timezone": "Asia/Shanghai",
+  "version": "0.1.0+15",
+  "distribution": "internal",
+  "status": "user_confirmed_test_passed",
+  "branch": "feat/voice-aac-comparison",
+  "runtimeSourceCommit": "15079e6fc57be7c1e0d5b6c5f876784f183ce63e",
+  "localAnnotatedTag": "smartfit-v0.1.0+15-internal-verified",
+  "tagTarget": "documentation_save_commit_with_unchanged_runtime_code",
+  "userAcceptance": {
+    "source": "current_conversation_user_confirmation",
+    "originalMessage": "我测试通过了 你先做一个版本保存 文档对齐台账更新",
+    "associatedDelivery": "latest_delivered_plus15_internal_arm64_apk",
+    "scope": "User confirms this delivered fix passed their test; no new per-item measurements were supplied.",
+    "newDeviceTraceSupplied": false,
+    "newTimingOrTokenMetricsAdded": false
+  },
+  "apk": {
+    "path": ".buildlog/install/SmartFit-0.1.0+15-storage-fix-internal-arm64-v8a-release.apk",
+    "bytes": 49384327,
+    "sha256": "6ecdc72d0fb48c8b179e288009cfe8279a50be4bef1391ee7dfdedebf48249fb",
+    "package": "com.ugk.smartfit.internal",
+    "versionName": "0.1.0",
+    "versionCode": 2015,
+    "abis": ["arm64-v8a"],
+    "buildMode": "release",
+    "debuggable": false,
+    "minSdk": 24,
+    "targetSdk": 36,
+    "sizeHashAndBadgingRecheckedOnSave": true,
+    "retainedOriginalArtifact": true,
+    "rebuiltForThisSave": false
+  },
+  "appPinnedSdk": {
+    "commit": "f684e02f38e652633c23fa8946a53d02b6aa3ea2",
+    "coach": "0.3.3",
+    "trainer": "0.1.6",
+    "describesCurrentSdkHead": false
+  },
+  "existingValidation": {
+    "sourceCommit": "15079e6fc57be7c1e0d5b6c5f876784f183ce63e",
+    "flutterTestsPassed": 298,
+    "pythonTestsPassed": 3,
+    "analysisIssues": 0,
+    "strictLockfilePassed": true,
+    "releaseJniGateAbisPassed": ["armeabi-v7a", "arm64-v8a", "x86_64"],
+    "voiceClipsVerified": 695,
+    "commonChimesVerified": 5,
+    "trainingMediaFilesVerified": 413,
+    "rerunForDocumentationOnlySave": false
+  },
+  "localMainAtSave": {
+    "commit": "94d78cee9550dfbf470c7140e3729260d9b79f2d",
+    "version": "0.1.0+12"
+  },
+  "deferredAcceptance": [
+    "Android continuous training longer than 20 minutes with per-item evidence",
+    "iOS compilation, playback and file-export acceptance"
+  ],
+  "mergePerformed": false,
+  "pushPerformed": false,
+  "newProductionApkCreated": false
+}

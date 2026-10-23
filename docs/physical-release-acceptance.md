@@ -1,11 +1,10 @@
 # arm64 release 真机连续训练验收
 
-状态：**未执行，等待真机**。2026-10-22 ADB 未列出设备，开哥确认“目前没有真机”。没有用模拟器、组件测试或编译成功代替本项结果。
+状态：**连续 >20 分钟专项仍待执行**。2026-10-23 开哥确认 +15 本次测试通过，已记入[用户验收](acceptance.md)；该反馈未提供连续训练时长或本表逐项结果，因此不替代本专项。2026-10-22 的“目前没有真机”是当时记录，不代表当前设备状况。
 
-待用包为独立 `internal` flavor 的 arm64 release，应用 ID `com.ugk.smartfit.internal`，名称“智能健身助手·内测”，与原 App 数据隔离。使用 release/AOT 编译、现有开发签名；待审核动作及 LAN HTTP 仅在此内测构建显式启用。生产 release 仍保留审核门禁和 HTTPS 限制。APK 哈希与字节以 [release 体积记录](release-size-2026-10-22.md) 为准。
+当前专项待用包为独立 `internal` flavor 的 +15 arm64 release，应用 ID `com.ugk.smartfit.internal`，名称“智能健身助手·内测”，与 production 数据隔离。使用 release/AOT 编译、现有开发签名；待审核动作及 LAN HTTP 仅在此内测构建显式启用。生产 release 仍保留审核门禁和 HTTPS 限制。APK 哈希与字节以[当前版本台账](version-management.md)为准。
 
-2026-10-22 语音选定 LC 后，新待验收包改为 `SmartFit-0.1.0+13-lc32-internal-arm64-v8a-release.apk`。
-对应哈希、体积及平台播放待验项见 [LC 全量转换记录](voice-lc32-release-2026-10-22.md)。请使用新包确认压缩后语音首尾与拼接节奏。
+使用 `SmartFit-0.1.0+15-storage-fix-internal-arm64-v8a-release.apk`，versionCode `2015`，49,384,327B，SHA-256 `6ecdc72d0fb48c8b179e288009cfe8279a50be4bef1391ee7dfdedebf48249fb`。+13/+14 已发现发布包存储缺陷，不再作为待验包；+15 保留已选 AAC-LC 音频，专项仍需记录语音首尾与拼接节奏。
 
 ## 准备
 
