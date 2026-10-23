@@ -11,6 +11,8 @@
 
 ## 版本与验收入口
 
+2026-10-23 流畅度审核分支 `feat/performance-baseline` 正在准备 **`0.1.0+16` 内测性能基线**：仅增加内存帧统计、场景分组和系统分享，不先修改业务/视觉或 SDK。开哥导出手机基线后，再据实测决定修复与对比；本轮尚未合并推送。[基线采集说明](docs/performance-baseline-2026-10-23.md)、[App 与 SDK 静态审核](docs/performance-static-audit-2026-10-23.md)。
+
 2026-10-23 当前保存版本为 **`0.1.0+15` internal**，运行源码 `15079e6`，本地注释标签 `smartfit-v0.1.0+15-internal-verified`。开哥确认本次测试通过；arm64 release 为 **49,384,327B / 49.38MB**，包含已选 AAC-LC、内测运行日志与 Android 存储 JNI 修复。App 两项 SDK 依赖固定 `f684e02`（coach 0.3.3 / trainer 0.1.6）。当前仅保存版本及对齐文档，尚未合并或推送；连续 >20 分钟训练和 iOS 专项单独待验。入口：[验收记录](docs/acceptance.md)、[当前台账](docs/version-management.md)、[修复详情](docs/android-storage-jni-fix-2026-10-23.md)。下方为历史阶段。
 
 2026-10-22 已按开哥授权修复、通过审核并合并 [PR #5](https://github.com/mhgd3250905/Sport-Helper/pull/5)，合并提交 `172366c6527d999b7817d97fe386e442f70f0e20`。计划卡展开后大图过渡到首行动作缩略图，标题与收起按钮适配大字体，隐藏卡片退出键盘焦点。253 项测试、分析 0 issue、Web/Android debug 构建及浏览器交互通过；SDK 0.3.3 与顶部栏改动保留。本轮未交付或安装新 APK，[审核、截图与边界](docs/pr5-local-review.md)。

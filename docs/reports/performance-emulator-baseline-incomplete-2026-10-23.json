@@ -1,0 +1,234 @@
+{
+  "schema": 1,
+  "reportType": "frame_performance",
+  "app": "smartfit",
+  "startedAt": "2026-10-23T03:06:40.387192Z",
+  "exportedAt": "2026-10-23T03:09:31.880815Z",
+  "enabled": true,
+  "running": true,
+  "collecting": true,
+  "currentPage": "action_library",
+  "currentScenario": null,
+  "currentRefreshRateHz": 60.000003814697266,
+  "metadata": {
+    "appVersion": "0.1.0",
+    "appBuild": "16",
+    "appBaseCommit": "c35068003fe484f793ce051134444ae3b0172c4d",
+    "sdkRef": "f684e02f38e652633c23fa8946a53d02b6aa3ea2",
+    "appSource": "working_tree",
+    "measurementKind": "baseline",
+    "flavor": "internal",
+    "buildMode": "profile",
+    "platform": "android",
+    "renderer": "unverified",
+    "metadataStatus": "available",
+    "refreshRateSource": "flutter_display",
+    "appearance": "system",
+    "theme": "light",
+    "starfield": true,
+    "glassQuality": "standard",
+    "contentActionCount": 93,
+    "chatMessageCount": 13,
+    "deviceModel": "sdk_gphone64_x86_64",
+    "deviceManufacturer": "Google",
+    "systemVersion": "15",
+    "deviceApiLevel": 35,
+    "appBuildNumber": 16,
+    "isEmulator": true
+  },
+  "definitions": {
+    "durations": "milliseconds; UI is FrameTiming.buildDuration; raster is FrameTiming.rasterDuration",
+    "coverage": "Flutter engine frame timings only; embedded WebView compositor and video frames are not measured; no screen-present FPS or actual display-present dropped-frame measurement is provided",
+    "overBudgetFrames": "duration > 1000 / refreshRateHz, separately per thread; union counts a frame once when either thread exceeds budget",
+    "estimatedMissedVsyncs": "sum(max(0, ceil(max(buildUs, rasterUs) / (1000000 / refreshRateHz)) - 1)); throughput estimate, not measured display-present drops",
+    "percentiles": "nearest rank, logarithmic histogram upper bound capped at observed maximum; error <= 6.25% of duration or 1 microsecond; averages and worst frames are exact",
+    "attribution": "labels start on next scheduler frame; PlatformDispatcher.frameData.frameNumber matches FrameTiming.frameNumber; delayed batches use retained frame-key history, not callback time or presentation timestamps",
+    "unattributed": "frames without retained label history are counted and excluded from duration/budget statistics rather than guessed",
+    "lifecycle": "only resumed state is collected; engine batches pending at stop/pause may not be delivered; pre-reset frames are excluded",
+    "refreshRate": "per-frame label rate; initial 60 Hz is an assumption until the app supplies a display rate",
+    "scenarios": "one explicit scenario at a time; frames outside a scenario remain in totals and page statistics; settings and performance_settings pages are excluded from scenario statistics",
+    "conditionChangesDuringCapture": "number of changes to previously supplied theme, appearance, starfield, glassQuality or refresh-rate values while running; initial values and device metadata readiness do not count; reset clears the count and retains current conditions"
+  },
+  "retention": {
+    "maxPages": 32,
+    "maxScenarios": 8,
+    "histogramBucketsPerThread": 1024,
+    "maxLabelTransitions": 128,
+    "retainedLabelTransitions": 17,
+    "evictedLabelTransitions": 0,
+    "pageOverflow": "additional page identifiers aggregate in otherPages",
+    "perFrameSamplesStored": 0
+  },
+  "receivedFrameCount": 1124,
+  "recordedFrameCount": 1124,
+  "unattributedFrameCount": 0,
+  "ignoredBeforeSessionFrameCount": 0,
+  "ignoredInactiveFrameCount": 0,
+  "invalidTimingFrameCount": 0,
+  "invalidPageLabelCount": 0,
+  "unavailableFrameKeyBoundaryCount": 0,
+  "conditionChangesDuringCapture": 0,
+  "total": {
+    "frameCount": 1124,
+    "uiBuild": {
+      "averageMs": 1.0094359430604982,
+      "p90Ms": 1.599,
+      "p99Ms": 4.607,
+      "worstMs": 39.577,
+      "overBudgetFrames": 1
+    },
+    "raster": {
+      "averageMs": 9.468465302491104,
+      "p90Ms": 17.407,
+      "p99Ms": 20.479,
+      "worstMs": 44.891,
+      "overBudgetFrames": 130
+    },
+    "eitherThreadOverBudgetFrames": 131,
+    "estimatedMissedVsyncs": 133,
+    "refreshRatesHz": [
+      60.000003814697266
+    ],
+    "refreshRatesTruncated": false
+  },
+  "pages": {
+    "action_library": {
+      "frameCount": 995,
+      "uiBuild": {
+        "averageMs": 1.013905527638191,
+        "p90Ms": 1.599,
+        "p99Ms": 4.607,
+        "worstMs": 39.577,
+        "overBudgetFrames": 1
+      },
+      "raster": {
+        "averageMs": 10.034276381909548,
+        "p90Ms": 17.407,
+        "p99Ms": 22.527,
+        "worstMs": 44.891,
+        "overBudgetFrames": 124
+      },
+      "eitherThreadOverBudgetFrames": 125,
+      "estimatedMissedVsyncs": 127,
+      "refreshRatesHz": [
+        60.000003814697266
+      ],
+      "refreshRatesTruncated": false
+    },
+    "exercise_details": {
+      "frameCount": 129,
+      "uiBuild": {
+        "averageMs": 0.9749612403100776,
+        "p90Ms": 1.471,
+        "p99Ms": 3.711,
+        "worstMs": 4.474,
+        "overBudgetFrames": 0
+      },
+      "raster": {
+        "averageMs": 5.104263565891474,
+        "p90Ms": 13.823,
+        "p99Ms": 17.608,
+        "worstMs": 17.608,
+        "overBudgetFrames": 6
+      },
+      "eitherThreadOverBudgetFrames": 6,
+      "estimatedMissedVsyncs": 6,
+      "refreshRatesHz": [
+        60.000003814697266
+      ],
+      "refreshRatesTruncated": false
+    }
+  },
+  "otherPages": {
+    "frameCount": 0,
+    "uiBuild": {
+      "averageMs": null,
+      "p90Ms": null,
+      "p99Ms": null,
+      "worstMs": null,
+      "overBudgetFrames": 0
+    },
+    "raster": {
+      "averageMs": null,
+      "p90Ms": null,
+      "p99Ms": null,
+      "worstMs": null,
+      "overBudgetFrames": 0
+    },
+    "eitherThreadOverBudgetFrames": 0,
+    "estimatedMissedVsyncs": 0,
+    "refreshRatesHz": [],
+    "refreshRatesTruncated": false
+  },
+  "scenarios": {
+    "actionListScroll": {
+      "frameCount": 556,
+      "uiBuild": {
+        "averageMs": 0.9244424460431654,
+        "p90Ms": 1.663,
+        "p99Ms": 3.199,
+        "worstMs": 39.577,
+        "overBudgetFrames": 1
+      },
+      "raster": {
+        "averageMs": 14.27325,
+        "p90Ms": 17.407,
+        "p99Ms": 22.527,
+        "worstMs": 26.225,
+        "overBudgetFrames": 112
+      },
+      "eitherThreadOverBudgetFrames": 113,
+      "estimatedMissedVsyncs": 114,
+      "refreshRatesHz": [
+        60.000003814697266
+      ],
+      "refreshRatesTruncated": false
+    },
+    "filterSwitch": {
+      "frameCount": 323,
+      "uiBuild": {
+        "averageMs": 1.2539411764705883,
+        "p90Ms": 1.727,
+        "p99Ms": 6.399,
+        "worstMs": 9.728,
+        "overBudgetFrames": 0
+      },
+      "raster": {
+        "averageMs": 5.030352941176471,
+        "p90Ms": 11.263,
+        "p99Ms": 19.455,
+        "worstMs": 44.891,
+        "overBudgetFrames": 12
+      },
+      "eitherThreadOverBudgetFrames": 12,
+      "estimatedMissedVsyncs": 13,
+      "refreshRatesHz": [
+        60.000003814697266
+      ],
+      "refreshRatesTruncated": false
+    },
+    "actionDetail": {
+      "frameCount": 240,
+      "uiBuild": {
+        "averageMs": 0.8871125,
+        "p90Ms": 1.215,
+        "p99Ms": 3.583,
+        "worstMs": 4.474,
+        "overBudgetFrames": 0
+      },
+      "raster": {
+        "averageMs": 4.43775,
+        "p90Ms": 8.191,
+        "p99Ms": 17.608,
+        "worstMs": 17.608,
+        "overBudgetFrames": 6
+      },
+      "eitherThreadOverBudgetFrames": 6,
+      "estimatedMissedVsyncs": 6,
+      "refreshRatesHz": [
+        60.000003814697266
+      ],
+      "refreshRatesTruncated": false
+    }
+  }
+}

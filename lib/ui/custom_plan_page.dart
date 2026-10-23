@@ -75,7 +75,7 @@ class _CustomPlanPageState extends State<CustomPlanPage> {
     await s.store.rememberPlan(plan);
     if (!mounted) return;
     await Navigator.of(context).push(
-      MaterialPageRoute<void>(builder: (_) => PlanPage(
+      MaterialPageRoute<void>(settings: const RouteSettings(name: 'plan'), builder: (_) => PlanPage(
         plan: plan,
         request: const DescriptionMatcher().apply(req.description, req),
       )),

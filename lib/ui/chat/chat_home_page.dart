@@ -90,8 +90,19 @@ class _ChatHomePageState extends State<ChatHomePage> {
     }
   }
 
-  Future<void> _push(Widget page) =>
-      Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => page));
+  Future<void> _push(Widget page) => Navigator.of(context).push(
+    MaterialPageRoute<void>(
+      settings: RouteSettings(
+        name: switch (page) {
+          LibraryPage() => 'library',
+          AboutPage() => 'settings',
+          CustomPlanPage() => 'custom_plan',
+          _ => 'other',
+        },
+      ),
+      builder: (_) => page,
+    ),
+  );
 
   /// Close the drawer first so the chat (or the player) is what you see.
   void _fromDrawer(Future<void> Function() then) {
@@ -145,6 +156,7 @@ class _ChatHomePageState extends State<ChatHomePage> {
   Future<void> _details(ChatMessage m, {TrainingPlan? validatedPlan}) async {
     final plan = await Navigator.of(context).push<TrainingPlan>(
       MaterialPageRoute(
+        settings: const RouteSettings(name: 'plan'),
         builder: (_) => PlanPage(
           plan: validatedPlan ?? m.plan!,
           request: m.request,

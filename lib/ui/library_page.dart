@@ -123,6 +123,7 @@ class _LibraryPageState extends State<LibraryPage> {
 Future<void> showExerciseDetails(BuildContext context, Exercise e) =>
     showModalBottomSheet<void>(
       context: context,
+      routeSettings: const RouteSettings(name: 'exercise_details'),
       isScrollControlled: true,
       sheetAnimationStyle: SfMotion.sheet,
       builder: (c) => SafeArea(

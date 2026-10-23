@@ -2,16 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
 import '../app/services.dart';
+import '../app/build_info.dart';
 import '../app/training_media_config.dart';
 import '../chat/safety_script.dart' show disclaimerText;
 import '../diagnostics/runtime_log.dart';
+import '../diagnostics/frame_recorder.dart';
+import 'performance_settings.dart';
 import 'runtime_log_settings.dart';
 import 'theme.dart';
 import 'training_media_settings.dart';
 
 const appVersion = TrainingMediaConfig.isInternal
-    ? '0.1.0+15 (内测)'
-    : '0.1.0+15 (MVP)';
+    ? '${AppBuildInfo.version} (内测)'
+    : '${AppBuildInfo.version} (MVP)';
 
 class AboutPage extends StatelessWidget {
   const AboutPage({super.key});
@@ -90,6 +93,23 @@ class AboutPage extends StatelessWidget {
             ],
             const SfSectionTitle('AI 记忆'),
             const SfPanel(child: _AiMemorySettings()),
+            if (FrameRecorder.buildEnabled) ...[
+              const SfSectionTitle('性能'),
+              SfPanel(
+                child: SfListRow(
+                  key: const ValueKey('performance-report-open'),
+                  title: '导出性能报告',
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      settings: const RouteSettings(
+                        name: 'performance_settings',
+                      ),
+                      builder: (_) => const PerformanceSettingsPage(),
+                    ),
+                  ),
+                ),
+              ),
+            ],
             if (RuntimeLog.instance.enabled) ...[
               const SfSectionTitle('运行日志'),
               const SfPanel(child: RuntimeLogSettings()),

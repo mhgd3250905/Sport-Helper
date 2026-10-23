@@ -9,6 +9,7 @@ import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
 
 import 'app/services.dart';
+import 'app/build_info.dart';
 import 'app/device_identity.dart';
 import 'app/training_media_config.dart';
 import 'package:ugk_trainer/ugk_trainer.dart'
@@ -16,6 +17,10 @@ import 'package:ugk_trainer/ugk_trainer.dart'
 import 'core/storage/local_state_storage.dart';
 import 'data/app_store.dart';
 import 'diagnostics/runtime_log.dart';
+import 'diagnostics/frame_recorder.dart';
+import 'diagnostics/performance_report.dart';
+import 'diagnostics/performance_routes.dart';
+import 'diagnostics/performance_vm.dart';
 import 'ui/chat/chat_home_page.dart';
 import 'ui/theme/app_theme.dart';
 import 'ui/theme/glass.dart';
@@ -43,7 +48,7 @@ Future<void> main() async {
   log.record(
     'app.start',
     fields: {
-      'version': '0.1.0+15',
+      'version': AppBuildInfo.version,
       'flavor': TrainingMediaConfig.isInternal ? 'internal' : 'production',
       'platform': kIsWeb ? 'web' : defaultTargetPlatform.name,
     },
@@ -121,6 +126,11 @@ Future<void> main() async {
     media: media,
   );
   log.record('app.ready');
+  if (FrameRecorder.buildEnabled) {
+    FrameRecorder.instance.start();
+    installPerformanceServiceExtension();
+    unawaited(PerformanceReportService.instance.initialize());
+  }
   runApp(
     LiquidGlassWidgets.wrap(
       // Material theme mode drives the glass brightness.
@@ -154,6 +164,12 @@ class SmartFitApp extends StatefulWidget {
 }
 
 class _SmartFitAppState extends State<SmartFitApp> with WidgetsBindingObserver {
+  // Keeping this instance stable preserves Navigator's route history when the
+  // app's existing store listener rebuilds MaterialApp.
+  late final _performanceRoutes = FrameRecorder.buildEnabled
+      ? PerformanceRouteObserver()
+      : null;
+
   @override
   void initState() {
     super.initState();
@@ -168,6 +184,7 @@ class _SmartFitAppState extends State<SmartFitApp> with WidgetsBindingObserver {
 
   @override
   void dispose() {
+    if (FrameRecorder.buildEnabled) FrameRecorder.instance.stop();
     WidgetsBinding.instance.removeObserver(this);
     RuntimeLog.instance.record('app.dispose');
     unawaited(RuntimeLog.instance.flush());
@@ -194,12 +211,33 @@ class _SmartFitAppState extends State<SmartFitApp> with WidgetsBindingObserver {
         locale: const Locale('zh', 'CN'),
         supportedLocales: const [Locale('zh', 'CN'), Locale('en')],
         localizationsDelegates: GlobalMaterialLocalizations.delegates,
+        navigatorObservers: [?_performanceRoutes],
         // Glass widgets render text outside a Scaffold (toasts, overlays):
         // a transparent Material gives them Material text and ink.
-        builder: (context, child) => Material(
-          type: MaterialType.transparency,
-          child: SfPaletteScope(child: child!),
-        ),
+        builder: (context, child) {
+          if (FrameRecorder.buildEnabled) {
+            final store = widget.services.store;
+            final rate = View.of(context).display.refreshRate;
+            if (rate.isFinite && rate >= 10 && rate <= 1000) {
+              FrameRecorder.instance.setRefreshRateHz(rate);
+              FrameRecorder.instance.setMetadata({
+                'refreshRateSource': 'flutter_display',
+              });
+            }
+            FrameRecorder.instance.setMetadata({
+              'appearance': store.appearance,
+              'theme': Theme.of(context).brightness.name,
+              'starfield': store.starfield,
+              'glassQuality': store.glassQuality ?? 'adaptive_initial',
+              'contentActionCount': widget.services.library.length,
+              'chatMessageCount': widget.services.chat.messages.length,
+            });
+          }
+          return Material(
+            type: MaterialType.transparency,
+            child: SfPaletteScope(child: child!),
+          );
+        },
         // The chat opens with the safety talk on first launch.
         home: const ChatHomePage(),
       ),

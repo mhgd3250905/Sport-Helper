@@ -29,6 +29,11 @@ try {
   if ($Flavor -eq 'internal') {
     $defines += '--dart-define=UGK_INTERNAL_MEDIA_PREVIEW=true'
     $defines += '--dart-define=SMARTFIT_INCLUDE_PENDING_MEDIA=true'
+    $buildSource = & git rev-parse HEAD
+    if ($LASTEXITCODE -ne 0 -or $buildSource -notmatch '^[0-9a-f]{40}$') {
+      throw 'Cannot identify the source revision for internal diagnostics.'
+    }
+    $defines += '--dart-define=SMARTFIT_BUILD_SOURCE=' + $buildSource
   }
   foreach ($entry in @(@('SMARTFIT_MEDIA_PRIMARY_URL', $MediaPrimaryUrl), @('SMARTFIT_MEDIA_SECONDARY_URL', $MediaSecondaryUrl))) {
     if (-not [string]::IsNullOrWhiteSpace($entry[1])) {

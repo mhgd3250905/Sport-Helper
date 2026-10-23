@@ -143,6 +143,7 @@ class _PlanPageState extends State<PlanPage> {
               setState(() => _previewOn = false); // free the preview WebView
               await Navigator.of(context).push(
                 MaterialPageRoute<void>(
+                  settings: const RouteSettings(name: 'player'),
                   builder: (_) => PlayerPage(plan: _plan),
                 ),
               );
