@@ -1,0 +1,72 @@
+{
+  "date": "2026-10-23",
+  "sourceLog": {
+    "file": "SmartFit-runtime-20261023T004906692417Z.json",
+    "bytes": 10377,
+    "sha256": "d305e5806a047f16aa01602b2446df999f52fc1fb78d73ea2118ae10cd15ce41"
+  },
+  "version": "0.1.0+14",
+  "platform": "android",
+  "flavor": "internal",
+  "eventCount": 47,
+  "eventSequenceComplete": true,
+  "firstAtUtc": "2026-10-23T00:48:41.633397Z",
+  "lastAtUtc": "2026-10-23T00:49:06.690732Z",
+  "persistenceFailed": true,
+  "identityFailure": [
+    {
+      "errorType": "PlatformException"
+    }
+  ],
+  "engine": [
+    {
+      "hasKey": true,
+      "hasDeviceIdentity": false,
+      "available": true,
+      "catalogCount": 93,
+      "route": "local",
+      "reason": "identity_unavailable"
+    }
+  ],
+  "routes": [
+    {
+      "route": "local",
+      "reason": "offline_engine"
+    },
+    {
+      "route": "local",
+      "reason": "offline_engine"
+    }
+  ],
+  "replies": [
+    {
+      "elapsedMs": 453,
+      "count": 1,
+      "hasPlan": false,
+      "hasActions": false
+    },
+    {
+      "elapsedMs": 465,
+      "count": 2,
+      "hasPlan": true,
+      "hasActions": false
+    }
+  ],
+  "planSources": [
+    {
+      "source": "template",
+      "count": 7
+    }
+  ],
+  "aiRequestCount": 0,
+  "mediaWaitingForWifi": [
+    "h-banana",
+    "h-knee-hug",
+    "h-wall-straddle",
+    "n-thomas-test",
+    "n-windshield"
+  ],
+  "trainingStarted": false,
+  "diagnosis": "Startup identity storage failed; configured app key present, whole engine local, no AI request in this complete exported window. APK DEX separately confirms R8/JNI signature defect.",
+  "nativeExceptionNameInPhoneLog": "not_recorded_in_plus14"
+}

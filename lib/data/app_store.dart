@@ -5,6 +5,7 @@ import 'package:ugk_trainer/ugk_trainer.dart' show SessionResult;
 
 import '../app/user_memory_store.dart';
 import '../core/storage/local_state_storage.dart';
+import '../diagnostics/runtime_log.dart';
 import '../domain/plan.dart';
 import '../domain/saved_plan.dart';
 import '../voice/voice_queue.dart';
@@ -108,7 +109,13 @@ class AppStore extends ChangeNotifier {
   Future<void> load() async {
     try {
       final raw = await _storage.read(key);
-      if (raw == null) return;
+      if (raw == null) {
+        RuntimeLog.instance.record(
+          'state.loaded',
+          fields: {'available': false},
+        );
+        return;
+      }
       final j = jsonDecode(raw) as Map<String, dynamic>;
       safetyAccepted = j['safetyAccepted'] == true;
       safetyBlocked = j['safetyBlocked'] == true;
@@ -156,7 +163,12 @@ class AppStore extends ChangeNotifier {
         );
         _sessions[session.sessionId] = session;
       }
-    } on Object {
+      RuntimeLog.instance.record('state.loaded', fields: {'available': true});
+    } on Object catch (error) {
+      RuntimeLog.instance.record(
+        'state.load_failed',
+        fields: RuntimeLog.errorFields(error),
+      );
       // Corrupt or old state: start fresh rather than crash.
     }
   }

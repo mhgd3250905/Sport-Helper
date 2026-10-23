@@ -1,0 +1,344 @@
+{
+  "schema": 1,
+  "check": "android_storage_jni",
+  "passed": true,
+  "contract": {
+    "sharedPreferencesAndroid": "2.5.0",
+    "jni": "1.1.0"
+  },
+  "apk": {
+    "name": "SmartFit-0.1.0+15-storage-fix-internal-arm64-v8a-release.apk",
+    "bytes": 49384327,
+    "sha256": "6ecdc72d0fb48c8b179e288009cfe8279a50be4bef1391ee7dfdedebf48249fb"
+  },
+  "dexFiles": [
+    "classes.dex"
+  ],
+  "classes": [
+    {
+      "descriptor": "Lkotlin/Unit;",
+      "present": true
+    },
+    {
+      "descriptor": "Lkotlin/Result;",
+      "present": true
+    },
+    {
+      "descriptor": "Lkotlin/Result$Failure;",
+      "present": true
+    },
+    {
+      "descriptor": "Lkotlin/coroutines/Continuation;",
+      "present": true
+    },
+    {
+      "descriptor": "Lkotlin/coroutines/intrinsics/CoroutineSingletons;",
+      "present": true
+    },
+    {
+      "descriptor": "Lkotlin/coroutines/intrinsics/IntrinsicsKt;",
+      "present": true
+    },
+    {
+      "descriptor": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesApiRegistrar;",
+      "present": true
+    },
+    {
+      "descriptor": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesAsyncApiRegistrar;",
+      "present": true
+    }
+  ],
+  "methods": [
+    {
+      "owner": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesApiRegistrar;",
+      "name": "<init>",
+      "descriptor": "()V",
+      "static": false,
+      "present": true,
+      "declaredIn": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesApiRegistrar;"
+    },
+    {
+      "owner": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesApiRegistrar;",
+      "name": "register",
+      "descriptor": "(Lio/flutter/plugins/sharedpreferences/SharedPreferencesApi;Ljava/lang/String;)Lio/flutter/plugins/sharedpreferences/SharedPreferencesApiRegistrar;",
+      "static": false,
+      "present": true,
+      "declaredIn": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesApiRegistrar;"
+    },
+    {
+      "owner": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesApiRegistrar;",
+      "name": "getInstance",
+      "descriptor": "(Ljava/lang/String;)Lio/flutter/plugins/sharedpreferences/SharedPreferencesApiRegistrar;",
+      "static": false,
+      "present": true,
+      "declaredIn": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesApiRegistrar;"
+    },
+    {
+      "owner": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesApiRegistrar;",
+      "name": "remove",
+      "descriptor": "(Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;",
+      "static": false,
+      "present": true,
+      "declaredIn": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesApiRegistrar;"
+    },
+    {
+      "owner": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesApiRegistrar;",
+      "name": "setBool",
+      "descriptor": "(Ljava/lang/String;ZLkotlin/coroutines/Continuation;)Ljava/lang/Object;",
+      "static": false,
+      "present": true,
+      "declaredIn": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesApiRegistrar;"
+    },
+    {
+      "owner": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesApiRegistrar;",
+      "name": "setString",
+      "descriptor": "(Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;",
+      "static": false,
+      "present": true,
+      "declaredIn": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesApiRegistrar;"
+    },
+    {
+      "owner": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesApiRegistrar;",
+      "name": "setInt",
+      "descriptor": "(Ljava/lang/String;JLkotlin/coroutines/Continuation;)Ljava/lang/Object;",
+      "static": false,
+      "present": true,
+      "declaredIn": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesApiRegistrar;"
+    },
+    {
+      "owner": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesApiRegistrar;",
+      "name": "setDouble",
+      "descriptor": "(Ljava/lang/String;DLkotlin/coroutines/Continuation;)Ljava/lang/Object;",
+      "static": false,
+      "present": true,
+      "declaredIn": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesApiRegistrar;"
+    },
+    {
+      "owner": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesApiRegistrar;",
+      "name": "setEncodedStringList",
+      "descriptor": "(Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;",
+      "static": false,
+      "present": true,
+      "declaredIn": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesApiRegistrar;"
+    },
+    {
+      "owner": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesApiRegistrar;",
+      "name": "setDeprecatedStringList",
+      "descriptor": "(Ljava/lang/String;Ljava/util/List;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;",
+      "static": false,
+      "present": true,
+      "declaredIn": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesApiRegistrar;"
+    },
+    {
+      "owner": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesApiRegistrar;",
+      "name": "clear",
+      "descriptor": "(Ljava/lang/String;Ljava/util/List;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;",
+      "static": false,
+      "present": true,
+      "declaredIn": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesApiRegistrar;"
+    },
+    {
+      "owner": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesApiRegistrar;",
+      "name": "getAll",
+      "descriptor": "(Ljava/lang/String;Ljava/util/List;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;",
+      "static": false,
+      "present": true,
+      "declaredIn": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesApiRegistrar;"
+    },
+    {
+      "owner": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesAsyncApiRegistrar;",
+      "name": "<init>",
+      "descriptor": "()V",
+      "static": false,
+      "present": true,
+      "declaredIn": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesAsyncApiRegistrar;"
+    },
+    {
+      "owner": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesAsyncApiRegistrar;",
+      "name": "register",
+      "descriptor": "(Lio/flutter/plugins/sharedpreferences/SharedPreferencesAsyncApi;Ljava/lang/String;)Lio/flutter/plugins/sharedpreferences/SharedPreferencesAsyncApiRegistrar;",
+      "static": false,
+      "present": true,
+      "declaredIn": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesAsyncApiRegistrar;"
+    },
+    {
+      "owner": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesAsyncApiRegistrar;",
+      "name": "getInstance",
+      "descriptor": "(Ljava/lang/String;)Lio/flutter/plugins/sharedpreferences/SharedPreferencesAsyncApiRegistrar;",
+      "static": false,
+      "present": true,
+      "declaredIn": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesAsyncApiRegistrar;"
+    },
+    {
+      "owner": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesAsyncApiRegistrar;",
+      "name": "setBool",
+      "descriptor": "(Ljava/lang/String;ZLio/flutter/plugins/sharedpreferences/SharedPreferencesPigeonOptions;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;",
+      "static": false,
+      "present": true,
+      "declaredIn": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesAsyncApiRegistrar;"
+    },
+    {
+      "owner": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesAsyncApiRegistrar;",
+      "name": "setString",
+      "descriptor": "(Ljava/lang/String;Ljava/lang/String;Lio/flutter/plugins/sharedpreferences/SharedPreferencesPigeonOptions;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;",
+      "static": false,
+      "present": true,
+      "declaredIn": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesAsyncApiRegistrar;"
+    },
+    {
+      "owner": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesAsyncApiRegistrar;",
+      "name": "setInt",
+      "descriptor": "(Ljava/lang/String;JLio/flutter/plugins/sharedpreferences/SharedPreferencesPigeonOptions;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;",
+      "static": false,
+      "present": true,
+      "declaredIn": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesAsyncApiRegistrar;"
+    },
+    {
+      "owner": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesAsyncApiRegistrar;",
+      "name": "setDouble",
+      "descriptor": "(Ljava/lang/String;DLio/flutter/plugins/sharedpreferences/SharedPreferencesPigeonOptions;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;",
+      "static": false,
+      "present": true,
+      "declaredIn": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesAsyncApiRegistrar;"
+    },
+    {
+      "owner": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesAsyncApiRegistrar;",
+      "name": "setEncodedStringList",
+      "descriptor": "(Ljava/lang/String;Ljava/lang/String;Lio/flutter/plugins/sharedpreferences/SharedPreferencesPigeonOptions;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;",
+      "static": false,
+      "present": true,
+      "declaredIn": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesAsyncApiRegistrar;"
+    },
+    {
+      "owner": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesAsyncApiRegistrar;",
+      "name": "setDeprecatedStringList",
+      "descriptor": "(Ljava/lang/String;Ljava/util/List;Lio/flutter/plugins/sharedpreferences/SharedPreferencesPigeonOptions;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;",
+      "static": false,
+      "present": true,
+      "declaredIn": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesAsyncApiRegistrar;"
+    },
+    {
+      "owner": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesAsyncApiRegistrar;",
+      "name": "getString",
+      "descriptor": "(Ljava/lang/String;Lio/flutter/plugins/sharedpreferences/SharedPreferencesPigeonOptions;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;",
+      "static": false,
+      "present": true,
+      "declaredIn": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesAsyncApiRegistrar;"
+    },
+    {
+      "owner": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesAsyncApiRegistrar;",
+      "name": "getInt",
+      "descriptor": "(Ljava/lang/String;Lio/flutter/plugins/sharedpreferences/SharedPreferencesPigeonOptions;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;",
+      "static": false,
+      "present": true,
+      "declaredIn": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesAsyncApiRegistrar;"
+    },
+    {
+      "owner": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesAsyncApiRegistrar;",
+      "name": "getBool",
+      "descriptor": "(Ljava/lang/String;Lio/flutter/plugins/sharedpreferences/SharedPreferencesPigeonOptions;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;",
+      "static": false,
+      "present": true,
+      "declaredIn": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesAsyncApiRegistrar;"
+    },
+    {
+      "owner": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesAsyncApiRegistrar;",
+      "name": "getDouble",
+      "descriptor": "(Ljava/lang/String;Lio/flutter/plugins/sharedpreferences/SharedPreferencesPigeonOptions;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;",
+      "static": false,
+      "present": true,
+      "declaredIn": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesAsyncApiRegistrar;"
+    },
+    {
+      "owner": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesAsyncApiRegistrar;",
+      "name": "getPlatformEncodedStringList",
+      "descriptor": "(Ljava/lang/String;Lio/flutter/plugins/sharedpreferences/SharedPreferencesPigeonOptions;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;",
+      "static": false,
+      "present": true,
+      "declaredIn": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesAsyncApiRegistrar;"
+    },
+    {
+      "owner": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesAsyncApiRegistrar;",
+      "name": "getStringList",
+      "descriptor": "(Ljava/lang/String;Lio/flutter/plugins/sharedpreferences/SharedPreferencesPigeonOptions;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;",
+      "static": false,
+      "present": true,
+      "declaredIn": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesAsyncApiRegistrar;"
+    },
+    {
+      "owner": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesAsyncApiRegistrar;",
+      "name": "clear",
+      "descriptor": "(Ljava/util/List;Lio/flutter/plugins/sharedpreferences/SharedPreferencesPigeonOptions;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;",
+      "static": false,
+      "present": true,
+      "declaredIn": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesAsyncApiRegistrar;"
+    },
+    {
+      "owner": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesAsyncApiRegistrar;",
+      "name": "getAll",
+      "descriptor": "(Ljava/util/List;Lio/flutter/plugins/sharedpreferences/SharedPreferencesPigeonOptions;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;",
+      "static": false,
+      "present": true,
+      "declaredIn": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesAsyncApiRegistrar;"
+    },
+    {
+      "owner": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesAsyncApiRegistrar;",
+      "name": "getKeys",
+      "descriptor": "(Ljava/util/List;Lio/flutter/plugins/sharedpreferences/SharedPreferencesPigeonOptions;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;",
+      "static": false,
+      "present": true,
+      "declaredIn": "Lio/flutter/plugins/sharedpreferences/SharedPreferencesAsyncApiRegistrar;"
+    },
+    {
+      "owner": "Lkotlin/coroutines/Continuation;",
+      "name": "resumeWith",
+      "descriptor": "(Ljava/lang/Object;)V",
+      "static": false,
+      "present": true,
+      "declaredIn": "Lkotlin/coroutines/Continuation;"
+    },
+    {
+      "owner": "Lkotlin/Result$Failure;",
+      "name": "<init>",
+      "descriptor": "(Ljava/lang/Throwable;)V",
+      "static": false,
+      "present": true,
+      "declaredIn": "Lkotlin/Result$Failure;"
+    },
+    {
+      "owner": "Lkotlin/coroutines/intrinsics/IntrinsicsKt;",
+      "name": "getCOROUTINE_SUSPENDED",
+      "descriptor": "()Ljava/lang/Object;",
+      "static": true,
+      "present": true,
+      "declaredIn": "Lky;"
+    }
+  ],
+  "fields": [
+    {
+      "owner": "Lkotlin/Unit;",
+      "name": "INSTANCE",
+      "descriptor": "Lkotlin/Unit;",
+      "static": true,
+      "present": true,
+      "declaredIn": "Lkotlin/Unit;"
+    },
+    {
+      "owner": "Lkotlin/Result;",
+      "name": "value",
+      "descriptor": "Ljava/lang/Object;",
+      "static": false,
+      "present": true,
+      "declaredIn": "Lkotlin/Result;"
+    },
+    {
+      "owner": "Lkotlin/Result$Failure;",
+      "name": "exception",
+      "descriptor": "Ljava/lang/Throwable;",
+      "static": false,
+      "present": true,
+      "declaredIn": "Lkotlin/Result$Failure;"
+    }
+  ],
+  "failedChecks": []
+}

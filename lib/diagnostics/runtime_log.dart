@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart' show PlatformException;
 
 import '../core/storage/local_state_storage.dart';
 
@@ -38,6 +39,7 @@ class RuntimeLog {
   int _savedRevision = 0;
   Future<void>? _writing;
   bool persistenceFailed = false;
+  bool _writeFailureRecorded = false;
 
   int get entryCount => _entries.length;
   int get usedBytes => _bytes;
@@ -103,6 +105,23 @@ class RuntimeLog {
     return _token.hasMatch(name) ? name : 'Error';
   }
 
+  /// Preserve a machine error code and a fixed classification, never the
+  /// native message/details (which can contain paths or preference contents).
+  static Map<String, Object?> errorFields(Object error) {
+    final fields = <String, Object?>{'errorType': errorType(error)};
+    if (error is PlatformException) {
+      fields['code'] = _safeToken(error.code) ?? 'platform_error';
+      final message = error.message ?? '';
+      if (message.contains('NoSuchMethodError')) {
+        fields['reason'] = 'jni_method_lookup_failed';
+      } else if (message.contains('ClassNotFoundException') ||
+          message.contains('NoClassDefFoundError')) {
+        fields['reason'] = 'jni_class_lookup_failed';
+      }
+    }
+    return fields;
+  }
+
   Map<String, Object?> _safeFields(Map fields) => {
     for (final entry in fields.entries)
       if (_fields.contains(entry.key) &&
@@ -145,8 +164,9 @@ class RuntimeLog {
           }
         }
       }
-    } on Object {
+    } on Object catch (error) {
       persistenceFailed = true;
+      record('diagnostics.storage_read_failed', fields: errorFields(error));
     }
   }
 
@@ -195,7 +215,7 @@ class RuntimeLog {
   Map<String, Object?> _snapshot() => {
     'schema': 1,
     'app': 'smartfit',
-    'version': '0.1.0+14',
+    'version': '0.1.0+15',
     'exportedAt': _clock().toUtc().toIso8601String(),
     'persistenceFailed': persistenceFailed,
     'retention': {'maxEntries': maxEntries, 'maxBytes': maxBytes, 'maxDays': 7},
@@ -218,9 +238,17 @@ class RuntimeLog {
           await storage!.write(storageKey, exportJson());
           _savedRevision = revision;
           persistenceFailed = false;
+          _writeFailureRecorded = false;
         }
-      } on Object {
+      } on Object catch (error) {
         persistenceFailed = true;
+        if (!_writeFailureRecorded) {
+          _writeFailureRecorded = true;
+          record(
+            'diagnostics.storage_write_failed',
+            fields: errorFields(error),
+          );
+        }
       } finally {
         _writing = null;
         done.complete();

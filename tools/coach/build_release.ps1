@@ -4,6 +4,7 @@ param(
   [string]$MediaPrimaryUrl = '',
   [string]$MediaSecondaryUrl = '',
   [string]$FlutterCommand = 'flutter',
+  [string]$PythonCommand = 'python',
   [string]$BuildLog = '.buildlog/release-build.log'
 )
 
@@ -46,6 +47,14 @@ try {
   & $FlutterCommand build apk --release --split-per-abi --no-pub --flavor $Flavor @defines *> $BuildLog
   $buildStatus = $LASTEXITCODE
   if ($buildStatus -ne 0) { throw 'Release build failed; inspect the local build log.' }
+  $jniChecker = Join-Path $PSScriptRoot 'verify_android_storage_jni.py'
+  $reportDirectory = if ($logDirectory) { $logDirectory } else { '.' }
+  foreach ($abi in @('armeabi-v7a', 'arm64-v8a', 'x86_64')) {
+    $apkPath = Join-Path (Get-Location) "build/app/outputs/flutter-apk/app-$abi-$Flavor-release.apk"
+    $reportPath = Join-Path $reportDirectory "storage-jni-$Flavor-$abi.json"
+    & $PythonCommand $jniChecker --apk $apkPath --report $reportPath
+    if ($LASTEXITCODE -ne 0) { throw 'Release APK failed the storage JNI compatibility check.' }
+  }
 } finally {
   # Never print the source contents, key, or complete build command.
   $content = $null

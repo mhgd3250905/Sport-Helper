@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter/services.dart';
 import 'package:smartfit/core/storage/local_state_storage.dart';
 import 'package:smartfit/diagnostics/runtime_log.dart';
 
@@ -60,8 +61,8 @@ void main() {
           'errorType': 'raw error with PRIVATE_KEY',
           'model': {'nested': 'PRIVATE_KEY'},
           'source': 'http://host/private?key=PRIVATE_KEY',
-      'code': 'https://privatehost',
-      'kind': '/private/path',
+          'code': 'https://privatehost',
+          'kind': '/private/path',
         },
       );
       await log.flush();
@@ -128,7 +129,10 @@ void main() {
       log.record('app.start');
       await log.flush();
       expect(log.persistenceFailed, isTrue);
-      expect(_events(log).length, 1);
+      expect(_events(log).map((e) => e['event']), [
+        'app.start',
+        'diagnostics.storage_write_failed',
+      ]);
       storage.fail = false;
       await log.flush();
       expect(log.persistenceFailed, isFalse);
@@ -148,6 +152,38 @@ void main() {
       await log.flush();
       expect(log.persistenceFailed, isFalse);
       expect(jsonDecode(storage.value!)['schema'], 1);
+    },
+  );
+  test(
+    'JNI errors retain machine classification without native details',
+    () async {
+      final storage = _Storage()..fail = true;
+      final log = RuntimeLog(enabled: true, storage: storage);
+      final fields = RuntimeLog.errorFields(
+        PlatformException(
+          code: 'JavaException',
+          message:
+              'java.lang.NoSuchMethodError private-device-id private-prompt',
+          details: '/private/path SECRET',
+        ),
+      );
+      log.record('app.identity_unavailable', fields: fields);
+      await log.flush();
+      expect(_events(log).first['fields'], {
+        'errorType': 'PlatformException',
+        'code': 'JavaException',
+        'reason': 'jni_method_lookup_failed',
+      });
+      expect(log.exportJson(), isNot(contains('private')));
+      expect(log.exportJson(), isNot(contains('SECRET')));
+      log.record('app.ready');
+      await log.flush();
+      expect(
+        _events(
+          log,
+        ).where((e) => e['event'] == 'diagnostics.storage_write_failed'),
+        hasLength(1),
+      );
     },
   );
 }

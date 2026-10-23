@@ -43,7 +43,7 @@ Future<void> main() async {
   log.record(
     'app.start',
     fields: {
-      'version': '0.1.0+14',
+      'version': '0.1.0+15',
       'flavor': TrainingMediaConfig.isInternal ? 'internal' : 'production',
       'platform': kIsWeb ? 'web' : defaultTargetPlatform.name,
     },
@@ -97,7 +97,7 @@ Future<void> main() async {
   );
   final store = AppStore(storage);
   await store.load();
-  log.record('app.storage_ready');
+  log.record('app.state_initialized');
   media.wifiOnly = store.mediaWifiOnly;
   String? deviceId;
   try {
@@ -105,7 +105,7 @@ Future<void> main() async {
   } on Object catch (error) {
     log.record(
       'app.identity_unavailable',
-      fields: {'errorType': RuntimeLog.errorType(error)},
+      fields: RuntimeLog.errorFields(error),
     );
     // No persisted identifier means no proxy call; offline training still works.
   }

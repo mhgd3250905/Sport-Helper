@@ -1,6 +1,10 @@
 # 版本管理与台账
 
-## 当前内测候选（2026-10-23）
+## 当前内测修复候选（2026-10-23，+15）
+
+`feat/voice-aac-comparison` 当前 `0.1.0+15`，修复 Android release JNI 存储签名缺陷。internal arm64 身份 `com.ugk.smartfit.internal` / versionCode `2015`，49,384,327B，SHA-256 `6ecdc72d0fb48c8b179e288009cfe8279a50be4bef1391ee7dfdedebf48249fb`。运行依赖/存储后端/用户数据均未迁移或清理；+13/+14 包不再推荐安装。298 测试、分析、三 ABI 最终 DEX 门禁通过，真机 AI/持久日志与 20 分钟训练待验，分支未合并/推送。详见 [修复报告](android-storage-jni-fix-2026-10-23.md)。
+
+## 上一内测候选（2026-10-23，+14 已由 +15 替代）
 
 `feat/voice-aac-comparison` 当前 `0.1.0+14`，关于页同步；internal arm64 包为 `com.ugk.smartfit.internal` / versionCode `2014`，49,384,327B，SHA-256 `c26b4a3a744566c354887cc7fd7822ebf31ed0080f918bfb702b874a53885710`。保留已选定的全量 AAC-LC，增加本机运行日志与手动导出；两项 SDK ref 仍固定 `f684e02f38e652633c23fa8946a53d02b6aa3ea2`。仅构建新内测候选，没有新建 +14 生产交付包；没有合并或推送。真机保存与持续训练待有设备时进行。详见 [日志交付及核验](internal-runtime-logs-2026-10-23.md)。以下台账保留原日期的历史快照。
 

@@ -10,8 +10,8 @@ import 'theme.dart';
 import 'training_media_settings.dart';
 
 const appVersion = TrainingMediaConfig.isInternal
-    ? '0.1.0+14 (内测)'
-    : '0.1.0+14 (MVP)';
+    ? '0.1.0+15 (内测)'
+    : '0.1.0+15 (MVP)';
 
 class AboutPage extends StatelessWidget {
   const AboutPage({super.key});
