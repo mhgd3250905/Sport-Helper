@@ -59,7 +59,7 @@ class PerformanceReportService extends ChangeNotifier {
     if (!recorder.enabled) return;
     recorder.setMetadata({
       'appVersion': AppBuildInfo.version,
-      'appBuild': '21',
+      'appBuild': '22',
       'appBaseCommit': AppBuildInfo.performanceBase,
       'sdkRef': AppBuildInfo.sdkRef,
       'appSource': const String.fromEnvironment(

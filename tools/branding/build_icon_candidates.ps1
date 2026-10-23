@@ -1,7 +1,7 @@
 param(
   [Parameter(Mandatory = $true)][string]$AppKeyFile,
   [ValidateSet('A', 'B', 'A2')][string[]]$Variants = @('A2'),
-  [int]$BuildNumber = 21,
+  [int]$BuildNumber = 22,
   [string]$MediaPrimaryUrl = '',
   [string]$MediaSecondaryUrl = '',
   [string]$FlutterCommand = 'flutter',

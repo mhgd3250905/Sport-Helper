@@ -54,15 +54,15 @@ does not read the internal candidate source sets.
 ./tools/branding/build_icon_candidates.ps1 -AppKeyFile '<local key file>' -Variants A2 -OutputDirectory .buildlog/icon-a2/install
 ```
 
-The wrapper defaults to A2; A and B remain explicit options. It builds internal
+The wrapper defaults to A2/build22; A and B remain explicit options. It builds internal
 arm64 release packages serially, injects the committed source SHA, retains the
 internal media parameters, and never prints the key or full command. It checks
 matching App/report build identity, the approved SDK lock and clean runtime
 before/after each build, runs the final DEX/JNI gate, and writes hash-bound receipts.
 
-`SmartFit-0.1.0+21-internal-iconA2.apk` uses the same
-`com.ugk.smartfit.internal`, versionCode2021 and signer as the current +21 A/B
-packages so it can cover-install without a downgrade or data reset. Use a new
+`SmartFit-0.1.0+22-internal-iconA2.apk` uses the same
+`com.ugk.smartfit.internal`, versionCode2022 with the same signer as the current +21 A/B
+packages so it can upgrade the current App without a data reset. Use a new
 output directory to retain historical packages and receipts. Source SHA in the
 exported report distinguishes builds with the same versionCode. The branch
 retains all approved main performance defaults; this icon edit changes no Dart
@@ -77,3 +77,8 @@ configurations retained. Explicit IconA/B/A2.internal.xcconfig overrides select
 only the appiconset; they change no bundle ID, scheme, signing or provisioning.
 No existing scheme imports these overrides. macOS compilation/signing remains
 unverified on this Windows host.
+
+The A2 review uses build22 to exercise a normal Android version upgrade after
+same-version replacements retained the old MIUI icon. Historical A/B build21
+packages are preserved; installing an older build over build22 may be rejected
+as a downgrade. No App data or launcher data is cleared to change icons.
