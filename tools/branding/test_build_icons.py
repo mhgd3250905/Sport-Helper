@@ -42,7 +42,7 @@ class IconAssetsTest(unittest.TestCase):
         self.assertNotIn("IconB.internal.xcconfig", project)
         self.assertNotIn("IconA2.internal.xcconfig", project)
 
-    def test_local_default_android_and_ios_slots_use_pending_a2(self):
+    def test_default_android_and_ios_slots_use_user_selected_a2(self):
         expected = icons.selected_production_assets(self.assets)
         self.assertEqual(len(expected), 38)
         for path, content in expected.items():
@@ -62,9 +62,9 @@ class IconAssetsTest(unittest.TestCase):
             icons.ROOT, self.assets, icons.protected_assets(icons.ROOT)
         )
         self.assertEqual(selection["variant"], "A2")
-        self.assertEqual(selection["status"], "awaiting_user_visual_confirmation")
-        self.assertFalse(selection["productionReleaseApproved"])
-        self.assertFalse(selection["brandMergeApproved"])
+        self.assertEqual(selection["status"], "user_selected_default")
+        self.assertTrue(selection["productionReleaseApproved"])
+        self.assertTrue(selection["brandMergeApproved"])
 
     def test_rebaselining_wrong_production_artwork_is_rejected_without_repair(self):
         with tempfile.TemporaryDirectory() as temporary:

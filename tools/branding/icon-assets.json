@@ -3,8 +3,8 @@
   "generator": "tools/branding/build_icons.py",
   "productionDefaultVariant": "A2",
   "productionDefaultSourceSha256": "ad29f8ed04a444bdea1cb46433d4c5c412613a263144e1ad2021c7527f4c8894",
-  "productionDefaultStatus": "awaiting_user_visual_confirmation",
-  "productionReleaseApproved": false,
+  "productionDefaultStatus": "user_selected_default",
+  "productionReleaseApproved": true,
   "productionDefaultsProtected": true,
   "protectedProductionAssets": {
     "android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml": "e8200c4fc8e07fda81e7f093c1ee85f99dcf2fe8697bcf2b28404b80892748f9",

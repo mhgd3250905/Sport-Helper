@@ -2,9 +2,10 @@
 
 The 2026-10-24 request supersedes the earlier cropped B choice: return to the
 original full-body artwork and make it slightly larger with complete feet.
-**A2 is the new review candidate.** Default Android and iOS resources are
-prepared as A2 only on this local brand branch. Visual confirmation and brand
-merge/release approval are still pending; main has not received brand changes.
+**A2 is the user-selected default.** After the physical-device icon check on
+2026-10-24, the user explicitly approved A2 and merging/pushing the icon/brand
+branch to main. This selects the production icon resources; it does not itself
+publish a new production binary.
 
 | Parameter | Source in assets/brand/source | Composition |
 | --- | --- | --- |
@@ -16,6 +17,9 @@ Original A/B sources, generated candidates, previews, and delivered APKs remain.
 The exact built-in image_gen edit prompt, reference hash, generated hash and
 uniform size normalization for A2 are in `fullbody-zoom-provenance.json`.
 All three pipeline sources are 1024x1024 opaque RGB, full bleed without rounding.
+The original 1254x1254 A2 tool output is retained byte-for-byte under
+`archive/smartfit-icon-v3-fullbody-zoom-generated-1254.png`, outside bundled App
+assets. Keep the original sources and archive when preparing future variants.
 
 ## Generate and verify
 
@@ -82,3 +86,6 @@ The A2 review uses build22 to exercise a normal Android version upgrade after
 same-version replacements retained the old MIUI icon. Historical A/B build21
 packages are preserved; installing an older build over build22 may be rejected
 as a downgrade. No App data or launcher data is cleared to change icons.
+Both build21 and build22 still showed the old cached B icon before the user
+rebooted. After that reboot, the system App-info icon matched A2 with complete
+shoes and robot; the installed build22 hash was unchanged.

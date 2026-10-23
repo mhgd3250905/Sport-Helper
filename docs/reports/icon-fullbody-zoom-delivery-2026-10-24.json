@@ -27,8 +27,14 @@
     "sourceMode": "RGB",
     "sourceSha256": "ad29f8ed04a444bdea1cb46433d4c5c412613a263144e1ad2021c7527f4c8894",
     "originalAAndBRetained": true,
-    "humanVisualConfirmationPending": true,
-    "brandMergeApproved": false
+    "humanVisualConfirmationPending": false,
+    "brandMergeApproved": true,
+    "generatedArchive": "tools/branding/archive/smartfit-icon-v3-fullbody-zoom-generated-1254.png",
+    "userApproval": {
+      "date": "2026-10-24",
+      "evidence": "采用 A2，合入 main 并推送",
+      "scope": "A2 default icon selection and icon/brand branch merge/push; no new production binary publication"
+    }
   },
   "localDefault": {
     "schemaVersion": 1,
@@ -36,12 +42,15 @@
     "source": "assets/brand/source/smartfit-icon-v3-fullbody-zoom.png",
     "sourceSha256": "ad29f8ed04a444bdea1cb46433d4c5c412613a263144e1ad2021c7527f4c8894",
     "proposedDate": "2026-10-24",
-    "status": "awaiting_user_visual_confirmation",
-    "scope": "local_brand_branch_only",
-    "productionReleaseApproved": false,
-    "brandMergeApproved": false,
+    "status": "user_selected_default",
+    "scope": "production_icon_default_and_brand_merge",
+    "productionReleaseApproved": true,
+    "brandMergeApproved": true,
+    "approvalDate": "2026-10-24",
+    "approvalEvidence": "采用 A2，合入 main 并推送",
+    "approvalScope": "A2 production icon default and icon/brand branch merge/push; not a new production binary distribution",
     "supersedes": "B",
-    "decision": "User rejected the cropped B artwork and requested the original full-body A slightly enlarged with both feet intact. A2 is the local review candidate; visual confirmation and brand merge approval are pending."
+    "decision": "After device reboot confirmed the slightly enlarged full-body A2 with complete feet, the user selected A2 and explicitly approved merging the icon/brand branch into main and pushing. Original A/B/A2 source artwork and the original A2 generated file are retained for future adjustments."
   },
   "apk": {
     "variant": "A2",
@@ -197,8 +206,8 @@
     "iconVisualVerified": true,
     "cacheRefresh": "User rebooted the phone; no reinstall or App/launcher data reset during verification. Version upgrade alone had not refreshed the old B icon.",
     "notAPerformanceTest": true,
-    "humanVisualConfirmationPending": true,
-    "brandMergeApproved": false,
+    "humanVisualConfirmationPending": false,
+    "brandMergeApproved": true,
     "displayedIconStillOldB": false,
     "bothFeetVisibleOnSystemUi": true,
     "preparedSourceBitmapFullBodyVerified": true,
@@ -274,10 +283,8 @@
     "notAcceptedAsVisualConfirmation": true
   },
   "previousBChoiceSuperseded": true,
-  "brandMergedMain": false,
-  "brandPushed": false,
-  "humanVisualConfirmationPending": true,
-  "brandMergeApproved": false,
+  "humanVisualConfirmationPending": false,
+  "brandMergeApproved": true,
   "preRebootPhoneSmoke": {
     "performed": true,
     "variant": "A2",
@@ -324,5 +331,23 @@
     "screenshotSha256": "25f32277a342d774f7628fc27278b7cab6cc3ed7e6918e916bb9411cdd6ecfc3",
     "humanVisualConfirmationPending": true,
     "notAPerformanceTest": true
+  },
+  "preApprovalIntegrationSnapshot": {
+    "brandMergedMain": false,
+    "brandPushed": false
+  },
+  "userApproval": {
+    "date": "2026-10-24",
+    "evidence": "采用 A2，合入 main 并推送",
+    "scope": "A2 default icon selection and icon/brand branch merge/push; no new production binary publication"
+  },
+  "sourceArchive": {
+    "originalA": "assets/brand/source/smartfit-icon-v3.png",
+    "originalB": "assets/brand/source/smartfit-icon-v4-crop.png",
+    "selectedA2": "assets/brand/source/smartfit-icon-v3-fullbody-zoom.png",
+    "rawGeneratedA2": "tools/branding/archive/smartfit-icon-v3-fullbody-zoom-generated-1254.png",
+    "rawGeneratedSha256": "233f7568bad123263a8a21ec5a3ddc1147412515976aca48c87191d2cb324e7a",
+    "rawGeneratedSizeBytes": 1496143,
+    "archiveOutsideBundledAssets": true
   }
 }

@@ -4,10 +4,13 @@
   "source": "assets/brand/source/smartfit-icon-v3-fullbody-zoom.png",
   "sourceSha256": "ad29f8ed04a444bdea1cb46433d4c5c412613a263144e1ad2021c7527f4c8894",
   "proposedDate": "2026-10-24",
-  "status": "awaiting_user_visual_confirmation",
-  "scope": "local_brand_branch_only",
-  "productionReleaseApproved": false,
-  "brandMergeApproved": false,
+  "status": "user_selected_default",
+  "scope": "production_icon_default_and_brand_merge",
+  "productionReleaseApproved": true,
+  "brandMergeApproved": true,
+  "approvalDate": "2026-10-24",
+  "approvalEvidence": "采用 A2，合入 main 并推送",
+  "approvalScope": "A2 production icon default and icon/brand branch merge/push; not a new production binary distribution",
   "supersedes": "B",
-  "decision": "User rejected the cropped B artwork and requested the original full-body A slightly enlarged with both feet intact. A2 is the local review candidate; visual confirmation and brand merge approval are pending."
+  "decision": "After device reboot confirmed the slightly enlarged full-body A2 with complete feet, the user selected A2 and explicitly approved merging the icon/brand branch into main and pushing. Original A/B/A2 source artwork and the original A2 generated file are retained for future adjustments."
 }

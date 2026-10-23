@@ -20,6 +20,12 @@
   "sourceMode": "RGB",
   "sourceSha256": "ad29f8ed04a444bdea1cb46433d4c5c412613a263144e1ad2021c7527f4c8894",
   "originalAAndBRetained": true,
-  "humanVisualConfirmationPending": true,
-  "brandMergeApproved": false
+  "humanVisualConfirmationPending": false,
+  "brandMergeApproved": true,
+  "generatedArchive": "tools/branding/archive/smartfit-icon-v3-fullbody-zoom-generated-1254.png",
+  "userApproval": {
+    "date": "2026-10-24",
+    "evidence": "采用 A2，合入 main 并推送",
+    "scope": "A2 default icon selection and icon/brand branch merge/push; no new production binary publication"
+  }
 }
