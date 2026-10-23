@@ -1,7 +1,27 @@
+import 'dart:ui' show FrameTiming;
+
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:smartfit/ui/theme/adaptive_glass.dart';
+
+class _CountingController extends SfAdaptiveGlassController {
+  _CountingController()
+    : super(
+        initialQuality: GlassQuality.standard,
+        refreshRateHz: 120,
+        shaderFiltersSupported: true,
+        isWeb: false,
+      );
+
+  int deliveredFrames = 0;
+
+  @override
+  void addTimings(List<FrameTiming> timings) {
+    deliveredFrames += timings.length;
+    super.addTimings(timings);
+  }
+}
 
 void main() {
   late SfAdaptiveGlassController controller;
@@ -83,6 +103,22 @@ void main() {
     },
   );
 
+  test('90 Hz and 120 Hz use display-relative downgrade thresholds', () {
+    controller.dispose();
+    controller = create(initialQuality: GlassQuality.premium, hz: 90);
+    frames(240, 16666); // Below 1.5 * (1000 / 90), not a 16 ms cutoff.
+    expect(controller.effectiveQuality, GlassQuality.premium);
+    frames(240, 16667);
+    expect(controller.effectiveQuality, GlassQuality.standard);
+
+    controller.dispose();
+    controller = create(initialQuality: GlassQuality.premium, hz: 120);
+    frames(240, 12500); // Exactly 1.5 budget is not over budget.
+    expect(controller.effectiveQuality, GlassQuality.premium);
+    frames(240, 12501);
+    expect(controller.effectiveQuality, GlassQuality.standard);
+  });
+
   test(
     'runtime needs two consecutive P95 slow windows and eight second cooldown',
     () {
@@ -161,6 +197,35 @@ void main() {
     controller.resetOnResume();
     expect(controller.phase, 'skipping');
     expect(controller.retainedSampleCount, 0);
+  });
+
+  test('refresh changes restart the skip phase and discard warmup samples', () {
+    frames(89, 80000);
+    controller.setRefreshRateHz(90);
+    frames(89, 80000);
+    expect(controller.phase, 'skipping');
+    frames(1, 80000);
+    frames(179, 80000);
+    expect(controller.phase, 'warmup');
+    expect(controller.retainedSampleCount, 179);
+    controller.setRefreshRateHz(120);
+    expect(controller.retainedSampleCount, 0);
+    frames(180, 1000);
+    expect(controller.phase, 'runtime');
+    expect(controller.effectiveQuality, GlassQuality.premium);
+  });
+
+  test('refresh changes clear slow streaks and prior-budget cooldown', () {
+    controller.dispose();
+    controller = create(initialQuality: GlassQuality.premium, hz: 60);
+    frames(240, 30000);
+    expect(controller.effectiveQuality, GlassQuality.standard);
+    frames(120, 30000);
+    controller.setRefreshRateHz(120);
+    frames(120, 13000);
+    expect(controller.effectiveQuality, GlassQuality.standard);
+    frames(120, 13000);
+    expect(controller.effectiveQuality, GlassQuality.minimal);
   });
 
   test('web stays standard and unsupported native stays minimal', () {
@@ -258,5 +323,80 @@ void main() {
     expect(controller.phase, 'comparison_locked');
     await tester.pumpWidget(const SizedBox());
     freeze.dispose();
+  });
+
+  testWidgets('scope reads live display changes without an internal recorder', (
+    tester,
+  ) async {
+    tester.view.display.refreshRate = 120;
+    addTearDown(tester.view.display.resetRefreshRate);
+    controller.dispose();
+    controller = create(initialQuality: GlassQuality.premium);
+    SfAdaptiveGlassData? latest;
+    await tester.pumpWidget(
+      SfAdaptiveGlass(
+        controller: controller,
+        initialQuality: GlassQuality.premium,
+        onQualityChanged: (_, to) {},
+        child: Builder(
+          builder: (context) {
+            latest = SfAdaptiveGlassData.maybeOf(context);
+            return const SizedBox();
+          },
+        ),
+      ),
+    );
+    expect(latest!.targetFrameMs, 1000 / 120);
+    frames(119, 80000);
+    tester.view.display.refreshRate = 90;
+    await tester.pump();
+    expect(latest!.refreshRateHz, 90);
+    expect(latest!.targetFrameMs, 1000 / 90);
+    expect(controller.retainedSampleCount, 0);
+    await tester.pumpWidget(const SizedBox());
+  });
+
+  testWidgets('timings callback attaches once and detaches across lifecycle', (
+    tester,
+  ) async {
+    controller.dispose();
+    final counting = _CountingController();
+    controller = counting;
+    final binding = tester.binding;
+    binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    final timing = FrameTiming(
+      vsyncStart: 1000,
+      buildStart: 1000,
+      buildFinish: 2000,
+      rasterStart: 2000,
+      rasterFinish: 3000,
+      rasterFinishWallTime: 3000,
+      frameNumber: 42,
+    );
+    void report() => binding.platformDispatcher.onReportTimings?.call([timing]);
+    await tester.pumpWidget(
+      SfAdaptiveGlass(
+        controller: controller,
+        initialQuality: GlassQuality.standard,
+        onQualityChanged: (_, to) {},
+        child: const SizedBox(),
+      ),
+    );
+    report();
+    expect(counting.deliveredFrames, 1);
+    binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    report();
+    expect(counting.deliveredFrames, 2);
+    binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+    report();
+    expect(counting.deliveredFrames, 2);
+    binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+    binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    report();
+    expect(counting.deliveredFrames, 3);
+    await tester.pumpWidget(const SizedBox());
+    report();
+    expect(counting.deliveredFrames, 3);
   });
 }

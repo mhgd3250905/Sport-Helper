@@ -89,7 +89,7 @@ class RasterMatrixTests(unittest.TestCase):
         matrix = build_matrix([report()])
         self.assertTrue(all(not value.issues for value in matrix.cells.values()))
         output = render_matrix(matrix)
-        steady = output.split("## 稳态 Raster", 1)[1].split("## 前 2 秒", 1)[0]
+        steady = output.split("## 稳态 Raster", 1)[1].split("## 每格实际列表卡片模式", 1)[0]
         self.assertEqual(steady.count("| glass_"), 8)
         differences = output.split("## 仅同场景", 1)[1]
         self.assertEqual(differences.count("| longChatScroll |"), 4)
@@ -98,6 +98,53 @@ class RasterMatrixTests(unittest.TestCase):
         self.assertIn("| longChatScroll | 关闭星尘（玻璃开） | -1.000 | +0.000 | +0.000 | +0.00 |", output)
         self.assertIn("每格已记录实际窗口尺寸", output)
         self.assertIn("不能确认着色器编译", output)
+
+    def test_new_static_card_report_requires_explicit_actual_mode(self):
+        value = report()
+        value["metadata"]["measurementKind"] = "raster_controls_v3"
+        for item in value["cases"].values():
+            item["conditions"][0]["condition"]["scrollCardGlassEnabled"] = False
+        matrix = build_matrix([value])
+        self.assertTrue(all(not cell.issues for cell in matrix.cells.values()))
+        self.assertIn("默认静态仿玻璃", render_matrix(matrix))
+        for scenario in SCENARIOS:
+            for left, right in ((VARIANTS[0], VARIANTS[1]), (VARIANTS[0], VARIANTS[2])):
+                self.assertEqual(pair_issues(matrix.cells[f"{left}__{scenario}"],
+                                             matrix.cells[f"{right}__{scenario}"]), [])
+        first_key = f"{VARIANTS[0]}__{SCENARIOS[0]}"
+        value["cases"][first_key]["conditions"][0]["condition"].pop("scrollCardGlassEnabled")
+        self.assertIn("actual.scrollCardGlassEnabled 未确认", build_matrix([value]).cells[first_key].issues)
+
+    def test_new_different_card_modes_are_not_compared(self):
+        value = report()
+        value["metadata"]["measurementKind"] = "raster_controls_v3"
+        for item in value["cases"].values():
+            item["conditions"][0]["condition"]["scrollCardGlassEnabled"] = False
+        first_key = f"{VARIANTS[0]}__{SCENARIOS[0]}"
+        update_condition(value, first_key, scrollCardGlassEnabled=True)
+        matrix = build_matrix([value])
+        first = matrix.cells[first_key]
+        self.assertFalse(first.issues)
+        for other in (VARIANTS[1], VARIANTS[2]):
+            self.assertIn("actual.scrollCardGlassEnabled 不同；需同一卡片模式对照", pair_issues(
+                first, matrix.cells[f"{other}__{SCENARIOS[0]}"]))
+
+    def test_legacy_card_report_stays_readable_but_cannot_mix_with_new_mode(self):
+        old = report()
+        matrix = build_matrix([old])
+        self.assertTrue(all(not cell.issues for cell in matrix.cells.values()))
+        self.assertIn("旧版：沿用全局玻璃（未独立记录）", render_matrix(matrix))
+        first_key = f"{VARIANTS[0]}__{SCENARIOS[0]}"
+        second_key = f"{VARIANTS[1]}__{SCENARIOS[0]}"
+        update_condition(old, second_key, scrollCardGlassEnabled=False)
+        matrix = build_matrix([old])
+        self.assertIn("列表卡片渲染条件的记录版本不同", pair_issues(matrix.cells[first_key], matrix.cells[second_key]))
+
+    def test_actual_card_glass_cannot_be_on_with_global_glass_off(self):
+        value = report()
+        key = f"{VARIANTS[2]}__{SCENARIOS[0]}"
+        update_condition(value, key, scrollCardGlassEnabled=True)
+        self.assertIn("列表卡片真玻璃要求全局玻璃开启", build_matrix([value]).cells[key].issues)
 
     def test_missing_cell_is_dash_and_never_fabricated_zero(self):
         value = report()

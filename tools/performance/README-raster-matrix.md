@@ -11,6 +11,8 @@ python -m unittest discover -s tools/performance -p test_raster_matrix.py -v
 
 每个差值只关闭一个开关，且保持场景、测试数据和消息数一致；同时核对每帧实际 renderer/backend、刷新率、主题、窗口尺寸、像素比和文字缩放。两边玻璃都开启的星尘对照，还要求实际玻璃 quality/phase/frost 一致。未记录实际尺寸的格需重新采样。全局首次进页窗口不绑定某个档位，不能用来做四档归因。
 
+`raster_controls_v3` 继续使用 schema 2，并逐帧显式记录 `scrollCardGlassEnabled`。`glass_on/off` 仍表示总玻璃开关；列表卡片默认静态仿玻璃，内测“列表卡片真玻璃”可单独开启旧效果用于对照。工具逐格列出实际卡片模式，拒绝把不同卡片模式当成同条件的星尘或全局玻璃差值。切换卡片模式后应清空并另导出一轮报告。旧 `raster_controls_v2` 报告仍可单独读取，明确标为当时的卡片路径，不能与新版静态卡片混为一组。
+
 工具不合并百分位，不推断根因或着色器编译。P90/P99 是记录器导出的直方图估计；超预算比例不是屏幕实际掉帧率。输出文件和 stdout 均使用 LF。
 
 ## Android renderer 解析器验证

@@ -59,14 +59,14 @@ class PerformanceReportService extends ChangeNotifier {
     if (!recorder.enabled) return;
     recorder.setMetadata({
       'appVersion': AppBuildInfo.version,
-      'appBuild': '17',
+      'appBuild': '18',
       'appBaseCommit': AppBuildInfo.performanceBase,
       'sdkRef': AppBuildInfo.sdkRef,
       'appSource': const String.fromEnvironment(
         'SMARTFIT_BUILD_SOURCE',
         defaultValue: 'working_tree',
       ),
-      'measurementKind': 'raster_controls_v2',
+      'measurementKind': 'raster_controls_v3',
       'flavor': 'internal',
       'buildMode': kReleaseMode
           ? 'release'

@@ -13,9 +13,9 @@ import 'widgets.dart' show SfControlInk, SfPressedScope;
 /// Liquid glass, the SmartFit way (docs/liquid-glass-plan.md).
 ///
 /// Glass is only the navigation and control layer: bars, chips, floating
-/// buttons, sheets, toasts, and the chat's tappable cards (raised). Text
-/// bubbles, lists and the video stay flat and
-/// opaque. Every glass surface goes through [SfGlassSurface] so the
+/// buttons, sheets and toasts. Scrolling cards use [SfScrollCardSurface],
+/// which paints a static glass-like face without sampling the background.
+/// Every fixed glass surface goes through [SfGlassSurface] so the
 /// material (iOS 27 regular, light or dark to match the palette) and the
 /// quality policy live in one place.
 abstract final class SfGlass {
@@ -93,7 +93,7 @@ abstract final class SfGlass {
 
   static GlassQuality resolve(GlassQuality q, {BuildContext? context}) {
     final requested = qualityOverride ?? q;
-    if (PerformanceLab.buildEnabled && context != null) {
+    if (context != null) {
       return SfAdaptiveGlassData.maybeOf(context)?.cap(requested) ?? requested;
     }
     return requested;
@@ -251,8 +251,90 @@ class SfGlassSurface extends StatelessWidget {
   }
 }
 
-/// Capture is part of the glass treatment and must also disappear in its
-/// control condition. Production retains the original background source.
+/// A scrolling card paints its own face instead of filtering the scene behind
+/// it. The internal-only override restores the previous material for a phone
+/// comparison; production always takes the static branch.
+class SfScrollCardSurface extends StatelessWidget {
+  const SfScrollCardSurface({
+    super.key,
+    required this.child,
+    this.radius = SfRadius.lg,
+    this.padding,
+    this.width,
+    this.height,
+    this.quality = SfGlass.control,
+  });
+
+  final Widget child;
+  final double radius;
+  final EdgeInsetsGeometry? padding;
+  final double? width;
+  final double? height;
+  final GlassQuality quality;
+
+  @override
+  Widget build(BuildContext context) {
+    if (PerformanceLab.buildEnabled) {
+      return ListenableBuilder(
+        listenable: PerformanceLab.instance,
+        builder: (context, _) => _surface(),
+      );
+    }
+    return _surface();
+  }
+
+  Widget _surface() {
+    if (PerformanceLab.buildEnabled &&
+        PerformanceLab.instance.scrollingGlassEnabled) {
+      return SfGlassSurface(
+        radius: radius,
+        padding: padding,
+        width: width,
+        height: height,
+        quality: quality,
+        child: child,
+      );
+    }
+    final dark = SfColors.isDark;
+    return SizedBox(
+      width: width,
+      height: height,
+      child: DecoratedBox(
+        key: const ValueKey('sf-static-scroll-card'),
+        decoration: ShapeDecoration(
+          shape: RoundedSuperellipseBorder(
+            borderRadius: BorderRadius.circular(radius),
+            side: BorderSide(
+              color: Colors.white.withValues(alpha: dark ? .14 : .85),
+              width: .8,
+            ),
+          ),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              SfColors.surfaceHigh.withValues(alpha: dark ? .88 : .72),
+              SfColors.surface.withValues(alpha: dark ? .90 : .88),
+            ],
+          ),
+          shadows: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: dark ? .12 : .045),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        // Container adds ShapeDecoration.dimensions to its padding, which
+        // would grow an intrinsic-height move card by twice the rim width.
+        child: Padding(padding: padding ?? EdgeInsets.zero, child: child),
+      ),
+    );
+  }
+}
+
+/// Only the internal legacy-card comparison needs a scene capture source.
+/// Fixed bars keep their glass material without capturing the scrolling list.
 class SfGlassBackgroundSource extends StatelessWidget {
   const SfGlassBackgroundSource({super.key, required this.child});
   final Widget child;
@@ -260,12 +342,12 @@ class SfGlassBackgroundSource extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (!PerformanceLab.buildEnabled) {
-      return GlassBackgroundSource(child: child);
+      return child;
     }
     return ListenableBuilder(
       listenable: PerformanceLab.instance,
       child: child,
-      builder: (_, child) => PerformanceLab.instance.glassEnabled
+      builder: (_, child) => PerformanceLab.instance.scrollingGlassEnabled
           ? GlassBackgroundSource(child: child!)
           : child!,
     );

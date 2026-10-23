@@ -269,6 +269,7 @@ class FrameRecorder with WidgetsBindingObserver {
   /// The immutable value is captured with the next engine frame boundary.
   void setRenderConditions({
     required bool glassEnabled,
+    required bool scrollCardGlassEnabled,
     required bool starfield,
     required String glassQuality,
     required String glassPhase,
@@ -285,6 +286,7 @@ class FrameRecorder with WidgetsBindingObserver {
     if (!enabled) return;
     final next = _RenderConditions(
       glassEnabled: glassEnabled,
+      scrollCardGlassEnabled: scrollCardGlassEnabled,
       starfield: starfield,
       glassQuality: _conditionId(glassQuality),
       glassPhase: _conditionId(glassPhase),
@@ -563,7 +565,8 @@ class FrameRecorder with WidgetsBindingObserver {
           'performance_settings pages are excluded from scenario statistics',
       'conditionChangesDuringCapture':
           'number of changes to previously supplied theme, appearance, '
-          'starfield, glassQuality or refresh-rate values while running; '
+          'starfield, glassQuality, scrollCardGlassEnabled or refresh-rate '
+          'values while running; '
           'initial values and device metadata readiness do not count; '
           'reset clears the count and retains current conditions',
       'comparisonWindows':
@@ -576,6 +579,13 @@ class FrameRecorder with WidgetsBindingObserver {
           'one actual render condition and one refresh rate; verified renderer; '
           'variant matches actual switches; long chat >=60 messages; no '
           'condition overflow or out-of-order case timestamps',
+      'scrollCardGlassEnabled':
+          'actual scroll-card renderer; false is a static simulated-glass '
+          'surface without backdrop filters or scroll background capture; '
+          'true is the internal-only real-glass comparison override and '
+          'requires the global glass switch; glass_on/off variants still '
+          'describe the global switch, not the card renderer; '
+          'raster_controls_v2 reports did not record this field',
     },
     'retention': {
       'maxPages': maxPages,
@@ -644,6 +654,7 @@ class FrameRecorder with WidgetsBindingObserver {
     'appearance',
     'starfield',
     'glassQuality',
+    'scrollCardGlassEnabled',
   };
   static const _metadataKeys = {
     'appVersion',
@@ -667,6 +678,7 @@ class FrameRecorder with WidgetsBindingObserver {
     'appearance',
     'starfield',
     'glassQuality',
+    'scrollCardGlassEnabled',
     'deviceApiLevel',
     'metadataStatus',
     'contentActionCount',
@@ -702,6 +714,7 @@ class _FrameLabel {
 class _RenderConditions {
   const _RenderConditions({
     this.glassEnabled,
+    this.scrollCardGlassEnabled,
     this.starfield,
     this.glassQuality = 'unknown',
     this.glassPhase = 'unknown',
@@ -717,6 +730,7 @@ class _RenderConditions {
   });
 
   final bool? glassEnabled;
+  final bool? scrollCardGlassEnabled;
   final bool? starfield;
   final String glassQuality;
   final String glassPhase;
@@ -732,12 +746,13 @@ class _RenderConditions {
 
   bool get isSupplied => glassEnabled != null;
   String get key =>
-      '$glassEnabled|$starfield|$glassQuality|$glassPhase|$glassFrost|'
+      '$glassEnabled|$scrollCardGlassEnabled|$starfield|$glassQuality|$glassPhase|$glassFrost|'
       '$renderer|$rendererBackend|$adaptiveTargetFrameMs|$theme|$viewportWidth|'
       '$viewportHeight|$devicePixelRatio|$textScale';
 
   Map<String, Object?> snapshot(double hz) => {
     'glassEnabled': glassEnabled,
+    'scrollCardGlassEnabled': scrollCardGlassEnabled,
     'starfield': starfield,
     'glassQuality': glassQuality,
     'glassPhase': glassPhase,
@@ -758,6 +773,7 @@ class _RenderConditions {
   bool operator ==(Object other) =>
       other is _RenderConditions &&
       glassEnabled == other.glassEnabled &&
+      scrollCardGlassEnabled == other.scrollCardGlassEnabled &&
       starfield == other.starfield &&
       glassQuality == other.glassQuality &&
       glassPhase == other.glassPhase &&
@@ -774,6 +790,7 @@ class _RenderConditions {
   @override
   int get hashCode => Object.hash(
     glassEnabled,
+    scrollCardGlassEnabled,
     starfield,
     glassQuality,
     glassPhase,
@@ -1007,6 +1024,7 @@ class _CaseStats {
     if (groups.values.any((group) {
       final condition = group.conditions;
       return !condition.isSupplied ||
+          condition.scrollCardGlassEnabled == null ||
           condition.starfield == null ||
           condition.glassQuality == 'unknown' ||
           condition.glassPhase == 'unknown' ||
@@ -1035,6 +1053,13 @@ class _CaseStats {
           condition.starfield != expectsStars;
     })) {
       issues.add('variant_switches_do_not_match_actual_conditions');
+    }
+    if (groups.values.any(
+      (group) =>
+          group.conditions.scrollCardGlassEnabled == true &&
+          group.conditions.glassEnabled != true,
+    )) {
+      issues.add('scroll_card_glass_requires_global_glass');
     }
     return issues;
   }

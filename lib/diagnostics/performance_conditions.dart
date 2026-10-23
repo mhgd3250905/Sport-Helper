@@ -42,12 +42,14 @@ class PerformanceConditions extends StatelessWidget {
           'theme': Theme.of(context).brightness.name,
           'refreshRateSource': 'flutter_display',
           'starfield': actualStars,
+          'scrollCardGlassEnabled': lab.scrollingGlassEnabled,
           'glassQuality': lab.glassEnabled
               ? scope?.effectiveQuality.name ?? 'unknown'
               : 'off',
         });
         recorder.setRenderConditions(
           glassEnabled: lab.glassEnabled,
+          scrollCardGlassEnabled: lab.scrollingGlassEnabled,
           starfield: actualStars,
           glassQuality: lab.glassEnabled
               ? scope?.effectiveQuality.name ?? 'unknown'

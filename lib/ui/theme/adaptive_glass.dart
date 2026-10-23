@@ -6,8 +6,8 @@ import 'package:flutter/widgets.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
 /// App-owned adaptation uses the display's exact (double) frame budget.
-/// The third-party scope accepts an integer budget, so internal comparisons
-/// use this scope without changing that package or either training SDK.
+/// Both production and internal builds use this scope; the third-party scope
+/// only accepts an integer budget. Neither training SDK needs modification.
 class SfAdaptiveGlassController extends ChangeNotifier {
   SfAdaptiveGlassController({
     GlassQuality? initialQuality,
@@ -83,6 +83,10 @@ class SfAdaptiveGlassController extends ChangeNotifier {
     if (!_validHz(hz) || _refreshRateHz == hz) return;
     _refreshRateHz = hz;
     _clearWindows();
+    _skippedFrames = 0;
+    // A tier change under the previous budget must not delay responding to a
+    // new display rate. The current tier remains until a fresh window settles.
+    _lastQualityChange = null;
     notifyListeners();
   }
 

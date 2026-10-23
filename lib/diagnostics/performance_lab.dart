@@ -9,10 +9,16 @@ class PerformanceLab extends ChangeNotifier {
   static final instance = PerformanceLab();
   final bool enabled;
   bool _glassEnabled = true;
+  bool _scrollingGlassEnabled = false;
   bool? _starfield;
   bool _freezeAdaptation = false;
 
   bool get glassEnabled => !enabled || _glassEnabled;
+
+  /// Production and a fresh internal session always use static scroll cards.
+  /// The global glass switch must also be on for the comparison override.
+  bool get scrollingGlassEnabled =>
+      enabled && _scrollingGlassEnabled && glassEnabled;
   // An unset override preserves the original static sky when the user's
   // animation preference is off. Explicit off removes the entire dust layer.
   bool get starsVisible => !enabled || _starfield != false;
@@ -43,6 +49,12 @@ class PerformanceLab extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setScrollingGlassEnabled(bool value) {
+    if (!enabled || value == _scrollingGlassEnabled) return;
+    _scrollingGlassEnabled = value;
+    notifyListeners();
+  }
+
   void setStarfieldOverride(bool? value) {
     if (!enabled || value == _starfield) return;
     _starfield = value;
@@ -55,12 +67,16 @@ class PerformanceLab extends ChangeNotifier {
     notifyListeners();
   }
 
-  PerformanceLabOverrides snapshotOverrides() =>
-      PerformanceLabOverrides(_glassEnabled, _starfield);
+  PerformanceLabOverrides snapshotOverrides() => PerformanceLabOverrides(
+    _glassEnabled,
+    _starfield,
+    scrollingGlassEnabled: _scrollingGlassEnabled,
+  );
 
   void restoreOverrides(PerformanceLabOverrides value) {
     if (!enabled) return;
     _glassEnabled = value.glassEnabled;
+    _scrollingGlassEnabled = value.scrollingGlassEnabled;
     _starfield = value.starfield;
     notifyListeners();
   }
@@ -71,7 +87,12 @@ class PerformanceLab extends ChangeNotifier {
 
 @immutable
 class PerformanceLabOverrides {
-  const PerformanceLabOverrides(this.glassEnabled, this.starfield);
+  const PerformanceLabOverrides(
+    this.glassEnabled,
+    this.starfield, {
+    this.scrollingGlassEnabled = false,
+  });
   final bool glassEnabled;
+  final bool scrollingGlassEnabled;
   final bool? starfield;
 }

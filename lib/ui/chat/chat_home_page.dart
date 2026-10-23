@@ -246,11 +246,10 @@ class _ChatHomePageState extends State<ChatHomePage> {
             child: Stack(
               fit: StackFit.expand,
               children: [
-                // Liquid glass on a real refraction source: the colour field
-                // and the conversation are one capture surface
-                // (GlassBackgroundSource) inside a LiquidGlassScope, and the
-                // chips + input float above it, so messages and the plan
-                // card scroll *under* the glass instead of stopping above it.
+                // Cards paint a static face; the scrolling conversation is
+                // not a texture capture source. Only the internal legacy-card
+                // comparison restores that boundary. Fixed chips and input
+                // keep their glass material above the conversation.
                 LiquidGlassScope(
                   child: ListenableBuilder(
                     listenable: _chat,

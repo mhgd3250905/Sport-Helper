@@ -82,6 +82,17 @@ class _PerformanceSettingsPageState extends State<PerformanceSettingsPage> {
                       onChanged: _busy ? null : lab.setGlassEnabled,
                     ),
                     SwitchListTile(
+                      key: const ValueKey('performance-scroll-card-glass'),
+                      title: const Text('列表卡片真玻璃'),
+                      subtitle: const Text(
+                        '默认关闭，使用静态仿玻璃；开启用于旧效果对照。全局玻璃关闭时不生效。',
+                      ),
+                      value: lab.scrollingGlassEnabled,
+                      onChanged: _busy || !lab.glassEnabled
+                          ? null
+                          : lab.setScrollingGlassEnabled,
+                    ),
+                    SwitchListTile(
                       title: const Text('星尘'),
                       value: lab.starfieldFor(persistedStars),
                       onChanged: _busy ? null : lab.setStarfieldOverride,
@@ -104,6 +115,7 @@ class _PerformanceSettingsPageState extends State<PerformanceSettingsPage> {
             ),
             Text(
               '八格使用同一档位、固定步速和滑动距离；一次约 5 分钟。'
+              '玻璃开/关指全局开关；列表卡片由上方独立开关决定，报告记录实际卡片模式。'
               '采样后可导出包含稳态和进入尖峰的同一份报告。',
               style: SfType.caption,
             ),

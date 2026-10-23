@@ -173,6 +173,16 @@ class _PerformanceLabPageState extends State<PerformanceLabPage> {
             style: SfType.body,
           ),
           const SizedBox(height: SfSpace.x3),
+          ListenableBuilder(
+            listenable: PerformanceLab.instance,
+            builder: (context, _) => Text(
+              '列表卡片：${PerformanceLab.instance.scrollingGlassEnabled ? '真玻璃对照' : '静态仿玻璃（默认）'}。'
+              '下方玻璃开/关指全局开关；卡片模式另记入每格条件。'
+              '更换卡片模式后请开始新一轮，避免混合两种模式。',
+              key: const ValueKey('performance-scroll-card-mode'),
+              style: SfType.caption,
+            ),
+          ),
           Text(
             '点击任意一格即生成独立测试会话；重新采样只替换本格。'
             '矩阵采样固定进入时的玻璃档位，离开此页后恢复自适应。'
@@ -256,7 +266,17 @@ class _PerformanceLabPageState extends State<PerformanceLabPage> {
         raster[key] is num ? (raster[key] as num).toStringAsFixed(2) : '—';
     final ratio = raster['overBudgetRatio'];
     final percent = ratio is num ? (ratio * 100).toStringAsFixed(2) : '—';
-    return '$status\nRaster 均值 ${ms('averageMs')} ms · '
+    final groups = value['conditions'];
+    final actual = groups is List && groups.length == 1 && groups.single is Map
+        ? (groups.single as Map)['condition']
+        : null;
+    final cards = actual is Map ? actual['scrollCardGlassEnabled'] : null;
+    final cardMode = switch (cards) {
+      true => '真玻璃',
+      false => '静态仿玻璃',
+      _ => '未记录',
+    };
+    return '$status · 卡片：$cardMode\nRaster 均值 ${ms('averageMs')} ms · '
         'P90 ${ms('p90Ms')} ms · P99 ${ms('p99Ms')} ms · 超预算 $percent%';
   }
 }

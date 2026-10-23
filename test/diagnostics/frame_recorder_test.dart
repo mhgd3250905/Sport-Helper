@@ -45,6 +45,7 @@ void main() {
 
   void conditions({
     bool glass = true,
+    bool scrollCardGlass = false,
     bool stars = true,
     String quality = 'high',
     String phase = 'stable',
@@ -54,6 +55,7 @@ void main() {
     double budget = 1000 / 60,
   }) => recorder.setRenderConditions(
     glassEnabled: glass,
+    scrollCardGlassEnabled: scrollCardGlass,
     starfield: stars,
     glassQuality: quality,
     glassPhase: phase,
@@ -528,6 +530,7 @@ void main() {
     final changed = groups[1] as Map;
     expect(original['condition'], {
       'glassEnabled': true,
+      'scrollCardGlassEnabled': false,
       'starfield': true,
       'glassQuality': 'high',
       'glassPhase': 'stable',
@@ -563,6 +566,36 @@ void main() {
     final perScenario = recorder.snapshot()['scenarioConditions'] as Map;
     expect((perScenario['longChatScroll'] as Map)['groups'], hasLength(2));
   });
+
+  test(
+    'scroll-card rendering changes retain actual mode and invalidate a case',
+    () {
+      recorder.setPage('chat');
+      conditions();
+      beginCase();
+      recorder.start();
+      final first = frame();
+      conditions(scrollCardGlass: true);
+      final second = frame();
+      report([timing(first, 1000, 3000), timing(second, 1000, 12000)]);
+      final measurement = currentCase();
+      final groups = measurement['conditions'] as List;
+      expect(groups, hasLength(2));
+      expect(
+        ((groups.first as Map)['condition'] as Map)['scrollCardGlassEnabled'],
+        false,
+      );
+      expect(
+        ((groups.last as Map)['condition'] as Map)['scrollCardGlassEnabled'],
+        true,
+      );
+      expect(
+        measurement['comparisonIssues'],
+        contains('mixed_render_conditions'),
+      );
+      expect(recorder.snapshot()['conditionChangesDuringCapture'], 1);
+    },
+  );
 
   test('case warmup uses real vsync and exact two second boundary', () {
     recorder.setPage('chat');

@@ -227,6 +227,12 @@ def _validate_cell(raw: Any, key: str, metadata: dict[str, Any]) -> Cell:
         issues.append("实际开关与档位不一致")
     if type(condition.get("glassFrost")) is not bool:
         issues.append("actual.glassFrost 未确认")
+    card_glass = condition.get("scrollCardGlassEnabled")
+    if metadata.get("measurementKind") == "raster_controls_v3" or "scrollCardGlassEnabled" in condition:
+        if type(card_glass) is not bool:
+            issues.append("actual.scrollCardGlassEnabled 未确认")
+        elif card_glass and condition.get("glassEnabled") is not True:
+            issues.append("列表卡片真玻璃要求全局玻璃开启")
     for key_name in ACTUAL_DIMENSIONS:
         value = condition.get(key_name)
         if not _number(value) or value <= 0:
@@ -299,6 +305,13 @@ def pair_issues(left: Cell | None, right: Cell | None) -> list[str]:
     for key in ("renderer", "rendererBackend", "refreshRateHz", "adaptiveTargetFrameMs", "theme", *ACTUAL_DIMENSIONS):
         if left.condition.get(key) != right.condition.get(key):
             issues.append(f"actual.{key} 不同")
+    # Older v2 captures did not expose this independent switch. Keep their
+    # original within-matrix comparisons readable, but never silently treat a
+    # new static card as the old glass card (or compare mixed card modes).
+    if ("scrollCardGlassEnabled" in left.condition) != ("scrollCardGlassEnabled" in right.condition):
+        issues.append("列表卡片渲染条件的记录版本不同")
+    elif left.condition.get("scrollCardGlassEnabled") != right.condition.get("scrollCardGlassEnabled"):
+        issues.append("actual.scrollCardGlassEnabled 不同；需同一卡片模式对照")
     if left.condition["glassEnabled"] and right.condition["glassEnabled"]:
         for key in ("glassQuality", "glassPhase", "glassFrost"):
             if left.condition.get(key) != right.condition.get(key):
@@ -329,6 +342,10 @@ def render_matrix(matrix: Matrix) -> str:
     else:
         lines.append("每格已记录实际窗口尺寸、像素比和文字缩放；差值逐格核对。采样必须保持相同方向与系统外观。")
     lines.append("主题同时核对每帧实际条件和报告元数据；采样中应保持主题不变。")
+    if matrix.metadata.get("measurementKind") == "raster_controls_v3":
+        lines.append("glass_on/off 表示全局玻璃开关；列表卡片独立记录 scrollCardGlassEnabled，默认静态仿玻璃。不同实际卡片模式不用于本表的单开关差值。")
+    else:
+        lines.append("旧版报告未独立记录列表卡片模式：卡片沿用当时的全局玻璃路径，不能当成新版默认静态仿玻璃。")
     if matrix.metadata.get("isEmulator") is True:
         lines.append("本次为模拟器数据，只能作相对比较，绝对值不代表真机。")
     lines.extend(["", "## 稳态 Raster（首次 case 帧 +2 秒之后）", "",
@@ -340,6 +357,22 @@ def render_matrix(matrix: Matrix) -> str:
             status = "缺格" if cell is None else ("有效" if not cell.issues else "无效：" + "；".join(cell.issues))
             values = " | ".join(_value(cell, "steadyState", key) for key in ("averageMs", "p90Ms", "p99Ms", "overBudgetRatio"))
             lines.append(f"| {variant} | {scenario} | {values} | {_text(status)} |")
+    lines.extend(["", "## 每格实际列表卡片模式", "",
+                  "| 档位 | 固定场景 | 实际卡片模式 |",
+                  "| --- | --- | --- |"])
+    for variant in VARIANTS:
+        for scenario in SCENARIOS:
+            cell = matrix.cells.get(f"{variant}__{scenario}")
+            mode = "缺格"
+            if cell is not None:
+                actual = cell.condition.get("scrollCardGlassEnabled")
+                if type(actual) is bool:
+                    mode = "真玻璃" if actual else "静态仿玻璃"
+                elif cell.metadata.get("measurementKind") == "raster_controls_v2" and "scrollCardGlassEnabled" not in cell.condition:
+                    mode = "旧版：沿用全局玻璃（未独立记录）"
+                else:
+                    mode = "未知；不可对照"
+            lines.append(f"| {variant} | {scenario} | {mode} |")
     lines.extend(["", "## 前 2 秒与最差帧（Raster）", "",
                   "| 档位 | 固定场景 | 前 2 秒平均 ms | 前 2 秒最差 ms | 本格与首次进页 2 秒交集最差 ms | 稳态最差 ms | 全段最差 ms |",
                   "| --- | --- | ---: | ---: | ---: | ---: | ---: |"])

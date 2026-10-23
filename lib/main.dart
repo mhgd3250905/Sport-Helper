@@ -138,31 +138,23 @@ Future<void> main() async {
     LiquidGlassWidgets.wrap(
       // Material theme mode drives the glass brightness.
       brightnessResolver: Theme.maybeBrightnessOf,
-      // Benchmarks the device's raster budget and settles premium / standard
-      // / minimal; the settled tier is kept so the next launch starts there.
-      adaptiveQuality: !FrameRecorder.buildEnabled,
-      adaptiveConfig: GlassAdaptiveScopeConfig(
+      // One App-owned monitor uses the exact display budget in every build.
+      // The package's integer 16 ms default must not run alongside it.
+      adaptiveQuality: false,
+      child: SfAdaptiveGlass(
         initialQuality: SfGlass.initialQuality(store.glassQuality),
-        // The web's ceiling is standard; keep it there rather than letting a
-        // slow first frame drop the shader for the whole session.
-        minQuality: kIsWeb ? GlassQuality.standard : GlassQuality.minimal,
         onQualityChanged: (_, to) => store.setGlassQuality(to.name),
+        freezeListenable: FrameRecorder.buildEnabled
+            ? PerformanceLab.instance
+            : null,
+        freezeAdaptation: FrameRecorder.buildEnabled
+            ? () => PerformanceLab.instance.freezeAdaptation
+            : null,
+        child: TrainingMediaScope(
+          repository: media,
+          child: SmartFitApp(services: services),
+        ),
       ),
-      child: FrameRecorder.buildEnabled
-          ? SfAdaptiveGlass(
-              initialQuality: SfGlass.initialQuality(store.glassQuality),
-              onQualityChanged: (_, to) => store.setGlassQuality(to.name),
-              freezeListenable: PerformanceLab.instance,
-              freezeAdaptation: () => PerformanceLab.instance.freezeAdaptation,
-              child: TrainingMediaScope(
-                repository: media,
-                child: SmartFitApp(services: services),
-              ),
-            )
-          : TrainingMediaScope(
-              repository: media,
-              child: SmartFitApp(services: services),
-            ),
     ),
   );
 }

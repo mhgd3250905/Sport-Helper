@@ -16,7 +16,7 @@ import '../theme/widgets.dart';
 import 'expand_route.dart';
 
 /// The assistant's plan reply: a compact, fixed-height card (like a link
-/// share in a messenger), raised on liquid glass because it is tappable;
+/// share in a messenger), raised on a static glass-like face;
 /// the media inside stays opaque and rounded.
 ///
 /// * one move → [_ExerciseBody], 130 px at default text size: a square preview on the left,
@@ -881,7 +881,7 @@ class _PlanCardState extends State<PlanCard>
       );
     }
 
-    Widget card = SfGlassSurface(
+    Widget card = SfScrollCardSurface(
       radius: SfRadius.lg,
       width: width,
       padding: const EdgeInsets.all(_inset),
@@ -924,7 +924,10 @@ class _PlanCardState extends State<PlanCard>
 
     return Align(
       alignment: Alignment.centerLeft,
-      child: SizedBox(key: _card, width: width, child: card),
+      child: RepaintBoundary(
+        key: const ValueKey('plan-card-paint-boundary'),
+        child: SizedBox(key: _card, width: width, child: card),
+      ),
     );
   }
 
