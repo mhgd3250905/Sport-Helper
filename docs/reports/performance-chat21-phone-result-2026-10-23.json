@@ -1,0 +1,423 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-23",
+  "sourceCommit": "c226177c6457843753bd776fe72387a85ac6cb03",
+  "apkSha256": "26249b650e142a475e309740a0e245edf7c39b4f2631174cfad875f8256316d0",
+  "reports": [
+    {
+      "theme": "light",
+      "originalFileName": "SmartFit-performance-20261023T151159669121Z.json",
+      "archive": "docs/reports/performance-chat21-light-20261023T151159669121Z.json",
+      "sizeBytes": 33425,
+      "sha256": "d17e18f46f5edd84cf9486d5f5f0845d5c98e37cf4bed5acfb579dffc6172f30",
+      "metadata": {
+        "appVersion": "0.1.0",
+        "appBuild": "21",
+        "appBaseCommit": "c35068003fe484f793ce051134444ae3b0172c4d",
+        "sdkRef": "f684e02f38e652633c23fa8946a53d02b6aa3ea2",
+        "appSource": "c226177c6457843753bd776fe72387a85ac6cb03",
+        "measurementKind": "raster_controls_v4",
+        "flavor": "internal",
+        "buildMode": "release",
+        "platform": "android",
+        "renderer": "impeller",
+        "metadataStatus": "available",
+        "appearance": "light",
+        "theme": "light",
+        "contentActionCount": 93,
+        "chatMessageCount": 0,
+        "refreshRateSource": "flutter_display",
+        "starfield": true,
+        "scrollCardGlassEnabled": false,
+        "glassQuality": "premium",
+        "deviceModel": "2602BRT18C",
+        "deviceManufacturer": "Xiaomi",
+        "systemVersion": "16",
+        "deviceApiLevel": 36,
+        "appBuildNumber": 2021,
+        "isEmulator": false,
+        "rendererBackend": "vulkan",
+        "rendererSource": "android_engine_startup_log_own_pid_cached",
+        "rendererVerified": true
+      },
+      "validExpectedCells": 1,
+      "acceptanceReady": true,
+      "acceptanceIssues": [],
+      "cells": [
+        {
+          "id": "chat_suggestions_static__longChatScroll",
+          "issues": [],
+          "entryIssues": [],
+          "actualConditions": {
+            "glassEnabled": true,
+            "scrollCardGlassEnabled": false,
+            "starfield": true,
+            "glassQuality": "premium",
+            "glassPhase": "comparison_locked",
+            "glassFrost": false,
+            "renderer": "Impeller",
+            "rendererBackend": "vulkan",
+            "refreshRateHz": 120.00000762939453,
+            "frameBudgetMs": 8.333332803514303,
+            "adaptiveTargetFrameMs": 8.333332803514303,
+            "theme": "light",
+            "viewportWidth": 393.84615384615387,
+            "viewportHeight": 852.9230769230769,
+            "devicePixelRatio": 3.25,
+            "textScale": 1.0,
+            "fixedGlass": {
+              "context": "chat",
+              "configurationId": "chat_suggestions_static",
+              "policy": {
+                "topBar": true,
+                "bottomBar": true,
+                "input": true,
+                "suggestions": false,
+                "saturationEnabled": true,
+                "blurScale": 1.0
+              },
+              "presentRoles": [
+                "input",
+                "suggestions"
+              ],
+              "roleStates": {
+                "topBar": null,
+                "bottomBar": null,
+                "input": true,
+                "suggestions": false
+              },
+              "baseBlur": 1.5,
+              "baseSaturation": 1.1,
+              "roleMaterials": {
+                "topBar": null,
+                "bottomBar": null,
+                "input": {
+                  "trueGlass": true,
+                  "blur": 1.5,
+                  "saturation": 1.1
+                },
+                "suggestions": {
+                  "trueGlass": false,
+                  "blur": 0.0,
+                  "saturation": 1.0
+                }
+              },
+              "prewarmEnabled": false,
+              "prewarmStatus": "disabled",
+              "prewarmDurationMs": null,
+              "prewarmLogicalWidth": null,
+              "prewarmLogicalHeight": null,
+              "prewarmPixelRatio": null
+            }
+          },
+          "fixtureId": "long_chat_72_v1",
+          "messageCount": 72,
+          "steadyState": {
+            "frameCount": 3616,
+            "uiBuild": {
+              "averageMs": 0.607214878318584,
+              "p90Ms": 0.927,
+              "p99Ms": 1.535,
+              "worstMs": 2.522,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "raster": {
+              "averageMs": 4.068388274336283,
+              "p90Ms": 4.863,
+              "p99Ms": 5.631,
+              "worstMs": 7.442,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "eitherThreadOverBudgetFrames": 0,
+            "estimatedMissedVsyncs": 0,
+            "refreshRatesHz": [
+              120.00000762939453
+            ],
+            "refreshRatesTruncated": false
+          },
+          "scriptFirst2Seconds": {
+            "frameCount": 241,
+            "uiBuild": {
+              "averageMs": 0.6624190871369294,
+              "p90Ms": 0.959,
+              "p99Ms": 3.199,
+              "worstMs": 5.023,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "raster": {
+              "averageMs": 4.133165975103734,
+              "p90Ms": 5.119,
+              "p99Ms": 6.399,
+              "worstMs": 7.104,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "eitherThreadOverBudgetFrames": 0,
+            "estimatedMissedVsyncs": 0,
+            "refreshRatesHz": [
+              120.00000762939453
+            ],
+            "refreshRatesTruncated": false
+          },
+          "entryFirst2Seconds": {
+            "frameCount": 232,
+            "uiBuild": {
+              "averageMs": 0.8777327586206897,
+              "p90Ms": 1.087,
+              "p99Ms": 10.751,
+              "worstMs": 16.206,
+              "overBudgetFrames": 3,
+              "overBudgetRatio": 0.01293103448275862
+            },
+            "raster": {
+              "averageMs": 4.487288793103448,
+              "p90Ms": 5.631,
+              "p99Ms": 14.335,
+              "worstMs": 20.588,
+              "overBudgetFrames": 6,
+              "overBudgetRatio": 0.02586206896551724
+            },
+            "eitherThreadOverBudgetFrames": 9,
+            "estimatedMissedVsyncs": 11,
+            "refreshRatesHz": [
+              120.00000762939453
+            ],
+            "refreshRatesTruncated": false
+          },
+          "targetPreviouslyEntered": false,
+          "entryOrdinal": 1,
+          "acceptanceReady": true
+        }
+      ]
+    },
+    {
+      "theme": "dark",
+      "originalFileName": "SmartFit-performance-20261023T152455149607Z.json",
+      "archive": "docs/reports/performance-chat21-dark-20261023T152455149607Z.json",
+      "sizeBytes": 28814,
+      "sha256": "715803fbfa26dca1dfc0187cd02b40297d7acb4583f0def8ab864b0bd8d0d0ba",
+      "metadata": {
+        "appVersion": "0.1.0",
+        "appBuild": "21",
+        "appBaseCommit": "c35068003fe484f793ce051134444ae3b0172c4d",
+        "sdkRef": "f684e02f38e652633c23fa8946a53d02b6aa3ea2",
+        "appSource": "c226177c6457843753bd776fe72387a85ac6cb03",
+        "measurementKind": "raster_controls_v4",
+        "flavor": "internal",
+        "buildMode": "release",
+        "platform": "android",
+        "renderer": "impeller",
+        "metadataStatus": "available",
+        "appearance": "dark",
+        "theme": "dark",
+        "contentActionCount": 93,
+        "chatMessageCount": 19,
+        "refreshRateSource": "flutter_display",
+        "starfield": true,
+        "scrollCardGlassEnabled": false,
+        "glassQuality": "premium",
+        "deviceModel": "2602BRT18C",
+        "deviceManufacturer": "Xiaomi",
+        "systemVersion": "16",
+        "deviceApiLevel": 36,
+        "appBuildNumber": 2021,
+        "isEmulator": false,
+        "rendererBackend": "vulkan",
+        "rendererSource": "android_engine_startup_log_own_pid_cached",
+        "rendererVerified": true
+      },
+      "validExpectedCells": 1,
+      "acceptanceReady": true,
+      "acceptanceIssues": [],
+      "cells": [
+        {
+          "id": "chat_suggestions_static__longChatScroll",
+          "issues": [],
+          "entryIssues": [],
+          "actualConditions": {
+            "glassEnabled": true,
+            "scrollCardGlassEnabled": false,
+            "starfield": true,
+            "glassQuality": "premium",
+            "glassPhase": "comparison_locked",
+            "glassFrost": false,
+            "renderer": "Impeller",
+            "rendererBackend": "vulkan",
+            "refreshRateHz": 120.00000762939453,
+            "frameBudgetMs": 8.333332803514303,
+            "adaptiveTargetFrameMs": 8.333332803514303,
+            "theme": "dark",
+            "viewportWidth": 393.84615384615387,
+            "viewportHeight": 852.9230769230769,
+            "devicePixelRatio": 3.25,
+            "textScale": 1.0,
+            "fixedGlass": {
+              "context": "chat",
+              "configurationId": "chat_suggestions_static",
+              "policy": {
+                "topBar": true,
+                "bottomBar": true,
+                "input": true,
+                "suggestions": false,
+                "saturationEnabled": true,
+                "blurScale": 1.0
+              },
+              "presentRoles": [
+                "input",
+                "suggestions"
+              ],
+              "roleStates": {
+                "topBar": null,
+                "bottomBar": null,
+                "input": true,
+                "suggestions": false
+              },
+              "baseBlur": 1.2,
+              "baseSaturation": 1.15,
+              "roleMaterials": {
+                "topBar": null,
+                "bottomBar": null,
+                "input": {
+                  "trueGlass": true,
+                  "blur": 1.2,
+                  "saturation": 1.15
+                },
+                "suggestions": {
+                  "trueGlass": false,
+                  "blur": 0.0,
+                  "saturation": 1.0
+                }
+              },
+              "prewarmEnabled": false,
+              "prewarmStatus": "disabled",
+              "prewarmDurationMs": null,
+              "prewarmLogicalWidth": null,
+              "prewarmLogicalHeight": null,
+              "prewarmPixelRatio": null
+            }
+          },
+          "fixtureId": "long_chat_72_v1",
+          "messageCount": 72,
+          "steadyState": {
+            "frameCount": 3616,
+            "uiBuild": {
+              "averageMs": 0.68002046460177,
+              "p90Ms": 1.087,
+              "p99Ms": 1.663,
+              "worstMs": 2.998,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "raster": {
+              "averageMs": 3.4883238384955755,
+              "p90Ms": 4.095,
+              "p99Ms": 4.607,
+              "worstMs": 7.43,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "eitherThreadOverBudgetFrames": 0,
+            "estimatedMissedVsyncs": 0,
+            "refreshRatesHz": [
+              120.00000762939453
+            ],
+            "refreshRatesTruncated": false
+          },
+          "scriptFirst2Seconds": {
+            "frameCount": 241,
+            "uiBuild": {
+              "averageMs": 0.6950082987551868,
+              "p90Ms": 1.087,
+              "p99Ms": 3.071,
+              "worstMs": 6.062,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "raster": {
+              "averageMs": 3.336875518672199,
+              "p90Ms": 3.967,
+              "p99Ms": 4.351,
+              "worstMs": 5.168,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "eitherThreadOverBudgetFrames": 0,
+            "estimatedMissedVsyncs": 0,
+            "refreshRatesHz": [
+              120.00000762939453
+            ],
+            "refreshRatesTruncated": false
+          },
+          "entryFirst2Seconds": {
+            "frameCount": 232,
+            "uiBuild": {
+              "averageMs": 0.9107844827586207,
+              "p90Ms": 1.151,
+              "p99Ms": 7.679,
+              "worstMs": 18.477,
+              "overBudgetFrames": 2,
+              "overBudgetRatio": 0.008620689655172414
+            },
+            "raster": {
+              "averageMs": 3.660771551724138,
+              "p90Ms": 4.351,
+              "p99Ms": 12.287,
+              "worstMs": 23.222,
+              "overBudgetFrames": 5,
+              "overBudgetRatio": 0.021551724137931036
+            },
+            "eitherThreadOverBudgetFrames": 7,
+            "estimatedMissedVsyncs": 9,
+            "refreshRatesHz": [
+              120.00000762939453
+            ],
+            "refreshRatesTruncated": false
+          },
+          "targetPreviouslyEntered": true,
+          "entryOrdinal": 2,
+          "acceptanceReady": true
+        }
+      ]
+    }
+  ],
+  "excludedFrom120HzAcceptance": [
+    {
+      "archive": "docs/reports/performance-chat21-light-20261023T150219567757Z.json",
+      "sha256": "fd302e50a7671a7adb207ddedfbc3b20cd3b4ead3da3859feee37119c8b2e49a",
+      "reason": "60Hz labels and 16.666667ms budget differ from 120Hz acceptance",
+      "notUsedForCrossVersionGain": true
+    }
+  ],
+  "gate": {
+    "requiredScenes": [
+      "light chat",
+      "dark chat"
+    ],
+    "requiredActualRefreshRateHz": 120,
+    "rasterP99LimitMsExclusive": 8.33,
+    "bothRasterP99BelowLimit": true,
+    "bothSteadyRasterOverBudgetZero": true,
+    "passed": true,
+    "entrySpikesExcludedFromGate": true,
+    "fallbackInputBlur1_2Required": false,
+    "fallbackInputBlur1_2Captured": false,
+    "planCasesRetestedThisRound": false
+  },
+  "deviceState": {
+    "temporaryDisplay0PreferredMode": "1280x2772@120",
+    "preferredModeRestoredToUnspecified": true,
+    "peakRefreshRateUnchanged": 120,
+    "starfieldUnchanged": true,
+    "appearanceRestoredToOriginalDark": true
+  },
+  "sdkChanged": false,
+  "prewarmEnabled": false,
+  "mergeApprovalRequired": true,
+  "mergeApprovalReceived": false,
+  "mergedMain": false,
+  "pushed": false,
+  "brandRebased": false
+}
