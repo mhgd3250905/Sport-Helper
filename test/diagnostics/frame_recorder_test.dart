@@ -53,7 +53,10 @@ void main() {
     bool frost = true,
     String renderer = 'Impeller',
     String backend = 'vulkan',
+    String theme = 'dark',
     double budget = 1000 / 60,
+    double baseBlur = 1.2,
+    double baseSaturation = 1.15,
     SfFixedGlassPolicy? fixedPolicy,
     bool isPlanContext = true,
     String fixedConfig = 'baseline',
@@ -70,7 +73,7 @@ void main() {
     renderer: renderer,
     rendererBackend: backend,
     adaptiveTargetFrameMs: budget,
-    theme: 'dark',
+    theme: theme,
     viewportWidth: 412,
     viewportHeight: 915,
     devicePixelRatio: 2.625,
@@ -85,9 +88,54 @@ void main() {
     prewarmEnabled: prewarmEnabled,
     prewarmStatus: prewarmStatus,
     prewarmDurationMs: prewarmDurationMs,
-    fixedGlassBaseBlur: 1.2,
-    fixedGlassBaseSaturation: 1.15,
+    fixedGlassBaseBlur: baseBlur,
+    fixedGlassBaseSaturation: baseSaturation,
   );
+
+  Map measureFixedChat({
+    required String configId,
+    required SfFixedGlassPolicy policy,
+    String theme = 'light',
+  }) {
+    recorder.start();
+    recorder.setRefreshRateHz(120);
+    conditions(
+      fixedPolicy: policy,
+      isPlanContext: false,
+      fixedConfig: configId,
+      theme: theme,
+      budget: 1000 / 120,
+      baseBlur: theme == 'light' ? 1.5 : 1.2,
+      baseSaturation: theme == 'light' ? 1.1 : 1.15,
+    );
+    expect(
+      recorder.beginFixedGlassEntry(
+        configId: configId,
+        targetPage: 'performance_chat',
+      ),
+      isTrue,
+    );
+    recorder.setPage('performance_chat');
+    final entry = frame();
+    report([timing(entry, 1000, 19000)]);
+    expect(
+      recorder.beginFixedGlassCase(
+        configId: configId,
+        scenario: FrameScenario.longChatScroll,
+        fixtureId: 'long_chat_72_v1',
+        messageCount: 72,
+      ),
+      isTrue,
+    );
+    final first = frame();
+    nextTimestamp += 31000000;
+    final last = frame();
+    report([timing(first, 1000, 7000), timing(last, 1000, 4000)]);
+    recorder.endCase();
+    return (recorder.snapshot()['fixedGlassCases']
+            as Map)['${configId}__longChatScroll']
+        as Map;
+  }
 
   bool beginCase({
     String variant = 'glass_on_stars_on',
@@ -660,10 +708,169 @@ void main() {
       expect(recorder.snapshot()['invalidCaseRequestCount'], 2);
       expect(
         (recorder.snapshot()['retention'] as Map)['maxFixedGlassCases'],
-        11,
+        13,
       );
     },
   );
+
+  for (final theme in ['light', 'dark']) {
+    test('static chat default records actual $theme materials and entry', () {
+      final cell = measureFixedChat(
+        configId: 'chat_suggestions_static',
+        policy: SfFixedGlassPolicy.chat,
+        theme: theme,
+      );
+      expect(cell['comparisonReady'], isTrue);
+      expect(cell['comparisonIssues'], isEmpty);
+      expect(cell['fixtureId'], 'long_chat_72_v1');
+      final actual =
+          ((cell['conditions'] as List).single as Map)['condition'] as Map;
+      final fixed = actual['fixedGlass'] as Map;
+      expect(actual['theme'], theme);
+      expect(actual['starfield'], isTrue);
+      expect(actual['scrollCardGlassEnabled'], isFalse);
+      expect(fixed['context'], 'chat');
+      expect(fixed['presentRoles'], ['input', 'suggestions']);
+      expect(fixed['roleStates'], {
+        'topBar': null,
+        'bottomBar': null,
+        'input': true,
+        'suggestions': false,
+      });
+      expect(fixed['roleMaterials'], {
+        'topBar': null,
+        'bottomBar': null,
+        'input': {
+          'trueGlass': true,
+          'blur': theme == 'light' ? 1.5 : 1.2,
+          'saturation': theme == 'light' ? 1.1 : 1.15,
+        },
+        'suggestions': {'trueGlass': false, 'blur': 0.0, 'saturation': 1.0},
+      });
+      expect((fixed['policy'] as Map).containsKey('inputBlur'), isFalse);
+      expect(fixed['prewarmEnabled'], isFalse);
+      expect(fixed['prewarmStatus'], 'disabled');
+      expect(fixed['prewarmDurationMs'], isNull);
+      expect(fixed['prewarmLogicalWidth'], isNull);
+      expect(fixed['prewarmLogicalHeight'], isNull);
+      expect(fixed['prewarmPixelRatio'], isNull);
+      expect(cell['entryCondition'], actual);
+      expect(cell['entryWindowComplete'], isTrue);
+      expect(
+        ((cell['entryFirst2Seconds'] as Map)['raster'] as Map)['worstMs'],
+        19,
+      );
+      expect(((cell['steadyState'] as Map)['raster'] as Map)['worstMs'], 4);
+      expect(recorder.snapshot()['cases'], isEmpty);
+      expect(
+        (recorder.snapshot()['retention'] as Map)['maxFixedGlassCases'],
+        13,
+      );
+    });
+  }
+
+  test('input-only comparison reports the absolute 1.2 sigma', () {
+    const configId = 'chat_suggestions_static_input_blur_1_2';
+    final cell = measureFixedChat(
+      configId: configId,
+      policy: SfFixedGlassPolicy.chat.copyWith(inputBlur: 1.2),
+    );
+    expect(cell['comparisonReady'], isTrue);
+    expect(cell['comparisonIssues'], isEmpty);
+    final actual =
+        ((cell['conditions'] as List).single as Map)['condition'] as Map;
+    final fixed = actual['fixedGlass'] as Map;
+    expect(fixed['baseBlur'], 1.5);
+    expect((fixed['policy'] as Map)['inputBlur'], 1.2);
+    expect((fixed['roleMaterials'] as Map)['input'], {
+      'trueGlass': true,
+      'blur': 1.2,
+      'saturation': 1.1,
+    });
+    expect((fixed['roleMaterials'] as Map)['suggestions'], {
+      'trueGlass': false,
+      'blur': 0.0,
+      'saturation': 1.0,
+    });
+    expect(fixed['prewarmEnabled'], isFalse);
+    expect(fixed['prewarmStatus'], 'disabled');
+    expect(cell['entryCondition'], actual);
+  });
+
+  test('input-only comparison cannot become valid under the dark theme', () {
+    final cell = measureFixedChat(
+      configId: 'chat_suggestions_static_input_blur_1_2',
+      policy: SfFixedGlassPolicy.chat.copyWith(inputBlur: 1.2),
+      theme: 'dark',
+    );
+    expect(cell['completed'], isTrue);
+    expect(cell['comparisonReady'], isFalse);
+    expect(cell['comparisonIssues'], [
+      'input_blur_control_requires_light_theme',
+    ]);
+    expect(count(cell, 'steadyState'), 1);
+  });
+
+  test('legacy chat baseline remains a separate true-glass control', () {
+    final cell = measureFixedChat(
+      configId: 'chat_baseline',
+      policy: SfFixedGlassPolicy.baseline,
+    );
+    expect(cell['comparisonReady'], isTrue);
+    expect(cell['comparisonIssues'], isEmpty);
+    final actual =
+        ((cell['conditions'] as List).single as Map)['condition'] as Map;
+    final fixed = actual['fixedGlass'] as Map;
+    expect((fixed['roleStates'] as Map)['suggestions'], isTrue);
+    expect((fixed['roleMaterials'] as Map)['suggestions'], {
+      'trueGlass': true,
+      'blur': 1.5,
+      'saturation': 1.1,
+    });
+  });
+
+  test('missing input sigma cannot impersonate the input-only comparison', () {
+    final cell = measureFixedChat(
+      configId: 'chat_suggestions_static_input_blur_1_2',
+      policy: SfFixedGlassPolicy.chat,
+    );
+    expect(cell['comparisonReady'], isFalse);
+    expect(cell['comparisonIssues'], ['fixed_glass_actual_policy_mismatch']);
+  });
+
+  test('new chat comparisons retain thirteen bounded replacement slots', () {
+    expect(SfFixedGlassPolicy.experimentIds, hasLength(13));
+    for (var pass = 0; pass < 2; pass++) {
+      for (final id in SfFixedGlassPolicy.experimentIds) {
+        expect(
+          recorder.beginFixedGlassCase(
+            configId: id,
+            scenario: SfFixedGlassPolicy.isChatConfiguration(id)
+                ? FrameScenario.longChatScroll
+                : FrameScenario.planCardScroll,
+            fixtureId: 'bounded_fixture_v1',
+            messageCount: 72,
+          ),
+          isTrue,
+        );
+        recorder.endCase(completed: false);
+      }
+    }
+    for (var i = 0; i < 20; i++) {
+      expect(
+        recorder.beginFixedGlassCase(
+          configId: 'unbounded_chat_$i',
+          scenario: FrameScenario.longChatScroll,
+          fixtureId: 'bounded_fixture_v1',
+          messageCount: 72,
+        ),
+        isFalse,
+      );
+    }
+    expect(recorder.snapshot()['fixedGlassCases'], hasLength(13));
+    expect(recorder.snapshot()['cases'], isEmpty);
+    expect(recorder.snapshot()['invalidCaseRequestCount'], 20);
+  });
 
   test('measurement metadata retains fixed app and device context fields', () {
     final metadata = <String, Object?>{

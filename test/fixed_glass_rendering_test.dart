@@ -156,23 +156,28 @@ Future<void> _precache(WidgetTester tester) async {
 Widget _surface({
   required SfFixedGlassPolicy policy,
   bool isPlanContext = true,
+  bool scoped = true,
   SfFixedGlassRole role = SfFixedGlassRole.input,
-}) => MaterialApp(
-  home: SfFixedGlassScope(
-    policy: policy,
-    isPlanContext: isPlanContext,
-    child: Center(
-      child: SfFixedGlassSurface(
-        role: role,
-        radius: 26,
-        width: 240,
-        height: 72,
-        padding: const EdgeInsets.all(12),
-        child: const Text('固定玻璃'),
-      ),
+}) {
+  Widget surface = Center(
+    child: SfFixedGlassSurface(
+      role: role,
+      radius: 26,
+      width: 240,
+      height: 72,
+      padding: const EdgeInsets.all(12),
+      child: const Text('固定玻璃'),
     ),
-  ),
-);
+  );
+  if (scoped) {
+    surface = SfFixedGlassScope(
+      policy: policy,
+      isPlanContext: isPlanContext,
+      child: surface,
+    );
+  }
+  return MaterialApp(home: surface);
+}
 
 void main() {
   setUp(() {
@@ -260,9 +265,42 @@ void main() {
       },
       skip: !PerformanceLab.buildEnabled,
     );
+
+    testWidgets(
+      'input-only blur override preserves ${palette.brightness} other materials',
+      (tester) async {
+        final previous = SfColors.palette;
+        SfColors.palette = palette;
+        addTearDown(() => SfColors.palette = previous);
+        const policy = SfFixedGlassPolicy(inputBlur: 1.2);
+        for (final role in SfFixedGlassRole.values) {
+          await tester.pumpWidget(
+            _surface(policy: SfFixedGlassPolicy.baseline, role: role),
+          );
+          final original = tester.getRect(find.byType(SfFixedGlassSurface));
+          await tester.pumpWidget(
+            _surface(policy: policy, role: role, isPlanContext: false),
+          );
+          final material = tester
+              .widget<GlassContainer>(find.byType(GlassContainer))
+              .settings!;
+          expect(
+            material.blur,
+            PerformanceLab.buildEnabled && role == SfFixedGlassRole.input
+                ? 1.2
+                : SfGlass.standardMaterial.blur,
+          );
+          expect(material.saturation, SfGlass.standardMaterial.saturation);
+          expect(find.byType(BackdropFilter), findsNWidgets(2));
+          expect(tester.getRect(find.byType(SfFixedGlassSurface)), original);
+          expect(tester.takeException(), isNull);
+        }
+        await tester.pumpWidget(const SizedBox.shrink());
+      },
+    );
   }
 
-  testWidgets('plan-only static override preserves ordinary chat glass', (
+  testWidgets('explicit material policy also applies to a chat scope', (
     tester,
   ) async {
     const policy = SfFixedGlassPolicy(
@@ -275,16 +313,36 @@ void main() {
       await tester.pumpWidget(
         _surface(policy: policy, role: role, isPlanContext: false),
       );
-      expect(find.byType(GlassContainer), findsOneWidget);
-      final material = tester
-          .widget<GlassContainer>(find.byType(GlassContainer))
-          .settings!;
-      expect(material.blur, SfGlass.standardMaterial.blur);
-      expect(material.saturation, SfGlass.standardMaterial.saturation);
+      expect(find.byType(GlassContainer), findsNothing);
+      expect(find.byType(BackdropFilter), findsNothing);
+      expect(find.byType(SfStaticGlassFace), findsOneWidget);
       expect(tester.takeException(), isNull);
     }
     await tester.pumpWidget(const SizedBox.shrink());
   });
+
+  testWidgets(
+    'fixed bars outside chat scopes preserve their original material',
+    (tester) async {
+      for (final role in SfFixedGlassRole.values) {
+        await tester.pumpWidget(
+          _surface(
+            policy: const SfFixedGlassPolicy(input: false, suggestions: false),
+            role: role,
+            scoped: false,
+          ),
+        );
+        expect(find.byType(GlassContainer), findsOneWidget);
+        final material = tester
+            .widget<GlassContainer>(find.byType(GlassContainer))
+            .settings!;
+        expect(material.blur, SfGlass.standardMaterial.blur);
+        expect(material.saturation, SfGlass.standardMaterial.saturation);
+        expect(tester.takeException(), isNull);
+      }
+      await tester.pumpWidget(const SizedBox.shrink());
+    },
+  );
 
   for (final theme in ['light', 'dark']) {
     testWidgets(

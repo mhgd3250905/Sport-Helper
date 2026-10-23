@@ -59,6 +59,45 @@ def fixed_report():
 
 
 class FixedGlassMatrixTests(unittest.TestCase):
+    def chat_default_report(self, blur_override=False):
+        value = fixed_report()
+        value["metadata"].update(theme="light", appearance="light")
+        config = "chat_suggestions_static_input_blur_1_2" if blur_override else "chat_suggestions_static"
+        raw = copy.deepcopy(value["fixedGlassCases"]["chat_baseline__longChatScroll"])
+        raw.update(id=f"{config}__longChatScroll", variant=config, fixedGlassConfigurationId=config)
+        actual = raw["conditions"][0]["condition"]
+        actual["theme"] = "light"
+        fixed = actual["fixedGlass"]
+        fixed.update(configurationId=config, policy=expected_policy(config), baseBlur=1.5)
+        fixed["roleStates"]["suggestions"] = False
+        fixed["roleMaterials"]["suggestions"] = {"trueGlass": False, "blur": 0.0, "saturation": 1.0}
+        fixed["roleMaterials"]["input"]["blur"] = 1.2 if blur_override else 1.5
+        raw["entryCondition"] = copy.deepcopy(actual)
+        value["fixedGlassCases"] = {raw["id"]: raw}
+        return value, raw
+
+    def test_chat_default_is_valid_without_changing_input_or_legacy_chat(self):
+        value, raw = self.chat_default_report()
+        measured = build_matrix(value)[raw["id"]]
+        self.assertEqual(measured.issues, [])
+        self.assertEqual(measured.entry_issues, [])
+        self.assertIn("| chat_suggestions_static | longChatScroll |", render_matrix(value, {raw["id"]: measured}))
+        fixed = raw["conditions"][0]["condition"]["fixedGlass"]
+        fixed["policy"]["suggestions"] = True
+        self.assertIn("实际玻璃策略与实验预设不同", build_matrix(value)[raw["id"]].issues)
+
+    def test_input_only_absolute_blur_control_requires_correct_light_material(self):
+        value, raw = self.chat_default_report(blur_override=True)
+        measured = build_matrix(value)[raw["id"]]
+        self.assertEqual(measured.issues, [])
+        self.assertEqual(measured.entry_issues, [])
+        fixed = raw["conditions"][0]["condition"]["fixedGlass"]
+        fixed["roleMaterials"]["input"]["blur"] = 1.5
+        self.assertIn("input 实际材质与策略不匹配", build_matrix(value)[raw["id"]].issues)
+        fixed["roleMaterials"]["input"]["blur"] = 1.2
+        raw["conditions"][0]["condition"]["theme"] = "dark"
+        self.assertIn("输入框模糊对照仅适用于浅色聊天", build_matrix(value)[raw["id"]].issues)
+
     def test_nine_real_cells_include_na_roles_and_entry_provenance(self):
         value = fixed_report()
         matrix = build_matrix(value)

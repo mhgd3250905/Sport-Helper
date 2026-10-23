@@ -569,7 +569,7 @@ class _PerformanceCaseRunnerState extends State<PerformanceCaseRunner>
     // These two acceptance cells exercise the actual page default, without a
     // material override that could conceal a missing production integration.
     if (widget.fixedGlassConfigurationId == 'suggestions_static' ||
-        widget.fixedGlassConfigurationId == 'chat_baseline') {
+        widget.fixedGlassConfigurationId == 'chat_suggestions_static') {
       return page;
     }
     return SfFixedGlassScope(

@@ -112,7 +112,7 @@ Future<void> _show(
 Finder _inside(Type parent, Type child) =>
     find.descendant(of: find.byType(parent), matching: find.byType(child));
 
-void _expectControls(WidgetTester tester, {required bool plan}) {
+void _expectControls(WidgetTester tester, {bool staticSuggestions = true}) {
   final input = _inside(ChatInputBar, GlassContainer);
   expect(input, findsOneWidget);
   final material = tester.widget<GlassContainer>(input).settings!;
@@ -121,15 +121,15 @@ void _expectControls(WidgetTester tester, {required bool plan}) {
   expect(_inside(ChatInputBar, BackdropFilter), findsNWidgets(2));
   expect(
     _inside(SuggestionStrip, GlassContainer),
-    plan ? findsNothing : findsWidgets,
+    staticSuggestions ? findsNothing : findsWidgets,
   );
   expect(
     _inside(SuggestionStrip, BackdropFilter),
-    plan ? findsNothing : findsWidgets,
+    staticSuggestions ? findsNothing : findsWidgets,
   );
   expect(
     _inside(SuggestionStrip, SfStaticGlassFace),
-    plan ? findsWidgets : findsNothing,
+    staticSuggestions ? findsWidgets : findsNothing,
   );
   expect(tester.takeException(), isNull);
 }
@@ -171,17 +171,58 @@ void main() {
     SfGlass.qualityOverride = null;
   });
 
-  test('measured plan policy changes only the suggestion material', () {
-    expect(SfFixedGlassPolicy.planCards.suggestions, isFalse);
+  test('approved chat policy changes only the suggestion material', () {
+    expect(SfFixedGlassPolicy.chat.suggestions, isFalse);
+    expect(SfFixedGlassPolicy.planCards, SfFixedGlassPolicy.chat);
+    expect(SfFixedGlassPolicy.chat.inputBlur, isNull);
     expect(
-      SfFixedGlassPolicy.planCards.copyWith(suggestions: true),
+      SfFixedGlassPolicy.chat.copyWith(suggestions: true),
       SfFixedGlassPolicy.baseline,
     );
   });
 
+  test('input blur follow-up is explicit and preserves legacy metadata', () {
+    final policy = SfFixedGlassPolicy.chat.copyWith(inputBlur: 1.2);
+    expect(SfFixedGlassPolicy.chat.toJson().containsKey('inputBlur'), isFalse);
+    expect(policy.toJson()['inputBlur'], 1.2);
+    expect(policy.key, isNot(SfFixedGlassPolicy.chat.key));
+    expect(
+      policy,
+      const SfFixedGlassPolicy(suggestions: false, inputBlur: 1.2),
+    );
+    expect(policy.copyWith(), policy);
+    expect(() => SfFixedGlassPolicy(inputBlur: .6), throwsAssertionError);
+    expect(
+      SfFixedGlassPolicy.forConfiguration('chat_baseline'),
+      SfFixedGlassPolicy.baseline,
+    );
+    expect(
+      SfFixedGlassPolicy.forConfiguration('chat_suggestions_static'),
+      SfFixedGlassPolicy.chat,
+    );
+    expect(
+      SfFixedGlassPolicy.forConfiguration(
+        'chat_suggestions_static_input_blur_1_2',
+      ),
+      policy,
+    );
+    for (final id in [
+      'chat_baseline',
+      'chat_suggestions_static',
+      'chat_suggestions_static_input_blur_1_2',
+      'custom_chat',
+    ]) {
+      expect(SfFixedGlassPolicy.isChatConfiguration(id), isTrue);
+      expect(SfFixedGlassPolicy.experimentIds, contains(id));
+    }
+    for (final id in ['baseline', 'suggestions_static', 'custom_plan', '']) {
+      expect(SfFixedGlassPolicy.isChatConfiguration(id), isFalse);
+    }
+  });
+
   for (final palette in [SfPalette.light, SfPalette.dark]) {
     testWidgets(
-      'ordinary ${palette.brightness} chat follows plan arrival and clearing',
+      'ordinary ${palette.brightness} chat stays static as plan context changes',
       (tester) async {
         tall(tester);
         final previous = SfColors.palette;
@@ -189,19 +230,37 @@ void main() {
         addTearDown(() => SfColors.palette = previous);
         final (app, chat, engine) = await _conversation(messages: [_message()]);
         await _show(tester, app, chat, palette);
-        _expectControls(tester, plan: false);
+        _expectControls(tester);
+        expect(
+          SfFixedGlassScope.maybeOf(
+            tester.element(find.byType(ChatInputBar)),
+          )!.isPlanContext,
+          isFalse,
+        );
 
         // Exercise the existing controller notifications, not a benchmark scope.
         engine.next = const BotMessage('安排好了。', plan: _plan);
         await chat.send('给我一个计划');
         await tester.pumpAndSettle();
         expect(find.byType(PlanCard), findsOneWidget);
-        _expectControls(tester, plan: true);
+        _expectControls(tester);
+        expect(
+          SfFixedGlassScope.maybeOf(
+            tester.element(find.byType(ChatInputBar)),
+          )!.isPlanContext,
+          isTrue,
+        );
 
         await chat.newConversation();
         await tester.pumpAndSettle();
         expect(find.byType(PlanCard), findsNothing);
-        _expectControls(tester, plan: false);
+        _expectControls(tester);
+        expect(
+          SfFixedGlassScope.maybeOf(
+            tester.element(find.byType(ChatInputBar)),
+          )!.isPlanContext,
+          isFalse,
+        );
         await tester.pumpWidget(const SizedBox());
       },
     );
@@ -217,7 +276,7 @@ void main() {
           messages: [_message(plan: _plan)],
         );
         await _show(tester, app, chat, palette);
-        _expectControls(tester, plan: true);
+        _expectControls(tester);
         final input = tester.getRect(find.byType(ChatInputBar));
         final suggestions = tester.getRect(find.byType(SuggestionStrip));
 
@@ -228,7 +287,7 @@ void main() {
           palette,
           override: SfFixedGlassPolicy.baseline,
         );
-        _expectControls(tester, plan: false);
+        _expectControls(tester, staticSuggestions: false);
         expect(tester.getRect(find.byType(ChatInputBar)), input);
         expect(tester.getRect(find.byType(SuggestionStrip)), suggestions);
 
@@ -261,11 +320,11 @@ void main() {
     );
     await _show(tester, app, chat, SfColors.palette);
     expect(find.byType(ValidatedPlanCard), findsOneWidget);
-    _expectControls(tester, plan: true);
+    _expectControls(tester);
     await tester.pumpWidget(const SizedBox());
   });
 
-  testWidgets('actions alone keep the measured chat baseline', (tester) async {
+  testWidgets('actions alone also use static chat suggestions', (tester) async {
     tall(tester);
     final actions = gate.check('', [
       coach.LlmToolCall(
@@ -284,7 +343,7 @@ void main() {
     await _show(tester, app, chat, SfColors.palette);
     expect(find.byType(ActionCard), findsOneWidget);
     expect(find.byType(PlanCard), findsNothing);
-    _expectControls(tester, plan: false);
+    _expectControls(tester);
     await tester.pumpWidget(const SizedBox());
   });
 
@@ -300,7 +359,7 @@ void main() {
         final (app, chat, _) = await _conversation(messages: [message]);
         await _show(tester, app, chat, SfColors.palette);
         expect(find.byType(PlanCard), findsNothing);
-        _expectControls(tester, plan: false);
+        _expectControls(tester);
         await tester.pumpWidget(const SizedBox());
       }
     },

@@ -268,4 +268,104 @@ void main() {
     },
     skip: !PerformanceLab.buildEnabled,
   );
+
+  testWidgets(
+    'input-only follow-up is available only in light without replacing presets',
+    (tester) async {
+      final source = services();
+      final recorder = FrameRecorder(enabled: true);
+      final service = PerformanceReportService(recorder: recorder);
+      for (final brightness in [Brightness.light, Brightness.dark]) {
+        await tester.pumpWidget(
+          AppScope(
+            services: source,
+            child: MaterialApp(
+              theme: ThemeData(brightness: brightness),
+              themeAnimationDuration: Duration.zero,
+              home: FixedGlassLabPage(service: service),
+            ),
+          ),
+        );
+        final buttons = _declared(tester).whereType<SfPrimaryButton>();
+        final followUp = buttons.singleWhere(
+          (button) =>
+              button.key == const ValueKey('fixed-glass-chat-input-1-2'),
+        );
+        expect(followUp.onPressed != null, brightness == Brightness.light);
+        final currentChat = buttons.singleWhere(
+          (button) => button.key == const ValueKey('fixed-glass-default-chat'),
+        );
+        expect(currentChat.onPressed, isNotNull);
+        expect(fixedGlassConfigurations, hasLength(9));
+        expect(fixedGlassConfigurations['chat_baseline'], contains('真玻璃'));
+        expect(
+          fixedGlassConfigurations.containsKey(
+            'chat_suggestions_static_input_blur_1_2',
+          ),
+          isFalse,
+        );
+      }
+      expect(recorder.snapshot()['fixedGlassCases'], isEmpty);
+      expect(source.store.chatLog, isEmpty);
+      await tester.pumpWidget(const SizedBox());
+      await tester.pump();
+      recorder.stop();
+    },
+    skip: !PerformanceLab.buildEnabled,
+  );
+
+  testWidgets(
+    'current chat button samples the real default without an ancestor override',
+    (tester) async {
+      tall(tester);
+      final source = services();
+      source.store.appearance = 'light';
+      final recorder = FrameRecorder(enabled: true);
+      final service = PerformanceReportService(
+        recorder: recorder,
+        platform: _VerifiedPhone(),
+      );
+      await tester.pumpWidget(
+        AppScope(
+          services: source,
+          child: MaterialApp(
+            theme: ThemeData.light(),
+            home: FixedGlassLabPage(service: service),
+          ),
+        ),
+      );
+      final button = find.byKey(const ValueKey('fixed-glass-default-chat'));
+      await tester.ensureVisible(button);
+      await tester.tap(button);
+      await tester.pump();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+      await tester.pump();
+      await tester.pump();
+      expect(find.byType(ChatHomePage), findsOneWidget);
+      final page = tester.element(find.byType(ChatHomePage));
+      expect(SfFixedGlassScope.maybeOf(page), isNull);
+      final input = tester.element(find.byType(ChatInputBar));
+      expect(SfFixedGlassScope.maybeOf(input)?.policy, SfFixedGlassPolicy.chat);
+      expect(
+        PerformanceLab.instance.fixedGlassConfigurationId,
+        'chat_suggestions_static',
+      );
+      expect(PerformanceLab.instance.fixedGlassPolicy, SfFixedGlassPolicy.chat);
+      expect(PerformanceLab.instance.prewarmEnabled, isFalse);
+      expect(PerformanceLab.instance.prewarmStatus, 'disabled');
+      expect(PerformanceLab.instance.starfieldFor(false), isFalse);
+      expect(source.store.chatLog, isEmpty);
+      final entries = recorder.snapshot()['fixedGlassEntries'] as Map;
+      expect(entries.keys, ['chat_suggestions_static']);
+      expect(
+        (entries['chat_suggestions_static'] as Map)['entryTargetPage'],
+        'performance_chat',
+      );
+      await tester.pumpWidget(const SizedBox());
+      await tester.pump();
+      recorder.stop();
+    },
+    skip: !PerformanceLab.buildEnabled,
+  );
 }

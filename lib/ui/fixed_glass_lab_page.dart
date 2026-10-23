@@ -98,7 +98,7 @@ class _FixedGlassLabPageState extends State<FixedGlassLabPage> {
         return;
       }
       final source = AppServices.of(context);
-      final scenario = id == 'chat_baseline'
+      final scenario = SfFixedGlassPolicy.isChatConfiguration(id)
           ? FrameScenario.longChatScroll
           : FrameScenario.planCardScroll;
       fixture = PerformanceFixture.create(
@@ -168,7 +168,11 @@ class _FixedGlassLabPageState extends State<FixedGlassLabPage> {
             scenario: scenario,
             fixedGlassConfigurationId: id,
             fixedGlassPolicy: policy,
-            variantLabel: fixedGlassConfigurations[id] ?? '手动计划卡配置',
+            variantLabel: switch (id) {
+              'chat_suggestions_static' => '聊天默认 · 建议条静态',
+              'chat_suggestions_static_input_blur_1_2' => '浅色聊天 · 输入框模糊 1.2',
+              _ => fixedGlassConfigurations[id] ?? '手动计划卡配置',
+            },
           ),
         ),
       );
@@ -236,8 +240,9 @@ class _FixedGlassLabPageState extends State<FixedGlassLabPage> {
             ),
             const SfSectionTitle('当前默认方案 · 两格复测'),
             Text(
-              '计划卡会话仅将建议条改为静态仿玻璃，输入框保留真玻璃；普通聊天保持原材质。'
-              '这两格直接使用正式页面默认，不注入实验材质。每格 32 秒，完成后导出本轮 JSON。',
+              '所有聊天建议条均为静态仿玻璃，输入框保留原真玻璃。'
+              '+21 本轮只在浅色、深色下各复测聊天一格，计划卡已达标无需重跑。'
+              '当前默认入口直接使用正式页面，不注入实验材质。每格 32 秒，完成后导出本轮 JSON。',
               style: SfType.caption,
             ),
             SfPrimaryButton(
@@ -252,10 +257,30 @@ class _FixedGlassLabPageState extends State<FixedGlassLabPage> {
             SfPrimaryButton(
               key: const ValueKey('fixed-glass-default-chat'),
               label: '复测当前默认 · 聊天 · 32 秒',
-              onPressed: _busy ? null : () => _sample('chat_baseline'),
+              onPressed: _busy
+                  ? null
+                  : () => _sample('chat_suggestions_static'),
             ),
             Text(
-              _result(cells[_cellId('chat_baseline')]),
+              _result(cells[_cellId('chat_suggestions_static')]),
+              style: SfType.caption,
+            ),
+            const SfSectionTitle('仅浅色聊天仍未达标时补采'),
+            Text(
+              '只将浅色输入框模糊改为 1.2，建议条仍静态，其余条件不变。'
+              '这是独立内测对照格，采完恢复，不改变正式默认；进入尖峰单独记录。',
+              style: SfType.caption,
+            ),
+            SfPrimaryButton(
+              key: const ValueKey('fixed-glass-chat-input-1-2'),
+              label: '补采浅色聊天 · 输入框模糊 1.2 · 32 秒',
+              onPressed:
+                  _busy || Theme.of(context).brightness != Brightness.light
+                  ? null
+                  : () => _sample('chat_suggestions_static_input_blur_1_2'),
+            ),
+            Text(
+              _result(cells[_cellId('chat_suggestions_static_input_blur_1_2')]),
               style: SfType.caption,
             ),
             const SfSectionTitle('固定配置 · 逐格采样'),
@@ -404,7 +429,7 @@ class _FixedGlassLabPageState extends State<FixedGlassLabPage> {
   }
 
   String _cellId(String id) =>
-      '${id}__${id == 'chat_baseline' ? 'longChatScroll' : 'planCardScroll'}';
+      '${id}__${SfFixedGlassPolicy.isChatConfiguration(id) ? 'longChatScroll' : 'planCardScroll'}';
 
   String _result(Object? value) {
     if (value is! Map) return '未采样';

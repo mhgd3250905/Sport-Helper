@@ -310,7 +310,7 @@ class FrameRecorder with WidgetsBindingObserver {
     required int messageCount,
   }) {
     if (!enabled) return false;
-    final isChat = configId == 'chat_baseline' || configId == 'custom_chat';
+    final isChat = SfFixedGlassPolicy.isChatConfiguration(configId);
     if (!SfFixedGlassPolicy.experimentIds.contains(configId) ||
         scenario !=
             (isChat
@@ -1050,7 +1050,12 @@ class _FixedGlassConditions {
             : {
                 'trueGlass': realGlassFor(role),
                 'blur': realGlassFor(role)
-                    ? (baseBlur == null ? null : baseBlur! * policy.blurScale)
+                    ? (role == SfFixedGlassRole.input &&
+                              policy.inputBlur != null
+                          ? policy.inputBlur
+                          : (baseBlur == null
+                                ? null
+                                : baseBlur! * policy.blurScale))
                     : 0.0,
                 'saturation': realGlassFor(role)
                     ? (policy.saturationEnabled ? baseSaturation : 1.0)
@@ -1376,7 +1381,7 @@ class _CaseStats {
       issues.add('adaptive_budget_does_not_match_refresh_rate');
     }
     if (fixedGlassConfigurationId case final configId?) {
-      final isChat = configId == 'chat_baseline' || configId == 'custom_chat';
+      final isChat = SfFixedGlassPolicy.isChatConfiguration(configId);
       final expectedPolicy = SfFixedGlassPolicy.forConfiguration(configId);
       if (groups.values.any((group) {
         final condition = group.conditions;
@@ -1390,11 +1395,17 @@ class _CaseStats {
             !fixed.hasRole(SfFixedGlassRole.input) ||
             !fixed.hasRole(SfFixedGlassRole.suggestions) ||
             (expectedPolicy != null && fixed.policy != expectedPolicy) ||
-            (isChat && fixed.policy != SfFixedGlassPolicy.baseline) ||
+            (isChat &&
+                expectedPolicy == null &&
+                fixed.policy != SfFixedGlassPolicy.baseline) ||
             condition.glassEnabled != true ||
             condition.scrollCardGlassEnabled != false;
       })) {
         issues.add('fixed_glass_actual_policy_mismatch');
+      }
+      if (configId == 'chat_suggestions_static_input_blur_1_2' &&
+          groups.values.any((group) => group.conditions.theme != 'light')) {
+        issues.add('input_blur_control_requires_light_theme');
       }
       if (groups.values.any((group) {
         final fixed = group.conditions.fixedGlass;

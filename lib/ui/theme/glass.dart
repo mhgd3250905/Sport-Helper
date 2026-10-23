@@ -255,7 +255,7 @@ class SfGlassSurface extends StatelessWidget {
 }
 
 /// Fixed controls have a tight clip and their own paint boundary. The page
-/// chooses its measured policy; ordinary chat stays on the baseline material.
+/// chooses its material policy; a surface outside a page scope stays baseline.
 class SfFixedGlassSurface extends StatelessWidget {
   const SfFixedGlassSurface({
     super.key,
@@ -281,9 +281,7 @@ class SfFixedGlassSurface extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scope = SfFixedGlassScope.maybeOf(context);
-    final policy = scope?.isPlanContext == true
-        ? scope!.policy
-        : SfFixedGlassPolicy.baseline;
+    final policy = scope?.policy ?? SfFixedGlassPolicy.baseline;
     final q = SfGlass.resolve(quality, context: context);
     final material = SfGlass.materialFor(q);
     final Widget surface;
@@ -307,7 +305,12 @@ class SfFixedGlassSurface extends StatelessWidget {
             ? null
             : material.copyWith(
                 saturation: policy.saturationEnabled ? material.saturation : 1,
-                blur: material.blur * policy.blurScale,
+                blur:
+                    PerformanceLab.buildEnabled &&
+                        role == SfFixedGlassRole.input &&
+                        policy.inputBlur != null
+                    ? policy.inputBlur!
+                    : material.blur * policy.blurScale,
               ),
         child: child,
       );

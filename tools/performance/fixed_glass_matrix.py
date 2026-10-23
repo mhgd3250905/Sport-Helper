@@ -26,7 +26,10 @@ CONFIGS = (
     "half_blur", "no_saturation_half_blur", "all_static",
     "baseline_prewarmed", "chat_baseline",
 )
-ALL_CONFIGS = (*CONFIGS, "custom_plan", "custom_chat")
+CHAT_DEFAULT_CONFIGS = (
+    "chat_suggestions_static", "chat_suggestions_static_input_blur_1_2",
+)
+ALL_CONFIGS = (*CONFIGS, *CHAT_DEFAULT_CONFIGS, "custom_plan", "custom_chat")
 ROLES = ("topBar", "bottomBar", "input", "suggestions")
 BASE_POLICY = dict.fromkeys(ROLES, True) | {"saturationEnabled": True, "blurScale": 1.0}
 
@@ -37,8 +40,10 @@ def expected_policy(config: str) -> dict[str, Any] | None:
         return None
     if config == "input_static":
         result["input"] = False
-    elif config == "suggestions_static":
+    elif config == "suggestions_static" or config in CHAT_DEFAULT_CONFIGS:
         result["suggestions"] = False
+    if config == "chat_suggestions_static_input_blur_1_2":
+        result["inputBlur"] = 1.2
     elif config == "all_static":
         result.update(dict.fromkeys(ROLES, False))
     if config in ("no_saturation", "no_saturation_half_blur"):
@@ -49,7 +54,7 @@ def expected_policy(config: str) -> dict[str, Any] | None:
 
 
 def scenario_for(config: str) -> str:
-    return "longChatScroll" if config in ("chat_baseline", "custom_chat") else "planCardScroll"
+    return "longChatScroll" if config in ("chat_baseline", *CHAT_DEFAULT_CONFIGS, "custom_chat") else "planCardScroll"
 
 
 @dataclass
@@ -87,15 +92,20 @@ def _validate_fixed(raw: Any, key: str, metadata: dict[str, Any]) -> FixedCell:
         cell.issues.append("实际配置或计划/聊天作用域不匹配")
     policy = fixed.get("policy")
     expected = expected_policy(config)
-    if not isinstance(policy, dict) or set(policy) != set(BASE_POLICY):
+    policy_keys = set(BASE_POLICY) | ({"inputBlur"} if isinstance(policy, dict) and "inputBlur" in policy else set())
+    if not isinstance(policy, dict) or set(policy) != policy_keys:
         cell.issues.append("玻璃策略字段不完整")
         return cell
     if any(type(policy.get(role)) is not bool for role in (*ROLES, "saturationEnabled")) or policy.get("blurScale") not in (1, .5):
         cell.issues.append("玻璃策略字段无效")
+    if "inputBlur" in policy and (not _number(policy["inputBlur"]) or policy["inputBlur"] != 1.2):
+        cell.issues.append("输入框模糊对照必须为 1.2")
     if expected is not None and policy != expected:
         cell.issues.append("实际玻璃策略与实验预设不同")
-    if not plan and policy != BASE_POLICY:
+    if not plan and config not in CHAT_DEFAULT_CONFIGS and policy != BASE_POLICY:
         cell.issues.append("聊天受到计划实验策略影响")
+    if config == "chat_suggestions_static_input_blur_1_2" and actual.get("theme") != "light":
+        cell.issues.append("输入框模糊对照仅适用于浅色聊天")
     if actual.get("glassEnabled") is not True or actual.get("scrollCardGlassEnabled") is not False:
         cell.issues.append("需要全局玻璃开、列表卡片静态")
     present = fixed.get("presentRoles")
@@ -112,7 +122,8 @@ def _validate_fixed(raw: Any, key: str, metadata: dict[str, Any]) -> FixedCell:
         for role in ROLES:
             expected_material = None if expected_states[role] is None else {
                 "trueGlass": expected_states[role],
-                "blur": base_blur * policy["blurScale"] if expected_states[role] else 0.0,
+                "blur": (policy.get("inputBlur", base_blur * policy["blurScale"])
+                         if role == "input" else base_blur * policy["blurScale"]) if expected_states[role] else 0.0,
                 "saturation": (base_sat if policy["saturationEnabled"] else 1.0) if expected_states[role] else 1.0,
             }
             if not isinstance(materials, dict) or materials.get(role, "missing") != expected_material:
@@ -220,6 +231,7 @@ def _metric(cell: FixedCell | None, window: str, metric: str) -> str:
 
 def render_matrix(report: dict[str, Any], cells: dict[str, FixedCell]) -> str:
     valid = sum(not cells[f"{c}__{scenario_for(c)}"].issues for c in CONFIGS if f"{c}__{scenario_for(c)}" in cells)
+    displayed_configs = (*CONFIGS, *(c for c in ALL_CONFIGS if c not in CONFIGS and f"{c}__{scenario_for(c)}" in cells))
     meta = report.get("metadata", {})
     lines = ["# SmartFit 固定玻璃拆分实验", "", f"轮次 `{_text(report.get('startedAt'))}`；标准格有效 {valid}/9。", "",
              "；".join(f"{k}={_text(meta.get(k))}" for k in ("deviceModel", "systemVersion", "appSource", "theme", "renderer", "rendererBackend")), "",
@@ -228,7 +240,7 @@ def render_matrix(report: dict[str, Any], cells: dict[str, FixedCell]) -> str:
              "预热 succeeded 仅表示完成了离屏绘制尝试，不证明所有驱动着色器已编译。", "",
              "| 配置 | 场景 | Raster 平均 ms | P99 ms | 超预算比例 | 有效性 |",
              "| --- | --- | ---: | ---: | ---: | --- |"]
-    for config in (*CONFIGS, *(c for c in ALL_CONFIGS if c.startswith("custom_") and f"{c}__{scenario_for(c)}" in cells)):
+    for config in displayed_configs:
         cell = cells.get(f"{config}__{scenario_for(config)}")
         status = "待采样" if cell is None else ("有效" if not cell.issues else "无效：" + "；".join(cell.issues))
         values = " | ".join(_metric(cell, "steadyState", m) for m in ("averageMs", "p99Ms", "overBudgetRatio"))
@@ -248,7 +260,7 @@ def render_matrix(report: dict[str, Any], cells: dict[str, FixedCell]) -> str:
                   "同一轮后跑的预热格已经受前面页面访问影响，不能当作冷/暖因果证据。冷/暖首次进入需分别重启 App 后首先跑 baseline / baseline_prewarmed，各自导出；本工具不跨启动合并帧或百分位。报告重置不会清除进程内页面访问历史。", "",
                   "本进程首次进入目标页也不保证 GPU 全冷：前页可能已经绘制共享组件，报告没有 Timeline 着色器编译事件。", "",
                   "| 配置 | 最差 Raster ms | 预热实际状态 | 预热绘制尺寸@像素比 | 本进程此前进过目标页 | entry 序号 | entry 有效性 |", "| --- | ---: | --- | --- | --- | ---: | --- |"])
-    for config in CONFIGS:
+    for config in displayed_configs:
         cell = cells.get(f"{config}__{scenario_for(config)}")
         fixed = cell.condition.get("fixedGlass", {}) if cell else {}
         status = "待采样" if cell is None else ("有效" if not cell.entry_issues else "；".join(cell.entry_issues))
@@ -258,7 +270,7 @@ def render_matrix(report: dict[str, Any], cells: dict[str, FixedCell]) -> str:
             f"{fixed.get('prewarmLogicalWidth')}×{fixed.get('prewarmLogicalHeight')}@{fixed.get('prewarmPixelRatio')}")
         lines.append(f"| {config} | {_metric(cell, 'entryFirst2Seconds', 'worstMs')} | {_text(fixed.get('prewarmStatus', '—'))} | {_text(geometry)} | {_text(prior)} | {_text(ordinal)} | {_text(status)} |")
     lines.extend(["", "## 每格实际材质", "", "| 配置 | 输入框 | 建议条 | 模糊 sigma | 饱和度 |", "| --- | --- | --- | ---: | ---: |"])
-    for config in CONFIGS:
+    for config in displayed_configs:
         cell = cells.get(f"{config}__{scenario_for(config)}")
         fixed = cell.condition.get("fixedGlass", {}) if cell and not cell.issues else {}
         states = fixed.get("roleStates", {})

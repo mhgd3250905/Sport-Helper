@@ -44,10 +44,8 @@ void main() {
             scenario: scenario,
             fixedGlassConfigurationId: plan
                 ? 'suggestions_static'
-                : 'chat_baseline',
-            fixedGlassPolicy: plan
-                ? SfFixedGlassPolicy.planCards
-                : SfFixedGlassPolicy.baseline,
+                : 'chat_suggestions_static',
+            fixedGlassPolicy: SfFixedGlassPolicy.chat,
             variantLabel: 'current default',
           ),
         ),
@@ -66,7 +64,7 @@ void main() {
           of: find.byType(SuggestionStrip),
           matching: find.byType(GlassContainer),
         ),
-        plan ? findsNothing : findsWidgets,
+        findsNothing,
       );
       expect(
         find.descendant(

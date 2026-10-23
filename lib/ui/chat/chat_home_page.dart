@@ -250,7 +250,7 @@ class _ChatHomePageState extends State<ChatHomePage> {
                 // Cards paint a static face; the scrolling conversation is
                 // not a texture capture source. Only the internal legacy-card
                 // comparison restores that boundary. The fixed input keeps
-                // its glass; plan conversations use static suggestion chips.
+                // its glass; every conversation uses static suggestion chips.
                 LiquidGlassScope(
                   child: ListenableBuilder(
                     listenable: _chat,
@@ -330,9 +330,7 @@ class _ChatHomePageState extends State<ChatHomePage> {
     );
     return SfFixedGlassScope(
       isPlanContext: hasPlanCards,
-      policy: hasPlanCards
-          ? SfFixedGlassPolicy.planCards
-          : SfFixedGlassPolicy.baseline,
+      policy: SfFixedGlassPolicy.chat,
       child: child,
     );
   }

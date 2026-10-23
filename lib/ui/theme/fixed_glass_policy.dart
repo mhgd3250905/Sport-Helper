@@ -13,13 +13,18 @@ class SfFixedGlassPolicy {
     this.suggestions = true,
     this.saturationEnabled = true,
     this.blurScale = 1,
-  }) : assert(blurScale == 1 || blurScale == .5);
+    this.inputBlur,
+  }) : assert(blurScale == 1 || blurScale == .5),
+       assert(inputBlur == null || inputBlur == 1.2);
 
   static const baseline = SfFixedGlassPolicy();
 
-  /// The phone comparison isolated the plan conversation's suggestion strip.
-  /// Keep the input's full material and leave ordinary chat on [baseline].
-  static const planCards = SfFixedGlassPolicy(suggestions: false);
+  /// Every chat suggestion strip uses the approved static face. The input
+  /// keeps its original material; the phone comparison needs no warm-up.
+  static const chat = SfFixedGlassPolicy(suggestions: false);
+
+  /// Compatibility name for the original plan-card-only rollout.
+  static const planCards = chat;
   static const experimentIds = {
     'baseline',
     'input_static',
@@ -30,6 +35,8 @@ class SfFixedGlassPolicy {
     'all_static',
     'baseline_prewarmed',
     'chat_baseline',
+    'chat_suggestions_static',
+    'chat_suggestions_static_input_blur_1_2',
     'custom_plan',
     'custom_chat',
   };
@@ -38,6 +45,8 @@ class SfFixedGlassPolicy {
     'baseline' || 'baseline_prewarmed' || 'chat_baseline' => baseline,
     'input_static' => baseline.copyWith(input: false),
     'suggestions_static' => planCards,
+    'chat_suggestions_static' => chat,
+    'chat_suggestions_static_input_blur_1_2' => chat.copyWith(inputBlur: 1.2),
     'no_saturation' => baseline.copyWith(saturationEnabled: false),
     'half_blur' => baseline.copyWith(blurScale: .5),
     'no_saturation_half_blur' => baseline.copyWith(
@@ -52,12 +61,24 @@ class SfFixedGlassPolicy {
     ),
     _ => null,
   };
+
+  static bool isChatConfiguration(String id) => switch (id) {
+    'chat_baseline' ||
+    'chat_suggestions_static' ||
+    'chat_suggestions_static_input_blur_1_2' ||
+    'custom_chat' => true,
+    _ => false,
+  };
   final bool topBar;
   final bool bottomBar;
   final bool input;
   final bool suggestions;
   final bool saturationEnabled;
   final double blurScale;
+
+  /// An absolute sigma for the internal input-only follow-up comparison.
+  /// The production/default policy leaves this null and ignores overrides.
+  final double? inputBlur;
 
   bool enabledFor(SfFixedGlassRole role) => switch (role) {
     SfFixedGlassRole.topBar => topBar,
@@ -73,6 +94,7 @@ class SfFixedGlassPolicy {
     bool? suggestions,
     bool? saturationEnabled,
     double? blurScale,
+    double? inputBlur,
   }) => SfFixedGlassPolicy(
     topBar: topBar ?? this.topBar,
     bottomBar: bottomBar ?? this.bottomBar,
@@ -80,11 +102,13 @@ class SfFixedGlassPolicy {
     suggestions: suggestions ?? this.suggestions,
     saturationEnabled: saturationEnabled ?? this.saturationEnabled,
     blurScale: blurScale ?? this.blurScale,
+    inputBlur: inputBlur ?? this.inputBlur,
   );
 
   String get key =>
       '${topBar ? 1 : 0}${bottomBar ? 1 : 0}${input ? 1 : 0}'
-      '${suggestions ? 1 : 0}|${saturationEnabled ? 1 : 0}|$blurScale';
+      '${suggestions ? 1 : 0}|${saturationEnabled ? 1 : 0}|$blurScale'
+      '${inputBlur == null ? '' : '|inputBlur=$inputBlur'}';
 
   Map<String, Object> toJson() => {
     'topBar': topBar,
@@ -93,6 +117,7 @@ class SfFixedGlassPolicy {
     'suggestions': suggestions,
     'saturationEnabled': saturationEnabled,
     'blurScale': blurScale,
+    'inputBlur': ?inputBlur,
   };
 
   @override
@@ -102,9 +127,9 @@ class SfFixedGlassPolicy {
   int get hashCode => key.hashCode;
 }
 
-/// A page-local policy. Normal plan conversations use [SfFixedGlassPolicy.planCards]
-/// while ordinary chat keeps its baseline. Internal experiments can provide an
-/// explicit ancestor scope without changing the production default.
+/// A page-local material policy. Every normal chat uses [SfFixedGlassPolicy.chat].
+/// [isPlanContext] describes the content, independently of the chosen material.
+/// Internal comparisons can supply an explicit ancestor policy.
 class SfFixedGlassScope extends InheritedWidget {
   const SfFixedGlassScope({
     super.key,

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../data/app_store.dart';
 import '../ui/theme/adaptive_glass.dart';
 import '../ui/theme/glass.dart';
-import '../ui/theme/fixed_glass_policy.dart';
 import 'frame_recorder.dart';
 import 'performance_lab.dart';
 import 'performance_report.dart';
@@ -74,9 +73,7 @@ class PerformanceConditions extends StatelessWidget {
           textScale: media.textScaler.scale(1),
           fixedGlassPolicy: lab.fixedGlassPresentRoles.isEmpty
               ? null
-              : (lab.fixedGlassPlanContext
-                    ? lab.fixedGlassPolicy
-                    : SfFixedGlassPolicy.baseline),
+              : lab.fixedGlassPolicy,
           fixedGlassPlanContext: lab.fixedGlassPlanContext,
           fixedGlassPresentRoles: lab.fixedGlassPresentRoles,
           fixedGlassConfigurationId: lab.fixedGlassConfigurationId,
