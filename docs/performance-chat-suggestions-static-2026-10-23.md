@@ -31,6 +31,22 @@
 
 代码与诊断已完成。全量 Flutter 测试 414 通过、13 按构建条件跳过；内测专项 98 通过、6 跳过；Python 性能分析测试 54 通过；`flutter analyze --no-pub` 无问题。另核验旧 +19 九格及 +20 两份两格原始报告，新分析器仍分别判为 9/9、2/2、2/2 有效。独立只读审阅确认采样入口与真实材质一致。
 
-即将构建 +21；尚无本轮真机结果，不预填实测数据。本轮性能分支继续为 `feat/performance-baseline`，不改 main 或品牌分支。SDK 锁文件 SHA-256 仍为 `17c7332a9c1970da9a1a5738c1f9924e3b53fee21aa36f64b79c35eea2d0cc47`。
++21 内测包与生产隔离验证包已构建并完成检查。内测 APK 已在原 USB 真机覆盖安装，保留数据，并直接核验装机 APK SHA-256 与归档一致。包身份详见 [交付台账](reports/performance-chat-suggestions-delivery-2026-10-23.json)。
+
+| 项目 | 已核验值 |
+| --- | --- |
+| 源码 | `c226177c6457843753bd776fe72387a85ac6cb03` |
+| 内测包名 / versionCode | `com.ugk.smartfit.internal` / `2021` |
+| ABI / 模式 | arm64-v8a / release，非 debuggable |
+| 文件 | `.buildlog/install/SmartFit-0.1.0+21-chat-suggestions-static-internal-arm64-v8a-release.apk` |
+| 大小 / SHA-256 | 49794495 bytes / `26249b650e142a475e309740a0e245edf7c39b4f2631174cfad875f8256316d0` |
+| 签名 | 与现有采样包一致，APK v2 验证通过 |
+| JNI / 生产隔离 | 两 flavor JNI 通过；生产 APK 所有内测入口、记录器及新增补采标记均不存在 |
+
+生产包仅用于剥离检查，未注入 Worker key，不作为本次交付包。构建串行进行，Gradle 单工作线程、1GB 堆，无模拟器。
+
+手机星尘保持开启。浅色聊天已自动采样一次，界面显示 Raster 均值约 4.07ms、P99 约 5.89ms、超预算 0.00%；**这仍是界面四舍五入值，待原始 JSON 核验，不提前判定整轮通过**。未触发输入模糊 1.2 补采。手机停在浅色报告分享页，等待保存原始文件后再清空、切深色采样，计划卡未重跑。
+
+本轮性能分支继续为 `feat/performance-baseline`，未合 main、未推送、未 rebase 品牌分支。SDK 锁文件 SHA-256 仍为 `17c7332a9c1970da9a1a5738c1f9924e3b53fee21aa36f64b79c35eea2d0cc47`。
 
 上一轮四格原始数据及未达标结论保留于 [USB 确认报告](performance-confirmation-usb-2026-10-23.md)，不覆盖旧结论。

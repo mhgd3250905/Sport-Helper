@@ -1,0 +1,131 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-23",
+  "branch": "feat/performance-baseline",
+  "status": "installed-build21-awaiting-light-dark-chat-json",
+  "sourceCommit": "c226177c6457843753bd776fe72387a85ac6cb03",
+  "internalAPK": {
+    "apk": "build/app/outputs/flutter-apk/app-arm64-v8a-internal-release.apk",
+    "packageName": "com.ugk.smartfit.internal",
+    "versionCode": 2021,
+    "versionName": "0.1.0",
+    "abi": "arm64-v8a",
+    "mode": "release",
+    "debuggable": false,
+    "sourceCommit": "c226177c6457843753bd776fe72387a85ac6cb03",
+    "sdkRef": "f684e02f38e652633c23fa8946a53d02b6aa3ea2",
+    "lockSha256": "17c7332a9c1970da9a1a5738c1f9924e3b53fee21aa36f64b79c35eea2d0cc47",
+    "sizeBytes": 49794495,
+    "sha256": "26249b650e142a475e309740a0e245edf7c39b4f2631174cfad875f8256316d0",
+    "dartInternalMarkers": {
+      "frame_performance": true,
+      "SmartFit-performance-": true,
+      "smartfit/performance": true,
+      "raster_controls_v4": true,
+      "scrollCardGlassEnabled": true,
+      "performance-scroll-card-glass": true,
+      "long_chat_72_v1": true,
+      "fixedGlassCases": true,
+      "fixed_glass_lab": true,
+      "baseline_prewarmed": true,
+      "prewarmLogicalWidth": true,
+      "fixed-glass-default-plan": true,
+      "fixed-glass-default-chat": true,
+      "chat_suggestions_static": true,
+      "chat_suggestions_static_input_blur_1_2": true
+    },
+    "nativeInternalMarkers": {
+      "InternalPerformanceFileProvider": true,
+      "smartfit/performance": true,
+      "smartfit-renderer-probe": true
+    },
+    "staticScrollCardIncluded": true,
+    "profileVmExtensionIncluded": false,
+    "signatureV2Verified": true,
+    "signerMatchesExistingSamplingPackages": true,
+    "signerSha256": "3761270a4764157f0e389014a9e5b800b05403bfddce0f4f7f8c039f6a53bdc7",
+    "flavorIsolationPassed": true,
+    "storageJniPassed": true,
+    "buildReceiptVerified": true,
+    "sharedAdaptiveFreezePhaseIncluded": true,
+    "productionValidationOnly": false,
+    "archivePath": ".buildlog/install/SmartFit-0.1.0+21-chat-suggestions-static-internal-arm64-v8a-release.apk"
+  },
+  "productionValidationOnly": {
+    "apk": "build/app/outputs/flutter-apk/app-arm64-v8a-production-release.apk",
+    "packageName": "com.ugk.smartfit",
+    "versionCode": 2021,
+    "versionName": "0.1.0",
+    "abi": "arm64-v8a",
+    "mode": "release",
+    "debuggable": false,
+    "sourceCommit": "c226177c6457843753bd776fe72387a85ac6cb03",
+    "sdkRef": "f684e02f38e652633c23fa8946a53d02b6aa3ea2",
+    "lockSha256": "17c7332a9c1970da9a1a5738c1f9924e3b53fee21aa36f64b79c35eea2d0cc47",
+    "sizeBytes": 49384431,
+    "sha256": "8b515fc2abeacc5ce455640e9ac5cd0d015afe850dfeeff6a28a2abc13b278a0",
+    "dartInternalMarkers": {
+      "frame_performance": false,
+      "SmartFit-performance-": false,
+      "smartfit/performance": false,
+      "raster_controls_v4": false,
+      "scrollCardGlassEnabled": false,
+      "performance-scroll-card-glass": false,
+      "long_chat_72_v1": false,
+      "fixedGlassCases": false,
+      "fixed_glass_lab": false,
+      "baseline_prewarmed": false,
+      "prewarmLogicalWidth": false,
+      "fixed-glass-default-plan": false,
+      "fixed-glass-default-chat": false,
+      "chat_suggestions_static": false,
+      "chat_suggestions_static_input_blur_1_2": false
+    },
+    "nativeInternalMarkers": {
+      "InternalPerformanceFileProvider": false,
+      "smartfit/performance": false,
+      "smartfit-renderer-probe": false
+    },
+    "staticScrollCardIncluded": true,
+    "profileVmExtensionIncluded": false,
+    "signatureV2Verified": true,
+    "signerMatchesExistingSamplingPackages": true,
+    "signerSha256": "3761270a4764157f0e389014a9e5b800b05403bfddce0f4f7f8c039f6a53bdc7",
+    "flavorIsolationPassed": true,
+    "storageJniPassed": true,
+    "buildReceiptVerified": true,
+    "sharedAdaptiveFreezePhaseIncluded": false,
+    "productionValidationOnly": true
+  },
+  "validation": {
+    "fullFlutter": {
+      "passed": 414,
+      "skipped": 13
+    },
+    "internalPerformance": {
+      "passed": 98,
+      "skipped": 6
+    },
+    "pythonPerformance": {
+      "passed": 54
+    },
+    "staticAnalysis": "No issues found",
+    "legacyReportsValid": [
+      9,
+      2,
+      2
+    ]
+  },
+  "phoneInstalledSha256Verified": true,
+  "sdkChanged": false,
+  "starfieldChanged": false,
+  "prewarmDefaultEnabled": false,
+  "plansRetestedThisRound": false,
+  "inputDefaultBlurChanged": false,
+  "fallbackCaptured": false,
+  "mergeApprovalRequired": true,
+  "mergeApprovalReceived": false,
+  "mergedMain": false,
+  "pushed": false,
+  "brandRebased": false
+}
