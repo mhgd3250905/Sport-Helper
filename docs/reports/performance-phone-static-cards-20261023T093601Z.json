@@ -1,0 +1,2799 @@
+{
+  "schema": 2,
+  "reportType": "frame_performance",
+  "app": "smartfit",
+  "startedAt": "2026-10-23T09:26:03.463832Z",
+  "exportedAt": "2026-10-23T09:36:01.724819Z",
+  "enabled": true,
+  "running": true,
+  "collecting": true,
+  "currentPage": "performance_lab",
+  "currentScenario": null,
+  "currentRefreshRateHz": 120.00000762939453,
+  "currentCaseId": null,
+  "currentRenderConditions": {
+    "glassEnabled": true,
+    "scrollCardGlassEnabled": false,
+    "starfield": true,
+    "glassQuality": "minimal",
+    "glassPhase": "comparison_locked",
+    "glassFrost": false,
+    "renderer": "Impeller",
+    "rendererBackend": "vulkan",
+    "refreshRateHz": 120.00000762939453,
+    "frameBudgetMs": 8.333332803514303,
+    "adaptiveTargetFrameMs": 8.333332803514303,
+    "theme": "light",
+    "viewportWidth": 393.84615384615387,
+    "viewportHeight": 852.9230769230769,
+    "devicePixelRatio": 3.25,
+    "textScale": 1.0
+  },
+  "metadata": {
+    "appVersion": "0.1.0",
+    "appBuild": "18",
+    "appBaseCommit": "c35068003fe484f793ce051134444ae3b0172c4d",
+    "sdkRef": "f684e02f38e652633c23fa8946a53d02b6aa3ea2",
+    "appSource": "c6f09087a3dd1c3e291bc18e6722223ba52fd91f",
+    "measurementKind": "raster_controls_v3",
+    "flavor": "internal",
+    "buildMode": "release",
+    "platform": "android",
+    "renderer": "impeller",
+    "metadataStatus": "available",
+    "appearance": "system",
+    "theme": "light",
+    "contentActionCount": 93,
+    "chatMessageCount": 18,
+    "refreshRateSource": "flutter_display",
+    "starfield": true,
+    "scrollCardGlassEnabled": false,
+    "glassQuality": "minimal",
+    "deviceModel": "2602BRT18C",
+    "deviceManufacturer": "Xiaomi",
+    "systemVersion": "16",
+    "deviceApiLevel": 36,
+    "appBuildNumber": 2018,
+    "isEmulator": false,
+    "rendererBackend": "vulkan",
+    "rendererSource": "android_engine_startup_log_own_pid_cached",
+    "rendererVerified": true
+  },
+  "definitions": {
+    "durations": "milliseconds; UI is FrameTiming.buildDuration; raster is FrameTiming.rasterDuration",
+    "coverage": "Flutter engine frame timings only; embedded WebView compositor and video frames are not measured; no screen-present FPS or actual display-present dropped-frame measurement is provided",
+    "overBudgetFrames": "duration > 1000 / refreshRateHz, separately per thread; union counts a frame once when either thread exceeds budget",
+    "estimatedMissedVsyncs": "sum(max(0, ceil(max(buildUs, rasterUs) / (1000000 / refreshRateHz)) - 1)); throughput estimate, not measured display-present drops",
+    "percentiles": "nearest rank, logarithmic histogram upper bound capped at observed maximum; error <= 6.25% of duration or 1 microsecond; averages and worst frames are exact",
+    "attribution": "labels start on next scheduler frame; PlatformDispatcher.frameData.frameNumber matches FrameTiming.frameNumber; delayed batches use retained frame-key history, not callback time or presentation timestamps",
+    "unattributed": "frames without retained label history are counted and excluded from duration/budget statistics rather than guessed",
+    "lifecycle": "only resumed state is collected; engine batches pending at stop/pause may not be delivered; pre-reset frames are excluded",
+    "refreshRate": "per-frame label rate; initial 60 Hz is an assumption until the app supplies a display rate",
+    "scenarios": "one explicit scenario at a time; frames outside a scenario remain in totals and page statistics; settings and performance_settings pages are excluded from scenario statistics",
+    "conditionChangesDuringCapture": "number of changes to previously supplied theme, appearance, starfield, glassQuality, scrollCardGlassEnabled or refresh-rate values while running; initial values and device metadata readiness do not count; reset clears the count and retains current conditions",
+    "comparisonWindows": "warmupFirst2Seconds is [first case FrameTiming.vsyncStart, +2 s); steadyState begins at +2 s; firstPageEntryFirst2Seconds independently covers the first observed entry of each page in this round, and may overlap warmup or steady state; spikes do not prove shader compilation",
+    "comparisonEligibility": "completed; >=30 s observed case vsync span; steady frames present; one actual render condition and one refresh rate; verified renderer; variant matches actual switches; long chat >=60 messages; no condition overflow or out-of-order case timestamps",
+    "scrollCardGlassEnabled": "actual scroll-card renderer; false is a static simulated-glass surface without backdrop filters or scroll background capture; true is the internal-only real-glass comparison override and requires the global glass switch; glass_on/off variants still describe the global switch, not the card renderer; raster_controls_v2 reports did not record this field"
+  },
+  "retention": {
+    "maxPages": 32,
+    "maxScenarios": 9,
+    "histogramBucketsPerThread": 1024,
+    "maxLabelTransitions": 128,
+    "maxCases": 8,
+    "maxConditionGroupsPerCase": 16,
+    "retainedFirstPageEntries": 6,
+    "retainedLabelTransitions": 62,
+    "evictedLabelTransitions": 0,
+    "pageOverflow": "additional page identifiers aggregate in otherPages",
+    "perFrameSamplesStored": 0
+  },
+  "receivedFrameCount": 42329,
+  "recordedFrameCount": 42329,
+  "unattributedFrameCount": 0,
+  "ignoredBeforeSessionFrameCount": 0,
+  "ignoredInactiveFrameCount": 0,
+  "invalidTimingFrameCount": 0,
+  "invalidPageLabelCount": 0,
+  "unavailableFrameKeyBoundaryCount": 0,
+  "conditionChangesDuringCapture": 42,
+  "invalidCaseRequestCount": 0,
+  "total": {
+    "frameCount": 42329,
+    "uiBuild": {
+      "averageMs": 0.5489776985045713,
+      "p90Ms": 0.863,
+      "p99Ms": 1.855,
+      "worstMs": 44.645,
+      "overBudgetFrames": 28,
+      "overBudgetRatio": 0.000661485033901108
+    },
+    "raster": {
+      "averageMs": 4.8569583500673295,
+      "p90Ms": 10.751,
+      "p99Ms": 12.287,
+      "worstMs": 33.939,
+      "overBudgetFrames": 5591,
+      "overBudgetRatio": 0.1320843865907534
+    },
+    "eitherThreadOverBudgetFrames": 5609,
+    "estimatedMissedVsyncs": 5667,
+    "refreshRatesHz": [
+      120.00000762939453
+    ],
+    "refreshRatesTruncated": false
+  },
+  "pages": {
+    "chat": {
+      "frameCount": 9118,
+      "uiBuild": {
+        "averageMs": 0.48880993638955916,
+        "p90Ms": 0.863,
+        "p99Ms": 1.471,
+        "worstMs": 8.25,
+        "overBudgetFrames": 0,
+        "overBudgetRatio": 0.0
+      },
+      "raster": {
+        "averageMs": 8.597899649045843,
+        "p90Ms": 11.775,
+        "p99Ms": 12.799,
+        "worstMs": 33.939,
+        "overBudgetFrames": 5246,
+        "overBudgetRatio": 0.5753454704979162
+      },
+      "eitherThreadOverBudgetFrames": 5246,
+      "estimatedMissedVsyncs": 5256,
+      "refreshRatesHz": [
+        120.00000762939453
+      ],
+      "refreshRatesTruncated": false
+    },
+    "settings": {
+      "frameCount": 145,
+      "uiBuild": {
+        "averageMs": 0.6896206896551724,
+        "p90Ms": 0.703,
+        "p99Ms": 14.335,
+        "worstMs": 17.675,
+        "overBudgetFrames": 2,
+        "overBudgetRatio": 0.013793103448275862
+      },
+      "raster": {
+        "averageMs": 4.364806896551724,
+        "p90Ms": 9.215,
+        "p99Ms": 14.847,
+        "worstMs": 22.715,
+        "overBudgetFrames": 25,
+        "overBudgetRatio": 0.1724137931034483
+      },
+      "eitherThreadOverBudgetFrames": 26,
+      "estimatedMissedVsyncs": 28,
+      "refreshRatesHz": [
+        120.00000762939453
+      ],
+      "refreshRatesTruncated": false
+    },
+    "performance_settings": {
+      "frameCount": 84,
+      "uiBuild": {
+        "averageMs": 1.3512976190476191,
+        "p90Ms": 0.895,
+        "p99Ms": 22.243,
+        "worstMs": 22.243,
+        "overBudgetFrames": 4,
+        "overBudgetRatio": 0.047619047619047616
+      },
+      "raster": {
+        "averageMs": 3.3773214285714284,
+        "p90Ms": 3.711,
+        "p99Ms": 29.107,
+        "worstMs": 29.107,
+        "overBudgetFrames": 5,
+        "overBudgetRatio": 0.05952380952380952
+      },
+      "eitherThreadOverBudgetFrames": 8,
+      "estimatedMissedVsyncs": 13,
+      "refreshRatesHz": [
+        120.00000762939453
+      ],
+      "refreshRatesTruncated": false
+    },
+    "performance_lab": {
+      "frameCount": 1247,
+      "uiBuild": {
+        "averageMs": 0.7083985565356856,
+        "p90Ms": 0.991,
+        "p99Ms": 7.935,
+        "worstMs": 44.645,
+        "overBudgetFrames": 12,
+        "overBudgetRatio": 0.009623095429029671
+      },
+      "raster": {
+        "averageMs": 2.7423504410585404,
+        "p90Ms": 6.911,
+        "p99Ms": 17.407,
+        "worstMs": 25.179,
+        "overBudgetFrames": 67,
+        "overBudgetRatio": 0.053728949478749
+      },
+      "eitherThreadOverBudgetFrames": 72,
+      "estimatedMissedVsyncs": 102,
+      "refreshRatesHz": [
+        120.00000762939453
+      ],
+      "refreshRatesTruncated": false
+    },
+    "performance_chat": {
+      "frameCount": 15908,
+      "uiBuild": {
+        "averageMs": 0.5728931355292934,
+        "p90Ms": 0.895,
+        "p99Ms": 1.663,
+        "worstMs": 25.951,
+        "overBudgetFrames": 5,
+        "overBudgetRatio": 0.000314307266784008
+      },
+      "raster": {
+        "averageMs": 3.619595109378929,
+        "p90Ms": 5.375,
+        "p99Ms": 6.911,
+        "worstMs": 16.961,
+        "overBudgetFrames": 24,
+        "overBudgetRatio": 0.0015086748805632386
+      },
+      "eitherThreadOverBudgetFrames": 28,
+      "estimatedMissedVsyncs": 33,
+      "refreshRatesHz": [
+        120.00000762939453
+      ],
+      "refreshRatesTruncated": false
+    },
+    "performance_plan_cards": {
+      "frameCount": 15827,
+      "uiBuild": {
+        "averageMs": 0.5414953560371517,
+        "p90Ms": 0.767,
+        "p99Ms": 2.303,
+        "worstMs": 32.668,
+        "overBudgetFrames": 5,
+        "overBudgetRatio": 0.00031591584002021864
+      },
+      "raster": {
+        "averageMs": 4.124453086497757,
+        "p90Ms": 6.399,
+        "p99Ms": 8.703,
+        "worstMs": 17.777,
+        "overBudgetFrames": 224,
+        "overBudgetRatio": 0.014153029632905795
+      },
+      "eitherThreadOverBudgetFrames": 229,
+      "estimatedMissedVsyncs": 235,
+      "refreshRatesHz": [
+        120.00000762939453
+      ],
+      "refreshRatesTruncated": false
+    }
+  },
+  "otherPages": {
+    "frameCount": 0,
+    "uiBuild": {
+      "averageMs": null,
+      "p90Ms": null,
+      "p99Ms": null,
+      "worstMs": null,
+      "overBudgetFrames": 0,
+      "overBudgetRatio": null
+    },
+    "raster": {
+      "averageMs": null,
+      "p90Ms": null,
+      "p99Ms": null,
+      "worstMs": null,
+      "overBudgetFrames": 0,
+      "overBudgetRatio": null
+    },
+    "eitherThreadOverBudgetFrames": 0,
+    "estimatedMissedVsyncs": 0,
+    "refreshRatesHz": [],
+    "refreshRatesTruncated": false
+  },
+  "scenarios": {
+    "longChatScroll": {
+      "frameCount": 15428,
+      "uiBuild": {
+        "averageMs": 0.5626102540834846,
+        "p90Ms": 0.895,
+        "p99Ms": 1.535,
+        "worstMs": 3.374,
+        "overBudgetFrames": 0,
+        "overBudgetRatio": 0.0
+      },
+      "raster": {
+        "averageMs": 3.602236712470832,
+        "p90Ms": 5.375,
+        "p99Ms": 6.655,
+        "worstMs": 10.604,
+        "overBudgetFrames": 9,
+        "overBudgetRatio": 0.0005833549390718175
+      },
+      "eitherThreadOverBudgetFrames": 9,
+      "estimatedMissedVsyncs": 9,
+      "refreshRatesHz": [
+        120.00000762939453
+      ],
+      "refreshRatesTruncated": false
+    },
+    "planCardScroll": {
+      "frameCount": 15349,
+      "uiBuild": {
+        "averageMs": 0.5302055508502183,
+        "p90Ms": 0.767,
+        "p99Ms": 1.983,
+        "worstMs": 7.999,
+        "overBudgetFrames": 0,
+        "overBudgetRatio": 0.0
+      },
+      "raster": {
+        "averageMs": 4.091449475535866,
+        "p90Ms": 6.399,
+        "p99Ms": 8.703,
+        "worstMs": 16.616,
+        "overBudgetFrames": 169,
+        "overBudgetRatio": 0.011010489282689426
+      },
+      "eitherThreadOverBudgetFrames": 169,
+      "estimatedMissedVsyncs": 169,
+      "refreshRatesHz": [
+        120.00000762939453
+      ],
+      "refreshRatesTruncated": false
+    }
+  },
+  "cases": {
+    "glass_on_stars_on__longChatScroll": {
+      "id": "glass_on_stars_on__longChatScroll",
+      "variant": "glass_on_stars_on",
+      "scenario": "longChatScroll",
+      "fixtureId": "long_chat_72_v1",
+      "messageCount": 72,
+      "completed": true,
+      "invalidationReason": null,
+      "observedDurationSeconds": 32.02202,
+      "firstVsyncStartUs": 306180522734,
+      "lastVsyncStartUs": 306212544754,
+      "pages": [
+        "performance_chat"
+      ],
+      "comparisonReady": true,
+      "comparisonIssues": [],
+      "overflowConditionFrameCount": 0,
+      "allFrames": {
+        "frameCount": 3857,
+        "uiBuild": {
+          "averageMs": 0.592331086336531,
+          "p90Ms": 0.927,
+          "p99Ms": 1.727,
+          "worstMs": 3.107,
+          "overBudgetFrames": 0,
+          "overBudgetRatio": 0.0
+        },
+        "raster": {
+          "averageMs": 4.889185895773918,
+          "p90Ms": 5.631,
+          "p99Ms": 6.911,
+          "worstMs": 10.604,
+          "overBudgetFrames": 8,
+          "overBudgetRatio": 0.002074150894477573
+        },
+        "eitherThreadOverBudgetFrames": 8,
+        "estimatedMissedVsyncs": 8,
+        "refreshRatesHz": [
+          120.00000762939453
+        ],
+        "refreshRatesTruncated": false
+      },
+      "warmupFirst2Seconds": {
+        "frameCount": 241,
+        "uiBuild": {
+          "averageMs": 0.5825435684647302,
+          "p90Ms": 0.959,
+          "p99Ms": 1.599,
+          "worstMs": 2.486,
+          "overBudgetFrames": 0,
+          "overBudgetRatio": 0.0
+        },
+        "raster": {
+          "averageMs": 4.857033195020747,
+          "p90Ms": 5.631,
+          "p99Ms": 6.911,
+          "worstMs": 8.011,
+          "overBudgetFrames": 0,
+          "overBudgetRatio": 0.0
+        },
+        "eitherThreadOverBudgetFrames": 0,
+        "estimatedMissedVsyncs": 0,
+        "refreshRatesHz": [
+          120.00000762939453
+        ],
+        "refreshRatesTruncated": false
+      },
+      "steadyState": {
+        "frameCount": 3616,
+        "uiBuild": {
+          "averageMs": 0.592983407079646,
+          "p90Ms": 0.927,
+          "p99Ms": 1.727,
+          "worstMs": 3.107,
+          "overBudgetFrames": 0,
+          "overBudgetRatio": 0.0
+        },
+        "raster": {
+          "averageMs": 4.891328816371682,
+          "p90Ms": 5.631,
+          "p99Ms": 6.911,
+          "worstMs": 10.604,
+          "overBudgetFrames": 8,
+          "overBudgetRatio": 0.0022123893805309734
+        },
+        "eitherThreadOverBudgetFrames": 8,
+        "estimatedMissedVsyncs": 8,
+        "refreshRatesHz": [
+          120.00000762939453
+        ],
+        "refreshRatesTruncated": false
+      },
+      "firstPageEntryFirst2Seconds": {
+        "frameCount": 190,
+        "uiBuild": {
+          "averageMs": 0.5857526315789473,
+          "p90Ms": 0.959,
+          "p99Ms": 1.663,
+          "worstMs": 2.486,
+          "overBudgetFrames": 0,
+          "overBudgetRatio": 0.0
+        },
+        "raster": {
+          "averageMs": 4.826568421052632,
+          "p90Ms": 5.631,
+          "p99Ms": 7.167,
+          "worstMs": 8.011,
+          "overBudgetFrames": 0,
+          "overBudgetRatio": 0.0
+        },
+        "eitherThreadOverBudgetFrames": 0,
+        "estimatedMissedVsyncs": 0,
+        "refreshRatesHz": [
+          120.00000762939453
+        ],
+        "refreshRatesTruncated": false
+      },
+      "conditions": [
+        {
+          "condition": {
+            "glassEnabled": true,
+            "scrollCardGlassEnabled": false,
+            "starfield": true,
+            "glassQuality": "minimal",
+            "glassPhase": "comparison_locked",
+            "glassFrost": false,
+            "renderer": "Impeller",
+            "rendererBackend": "vulkan",
+            "refreshRateHz": 120.00000762939453,
+            "frameBudgetMs": 8.333332803514303,
+            "adaptiveTargetFrameMs": 8.333332803514303,
+            "theme": "light",
+            "viewportWidth": 393.84615384615387,
+            "viewportHeight": 852.9230769230769,
+            "devicePixelRatio": 3.25,
+            "textScale": 1.0
+          },
+          "allFrames": {
+            "frameCount": 3857,
+            "uiBuild": {
+              "averageMs": 0.592331086336531,
+              "p90Ms": 0.927,
+              "p99Ms": 1.727,
+              "worstMs": 3.107,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "raster": {
+              "averageMs": 4.889185895773918,
+              "p90Ms": 5.631,
+              "p99Ms": 6.911,
+              "worstMs": 10.604,
+              "overBudgetFrames": 8,
+              "overBudgetRatio": 0.002074150894477573
+            },
+            "eitherThreadOverBudgetFrames": 8,
+            "estimatedMissedVsyncs": 8,
+            "refreshRatesHz": [
+              120.00000762939453
+            ],
+            "refreshRatesTruncated": false
+          },
+          "warmupFirst2Seconds": {
+            "frameCount": 241,
+            "uiBuild": {
+              "averageMs": 0.5825435684647302,
+              "p90Ms": 0.959,
+              "p99Ms": 1.599,
+              "worstMs": 2.486,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "raster": {
+              "averageMs": 4.857033195020747,
+              "p90Ms": 5.631,
+              "p99Ms": 6.911,
+              "worstMs": 8.011,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "eitherThreadOverBudgetFrames": 0,
+            "estimatedMissedVsyncs": 0,
+            "refreshRatesHz": [
+              120.00000762939453
+            ],
+            "refreshRatesTruncated": false
+          },
+          "steadyState": {
+            "frameCount": 3616,
+            "uiBuild": {
+              "averageMs": 0.592983407079646,
+              "p90Ms": 0.927,
+              "p99Ms": 1.727,
+              "worstMs": 3.107,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "raster": {
+              "averageMs": 4.891328816371682,
+              "p90Ms": 5.631,
+              "p99Ms": 6.911,
+              "worstMs": 10.604,
+              "overBudgetFrames": 8,
+              "overBudgetRatio": 0.0022123893805309734
+            },
+            "eitherThreadOverBudgetFrames": 8,
+            "estimatedMissedVsyncs": 8,
+            "refreshRatesHz": [
+              120.00000762939453
+            ],
+            "refreshRatesTruncated": false
+          },
+          "firstPageEntryFirst2Seconds": {
+            "frameCount": 190,
+            "uiBuild": {
+              "averageMs": 0.5857526315789473,
+              "p90Ms": 0.959,
+              "p99Ms": 1.663,
+              "worstMs": 2.486,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "raster": {
+              "averageMs": 4.826568421052632,
+              "p90Ms": 5.631,
+              "p99Ms": 7.167,
+              "worstMs": 8.011,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "eitherThreadOverBudgetFrames": 0,
+            "estimatedMissedVsyncs": 0,
+            "refreshRatesHz": [
+              120.00000762939453
+            ],
+            "refreshRatesTruncated": false
+          }
+        }
+      ]
+    },
+    "glass_on_stars_on__planCardScroll": {
+      "id": "glass_on_stars_on__planCardScroll",
+      "variant": "glass_on_stars_on",
+      "scenario": "planCardScroll",
+      "fixtureId": "plan_cards_72_v1",
+      "messageCount": 72,
+      "completed": true,
+      "invalidationReason": null,
+      "observedDurationSeconds": 32.021979,
+      "firstVsyncStartUs": 306217145942,
+      "lastVsyncStartUs": 306249167921,
+      "pages": [
+        "performance_plan_cards"
+      ],
+      "comparisonReady": true,
+      "comparisonIssues": [],
+      "overflowConditionFrameCount": 0,
+      "allFrames": {
+        "frameCount": 3834,
+        "uiBuild": {
+          "averageMs": 0.5345252999478352,
+          "p90Ms": 0.767,
+          "p99Ms": 1.983,
+          "worstMs": 7.891,
+          "overBudgetFrames": 0,
+          "overBudgetRatio": 0.0
+        },
+        "raster": {
+          "averageMs": 5.89033489827856,
+          "p90Ms": 7.935,
+          "p99Ms": 9.215,
+          "worstMs": 13.08,
+          "overBudgetFrames": 152,
+          "overBudgetRatio": 0.0396452790818988
+        },
+        "eitherThreadOverBudgetFrames": 152,
+        "estimatedMissedVsyncs": 152,
+        "refreshRatesHz": [
+          120.00000762939453
+        ],
+        "refreshRatesTruncated": false
+      },
+      "warmupFirst2Seconds": {
+        "frameCount": 240,
+        "uiBuild": {
+          "averageMs": 0.5342666666666667,
+          "p90Ms": 0.767,
+          "p99Ms": 1.663,
+          "worstMs": 6.629,
+          "overBudgetFrames": 0,
+          "overBudgetRatio": 0.0
+        },
+        "raster": {
+          "averageMs": 6.135233333333334,
+          "p90Ms": 7.935,
+          "p99Ms": 9.215,
+          "worstMs": 9.591,
+          "overBudgetFrames": 10,
+          "overBudgetRatio": 0.041666666666666664
+        },
+        "eitherThreadOverBudgetFrames": 10,
+        "estimatedMissedVsyncs": 10,
+        "refreshRatesHz": [
+          120.00000762939453
+        ],
+        "refreshRatesTruncated": false
+      },
+      "steadyState": {
+        "frameCount": 3594,
+        "uiBuild": {
+          "averageMs": 0.534542570951586,
+          "p90Ms": 0.767,
+          "p99Ms": 2.047,
+          "worstMs": 7.891,
+          "overBudgetFrames": 0,
+          "overBudgetRatio": 0.0
+        },
+        "raster": {
+          "averageMs": 5.873981079577073,
+          "p90Ms": 7.935,
+          "p99Ms": 9.215,
+          "worstMs": 13.08,
+          "overBudgetFrames": 142,
+          "overBudgetRatio": 0.03951029493600445
+        },
+        "eitherThreadOverBudgetFrames": 142,
+        "estimatedMissedVsyncs": 142,
+        "refreshRatesHz": [
+          120.00000762939453
+        ],
+        "refreshRatesTruncated": false
+      },
+      "firstPageEntryFirst2Seconds": {
+        "frameCount": 190,
+        "uiBuild": {
+          "averageMs": 0.5186210526315789,
+          "p90Ms": 0.799,
+          "p99Ms": 1.663,
+          "worstMs": 6.156,
+          "overBudgetFrames": 0,
+          "overBudgetRatio": 0.0
+        },
+        "raster": {
+          "averageMs": 6.258921052631579,
+          "p90Ms": 8.191,
+          "p99Ms": 9.215,
+          "worstMs": 9.591,
+          "overBudgetFrames": 10,
+          "overBudgetRatio": 0.05263157894736842
+        },
+        "eitherThreadOverBudgetFrames": 10,
+        "estimatedMissedVsyncs": 10,
+        "refreshRatesHz": [
+          120.00000762939453
+        ],
+        "refreshRatesTruncated": false
+      },
+      "conditions": [
+        {
+          "condition": {
+            "glassEnabled": true,
+            "scrollCardGlassEnabled": false,
+            "starfield": true,
+            "glassQuality": "minimal",
+            "glassPhase": "comparison_locked",
+            "glassFrost": false,
+            "renderer": "Impeller",
+            "rendererBackend": "vulkan",
+            "refreshRateHz": 120.00000762939453,
+            "frameBudgetMs": 8.333332803514303,
+            "adaptiveTargetFrameMs": 8.333332803514303,
+            "theme": "light",
+            "viewportWidth": 393.84615384615387,
+            "viewportHeight": 852.9230769230769,
+            "devicePixelRatio": 3.25,
+            "textScale": 1.0
+          },
+          "allFrames": {
+            "frameCount": 3834,
+            "uiBuild": {
+              "averageMs": 0.5345252999478352,
+              "p90Ms": 0.767,
+              "p99Ms": 1.983,
+              "worstMs": 7.891,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "raster": {
+              "averageMs": 5.89033489827856,
+              "p90Ms": 7.935,
+              "p99Ms": 9.215,
+              "worstMs": 13.08,
+              "overBudgetFrames": 152,
+              "overBudgetRatio": 0.0396452790818988
+            },
+            "eitherThreadOverBudgetFrames": 152,
+            "estimatedMissedVsyncs": 152,
+            "refreshRatesHz": [
+              120.00000762939453
+            ],
+            "refreshRatesTruncated": false
+          },
+          "warmupFirst2Seconds": {
+            "frameCount": 240,
+            "uiBuild": {
+              "averageMs": 0.5342666666666667,
+              "p90Ms": 0.767,
+              "p99Ms": 1.663,
+              "worstMs": 6.629,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "raster": {
+              "averageMs": 6.135233333333334,
+              "p90Ms": 7.935,
+              "p99Ms": 9.215,
+              "worstMs": 9.591,
+              "overBudgetFrames": 10,
+              "overBudgetRatio": 0.041666666666666664
+            },
+            "eitherThreadOverBudgetFrames": 10,
+            "estimatedMissedVsyncs": 10,
+            "refreshRatesHz": [
+              120.00000762939453
+            ],
+            "refreshRatesTruncated": false
+          },
+          "steadyState": {
+            "frameCount": 3594,
+            "uiBuild": {
+              "averageMs": 0.534542570951586,
+              "p90Ms": 0.767,
+              "p99Ms": 2.047,
+              "worstMs": 7.891,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "raster": {
+              "averageMs": 5.873981079577073,
+              "p90Ms": 7.935,
+              "p99Ms": 9.215,
+              "worstMs": 13.08,
+              "overBudgetFrames": 142,
+              "overBudgetRatio": 0.03951029493600445
+            },
+            "eitherThreadOverBudgetFrames": 142,
+            "estimatedMissedVsyncs": 142,
+            "refreshRatesHz": [
+              120.00000762939453
+            ],
+            "refreshRatesTruncated": false
+          },
+          "firstPageEntryFirst2Seconds": {
+            "frameCount": 190,
+            "uiBuild": {
+              "averageMs": 0.5186210526315789,
+              "p90Ms": 0.799,
+              "p99Ms": 1.663,
+              "worstMs": 6.156,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "raster": {
+              "averageMs": 6.258921052631579,
+              "p90Ms": 8.191,
+              "p99Ms": 9.215,
+              "worstMs": 9.591,
+              "overBudgetFrames": 10,
+              "overBudgetRatio": 0.05263157894736842
+            },
+            "eitherThreadOverBudgetFrames": 10,
+            "estimatedMissedVsyncs": 10,
+            "refreshRatesHz": [
+              120.00000762939453
+            ],
+            "refreshRatesTruncated": false
+          }
+        }
+      ]
+    },
+    "glass_on_stars_off__longChatScroll": {
+      "id": "glass_on_stars_off__longChatScroll",
+      "variant": "glass_on_stars_off",
+      "scenario": "longChatScroll",
+      "fixtureId": "long_chat_72_v1",
+      "messageCount": 72,
+      "completed": true,
+      "invalidationReason": null,
+      "observedDurationSeconds": 32.021921,
+      "firstVsyncStartUs": 306287041578,
+      "lastVsyncStartUs": 306319063499,
+      "pages": [
+        "performance_chat"
+      ],
+      "comparisonReady": true,
+      "comparisonIssues": [],
+      "overflowConditionFrameCount": 0,
+      "allFrames": {
+        "frameCount": 3857,
+        "uiBuild": {
+          "averageMs": 0.5323456053927923,
+          "p90Ms": 0.831,
+          "p99Ms": 1.599,
+          "worstMs": 3.374,
+          "overBudgetFrames": 0,
+          "overBudgetRatio": 0.0
+        },
+        "raster": {
+          "averageMs": 4.755832771584132,
+          "p90Ms": 5.375,
+          "p99Ms": 6.911,
+          "worstMs": 8.379,
+          "overBudgetFrames": 1,
+          "overBudgetRatio": 0.00025926886180969663
+        },
+        "eitherThreadOverBudgetFrames": 1,
+        "estimatedMissedVsyncs": 1,
+        "refreshRatesHz": [
+          120.00000762939453
+        ],
+        "refreshRatesTruncated": false
+      },
+      "warmupFirst2Seconds": {
+        "frameCount": 241,
+        "uiBuild": {
+          "averageMs": 0.5395560165975104,
+          "p90Ms": 0.863,
+          "p99Ms": 1.791,
+          "worstMs": 2.19,
+          "overBudgetFrames": 0,
+          "overBudgetRatio": 0.0
+        },
+        "raster": {
+          "averageMs": 4.681278008298755,
+          "p90Ms": 5.375,
+          "p99Ms": 6.399,
+          "worstMs": 8.27,
+          "overBudgetFrames": 0,
+          "overBudgetRatio": 0.0
+        },
+        "eitherThreadOverBudgetFrames": 0,
+        "estimatedMissedVsyncs": 0,
+        "refreshRatesHz": [
+          120.00000762939453
+        ],
+        "refreshRatesTruncated": false
+      },
+      "steadyState": {
+        "frameCount": 3616,
+        "uiBuild": {
+          "averageMs": 0.5318650442477877,
+          "p90Ms": 0.831,
+          "p99Ms": 1.599,
+          "worstMs": 3.374,
+          "overBudgetFrames": 0,
+          "overBudgetRatio": 0.0
+        },
+        "raster": {
+          "averageMs": 4.7608017146017705,
+          "p90Ms": 5.375,
+          "p99Ms": 7.167,
+          "worstMs": 8.379,
+          "overBudgetFrames": 1,
+          "overBudgetRatio": 0.0002765486725663717
+        },
+        "eitherThreadOverBudgetFrames": 1,
+        "estimatedMissedVsyncs": 1,
+        "refreshRatesHz": [
+          120.00000762939453
+        ],
+        "refreshRatesTruncated": false
+      },
+      "firstPageEntryFirst2Seconds": {
+        "frameCount": 0,
+        "uiBuild": {
+          "averageMs": null,
+          "p90Ms": null,
+          "p99Ms": null,
+          "worstMs": null,
+          "overBudgetFrames": 0,
+          "overBudgetRatio": null
+        },
+        "raster": {
+          "averageMs": null,
+          "p90Ms": null,
+          "p99Ms": null,
+          "worstMs": null,
+          "overBudgetFrames": 0,
+          "overBudgetRatio": null
+        },
+        "eitherThreadOverBudgetFrames": 0,
+        "estimatedMissedVsyncs": 0,
+        "refreshRatesHz": [],
+        "refreshRatesTruncated": false
+      },
+      "conditions": [
+        {
+          "condition": {
+            "glassEnabled": true,
+            "scrollCardGlassEnabled": false,
+            "starfield": false,
+            "glassQuality": "minimal",
+            "glassPhase": "comparison_locked",
+            "glassFrost": false,
+            "renderer": "Impeller",
+            "rendererBackend": "vulkan",
+            "refreshRateHz": 120.00000762939453,
+            "frameBudgetMs": 8.333332803514303,
+            "adaptiveTargetFrameMs": 8.333332803514303,
+            "theme": "light",
+            "viewportWidth": 393.84615384615387,
+            "viewportHeight": 852.9230769230769,
+            "devicePixelRatio": 3.25,
+            "textScale": 1.0
+          },
+          "allFrames": {
+            "frameCount": 3857,
+            "uiBuild": {
+              "averageMs": 0.5323456053927923,
+              "p90Ms": 0.831,
+              "p99Ms": 1.599,
+              "worstMs": 3.374,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "raster": {
+              "averageMs": 4.755832771584132,
+              "p90Ms": 5.375,
+              "p99Ms": 6.911,
+              "worstMs": 8.379,
+              "overBudgetFrames": 1,
+              "overBudgetRatio": 0.00025926886180969663
+            },
+            "eitherThreadOverBudgetFrames": 1,
+            "estimatedMissedVsyncs": 1,
+            "refreshRatesHz": [
+              120.00000762939453
+            ],
+            "refreshRatesTruncated": false
+          },
+          "warmupFirst2Seconds": {
+            "frameCount": 241,
+            "uiBuild": {
+              "averageMs": 0.5395560165975104,
+              "p90Ms": 0.863,
+              "p99Ms": 1.791,
+              "worstMs": 2.19,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "raster": {
+              "averageMs": 4.681278008298755,
+              "p90Ms": 5.375,
+              "p99Ms": 6.399,
+              "worstMs": 8.27,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "eitherThreadOverBudgetFrames": 0,
+            "estimatedMissedVsyncs": 0,
+            "refreshRatesHz": [
+              120.00000762939453
+            ],
+            "refreshRatesTruncated": false
+          },
+          "steadyState": {
+            "frameCount": 3616,
+            "uiBuild": {
+              "averageMs": 0.5318650442477877,
+              "p90Ms": 0.831,
+              "p99Ms": 1.599,
+              "worstMs": 3.374,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "raster": {
+              "averageMs": 4.7608017146017705,
+              "p90Ms": 5.375,
+              "p99Ms": 7.167,
+              "worstMs": 8.379,
+              "overBudgetFrames": 1,
+              "overBudgetRatio": 0.0002765486725663717
+            },
+            "eitherThreadOverBudgetFrames": 1,
+            "estimatedMissedVsyncs": 1,
+            "refreshRatesHz": [
+              120.00000762939453
+            ],
+            "refreshRatesTruncated": false
+          },
+          "firstPageEntryFirst2Seconds": {
+            "frameCount": 0,
+            "uiBuild": {
+              "averageMs": null,
+              "p90Ms": null,
+              "p99Ms": null,
+              "worstMs": null,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": null
+            },
+            "raster": {
+              "averageMs": null,
+              "p90Ms": null,
+              "p99Ms": null,
+              "worstMs": null,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": null
+            },
+            "eitherThreadOverBudgetFrames": 0,
+            "estimatedMissedVsyncs": 0,
+            "refreshRatesHz": [],
+            "refreshRatesTruncated": false
+          }
+        }
+      ]
+    },
+    "glass_on_stars_off__planCardScroll": {
+      "id": "glass_on_stars_off__planCardScroll",
+      "variant": "glass_on_stars_off",
+      "scenario": "planCardScroll",
+      "fixtureId": "plan_cards_72_v1",
+      "messageCount": 72,
+      "completed": true,
+      "invalidationReason": null,
+      "observedDurationSeconds": 32.022049,
+      "firstVsyncStartUs": 306336296475,
+      "lastVsyncStartUs": 306368318524,
+      "pages": [
+        "performance_plan_cards"
+      ],
+      "comparisonReady": true,
+      "comparisonIssues": [],
+      "overflowConditionFrameCount": 0,
+      "allFrames": {
+        "frameCount": 3838,
+        "uiBuild": {
+          "averageMs": 0.5011005732152163,
+          "p90Ms": 0.671,
+          "p99Ms": 2.047,
+          "worstMs": 7.229,
+          "overBudgetFrames": 0,
+          "overBudgetRatio": 0.0
+        },
+        "raster": {
+          "averageMs": 4.856324648254299,
+          "p90Ms": 5.631,
+          "p99Ms": 7.423,
+          "worstMs": 16.616,
+          "overBudgetFrames": 14,
+          "overBudgetRatio": 0.0036477331943720686
+        },
+        "eitherThreadOverBudgetFrames": 14,
+        "estimatedMissedVsyncs": 14,
+        "refreshRatesHz": [
+          120.00000762939453
+        ],
+        "refreshRatesTruncated": false
+      },
+      "warmupFirst2Seconds": {
+        "frameCount": 240,
+        "uiBuild": {
+          "averageMs": 0.5106208333333333,
+          "p90Ms": 0.703,
+          "p99Ms": 1.855,
+          "worstMs": 6.656,
+          "overBudgetFrames": 0,
+          "overBudgetRatio": 0.0
+        },
+        "raster": {
+          "averageMs": 4.804791666666667,
+          "p90Ms": 5.631,
+          "p99Ms": 7.423,
+          "worstMs": 8.37,
+          "overBudgetFrames": 1,
+          "overBudgetRatio": 0.004166666666666667
+        },
+        "eitherThreadOverBudgetFrames": 1,
+        "estimatedMissedVsyncs": 1,
+        "refreshRatesHz": [
+          120.00000762939453
+        ],
+        "refreshRatesTruncated": false
+      },
+      "steadyState": {
+        "frameCount": 3598,
+        "uiBuild": {
+          "averageMs": 0.5004655364091162,
+          "p90Ms": 0.671,
+          "p99Ms": 2.175,
+          "worstMs": 7.229,
+          "overBudgetFrames": 0,
+          "overBudgetRatio": 0.0
+        },
+        "raster": {
+          "averageMs": 4.859762090050028,
+          "p90Ms": 5.631,
+          "p99Ms": 7.679,
+          "worstMs": 16.616,
+          "overBudgetFrames": 13,
+          "overBudgetRatio": 0.003613118399110617
+        },
+        "eitherThreadOverBudgetFrames": 13,
+        "estimatedMissedVsyncs": 13,
+        "refreshRatesHz": [
+          120.00000762939453
+        ],
+        "refreshRatesTruncated": false
+      },
+      "firstPageEntryFirst2Seconds": {
+        "frameCount": 0,
+        "uiBuild": {
+          "averageMs": null,
+          "p90Ms": null,
+          "p99Ms": null,
+          "worstMs": null,
+          "overBudgetFrames": 0,
+          "overBudgetRatio": null
+        },
+        "raster": {
+          "averageMs": null,
+          "p90Ms": null,
+          "p99Ms": null,
+          "worstMs": null,
+          "overBudgetFrames": 0,
+          "overBudgetRatio": null
+        },
+        "eitherThreadOverBudgetFrames": 0,
+        "estimatedMissedVsyncs": 0,
+        "refreshRatesHz": [],
+        "refreshRatesTruncated": false
+      },
+      "conditions": [
+        {
+          "condition": {
+            "glassEnabled": true,
+            "scrollCardGlassEnabled": false,
+            "starfield": false,
+            "glassQuality": "minimal",
+            "glassPhase": "comparison_locked",
+            "glassFrost": false,
+            "renderer": "Impeller",
+            "rendererBackend": "vulkan",
+            "refreshRateHz": 120.00000762939453,
+            "frameBudgetMs": 8.333332803514303,
+            "adaptiveTargetFrameMs": 8.333332803514303,
+            "theme": "light",
+            "viewportWidth": 393.84615384615387,
+            "viewportHeight": 852.9230769230769,
+            "devicePixelRatio": 3.25,
+            "textScale": 1.0
+          },
+          "allFrames": {
+            "frameCount": 3838,
+            "uiBuild": {
+              "averageMs": 0.5011005732152163,
+              "p90Ms": 0.671,
+              "p99Ms": 2.047,
+              "worstMs": 7.229,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "raster": {
+              "averageMs": 4.856324648254299,
+              "p90Ms": 5.631,
+              "p99Ms": 7.423,
+              "worstMs": 16.616,
+              "overBudgetFrames": 14,
+              "overBudgetRatio": 0.0036477331943720686
+            },
+            "eitherThreadOverBudgetFrames": 14,
+            "estimatedMissedVsyncs": 14,
+            "refreshRatesHz": [
+              120.00000762939453
+            ],
+            "refreshRatesTruncated": false
+          },
+          "warmupFirst2Seconds": {
+            "frameCount": 240,
+            "uiBuild": {
+              "averageMs": 0.5106208333333333,
+              "p90Ms": 0.703,
+              "p99Ms": 1.855,
+              "worstMs": 6.656,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "raster": {
+              "averageMs": 4.804791666666667,
+              "p90Ms": 5.631,
+              "p99Ms": 7.423,
+              "worstMs": 8.37,
+              "overBudgetFrames": 1,
+              "overBudgetRatio": 0.004166666666666667
+            },
+            "eitherThreadOverBudgetFrames": 1,
+            "estimatedMissedVsyncs": 1,
+            "refreshRatesHz": [
+              120.00000762939453
+            ],
+            "refreshRatesTruncated": false
+          },
+          "steadyState": {
+            "frameCount": 3598,
+            "uiBuild": {
+              "averageMs": 0.5004655364091162,
+              "p90Ms": 0.671,
+              "p99Ms": 2.175,
+              "worstMs": 7.229,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "raster": {
+              "averageMs": 4.859762090050028,
+              "p90Ms": 5.631,
+              "p99Ms": 7.679,
+              "worstMs": 16.616,
+              "overBudgetFrames": 13,
+              "overBudgetRatio": 0.003613118399110617
+            },
+            "eitherThreadOverBudgetFrames": 13,
+            "estimatedMissedVsyncs": 13,
+            "refreshRatesHz": [
+              120.00000762939453
+            ],
+            "refreshRatesTruncated": false
+          },
+          "firstPageEntryFirst2Seconds": {
+            "frameCount": 0,
+            "uiBuild": {
+              "averageMs": null,
+              "p90Ms": null,
+              "p99Ms": null,
+              "worstMs": null,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": null
+            },
+            "raster": {
+              "averageMs": null,
+              "p90Ms": null,
+              "p99Ms": null,
+              "worstMs": null,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": null
+            },
+            "eitherThreadOverBudgetFrames": 0,
+            "estimatedMissedVsyncs": 0,
+            "refreshRatesHz": [],
+            "refreshRatesTruncated": false
+          }
+        }
+      ]
+    },
+    "glass_off_stars_on__longChatScroll": {
+      "id": "glass_off_stars_on__longChatScroll",
+      "variant": "glass_off_stars_on",
+      "scenario": "longChatScroll",
+      "fixtureId": "long_chat_72_v1",
+      "messageCount": 72,
+      "completed": true,
+      "invalidationReason": null,
+      "observedDurationSeconds": 32.02189,
+      "firstVsyncStartUs": 306410319376,
+      "lastVsyncStartUs": 306442341266,
+      "pages": [
+        "performance_chat"
+      ],
+      "comparisonReady": true,
+      "comparisonIssues": [],
+      "overflowConditionFrameCount": 0,
+      "allFrames": {
+        "frameCount": 3857,
+        "uiBuild": {
+          "averageMs": 0.5843404200155561,
+          "p90Ms": 0.927,
+          "p99Ms": 1.535,
+          "worstMs": 2.443,
+          "overBudgetFrames": 0,
+          "overBudgetRatio": 0.0
+        },
+        "raster": {
+          "averageMs": 2.495027741768214,
+          "p90Ms": 2.943,
+          "p99Ms": 3.455,
+          "worstMs": 7.352,
+          "overBudgetFrames": 0,
+          "overBudgetRatio": 0.0
+        },
+        "eitherThreadOverBudgetFrames": 0,
+        "estimatedMissedVsyncs": 0,
+        "refreshRatesHz": [
+          120.00000762939453
+        ],
+        "refreshRatesTruncated": false
+      },
+      "warmupFirst2Seconds": {
+        "frameCount": 241,
+        "uiBuild": {
+          "averageMs": 0.5478796680497925,
+          "p90Ms": 0.831,
+          "p99Ms": 1.215,
+          "worstMs": 1.568,
+          "overBudgetFrames": 0,
+          "overBudgetRatio": 0.0
+        },
+        "raster": {
+          "averageMs": 2.460551867219917,
+          "p90Ms": 2.815,
+          "p99Ms": 3.199,
+          "worstMs": 4.607,
+          "overBudgetFrames": 0,
+          "overBudgetRatio": 0.0
+        },
+        "eitherThreadOverBudgetFrames": 0,
+        "estimatedMissedVsyncs": 0,
+        "refreshRatesHz": [
+          120.00000762939453
+        ],
+        "refreshRatesTruncated": false
+      },
+      "steadyState": {
+        "frameCount": 3616,
+        "uiBuild": {
+          "averageMs": 0.58677046460177,
+          "p90Ms": 0.927,
+          "p99Ms": 1.535,
+          "worstMs": 2.443,
+          "overBudgetFrames": 0,
+          "overBudgetRatio": 0.0
+        },
+        "raster": {
+          "averageMs": 2.4973254977876103,
+          "p90Ms": 2.943,
+          "p99Ms": 3.455,
+          "worstMs": 7.352,
+          "overBudgetFrames": 0,
+          "overBudgetRatio": 0.0
+        },
+        "eitherThreadOverBudgetFrames": 0,
+        "estimatedMissedVsyncs": 0,
+        "refreshRatesHz": [
+          120.00000762939453
+        ],
+        "refreshRatesTruncated": false
+      },
+      "firstPageEntryFirst2Seconds": {
+        "frameCount": 0,
+        "uiBuild": {
+          "averageMs": null,
+          "p90Ms": null,
+          "p99Ms": null,
+          "worstMs": null,
+          "overBudgetFrames": 0,
+          "overBudgetRatio": null
+        },
+        "raster": {
+          "averageMs": null,
+          "p90Ms": null,
+          "p99Ms": null,
+          "worstMs": null,
+          "overBudgetFrames": 0,
+          "overBudgetRatio": null
+        },
+        "eitherThreadOverBudgetFrames": 0,
+        "estimatedMissedVsyncs": 0,
+        "refreshRatesHz": [],
+        "refreshRatesTruncated": false
+      },
+      "conditions": [
+        {
+          "condition": {
+            "glassEnabled": false,
+            "scrollCardGlassEnabled": false,
+            "starfield": true,
+            "glassQuality": "off",
+            "glassPhase": "comparison_locked",
+            "glassFrost": false,
+            "renderer": "Impeller",
+            "rendererBackend": "vulkan",
+            "refreshRateHz": 120.00000762939453,
+            "frameBudgetMs": 8.333332803514303,
+            "adaptiveTargetFrameMs": 8.333332803514303,
+            "theme": "light",
+            "viewportWidth": 393.84615384615387,
+            "viewportHeight": 852.9230769230769,
+            "devicePixelRatio": 3.25,
+            "textScale": 1.0
+          },
+          "allFrames": {
+            "frameCount": 3857,
+            "uiBuild": {
+              "averageMs": 0.5843404200155561,
+              "p90Ms": 0.927,
+              "p99Ms": 1.535,
+              "worstMs": 2.443,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "raster": {
+              "averageMs": 2.495027741768214,
+              "p90Ms": 2.943,
+              "p99Ms": 3.455,
+              "worstMs": 7.352,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "eitherThreadOverBudgetFrames": 0,
+            "estimatedMissedVsyncs": 0,
+            "refreshRatesHz": [
+              120.00000762939453
+            ],
+            "refreshRatesTruncated": false
+          },
+          "warmupFirst2Seconds": {
+            "frameCount": 241,
+            "uiBuild": {
+              "averageMs": 0.5478796680497925,
+              "p90Ms": 0.831,
+              "p99Ms": 1.215,
+              "worstMs": 1.568,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "raster": {
+              "averageMs": 2.460551867219917,
+              "p90Ms": 2.815,
+              "p99Ms": 3.199,
+              "worstMs": 4.607,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "eitherThreadOverBudgetFrames": 0,
+            "estimatedMissedVsyncs": 0,
+            "refreshRatesHz": [
+              120.00000762939453
+            ],
+            "refreshRatesTruncated": false
+          },
+          "steadyState": {
+            "frameCount": 3616,
+            "uiBuild": {
+              "averageMs": 0.58677046460177,
+              "p90Ms": 0.927,
+              "p99Ms": 1.535,
+              "worstMs": 2.443,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "raster": {
+              "averageMs": 2.4973254977876103,
+              "p90Ms": 2.943,
+              "p99Ms": 3.455,
+              "worstMs": 7.352,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "eitherThreadOverBudgetFrames": 0,
+            "estimatedMissedVsyncs": 0,
+            "refreshRatesHz": [
+              120.00000762939453
+            ],
+            "refreshRatesTruncated": false
+          },
+          "firstPageEntryFirst2Seconds": {
+            "frameCount": 0,
+            "uiBuild": {
+              "averageMs": null,
+              "p90Ms": null,
+              "p99Ms": null,
+              "worstMs": null,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": null
+            },
+            "raster": {
+              "averageMs": null,
+              "p90Ms": null,
+              "p99Ms": null,
+              "worstMs": null,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": null
+            },
+            "eitherThreadOverBudgetFrames": 0,
+            "estimatedMissedVsyncs": 0,
+            "refreshRatesHz": [],
+            "refreshRatesTruncated": false
+          }
+        }
+      ]
+    },
+    "glass_off_stars_on__planCardScroll": {
+      "id": "glass_off_stars_on__planCardScroll",
+      "variant": "glass_off_stars_on",
+      "scenario": "planCardScroll",
+      "fixtureId": "plan_cards_72_v1",
+      "messageCount": 72,
+      "completed": true,
+      "invalidationReason": null,
+      "observedDurationSeconds": 32.021954,
+      "firstVsyncStartUs": 306526109770,
+      "lastVsyncStartUs": 306558131724,
+      "pages": [
+        "performance_plan_cards"
+      ],
+      "comparisonReady": true,
+      "comparisonIssues": [],
+      "overflowConditionFrameCount": 0,
+      "allFrames": {
+        "frameCount": 3842,
+        "uiBuild": {
+          "averageMs": 0.5576603331598126,
+          "p90Ms": 0.799,
+          "p99Ms": 1.791,
+          "worstMs": 6.887,
+          "overBudgetFrames": 0,
+          "overBudgetRatio": 0.0
+        },
+        "raster": {
+          "averageMs": 2.9121236335242062,
+          "p90Ms": 3.455,
+          "p99Ms": 4.607,
+          "worstMs": 10.608,
+          "overBudgetFrames": 2,
+          "overBudgetRatio": 0.0005205622071837585
+        },
+        "eitherThreadOverBudgetFrames": 2,
+        "estimatedMissedVsyncs": 2,
+        "refreshRatesHz": [
+          120.00000762939453
+        ],
+        "refreshRatesTruncated": false
+      },
+      "warmupFirst2Seconds": {
+        "frameCount": 240,
+        "uiBuild": {
+          "averageMs": 0.5682833333333333,
+          "p90Ms": 0.735,
+          "p99Ms": 1.407,
+          "worstMs": 6.757,
+          "overBudgetFrames": 0,
+          "overBudgetRatio": 0.0
+        },
+        "raster": {
+          "averageMs": 2.958670833333333,
+          "p90Ms": 3.455,
+          "p99Ms": 4.351,
+          "worstMs": 5.968,
+          "overBudgetFrames": 0,
+          "overBudgetRatio": 0.0
+        },
+        "eitherThreadOverBudgetFrames": 0,
+        "estimatedMissedVsyncs": 0,
+        "refreshRatesHz": [
+          120.00000762939453
+        ],
+        "refreshRatesTruncated": false
+      },
+      "steadyState": {
+        "frameCount": 3602,
+        "uiBuild": {
+          "averageMs": 0.5569525263742365,
+          "p90Ms": 0.799,
+          "p99Ms": 1.791,
+          "worstMs": 6.887,
+          "overBudgetFrames": 0,
+          "overBudgetRatio": 0.0
+        },
+        "raster": {
+          "averageMs": 2.9090222098833984,
+          "p90Ms": 3.327,
+          "p99Ms": 4.607,
+          "worstMs": 10.608,
+          "overBudgetFrames": 2,
+          "overBudgetRatio": 0.000555247084952804
+        },
+        "eitherThreadOverBudgetFrames": 2,
+        "estimatedMissedVsyncs": 2,
+        "refreshRatesHz": [
+          120.00000762939453
+        ],
+        "refreshRatesTruncated": false
+      },
+      "firstPageEntryFirst2Seconds": {
+        "frameCount": 0,
+        "uiBuild": {
+          "averageMs": null,
+          "p90Ms": null,
+          "p99Ms": null,
+          "worstMs": null,
+          "overBudgetFrames": 0,
+          "overBudgetRatio": null
+        },
+        "raster": {
+          "averageMs": null,
+          "p90Ms": null,
+          "p99Ms": null,
+          "worstMs": null,
+          "overBudgetFrames": 0,
+          "overBudgetRatio": null
+        },
+        "eitherThreadOverBudgetFrames": 0,
+        "estimatedMissedVsyncs": 0,
+        "refreshRatesHz": [],
+        "refreshRatesTruncated": false
+      },
+      "conditions": [
+        {
+          "condition": {
+            "glassEnabled": false,
+            "scrollCardGlassEnabled": false,
+            "starfield": true,
+            "glassQuality": "off",
+            "glassPhase": "comparison_locked",
+            "glassFrost": false,
+            "renderer": "Impeller",
+            "rendererBackend": "vulkan",
+            "refreshRateHz": 120.00000762939453,
+            "frameBudgetMs": 8.333332803514303,
+            "adaptiveTargetFrameMs": 8.333332803514303,
+            "theme": "light",
+            "viewportWidth": 393.84615384615387,
+            "viewportHeight": 852.9230769230769,
+            "devicePixelRatio": 3.25,
+            "textScale": 1.0
+          },
+          "allFrames": {
+            "frameCount": 3842,
+            "uiBuild": {
+              "averageMs": 0.5576603331598126,
+              "p90Ms": 0.799,
+              "p99Ms": 1.791,
+              "worstMs": 6.887,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "raster": {
+              "averageMs": 2.9121236335242062,
+              "p90Ms": 3.455,
+              "p99Ms": 4.607,
+              "worstMs": 10.608,
+              "overBudgetFrames": 2,
+              "overBudgetRatio": 0.0005205622071837585
+            },
+            "eitherThreadOverBudgetFrames": 2,
+            "estimatedMissedVsyncs": 2,
+            "refreshRatesHz": [
+              120.00000762939453
+            ],
+            "refreshRatesTruncated": false
+          },
+          "warmupFirst2Seconds": {
+            "frameCount": 240,
+            "uiBuild": {
+              "averageMs": 0.5682833333333333,
+              "p90Ms": 0.735,
+              "p99Ms": 1.407,
+              "worstMs": 6.757,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "raster": {
+              "averageMs": 2.958670833333333,
+              "p90Ms": 3.455,
+              "p99Ms": 4.351,
+              "worstMs": 5.968,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "eitherThreadOverBudgetFrames": 0,
+            "estimatedMissedVsyncs": 0,
+            "refreshRatesHz": [
+              120.00000762939453
+            ],
+            "refreshRatesTruncated": false
+          },
+          "steadyState": {
+            "frameCount": 3602,
+            "uiBuild": {
+              "averageMs": 0.5569525263742365,
+              "p90Ms": 0.799,
+              "p99Ms": 1.791,
+              "worstMs": 6.887,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "raster": {
+              "averageMs": 2.9090222098833984,
+              "p90Ms": 3.327,
+              "p99Ms": 4.607,
+              "worstMs": 10.608,
+              "overBudgetFrames": 2,
+              "overBudgetRatio": 0.000555247084952804
+            },
+            "eitherThreadOverBudgetFrames": 2,
+            "estimatedMissedVsyncs": 2,
+            "refreshRatesHz": [
+              120.00000762939453
+            ],
+            "refreshRatesTruncated": false
+          },
+          "firstPageEntryFirst2Seconds": {
+            "frameCount": 0,
+            "uiBuild": {
+              "averageMs": null,
+              "p90Ms": null,
+              "p99Ms": null,
+              "worstMs": null,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": null
+            },
+            "raster": {
+              "averageMs": null,
+              "p90Ms": null,
+              "p99Ms": null,
+              "worstMs": null,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": null
+            },
+            "eitherThreadOverBudgetFrames": 0,
+            "estimatedMissedVsyncs": 0,
+            "refreshRatesHz": [],
+            "refreshRatesTruncated": false
+          }
+        }
+      ]
+    },
+    "glass_off_stars_off__longChatScroll": {
+      "id": "glass_off_stars_off__longChatScroll",
+      "variant": "glass_off_stars_off",
+      "scenario": "longChatScroll",
+      "fixtureId": "long_chat_72_v1",
+      "messageCount": 72,
+      "completed": true,
+      "invalidationReason": null,
+      "observedDurationSeconds": 32.021955,
+      "firstVsyncStartUs": 306571735798,
+      "lastVsyncStartUs": 306603757753,
+      "pages": [
+        "performance_chat"
+      ],
+      "comparisonReady": true,
+      "comparisonIssues": [],
+      "overflowConditionFrameCount": 0,
+      "allFrames": {
+        "frameCount": 3857,
+        "uiBuild": {
+          "averageMs": 0.5414239045890589,
+          "p90Ms": 0.831,
+          "p99Ms": 1.471,
+          "worstMs": 2.276,
+          "overBudgetFrames": 0,
+          "overBudgetRatio": 0.0
+        },
+        "raster": {
+          "averageMs": 2.268900440757065,
+          "p90Ms": 2.687,
+          "p99Ms": 3.455,
+          "worstMs": 6.937,
+          "overBudgetFrames": 0,
+          "overBudgetRatio": 0.0
+        },
+        "eitherThreadOverBudgetFrames": 0,
+        "estimatedMissedVsyncs": 0,
+        "refreshRatesHz": [
+          120.00000762939453
+        ],
+        "refreshRatesTruncated": false
+      },
+      "warmupFirst2Seconds": {
+        "frameCount": 241,
+        "uiBuild": {
+          "averageMs": 0.5360165975103734,
+          "p90Ms": 0.895,
+          "p99Ms": 1.407,
+          "worstMs": 1.41,
+          "overBudgetFrames": 0,
+          "overBudgetRatio": 0.0
+        },
+        "raster": {
+          "averageMs": 2.2194149377593364,
+          "p90Ms": 2.687,
+          "p99Ms": 3.455,
+          "worstMs": 3.636,
+          "overBudgetFrames": 0,
+          "overBudgetRatio": 0.0
+        },
+        "eitherThreadOverBudgetFrames": 0,
+        "estimatedMissedVsyncs": 0,
+        "refreshRatesHz": [
+          120.00000762939453
+        ],
+        "refreshRatesTruncated": false
+      },
+      "steadyState": {
+        "frameCount": 3616,
+        "uiBuild": {
+          "averageMs": 0.5417842920353982,
+          "p90Ms": 0.831,
+          "p99Ms": 1.471,
+          "worstMs": 2.276,
+          "overBudgetFrames": 0,
+          "overBudgetRatio": 0.0
+        },
+        "raster": {
+          "averageMs": 2.2721985619469027,
+          "p90Ms": 2.687,
+          "p99Ms": 3.455,
+          "worstMs": 6.937,
+          "overBudgetFrames": 0,
+          "overBudgetRatio": 0.0
+        },
+        "eitherThreadOverBudgetFrames": 0,
+        "estimatedMissedVsyncs": 0,
+        "refreshRatesHz": [
+          120.00000762939453
+        ],
+        "refreshRatesTruncated": false
+      },
+      "firstPageEntryFirst2Seconds": {
+        "frameCount": 0,
+        "uiBuild": {
+          "averageMs": null,
+          "p90Ms": null,
+          "p99Ms": null,
+          "worstMs": null,
+          "overBudgetFrames": 0,
+          "overBudgetRatio": null
+        },
+        "raster": {
+          "averageMs": null,
+          "p90Ms": null,
+          "p99Ms": null,
+          "worstMs": null,
+          "overBudgetFrames": 0,
+          "overBudgetRatio": null
+        },
+        "eitherThreadOverBudgetFrames": 0,
+        "estimatedMissedVsyncs": 0,
+        "refreshRatesHz": [],
+        "refreshRatesTruncated": false
+      },
+      "conditions": [
+        {
+          "condition": {
+            "glassEnabled": false,
+            "scrollCardGlassEnabled": false,
+            "starfield": false,
+            "glassQuality": "off",
+            "glassPhase": "comparison_locked",
+            "glassFrost": false,
+            "renderer": "Impeller",
+            "rendererBackend": "vulkan",
+            "refreshRateHz": 120.00000762939453,
+            "frameBudgetMs": 8.333332803514303,
+            "adaptiveTargetFrameMs": 8.333332803514303,
+            "theme": "light",
+            "viewportWidth": 393.84615384615387,
+            "viewportHeight": 852.9230769230769,
+            "devicePixelRatio": 3.25,
+            "textScale": 1.0
+          },
+          "allFrames": {
+            "frameCount": 3857,
+            "uiBuild": {
+              "averageMs": 0.5414239045890589,
+              "p90Ms": 0.831,
+              "p99Ms": 1.471,
+              "worstMs": 2.276,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "raster": {
+              "averageMs": 2.268900440757065,
+              "p90Ms": 2.687,
+              "p99Ms": 3.455,
+              "worstMs": 6.937,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "eitherThreadOverBudgetFrames": 0,
+            "estimatedMissedVsyncs": 0,
+            "refreshRatesHz": [
+              120.00000762939453
+            ],
+            "refreshRatesTruncated": false
+          },
+          "warmupFirst2Seconds": {
+            "frameCount": 241,
+            "uiBuild": {
+              "averageMs": 0.5360165975103734,
+              "p90Ms": 0.895,
+              "p99Ms": 1.407,
+              "worstMs": 1.41,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "raster": {
+              "averageMs": 2.2194149377593364,
+              "p90Ms": 2.687,
+              "p99Ms": 3.455,
+              "worstMs": 3.636,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "eitherThreadOverBudgetFrames": 0,
+            "estimatedMissedVsyncs": 0,
+            "refreshRatesHz": [
+              120.00000762939453
+            ],
+            "refreshRatesTruncated": false
+          },
+          "steadyState": {
+            "frameCount": 3616,
+            "uiBuild": {
+              "averageMs": 0.5417842920353982,
+              "p90Ms": 0.831,
+              "p99Ms": 1.471,
+              "worstMs": 2.276,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "raster": {
+              "averageMs": 2.2721985619469027,
+              "p90Ms": 2.687,
+              "p99Ms": 3.455,
+              "worstMs": 6.937,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "eitherThreadOverBudgetFrames": 0,
+            "estimatedMissedVsyncs": 0,
+            "refreshRatesHz": [
+              120.00000762939453
+            ],
+            "refreshRatesTruncated": false
+          },
+          "firstPageEntryFirst2Seconds": {
+            "frameCount": 0,
+            "uiBuild": {
+              "averageMs": null,
+              "p90Ms": null,
+              "p99Ms": null,
+              "worstMs": null,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": null
+            },
+            "raster": {
+              "averageMs": null,
+              "p90Ms": null,
+              "p99Ms": null,
+              "worstMs": null,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": null
+            },
+            "eitherThreadOverBudgetFrames": 0,
+            "estimatedMissedVsyncs": 0,
+            "refreshRatesHz": [],
+            "refreshRatesTruncated": false
+          }
+        }
+      ]
+    },
+    "glass_off_stars_off__planCardScroll": {
+      "id": "glass_off_stars_off__planCardScroll",
+      "variant": "glass_off_stars_off",
+      "scenario": "planCardScroll",
+      "fixtureId": "plan_cards_72_v1",
+      "messageCount": 72,
+      "completed": true,
+      "invalidationReason": null,
+      "observedDurationSeconds": 32.021995,
+      "firstVsyncStartUs": 306607694037,
+      "lastVsyncStartUs": 306639716032,
+      "pages": [
+        "performance_plan_cards"
+      ],
+      "comparisonReady": true,
+      "comparisonIssues": [],
+      "overflowConditionFrameCount": 0,
+      "allFrames": {
+        "frameCount": 3835,
+        "uiBuild": {
+          "averageMs": 0.527509778357236,
+          "p90Ms": 0.735,
+          "p99Ms": 1.919,
+          "worstMs": 7.999,
+          "overBudgetFrames": 0,
+          "overBudgetRatio": 0.0
+        },
+        "raster": {
+          "averageMs": 2.7090380704041723,
+          "p90Ms": 3.199,
+          "p99Ms": 4.863,
+          "worstMs": 8.648,
+          "overBudgetFrames": 1,
+          "overBudgetRatio": 0.0002607561929595828
+        },
+        "eitherThreadOverBudgetFrames": 1,
+        "estimatedMissedVsyncs": 1,
+        "refreshRatesHz": [
+          120.00000762939453
+        ],
+        "refreshRatesTruncated": false
+      },
+      "warmupFirst2Seconds": {
+        "frameCount": 240,
+        "uiBuild": {
+          "averageMs": 0.5183833333333333,
+          "p90Ms": 0.703,
+          "p99Ms": 1.791,
+          "worstMs": 6.21,
+          "overBudgetFrames": 0,
+          "overBudgetRatio": 0.0
+        },
+        "raster": {
+          "averageMs": 2.7230125,
+          "p90Ms": 3.199,
+          "p99Ms": 4.351,
+          "worstMs": 6.924,
+          "overBudgetFrames": 0,
+          "overBudgetRatio": 0.0
+        },
+        "eitherThreadOverBudgetFrames": 0,
+        "estimatedMissedVsyncs": 0,
+        "refreshRatesHz": [
+          120.00000762939453
+        ],
+        "refreshRatesTruncated": false
+      },
+      "steadyState": {
+        "frameCount": 3595,
+        "uiBuild": {
+          "averageMs": 0.5281190542420028,
+          "p90Ms": 0.735,
+          "p99Ms": 2.047,
+          "worstMs": 7.999,
+          "overBudgetFrames": 0,
+          "overBudgetRatio": 0.0
+        },
+        "raster": {
+          "averageMs": 2.7081051460361616,
+          "p90Ms": 3.199,
+          "p99Ms": 4.863,
+          "worstMs": 8.648,
+          "overBudgetFrames": 1,
+          "overBudgetRatio": 0.0002781641168289291
+        },
+        "eitherThreadOverBudgetFrames": 1,
+        "estimatedMissedVsyncs": 1,
+        "refreshRatesHz": [
+          120.00000762939453
+        ],
+        "refreshRatesTruncated": false
+      },
+      "firstPageEntryFirst2Seconds": {
+        "frameCount": 0,
+        "uiBuild": {
+          "averageMs": null,
+          "p90Ms": null,
+          "p99Ms": null,
+          "worstMs": null,
+          "overBudgetFrames": 0,
+          "overBudgetRatio": null
+        },
+        "raster": {
+          "averageMs": null,
+          "p90Ms": null,
+          "p99Ms": null,
+          "worstMs": null,
+          "overBudgetFrames": 0,
+          "overBudgetRatio": null
+        },
+        "eitherThreadOverBudgetFrames": 0,
+        "estimatedMissedVsyncs": 0,
+        "refreshRatesHz": [],
+        "refreshRatesTruncated": false
+      },
+      "conditions": [
+        {
+          "condition": {
+            "glassEnabled": false,
+            "scrollCardGlassEnabled": false,
+            "starfield": false,
+            "glassQuality": "off",
+            "glassPhase": "comparison_locked",
+            "glassFrost": false,
+            "renderer": "Impeller",
+            "rendererBackend": "vulkan",
+            "refreshRateHz": 120.00000762939453,
+            "frameBudgetMs": 8.333332803514303,
+            "adaptiveTargetFrameMs": 8.333332803514303,
+            "theme": "light",
+            "viewportWidth": 393.84615384615387,
+            "viewportHeight": 852.9230769230769,
+            "devicePixelRatio": 3.25,
+            "textScale": 1.0
+          },
+          "allFrames": {
+            "frameCount": 3835,
+            "uiBuild": {
+              "averageMs": 0.527509778357236,
+              "p90Ms": 0.735,
+              "p99Ms": 1.919,
+              "worstMs": 7.999,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "raster": {
+              "averageMs": 2.7090380704041723,
+              "p90Ms": 3.199,
+              "p99Ms": 4.863,
+              "worstMs": 8.648,
+              "overBudgetFrames": 1,
+              "overBudgetRatio": 0.0002607561929595828
+            },
+            "eitherThreadOverBudgetFrames": 1,
+            "estimatedMissedVsyncs": 1,
+            "refreshRatesHz": [
+              120.00000762939453
+            ],
+            "refreshRatesTruncated": false
+          },
+          "warmupFirst2Seconds": {
+            "frameCount": 240,
+            "uiBuild": {
+              "averageMs": 0.5183833333333333,
+              "p90Ms": 0.703,
+              "p99Ms": 1.791,
+              "worstMs": 6.21,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "raster": {
+              "averageMs": 2.7230125,
+              "p90Ms": 3.199,
+              "p99Ms": 4.351,
+              "worstMs": 6.924,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "eitherThreadOverBudgetFrames": 0,
+            "estimatedMissedVsyncs": 0,
+            "refreshRatesHz": [
+              120.00000762939453
+            ],
+            "refreshRatesTruncated": false
+          },
+          "steadyState": {
+            "frameCount": 3595,
+            "uiBuild": {
+              "averageMs": 0.5281190542420028,
+              "p90Ms": 0.735,
+              "p99Ms": 2.047,
+              "worstMs": 7.999,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "raster": {
+              "averageMs": 2.7081051460361616,
+              "p90Ms": 3.199,
+              "p99Ms": 4.863,
+              "worstMs": 8.648,
+              "overBudgetFrames": 1,
+              "overBudgetRatio": 0.0002781641168289291
+            },
+            "eitherThreadOverBudgetFrames": 1,
+            "estimatedMissedVsyncs": 1,
+            "refreshRatesHz": [
+              120.00000762939453
+            ],
+            "refreshRatesTruncated": false
+          },
+          "firstPageEntryFirst2Seconds": {
+            "frameCount": 0,
+            "uiBuild": {
+              "averageMs": null,
+              "p90Ms": null,
+              "p99Ms": null,
+              "worstMs": null,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": null
+            },
+            "raster": {
+              "averageMs": null,
+              "p90Ms": null,
+              "p99Ms": null,
+              "worstMs": null,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": null
+            },
+            "eitherThreadOverBudgetFrames": 0,
+            "estimatedMissedVsyncs": 0,
+            "refreshRatesHz": [],
+            "refreshRatesTruncated": false
+          }
+        }
+      ]
+    }
+  },
+  "scenarioConditions": {
+    "longChatScroll": {
+      "groups": [
+        {
+          "condition": {
+            "glassEnabled": true,
+            "scrollCardGlassEnabled": false,
+            "starfield": true,
+            "glassQuality": "minimal",
+            "glassPhase": "comparison_locked",
+            "glassFrost": false,
+            "renderer": "Impeller",
+            "rendererBackend": "vulkan",
+            "refreshRateHz": 120.00000762939453,
+            "frameBudgetMs": 8.333332803514303,
+            "adaptiveTargetFrameMs": 8.333332803514303,
+            "theme": "light",
+            "viewportWidth": 393.84615384615387,
+            "viewportHeight": 852.9230769230769,
+            "devicePixelRatio": 3.25,
+            "textScale": 1.0
+          },
+          "frames": {
+            "frameCount": 3857,
+            "uiBuild": {
+              "averageMs": 0.592331086336531,
+              "p90Ms": 0.927,
+              "p99Ms": 1.727,
+              "worstMs": 3.107,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "raster": {
+              "averageMs": 4.889185895773918,
+              "p90Ms": 5.631,
+              "p99Ms": 6.911,
+              "worstMs": 10.604,
+              "overBudgetFrames": 8,
+              "overBudgetRatio": 0.002074150894477573
+            },
+            "eitherThreadOverBudgetFrames": 8,
+            "estimatedMissedVsyncs": 8,
+            "refreshRatesHz": [
+              120.00000762939453
+            ],
+            "refreshRatesTruncated": false
+          }
+        },
+        {
+          "condition": {
+            "glassEnabled": true,
+            "scrollCardGlassEnabled": false,
+            "starfield": false,
+            "glassQuality": "minimal",
+            "glassPhase": "comparison_locked",
+            "glassFrost": false,
+            "renderer": "Impeller",
+            "rendererBackend": "vulkan",
+            "refreshRateHz": 120.00000762939453,
+            "frameBudgetMs": 8.333332803514303,
+            "adaptiveTargetFrameMs": 8.333332803514303,
+            "theme": "light",
+            "viewportWidth": 393.84615384615387,
+            "viewportHeight": 852.9230769230769,
+            "devicePixelRatio": 3.25,
+            "textScale": 1.0
+          },
+          "frames": {
+            "frameCount": 3857,
+            "uiBuild": {
+              "averageMs": 0.5323456053927923,
+              "p90Ms": 0.831,
+              "p99Ms": 1.599,
+              "worstMs": 3.374,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "raster": {
+              "averageMs": 4.755832771584132,
+              "p90Ms": 5.375,
+              "p99Ms": 6.911,
+              "worstMs": 8.379,
+              "overBudgetFrames": 1,
+              "overBudgetRatio": 0.00025926886180969663
+            },
+            "eitherThreadOverBudgetFrames": 1,
+            "estimatedMissedVsyncs": 1,
+            "refreshRatesHz": [
+              120.00000762939453
+            ],
+            "refreshRatesTruncated": false
+          }
+        },
+        {
+          "condition": {
+            "glassEnabled": false,
+            "scrollCardGlassEnabled": false,
+            "starfield": true,
+            "glassQuality": "off",
+            "glassPhase": "comparison_locked",
+            "glassFrost": false,
+            "renderer": "Impeller",
+            "rendererBackend": "vulkan",
+            "refreshRateHz": 120.00000762939453,
+            "frameBudgetMs": 8.333332803514303,
+            "adaptiveTargetFrameMs": 8.333332803514303,
+            "theme": "light",
+            "viewportWidth": 393.84615384615387,
+            "viewportHeight": 852.9230769230769,
+            "devicePixelRatio": 3.25,
+            "textScale": 1.0
+          },
+          "frames": {
+            "frameCount": 3857,
+            "uiBuild": {
+              "averageMs": 0.5843404200155561,
+              "p90Ms": 0.927,
+              "p99Ms": 1.535,
+              "worstMs": 2.443,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "raster": {
+              "averageMs": 2.495027741768214,
+              "p90Ms": 2.943,
+              "p99Ms": 3.455,
+              "worstMs": 7.352,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "eitherThreadOverBudgetFrames": 0,
+            "estimatedMissedVsyncs": 0,
+            "refreshRatesHz": [
+              120.00000762939453
+            ],
+            "refreshRatesTruncated": false
+          }
+        },
+        {
+          "condition": {
+            "glassEnabled": false,
+            "scrollCardGlassEnabled": false,
+            "starfield": false,
+            "glassQuality": "off",
+            "glassPhase": "comparison_locked",
+            "glassFrost": false,
+            "renderer": "Impeller",
+            "rendererBackend": "vulkan",
+            "refreshRateHz": 120.00000762939453,
+            "frameBudgetMs": 8.333332803514303,
+            "adaptiveTargetFrameMs": 8.333332803514303,
+            "theme": "light",
+            "viewportWidth": 393.84615384615387,
+            "viewportHeight": 852.9230769230769,
+            "devicePixelRatio": 3.25,
+            "textScale": 1.0
+          },
+          "frames": {
+            "frameCount": 3857,
+            "uiBuild": {
+              "averageMs": 0.5414239045890589,
+              "p90Ms": 0.831,
+              "p99Ms": 1.471,
+              "worstMs": 2.276,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "raster": {
+              "averageMs": 2.268900440757065,
+              "p90Ms": 2.687,
+              "p99Ms": 3.455,
+              "worstMs": 6.937,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "eitherThreadOverBudgetFrames": 0,
+            "estimatedMissedVsyncs": 0,
+            "refreshRatesHz": [
+              120.00000762939453
+            ],
+            "refreshRatesTruncated": false
+          }
+        }
+      ],
+      "overflowFrameCount": 0
+    },
+    "planCardScroll": {
+      "groups": [
+        {
+          "condition": {
+            "glassEnabled": true,
+            "scrollCardGlassEnabled": false,
+            "starfield": true,
+            "glassQuality": "minimal",
+            "glassPhase": "comparison_locked",
+            "glassFrost": false,
+            "renderer": "Impeller",
+            "rendererBackend": "vulkan",
+            "refreshRateHz": 120.00000762939453,
+            "frameBudgetMs": 8.333332803514303,
+            "adaptiveTargetFrameMs": 8.333332803514303,
+            "theme": "light",
+            "viewportWidth": 393.84615384615387,
+            "viewportHeight": 852.9230769230769,
+            "devicePixelRatio": 3.25,
+            "textScale": 1.0
+          },
+          "frames": {
+            "frameCount": 3834,
+            "uiBuild": {
+              "averageMs": 0.5345252999478352,
+              "p90Ms": 0.767,
+              "p99Ms": 1.983,
+              "worstMs": 7.891,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "raster": {
+              "averageMs": 5.89033489827856,
+              "p90Ms": 7.935,
+              "p99Ms": 9.215,
+              "worstMs": 13.08,
+              "overBudgetFrames": 152,
+              "overBudgetRatio": 0.0396452790818988
+            },
+            "eitherThreadOverBudgetFrames": 152,
+            "estimatedMissedVsyncs": 152,
+            "refreshRatesHz": [
+              120.00000762939453
+            ],
+            "refreshRatesTruncated": false
+          }
+        },
+        {
+          "condition": {
+            "glassEnabled": true,
+            "scrollCardGlassEnabled": false,
+            "starfield": false,
+            "glassQuality": "minimal",
+            "glassPhase": "comparison_locked",
+            "glassFrost": false,
+            "renderer": "Impeller",
+            "rendererBackend": "vulkan",
+            "refreshRateHz": 120.00000762939453,
+            "frameBudgetMs": 8.333332803514303,
+            "adaptiveTargetFrameMs": 8.333332803514303,
+            "theme": "light",
+            "viewportWidth": 393.84615384615387,
+            "viewportHeight": 852.9230769230769,
+            "devicePixelRatio": 3.25,
+            "textScale": 1.0
+          },
+          "frames": {
+            "frameCount": 3838,
+            "uiBuild": {
+              "averageMs": 0.5011005732152163,
+              "p90Ms": 0.671,
+              "p99Ms": 2.047,
+              "worstMs": 7.229,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "raster": {
+              "averageMs": 4.856324648254299,
+              "p90Ms": 5.631,
+              "p99Ms": 7.423,
+              "worstMs": 16.616,
+              "overBudgetFrames": 14,
+              "overBudgetRatio": 0.0036477331943720686
+            },
+            "eitherThreadOverBudgetFrames": 14,
+            "estimatedMissedVsyncs": 14,
+            "refreshRatesHz": [
+              120.00000762939453
+            ],
+            "refreshRatesTruncated": false
+          }
+        },
+        {
+          "condition": {
+            "glassEnabled": false,
+            "scrollCardGlassEnabled": false,
+            "starfield": true,
+            "glassQuality": "off",
+            "glassPhase": "comparison_locked",
+            "glassFrost": false,
+            "renderer": "Impeller",
+            "rendererBackend": "vulkan",
+            "refreshRateHz": 120.00000762939453,
+            "frameBudgetMs": 8.333332803514303,
+            "adaptiveTargetFrameMs": 8.333332803514303,
+            "theme": "light",
+            "viewportWidth": 393.84615384615387,
+            "viewportHeight": 852.9230769230769,
+            "devicePixelRatio": 3.25,
+            "textScale": 1.0
+          },
+          "frames": {
+            "frameCount": 3842,
+            "uiBuild": {
+              "averageMs": 0.5576603331598126,
+              "p90Ms": 0.799,
+              "p99Ms": 1.791,
+              "worstMs": 6.887,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "raster": {
+              "averageMs": 2.9121236335242062,
+              "p90Ms": 3.455,
+              "p99Ms": 4.607,
+              "worstMs": 10.608,
+              "overBudgetFrames": 2,
+              "overBudgetRatio": 0.0005205622071837585
+            },
+            "eitherThreadOverBudgetFrames": 2,
+            "estimatedMissedVsyncs": 2,
+            "refreshRatesHz": [
+              120.00000762939453
+            ],
+            "refreshRatesTruncated": false
+          }
+        },
+        {
+          "condition": {
+            "glassEnabled": false,
+            "scrollCardGlassEnabled": false,
+            "starfield": false,
+            "glassQuality": "off",
+            "glassPhase": "comparison_locked",
+            "glassFrost": false,
+            "renderer": "Impeller",
+            "rendererBackend": "vulkan",
+            "refreshRateHz": 120.00000762939453,
+            "frameBudgetMs": 8.333332803514303,
+            "adaptiveTargetFrameMs": 8.333332803514303,
+            "theme": "light",
+            "viewportWidth": 393.84615384615387,
+            "viewportHeight": 852.9230769230769,
+            "devicePixelRatio": 3.25,
+            "textScale": 1.0
+          },
+          "frames": {
+            "frameCount": 3835,
+            "uiBuild": {
+              "averageMs": 0.527509778357236,
+              "p90Ms": 0.735,
+              "p99Ms": 1.919,
+              "worstMs": 7.999,
+              "overBudgetFrames": 0,
+              "overBudgetRatio": 0.0
+            },
+            "raster": {
+              "averageMs": 2.7090380704041723,
+              "p90Ms": 3.199,
+              "p99Ms": 4.863,
+              "worstMs": 8.648,
+              "overBudgetFrames": 1,
+              "overBudgetRatio": 0.0002607561929595828
+            },
+            "eitherThreadOverBudgetFrames": 1,
+            "estimatedMissedVsyncs": 1,
+            "refreshRatesHz": [
+              120.00000762939453
+            ],
+            "refreshRatesTruncated": false
+          }
+        }
+      ],
+      "overflowFrameCount": 0
+    }
+  },
+  "pageEntries": {
+    "chat": {
+      "firstVsyncStartUs": 306058517044,
+      "first2Seconds": {
+        "frameCount": 147,
+        "uiBuild": {
+          "averageMs": 0.3502448979591837,
+          "p90Ms": 0.511,
+          "p99Ms": 3.327,
+          "worstMs": 4.077,
+          "overBudgetFrames": 0,
+          "overBudgetRatio": 0.0
+        },
+        "raster": {
+          "averageMs": 4.19221768707483,
+          "p90Ms": 8.191,
+          "p99Ms": 22.527,
+          "worstMs": 33.939,
+          "overBudgetFrames": 7,
+          "overBudgetRatio": 0.047619047619047616
+        },
+        "eitherThreadOverBudgetFrames": 7,
+        "estimatedMissedVsyncs": 11,
+        "refreshRatesHz": [
+          120.00000762939453
+        ],
+        "refreshRatesTruncated": false
+      },
+      "earlierOutOfOrderFrameCount": 0
+    },
+    "settings": {
+      "firstVsyncStartUs": 306154867700,
+      "first2Seconds": {
+        "frameCount": 145,
+        "uiBuild": {
+          "averageMs": 0.6896206896551724,
+          "p90Ms": 0.703,
+          "p99Ms": 14.335,
+          "worstMs": 17.675,
+          "overBudgetFrames": 2,
+          "overBudgetRatio": 0.013793103448275862
+        },
+        "raster": {
+          "averageMs": 4.364806896551724,
+          "p90Ms": 9.215,
+          "p99Ms": 14.847,
+          "worstMs": 22.715,
+          "overBudgetFrames": 25,
+          "overBudgetRatio": 0.1724137931034483
+        },
+        "eitherThreadOverBudgetFrames": 26,
+        "estimatedMissedVsyncs": 28,
+        "refreshRatesHz": [
+          120.00000762939453
+        ],
+        "refreshRatesTruncated": false
+      },
+      "earlierOutOfOrderFrameCount": 0
+    },
+    "performance_settings": {
+      "firstVsyncStartUs": 306156993676,
+      "first2Seconds": {
+        "frameCount": 40,
+        "uiBuild": {
+          "averageMs": 1.5910250000000001,
+          "p90Ms": 0.703,
+          "p99Ms": 22.243,
+          "worstMs": 22.243,
+          "overBudgetFrames": 2,
+          "overBudgetRatio": 0.05
+        },
+        "raster": {
+          "averageMs": 4.470575,
+          "p90Ms": 10.751,
+          "p99Ms": 29.107,
+          "worstMs": 29.107,
+          "overBudgetFrames": 5,
+          "overBudgetRatio": 0.125
+        },
+        "eitherThreadOverBudgetFrames": 6,
+        "estimatedMissedVsyncs": 11,
+        "refreshRatesHz": [
+          120.00000762939453
+        ],
+        "refreshRatesTruncated": false
+      },
+      "earlierOutOfOrderFrameCount": 0
+    },
+    "performance_lab": {
+      "firstVsyncStartUs": 306174243092,
+      "first2Seconds": {
+        "frameCount": 46,
+        "uiBuild": {
+          "averageMs": 1.1140652173913042,
+          "p90Ms": 0.671,
+          "p99Ms": 17.969,
+          "worstMs": 17.969,
+          "overBudgetFrames": 2,
+          "overBudgetRatio": 0.043478260869565216
+        },
+        "raster": {
+          "averageMs": 2.669086956521739,
+          "p90Ms": 3.327,
+          "p99Ms": 9.611,
+          "worstMs": 9.611,
+          "overBudgetFrames": 2,
+          "overBudgetRatio": 0.043478260869565216
+        },
+        "eitherThreadOverBudgetFrames": 3,
+        "estimatedMissedVsyncs": 4,
+        "refreshRatesHz": [
+          120.00000762939453
+        ],
+        "refreshRatesTruncated": false
+      },
+      "earlierOutOfOrderFrameCount": 0
+    },
+    "performance_chat": {
+      "firstVsyncStartUs": 306180099163,
+      "first2Seconds": {
+        "frameCount": 236,
+        "uiBuild": {
+          "averageMs": 0.7501483050847457,
+          "p90Ms": 1.151,
+          "p99Ms": 2.559,
+          "worstMs": 15.581,
+          "overBudgetFrames": 1,
+          "overBudgetRatio": 0.00423728813559322
+        },
+        "raster": {
+          "averageMs": 5.049021186440679,
+          "p90Ms": 6.143,
+          "p99Ms": 12.287,
+          "worstMs": 16.961,
+          "overBudgetFrames": 8,
+          "overBudgetRatio": 0.03389830508474576
+        },
+        "eitherThreadOverBudgetFrames": 9,
+        "estimatedMissedVsyncs": 10,
+        "refreshRatesHz": [
+          120.00000762939453
+        ],
+        "refreshRatesTruncated": false
+      },
+      "earlierOutOfOrderFrameCount": 0
+    },
+    "performance_plan_cards": {
+      "firstVsyncStartUs": 306216722616,
+      "first2Seconds": {
+        "frameCount": 236,
+        "uiBuild": {
+          "averageMs": 0.8097542372881357,
+          "p90Ms": 1.599,
+          "p99Ms": 6.399,
+          "worstMs": 18.53,
+          "overBudgetFrames": 1,
+          "overBudgetRatio": 0.00423728813559322
+        },
+        "raster": {
+          "averageMs": 6.466008474576271,
+          "p90Ms": 8.703,
+          "p99Ms": 11.775,
+          "worstMs": 17.777,
+          "overBudgetFrames": 23,
+          "overBudgetRatio": 0.09745762711864407
+        },
+        "eitherThreadOverBudgetFrames": 24,
+        "estimatedMissedVsyncs": 26,
+        "refreshRatesHz": [
+          120.00000762939453
+        ],
+        "refreshRatesTruncated": false
+      },
+      "earlierOutOfOrderFrameCount": 0
+    }
+  }
+}

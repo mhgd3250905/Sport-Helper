@@ -56,9 +56,9 @@
 | JNI | 实际 arm64 release 的 Android 存储 JNI 门禁通过 |
 | 内测标记 | AOT 含 v3、记录器、列表卡片开关、固定会话及实际打包源码标记；native 探测/分享标记存在；没有 profile VM-service 扩展 |
 | 生产隔离 | 实际 arm64 production release 的 7 项 Dart 内测标记、3 项 native 内测标记及 profile VM-service 扩展全部不存在；静态卡片存在，JNI 与签名检查通过。不交付该无 AI 构建凭据检查包 |
-| 手机性能 | 尚未收到 +18 报告；P99 与超预算目标待复测 |
+| 手机性能 | +18 已收到 8/8 有效格；默认计划卡 P99 9.215ms、超预算 3.951%，明显改善但未达到 P99 <8.33ms，暂未通过验收 |
 
-机器可读身份与检查见 [交付记录](reports/performance-static-scroll-cards-delivery-2026-10-23.json)。只有新手机报告才能填写性能达标结果。
+机器可读身份与检查见 [交付记录](reports/performance-static-scroll-cards-delivery-2026-10-23.json)。手机修前/修后、剩余玻璃路径、聊天与进入尖峰见 [真机复测分析](performance-static-scroll-cards-phone-review-2026-10-23.md)。本轮未将关星尘或全关玻璃的结果替代默认配置验收，没有继续修改运行代码。
 
 Cockpit 本地服务不可达，旧进度请求仍未确认；保留原 clientRequestId 和参数，不用新请求号绕过。源码、截图、测试结果与包身份已在本地 Git 分支保存。
 
