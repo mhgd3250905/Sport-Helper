@@ -637,5 +637,7 @@
     "internalApksAndScreenshots": "9773b61c45e3ffd286b789c32a6637eb04cfc09a",
     "defaultBAndProductionValidation": "216c7b3b881328167900b84ee241c9f5a48b9cbe",
     "afterValidation": "Only documentation, refreshed fixture PNGs, LF checkout guard, and an explanatory Gradle comment; runtime behavior and generated image bytes unchanged"
-  }
+  },
+  "supersededBy": "docs/reports/icon-fullbody-zoom-delivery-2026-10-24.json",
+  "supersededReason": "User rejected cropped B and requested the original full-body A slightly enlarged with feet retained."
 }

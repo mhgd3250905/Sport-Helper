@@ -1,0 +1,279 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-24",
+  "variant": "A2",
+  "sourceCommit": "b50722329145a267b098f8f0e6e64054936fd4e0",
+  "baseMain": "d362084976387b2b2fc331a0da8974dc112c02bf",
+  "request": "Original full-body A slightly enlarged, complete feet retained; replaces the earlier B choice",
+  "provenance": {
+    "schemaVersion": 1,
+    "date": "2026-10-24",
+    "variant": "A2",
+    "method": "built-in image_gen edit",
+    "reference": "assets/brand/source/smartfit-icon-v3.png",
+    "referenceSha256": "5489859ef71dd279453f46e15d0d1632eabf7f5cbdc7e677d591c34f14f8637c",
+    "prompt": "Edit the provided ORIGINAL FULL-BODY SmartFit app icon. Produce exactly one 1024x1024 opaque full-bleed square image, no rounded corners. Make ONLY a subtle composition zoom: enlarge the existing woman, robot, motion arc, sparkles, and their ground shadow together by about 15 percent, maintaining their relative geometry and placement. The woman must remain fully visible from the tip of her raised hand to BOTH COMPLETE shoes with generous clear background below the soles (at least about 40 px). The entire raised arm, full legs, both feet, robot antenna and robot body must remain inside the square with visible breathing room; absolutely no half-body or leg/foot cropping. Preserve the same character identity, facial features, hairstyle, body proportions, stretching pose, coral exercise clothing and shoes, white robot with teal face, soft original 3D illustration style, original mint-to-teal gradient colors, lighting and overall design. Extend/reconstruct only the same smooth gradient background where required by the repositioning. Do not add objects, text, a border, a logo, extra effects or a new design. It should look like the same original full-body artwork, just slightly larger within the canvas, with the feet completely intact.",
+    "generatedSize": [
+      1254,
+      1254
+    ],
+    "generatedSha256": "233f7568bad123263a8a21ec5a3ddc1147412515976aca48c87191d2cb324e7a",
+    "normalization": "Uniform LANCZOS resample to the required 1024x1024 launcher source; no crop or additional image editing",
+    "source": "assets/brand/source/smartfit-icon-v3-fullbody-zoom.png",
+    "sourceSize": [
+      1024,
+      1024
+    ],
+    "sourceMode": "RGB",
+    "sourceSha256": "ad29f8ed04a444bdea1cb46433d4c5c412613a263144e1ad2021c7527f4c8894",
+    "originalAAndBRetained": true,
+    "humanVisualConfirmationPending": true,
+    "brandMergeApproved": false
+  },
+  "localDefault": {
+    "schemaVersion": 1,
+    "variant": "A2",
+    "source": "assets/brand/source/smartfit-icon-v3-fullbody-zoom.png",
+    "sourceSha256": "ad29f8ed04a444bdea1cb46433d4c5c412613a263144e1ad2021c7527f4c8894",
+    "proposedDate": "2026-10-24",
+    "status": "awaiting_user_visual_confirmation",
+    "scope": "local_brand_branch_only",
+    "productionReleaseApproved": false,
+    "brandMergeApproved": false,
+    "supersedes": "B",
+    "decision": "User rejected the cropped B artwork and requested the original full-body A slightly enlarged with both feet intact. A2 is the local review candidate; visual confirmation and brand merge approval are pending."
+  },
+  "apk": {
+    "variant": "A2",
+    "sourceCommit": "b50722329145a267b098f8f0e6e64054936fd4e0",
+    "baseMain": "d362084976387b2b2fc331a0da8974dc112c02bf",
+    "flavor": "internal",
+    "versionName": "0.1.0",
+    "versionCode": 2022,
+    "buildMode": "release",
+    "abi": "arm64-v8a",
+    "sdkRef": "f684e02f38e652633c23fa8946a53d02b6aa3ea2",
+    "lockSha256": "629fbe117adc84bc7d719adfcdc2ae95188872c8c7a219e8442afb7e6aee1051",
+    "apk": ".buildlog/icon-a2-22/install/SmartFit-0.1.0+22-internal-iconA2.apk",
+    "sizeBytes": 50060399,
+    "sha256": "eeacfbb71bb065aaef35e36b55b50d8a00c7da256d1b3b9553f114667fbba7d4",
+    "runtimeCleanBeforeAndAfterBuild": true,
+    "createdAtUtc": "2026-10-23T16:18:48.3570987Z",
+    "packageName": "com.ugk.smartfit.internal",
+    "debuggable": false,
+    "signatureV2Verified": true,
+    "signerMatchesInstalledBuild21": true,
+    "certificateSha256": "3761270a4764157f0e389014a9e5b800b05403bfddce0f4f7f8c039f6a53bdc7",
+    "selectedIconResourcePixelMatches": [
+      {
+        "density": "mdpi",
+        "resource": "ic_launcher",
+        "packedPaths": [
+          "res/9w.png",
+          "res/zR.png"
+        ]
+      },
+      {
+        "density": "mdpi",
+        "resource": "ic_launcher_foreground",
+        "packedPaths": [
+          "res/QZ.png"
+        ]
+      },
+      {
+        "density": "mdpi",
+        "resource": "ic_launcher_background",
+        "packedPaths": [
+          "res/3z.png"
+        ]
+      },
+      {
+        "density": "hdpi",
+        "resource": "ic_launcher",
+        "packedPaths": [
+          "res/8c.png",
+          "res/yn.png"
+        ]
+      },
+      {
+        "density": "hdpi",
+        "resource": "ic_launcher_foreground",
+        "packedPaths": [
+          "res/zr.png"
+        ]
+      },
+      {
+        "density": "hdpi",
+        "resource": "ic_launcher_background",
+        "packedPaths": [
+          "res/I2.png"
+        ]
+      },
+      {
+        "density": "xhdpi",
+        "resource": "ic_launcher",
+        "packedPaths": [
+          "res/FS.png",
+          "res/wb.png"
+        ]
+      },
+      {
+        "density": "xhdpi",
+        "resource": "ic_launcher_foreground",
+        "packedPaths": [
+          "res/Em.png"
+        ]
+      },
+      {
+        "density": "xhdpi",
+        "resource": "ic_launcher_background",
+        "packedPaths": [
+          "res/6h.png"
+        ]
+      },
+      {
+        "density": "xxhdpi",
+        "resource": "ic_launcher",
+        "packedPaths": [
+          "res/RJ.png",
+          "res/fO.png"
+        ]
+      },
+      {
+        "density": "xxhdpi",
+        "resource": "ic_launcher_foreground",
+        "packedPaths": [
+          "res/Lf.png"
+        ]
+      },
+      {
+        "density": "xxhdpi",
+        "resource": "ic_launcher_background",
+        "packedPaths": [
+          "res/cV.png"
+        ]
+      },
+      {
+        "density": "xxxhdpi",
+        "resource": "ic_launcher",
+        "packedPaths": [
+          "res/Gc.png",
+          "res/o-.png"
+        ]
+      },
+      {
+        "density": "xxxhdpi",
+        "resource": "ic_launcher_foreground",
+        "packedPaths": [
+          "res/as.png"
+        ]
+      },
+      {
+        "density": "xxxhdpi",
+        "resource": "ic_launcher_background",
+        "packedPaths": [
+          "res/Gx.png"
+        ]
+      }
+    ],
+    "otherCandidateLegacyIconsAbsent": true,
+    "internalPerformanceMarkersPresent": true,
+    "profileVmExtensionAbsent": true,
+    "storageJniPassed": true,
+    "sourceEmbedded": true
+  },
+  "phoneSmoke": {
+    "performed": true,
+    "variant": "A2",
+    "serial": "QSG6Q8IFDMDELVGQ",
+    "deviceModel": "2602BRT18C",
+    "systemVersion": "16",
+    "isPhysicalDevice": true,
+    "coverInstallWithoutDataReset": true,
+    "installedApkSha256": "eeacfbb71bb065aaef35e36b55b50d8a00c7da256d1b3b9553f114667fbba7d4",
+    "activityLaunchPassed": true,
+    "processAliveAfterSeconds": 5,
+    "iconAppInfoScreenshot": ".buildlog/icon-a2-22/iconA2-app-info.png",
+    "iconVisualVerified": false,
+    "cacheRefresh": "Returned to launcher, restarted own App-info Settings page; App and launcher data retained",
+    "notAPerformanceTest": true,
+    "humanVisualConfirmationPending": true,
+    "brandMergeApproved": false,
+    "displayedIconStillOldB": true,
+    "bothFeetVisibleOnSystemUi": null,
+    "preparedSourceBitmapFullBodyVerified": true,
+    "systemIconVisualConfirmationPending": true
+  },
+  "checks": {
+    "iconPythonPassed": 14,
+    "generatedFilesVerified": 118,
+    "defaultProtectedFilesVerified": 38,
+    "fullBodySourceVisualReviewPassed": true,
+    "circleAndRoundedMaskVisualReviewPassed": true,
+    "fullSourceInside66DpSafeCircleAtEveryDensity": true,
+    "originalAAndBArtifactsRetained": true,
+    "newBuild22Checks": {
+      "metadataExportTests": {
+        "passed": 18,
+        "skipped": 1
+      },
+      "staticAnalysisIssues": 0
+    },
+    "onlyVersionMetadataChangedInDart": true,
+    "lockMatchesMainGitBlob": "443084a3eab41c77f8a01a5a1d7c7c03ac7bbcea",
+    "buildIdentityAndSourceHashVerified": true,
+    "signatureV2Verified": true,
+    "storageJniPassed": true
+  },
+  "reusedChecks": {
+    "flutterTests": {
+      "source": "9773b61c45e3ffd286b789c32a6637eb04cfc09a",
+      "passed": 420,
+      "skipped": 13,
+      "rerun": false
+    },
+    "internalMaterialTests": {
+      "passed": 23,
+      "skipped": 4,
+      "rerun": false
+    },
+    "analyzer": {
+      "issues": 0,
+      "rerun": false
+    },
+    "productionIsolation": {
+      "source": "216c7b3b881328167900b84ee241c9f5a48b9cbe",
+      "rerun": false,
+      "reason": "Dart/native rendering and performance behavior unchanged; this round also synchronizes version metadata to22; no claim of a new A2 production APK"
+    }
+  },
+  "preview": {
+    "file": "docs/screenshots/icon-fullbody-zoom/icon-mask-preview.png",
+    "sha256": "e5dbf874e84878d7eec268656113113fe73bd22b4f0d9c60330b370a2f915758",
+    "width": 1500,
+    "height": 1560
+  },
+  "ios": {
+    "all19SlotsGenerated": true,
+    "compiledOnMacOS": false
+  },
+  "emulatorStarted": false,
+  "newPerformanceMeasurement": false,
+  "sdkChanged": false,
+  "starfieldChanged": false,
+  "themeTokensChangedThisRound": false,
+  "sameVersionAttempt": {
+    "versionCode": 2021,
+    "apk": ".buildlog/icon-a2/install/SmartFit-0.1.0+21-internal-iconA2.apk",
+    "sha256": "cd2209bdfbf08d5c8e76ba065cea2e27af0291a6f05d6cae4daf7265a6ef9821",
+    "installedHashMatched": true,
+    "oldBIconRegionUnchanged": true,
+    "launcherAndSettingsRestartedWithoutDataReset": true,
+    "notAcceptedAsVisualConfirmation": true
+  },
+  "previousBChoiceSuperseded": true,
+  "brandMergedMain": false,
+  "brandPushed": false,
+  "humanVisualConfirmationPending": true,
+  "brandMergeApproved": false
+}
