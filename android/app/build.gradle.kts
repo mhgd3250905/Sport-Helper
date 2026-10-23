@@ -1,3 +1,5 @@
+import java.util.Base64
+
 plugins {
     id("com.android.application")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
@@ -9,7 +11,7 @@ plugins {
 // Flutter exposes --dart-define values as base64-encoded Gradle dart-defines.
 val iconDefines = providers.gradleProperty("dart-defines").orNull
     .orEmpty().split(",").mapNotNull { encoded ->
-        runCatching { String(java.util.Base64.getDecoder().decode(encoded), Charsets.UTF_8) }
+        runCatching { String(Base64.getDecoder().decode(encoded), Charsets.UTF_8) }
             .getOrNull()
     }.filter { it.startsWith("SMARTFIT_ICON_VARIANT=") }
     .map { it.substringAfter("=").uppercase() }.distinct()
