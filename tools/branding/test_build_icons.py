@@ -32,14 +32,60 @@ class IconAssetsTest(unittest.TestCase):
             with self.subTest(path=path):
                 self.assertEqual((icons.ROOT / path).read_bytes(), content)
 
-    def test_all_original_production_icon_files_match_snapshot(self):
-        self.assertEqual(len(icons.protected_assets(icons.ROOT)), 21)
+    def test_selected_production_icons_match_snapshot_and_generator_never_writes_them(self):
+        self.assertEqual(len(icons.protected_assets(icons.ROOT)), 38)
         self.assertNotIn("android/app/src/main", "\n".join(self.assets))
         self.assertNotIn("AppIcon.appiconset/", "\n".join(self.assets))
         project = (icons.ROOT / "ios/Runner.xcodeproj/project.pbxproj").read_text("utf-8")
         self.assertEqual(project.count("ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;"), 3)
         self.assertNotIn("IconA.internal.xcconfig", project)
         self.assertNotIn("IconB.internal.xcconfig", project)
+
+    def test_default_android_and_ios_slots_use_selected_b(self):
+        expected = icons.selected_production_assets(self.assets)
+        self.assertEqual(len(expected), 38)
+        for path, content in expected.items():
+            with self.subTest(path=path):
+                actual = (icons.ROOT / path).read_bytes()
+                if path.endswith("/Contents.json"):
+                    self.assertEqual(json.loads(actual), json.loads(content))
+                    self.assertEqual(len(json.loads(actual)["images"]), 19)
+                else:
+                    self.assertEqual(actual, content)
+        namespace = "{http://schemas.android.com/apk/res/android}"
+        manifest = ET.parse(icons.ROOT / "android/app/src/main/AndroidManifest.xml")
+        application = manifest.getroot().find("application")
+        self.assertEqual(application.get(namespace + "icon"), "@mipmap/ic_launcher")
+        self.assertEqual(application.get(namespace + "roundIcon"), "@mipmap/ic_launcher_round")
+        selection = icons.verify_selected_production(
+            icons.ROOT, self.assets, icons.protected_assets(icons.ROOT)
+        )
+        self.assertEqual(selection["variant"], "B")
+
+    def test_rebaselining_wrong_production_artwork_is_rejected_without_repair(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            selection = root / "tools/branding/production-icon-selection.json"
+            selection.parent.mkdir(parents=True)
+            selection.write_bytes((icons.ROOT / selection.relative_to(root)).read_bytes())
+            expected = icons.selected_production_assets(self.assets)
+            for path, content in expected.items():
+                destination = root / path
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                destination.write_bytes(content)
+            changed = "android/app/src/main/res/mipmap-mdpi/ic_launcher.png"
+            wrong = self.assets[
+                "android/app/src/internal/iconVariants/A/res/mipmap-mdpi/ic_launcher.png"
+            ]
+            (root / changed).write_bytes(wrong)
+            records = {path: icons.sha256((root / path).read_bytes()) for path in expected}
+            (root / "tools/branding/production-icons.sha256.json").write_bytes(
+                icons.json_bytes(records)
+            )
+            protected = icons.protected_assets(root)
+            with self.assertRaisesRegex(ValueError, "Selected production B differs"):
+                icons.verify_selected_production(root, self.assets, protected)
+            self.assertEqual((root / changed).read_bytes(), wrong)
 
     def test_android_whole_foreground_fits_safe_circle_at_every_density(self):
         for variant in icons.VARIANTS:

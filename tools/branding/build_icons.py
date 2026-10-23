@@ -115,12 +115,51 @@ def gradient(source: Image.Image, scale: float) -> Image.Image:
 
 
 def protected_assets(root: Path) -> dict[str, str]:
-    """Verify the original AppIcon and Android main launcher icons are intact."""
+    """Verify the selected production AppIcon and Android launcher snapshot."""
     records = json.loads((root / "tools/branding/production-icons.sha256.json").read_text("utf-8"))
     for path, expected in records.items():
         if sha256((root / path).read_bytes()) != expected:
             raise ValueError(f"Production icon changed: {path}")
     return records
+
+
+def selected_production_assets(generated: dict[str, bytes]) -> dict[str, bytes]:
+    """Map the reviewed B output to default paths, without writing production."""
+    mappings = {
+        "android/app/src/internal/iconVariants/B/res/": "android/app/src/main/res/",
+        "ios/Runner/Assets.xcassets/AppIconB.appiconset/":
+            "ios/Runner/Assets.xcassets/AppIcon.appiconset/",
+    }
+    return {
+        destination + path.removeprefix(source): content
+        for source, destination in mappings.items()
+        for path, content in generated.items()
+        if path.startswith(source)
+    }
+
+
+def verify_selected_production(
+    root: Path, generated: dict[str, bytes], protected: dict[str, str]
+) -> dict:
+    """Reject a changed selection or rebaselined assets that no longer match B."""
+    selection = json.loads(
+        (root / "tools/branding/production-icon-selection.json").read_text("utf-8")
+    )
+    if (selection.get("schemaVersion") != 1 or selection.get("variant") != "B"
+            or selection.get("source") != f"assets/brand/source/{VARIANTS['B'][0]}"
+            or selection.get("sourceSha256") != VARIANTS["B"][1]):
+        raise ValueError("Production selection differs from the user-selected B artwork")
+    expected = selected_production_assets(generated)
+    if set(protected) != set(expected):
+        raise ValueError("Production icon snapshot inventory differs from selected B")
+    for path, content in expected.items():
+        actual = (root / path).read_bytes()
+        # Keep the existing Xcode slot file's formatting; its structure is fixed.
+        matches = (json.loads(actual) == json.loads(content)
+                   if path.endswith("/Contents.json") else actual == content)
+        if not matches:
+            raise ValueError(f"Selected production B differs: {path}")
+    return selection
 
 
 def verify_owned_inventory(root: Path, generated: dict[str, bytes]) -> None:
@@ -189,10 +228,13 @@ def build_assets(root: Path = ROOT) -> dict[str, bytes]:
                 for point in ((0, 0), (1023, 0), (0, 1023), (1023, 1023))
             ],
         }
+    selection = verify_selected_production(root, generated, protected)
     manifest = {
         "schemaVersion": 1,
         "generator": "tools/branding/build_icons.py",
-        "productionDefaultsUnchanged": True,
+        "productionDefaultVariant": selection["variant"],
+        "productionDefaultSourceSha256": selection["sourceSha256"],
+        "productionDefaultsProtected": True,
         "protectedProductionAssets": protected,
         "android": {
             "layerDp": LAYER_DP,
@@ -261,7 +303,7 @@ def main() -> int:
             destination = ROOT / path
             destination.parent.mkdir(parents=True, exist_ok=True)
             destination.write_bytes(content)
-        print(f"Generated {len(generated)} files; production icon defaults are unchanged.")
+        print(f"Generated {len(generated)} candidate files; selected production B is unchanged.")
     if args.preview:
         mask_preview(ROOT, args.preview.resolve())
         print(f"Mask preview: {args.preview.resolve()}")

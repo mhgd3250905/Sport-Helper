@@ -14,7 +14,11 @@ python -m unittest discover -s tools/branding -p 'test_*.py'
 python tools/branding/build_icons.py --check --preview .buildlog/branding/icon-mask-preview.png
 ```
 
-The generator verifies the source SHA-256 values and a snapshot of the original
+The user selected **B (`smartfit-icon-v4-crop.png`)** after seeing A on the phone.
+The checked-in Android and iOS production defaults are now B on this branch;
+merging the brand branch still requires separate human approval.
+
+The generator verifies the source SHA-256 values and a snapshot of the selected
 production icon files before writing. Its output manifest records every generated
 file's size and SHA-256. It never writes `android/app/src/main/res` or the original
 iOS `AppIcon.appiconset`. Generation and verification also reject unexpected
@@ -24,9 +28,9 @@ nothing; unrelated tooling and production directories are not scanned.
 
 ## Android selection
 
-Only the `internal` source set receives the selected resource directory. The
-`production` source set and the existing application IDs remain unchanged.
-Omitting the parameter retains the original launcher icon.
+Only the `internal` source set receives an explicit A/B override directory. The
+existing application IDs remain unchanged. Omitting the parameter uses the
+selected B default from `main/res`; production also uses that B default.
 
 ```powershell
 flutter build apk --release --no-pub --flavor internal --build-number 21 --target-platform android-arm64 --split-per-abi --dart-define=SMARTFIT_ICON_VARIANT=A --dart-define=SMARTFIT_BUILD_SOURCE=<committed-source-sha>
@@ -82,9 +86,11 @@ actual launcher caching and animation still need the requested phone A/B check.
 
 ## iOS selection
 
-`AppIconA.appiconset` and `AppIconB.appiconset` duplicate every existing iPhone,
-iPad, and 1024 px marketing slot with opaque RGB images. The original production
-AppIcon remains unchanged. No existing scheme includes the new override files.
+`AppIconA.appiconset` and `AppIconB.appiconset` cover every existing iPhone,
+iPad, and 1024 px marketing slot with opaque RGB images. After the user's B
+selection, the default `AppIcon.appiconset` contains B in every existing slot;
+the existing three build configurations still select `AppIcon`. No existing
+scheme includes the explicit candidate override files.
 
 This repository currently has no separate iOS internal scheme or provisioning
 identity. `IconA.internal.xcconfig` and `IconB.internal.xcconfig` contain only
