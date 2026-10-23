@@ -8,6 +8,8 @@
 
 安装 arm64 internal release 基线包，沿用 `com.ugk.smartfit.internal`，覆盖已有内测版即可保留原设置和聊天。首次打开先正常使用约 10 秒，让自适应玻璃质量稳定。
 
+下载源沿用 +15 的本机测试主/备地址 `192.168.71.116:8778/8779`，未上传云端。内置动作可离线使用；采集下载场景时手机需能访问本机素材服务。本次启动的只读服务使用正常速度，未人为降速到手机包里。
+
 1. 打开「左下角我的计划 → 设置 → 导出性能报告」，点「开始新一轮」。只在一轮开始时清空，不要每换场景都清空。
 2. 选择一个场景，点「开始此场景并返回」，到目标页面操作约 20–30 秒。回设置选下一个场景。设置与性能报告页不计入场景，导航到目标页的转场可能计入，复测时保持相同步骤。
 3. 依次覆盖动作库快速滑动、筛选切换、动作详情进出、长聊天滑动、计划卡展开/收起、训练页切换动作、下载和校验进行中的滑动。下载场景必须实际开始下载；仅选标签不会制造下载。若没有可下载素材，在反馈中标注未跑。
@@ -61,6 +63,21 @@ python tools/performance/compare_reports.py before.json after.json -o comparison
 
 动作库路径为 28 次上下交替 fling（240ms 的输入手势），筛选为 18 次“全部/力量/核心”切换，详情为 5 次首个动作进出（每次停留约 1.6 秒）。帧标签窗口包含手势之间的停顿及首尾命令耗时；详情来源为首个内置动作，非下载/解码压力测试。筛选 VM Timeline 保存在 `.buildlog/performance-filter-timeline.json`，32,575 个事件，约 7.66MB，含 UI/Raster 线程；不将完整 trace 或模拟器临时文件提交到 Git。不能用该组单次采样推断图像、阴影或 SDK 就是根因。
 
-代码验证与最终 APK 身份会在最终核验后追加。没有修复后包之前，不填写“优化后”数字或性能提升百分比。
+| 项目 | 本轮最终核验 |
+| --- | --- |
+| 运行源码 | `4319e1e345317b9e9cc47b435ab210a181a0ef12`；后续文档提交不冒充重新打包 |
+| APK | `.buildlog/install/SmartFit-0.1.0+16-performance-baseline-internal-arm64-v8a-release.apk` |
+| 身份 | `com.ugk.smartfit.internal` / versionName `0.1.0` / versionCode `2016` / arm64-v8a / release / 非 debuggable |
+| 字节数 / SHA-256 | 49,515,967B（49.52MB）；`942eed98ca4e6860f69326107568ea6fc71f099eba56fc45e12022e5e42502ac` |
+| 签名 | 既有开发签名配置，APK v2 校验通过 |
+| Dart 验证 | 全量 334 项通过；随后仅补导出时读取实际聊天条数，导出模块 18 项补检通过；最终 analyze 0 issue |
+| Python | 对比工具 17 项、存储 JNI 工具 3 项通过；测试输入不当作实测数据 |
+| 发布门禁 | internal release 三 ABI 最终 DEX 存储 JNI 检查通过；最终 arm64 包包含记录器 schema/通道/文件名前缀和 internal Provider，且不包含 profile VM 扩展 |
+| 生产版隔离 | 另构建 arm64 production release，仅用于核验：上述三个 Dart marker、native 性能通道和 Provider 均不存在，profile VM 扩展不存在；不交付此无 AI 构建凭据的核验包 |
+| 依赖与 SDK | `pubspec.lock` 与 +15 保存节点字节一致，SDK 引用目录 Git 状态干净，无 SDK 修改 |
+| 真机与系统分享 | 尚无真机帧数据；UI/channel 合同与 native 编译已验，实际 Android 分享面板、接收方取 JSON 和手机性能待开哥验证 |
+| 合并状态 | 本地分支保存，未合 main、未推送；卡顿修复与修复后对比尚未开始 |
+
+机器可读包身份和核验项见[交付记录](reports/performance-baseline-delivery-2026-10-23.json)。没有修复后包之前，不填写“优化后”数字或性能提升百分比。DevTools 自动生成的 `devtools_options.yaml` 保留为未跟踪文件，未纳入本轮提交；本轮没有清理模拟器目录或已有改动。
 
 参考：[FrameTiming](https://api.flutter.dev/flutter/dart-ui/FrameTiming-class.html)、[addTimingsCallback](https://api.flutter.dev/flutter/scheduler/SchedulerBinding/addTimingsCallback.html)、[Flutter 构建模式](https://docs.flutter.dev/testing/build-modes)。

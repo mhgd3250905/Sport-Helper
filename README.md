@@ -11,7 +11,7 @@
 
 ## 版本与验收入口
 
-2026-10-23 流畅度审核分支 `feat/performance-baseline` 正在准备 **`0.1.0+16` 内测性能基线**：仅增加内存帧统计、场景分组和系统分享，不先修改业务/视觉或 SDK。开哥导出手机基线后，再据实测决定修复与对比；本轮尚未合并推送。[基线采集说明](docs/performance-baseline-2026-10-23.md)、[App 与 SDK 静态审核](docs/performance-static-audit-2026-10-23.md)。
+2026-10-23 流畅度审核分支 `feat/performance-baseline` 已生成 **`0.1.0+16` 内测性能基线**（运行源码 `4319e1e`，arm64 release 49,515,967B）：仅增加内存帧统计、场景分组和系统分享，不先修改业务/视觉或 SDK。334 项测试、分析、三 ABI JNI 和生产版裁剪通过；按开哥提醒已停止模拟器，仅保留三个已导出场景。开哥导出手机基线后，再据实测决定修复与对比；本轮尚未合并推送。[基线采集与产物核验](docs/performance-baseline-2026-10-23.md)、[App 与 SDK 静态审核](docs/performance-static-audit-2026-10-23.md)。
 
 2026-10-23 当前保存版本为 **`0.1.0+15` internal**，运行源码 `15079e6`，本地注释标签 `smartfit-v0.1.0+15-internal-verified`。开哥确认本次测试通过；arm64 release 为 **49,384,327B / 49.38MB**，包含已选 AAC-LC、内测运行日志与 Android 存储 JNI 修复。App 两项 SDK 依赖固定 `f684e02`（coach 0.3.3 / trainer 0.1.6）。当前仅保存版本及对齐文档，尚未合并或推送；连续 >20 分钟训练和 iOS 专项单独待验。入口：[验收记录](docs/acceptance.md)、[当前台账](docs/version-management.md)、[修复详情](docs/android-storage-jni-fix-2026-10-23.md)。下方为历史阶段。
 
