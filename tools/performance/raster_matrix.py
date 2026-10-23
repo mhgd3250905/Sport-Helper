@@ -228,7 +228,7 @@ def _validate_cell(raw: Any, key: str, metadata: dict[str, Any]) -> Cell:
     if type(condition.get("glassFrost")) is not bool:
         issues.append("actual.glassFrost 未确认")
     card_glass = condition.get("scrollCardGlassEnabled")
-    if metadata.get("measurementKind") == "raster_controls_v3" or "scrollCardGlassEnabled" in condition:
+    if metadata.get("measurementKind") in ("raster_controls_v3", "raster_controls_v4") or "scrollCardGlassEnabled" in condition:
         if type(card_glass) is not bool:
             issues.append("actual.scrollCardGlassEnabled 未确认")
         elif card_glass and condition.get("glassEnabled") is not True:
@@ -316,6 +316,15 @@ def pair_issues(left: Cell | None, right: Cell | None) -> list[str]:
         for key in ("glassQuality", "glassPhase", "glassFrost"):
             if left.condition.get(key) != right.condition.get(key):
                 issues.append(f"actual.{key} 不同")
+    left_fixed, right_fixed = left.condition.get("fixedGlass"), right.condition.get("fixedGlass")
+    if (left_fixed is None) != (right_fixed is None):
+        issues.append("固定玻璃作用域记录不同")
+    elif isinstance(left_fixed, dict) and isinstance(right_fixed, dict):
+        for key in ("context", "policy", "presentRoles", "baseBlur", "baseSaturation",
+                    "prewarmEnabled", "prewarmStatus", "prewarmLogicalWidth",
+                    "prewarmLogicalHeight", "prewarmPixelRatio"):
+            if left_fixed.get(key) != right_fixed.get(key):
+                issues.append(f"actual.fixedGlass.{key} 不同")
     return issues
 
 
@@ -342,7 +351,7 @@ def render_matrix(matrix: Matrix) -> str:
     else:
         lines.append("每格已记录实际窗口尺寸、像素比和文字缩放；差值逐格核对。采样必须保持相同方向与系统外观。")
     lines.append("主题同时核对每帧实际条件和报告元数据；采样中应保持主题不变。")
-    if matrix.metadata.get("measurementKind") == "raster_controls_v3":
+    if matrix.metadata.get("measurementKind") in ("raster_controls_v3", "raster_controls_v4"):
         lines.append("glass_on/off 表示全局玻璃开关；列表卡片独立记录 scrollCardGlassEnabled，默认静态仿玻璃。不同实际卡片模式不用于本表的单开关差值。")
     else:
         lines.append("旧版报告未独立记录列表卡片模式：卡片沿用当时的全局玻璃路径，不能当成新版默认静态仿玻璃。")

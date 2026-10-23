@@ -85,6 +85,25 @@ def sync_windows(value):
 
 
 class RasterMatrixTests(unittest.TestCase):
+    def test_v4_legacy_matrix_keeps_static_card_description_and_checks_fixed_policy(self):
+        value = report()
+        value['metadata']['measurementKind'] = 'raster_controls_v4'
+        for item in value['cases'].values():
+            item['conditions'][0]['condition']['scrollCardGlassEnabled'] = False
+            item['conditions'][0]['condition']['fixedGlass'] = {
+                'context': 'plan', 'policy': {'input': True},
+                'presentRoles': ['input', 'suggestions'],
+                'baseBlur': 1.2, 'baseSaturation': 1.15,
+                'prewarmEnabled': False, 'prewarmStatus': 'disabled',
+            }
+        matrix = build_matrix([value])
+        self.assertIn('默认静态仿玻璃', render_matrix(matrix))
+        left = matrix.cells[f'{VARIANTS[0]}__{SCENARIOS[0]}']
+        right = matrix.cells[f'{VARIANTS[1]}__{SCENARIOS[0]}']
+        self.assertEqual(pair_issues(left, right), [])
+        right.condition['fixedGlass']['policy']['input'] = False
+        self.assertIn('actual.fixedGlass.policy 不同', pair_issues(left, right))
+
     def test_full_matrix_has_eight_rows_and_fixed_within_scene_pairs(self):
         matrix = build_matrix([report()])
         self.assertTrue(all(not value.issues for value in matrix.cells.values()))

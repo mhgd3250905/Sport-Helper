@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../chat/chat_models.dart';
+import '../theme/fixed_glass_policy.dart';
 import '../theme/glass.dart';
 import '../theme/sf_icons.dart';
 import '../theme/tokens.dart';
@@ -483,7 +484,8 @@ class SuggestionStrip extends StatelessWidget {
             onTap: () => onTap(items[i]),
             // Liquid glass: discovery chips are controls, so they float on
             // glass over the colour field (standard quality).
-            child: SfGlassSurface(
+            child: SfFixedGlassSurface(
+              role: SfFixedGlassRole.suggestions,
               radius: dark ? 20 : 18,
               height: dark ? SfControlInk.minHeight : 36,
               padding: const EdgeInsets.symmetric(horizontal: 14),
@@ -562,7 +564,8 @@ class _ChatInputBarState extends State<ChatInputBar> {
       padding: const EdgeInsets.fromLTRB(SfSpace.x3, 0, SfSpace.x3, SfSpace.x3),
       // Liquid glass: the input is the chat's persistent bar, so it gets
       // the premium material when the device allows (adaptive ceiling).
-      child: SfGlassSurface(
+      child: SfFixedGlassSurface(
+        role: SfFixedGlassRole.input,
         radius: 26,
         quality: SfGlass.bar,
         child: Material(

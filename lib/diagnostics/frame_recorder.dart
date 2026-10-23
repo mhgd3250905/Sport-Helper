@@ -5,6 +5,8 @@ import 'dart:ui' show FramePhase;
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 
+import '../ui/theme/fixed_glass_policy.dart';
+
 /// Fixed identifiers only: never pass a chat message, exercise name or path.
 enum FrameScenario {
   actionListScroll,
@@ -63,6 +65,12 @@ class FrameRecorder with WidgetsBindingObserver {
   final _scenarioConditions = <FrameScenario, _ScenarioConditions>{};
   final _metadata = <String, Object?>{};
   final _cases = <String, _CaseStats>{};
+  final _fixedGlassCases = <String, _CaseStats>{};
+  final _fixedGlassEntries = <String, _FixedGlassEntry>{};
+  // Lifetime visits survive a report reset. A new report does not make cached
+  // pages or pipelines cold again; only an app-process restart clears these.
+  final _pageVisitCounts = <String, int>{};
+  _FixedGlassEntry? _activeFixedGlassEntry;
   final _firstPageEntries = <String, _PageEntry>{};
   _CaseStats? _activeCase;
   _RenderConditions _conditions = const _RenderConditions();
@@ -159,6 +167,9 @@ class FrameRecorder with WidgetsBindingObserver {
     _scenarios.clear();
     _scenarioConditions.clear();
     _cases.clear();
+    _fixedGlassCases.clear();
+    _fixedGlassEntries.clear();
+    _activeFixedGlassEntry = null;
     _firstPageEntries.clear();
     _activeCase = null;
     _labels.clear();
@@ -186,6 +197,14 @@ class FrameRecorder with WidgetsBindingObserver {
     }
     if (_page == stableId) return;
     _page = stableId;
+    if (_pageVisitCounts.containsKey(stableId) ||
+        _pageVisitCounts.length < maxPages) {
+      _pageVisitCounts.update(
+        stableId,
+        (count) => count + 1,
+        ifAbsent: () => 1,
+      );
+    }
     _scheduleBoundary();
   }
 
@@ -248,6 +267,82 @@ class FrameRecorder with WidgetsBindingObserver {
     _scheduleBoundary();
   }
 
+  /// Called before pushing the target route. Only frames whose actual page
+  /// label matches [targetPage] enter this configuration's entry window.
+  /// Entry timings are kept separate from the subsequent scripted scroll.
+  bool beginFixedGlassEntry({
+    required String configId,
+    required String targetPage,
+  }) {
+    if (!enabled) return false;
+    if (!SfFixedGlassPolicy.experimentIds.contains(configId) ||
+        !_pageId.hasMatch(targetPage) ||
+        _scenarioExcludedPages.contains(targetPage)) {
+      _invalidCaseRequests++;
+      return false;
+    }
+    final priorVisits = _pageVisitCounts[targetPage] ?? 0;
+    for (final measurement in _fixedGlassCases.values) {
+      if (measurement.fixedGlassConfigurationId == configId) {
+        measurement.completed = false;
+        measurement.invalidationReason = 'new_entry_attempt_started';
+      }
+    }
+    final entry = _FixedGlassEntry(
+      configId,
+      targetPage,
+      targetPreviouslyEntered: priorVisits > 0,
+      entryOrdinal: priorVisits + 1,
+      maxConditionGroups: maxConditionGroupsPerCase,
+    );
+    _fixedGlassEntries[configId] = entry;
+    _activeFixedGlassEntry = entry;
+    _scheduleBoundary();
+    return true;
+  }
+
+  /// An independent bounded matrix, retaining compatibility with the eight
+  /// global glass/starfield cells. The starfield is never an experiment knob.
+  bool beginFixedGlassCase({
+    required String configId,
+    required FrameScenario scenario,
+    required String fixtureId,
+    required int messageCount,
+  }) {
+    if (!enabled) return false;
+    final isChat = configId == 'chat_baseline' || configId == 'custom_chat';
+    if (!SfFixedGlassPolicy.experimentIds.contains(configId) ||
+        scenario !=
+            (isChat
+                ? FrameScenario.longChatScroll
+                : FrameScenario.planCardScroll) ||
+        !_pageId.hasMatch(fixtureId) ||
+        messageCount < 60 ||
+        messageCount > 10000) {
+      _invalidCaseRequests++;
+      return false;
+    }
+    _activeCase?.completed = false;
+    final id = '${configId}__${scenario.name}';
+    _fixedGlassCases[id]?.retire();
+    final measurement = _CaseStats(
+      id: id,
+      variant: configId,
+      scenario: scenario,
+      fixtureId: fixtureId,
+      messageCount: messageCount,
+      maxConditionGroups: maxConditionGroupsPerCase,
+      fixedGlassConfigurationId: configId,
+      fixedGlassEntry: _fixedGlassEntries[configId],
+    );
+    _fixedGlassCases[id] = measurement;
+    _fixedGlassEntries[configId]?.scriptStarted = true;
+    _activeCase = measurement;
+    _scenario = scenario;
+    _scheduleBoundary();
+    return true;
+  }
+
   /// Invalidates a completed cell if delivery of its final engine timings is
   /// interrupted. Existing frame labels and aggregates remain available, so a
   /// delayed tail still belongs to its original cell without reopening a case.
@@ -256,7 +351,7 @@ class FrameRecorder with WidgetsBindingObserver {
     String reason = 'interrupted_tail_delivery',
   }) {
     if (!enabled) return;
-    final measurement = _cases[id];
+    final measurement = _cases[id] ?? _fixedGlassCases[id];
     if (measurement == null) return;
     measurement.completed = false;
     measurement.invalidationReason = _pageId.hasMatch(reason)
@@ -282,6 +377,18 @@ class FrameRecorder with WidgetsBindingObserver {
     double? viewportHeight,
     double? devicePixelRatio,
     double? textScale,
+    SfFixedGlassPolicy? fixedGlassPolicy,
+    bool? fixedGlassPlanContext,
+    Set<SfFixedGlassRole> fixedGlassPresentRoles = const {},
+    String fixedGlassConfigurationId = 'baseline',
+    bool prewarmEnabled = false,
+    String prewarmStatus = 'disabled',
+    double? prewarmDurationMs,
+    double? prewarmLogicalWidth,
+    double? prewarmLogicalHeight,
+    double? prewarmPixelRatio,
+    double? fixedGlassBaseBlur,
+    double? fixedGlassBaseSaturation,
   }) {
     if (!enabled) return;
     final next = _RenderConditions(
@@ -302,6 +409,48 @@ class FrameRecorder with WidgetsBindingObserver {
       viewportHeight: _positiveDimension(viewportHeight),
       devicePixelRatio: _positiveDimension(devicePixelRatio),
       textScale: _positiveDimension(textScale),
+      fixedGlass: fixedGlassPolicy != null && fixedGlassPlanContext != null
+          ? _FixedGlassConditions(
+              policy: fixedGlassPolicy,
+              isPlanContext: fixedGlassPlanContext,
+              roleMask: SfFixedGlassRole.values.fold<int>(
+                0,
+                (mask, role) => fixedGlassPresentRoles.contains(role)
+                    ? mask | (1 << role.index)
+                    : mask,
+              ),
+              configurationId:
+                  SfFixedGlassPolicy.experimentIds.contains(
+                    fixedGlassConfigurationId,
+                  )
+                  ? fixedGlassConfigurationId
+                  : 'unknown',
+              prewarmEnabled: prewarmEnabled,
+              prewarmStatus:
+                  const {
+                    'disabled',
+                    'pending',
+                    'succeeded',
+                    'unsupported',
+                    'failed',
+                  }.contains(prewarmStatus)
+                  ? prewarmStatus
+                  : 'unknown',
+              prewarmDurationMs:
+                  prewarmDurationMs != null &&
+                      prewarmDurationMs.isFinite &&
+                      prewarmDurationMs >= 0 &&
+                      prewarmDurationMs <= 60000
+                  ? prewarmDurationMs
+                  : null,
+              globalGlassEnabled: glassEnabled,
+              prewarmLogicalWidth: _positiveDimension(prewarmLogicalWidth),
+              prewarmLogicalHeight: _positiveDimension(prewarmLogicalHeight),
+              prewarmPixelRatio: _positiveDimension(prewarmPixelRatio),
+              baseBlur: _positiveDimension(fixedGlassBaseBlur),
+              baseSaturation: _positiveDimension(fixedGlassBaseSaturation),
+            )
+          : null,
       adaptiveTargetFrameMs:
           adaptiveTargetFrameMs.isFinite &&
               adaptiveTargetFrameMs > 0 &&
@@ -391,6 +540,9 @@ class FrameRecorder with WidgetsBindingObserver {
               (_firstPageEntries.length < maxPages
                   ? (_firstPageEntries[_page] = _PageEntry())
                   : null),
+          fixedGlassEntry: _activeFixedGlassEntry?.targetPage == _page
+              ? _activeFixedGlassEntry
+              : null,
           active: true,
         ),
       );
@@ -400,6 +552,9 @@ class FrameRecorder with WidgetsBindingObserver {
   void _markInactive() {
     if (!_attached || _sessionStartFrameNumber == null) return;
     _activeCase?.lifecycleInterrupted = true;
+    if (_activeFixedGlassEntry case final entry?) {
+      if (!entry.windowComplete) entry.lifecycleInterrupted = true;
+    }
     // The last begun frame remains eligible. Subsequent frames until resume
     // are explicitly excluded, even if the engine reports them in a late batch.
     _addLabel(
@@ -411,6 +566,9 @@ class FrameRecorder with WidgetsBindingObserver {
         conditions: _conditions,
         measurement: _activeCase,
         firstPageEntry: _firstPageEntries[_page],
+        fixedGlassEntry: _activeFixedGlassEntry?.targetPage == _page
+            ? _activeFixedGlassEntry
+            : null,
         active: false,
       ),
     );
@@ -479,6 +637,7 @@ class FrameRecorder with WidgetsBindingObserver {
       final vsyncUs = timing.timestampInMicroseconds(FramePhase.vsyncStart);
       final entry = label.firstPageEntry;
       entry?.add(buildUs, rasterUs, label.refreshRateHz, vsyncUs);
+      label.fixedGlassEntry?.add(buildUs, rasterUs, label, vsyncUs);
       final pageStats =
           _pages[label.page] ??
           (_pages.length < maxPages
@@ -586,6 +745,13 @@ class FrameRecorder with WidgetsBindingObserver {
           'requires the global glass switch; glass_on/off variants still '
           'describe the global switch, not the card renderer; '
           'raster_controls_v2 reports did not record this field',
+      'fixedGlassCases':
+          'independent same-scene fixed-surface experiments; plan policy '
+          'never applies to chat; absent top/bottom roles are N/A, not cells; '
+          'entryFirst2Seconds starts on the first observed target-page frame '
+          'after a route-push request, separate from scripted scroll windows; '
+          'prewarm succeeded confirms a rendered attempt, not a guarantee '
+          'that every driver shader or pipeline was compiled',
     },
     'retention': {
       'maxPages': maxPages,
@@ -593,6 +759,7 @@ class FrameRecorder with WidgetsBindingObserver {
       'histogramBucketsPerThread': _DurationStats.bucketCount,
       'maxLabelTransitions': maxLabelTransitions,
       'maxCases': 8,
+      'maxFixedGlassCases': SfFixedGlassPolicy.experimentIds.length,
       'maxConditionGroupsPerCase': maxConditionGroupsPerCase,
       'retainedFirstPageEntries': _firstPageEntries.length,
       'retainedLabelTransitions': _labels.length,
@@ -622,6 +789,14 @@ class FrameRecorder with WidgetsBindingObserver {
     'cases': {
       for (final entry in _cases.entries) entry.key: entry.value.snapshot(),
     },
+    'fixedGlassCases': {
+      for (final entry in _fixedGlassCases.entries)
+        entry.key: entry.value.snapshot(),
+    },
+    'fixedGlassEntries': {
+      for (final entry in _fixedGlassEntries.entries)
+        entry.key: entry.value.snapshot(),
+    },
     'scenarioConditions': {
       for (final entry in _scenarioConditions.entries)
         entry.key.name: entry.value.snapshot(),
@@ -638,6 +813,7 @@ class FrameRecorder with WidgetsBindingObserver {
     'settings',
     'performance_settings',
     'performance_lab',
+    'fixed_glass_lab',
   };
   static const _comparisonScenarios = {
     FrameScenario.longChatScroll,
@@ -698,6 +874,7 @@ class _FrameLabel {
     required this.conditions,
     required this.measurement,
     required this.firstPageEntry,
+    this.fixedGlassEntry,
   }) : conditionKey = '${conditions.key}|$refreshRateHz';
 
   final int startFrameNumber;
@@ -708,6 +885,7 @@ class _FrameLabel {
   final _RenderConditions conditions;
   final _CaseStats? measurement;
   final _PageEntry? firstPageEntry;
+  final _FixedGlassEntry? fixedGlassEntry;
   final String conditionKey;
 }
 
@@ -727,6 +905,7 @@ class _RenderConditions {
     this.viewportHeight,
     this.devicePixelRatio,
     this.textScale,
+    this.fixedGlass,
   });
 
   final bool? glassEnabled;
@@ -743,12 +922,13 @@ class _RenderConditions {
   final double? viewportHeight;
   final double? devicePixelRatio;
   final double? textScale;
+  final _FixedGlassConditions? fixedGlass;
 
   bool get isSupplied => glassEnabled != null;
   String get key =>
       '$glassEnabled|$scrollCardGlassEnabled|$starfield|$glassQuality|$glassPhase|$glassFrost|'
       '$renderer|$rendererBackend|$adaptiveTargetFrameMs|$theme|$viewportWidth|'
-      '$viewportHeight|$devicePixelRatio|$textScale';
+      '$viewportHeight|$devicePixelRatio|$textScale|${fixedGlass?.key}';
 
   Map<String, Object?> snapshot(double hz) => {
     'glassEnabled': glassEnabled,
@@ -767,6 +947,7 @@ class _RenderConditions {
     'viewportHeight': viewportHeight,
     'devicePixelRatio': devicePixelRatio,
     'textScale': textScale,
+    if (fixedGlass != null) 'fixedGlass': fixedGlass!.snapshot(),
   };
 
   @override
@@ -785,7 +966,8 @@ class _RenderConditions {
       viewportWidth == other.viewportWidth &&
       viewportHeight == other.viewportHeight &&
       devicePixelRatio == other.devicePixelRatio &&
-      textScale == other.textScale;
+      textScale == other.textScale &&
+      fixedGlass == other.fixedGlass;
 
   @override
   int get hashCode => Object.hash(
@@ -803,7 +985,151 @@ class _RenderConditions {
     viewportHeight,
     devicePixelRatio,
     textScale,
+    fixedGlass,
   );
+}
+
+/// The bounded immutable value attached to a frame label. Maps/lists are only
+/// allocated when an explicit report is exported, never for each timing.
+class _FixedGlassConditions {
+  const _FixedGlassConditions({
+    required this.policy,
+    required this.isPlanContext,
+    required this.roleMask,
+    required this.configurationId,
+    required this.prewarmEnabled,
+    required this.prewarmStatus,
+    required this.prewarmDurationMs,
+    required this.globalGlassEnabled,
+    required this.prewarmLogicalWidth,
+    required this.prewarmLogicalHeight,
+    required this.prewarmPixelRatio,
+    required this.baseBlur,
+    required this.baseSaturation,
+  });
+  final SfFixedGlassPolicy policy;
+  final bool isPlanContext;
+  final int roleMask;
+  final String configurationId;
+  final bool prewarmEnabled;
+  final String prewarmStatus;
+  final double? prewarmDurationMs;
+  final bool globalGlassEnabled;
+  final double? prewarmLogicalWidth;
+  final double? prewarmLogicalHeight;
+  final double? prewarmPixelRatio;
+  final double? baseBlur;
+  final double? baseSaturation;
+  String get key =>
+      '${policy.key}|$isPlanContext|$roleMask|$configurationId|'
+      '$prewarmEnabled|$prewarmStatus|$prewarmDurationMs|'
+      '$globalGlassEnabled|$baseBlur|$baseSaturation|'
+      '$prewarmLogicalWidth|$prewarmLogicalHeight|$prewarmPixelRatio';
+
+  bool hasRole(SfFixedGlassRole role) => roleMask & (1 << role.index) != 0;
+  bool realGlassFor(SfFixedGlassRole role) =>
+      globalGlassEnabled && policy.enabledFor(role);
+  Map<String, Object?> snapshot() => {
+    'context': isPlanContext ? 'plan' : 'chat',
+    'configurationId': configurationId,
+    'policy': policy.toJson(),
+    'presentRoles': [
+      for (final role in SfFixedGlassRole.values)
+        if (hasRole(role)) role.name,
+    ],
+    'roleStates': {
+      for (final role in SfFixedGlassRole.values)
+        role.name: hasRole(role) ? realGlassFor(role) : null,
+    },
+    'baseBlur': baseBlur,
+    'baseSaturation': baseSaturation,
+    'roleMaterials': {
+      for (final role in SfFixedGlassRole.values)
+        role.name: !hasRole(role)
+            ? null
+            : {
+                'trueGlass': realGlassFor(role),
+                'blur': realGlassFor(role)
+                    ? (baseBlur == null ? null : baseBlur! * policy.blurScale)
+                    : 0.0,
+                'saturation': realGlassFor(role)
+                    ? (policy.saturationEnabled ? baseSaturation : 1.0)
+                    : 1.0,
+              },
+    },
+    'prewarmEnabled': prewarmEnabled,
+    'prewarmStatus': prewarmStatus,
+    'prewarmDurationMs': prewarmDurationMs,
+    'prewarmLogicalWidth': prewarmLogicalWidth,
+    'prewarmLogicalHeight': prewarmLogicalHeight,
+    'prewarmPixelRatio': prewarmPixelRatio,
+  };
+  @override
+  bool operator ==(Object other) =>
+      other is _FixedGlassConditions && key == other.key;
+  @override
+  int get hashCode => key.hashCode;
+}
+
+class _FixedGlassEntry {
+  _FixedGlassEntry(
+    this.configId,
+    this.targetPage, {
+    required this.targetPreviouslyEntered,
+    required this.entryOrdinal,
+    required this.maxConditionGroups,
+  });
+  final String configId;
+  final String targetPage;
+  final bool targetPreviouslyEntered;
+  final int entryOrdinal;
+  final int maxConditionGroups;
+  final stats = _PageEntry();
+  _RenderConditions? firstConditions;
+  double? firstRefreshRateHz;
+  final _conditionKeys = <String>{};
+  bool conditionOverflow = false;
+  bool lifecycleInterrupted = false;
+  bool windowComplete = false;
+  bool scriptStarted = false;
+  bool outOfOrder = false;
+  int? _lastVsyncUs;
+
+  void add(int buildUs, int rasterUs, _FrameLabel label, int vsyncUs) {
+    firstConditions ??= label.conditions;
+    firstRefreshRateHz ??= label.refreshRateHz;
+    stats.add(buildUs, rasterUs, label.refreshRateHz, vsyncUs);
+    if (!windowComplete && _lastVsyncUs != null && vsyncUs < _lastVsyncUs!) {
+      outOfOrder = true;
+    }
+    _lastVsyncUs = math.max(_lastVsyncUs ?? vsyncUs, vsyncUs);
+    if (vsyncUs - stats.firstVsyncUs! >= 2000000) windowComplete = true;
+    if (stats.contains(vsyncUs) &&
+        !_conditionKeys.contains(label.conditionKey)) {
+      if (_conditionKeys.length < maxConditionGroups) {
+        _conditionKeys.add(label.conditionKey);
+      } else {
+        conditionOverflow = true;
+      }
+    }
+  }
+
+  Map<String, Object?> snapshot() => {
+    'configurationId': configId,
+    'entryCaptureSource': 'route_push_before_target_build',
+    'entryTargetPage': targetPage,
+    'targetPreviouslyEntered': targetPreviouslyEntered,
+    'entryOrdinal': entryOrdinal,
+    'entryConditionGroupCount': _conditionKeys.length,
+    'entryConditionGroupsOverflow': conditionOverflow,
+    'entryLifecycleInterrupted': lifecycleInterrupted,
+    'entryWindowComplete': windowComplete,
+    'entryOutOfOrderTimings': outOfOrder,
+    'scriptStarted': scriptStarted,
+    'entryFirstVsyncStartUs': stats.firstVsyncUs,
+    'entryFirst2Seconds': stats._stats.snapshot(),
+    'entryCondition': firstConditions?.snapshot(firstRefreshRateHz ?? 60),
+  };
 }
 
 class _PageEntry {
@@ -910,6 +1236,8 @@ class _CaseStats {
     required this.fixtureId,
     required this.messageCount,
     required this.maxConditionGroups,
+    this.fixedGlassConfigurationId,
+    this.fixedGlassEntry,
   });
 
   final String id;
@@ -918,6 +1246,8 @@ class _CaseStats {
   final String fixtureId;
   final int messageCount;
   final int maxConditionGroups;
+  final String? fixedGlassConfigurationId;
+  final _FixedGlassEntry? fixedGlassEntry;
   _WindowStats? _windows = _WindowStats();
   _WindowStats get windows => _windows!;
   final groups = <String, _ConditionStats>{};
@@ -1045,14 +1375,75 @@ class _CaseStats {
     })) {
       issues.add('adaptive_budget_does_not_match_refresh_rate');
     }
-    final expectsGlass = variant.startsWith('glass_on_');
-    final expectsStars = variant.endsWith('_stars_on');
-    if (groups.values.any((group) {
-      final condition = group.conditions;
-      return condition.glassEnabled != expectsGlass ||
-          condition.starfield != expectsStars;
-    })) {
-      issues.add('variant_switches_do_not_match_actual_conditions');
+    if (fixedGlassConfigurationId case final configId?) {
+      final isChat = configId == 'chat_baseline' || configId == 'custom_chat';
+      final expectedPolicy = SfFixedGlassPolicy.forConfiguration(configId);
+      if (groups.values.any((group) {
+        final condition = group.conditions;
+        final fixed = condition.fixedGlass;
+        return fixed == null ||
+            fixed.configurationId != configId ||
+            fixed.isPlanContext == isChat ||
+            fixed.roleMask == 0 ||
+            fixed.baseBlur == null ||
+            fixed.baseSaturation == null ||
+            !fixed.hasRole(SfFixedGlassRole.input) ||
+            !fixed.hasRole(SfFixedGlassRole.suggestions) ||
+            (expectedPolicy != null && fixed.policy != expectedPolicy) ||
+            (isChat && fixed.policy != SfFixedGlassPolicy.baseline) ||
+            condition.glassEnabled != true ||
+            condition.scrollCardGlassEnabled != false;
+      })) {
+        issues.add('fixed_glass_actual_policy_mismatch');
+      }
+      if (groups.values.any((group) {
+        final fixed = group.conditions.fixedGlass;
+        if (fixed == null) return true;
+        if (fixed.prewarmEnabled) {
+          return !const {
+                'succeeded',
+                'unsupported',
+                'failed',
+              }.contains(fixed.prewarmStatus) ||
+              fixed.prewarmDurationMs == null ||
+              (fixed.prewarmStatus == 'succeeded' &&
+                  (fixed.prewarmLogicalWidth == null ||
+                      fixed.prewarmLogicalHeight == null ||
+                      fixed.prewarmPixelRatio == null));
+        }
+        return fixed.prewarmStatus != 'disabled';
+      })) {
+        issues.add('fixed_glass_prewarm_state_unverified');
+      }
+      if (groups.values.any((group) {
+        final fixed = group.conditions.fixedGlass;
+        if (fixed == null) return true;
+        return configId == 'baseline_prewarmed'
+            ? !fixed.prewarmEnabled
+            : (!configId.startsWith('custom_') && fixed.prewarmEnabled);
+      })) {
+        issues.add('fixed_glass_prewarm_configuration_mismatch');
+      }
+      if (configId == 'baseline_prewarmed' &&
+          groups.values.any(
+            (group) =>
+                group.conditions.fixedGlass?.prewarmStatus != 'succeeded',
+          )) {
+        issues.add('fixed_glass_prewarm_not_succeeded');
+      }
+      if (fixedGlassEntry == null || fixedGlassEntry!.stats._stats.count == 0) {
+        issues.add('fixed_glass_entry_frames_missing');
+      }
+    } else {
+      final expectsGlass = variant.startsWith('glass_on_');
+      final expectsStars = variant.endsWith('_stars_on');
+      if (groups.values.any((group) {
+        final condition = group.conditions;
+        return condition.glassEnabled != expectsGlass ||
+            condition.starfield != expectsStars;
+      })) {
+        issues.add('variant_switches_do_not_match_actual_conditions');
+      }
     }
     if (groups.values.any(
       (group) =>
@@ -1083,6 +1474,25 @@ class _CaseStats {
       'overflowConditionFrameCount': _overflowConditionFrames,
       ...windows.snapshot(),
       'conditions': [for (final group in groups.values) group.snapshot()],
+      if (fixedGlassConfigurationId != null) ...{
+        'fixedGlassConfigurationId': fixedGlassConfigurationId,
+        'entryCaptureSource': 'route_push_before_target_build',
+        'entryTargetPage': fixedGlassEntry?.targetPage,
+        'targetPreviouslyEntered': fixedGlassEntry?.targetPreviouslyEntered,
+        'entryOrdinal': fixedGlassEntry?.entryOrdinal,
+        'entryConditionGroupCount': fixedGlassEntry?._conditionKeys.length,
+        'entryConditionGroupsOverflow': fixedGlassEntry?.conditionOverflow,
+        'entryLifecycleInterrupted': fixedGlassEntry?.lifecycleInterrupted,
+        'entryWindowComplete': fixedGlassEntry?.windowComplete,
+        'entryOutOfOrderTimings': fixedGlassEntry?.outOfOrder,
+        'entryEarlierOutOfOrderFrameCount':
+            fixedGlassEntry?.stats._framesBeforeFirstObservation,
+        'entryFirstVsyncStartUs': fixedGlassEntry?.stats.firstVsyncUs,
+        'entryFirst2Seconds': fixedGlassEntry?.stats._stats.snapshot(),
+        'entryCondition': fixedGlassEntry?.firstConditions?.snapshot(
+          fixedGlassEntry?.firstRefreshRateHz ?? 60,
+        ),
+      },
     };
   }
 }

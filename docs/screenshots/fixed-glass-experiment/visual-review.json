@@ -1,0 +1,156 @@
+{
+  "schemaVersion": 1,
+  "reviewDate": "2026-10-23",
+  "status": "candidates-awaiting-same-device-results",
+  "renderMethod": "Flutter widget test, real App conversation and plan widgets",
+  "harness": "test/fixed_glass_rendering_test.dart",
+  "isDeviceScreenshot": false,
+  "isPerformanceMeasurement": false,
+  "physicalSize": [
+    1170,
+    2532
+  ],
+  "logicalSize": [
+    390,
+    844
+  ],
+  "devicePixelRatio": 3,
+  "glassQuality": "minimal",
+  "starfield": "existing static field, animation preference off",
+  "scrollCards": "static for all candidates",
+  "backgroundCapture": false,
+  "realFixedGlassRoles": [
+    "input",
+    "suggestions"
+  ],
+  "notApplicableRoles": [
+    "topBar",
+    "bottomBar"
+  ],
+  "checks": {
+    "internalTests": 7,
+    "productionTestsPassed": 3,
+    "productionTestsSkipped": 4,
+    "sameGeometryAcrossCandidates": true,
+    "tightClipAndRepaintBoundaryVerified": true,
+    "minimalBackdropFiltersPerBaselineSurface": 2,
+    "minimalBackdropFiltersPerNoSaturationSurface": 1,
+    "allStaticBackdropFilters": 0,
+    "chatContextPreservesBaselineMaterial": true
+  },
+  "images": [
+    {
+      "theme": "light",
+      "candidate": "baseline",
+      "file": "plan-light-baseline.png",
+      "sizePixels": [
+        1170,
+        2532
+      ],
+      "sha256": "7488f304b25d5b122a0817dbcbe2fa0e3c60b99c238e3ea168d604736b438e07",
+      "differenceBoundsFromBaselinePixels": null
+    },
+    {
+      "theme": "light",
+      "candidate": "no-saturation",
+      "file": "plan-light-no-saturation.png",
+      "sizePixels": [
+        1170,
+        2532
+      ],
+      "sha256": "e95280750bfbe96d0ea21a8ec0bdee6817f916671fb725e16d5107298c00c046",
+      "differenceBoundsFromBaselinePixels": [
+        36,
+        2208,
+        1134,
+        2496
+      ]
+    },
+    {
+      "theme": "light",
+      "candidate": "half-blur",
+      "file": "plan-light-half-blur.png",
+      "sizePixels": [
+        1170,
+        2532
+      ],
+      "sha256": "455c521ad40a6e392d936909944f4fbeef8efe04b9fc7231e0d28b557209705f",
+      "differenceBoundsFromBaselinePixels": [
+        38,
+        2208,
+        1132,
+        2496
+      ]
+    },
+    {
+      "theme": "light",
+      "candidate": "all-static",
+      "file": "plan-light-all-static.png",
+      "sizePixels": [
+        1170,
+        2532
+      ],
+      "sha256": "1522eafbfbc12aa9e861f2687105a830cf74ce67215c30b1277454628b2607de",
+      "differenceBoundsFromBaselinePixels": [
+        36,
+        2208,
+        1134,
+        2496
+      ]
+    },
+    {
+      "theme": "dark",
+      "candidate": "baseline",
+      "file": "plan-dark-baseline.png",
+      "sizePixels": [
+        1170,
+        2532
+      ],
+      "sha256": "aa38563c345663ee0993e225466d2ea555f0f599467efdb68088b69816abe215",
+      "differenceBoundsFromBaselinePixels": null
+    },
+    {
+      "theme": "dark",
+      "candidate": "no-saturation",
+      "file": "plan-dark-no-saturation.png",
+      "sizePixels": [
+        1170,
+        2532
+      ],
+      "sha256": "aa38563c345663ee0993e225466d2ea555f0f599467efdb68088b69816abe215",
+      "differenceBoundsFromBaselinePixels": null
+    },
+    {
+      "theme": "dark",
+      "candidate": "half-blur",
+      "file": "plan-dark-half-blur.png",
+      "sizePixels": [
+        1170,
+        2532
+      ],
+      "sha256": "9f3bbe9edc08b6d32cc9a0eb31f86e1c8a802398d0037a7e97faddbb7e5b8ffa",
+      "differenceBoundsFromBaselinePixels": [
+        48,
+        2196,
+        1099,
+        2496
+      ]
+    },
+    {
+      "theme": "dark",
+      "candidate": "all-static",
+      "file": "plan-dark-all-static.png",
+      "sizePixels": [
+        1170,
+        2532
+      ],
+      "sha256": "f5787791efc50a95fba40720e18c2de01680b6c30858d3a843814ae3ec2fce93",
+      "differenceBoundsFromBaselinePixels": [
+        36,
+        2196,
+        1134,
+        2496
+      ]
+    }
+  ]
+}

@@ -10,6 +10,7 @@ import '../diagnostics/performance_lab.dart';
 import '../diagnostics/performance_report.dart';
 import 'chat/chat_home_page.dart';
 import 'theme.dart';
+import 'theme/fixed_glass_policy.dart';
 
 /// Fixed workload shared by all eight cells: 800 logical pixels/second,
 /// reversing every four seconds over the same 3,200-pixel range.
@@ -293,6 +294,9 @@ class PerformanceCaseRunner extends StatefulWidget {
     required this.scenario,
     this.sampleDuration = PerformanceScrollProtocol.sampleDuration,
     this.tailDelay = PerformanceScrollProtocol.tailDeliveryDelay,
+    this.fixedGlassConfigurationId,
+    this.fixedGlassPolicy = SfFixedGlassPolicy.baseline,
+    this.variantLabel,
   });
 
   final PerformanceFixture fixture;
@@ -300,6 +304,9 @@ class PerformanceCaseRunner extends StatefulWidget {
   final FrameRecorder recorder;
   final String variant;
   final FrameScenario scenario;
+  final String? fixedGlassConfigurationId;
+  final SfFixedGlassPolicy fixedGlassPolicy;
+  final String? variantLabel;
 
   /// Short durations are useful in widget tests; they cannot produce a valid
   /// 30-second steady-state comparison in the recorder.
@@ -394,17 +401,26 @@ class _PerformanceCaseRunnerState extends State<PerformanceCaseRunner>
     }
     _initialSize = MediaQuery.sizeOf(context);
     widget.recorder.start();
-    _caseStarted = widget.recorder.beginCase(
-      variant: widget.variant,
-      scenario: widget.scenario,
-      fixtureId: widget.fixture.id,
-      messageCount: widget.fixture.controller.messages.length,
-    );
+    final fixedConfiguration = widget.fixedGlassConfigurationId;
+    _caseStarted = fixedConfiguration == null
+        ? widget.recorder.beginCase(
+            variant: widget.variant,
+            scenario: widget.scenario,
+            fixtureId: widget.fixture.id,
+            messageCount: widget.fixture.controller.messages.length,
+          )
+        : widget.recorder.beginFixedGlassCase(
+            configId: fixedConfiguration,
+            scenario: widget.scenario,
+            fixtureId: widget.fixture.id,
+            messageCount: widget.fixture.controller.messages.length,
+          );
     if (!_caseStarted) {
       _abort('记录器未能开始采样，请返回重试。');
       return;
     }
-    _startedCaseId = '${widget.variant}__${widget.scenario.name}';
+    _startedCaseId =
+        '${fixedConfiguration ?? widget.variant}__${widget.scenario.name}';
     final stopwatch = Stopwatch()..start();
     _status.value = '正在采样 · 0 / ${widget.sampleDuration.inSeconds} 秒';
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
@@ -492,9 +508,13 @@ class _PerformanceCaseRunnerState extends State<PerformanceCaseRunner>
         fit: StackFit.expand,
         children: [
           IgnorePointer(
-            child: ChatHomePage(
-              controller: widget.fixture.controller,
-              scrollController: _scroll,
+            child: SfFixedGlassScope(
+              isPlanContext: widget.scenario == FrameScenario.planCardScroll,
+              policy: widget.fixedGlassPolicy,
+              child: ChatHomePage(
+                controller: widget.fixture.controller,
+                scrollController: _scroll,
+              ),
             ),
           ),
           Positioned(
@@ -519,7 +539,7 @@ class _PerformanceCaseRunnerState extends State<PerformanceCaseRunner>
                               style: SfType.caption,
                             ),
                             Text(
-                              _variants[widget.variant]!,
+                              widget.variantLabel ?? _variants[widget.variant]!,
                               style: SfType.caption,
                             ),
                             ValueListenableBuilder<String>(

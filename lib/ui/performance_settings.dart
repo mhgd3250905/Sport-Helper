@@ -4,6 +4,7 @@ import '../app/services.dart';
 import '../diagnostics/frame_recorder.dart';
 import '../diagnostics/performance_report.dart';
 import '../diagnostics/performance_lab.dart';
+import 'fixed_glass_lab_page.dart';
 import 'performance_lab_page.dart';
 import 'theme.dart';
 
@@ -117,6 +118,24 @@ class _PerformanceSettingsPageState extends State<PerformanceSettingsPage> {
               '八格使用同一档位、固定步速和滑动距离；一次约 5 分钟。'
               '玻璃开/关指全局开关；列表卡片由上方独立开关决定，报告记录实际卡片模式。'
               '采样后可导出包含稳态和进入尖峰的同一份报告。',
+              style: SfType.caption,
+            ),
+            const SizedBox(height: SfSpace.x3),
+            SfPrimaryButton(
+              key: const ValueKey('performance-open-fixed-glass-lab'),
+              label: '固定玻璃拆分 · 计划卡与聊天采样',
+              onPressed: _busy
+                  ? null
+                  : () => Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        settings: const RouteSettings(name: 'fixed_glass_lab'),
+                        builder: (_) => FixedGlassLabPage(service: _service),
+                      ),
+                    ),
+            ),
+            Text(
+              '输入框、建议条、饱和度和模糊分别对照；保持星尘偏好不变，'
+              '每个配置单独一格，生产版不包含此入口。',
               style: SfType.caption,
             ),
           ],

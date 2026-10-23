@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../data/app_store.dart';
 import '../ui/theme/adaptive_glass.dart';
 import '../ui/theme/glass.dart';
+import '../ui/theme/fixed_glass_policy.dart';
 import 'frame_recorder.dart';
 import 'performance_lab.dart';
 import 'performance_report.dart';
@@ -71,6 +72,26 @@ class PerformanceConditions extends StatelessWidget {
           viewportHeight: media.size.height,
           devicePixelRatio: media.devicePixelRatio,
           textScale: media.textScaler.scale(1),
+          fixedGlassPolicy: lab.fixedGlassPresentRoles.isEmpty
+              ? null
+              : (lab.fixedGlassPlanContext
+                    ? lab.fixedGlassPolicy
+                    : SfFixedGlassPolicy.baseline),
+          fixedGlassPlanContext: lab.fixedGlassPlanContext,
+          fixedGlassPresentRoles: lab.fixedGlassPresentRoles,
+          fixedGlassConfigurationId: lab.fixedGlassConfigurationId,
+          prewarmEnabled: lab.prewarmEnabled,
+          prewarmStatus: lab.prewarmStatus,
+          prewarmDurationMs: lab.prewarmDurationMs,
+          prewarmLogicalWidth: lab.prewarmLogicalWidth,
+          prewarmLogicalHeight: lab.prewarmLogicalHeight,
+          prewarmPixelRatio: lab.prewarmPixelRatio,
+          fixedGlassBaseBlur: SfGlass.materialFor(
+            scope?.effectiveQuality ?? SfGlass.control,
+          ).blur,
+          fixedGlassBaseSaturation: SfGlass.materialFor(
+            scope?.effectiveQuality ?? SfGlass.control,
+          ).saturation,
         );
         return child!;
       },

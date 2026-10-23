@@ -5,6 +5,7 @@ import 'dart:ui' show FrameTiming;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smartfit/diagnostics/frame_recorder.dart';
+import 'package:smartfit/ui/theme/fixed_glass_policy.dart';
 
 void main() {
   final binding = TestWidgetsFlutterBinding.ensureInitialized();
@@ -53,6 +54,12 @@ void main() {
     String renderer = 'Impeller',
     String backend = 'vulkan',
     double budget = 1000 / 60,
+    SfFixedGlassPolicy? fixedPolicy,
+    bool isPlanContext = true,
+    String fixedConfig = 'baseline',
+    bool prewarmEnabled = false,
+    String prewarmStatus = 'disabled',
+    double? prewarmDurationMs,
   }) => recorder.setRenderConditions(
     glassEnabled: glass,
     scrollCardGlassEnabled: scrollCardGlass,
@@ -68,6 +75,18 @@ void main() {
     viewportHeight: 915,
     devicePixelRatio: 2.625,
     textScale: 1,
+    fixedGlassPolicy: fixedPolicy,
+    fixedGlassPlanContext: fixedPolicy == null ? null : isPlanContext,
+    fixedGlassPresentRoles: const {
+      SfFixedGlassRole.input,
+      SfFixedGlassRole.suggestions,
+    },
+    fixedGlassConfigurationId: fixedConfig,
+    prewarmEnabled: prewarmEnabled,
+    prewarmStatus: prewarmStatus,
+    prewarmDurationMs: prewarmDurationMs,
+    fixedGlassBaseBlur: 1.2,
+    fixedGlassBaseSaturation: 1.15,
   );
 
   bool beginCase({
@@ -444,6 +463,207 @@ void main() {
     });
     expect(jsonEncode(snapshot), isNot(contains('PRIVATE_KEY')));
   });
+
+  test('fixed-glass matrix keeps entry and steady scroll independently', () {
+    recorder.start();
+    conditions(fixedPolicy: SfFixedGlassPolicy.baseline);
+    expect(
+      recorder.beginFixedGlassEntry(
+        configId: 'baseline',
+        targetPage: 'performance_plan_cards',
+      ),
+      isTrue,
+    );
+    recorder.setPage('performance_plan_cards');
+    final entry = frame();
+    report([timing(entry, 1000, 19000)]);
+    expect(
+      recorder.beginFixedGlassCase(
+        configId: 'baseline',
+        scenario: FrameScenario.planCardScroll,
+        fixtureId: 'plan_cards_72_v1',
+        messageCount: 72,
+      ),
+      isTrue,
+    );
+    final start = frame();
+    nextTimestamp += 31000000;
+    final end = frame();
+    report([timing(start, 1000, 7000), timing(end, 1000, 4000)]);
+    recorder.endCase();
+    final snapshot = recorder.snapshot();
+    final cell =
+        (snapshot['fixedGlassCases'] as Map)['baseline__planCardScroll'] as Map;
+    expect(snapshot['cases'], isEmpty);
+    expect(cell['comparisonReady'], isTrue);
+    expect(cell['comparisonIssues'], isEmpty);
+    expect(cell['targetPreviouslyEntered'], isFalse);
+    expect(cell['entryOrdinal'], 1);
+    expect(cell['entryConditionGroupCount'], 1);
+    expect(
+      ((cell['entryFirst2Seconds'] as Map)['raster'] as Map)['worstMs'],
+      19,
+    );
+    expect(((cell['steadyState'] as Map)['raster'] as Map)['worstMs'], 4);
+    final fixed =
+        ((cell['conditions'] as List).single as Map)['condition'] as Map;
+    final state = fixed['fixedGlass'] as Map;
+    expect(state['roleStates'], {
+      'topBar': null,
+      'bottomBar': null,
+      'input': true,
+      'suggestions': true,
+    });
+    expect((state['roleMaterials'] as Map)['input'], {
+      'trueGlass': true,
+      'blur': 1.2,
+      'saturation': 1.15,
+    });
+    recorder.setPage('performance_settings');
+    recorder.beginFixedGlassEntry(
+      configId: 'baseline',
+      targetPage: 'performance_plan_cards',
+    );
+    final stale =
+        (recorder.snapshot()['fixedGlassCases']
+                as Map)['baseline__planCardScroll']
+            as Map;
+    expect(stale['comparisonReady'], isFalse);
+    expect(stale['invalidationReason'], 'new_entry_attempt_started');
+    final pending =
+        (recorder.snapshot()['fixedGlassEntries'] as Map)['baseline'] as Map;
+    expect(pending['scriptStarted'], isFalse);
+    expect((pending['entryFirst2Seconds'] as Map)['frameCount'], 0);
+    // Export/reset cannot turn a previously visited page into a cold page.
+    recorder.reset();
+    recorder.setPage('performance_settings');
+    recorder.beginFixedGlassEntry(
+      configId: 'baseline',
+      targetPage: 'performance_plan_cards',
+    );
+    recorder.setPage('performance_plan_cards');
+    final revisit = frame();
+    report([timing(revisit, 1000, 1000)]);
+    recorder.beginFixedGlassCase(
+      configId: 'baseline',
+      scenario: FrameScenario.planCardScroll,
+      fixtureId: 'plan_cards_72_v1',
+      messageCount: 72,
+    );
+    final second =
+        (recorder.snapshot()['fixedGlassCases']
+                as Map)['baseline__planCardScroll']
+            as Map;
+    expect(second['targetPreviouslyEntered'], isTrue);
+    expect(second['entryOrdinal'], 2);
+  });
+
+  test(
+    'fixed-glass material changes in delayed batches never mix silently',
+    () {
+      recorder.start();
+      recorder.setPage('performance_plan_cards');
+      conditions(fixedPolicy: SfFixedGlassPolicy.baseline);
+      recorder.beginFixedGlassEntry(
+        configId: 'baseline',
+        targetPage: 'performance_plan_cards',
+      );
+      recorder.beginFixedGlassCase(
+        configId: 'baseline',
+        scenario: FrameScenario.planCardScroll,
+        fixtureId: 'plan_cards_72_v1',
+        messageCount: 72,
+      );
+      final first = frame();
+      conditions(
+        fixedPolicy: SfFixedGlassPolicy.baseline.copyWith(
+          saturationEnabled: false,
+          blurScale: .5,
+        ),
+      );
+      final second = frame();
+      report([timing(first, 1000, 8000), timing(second, 1000, 3000)]);
+      recorder.endCase();
+      final cell =
+          (recorder.snapshot()['fixedGlassCases']
+                  as Map)['baseline__planCardScroll']
+              as Map;
+      expect(
+        cell['comparisonIssues'],
+        containsAll([
+          'mixed_render_conditions',
+          'fixed_glass_actual_policy_mismatch',
+        ]),
+      );
+      expect(cell['entryConditionGroupCount'], 2);
+      final groups = cell['conditions'] as List;
+      expect(
+        (((groups[1] as Map)['condition'] as Map)['fixedGlass']
+            as Map)['roleMaterials'],
+        {
+          'topBar': null,
+          'bottomBar': null,
+          'input': {'trueGlass': true, 'blur': .6, 'saturation': 1.0},
+          'suggestions': {'trueGlass': true, 'blur': .6, 'saturation': 1.0},
+        },
+      );
+    },
+  );
+
+  test(
+    'prewarm failures remain explicit and N/A roles cannot be fake cells',
+    () {
+      expect(
+        recorder.beginFixedGlassCase(
+          configId: 'top_bar_static',
+          scenario: FrameScenario.planCardScroll,
+          fixtureId: 'plan_cards_72_v1',
+          messageCount: 72,
+        ),
+        isFalse,
+      );
+      expect(
+        recorder.beginFixedGlassCase(
+          configId: 'chat_baseline',
+          scenario: FrameScenario.planCardScroll,
+          fixtureId: 'plan_cards_72_v1',
+          messageCount: 72,
+        ),
+        isFalse,
+      );
+      recorder.start();
+      recorder.setPage('performance_plan_cards');
+      conditions(
+        fixedPolicy: SfFixedGlassPolicy.baseline,
+        fixedConfig: 'baseline_prewarmed',
+        prewarmEnabled: true,
+        prewarmStatus: 'unsupported',
+        prewarmDurationMs: 4,
+      );
+      recorder.beginFixedGlassCase(
+        configId: 'baseline_prewarmed',
+        scenario: FrameScenario.planCardScroll,
+        fixtureId: 'plan_cards_72_v1',
+        messageCount: 72,
+      );
+      final first = frame();
+      report([timing(first, 1000, 4000)]);
+      recorder.endCase();
+      final cell =
+          (recorder.snapshot()['fixedGlassCases']
+                  as Map)['baseline_prewarmed__planCardScroll']
+              as Map;
+      expect(
+        cell['comparisonIssues'],
+        contains('fixed_glass_prewarm_not_succeeded'),
+      );
+      expect(recorder.snapshot()['invalidCaseRequestCount'], 2);
+      expect(
+        (recorder.snapshot()['retention'] as Map)['maxFixedGlassCases'],
+        11,
+      );
+    },
+  );
 
   test('measurement metadata retains fixed app and device context fields', () {
     final metadata = <String, Object?>{

@@ -3,8 +3,78 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:smartfit/diagnostics/performance_lab.dart';
 import 'package:smartfit/ui/theme/glass.dart';
+import 'package:smartfit/ui/theme/fixed_glass_policy.dart';
 
 void main() {
+  test(
+    'fixed-glass presets preserve star preference and restore ephemeral state',
+    () {
+      final lab = PerformanceLab(enabled: true);
+      lab.setFixedGlassContext(
+        isPlanContext: true,
+        presentRoles: const {
+          SfFixedGlassRole.input,
+          SfFixedGlassRole.suggestions,
+        },
+      );
+      lab.applyFixedGlassConfiguration('no_saturation_half_blur');
+      expect(lab.fixedGlassPolicy.saturationEnabled, isFalse);
+      expect(lab.fixedGlassPolicy.blurScale, .5);
+      expect(lab.starfieldFor(false), isFalse);
+      expect(lab.starfieldFor(true), isTrue);
+      expect(lab.scrollingGlassEnabled, isFalse);
+      final previous = lab.snapshotOverrides();
+      lab.applyFixedGlassConfiguration('baseline_prewarmed');
+      expect(lab.prewarmStatus, 'pending');
+      lab.setPrewarmStatus(
+        'succeeded',
+        durationMs: 12,
+        logicalWidth: 390,
+        logicalHeight: 480,
+        pixelRatio: 3.25,
+      );
+      expect(lab.prewarmPixelRatio, 3.25);
+      lab.restoreOverrides(previous);
+      expect(lab.fixedGlassConfigurationId, 'no_saturation_half_blur');
+      expect(lab.fixedGlassPolicy.blurScale, .5);
+      expect(lab.prewarmStatus, 'disabled');
+      expect(lab.prewarmPixelRatio, isNull);
+      expect(lab.fixedGlassPresentRoles, hasLength(2));
+      lab.resetOverrides();
+      expect(lab.fixedGlassPolicy, SfFixedGlassPolicy.baseline);
+      expect(lab.fixedGlassPresentRoles, isEmpty);
+      expect(
+        () => lab.applyFixedGlassConfiguration('top_bar_static'),
+        throwsArgumentError,
+      );
+      lab.dispose();
+    },
+  );
+
+  test('production cannot enable fixed-glass experiments or prewarming', () {
+    final lab = PerformanceLab(enabled: false);
+    lab.applyFixedGlassConfiguration('all_static');
+    lab.setFixedGlassPolicy(SfFixedGlassPolicy.baseline.copyWith(input: false));
+    lab.setFixedGlassContext(
+      isPlanContext: true,
+      presentRoles: const {SfFixedGlassRole.input},
+    );
+    lab.setPrewarmEnabled(true);
+    lab.setPrewarmStatus(
+      'succeeded',
+      durationMs: 1,
+      logicalWidth: 100,
+      logicalHeight: 100,
+      pixelRatio: 1,
+    );
+    expect(lab.fixedGlassPolicy, SfFixedGlassPolicy.baseline);
+    expect(lab.fixedGlassPlanContext, isFalse);
+    expect(lab.fixedGlassPresentRoles, isEmpty);
+    expect(lab.prewarmEnabled, isFalse);
+    expect(lab.prewarmStatus, 'disabled');
+    expect(lab.prewarmDurationMs, isNull);
+    lab.dispose();
+  });
   test('overrides default to existing settings and never persist', () {
     final lab = PerformanceLab(enabled: true);
     expect(lab.glassEnabled, isTrue);

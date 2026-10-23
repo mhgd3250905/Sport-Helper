@@ -7,6 +7,7 @@ import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
 import '../../diagnostics/performance_lab.dart';
 import 'adaptive_glass.dart';
+import 'fixed_glass_policy.dart';
 import 'tokens.dart';
 import 'widgets.dart' show SfControlInk, SfPressedScope;
 
@@ -121,6 +122,7 @@ class SfGlassSurface extends StatelessWidget {
     this.height,
     this.quality = SfGlass.control,
     this.control = false,
+    this.settingsOverride,
   });
 
   /// A tappable control (quick-reply chip). Dark: painted with
@@ -136,6 +138,7 @@ class SfGlassSurface extends StatelessWidget {
   final double? width;
   final double? height;
   final GlassQuality quality;
+  final LiquidGlassSettings? settingsOverride;
 
   @override
   Widget build(BuildContext context) {
@@ -173,7 +176,7 @@ class SfGlassSurface extends StatelessWidget {
     } else {
       glass = GlassContainer(
         useOwnLayer: true,
-        settings: SfGlass.materialFor(q),
+        settings: settingsOverride ?? SfGlass.materialFor(q),
         quality: q,
         shape: shape,
         width: width,
@@ -251,6 +254,84 @@ class SfGlassSurface extends StatelessWidget {
   }
 }
 
+/// Fixed controls have a tight clip and their own paint boundary. Only an
+/// internal plan scope can change their material; ordinary chat stays baseline.
+class SfFixedGlassSurface extends StatelessWidget {
+  const SfFixedGlassSurface({
+    super.key,
+    required this.role,
+    required this.child,
+    this.radius,
+    this.padding,
+    this.width,
+    this.height,
+    this.quality = SfGlass.control,
+    this.control = false,
+  });
+
+  final SfFixedGlassRole role;
+  final Widget child;
+  final double? radius;
+  final EdgeInsetsGeometry? padding;
+  final double? width;
+  final double? height;
+  final GlassQuality quality;
+  final bool control;
+
+  @override
+  Widget build(BuildContext context) {
+    final scope = PerformanceLab.buildEnabled
+        ? SfFixedGlassScope.maybeOf(context)
+        : null;
+    final policy = scope?.isPlanContext == true
+        ? scope!.policy
+        : SfFixedGlassPolicy.baseline;
+    final q = SfGlass.resolve(quality, context: context);
+    final material = SfGlass.materialFor(q);
+    final Widget surface;
+    if (!policy.enabledFor(role)) {
+      surface = SfStaticGlassFace(
+        radius: radius ?? 999,
+        padding: padding,
+        width: width,
+        height: height,
+        child: child,
+      );
+    } else {
+      surface = SfGlassSurface(
+        radius: radius,
+        padding: padding,
+        width: width,
+        height: height,
+        quality: quality,
+        control: control,
+        settingsOverride: policy == SfFixedGlassPolicy.baseline
+            ? null
+            : material.copyWith(
+                saturation: policy.saturationEnabled ? material.saturation : 1,
+                blur: material.blur * policy.blurScale,
+              ),
+        child: child,
+      );
+    }
+    return RepaintBoundary(
+      key: ValueKey('sf-fixed-glass-boundary-${role.name}'),
+      child: ClipPath(
+        key: ValueKey('sf-fixed-glass-clip-${role.name}'),
+        clipBehavior: Clip.antiAlias,
+        clipper: ShapeBorderClipper(
+          shape: radius == null
+              ? const StadiumBorder()
+              : RoundedSuperellipseBorder(
+                  borderRadius: BorderRadius.circular(radius!),
+                ),
+        ),
+        child: surface,
+      ),
+    );
+  }
+}
+
 /// A scrolling card paints its own face instead of filtering the scene behind
 /// it. The internal-only override restores the previous material for a phone
 /// comparison; production always takes the static branch.
@@ -295,6 +376,35 @@ class SfScrollCardSurface extends StatelessWidget {
         child: child,
       );
     }
+    return SfStaticGlassFace(
+      radius: radius,
+      padding: padding,
+      width: width,
+      height: height,
+      child: child,
+    );
+  }
+}
+
+/// Shared painted face. Unlike the scrolling-card wrapper, it never enables
+/// backdrop sampling, including when another internal override is active.
+class SfStaticGlassFace extends StatelessWidget {
+  const SfStaticGlassFace({
+    super.key,
+    required this.child,
+    this.radius = SfRadius.lg,
+    this.padding,
+    this.width,
+    this.height,
+  });
+  final Widget child;
+  final double radius;
+  final EdgeInsetsGeometry? padding;
+  final double? width;
+  final double? height;
+
+  @override
+  Widget build(BuildContext context) {
     final dark = SfColors.isDark;
     return SizedBox(
       width: width,
