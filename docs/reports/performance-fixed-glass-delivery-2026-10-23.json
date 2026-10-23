@@ -1,0 +1,179 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-23",
+  "status": "experiment-apk-ready-awaiting-same-device-samples",
+  "branch": "feat/performance-baseline",
+  "sourceCommit": "761d979f7844cc6b36369e2f3212852cb0278363",
+  "mergedMain": false,
+  "pushed": false,
+  "internalAPK": {
+    "apk": "build/app/outputs/flutter-apk/app-arm64-v8a-internal-release.apk",
+    "packageName": "com.ugk.smartfit.internal",
+    "versionCode": 2019,
+    "versionName": "0.1.0",
+    "abi": "arm64-v8a",
+    "mode": "release",
+    "debuggable": false,
+    "sourceCommit": "761d979f7844cc6b36369e2f3212852cb0278363",
+    "sizeBytes": 49794495,
+    "sha256": "7325918877c448f7a8bea8d6caa2f3aedc3c31eb4aafeb2bf083c04f25031f07",
+    "dartInternalMarkers": {
+      "frame_performance": true,
+      "SmartFit-performance-": true,
+      "smartfit/performance": true,
+      "raster_controls_v4": true,
+      "scrollCardGlassEnabled": true,
+      "performance-scroll-card-glass": true,
+      "long_chat_72_v1": true,
+      "fixedGlassCases": true,
+      "fixed_glass_lab": true,
+      "baseline_prewarmed": true,
+      "prewarmLogicalWidth": true
+    },
+    "nativeInternalMarkers": {
+      "InternalPerformanceFileProvider": true,
+      "smartfit/performance": true,
+      "smartfit-renderer-probe": true
+    },
+    "staticScrollCardIncluded": true,
+    "profileVmExtensionIncluded": false,
+    "signatureV2Verified": true,
+    "signerMatchesBuild17": true,
+    "signerSha256": "3761270a4764157f0e389014a9e5b800b05403bfddce0f4f7f8c039f6a53bdc7",
+    "flavorIsolationPassed": true,
+    "sharedAdaptiveFreezePhaseIncluded": true,
+    "archivePath": ".buildlog/install/SmartFit-0.1.0+19-fixed-glass-experiments-internal-arm64-v8a-release.apk",
+    "sha256Sidecar": ".buildlog/install/SmartFit-0.1.0+19-fixed-glass-experiments-internal-arm64-v8a-release.apk.sha256"
+  },
+  "productionStripCheck": {
+    "validationOnlyNotForDistribution": true,
+    "packageName": "com.ugk.smartfit",
+    "versionCode": 2019,
+    "sizeBytes": 49384431,
+    "sha256": "2c962b680c81348cd34af3cc68684766bcf734e805bc08bdf2563b4e2ae4a2da",
+    "dartInternalMarkers": {
+      "frame_performance": false,
+      "SmartFit-performance-": false,
+      "smartfit/performance": false,
+      "raster_controls_v4": false,
+      "scrollCardGlassEnabled": false,
+      "performance-scroll-card-glass": false,
+      "long_chat_72_v1": false,
+      "fixedGlassCases": false,
+      "fixed_glass_lab": false,
+      "baseline_prewarmed": false,
+      "prewarmLogicalWidth": false
+    },
+    "nativeInternalMarkers": {
+      "InternalPerformanceFileProvider": false,
+      "smartfit/performance": false,
+      "smartfit-renderer-probe": false
+    },
+    "signatureV2Verified": true,
+    "flavorIsolationPassed": true
+  },
+  "checks": {
+    "flutterFull": {
+      "passed": 393,
+      "skipped": 9
+    },
+    "flutterInternalFocused": {
+      "passed": 97,
+      "skipped": 4
+    },
+    "flutterScreenshotInternal": {
+      "passed": 7,
+      "generatedImages": 8
+    },
+    "pythonPerformanceTools": {
+      "passed": 52
+    },
+    "flutterAnalyzeIssues": 0,
+    "arm64JNIGate": {
+      "internal": true,
+      "production": true
+    },
+    "nativeReportCapacityBytes": 8388608,
+    "pubspecLockUnchangedFrom": "5faba74",
+    "pubspecLockSHA256": "17c7332a9c1970da9a1a5738c1f9924e3b53fee21aa36f64b79c35eea2d0cc47",
+    "SDKUnchanged": true,
+    "simulatorStarted": false
+  },
+  "realFixedGlassRoles": [
+    "input",
+    "suggestions"
+  ],
+  "notApplicableRoles": [
+    "topBar",
+    "bottomBar"
+  ],
+  "starfieldChanged": false,
+  "chatMaterialChanged": false,
+  "defaultConfiguration": "baseline-pending-measured-selection",
+  "sameDeviceSamples": null,
+  "measuredPassingDefault": null,
+  "matrixCells": [
+    {
+      "configuration": "baseline",
+      "scenario": "planCardScroll",
+      "sampleDurationSeconds": 32,
+      "measurement": null
+    },
+    {
+      "configuration": "input_static",
+      "scenario": "planCardScroll",
+      "sampleDurationSeconds": 32,
+      "measurement": null
+    },
+    {
+      "configuration": "suggestions_static",
+      "scenario": "planCardScroll",
+      "sampleDurationSeconds": 32,
+      "measurement": null
+    },
+    {
+      "configuration": "no_saturation",
+      "scenario": "planCardScroll",
+      "sampleDurationSeconds": 32,
+      "measurement": null
+    },
+    {
+      "configuration": "half_blur",
+      "scenario": "planCardScroll",
+      "sampleDurationSeconds": 32,
+      "measurement": null
+    },
+    {
+      "configuration": "no_saturation_half_blur",
+      "scenario": "planCardScroll",
+      "sampleDurationSeconds": 32,
+      "measurement": null
+    },
+    {
+      "configuration": "all_static",
+      "scenario": "planCardScroll",
+      "sampleDurationSeconds": 32,
+      "measurement": null
+    },
+    {
+      "configuration": "baseline_prewarmed",
+      "scenario": "planCardScroll",
+      "sampleDurationSeconds": 32,
+      "measurement": null
+    },
+    {
+      "configuration": "chat_baseline",
+      "scenario": "longChatScroll",
+      "sampleDurationSeconds": 32,
+      "measurement": null
+    }
+  ],
+  "coldEntryProtocol": "Restart the App before baseline and export; restart again before baseline_prewarmed and export separately. Entry ordinal and actual prewarm success are required; no shader-compilation attribution without a Timeline.",
+  "screenshots": {
+    "index": "docs/screenshots/fixed-glass-experiment/README.md",
+    "manifest": "docs/screenshots/fixed-glass-experiment/visual-review.json",
+    "isDeviceScreenshot": false,
+    "isPerformanceMeasurement": false
+  },
+  "handoff": "docs/performance-fixed-glass-experiment-2026-10-23.md"
+}

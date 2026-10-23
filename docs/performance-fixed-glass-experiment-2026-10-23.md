@@ -58,4 +58,16 @@ python tools/performance/fixed_glass_matrix.py 'F:/test-logs/SmartFit-performanc
 
 完整 Flutter 测试 393 项通过、9 项跳过（内测专用或需显式开启的图片生成）；内测专项 97 项通过、4 项跳过（生产断言或图片生成），图片专项 7 项通过并生成八图。Python 性能工具 52 项通过，静态分析零问题。`git diff --check` 通过；不启动模拟器。SDK 固定引用及依赖锁文件与修前分支保持原样。真实实验数据、最终默认与新计划卡/聊天复测结果目前待手机采集，不能宣称已达标。
 
-安装包身份与校验在构建完成后附于本节。
+## +19 安装包身份
+
+内测安装包位于 `.buildlog/install/SmartFit-0.1.0+19-fixed-glass-experiments-internal-arm64-v8a-release.apk`，同目录附 `.apk.sha256`。包名 `com.ugk.smartfit.internal`，versionCode `2019`，versionName `0.1.0`，arm64-v8a、AOT release、非 debuggable。可覆盖 +17/+18 内测包；签名证书一致、APK v2 签名验证通过。
+
+- 源码提交：`761d979f7844cc6b36369e2f3212852cb0278363`。
+- 大小：49,794,495 bytes（约 47.49 MiB）。
+- SHA-256：`7325918877c448f7a8bea8d6caa2f3aedc3c31eb4aafeb2bf083c04f25031f07`。
+- `raster_controls_v4`、`fixedGlassCases`、进入前预热状态及几何字段均确认包含于 AOT；JNI arm64 检查通过。
+
+本包用于相同真机流程下的相对对照。没有设备 Timeline 或 GPU trace 时，不把单项改善进一步归因于某个 GPU 驱动或着色器编译事件。最终默认配置与达标声明仍等待同机采样。
+
+
+生产 arm64 检查包仅用于裁剪核对，不作内测交付。AOT 与 DEX 中的帧记录器、报告分享通道、renderer 探针、固定玻璃实验入口/配置及预热标记均已剔除；arm64 JNI 和签名验证均通过。完整包身份与验证记录见 [交付校验 JSON](reports/performance-fixed-glass-delivery-2026-10-23.json)。
