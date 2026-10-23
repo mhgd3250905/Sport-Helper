@@ -123,6 +123,7 @@ class _PlanPageState extends State<PlanPage> {
             key: const ValueKey('start'),
             icon: SfGlyph.play,
             label: '开始跟练',
+            emphasized: true,
             onPressed: () async {
               if (!s.store.trainingAllowed) {
                 showSfToast(

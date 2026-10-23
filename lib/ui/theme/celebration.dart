@@ -94,7 +94,7 @@ class SfFinishMark extends StatelessWidget {
           painter: full
               ? _RipplePainter(
                   progress: ring.value,
-                  color: SfColors.accent,
+                  color: SfColors.emphasis,
                   inner: size / 2,
                 )
               : null,
@@ -106,13 +106,13 @@ class SfFinishMark extends StatelessWidget {
                 height: size,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: full ? SfColors.accentSoft : SfColors.surfaceHigh,
+                  color: full ? SfColors.emphasisSoft : SfColors.surfaceHigh,
                 ),
                 alignment: Alignment.center,
                 child: full
                     ? CustomPaint(
                         size: Size.square(size * .5),
-                        painter: _CheckPainter(draw.value, SfColors.accentText),
+                        painter: _CheckPainter(draw.value, SfColors.emphasisText),
                       )
                     : SfIcon(SfGlyph.stop, size: size * .47, strokeWidth: 2.2, color: SfColors.muted),
               ),

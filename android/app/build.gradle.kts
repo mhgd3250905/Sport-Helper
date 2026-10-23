@@ -4,6 +4,27 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+// Both choices keep the internal application ID. Production never reads these
+// resources, and a build without an explicit choice retains the original icon.
+// Flutter exposes --dart-define values as base64-encoded Gradle dart-defines.
+val iconDefines = providers.gradleProperty("dart-defines").orNull
+    .orEmpty().split(",").mapNotNull { encoded ->
+        runCatching { String(java.util.Base64.getDecoder().decode(encoded), Charsets.UTF_8) }
+            .getOrNull()
+    }.filter { it.startsWith("SMARTFIT_ICON_VARIANT=") }
+    .map { it.substringAfter("=").uppercase() }.distinct()
+require(iconDefines.size <= 1) { "Only one SMARTFIT_ICON_VARIANT may be supplied." }
+val propertyIconVariant = providers.gradleProperty("smartfitIconVariant").orNull?.uppercase()
+val definedIconVariant = iconDefines.singleOrNull()
+require(propertyIconVariant == null || definedIconVariant == null ||
+    propertyIconVariant == definedIconVariant) {
+    "smartfitIconVariant and SMARTFIT_ICON_VARIANT disagree; supply one choice or matching values."
+}
+val smartfitIconVariant = propertyIconVariant ?: definedIconVariant.orEmpty()
+require(smartfitIconVariant in setOf("", "A", "B")) {
+    "smartfitIconVariant / SMARTFIT_ICON_VARIANT must be A or B (or omitted)."
+}
+
 android {
     namespace = "com.ugk.smartfit"
     compileSdk = flutter.compileSdkVersion
@@ -38,6 +59,12 @@ android {
             dimension = "distribution"
             applicationIdSuffix = ".internal"
         }
+    }
+
+    if (smartfitIconVariant.isNotEmpty()) {
+        sourceSets.getByName("internal").res.srcDir(
+            "src/internal/iconVariants/$smartfitIconVariant/res"
+        )
     }
 
     buildTypes {

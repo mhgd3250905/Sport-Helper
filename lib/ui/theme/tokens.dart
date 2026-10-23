@@ -5,15 +5,21 @@ import 'package:flutter/services.dart';
 /// size, spacing step, radius, shadow and motion timing in the UI comes
 /// from here, so the app is drawn with one hand.
 ///
-/// The discipline is HipLab's (docs/tactile-design-rationale-2026-10-19.md
-/// in that repo): one accent, tonal layers instead of glass and strokes,
-/// emphasis by colour rather than height, a small set of radii, and one
-/// motion vocabulary. The look is SmartFit's own: the chat floats in an
-/// endless sky (dark, default) or an endless white room (light).
+/// Teal carries the primary action and selection; coral marks starting or
+/// completing a workout. The chat floats in an endless sky (dark, default)
+/// or an endless white room (light).
 
 /// Bundled Noto Sans SC (assets/fonts/NotoSansSC.ttf, OFL 1.1; GB2312 +
 /// UI subset of the variable font, weights 100–900).
 const sfFontFamily = 'NotoSansSC';
+
+/// Colours sampled from the icon. The pale colours are decorative; text
+/// uses the contrast-adjusted roles in [SfPalette].
+abstract final class SfBrand {
+  static const mint = Color(0xFFBDF7CF);
+  static const teal = Color(0xFF7AD4D5);
+  static const coral = Color(0xFFE8705F);
+}
 
 /// One complete set of colour tokens: [dark] (deep sky) and [light]
 /// (paper white). Same roles in both; only values differ.
@@ -31,6 +37,9 @@ class SfPalette {
     required this.accent,
     required this.accentText,
     required this.onAccent,
+    required this.emphasis,
+    required this.emphasisText,
+    required this.onEmphasis,
     required this.text,
     required this.muted,
     required this.faint,
@@ -70,12 +79,18 @@ class SfPalette {
   /// on dark the tone steps carry the shape.
   final Color line;
 
-  /// The one accent: the primary action, progress, selection.
+  /// Primary action, progress and selection, in the icon's teal hue.
   final Color accent;
 
   /// Accent as small text / icons on the page (AA on [background]).
   final Color accentText;
   final Color onAccent;
+
+  /// Starting / completing a workout and important non-safety notices.
+  /// Safety and destructive actions retain [caution] / [danger].
+  final Color emphasis;
+  final Color emphasisText;
+  final Color onEmphasis;
 
   final Color text;
   final Color muted;
@@ -113,6 +128,8 @@ class SfPalette {
   /// Selected chip / option fill.
   Color get accentSoft => accent.withValues(alpha: isDark ? .16 : .12);
 
+  Color get emphasisSoft => emphasis.withValues(alpha: isDark ? .16 : .12);
+
   static const dark = SfPalette(
     brightness: Brightness.dark,
     skyTop: Color(0xFF121315), // deep neutral (round 4: no blue cast)
@@ -122,9 +139,12 @@ class SfPalette {
     surface: Color(0xFF15171C),
     surfaceHigh: Color(0xFF1F2228),
     line: Color(0xFF272A31),
-    accent: Color(0xFF3CCFA4),
-    accentText: Color(0xFF3CCFA4),
-    onAccent: Color(0xFF07261D),
+    accent: SfBrand.teal,
+    accentText: SfBrand.teal,
+    onAccent: Color(0xFF092F30),
+    emphasis: Color(0xFFF38F7F),
+    emphasisText: Color(0xFFF38F7F),
+    onEmphasis: Color(0xFF30120E),
     text: Color(0xFFF2F3F5),
     muted: Color(0xFF8D9199),
     faint: Color(0xFF5C6068),
@@ -136,8 +156,8 @@ class SfPalette {
     thumb: Color(0xFF2A2D34),
     scrim: Color(0xA6000000),
     track: Color(0x1FFFFFFF),
-    userBubble: Color(0xFF1D5243), // jade, solid (flat, z = 0); clear of the sky
-    assistantBubble: Color(0xFF2A2C31), // neutral grey, solid; clear of the sky
+    userBubble: Color(0xFF162F25), // mint tint, solid (flat, z = 0)
+    assistantBubble: Color(0xFF152E2F), // teal tint, solid (flat, z = 0)
     shadow: Color(0x00000000),
   );
 
@@ -150,9 +170,12 @@ class SfPalette {
     surface: Color(0xFFFFFFFF),
     surfaceHigh: Color(0xFFEEF0EE),
     line: Color(0xFFE1E4E1),
-    accent: Color(0xFF14A37B),
-    accentText: Color(0xFF0D6E53),
+    accent: Color(0xFF0F7976),
+    accentText: Color(0xFF0A6C69),
     onAccent: Color(0xFFFFFFFF),
+    emphasis: SfBrand.coral,
+    emphasisText: Color(0xFFA83B2E),
+    onEmphasis: Color(0xFF30120E),
     text: Color(0xFF121614),
     muted: Color(0xFF5D6661),
     faint: Color(0xFF9AA29E),
@@ -164,8 +187,8 @@ class SfPalette {
     thumb: Color(0xFFFFFFFF),
     scrim: Color(0x8C000000),
     track: Color(0x14000000),
-    userBubble: Color(0xFFDCEFE6), // light jade tint, solid (flat, z = 0)
-    assistantBubble: Color(0xFFE9ECEA), // neutral light grey, solid
+    userBubble: Color(0xFFE6F7EB), // light mint tint, solid (flat, z = 0)
+    assistantBubble: Color(0xFFE1F3F3), // light teal tint, solid (flat, z = 0)
     shadow: Color(0x121D2B25),
   );
 }
@@ -188,6 +211,10 @@ abstract final class SfColors {
   static Color get accentText => palette.accentText;
   static Color get accentSoft => palette.accentSoft;
   static Color get onAccent => palette.onAccent;
+  static Color get emphasis => palette.emphasis;
+  static Color get emphasisText => palette.emphasisText;
+  static Color get emphasisSoft => palette.emphasisSoft;
+  static Color get onEmphasis => palette.onEmphasis;
   static Color get text => palette.text;
   static Color get muted => palette.muted;
   static Color get faint => palette.faint;

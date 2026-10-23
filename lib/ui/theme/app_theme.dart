@@ -12,6 +12,8 @@ ThemeData buildTheme([SfPalette p = SfPalette.dark]) {
     onPrimary: p.onAccent,
     secondary: p.accent,
     onSecondary: p.onAccent,
+    tertiary: p.emphasis,
+    onTertiary: p.onEmphasis,
     surface: p.surface,
     onSurface: p.text,
     onSurfaceVariant: p.muted,

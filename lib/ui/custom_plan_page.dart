@@ -235,7 +235,7 @@ class _CustomPlanPageState extends State<CustomPlanPage> {
       padding: const EdgeInsets.symmetric(vertical: SfSpace.x2),
       child: Row(
         children: [
-          SfIcon(done ? SfGlyph.checkCircle : SfGlyph.clock, size: 20, color: done ? SfColors.accentText : SfColors.muted),
+          SfIcon(done ? SfGlyph.checkCircle : SfGlyph.clock, size: 20, color: done ? SfColors.emphasisText : SfColors.muted),
           const SizedBox(width: SfSpace.x3),
           Expanded(
             child: Column(

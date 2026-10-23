@@ -115,8 +115,8 @@ BorderRadius bubbleRadius({required bool user}) => BorderRadius.only(
 );
 
 /// A plain text bubble is content, not a control: flat at z = 0 — a solid
-/// fill, no glass, no shadow, no rim. The user's line is jade-tinted, the
-/// assistant's neutral grey; only interactive parts (cards, chips, the
+/// fill, no glass, no shadow, no rim. The user's line is mint-tinted, the
+/// assistant's teal-tinted; only interactive parts (cards, chips, the
 /// input bar) are raised liquid glass.
 class _Bubble extends StatelessWidget {
   const _Bubble({required this.user, required this.child, this.padding});

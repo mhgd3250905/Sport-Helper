@@ -1885,8 +1885,8 @@ class _PlayButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final stage = SfColors.palette;
     final dark = stage.mediaStage.computeLuminance() < .2;
-    final accent = dark ? SfPalette.dark.accent : SfPalette.light.accent;
-    final on = dark ? SfPalette.dark.onAccent : SfPalette.light.onAccent;
+    final accent = dark ? SfPalette.dark.emphasis : SfPalette.light.emphasis;
+    final on = dark ? SfPalette.dark.onEmphasis : SfPalette.light.onEmphasis;
     return SfPressable(
       semanticLabel: '开始训练',
       tooltip: '开始训练',

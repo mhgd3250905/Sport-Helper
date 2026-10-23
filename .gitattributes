@@ -4,3 +4,5 @@
 *.jpg binary
 *.png binary
 *.m4a binary
+android/app/src/internal/iconVariants/**/ic_launcher*.xml text eol=lf
+ios/Flutter/Icon?.internal.xcconfig text eol=lf

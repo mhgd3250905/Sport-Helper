@@ -265,18 +265,24 @@ class SfPrimaryButton extends StatelessWidget {
     this.icon,
     this.height = 52,
     this.expand = true,
+    this.emphasized = false,
   });
   final String label;
   final VoidCallback? onPressed;
   final SfGlyph? icon;
   final double height;
   final bool expand;
+  final bool emphasized;
 
   @override
   Widget build(BuildContext context) {
     final on = onPressed != null;
-    final fill = on ? SfColors.accent : SfColors.surfaceHigh;
-    final fg = on ? SfColors.onAccent : SfColors.faint;
+    final fill = on
+        ? (emphasized ? SfColors.emphasis : SfColors.accent)
+        : SfColors.surfaceHigh;
+    final fg = on
+        ? (emphasized ? SfColors.onEmphasis : SfColors.onAccent)
+        : SfColors.faint;
     return SizedBox(
       height: height,
       width: expand ? double.infinity : null,

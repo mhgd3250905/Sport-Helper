@@ -1,0 +1,4 @@
+// Opt-in icon override only. Not included by any existing scheme.
+// Select explicitly with xcodebuild -xcconfig Flutter/IconB.internal.xcconfig on an appropriately provisioned internal build.
+// Bundle identifier and signing remain the caller's responsibility.
+ASSETCATALOG_COMPILER_APPICON_NAME = AppIconB
