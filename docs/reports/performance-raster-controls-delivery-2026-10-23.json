@@ -1,0 +1,81 @@
+{
+  "apk": ".buildlog/install/SmartFit-0.1.0+17-raster-controls-internal-arm64-v8a-release.apk",
+  "packageName": "com.ugk.smartfit.internal",
+  "versionCode": 2017,
+  "versionName": "0.1.0",
+  "abi": "arm64-v8a",
+  "mode": "release",
+  "debuggable": false,
+  "sizeBytes": 49597887,
+  "sha256": "9cf671702b7287af1f67de249409dccbee714533c419e97a535bd2be9d3cd42b",
+  "dartInternalMarkers": {
+    "frame_performance": true,
+    "SmartFit-performance-": true,
+    "smartfit/performance": true,
+    "comparison_locked": true,
+    "glass_off_stars_off": true,
+    "long_chat_72_v1": true
+  },
+  "nativeInternalMarkers": {
+    "InternalPerformanceFileProvider": true,
+    "smartfit/performance": true,
+    "smartfit-renderer-probe": true
+  },
+  "profileVmExtensionIncluded": false,
+  "flavorIsolationPassed": true,
+  "sourceCommit": "7718e619a11250097aa27e629063935922beed0c",
+  "branch": "feat/performance-baseline",
+  "sdkRef": "f684e02f38e652633c23fa8946a53d02b6aa3ea2",
+  "signatureV2Verified": true,
+  "upgradeSignerMatchesBuild16": true,
+  "internalJniGateAllThreeAbis": true,
+  "productionArm64Isolation": {
+    "apk": "build/app/outputs/flutter-apk/app-arm64-v8a-production-release.apk",
+    "packageName": "com.ugk.smartfit",
+    "versionCode": 2017,
+    "versionName": "0.1.0",
+    "abi": "arm64-v8a",
+    "mode": "release",
+    "debuggable": false,
+    "sizeBytes": 49384431,
+    "sha256": "2f559ba8d836ec5cf51a51020b46dcb97d641fb0c56d87d13fd72e3e338a04e7",
+    "dartInternalMarkers": {
+      "frame_performance": false,
+      "SmartFit-performance-": false,
+      "smartfit/performance": false,
+      "comparison_locked": false,
+      "glass_off_stars_off": false,
+      "long_chat_72_v1": false
+    },
+    "nativeInternalMarkers": {
+      "InternalPerformanceFileProvider": false,
+      "smartfit/performance": false,
+      "smartfit-renderer-probe": false
+    },
+    "profileVmExtensionIncluded": false,
+    "flavorIsolationPassed": true
+  },
+  "productionArm64JniGate": true,
+  "flutterDefaultTestsPassed": 371,
+  "flutterDefaultTestsSkippedInternalOnly": 1,
+  "flutterInternalFocusedTestsPassed": 66,
+  "flutterInternalFocusedTestsSkippedProductionOnly": 2,
+  "pythonTestsPassed": 43,
+  "nativeParserChecksPassed": 16,
+  "staticAnalysisIssues": 0,
+  "deviceMatrixCollected": false,
+  "emulatorStarted": false,
+  "rootCause": "unconfirmed_pending_same_scene_phone_matrix",
+  "merged": false,
+  "pushed": false,
+  "protocol": {
+    "messageCount": 72,
+    "caseSeconds": 32,
+    "warmupSeconds": 2,
+    "tailDeliveryDelayMs": 1200,
+    "scrollDistanceLogicalPixels": 3200,
+    "legSeconds": 4,
+    "caseCount": 8,
+    "qualityFrozenAcrossMatrix": true
+  }
+}

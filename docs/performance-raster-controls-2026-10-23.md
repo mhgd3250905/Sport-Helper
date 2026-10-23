@@ -59,3 +59,21 @@ schema 2 保留原总计/页面/场景统计，并增加固定八格 `cases`、�
 八格 Python 工具 23 项、既有比较工具 17 项、Android 存储 JNI 工具 3 项通过。实际 renderer 解析器的 16 个合成引擎日志检查通过，internal Kotlin 编译通过。所有合成测试仅核验实现，不作为手机性能样本。
 
 本地 Cockpit 服务当前不可达，既有 revision 49 后的原进度请求保留为未确认状态；未新建或重置会话，未用新请求号绕过幂等保护。工作成果在当前 App Git 分支保存。
+
+## 安装包证据
+
+| 项目 | 结果 |
+| --- | --- |
+| 打包源码 | `7718e619a11250097aa27e629063935922beed0c`；后续交付文档提交不冒充重新打包 |
+| 安装包 | `.buildlog/install/SmartFit-0.1.0+17-raster-controls-internal-arm64-v8a-release.apk` |
+| 包身份 | `com.ugk.smartfit.internal` / versionCode `2017` / arm64-v8a / release / 非 debuggable |
+| 字节数 | 49,597,887 |
+| SHA-256 | `9cf671702b7287af1f67de249409dccbee714533c419e97a535bd2be9d3cd42b` |
+| 签名 | v2 验证通过，与已交付 +16 signer 相同，可覆盖安装 |
+| internal 门禁 | 三 ABI 最终 DEX 存储 JNI 检查均通过；arm64 AOT 包含记录器、八格、固定会话、精确预算与 native 探测标记；不含 profile VM 扩展 |
+| production 隔离 | 独立构建 arm64 production release，仅作剔除核验：六项 Dart 标记、三项 native 标记及 profile VM 扩展均不存在；存储 JNI 检查通过。此无 AI 构建凭据核验包不交付 |
+| SDK / lock | 两项 SDK 未改，固定引用目录 Git 状态干净；`pubspec.lock` 字节保持原样 |
+| 真机数据 | 未采集新版八格；未启动模拟器；没有填入猜测的帧数或收益 |
+| 合入状态 | 仅本地分支，main 保持 `94d78cee9550dfbf470c7140e3729260d9b79f2d`；未推送 |
+
+机器可读核验记录见 [交付记录](reports/performance-raster-controls-delivery-2026-10-23.json)。
