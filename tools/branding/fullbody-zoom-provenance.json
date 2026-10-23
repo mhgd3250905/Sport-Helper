@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-24",
+  "variant": "A2",
+  "method": "built-in image_gen edit",
+  "reference": "assets/brand/source/smartfit-icon-v3.png",
+  "referenceSha256": "5489859ef71dd279453f46e15d0d1632eabf7f5cbdc7e677d591c34f14f8637c",
+  "prompt": "Edit the provided ORIGINAL FULL-BODY SmartFit app icon. Produce exactly one 1024x1024 opaque full-bleed square image, no rounded corners. Make ONLY a subtle composition zoom: enlarge the existing woman, robot, motion arc, sparkles, and their ground shadow together by about 15 percent, maintaining their relative geometry and placement. The woman must remain fully visible from the tip of her raised hand to BOTH COMPLETE shoes with generous clear background below the soles (at least about 40 px). The entire raised arm, full legs, both feet, robot antenna and robot body must remain inside the square with visible breathing room; absolutely no half-body or leg/foot cropping. Preserve the same character identity, facial features, hairstyle, body proportions, stretching pose, coral exercise clothing and shoes, white robot with teal face, soft original 3D illustration style, original mint-to-teal gradient colors, lighting and overall design. Extend/reconstruct only the same smooth gradient background where required by the repositioning. Do not add objects, text, a border, a logo, extra effects or a new design. It should look like the same original full-body artwork, just slightly larger within the canvas, with the feet completely intact.",
+  "generatedSize": [
+    1254,
+    1254
+  ],
+  "generatedSha256": "233f7568bad123263a8a21ec5a3ddc1147412515976aca48c87191d2cb324e7a",
+  "normalization": "Uniform LANCZOS resample to the required 1024x1024 launcher source; no crop or additional image editing",
+  "source": "assets/brand/source/smartfit-icon-v3-fullbody-zoom.png",
+  "sourceSize": [
+    1024,
+    1024
+  ],
+  "sourceMode": "RGB",
+  "sourceSha256": "ad29f8ed04a444bdea1cb46433d4c5c412613a263144e1ad2021c7527f4c8894",
+  "originalAAndBRetained": true,
+  "humanVisualConfirmationPending": true,
+  "brandMergeApproved": false
+}

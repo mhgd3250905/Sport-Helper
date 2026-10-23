@@ -6,8 +6,8 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
-// Both choices keep the internal application ID. Production never reads these
-// resources, and a build without an explicit choice uses the selected default B.
+// All review choices keep the internal application ID. Production never reads
+// these candidate source sets. The local default A2 is awaiting visual approval.
 // Flutter exposes --dart-define values as base64-encoded Gradle dart-defines.
 val iconDefines = providers.gradleProperty("dart-defines").orNull
     .orEmpty().split(",").mapNotNull { encoded ->
@@ -23,8 +23,8 @@ require(propertyIconVariant == null || definedIconVariant == null ||
     "smartfitIconVariant and SMARTFIT_ICON_VARIANT disagree; supply one choice or matching values."
 }
 val smartfitIconVariant = propertyIconVariant ?: definedIconVariant.orEmpty()
-require(smartfitIconVariant in setOf("", "A", "B")) {
-    "smartfitIconVariant / SMARTFIT_ICON_VARIANT must be A or B (or omitted)."
+require(smartfitIconVariant in setOf("", "A", "B", "A2")) {
+    "smartfitIconVariant / SMARTFIT_ICON_VARIANT must be A, B, or A2 (or omitted)."
 }
 
 android {

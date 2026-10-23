@@ -40,8 +40,9 @@ class IconAssetsTest(unittest.TestCase):
         self.assertEqual(project.count("ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;"), 3)
         self.assertNotIn("IconA.internal.xcconfig", project)
         self.assertNotIn("IconB.internal.xcconfig", project)
+        self.assertNotIn("IconA2.internal.xcconfig", project)
 
-    def test_default_android_and_ios_slots_use_selected_b(self):
+    def test_local_default_android_and_ios_slots_use_pending_a2(self):
         expected = icons.selected_production_assets(self.assets)
         self.assertEqual(len(expected), 38)
         for path, content in expected.items():
@@ -60,7 +61,10 @@ class IconAssetsTest(unittest.TestCase):
         selection = icons.verify_selected_production(
             icons.ROOT, self.assets, icons.protected_assets(icons.ROOT)
         )
-        self.assertEqual(selection["variant"], "B")
+        self.assertEqual(selection["variant"], "A2")
+        self.assertEqual(selection["status"], "awaiting_user_visual_confirmation")
+        self.assertFalse(selection["productionReleaseApproved"])
+        self.assertFalse(selection["brandMergeApproved"])
 
     def test_rebaselining_wrong_production_artwork_is_rejected_without_repair(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -83,9 +87,21 @@ class IconAssetsTest(unittest.TestCase):
                 icons.json_bytes(records)
             )
             protected = icons.protected_assets(root)
-            with self.assertRaisesRegex(ValueError, "Selected production B differs"):
+            with self.assertRaisesRegex(ValueError, "Default production A2 differs"):
                 icons.verify_selected_production(root, self.assets, protected)
             self.assertEqual((root / changed).read_bytes(), wrong)
+
+    def test_preview_preserves_all_three_candidates_and_labels_the_full_body_zoom(self):
+        self.assertEqual(set(icons.VARIANTS), {"A", "B", "A2"})
+        self.assertEqual(icons.VARIANT_LABELS["A2"], "enlarged full body")
+        with tempfile.TemporaryDirectory() as temporary:
+            preview = Path(temporary) / "three-candidates.png"
+            icons.mask_preview(icons.ROOT, preview)
+            with Image.open(preview) as image:
+                self.assertEqual(image.size, (1500, 1560))
+                # The final candidate's full 432px image must fit below its label.
+                last = image.crop((28, 1108, 460, 1540))
+                self.assertGreater(len(last.getcolors(last.width * last.height)), 100)
 
     def test_android_whole_foreground_fits_safe_circle_at_every_density(self):
         for variant in icons.VARIANTS:

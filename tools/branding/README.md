@@ -1,100 +1,79 @@
-# Internal icon candidates
+# SmartFit icon review candidates
 
-The reviewed 1024 × 1024 sources are stored in `assets/brand/source/`:
+The 2026-10-24 request supersedes the earlier cropped B choice: return to the
+original full-body artwork and make it slightly larger with complete feet.
+**A2 is the new review candidate.** Default Android and iOS resources are
+prepared as A2 only on this local brand branch. Visual confirmation and brand
+merge/release approval are still pending; main has not received brand changes.
 
-- A: `smartfit-icon-v3.png`, full body.
-- B: `smartfit-icon-v4-crop.png`, supplied crop. Its lower legs are already cut by the source image edge.
+| Parameter | Source in assets/brand/source | Composition |
+| --- | --- | --- |
+| A | smartfit-icon-v3.png | Original full body |
+| B | smartfit-icon-v4-crop.png | Original supplied crop; lower legs cut by source |
+| A2 | smartfit-icon-v3-fullbody-zoom.png | Modest full-body enlargement, complete shoes |
 
-Regenerate both candidates with Python and Pillow. No pub dependency is added.
+Original A/B sources, generated candidates, previews, and delivered APKs remain.
+The exact built-in image_gen edit prompt, reference hash, generated hash and
+uniform size normalization for A2 are in `fullbody-zoom-provenance.json`.
+All three pipeline sources are 1024x1024 opaque RGB, full bleed without rounding.
+
+## Generate and verify
+
+Python and Pillow are used by the existing deterministic launcher pipeline:
 
 ```powershell
 python tools/branding/build_icons.py
 python tools/branding/build_icons.py --check
-python -m unittest discover -s tools/branding -p 'test_*.py'
+python -m unittest discover -s tools/branding
 python tools/branding/build_icons.py --check --preview .buildlog/branding/icon-mask-preview.png
 ```
 
-The user selected **B (`smartfit-icon-v4-crop.png`)** after seeing A on the phone.
-The checked-in Android and iOS production defaults are now B on this branch;
-merging the brand branch still requires separate human approval.
+The generator checks source hashes and all 38 protected local default files,
+then requires the defaults to match the A2 output independently of that snapshot.
+It writes only candidate files and the generated manifest, never default
+production assets. It verifies candidate directory inventory, reports unexpected
+files and deletes nothing. There are 118 generated files for the three choices.
 
-The generator verifies the source SHA-256 values and a snapshot of the selected
-production icon files before writing. Its output manifest records every generated
-file's size and SHA-256. It never writes `android/app/src/main/res` or the original
-iOS `AppIcon.appiconset`. Generation and verification also reject unexpected
-files inside the two owned candidate Android resource directories and the two
-candidate iOS appiconsets. They report stale files for inspection and delete
-nothing; unrelated tooling and production directories are not scanned.
+Android uses 108dp layers, an independently extended mint/teal gradient, and a
+46dp whole-image foreground whose 65.05dp diagonal fits the 66dp safe circle.
+No subject or source corner is clipped by the safe-circle boundary. Standard
+legacy sizes are 48/72/96/144/192px, and layer sizes are 108/162/216/324/432px.
+A2 enlarges the illustration within its source canvas without increasing the
+adaptive layer beyond the safe area. The A/B/A2 circle/rounded preview is
+`docs/screenshots/icon-fullbody-zoom/icon-mask-preview.png`.
 
-## Android selection
+## Android selection and packages
 
-Only the `internal` source set receives an explicit A/B override directory. The
-existing application IDs remain unchanged. Omitting the parameter uses the
-selected B default from `main/res`; production also uses that B default.
-
-```powershell
-flutter build apk --release --no-pub --flavor internal --build-number 21 --target-platform android-arm64 --split-per-abi --dart-define=SMARTFIT_ICON_VARIANT=A --dart-define=SMARTFIT_BUILD_SOURCE=<committed-source-sha>
-flutter build apk --release --no-pub --flavor internal --build-number 21 --target-platform android-arm64 --split-per-abi --dart-define=SMARTFIT_ICON_VARIANT=B --dart-define=SMARTFIT_BUILD_SOURCE=<committed-source-sha>
-```
-
-Direct Gradle invocations can use `-PsmartfitIconVariant=A` or `B`.
-Supplying both parameter forms is allowed only when their
-values agree; conflicting values fail instead of silently overriding a choice.
-The Gradle property can also be supplied through Gradle's standard environment
-mechanism, which is subject to the same conflict check. Both candidates keep
-`com.ugk.smartfit.internal` and the same version
-code, **2021** for these split arm64 APKs. They can cover-install each other and
-the existing +21 sampling build without a version downgrade. The original
-sampling APK is a separate, unchanged artifact.
-
-The wrapper builds both choices serially and copies each APK before the next
-build, so one build's output cannot overwrite the other candidate:
+`--dart-define=SMARTFIT_ICON_VARIANT=A|B|A2` adds only the selected internal
+resource directory. Direct Gradle builds can use `-PsmartfitIconVariant=A2`.
+Matching property/define choices are accepted; conflicting choices fail.
+Omitting the choice uses the prepared A2 default from main/res. Production
+does not read the internal candidate source sets.
 
 ```powershell
-./tools/branding/build_icon_candidates.ps1 -AppKeyFile '<local app-key file>'
+./tools/branding/build_icon_candidates.ps1 -AppKeyFile '<local key file>' -Variants A2 -OutputDirectory .buildlog/icon-a2/install
 ```
 
-Optional arguments include `-Variants A` (or B), `-MediaPrimaryUrl`,
-`-MediaSecondaryUrl`, and `-OutputDirectory`. By default it produces
-`SmartFit-0.1.0+21-internal-iconA.apk` and
-`SmartFit-0.1.0+21-internal-iconB.apk` in `.buildlog/brand-review/install/`.
-The wrapper adds the existing internal media and Worker key parameters without
-printing their values.
+The wrapper defaults to A2; A and B remain explicit options. It builds internal
+arm64 release packages serially, injects the committed source SHA, retains the
+internal media parameters, and never prints the key or full command. It checks
+matching App/report build identity, the approved SDK lock and clean runtime
+before/after each build, runs the final DEX/JNI gate, and writes hash-bound receipts.
 
-These are **release** internal packages for launcher icon and brand color review.
-The branch is rebased onto the approved performance main, including the +21
-static suggestion-strip defaults, internal recorder, and release/JNI corrections.
-The wrapper checks committed runtime files, matching diagnostic build identities,
-the approved SDK lock, actual source SHA, and the storage JNI gate for each APK.
-It records a hash-bound receipt next to each package. It does not change the
-production icon. The two candidates have identical theme tokens and runtime
-behavior; they differ only in launcher artwork.
+`SmartFit-0.1.0+21-internal-iconA2.apk` uses the same
+`com.ugk.smartfit.internal`, versionCode2021 and signer as the current +21 A/B
+packages so it can cover-install without a downgrade or data reset. Use a new
+output directory to retain historical packages and receipts. Source SHA in the
+exported report distinguishes builds with the same versionCode. The branch
+retains all approved main performance defaults; this icon edit changes no Dart
+theme token, SDK or rendering logic and is not a new timing measurement.
 
-Each candidate contains legacy 48/72/96/144/192 px icons and adaptive
-108/162/216/324/432 px foreground/background layers. The complete square artwork
-is centered at **46 dp** inside the 108 dp layer. Its 65.05 dp diagonal fits
-inside Android's 66 dp safe circle, including every corner. This deliberately
-retains margin around the illustration. The gradient background samples the
-source's mint/teal corner colors and anchors its gradient to the foreground
-edges; this reduces the seam that a separate full-width gradient would produce.
-The full opaque foreground is retained without cropping, rounding, or masking.
+## iOS
 
-Android defines the 108 dp layers and 66 dp safe area in the
-[official adaptive icon guide](https://developer.android.com/develop/ui/compose/system/icon_design_adaptive).
-The diagnostic preview simulates circular and rounded-square launcher masks;
-actual launcher caching and animation still need the requested phone A/B check.
-
-## iOS selection
-
-`AppIconA.appiconset` and `AppIconB.appiconset` cover every existing iPhone,
-iPad, and 1024 px marketing slot with opaque RGB images. After the user's B
-selection, the default `AppIcon.appiconset` contains B in every existing slot;
-the existing three build configurations still select `AppIcon`. No existing
-scheme includes the explicit candidate override files.
-
-This repository currently has no separate iOS internal scheme or provisioning
-identity. `IconA.internal.xcconfig` and `IconB.internal.xcconfig` contain only
-`ASSETCATALOG_COMPILER_APPICON_NAME`; they do not alter signing or bundle IDs.
-On macOS, a caller with an appropriately provisioned internal build can select
-one explicitly with `xcodebuild -xcconfig Flutter/IconA.internal.xcconfig` (or B).
-No iOS build or signing verification was performed on this Windows host.
+AppIconA, AppIconB and AppIconA2 appiconsets cover every existing iPhone/iPad
+and 1024px marketing slot with opaque images. The local default AppIcon contains
+A2 in all19 existing slots, with the original slot file and three Xcode build
+configurations retained. Explicit IconA/B/A2.internal.xcconfig overrides select
+only the appiconset; they change no bundle ID, scheme, signing or provisioning.
+No existing scheme imports these overrides. macOS compilation/signing remains
+unverified on this Windows host.

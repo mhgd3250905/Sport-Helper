@@ -1,8 +1,13 @@
 {
   "schemaVersion": 1,
-  "variant": "B",
-  "source": "assets/brand/source/smartfit-icon-v4-crop.png",
-  "sourceSha256": "a89d37b544942fe852b96e38b0faaaf66ac0d926d70037c227d0a102236d65f8",
-  "selectedDate": "2026-10-23",
-  "decision": "User selected the B half-body artwork after the real-device icon comparison."
+  "variant": "A2",
+  "source": "assets/brand/source/smartfit-icon-v3-fullbody-zoom.png",
+  "sourceSha256": "ad29f8ed04a444bdea1cb46433d4c5c412613a263144e1ad2021c7527f4c8894",
+  "proposedDate": "2026-10-24",
+  "status": "awaiting_user_visual_confirmation",
+  "scope": "local_brand_branch_only",
+  "productionReleaseApproved": false,
+  "brandMergeApproved": false,
+  "supersedes": "B",
+  "decision": "User rejected the cropped B artwork and requested the original full-body A slightly enlarged with both feet intact. A2 is the local review candidate; visual confirmation and brand merge approval are pending."
 }

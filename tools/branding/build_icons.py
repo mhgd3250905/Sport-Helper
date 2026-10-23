@@ -26,7 +26,10 @@ ROOT = Path(__file__).resolve().parents[2]
 VARIANTS = {
     "A": ("smartfit-icon-v3.png", "5489859ef71dd279453f46e15d0d1632eabf7f5cbdc7e677d591c34f14f8637c"),
     "B": ("smartfit-icon-v4-crop.png", "a89d37b544942fe852b96e38b0faaaf66ac0d926d70037c227d0a102236d65f8"),
+    "A2": ("smartfit-icon-v3-fullbody-zoom.png", "ad29f8ed04a444bdea1cb46433d4c5c412613a263144e1ad2021c7527f4c8894"),
 }
+VARIANT_LABELS = {"A": "original full body", "B": "user crop", "A2": "enlarged full body"}
+LOCAL_DEFAULT_VARIANT = "A2"
 DENSITIES = {"mdpi": 1, "hdpi": 1.5, "xhdpi": 2, "xxhdpi": 3, "xxxhdpi": 4}
 LAYER_DP = 108
 SAFE_DIAMETER_DP = 66
@@ -34,8 +37,10 @@ FOREGROUND_DP = 46
 OWNED_RESOURCE_ROOTS = (
     "android/app/src/internal/iconVariants/A/res",
     "android/app/src/internal/iconVariants/B/res",
+    "android/app/src/internal/iconVariants/A2/res",
     "ios/Runner/Assets.xcassets/AppIconA.appiconset",
     "ios/Runner/Assets.xcassets/AppIconB.appiconset",
+    "ios/Runner/Assets.xcassets/AppIconA2.appiconset",
 )
 ADAPTIVE_XML = b'''<?xml version="1.0" encoding="utf-8"?>
 <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
@@ -124,10 +129,10 @@ def protected_assets(root: Path) -> dict[str, str]:
 
 
 def selected_production_assets(generated: dict[str, bytes]) -> dict[str, bytes]:
-    """Map the reviewed B output to default paths, without writing production."""
+    """Map the local candidate to default paths, without writing production."""
     mappings = {
-        "android/app/src/internal/iconVariants/B/res/": "android/app/src/main/res/",
-        "ios/Runner/Assets.xcassets/AppIconB.appiconset/":
+        f"android/app/src/internal/iconVariants/{LOCAL_DEFAULT_VARIANT}/res/": "android/app/src/main/res/",
+        f"ios/Runner/Assets.xcassets/AppIcon{LOCAL_DEFAULT_VARIANT}.appiconset/":
             "ios/Runner/Assets.xcassets/AppIcon.appiconset/",
     }
     return {
@@ -141,24 +146,25 @@ def selected_production_assets(generated: dict[str, bytes]) -> dict[str, bytes]:
 def verify_selected_production(
     root: Path, generated: dict[str, bytes], protected: dict[str, str]
 ) -> dict:
-    """Reject a changed selection or rebaselined assets that no longer match B."""
+    """Reject changed or rebaselined assets that no longer match the local default."""
     selection = json.loads(
         (root / "tools/branding/production-icon-selection.json").read_text("utf-8")
     )
-    if (selection.get("schemaVersion") != 1 or selection.get("variant") != "B"
-            or selection.get("source") != f"assets/brand/source/{VARIANTS['B'][0]}"
-            or selection.get("sourceSha256") != VARIANTS["B"][1]):
-        raise ValueError("Production selection differs from the user-selected B artwork")
+    variant = LOCAL_DEFAULT_VARIANT
+    if (selection.get("schemaVersion") != 1 or selection.get("variant") != variant
+            or selection.get("source") != f"assets/brand/source/{VARIANTS[variant][0]}"
+            or selection.get("sourceSha256") != VARIANTS[variant][1]):
+        raise ValueError("Production selection differs from the local default artwork")
     expected = selected_production_assets(generated)
     if set(protected) != set(expected):
-        raise ValueError("Production icon snapshot inventory differs from selected B")
+        raise ValueError("Production icon snapshot inventory differs from the local default")
     for path, content in expected.items():
         actual = (root / path).read_bytes()
         # Keep the existing Xcode slot file's formatting; its structure is fixed.
         matches = (json.loads(actual) == json.loads(content)
                    if path.endswith("/Contents.json") else actual == content)
         if not matches:
-            raise ValueError(f"Selected production B differs: {path}")
+            raise ValueError(f"Default production {variant} differs: {path}")
     return selection
 
 
@@ -217,6 +223,7 @@ def build_assets(root: Path = ROOT) -> dict[str, bytes]:
             f"ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon{variant}\n"
         ).encode("utf-8")
         variants[variant] = {
+            "label": VARIANT_LABELS[variant],
             "source": f"assets/brand/source/{VARIANTS[variant][0]}",
             "sourceSize": [1024, 1024],
             "sourceMode": "RGB",
@@ -234,6 +241,8 @@ def build_assets(root: Path = ROOT) -> dict[str, bytes]:
         "generator": "tools/branding/build_icons.py",
         "productionDefaultVariant": selection["variant"],
         "productionDefaultSourceSha256": selection["sourceSha256"],
+        "productionDefaultStatus": selection["status"],
+        "productionReleaseApproved": selection["productionReleaseApproved"],
         "productionDefaultsProtected": True,
         "protectedProductionAssets": protected,
         "android": {
@@ -257,7 +266,7 @@ def build_assets(root: Path = ROOT) -> dict[str, bytes]:
 
 
 def mask_preview(root: Path, path: Path) -> None:
-    canvas = Image.new("RGB", (1500, 1060), "#F1F5F5")
+    canvas = Image.new("RGB", (1500, 60 + len(VARIANTS) * 500), "#F1F5F5")
     draw = ImageDraw.Draw(canvas)
     try:
         font = ImageFont.truetype("arial.ttf", 24)
@@ -269,7 +278,7 @@ def mask_preview(root: Path, path: Path) -> None:
     for row, variant in enumerate(VARIANTS):
         source, _ = read_source(root, variant)
         y = 70 + row * 500
-        draw.text((28, y), f"{variant}: {'full body' if variant == 'A' else 'user crop'}", fill="#173D3B", font=font)
+        draw.text((28, y), f"{variant}: {VARIANT_LABELS[variant]}", fill="#173D3B", font=font)
         canvas.paste(source.resize((432, 432), Image.Resampling.LANCZOS), (28, y + 38))
         composed = gradient(source, 6).convert("RGBA")
         composed.alpha_composite(foreground(source, 6))
@@ -303,7 +312,7 @@ def main() -> int:
             destination = ROOT / path
             destination.parent.mkdir(parents=True, exist_ok=True)
             destination.write_bytes(content)
-        print(f"Generated {len(generated)} candidate files; selected production B is unchanged.")
+        print(f"Generated {len(generated)} candidate files; local default {LOCAL_DEFAULT_VARIANT} is unchanged.")
     if args.preview:
         mask_preview(ROOT, args.preview.resolve())
         print(f"Mask preview: {args.preview.resolve()}")
