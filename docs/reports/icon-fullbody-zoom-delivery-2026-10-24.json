@@ -193,16 +193,17 @@
     "installedApkSha256": "eeacfbb71bb065aaef35e36b55b50d8a00c7da256d1b3b9553f114667fbba7d4",
     "activityLaunchPassed": true,
     "processAliveAfterSeconds": 5,
-    "iconAppInfoScreenshot": ".buildlog/icon-a2-22/iconA2-app-info.png",
-    "iconVisualVerified": false,
-    "cacheRefresh": "Returned to launcher, restarted own App-info Settings page; App and launcher data retained",
+    "iconAppInfoScreenshot": ".buildlog/icon-a2-22/post-reboot-app-info.png",
+    "iconVisualVerified": true,
+    "cacheRefresh": "User rebooted the phone; no reinstall or App/launcher data reset during verification. Version upgrade alone had not refreshed the old B icon.",
     "notAPerformanceTest": true,
     "humanVisualConfirmationPending": true,
     "brandMergeApproved": false,
-    "displayedIconStillOldB": true,
-    "bothFeetVisibleOnSystemUi": null,
+    "displayedIconStillOldB": false,
+    "bothFeetVisibleOnSystemUi": true,
     "preparedSourceBitmapFullBodyVerified": true,
-    "systemIconVisualConfirmationPending": true
+    "systemIconVisualConfirmationPending": false,
+    "visualObservedAfterUserReboot": true
   },
   "checks": {
     "iconPythonPassed": 14,
@@ -223,7 +224,8 @@
     "lockMatchesMainGitBlob": "443084a3eab41c77f8a01a5a1d7c7c03ac7bbcea",
     "buildIdentityAndSourceHashVerified": true,
     "signatureV2Verified": true,
-    "storageJniPassed": true
+    "storageJniPassed": true,
+    "systemA2IconVisualReviewPassed": true
   },
   "reusedChecks": {
     "flutterTests": {
@@ -275,5 +277,52 @@
   "brandMergedMain": false,
   "brandPushed": false,
   "humanVisualConfirmationPending": true,
-  "brandMergeApproved": false
+  "brandMergeApproved": false,
+  "preRebootPhoneSmoke": {
+    "performed": true,
+    "variant": "A2",
+    "serial": "QSG6Q8IFDMDELVGQ",
+    "deviceModel": "2602BRT18C",
+    "systemVersion": "16",
+    "isPhysicalDevice": true,
+    "coverInstallWithoutDataReset": true,
+    "installedApkSha256": "eeacfbb71bb065aaef35e36b55b50d8a00c7da256d1b3b9553f114667fbba7d4",
+    "activityLaunchPassed": true,
+    "processAliveAfterSeconds": 5,
+    "iconAppInfoScreenshot": ".buildlog/icon-a2-22/iconA2-app-info.png",
+    "iconVisualVerified": false,
+    "cacheRefresh": "Returned to launcher, restarted own App-info Settings page; App and launcher data retained",
+    "notAPerformanceTest": true,
+    "humanVisualConfirmationPending": true,
+    "brandMergeApproved": false,
+    "displayedIconStillOldB": true,
+    "bothFeetVisibleOnSystemUi": null,
+    "preparedSourceBitmapFullBodyVerified": true,
+    "systemIconVisualConfirmationPending": true
+  },
+  "postUserRebootVerification": {
+    "userReportedReboot": true,
+    "bootCompleted": true,
+    "bootUptimeSeconds": 440.1,
+    "installedVersionCode": 2022,
+    "installedApkSha256": "eeacfbb71bb065aaef35e36b55b50d8a00c7da256d1b3b9553f114667fbba7d4",
+    "installedIdentityVerified": true,
+    "appInfoPageOpened": true,
+    "screenshot": ".buildlog/icon-a2-22/post-reboot-app-info.png",
+    "oldBIconRegionUnchanged": false,
+    "meanIconDifferenceFromOldB": 12.4236181900555,
+    "visualReviewPending": false,
+    "appDataCleared": false,
+    "launcherDataCleared": false,
+    "appReinstalledThisCheck": false,
+    "brandMergeApproved": false,
+    "iconVisuallyMatchesA2": true,
+    "bothFeetVisibleOnSystemUi": true,
+    "robotAndAntennaComplete": true,
+    "independentReadOnlyVisualReviewPassed": true,
+    "visualReviewBasis": "Compared source A, cropped B, A2 source and system App-info images: A2 composition and slightly larger full-body proportions match; both shoes and full legs are present. Not based solely on pixel difference.",
+    "screenshotSha256": "25f32277a342d774f7628fc27278b7cab6cc3ed7e6918e916bb9411cdd6ecfc3",
+    "humanVisualConfirmationPending": true,
+    "notAPerformanceTest": true
+  }
 }
