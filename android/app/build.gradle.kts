@@ -7,7 +7,7 @@ plugins {
 }
 
 // Both choices keep the internal application ID. Production never reads these
-// resources, and a build without an explicit choice retains the original icon.
+// resources, and a build without an explicit choice uses the selected default B.
 // Flutter exposes --dart-define values as base64-encoded Gradle dart-defines.
 val iconDefines = providers.gradleProperty("dart-defines").orNull
     .orEmpty().split(",").mapNotNull { encoded ->

@@ -1,328 +1,641 @@
 {
-  "sourceCommit": "a59db050993496eb2175ba6f48555a7b39aabf89",
-  "baseMain": "94d78cee9550dfbf470c7140e3729260d9b79f2d",
+  "schemaVersion": 2,
+  "sourceCommit": "9773b61c45e3ffd286b789c32a6637eb04cfc09a",
+  "baseMain": "d362084976387b2b2fc331a0da8974dc112c02bf",
   "branch": "feat/icon-brand-variants",
-  "artifacts": [
+  "mainMerge": {
+    "approval": "same human explicitly agreed to merge and push, then proceed with icon A/B packages",
+    "approved": true,
+    "fastForwardMerged": true,
+    "pushed": true,
+    "remoteMainVerified": "d362084976387b2b2fc331a0da8974dc112c02bf"
+  },
+  "brandRebased": true,
+  "brandMergedMain": false,
+  "brandPushed": false,
+  "productionIconSelected": true,
+  "sdkRef": "f684e02f38e652633c23fa8946a53d02b6aa3ea2",
+  "sdkChanged": false,
+  "lockSha256": "629fbe117adc84bc7d719adfcdc2ae95188872c8c7a219e8442afb7e6aee1051",
+  "performanceDefaultsPreserved": {
+    "allChatSuggestionsStatic": true,
+    "inputTrueGlassUnchanged": true,
+    "scrollCardsStatic": true,
+    "starfieldUnchanged": true,
+    "prewarmEnabled": false,
+    "notANewPerformanceMeasurement": true
+  },
+  "checks": {
+    "pub": {
+      "enforcedLockfile": true
+    },
+    "tests": {
+      "passed": 420,
+      "skipped": 13
+    },
+    "internal-tests": {
+      "passed": 23,
+      "skipped": 4
+    },
+    "analyze": {
+      "passed": true,
+      "issues": 0
+    },
+    "shots": {
+      "passed": 4,
+      "skipped": 0
+    },
+    "iconPython": {
+      "passed": 13
+    },
+    "iconResources": {
+      "generatedFiles": 79,
+      "protectedProductionFiles": 38,
+      "passed": true,
+      "selectedDefaultMatchesCandidateB": true
+    },
+    "visualReview": {
+      "passed": true,
+      "method": "independent review of all four regenerated Flutter widget previews",
+      "trueDeviceScreenshots": false,
+      "glassMode": "minimal",
+      "starfield": "stationary"
+    },
+    "productionDefaults": {
+      "passed": true,
+      "variant": "B",
+      "internalMarkersAbsent": true,
+      "signatureV2Verified": true,
+      "storageJniPassed": true
+    },
+    "freshWindowsCheckout": {
+      "passed": true,
+      "freshCheckoutFiles": [
+        "android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml",
+        "android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml"
+      ],
+      "newline": "LF"
+    },
+    "independentDefaultReview": {
+      "passed": true,
+      "defaultResources": 38,
+      "androidResources": 22,
+      "iosFiles": 16,
+      "iosSlots": 19,
+      "noRuntimeOrSdkChanges": true
+    }
+  },
+  "apks": [
     {
       "variant": "A",
-      "apk": ".buildlog/brand-review/install/SmartFit-0.1.0+17-internal-iconA.apk",
-      "sourceCommit": "a59db050993496eb2175ba6f48555a7b39aabf89",
-      "baseMain": "94d78cee9550dfbf470c7140e3729260d9b79f2d",
-      "packageName": "com.ugk.smartfit.internal",
-      "versionCode": 2017,
+      "sourceCommit": "9773b61c45e3ffd286b789c32a6637eb04cfc09a",
+      "baseMain": "d362084976387b2b2fc331a0da8974dc112c02bf",
+      "flavor": "internal",
       "versionName": "0.1.0",
+      "versionCode": 2021,
+      "buildMode": "release",
       "abi": "arm64-v8a",
-      "buildMode": "profile",
-      "buildModeEvidence": "build_icon_candidates.ps1 invocation and assembleInternalProfile log",
-      "sizeBytes": 68810519,
-      "sha256": "20c493977202b091fb47b8de440be0266cb36397f89b2d7e5c073ec9c65e4f39",
+      "sdkRef": "f684e02f38e652633c23fa8946a53d02b6aa3ea2",
+      "lockSha256": "629fbe117adc84bc7d719adfcdc2ae95188872c8c7a219e8442afb7e6aee1051",
+      "apk": ".buildlog/brand21/install/SmartFit-0.1.0+21-internal-iconA.apk",
+      "sizeBytes": 49941255,
+      "sha256": "2504c9ba034ef5bcf1f300a18ed77cd68be09721fd3b727bb12c1d6b1548d077",
+      "runtimeCleanBeforeAndAfterBuild": true,
+      "createdAtUtc": "2026-10-23T15:46:15.0137985Z",
+      "packageName": "com.ugk.smartfit.internal",
+      "debuggable": false,
       "signatureV2Verified": true,
-      "signerMatchesSamplingBuild17": true,
+      "signerMatchesInstalledBuild21": true,
       "certificateSha256": "3761270a4764157f0e389014a9e5b800b05403bfddce0f4f7f8c039f6a53bdc7",
       "selectedIconResourcePixelMatches": [
         {
           "density": "mdpi",
           "resource": "ic_launcher",
           "packedPaths": [
-            "res/mipmap-mdpi-v4/ic_launcher.png",
-            "res/mipmap-mdpi-v4/ic_launcher_round.png"
+            "res/9w.png"
           ]
         },
         {
           "density": "mdpi",
           "resource": "ic_launcher_foreground",
           "packedPaths": [
-            "res/mipmap-mdpi-v4/ic_launcher_foreground.png"
+            "res/QZ.png"
           ]
         },
         {
           "density": "mdpi",
           "resource": "ic_launcher_background",
           "packedPaths": [
-            "res/mipmap-mdpi-v4/ic_launcher_background.png"
+            "res/3z.png"
           ]
         },
         {
           "density": "hdpi",
           "resource": "ic_launcher",
           "packedPaths": [
-            "res/mipmap-hdpi-v4/ic_launcher.png",
-            "res/mipmap-hdpi-v4/ic_launcher_round.png"
+            "res/yn.png"
           ]
         },
         {
           "density": "hdpi",
           "resource": "ic_launcher_foreground",
           "packedPaths": [
-            "res/mipmap-hdpi-v4/ic_launcher_foreground.png"
+            "res/zr.png"
           ]
         },
         {
           "density": "hdpi",
           "resource": "ic_launcher_background",
           "packedPaths": [
-            "res/mipmap-hdpi-v4/ic_launcher_background.png"
+            "res/I2.png"
           ]
         },
         {
           "density": "xhdpi",
           "resource": "ic_launcher",
           "packedPaths": [
-            "res/mipmap-xhdpi-v4/ic_launcher.png",
-            "res/mipmap-xhdpi-v4/ic_launcher_round.png"
+            "res/FS.png"
           ]
         },
         {
           "density": "xhdpi",
           "resource": "ic_launcher_foreground",
           "packedPaths": [
-            "res/mipmap-xhdpi-v4/ic_launcher_foreground.png"
+            "res/Em.png"
           ]
         },
         {
           "density": "xhdpi",
           "resource": "ic_launcher_background",
           "packedPaths": [
-            "res/mipmap-xhdpi-v4/ic_launcher_background.png"
+            "res/6h.png"
           ]
         },
         {
           "density": "xxhdpi",
           "resource": "ic_launcher",
           "packedPaths": [
-            "res/mipmap-xxhdpi-v4/ic_launcher.png",
-            "res/mipmap-xxhdpi-v4/ic_launcher_round.png"
+            "res/RJ.png"
           ]
         },
         {
           "density": "xxhdpi",
           "resource": "ic_launcher_foreground",
           "packedPaths": [
-            "res/mipmap-xxhdpi-v4/ic_launcher_foreground.png"
+            "res/Lf.png"
           ]
         },
         {
           "density": "xxhdpi",
           "resource": "ic_launcher_background",
           "packedPaths": [
-            "res/mipmap-xxhdpi-v4/ic_launcher_background.png"
+            "res/cV.png"
           ]
         },
         {
           "density": "xxxhdpi",
           "resource": "ic_launcher",
           "packedPaths": [
-            "res/mipmap-xxxhdpi-v4/ic_launcher.png",
-            "res/mipmap-xxxhdpi-v4/ic_launcher_round.png"
+            "res/o-.png"
           ]
         },
         {
           "density": "xxxhdpi",
           "resource": "ic_launcher_foreground",
           "packedPaths": [
-            "res/mipmap-xxxhdpi-v4/ic_launcher_foreground.png"
+            "res/as.png"
           ]
         },
         {
           "density": "xxxhdpi",
           "resource": "ic_launcher_background",
           "packedPaths": [
-            "res/mipmap-xxxhdpi-v4/ic_launcher_background.png"
+            "res/Gx.png"
           ]
         }
       ],
       "otherCandidateLegacyIconsAbsent": true,
-      "performanceRecorderAbsent": true,
-      "storageJniPassed": true
+      "internalPerformanceMarkersPresent": true,
+      "profileVmExtensionAbsent": true,
+      "storageJniPassed": true,
+      "sourceEmbedded": true
     },
     {
       "variant": "B",
-      "apk": ".buildlog/brand-review/install/SmartFit-0.1.0+17-internal-iconB.apk",
-      "sourceCommit": "a59db050993496eb2175ba6f48555a7b39aabf89",
-      "baseMain": "94d78cee9550dfbf470c7140e3729260d9b79f2d",
-      "packageName": "com.ugk.smartfit.internal",
-      "versionCode": 2017,
+      "sourceCommit": "9773b61c45e3ffd286b789c32a6637eb04cfc09a",
+      "baseMain": "d362084976387b2b2fc331a0da8974dc112c02bf",
+      "flavor": "internal",
       "versionName": "0.1.0",
+      "versionCode": 2021,
+      "buildMode": "release",
       "abi": "arm64-v8a",
-      "buildMode": "profile",
-      "buildModeEvidence": "build_icon_candidates.ps1 invocation and assembleInternalProfile log",
-      "sizeBytes": 68901434,
-      "sha256": "d68a51729fec223daa606725ee207aa89ae1326d6d093d0c5bbda48f3eab2d47",
+      "sdkRef": "f684e02f38e652633c23fa8946a53d02b6aa3ea2",
+      "lockSha256": "629fbe117adc84bc7d719adfcdc2ae95188872c8c7a219e8442afb7e6aee1051",
+      "apk": ".buildlog/brand21/install/SmartFit-0.1.0+21-internal-iconB.apk",
+      "sizeBytes": 50003871,
+      "sha256": "593aad38b5d3b97a0038e6fb2eb8403dd2ed8a440c1104a62f174399c2eb70e1",
+      "runtimeCleanBeforeAndAfterBuild": true,
+      "createdAtUtc": "2026-10-23T15:48:16.8837735Z",
+      "packageName": "com.ugk.smartfit.internal",
+      "debuggable": false,
       "signatureV2Verified": true,
-      "signerMatchesSamplingBuild17": true,
+      "signerMatchesInstalledBuild21": true,
       "certificateSha256": "3761270a4764157f0e389014a9e5b800b05403bfddce0f4f7f8c039f6a53bdc7",
       "selectedIconResourcePixelMatches": [
         {
           "density": "mdpi",
           "resource": "ic_launcher",
           "packedPaths": [
-            "res/mipmap-mdpi-v4/ic_launcher.png",
-            "res/mipmap-mdpi-v4/ic_launcher_round.png"
+            "res/9w.png"
           ]
         },
         {
           "density": "mdpi",
           "resource": "ic_launcher_foreground",
           "packedPaths": [
-            "res/mipmap-mdpi-v4/ic_launcher_foreground.png"
+            "res/QZ.png"
           ]
         },
         {
           "density": "mdpi",
           "resource": "ic_launcher_background",
           "packedPaths": [
-            "res/mipmap-mdpi-v4/ic_launcher_background.png"
+            "res/3z.png"
           ]
         },
         {
           "density": "hdpi",
           "resource": "ic_launcher",
           "packedPaths": [
-            "res/mipmap-hdpi-v4/ic_launcher.png",
-            "res/mipmap-hdpi-v4/ic_launcher_round.png"
+            "res/yn.png"
           ]
         },
         {
           "density": "hdpi",
           "resource": "ic_launcher_foreground",
           "packedPaths": [
-            "res/mipmap-hdpi-v4/ic_launcher_foreground.png"
+            "res/zr.png"
           ]
         },
         {
           "density": "hdpi",
           "resource": "ic_launcher_background",
           "packedPaths": [
-            "res/mipmap-hdpi-v4/ic_launcher_background.png"
+            "res/I2.png"
           ]
         },
         {
           "density": "xhdpi",
           "resource": "ic_launcher",
           "packedPaths": [
-            "res/mipmap-xhdpi-v4/ic_launcher.png",
-            "res/mipmap-xhdpi-v4/ic_launcher_round.png"
+            "res/FS.png"
           ]
         },
         {
           "density": "xhdpi",
           "resource": "ic_launcher_foreground",
           "packedPaths": [
-            "res/mipmap-xhdpi-v4/ic_launcher_foreground.png"
+            "res/Em.png"
           ]
         },
         {
           "density": "xhdpi",
           "resource": "ic_launcher_background",
           "packedPaths": [
-            "res/mipmap-xhdpi-v4/ic_launcher_background.png"
+            "res/6h.png"
           ]
         },
         {
           "density": "xxhdpi",
           "resource": "ic_launcher",
           "packedPaths": [
-            "res/mipmap-xxhdpi-v4/ic_launcher.png",
-            "res/mipmap-xxhdpi-v4/ic_launcher_round.png"
+            "res/RJ.png"
           ]
         },
         {
           "density": "xxhdpi",
           "resource": "ic_launcher_foreground",
           "packedPaths": [
-            "res/mipmap-xxhdpi-v4/ic_launcher_foreground.png"
+            "res/Lf.png"
           ]
         },
         {
           "density": "xxhdpi",
           "resource": "ic_launcher_background",
           "packedPaths": [
-            "res/mipmap-xxhdpi-v4/ic_launcher_background.png"
+            "res/cV.png"
           ]
         },
         {
           "density": "xxxhdpi",
           "resource": "ic_launcher",
           "packedPaths": [
-            "res/mipmap-xxxhdpi-v4/ic_launcher.png",
-            "res/mipmap-xxxhdpi-v4/ic_launcher_round.png"
+            "res/o-.png"
           ]
         },
         {
           "density": "xxxhdpi",
           "resource": "ic_launcher_foreground",
           "packedPaths": [
-            "res/mipmap-xxxhdpi-v4/ic_launcher_foreground.png"
+            "res/as.png"
           ]
         },
         {
           "density": "xxxhdpi",
           "resource": "ic_launcher_background",
           "packedPaths": [
-            "res/mipmap-xxxhdpi-v4/ic_launcher_background.png"
+            "res/Gx.png"
           ]
         }
       ],
       "otherCandidateLegacyIconsAbsent": true,
-      "performanceRecorderAbsent": true,
-      "storageJniPassed": true
+      "internalPerformanceMarkersPresent": true,
+      "profileVmExtensionAbsent": true,
+      "storageJniPassed": true,
+      "sourceEmbedded": true
     }
   ],
-  "apkContentComparison": {
-    "onlyA": [],
-    "onlyB": [],
-    "differentEntries": [
-      "res/mipmap-hdpi-v4/ic_launcher.png",
-      "res/mipmap-hdpi-v4/ic_launcher_background.png",
-      "res/mipmap-hdpi-v4/ic_launcher_foreground.png",
-      "res/mipmap-hdpi-v4/ic_launcher_round.png",
-      "res/mipmap-mdpi-v4/ic_launcher.png",
-      "res/mipmap-mdpi-v4/ic_launcher_background.png",
-      "res/mipmap-mdpi-v4/ic_launcher_foreground.png",
-      "res/mipmap-mdpi-v4/ic_launcher_round.png",
-      "res/mipmap-xhdpi-v4/ic_launcher.png",
-      "res/mipmap-xhdpi-v4/ic_launcher_background.png",
-      "res/mipmap-xhdpi-v4/ic_launcher_foreground.png",
-      "res/mipmap-xhdpi-v4/ic_launcher_round.png",
-      "res/mipmap-xxhdpi-v4/ic_launcher.png",
-      "res/mipmap-xxhdpi-v4/ic_launcher_background.png",
-      "res/mipmap-xxhdpi-v4/ic_launcher_foreground.png",
-      "res/mipmap-xxhdpi-v4/ic_launcher_round.png",
-      "res/mipmap-xxxhdpi-v4/ic_launcher.png",
-      "res/mipmap-xxxhdpi-v4/ic_launcher_background.png",
-      "res/mipmap-xxxhdpi-v4/ic_launcher_foreground.png",
-      "res/mipmap-xxxhdpi-v4/ic_launcher_round.png"
+  "candidateComparison": {
+    "changedZipEntries": [
+      "res/3z.png",
+      "res/6h.png",
+      "res/9w.png",
+      "res/Em.png",
+      "res/FS.png",
+      "res/Gx.png",
+      "res/I2.png",
+      "res/Lf.png",
+      "res/QZ.png",
+      "res/RJ.png",
+      "res/as.png",
+      "res/cV.png",
+      "res/o-.png",
+      "res/yn.png",
+      "res/zr.png"
     ],
-    "dartAppLibraryIdentical": true
+    "onlyIconPngEntriesDiffer": true,
+    "libappByteIdentical": true,
+    "otherZipEntryContentsIdentical": true
   },
-  "samplingArtifactSha256Unchanged": "9cf671702b7287af1f67de249409dccbee714533c419e97a535bd2be9d3cd42b",
-  "performanceBranchUnchanged": "99a9483699791895295eaac744ccfed4290e9a89",
-  "flutterFullTestsPassed": 271,
-  "flutterScreenshotTestsPassed": 4,
-  "pythonIconTestsPassed": 11,
-  "staticAnalysisIssues": 0,
-  "productionIconFilesProtected": 21,
-  "sdkRefUnchanged": "f684e02f38e652633c23fa8946a53d02b6aa3ea2",
-  "pubspecAndLockUnchanged": true,
+  "phoneSmoke": {
+    "performed": true,
+    "candidates": {
+      "A": {
+        "performed": true,
+        "serial": "QSG6Q8IFDMDELVGQ",
+        "deviceModel": "2602BRT18C",
+        "systemVersion": "16",
+        "isPhysicalDevice": true,
+        "coverInstallWithoutDataReset": true,
+        "installedApkSha256": "2504c9ba034ef5bcf1f300a18ed77cd68be09721fd3b727bb12c1d6b1548d077",
+        "activityLaunchPassed": true,
+        "processAliveAfterSeconds": 5,
+        "iconAppInfoScreenshot": ".buildlog/brand21/iconA-app-info.png",
+        "notAPerformanceTest": true
+      },
+      "B": {
+        "performed": true,
+        "serial": "QSG6Q8IFDMDELVGQ",
+        "deviceModel": "2602BRT18C",
+        "systemVersion": "16",
+        "isPhysicalDevice": true,
+        "coverInstallWithoutDataReset": true,
+        "installedApkSha256": "593aad38b5d3b97a0038e6fb2eb8403dd2ed8a440c1104a62f174399c2eb70e1",
+        "activityLaunchPassed": true,
+        "processAliveAfterSeconds": 5,
+        "iconAppInfoScreenshot": ".buildlog/brand21/iconB-app-info.png",
+        "notAPerformanceTest": true,
+        "iconVisualVerified": true,
+        "cacheRefresh": "Returned to launcher; relaunched own App-info page after stopping Settings; no App/launcher data cleared"
+      }
+    },
+    "lastInstalledVariant": "B",
+    "productionIconChoiceMade": true,
+    "chosenVariant": "B"
+  },
   "screenshots": {
-    "origin": "Flutter WidgetTester, fixed in-memory fixtures, static stars, SfGlass.minimal",
-    "deviceScreenshots": false,
-    "dimensions": [
-      1170,
-      2532
-    ],
+    "method": "Flutter WidgetTester rendering; fixed in-memory fixtures, 390x844 logical at DPR3; SfGlass.minimal, stationary stars; not phone screenshots or timing evidence",
     "files": [
-      "docs/screenshots/icon-brand/home-light.png",
-      "docs/screenshots/icon-brand/home-dark.png",
-      "docs/screenshots/icon-brand/chat-light.png",
-      "docs/screenshots/icon-brand/chat-dark.png"
+      {
+        "file": "docs/screenshots/icon-brand/home-light.png",
+        "sha256": "828fe8ed629727013cdd0dfc7a41eaae082896402b86579f3f6d7e4b9a07e961",
+        "width": 1170,
+        "height": 2532
+      },
+      {
+        "file": "docs/screenshots/icon-brand/home-dark.png",
+        "sha256": "c67f60b51b8236e81af38143a05de5a9e8a7e1dbe9a9cb2026f8ce79b15271e1",
+        "width": 1170,
+        "height": 2532
+      },
+      {
+        "file": "docs/screenshots/icon-brand/chat-light.png",
+        "sha256": "9538d759ed18a0951d5730f52a680ab8ea26eb63dfc343dce36714d695136482",
+        "width": 1170,
+        "height": 2532
+      },
+      {
+        "file": "docs/screenshots/icon-brand/chat-dark.png",
+        "sha256": "8c470bf20b2ee7cef7552412644be0b99f27c1ccda175324d993714844492bdc",
+        "width": 1170,
+        "height": 2532
+      }
     ]
   },
-  "emulatorLaunchedByThisTask": false,
-  "iosCandidatesGenerated": true,
-  "iosBuildVerified": false,
-  "physicalPhoneIconComparisonPending": true,
-  "mergePolicy": "performance first, then rebase, retest, user confirmation before merge/push",
-  "merged": false,
-  "pushed": false
+  "productionIconsUnchanged": false,
+  "ios": {
+    "allCandidateSlotsGenerated": true,
+    "compiled": false,
+    "reason": "Windows host; requires macOS signing/build environment"
+  },
+  "supersedes": {
+    "build": 17,
+    "mode": "profile",
+    "baseMain": "94d78cee9550dfbf470c7140e3729260d9b79f2d",
+    "reason": "Historical packages predate approved performance main and cannot cover-install +21; retained unchanged in prior delivery history"
+  },
+  "pending": [
+    "Separate human approval before merging and pushing the brand branch"
+  ],
+  "productionDefaultVariant": "B",
+  "productionSelection": {
+    "schemaVersion": 1,
+    "variant": "B",
+    "source": "assets/brand/source/smartfit-icon-v4-crop.png",
+    "sourceSha256": "a89d37b544942fe852b96e38b0faaaf66ac0d926d70037c227d0a102236d65f8",
+    "selectedDate": "2026-10-23",
+    "decision": "User selected the B half-body artwork after the real-device icon comparison."
+  },
+  "productionDefaultPrepared": true,
+  "productionDefaultMerged": false,
+  "productionValidation": {
+    "apk": "build/app/outputs/flutter-apk/app-arm64-v8a-production-release.apk",
+    "packageName": "com.ugk.smartfit",
+    "versionCode": 2021,
+    "versionName": "0.1.0",
+    "abi": "arm64-v8a",
+    "mode": "release",
+    "debuggable": false,
+    "sourceCommit": "216c7b3b881328167900b84ee241c9f5a48b9cbe",
+    "sdkRef": "f684e02f38e652633c23fa8946a53d02b6aa3ea2",
+    "lockSha256": "629fbe117adc84bc7d719adfcdc2ae95188872c8c7a219e8442afb7e6aee1051",
+    "sizeBytes": 49686435,
+    "sha256": "123ca114a6d5c1bb7e8c154ec38b498b47985d58db69f13b30eb2402c531b81e",
+    "dartInternalMarkers": {
+      "frame_performance": false,
+      "SmartFit-performance-": false,
+      "smartfit/performance": false,
+      "raster_controls_v4": false,
+      "scrollCardGlassEnabled": false,
+      "performance-scroll-card-glass": false,
+      "long_chat_72_v1": false,
+      "fixedGlassCases": false,
+      "fixed_glass_lab": false,
+      "baseline_prewarmed": false,
+      "prewarmLogicalWidth": false,
+      "fixed-glass-default-plan": false,
+      "fixed-glass-default-chat": false,
+      "chat_suggestions_static": false,
+      "chat_suggestions_static_input_blur_1_2": false
+    },
+    "nativeInternalMarkers": {
+      "InternalPerformanceFileProvider": false,
+      "smartfit/performance": false,
+      "smartfit-renderer-probe": false
+    },
+    "staticScrollCardIncluded": true,
+    "profileVmExtensionIncluded": false,
+    "signatureV2Verified": true,
+    "signerMatchesExistingSamplingPackages": true,
+    "signerSha256": "3761270a4764157f0e389014a9e5b800b05403bfddce0f4f7f8c039f6a53bdc7",
+    "flavorIsolationPassed": true,
+    "storageJniPassed": true,
+    "buildReceiptVerified": true,
+    "sharedAdaptiveFreezePhaseIncluded": false,
+    "productionValidationOnly": true,
+    "defaultIconVariant": "B",
+    "defaultBPixelMatches": [
+      {
+        "density": "mdpi",
+        "resource": "ic_launcher",
+        "packedPaths": [
+          "res/9w.png",
+          "res/zR.png"
+        ]
+      },
+      {
+        "density": "mdpi",
+        "resource": "ic_launcher_foreground",
+        "packedPaths": [
+          "res/QZ.png"
+        ]
+      },
+      {
+        "density": "mdpi",
+        "resource": "ic_launcher_background",
+        "packedPaths": [
+          "res/3z.png"
+        ]
+      },
+      {
+        "density": "hdpi",
+        "resource": "ic_launcher",
+        "packedPaths": [
+          "res/8c.png",
+          "res/yn.png"
+        ]
+      },
+      {
+        "density": "hdpi",
+        "resource": "ic_launcher_foreground",
+        "packedPaths": [
+          "res/zr.png"
+        ]
+      },
+      {
+        "density": "hdpi",
+        "resource": "ic_launcher_background",
+        "packedPaths": [
+          "res/I2.png"
+        ]
+      },
+      {
+        "density": "xhdpi",
+        "resource": "ic_launcher",
+        "packedPaths": [
+          "res/FS.png",
+          "res/wb.png"
+        ]
+      },
+      {
+        "density": "xhdpi",
+        "resource": "ic_launcher_foreground",
+        "packedPaths": [
+          "res/Em.png"
+        ]
+      },
+      {
+        "density": "xhdpi",
+        "resource": "ic_launcher_background",
+        "packedPaths": [
+          "res/6h.png"
+        ]
+      },
+      {
+        "density": "xxhdpi",
+        "resource": "ic_launcher",
+        "packedPaths": [
+          "res/RJ.png",
+          "res/fO.png"
+        ]
+      },
+      {
+        "density": "xxhdpi",
+        "resource": "ic_launcher_foreground",
+        "packedPaths": [
+          "res/Lf.png"
+        ]
+      },
+      {
+        "density": "xxhdpi",
+        "resource": "ic_launcher_background",
+        "packedPaths": [
+          "res/cV.png"
+        ]
+      },
+      {
+        "density": "xxxhdpi",
+        "resource": "ic_launcher",
+        "packedPaths": [
+          "res/Gc.png",
+          "res/o-.png"
+        ]
+      },
+      {
+        "density": "xxxhdpi",
+        "resource": "ic_launcher_foreground",
+        "packedPaths": [
+          "res/as.png"
+        ]
+      },
+      {
+        "density": "xxxhdpi",
+        "resource": "ic_launcher_background",
+        "packedPaths": [
+          "res/Gx.png"
+        ]
+      }
+    ],
+    "otherCandidateLegacyIconsAbsent": true,
+    "notDistributed": true,
+    "workerKeyIncluded": false,
+    "notInstalledOnPhone": true
+  },
+  "lockMatchesMainGitBlob": true,
+  "lockGitBlob": "443084a3eab41c77f8a01a5a1d7c7c03ac7bbcea",
+  "sourcePoints": {
+    "internalApksAndScreenshots": "9773b61c45e3ffd286b789c32a6637eb04cfc09a",
+    "defaultBAndProductionValidation": "216c7b3b881328167900b84ee241c9f5a48b9cbe",
+    "afterValidation": "Only documentation, refreshed fixture PNGs, LF checkout guard, and an explanatory Gradle comment; runtime behavior and generated image bytes unchanged"
+  }
 }
