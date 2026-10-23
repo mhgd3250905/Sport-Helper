@@ -50,3 +50,18 @@
 | 聊天 | [查看](screenshots/icon-brand/chat-light.png) | [查看](screenshots/icon-brand/chat-dark.png) |
 
 图标遮罩预览：[A/B 圆形及圆角对照](screenshots/icon-brand/icon-mask-preview.png)。全量 Flutter 测试 271 项通过，包含六项颜色对比度合同检查；截图测试 4 项通过；静态分析零问题。图标生成完整性、所有尺寸、safe circle、生产图标保护及额外资源拒绝等 Python 检查共 11 项通过。真机桌面 A/B、实际玻璃上的颜色和 iOS 编译尚待相应环境验收。
+
+## 已构建的 Android 候选
+
+打包源码 `a59db050993496eb2175ba6f48555a7b39aabf89`。两个 arm64 profile APK 均位于本机工作区 `.buildlog/brand-review/install/`，包名 `com.ugk.smartfit.internal`、versionName `0.1.0`、versionCode `2017`，v2 签名通过且 signer 与原 +17 采样包相同。
+
+| 候选包 | 字节数 | SHA-256 |
+| --- | ---: | --- |
+| `SmartFit-0.1.0+17-internal-iconA.apk` | 68,810,519 | `20c493977202b091fb47b8de440be0266cb36397f89b2d7e5c073ec9c65e4f39` |
+| `SmartFit-0.1.0+17-internal-iconB.apk` | 68,901,434 | `d68a51729fec223daa606725ee207aa89ae1326d6d093d0c5bbda48f3eab2d47` |
+
+已逐像素核验每包内五种密度的 legacy、前景和渐变背景，与对应候选生成资源完全一致；另一候选的 legacy 图标不存在。Android 实际 launcher 引用 `mipmap-anydpi-v26/ic_launcher.xml`。两 APK 的 ZIP 条目比较仅 20 个图标 PNG 不同，`libapp.so` 以及其它条目内容相同；未混入流畅度记录器。两包最终 DEX 的存储 JNI 检查通过。
+
+原 +17 流畅度采样包 SHA-256 仍为 `9cf671702b7287af1f67de249409dccbee714533c419e97a535bd2be9d3cd42b`，文件与流畅度分支 `99a9483699791895295eaac744ccfed4290e9a89` 均保持不变；原有未跟踪文件也保留。本次构建过程中发现其他任务的模拟器和接近耗尽的内存，准备停止本任务时构建已完成，未停止其他任务进程，后续只做轻量核验。没有启动模拟器。
+
+机器可读交付记录：[icon-brand-delivery-2026-10-23.json](reports/icon-brand-delivery-2026-10-23.json)。当前 main 仍为 `94d78cee9550dfbf470c7140e3729260d9b79f2d`，本分支未 rebase、未合并、未推送，等待开哥选择图标并确认流畅度先合的顺序。

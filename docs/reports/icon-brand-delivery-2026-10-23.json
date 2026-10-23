@@ -1,0 +1,328 @@
+{
+  "sourceCommit": "a59db050993496eb2175ba6f48555a7b39aabf89",
+  "baseMain": "94d78cee9550dfbf470c7140e3729260d9b79f2d",
+  "branch": "feat/icon-brand-variants",
+  "artifacts": [
+    {
+      "variant": "A",
+      "apk": ".buildlog/brand-review/install/SmartFit-0.1.0+17-internal-iconA.apk",
+      "sourceCommit": "a59db050993496eb2175ba6f48555a7b39aabf89",
+      "baseMain": "94d78cee9550dfbf470c7140e3729260d9b79f2d",
+      "packageName": "com.ugk.smartfit.internal",
+      "versionCode": 2017,
+      "versionName": "0.1.0",
+      "abi": "arm64-v8a",
+      "buildMode": "profile",
+      "buildModeEvidence": "build_icon_candidates.ps1 invocation and assembleInternalProfile log",
+      "sizeBytes": 68810519,
+      "sha256": "20c493977202b091fb47b8de440be0266cb36397f89b2d7e5c073ec9c65e4f39",
+      "signatureV2Verified": true,
+      "signerMatchesSamplingBuild17": true,
+      "certificateSha256": "3761270a4764157f0e389014a9e5b800b05403bfddce0f4f7f8c039f6a53bdc7",
+      "selectedIconResourcePixelMatches": [
+        {
+          "density": "mdpi",
+          "resource": "ic_launcher",
+          "packedPaths": [
+            "res/mipmap-mdpi-v4/ic_launcher.png",
+            "res/mipmap-mdpi-v4/ic_launcher_round.png"
+          ]
+        },
+        {
+          "density": "mdpi",
+          "resource": "ic_launcher_foreground",
+          "packedPaths": [
+            "res/mipmap-mdpi-v4/ic_launcher_foreground.png"
+          ]
+        },
+        {
+          "density": "mdpi",
+          "resource": "ic_launcher_background",
+          "packedPaths": [
+            "res/mipmap-mdpi-v4/ic_launcher_background.png"
+          ]
+        },
+        {
+          "density": "hdpi",
+          "resource": "ic_launcher",
+          "packedPaths": [
+            "res/mipmap-hdpi-v4/ic_launcher.png",
+            "res/mipmap-hdpi-v4/ic_launcher_round.png"
+          ]
+        },
+        {
+          "density": "hdpi",
+          "resource": "ic_launcher_foreground",
+          "packedPaths": [
+            "res/mipmap-hdpi-v4/ic_launcher_foreground.png"
+          ]
+        },
+        {
+          "density": "hdpi",
+          "resource": "ic_launcher_background",
+          "packedPaths": [
+            "res/mipmap-hdpi-v4/ic_launcher_background.png"
+          ]
+        },
+        {
+          "density": "xhdpi",
+          "resource": "ic_launcher",
+          "packedPaths": [
+            "res/mipmap-xhdpi-v4/ic_launcher.png",
+            "res/mipmap-xhdpi-v4/ic_launcher_round.png"
+          ]
+        },
+        {
+          "density": "xhdpi",
+          "resource": "ic_launcher_foreground",
+          "packedPaths": [
+            "res/mipmap-xhdpi-v4/ic_launcher_foreground.png"
+          ]
+        },
+        {
+          "density": "xhdpi",
+          "resource": "ic_launcher_background",
+          "packedPaths": [
+            "res/mipmap-xhdpi-v4/ic_launcher_background.png"
+          ]
+        },
+        {
+          "density": "xxhdpi",
+          "resource": "ic_launcher",
+          "packedPaths": [
+            "res/mipmap-xxhdpi-v4/ic_launcher.png",
+            "res/mipmap-xxhdpi-v4/ic_launcher_round.png"
+          ]
+        },
+        {
+          "density": "xxhdpi",
+          "resource": "ic_launcher_foreground",
+          "packedPaths": [
+            "res/mipmap-xxhdpi-v4/ic_launcher_foreground.png"
+          ]
+        },
+        {
+          "density": "xxhdpi",
+          "resource": "ic_launcher_background",
+          "packedPaths": [
+            "res/mipmap-xxhdpi-v4/ic_launcher_background.png"
+          ]
+        },
+        {
+          "density": "xxxhdpi",
+          "resource": "ic_launcher",
+          "packedPaths": [
+            "res/mipmap-xxxhdpi-v4/ic_launcher.png",
+            "res/mipmap-xxxhdpi-v4/ic_launcher_round.png"
+          ]
+        },
+        {
+          "density": "xxxhdpi",
+          "resource": "ic_launcher_foreground",
+          "packedPaths": [
+            "res/mipmap-xxxhdpi-v4/ic_launcher_foreground.png"
+          ]
+        },
+        {
+          "density": "xxxhdpi",
+          "resource": "ic_launcher_background",
+          "packedPaths": [
+            "res/mipmap-xxxhdpi-v4/ic_launcher_background.png"
+          ]
+        }
+      ],
+      "otherCandidateLegacyIconsAbsent": true,
+      "performanceRecorderAbsent": true,
+      "storageJniPassed": true
+    },
+    {
+      "variant": "B",
+      "apk": ".buildlog/brand-review/install/SmartFit-0.1.0+17-internal-iconB.apk",
+      "sourceCommit": "a59db050993496eb2175ba6f48555a7b39aabf89",
+      "baseMain": "94d78cee9550dfbf470c7140e3729260d9b79f2d",
+      "packageName": "com.ugk.smartfit.internal",
+      "versionCode": 2017,
+      "versionName": "0.1.0",
+      "abi": "arm64-v8a",
+      "buildMode": "profile",
+      "buildModeEvidence": "build_icon_candidates.ps1 invocation and assembleInternalProfile log",
+      "sizeBytes": 68901434,
+      "sha256": "d68a51729fec223daa606725ee207aa89ae1326d6d093d0c5bbda48f3eab2d47",
+      "signatureV2Verified": true,
+      "signerMatchesSamplingBuild17": true,
+      "certificateSha256": "3761270a4764157f0e389014a9e5b800b05403bfddce0f4f7f8c039f6a53bdc7",
+      "selectedIconResourcePixelMatches": [
+        {
+          "density": "mdpi",
+          "resource": "ic_launcher",
+          "packedPaths": [
+            "res/mipmap-mdpi-v4/ic_launcher.png",
+            "res/mipmap-mdpi-v4/ic_launcher_round.png"
+          ]
+        },
+        {
+          "density": "mdpi",
+          "resource": "ic_launcher_foreground",
+          "packedPaths": [
+            "res/mipmap-mdpi-v4/ic_launcher_foreground.png"
+          ]
+        },
+        {
+          "density": "mdpi",
+          "resource": "ic_launcher_background",
+          "packedPaths": [
+            "res/mipmap-mdpi-v4/ic_launcher_background.png"
+          ]
+        },
+        {
+          "density": "hdpi",
+          "resource": "ic_launcher",
+          "packedPaths": [
+            "res/mipmap-hdpi-v4/ic_launcher.png",
+            "res/mipmap-hdpi-v4/ic_launcher_round.png"
+          ]
+        },
+        {
+          "density": "hdpi",
+          "resource": "ic_launcher_foreground",
+          "packedPaths": [
+            "res/mipmap-hdpi-v4/ic_launcher_foreground.png"
+          ]
+        },
+        {
+          "density": "hdpi",
+          "resource": "ic_launcher_background",
+          "packedPaths": [
+            "res/mipmap-hdpi-v4/ic_launcher_background.png"
+          ]
+        },
+        {
+          "density": "xhdpi",
+          "resource": "ic_launcher",
+          "packedPaths": [
+            "res/mipmap-xhdpi-v4/ic_launcher.png",
+            "res/mipmap-xhdpi-v4/ic_launcher_round.png"
+          ]
+        },
+        {
+          "density": "xhdpi",
+          "resource": "ic_launcher_foreground",
+          "packedPaths": [
+            "res/mipmap-xhdpi-v4/ic_launcher_foreground.png"
+          ]
+        },
+        {
+          "density": "xhdpi",
+          "resource": "ic_launcher_background",
+          "packedPaths": [
+            "res/mipmap-xhdpi-v4/ic_launcher_background.png"
+          ]
+        },
+        {
+          "density": "xxhdpi",
+          "resource": "ic_launcher",
+          "packedPaths": [
+            "res/mipmap-xxhdpi-v4/ic_launcher.png",
+            "res/mipmap-xxhdpi-v4/ic_launcher_round.png"
+          ]
+        },
+        {
+          "density": "xxhdpi",
+          "resource": "ic_launcher_foreground",
+          "packedPaths": [
+            "res/mipmap-xxhdpi-v4/ic_launcher_foreground.png"
+          ]
+        },
+        {
+          "density": "xxhdpi",
+          "resource": "ic_launcher_background",
+          "packedPaths": [
+            "res/mipmap-xxhdpi-v4/ic_launcher_background.png"
+          ]
+        },
+        {
+          "density": "xxxhdpi",
+          "resource": "ic_launcher",
+          "packedPaths": [
+            "res/mipmap-xxxhdpi-v4/ic_launcher.png",
+            "res/mipmap-xxxhdpi-v4/ic_launcher_round.png"
+          ]
+        },
+        {
+          "density": "xxxhdpi",
+          "resource": "ic_launcher_foreground",
+          "packedPaths": [
+            "res/mipmap-xxxhdpi-v4/ic_launcher_foreground.png"
+          ]
+        },
+        {
+          "density": "xxxhdpi",
+          "resource": "ic_launcher_background",
+          "packedPaths": [
+            "res/mipmap-xxxhdpi-v4/ic_launcher_background.png"
+          ]
+        }
+      ],
+      "otherCandidateLegacyIconsAbsent": true,
+      "performanceRecorderAbsent": true,
+      "storageJniPassed": true
+    }
+  ],
+  "apkContentComparison": {
+    "onlyA": [],
+    "onlyB": [],
+    "differentEntries": [
+      "res/mipmap-hdpi-v4/ic_launcher.png",
+      "res/mipmap-hdpi-v4/ic_launcher_background.png",
+      "res/mipmap-hdpi-v4/ic_launcher_foreground.png",
+      "res/mipmap-hdpi-v4/ic_launcher_round.png",
+      "res/mipmap-mdpi-v4/ic_launcher.png",
+      "res/mipmap-mdpi-v4/ic_launcher_background.png",
+      "res/mipmap-mdpi-v4/ic_launcher_foreground.png",
+      "res/mipmap-mdpi-v4/ic_launcher_round.png",
+      "res/mipmap-xhdpi-v4/ic_launcher.png",
+      "res/mipmap-xhdpi-v4/ic_launcher_background.png",
+      "res/mipmap-xhdpi-v4/ic_launcher_foreground.png",
+      "res/mipmap-xhdpi-v4/ic_launcher_round.png",
+      "res/mipmap-xxhdpi-v4/ic_launcher.png",
+      "res/mipmap-xxhdpi-v4/ic_launcher_background.png",
+      "res/mipmap-xxhdpi-v4/ic_launcher_foreground.png",
+      "res/mipmap-xxhdpi-v4/ic_launcher_round.png",
+      "res/mipmap-xxxhdpi-v4/ic_launcher.png",
+      "res/mipmap-xxxhdpi-v4/ic_launcher_background.png",
+      "res/mipmap-xxxhdpi-v4/ic_launcher_foreground.png",
+      "res/mipmap-xxxhdpi-v4/ic_launcher_round.png"
+    ],
+    "dartAppLibraryIdentical": true
+  },
+  "samplingArtifactSha256Unchanged": "9cf671702b7287af1f67de249409dccbee714533c419e97a535bd2be9d3cd42b",
+  "performanceBranchUnchanged": "99a9483699791895295eaac744ccfed4290e9a89",
+  "flutterFullTestsPassed": 271,
+  "flutterScreenshotTestsPassed": 4,
+  "pythonIconTestsPassed": 11,
+  "staticAnalysisIssues": 0,
+  "productionIconFilesProtected": 21,
+  "sdkRefUnchanged": "f684e02f38e652633c23fa8946a53d02b6aa3ea2",
+  "pubspecAndLockUnchanged": true,
+  "screenshots": {
+    "origin": "Flutter WidgetTester, fixed in-memory fixtures, static stars, SfGlass.minimal",
+    "deviceScreenshots": false,
+    "dimensions": [
+      1170,
+      2532
+    ],
+    "files": [
+      "docs/screenshots/icon-brand/home-light.png",
+      "docs/screenshots/icon-brand/home-dark.png",
+      "docs/screenshots/icon-brand/chat-light.png",
+      "docs/screenshots/icon-brand/chat-dark.png"
+    ]
+  },
+  "emulatorLaunchedByThisTask": false,
+  "iosCandidatesGenerated": true,
+  "iosBuildVerified": false,
+  "physicalPhoneIconComparisonPending": true,
+  "mergePolicy": "performance first, then rebase, retest, user confirmation before merge/push",
+  "merged": false,
+  "pushed": false
+}
