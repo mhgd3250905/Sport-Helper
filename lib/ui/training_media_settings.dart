@@ -3,6 +3,8 @@ import 'package:ugk_trainer/ugk_trainer.dart';
 
 import '../app/services.dart';
 import '../app/training_media_config.dart';
+import '../diagnostics/runtime_log.dart';
+import '../diagnostics/training_media_log.dart';
 import 'theme.dart';
 
 class TrainingMediaSettings extends StatefulWidget {
@@ -25,22 +27,56 @@ class _TrainingMediaSettingsState extends State<TrainingMediaSettings> {
 
   Future<void> _refresh() async {
     final bytes = await AppServices.of(context).media!.cacheBytes();
+    if (_usedBytes != bytes) {
+      RuntimeLog.instance.record('media.cache.usage', fields: {'bytes': bytes});
+    }
     if (mounted) setState(() => _usedBytes = bytes);
   }
 
   Future<void> _download(TrainingMediaRepository repository) async {
     final operation = ++_operation;
+    final log = RuntimeLog.instance;
+    final logOperation = log.newOperation('package');
+    final watch = Stopwatch()..start();
+    log.record(
+      'media.package.requested',
+      operation: logOperation,
+      fields: {
+        'kind': 'realistic-dark',
+        'wifiOnly': repository.wifiOnly,
+        'offline': repository.isOffline,
+      },
+    );
     setState(() {
       _working = true;
       _message = null;
     });
     try {
       await repository.downloadPackage();
+      log.record(
+        'media.package.completed',
+        operation: logOperation,
+        fields: {
+          'kind': 'realistic-dark',
+          'verified': true,
+          'elapsedMs': watch.elapsedMilliseconds,
+        },
+      );
       if (mounted && operation == _operation) {
         setState(() => _message = '完整动作素材已下载并校验');
       }
-    } on Object {
+    } on Object catch (error) {
       final state = repository.stateFor('realistic-dark');
+      log.record(
+        'media.package.failed',
+        operation: logOperation,
+        fields: {
+          'phase': state.phase.name,
+          'reason': TrainingMediaLog.failureReason(state.error),
+          'errorType': RuntimeLog.errorType(error),
+          'elapsedMs': watch.elapsedMilliseconds,
+        },
+      );
       if (mounted && operation == _operation) {
         setState(
           () => _message = switch (state.phase) {
@@ -60,16 +96,33 @@ class _TrainingMediaSettingsState extends State<TrainingMediaSettings> {
 
   Future<void> _clear(TrainingMediaRepository repository) async {
     final operation = ++_operation;
+    final log = RuntimeLog.instance;
+    final logOperation = log.newOperation('cache');
+    log.record(
+      'media.cache.clear_requested',
+      operation: logOperation,
+      fields: {'bytes': _usedBytes},
+    );
     setState(() {
       _working = true;
       _message = null;
     });
     try {
       await repository.clearCache();
+      log.record(
+        'media.cache.cleared',
+        operation: logOperation,
+        fields: {'success': true},
+      );
       if (mounted && operation == _operation) {
         setState(() => _message = '缓存已清理，内置动作、计划和训练记录保留');
       }
-    } on Object {
+    } on Object catch (error) {
+      log.record(
+        'media.cache.clear_failed',
+        operation: logOperation,
+        fields: {'errorType': RuntimeLog.errorType(error)},
+      );
       if (mounted && operation == _operation) {
         setState(() => _message = '缓存暂时无法清理，请稍后重试');
       }
@@ -118,6 +171,10 @@ class _TrainingMediaSettingsState extends State<TrainingMediaSettings> {
               value: repository.wifiOnly,
               onChanged: (value) async {
                 repository.wifiOnly = value;
+                RuntimeLog.instance.record(
+                  'media.wifi_only.changed',
+                  fields: {'wifiOnly': value},
+                );
                 await services.store.setMediaWifiOnly(value);
               },
             ),

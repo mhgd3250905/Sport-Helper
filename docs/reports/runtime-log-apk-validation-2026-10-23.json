@@ -1,0 +1,14 @@
+{
+  "internalPackage": "com.ugk.smartfit.internal",
+  "versionCode": 2014,
+  "versionName": "0.1.0",
+  "arm64Only": true,
+  "nonDebuggable": true,
+  "v2SignatureVerified": true,
+  "currentAppKeyInAot": true,
+  "loggingCodeInAot": true,
+  "saveButtonInAot": true,
+  "retentionLabelInAot": true,
+  "nativeSaveChannelInDex": true,
+  "nativePickerInDex": true
+}

@@ -12,6 +12,8 @@ import '../chat/ai_coach_config.dart';
 import '../chat/chat_models.dart';
 import '../chat/rule_chat_engine.dart';
 import '../data/app_store.dart';
+import '../diagnostics/runtime_log.dart';
+import '../diagnostics/training_media_log.dart';
 import '../domain/exercise.dart';
 import '../domain/plan.dart';
 import '../domain/plan_generator.dart';
@@ -42,14 +44,29 @@ class AppServices {
          preferredExerciseIds: () => media?.isOffline == true
              ? media!.readyActionIds
              : const <String>{},
-         onGenerated: media == null
-             ? null
-             : (plan) => unawaited(
-                 media
-                     .prefetchActions(plan.items.map((item) => item.exerciseId))
-                     .catchError((Object _) {}),
-               ),
-       );
+         onGenerated: (plan) {
+           RuntimeLog.instance.record(
+             'plan.generated',
+             fields: {'source': 'template', 'count': plan.items.length},
+           );
+           if (media != null) {
+             unawaited(
+               media
+                   .prefetchActions(plan.items.map((item) => item.exerciseId))
+                   .catchError((Object error) {
+                     RuntimeLog.instance.record(
+                       'media.prefetch_error',
+                       fields: {'errorType': RuntimeLog.errorType(error)},
+                     );
+                   }),
+             );
+           }
+         },
+       ) {
+    if (media != null) {
+      _mediaLog = TrainingMediaLog(media!)..start();
+    }
+  }
 
   final ExerciseLibrary library;
   final TemplateCatalog catalog;
@@ -57,6 +74,7 @@ class AppServices {
   final VoiceSource voiceLibrary;
   final VoiceOutput voiceOutput;
   final TrainingMediaRepository? media;
+  TrainingMediaLog? _mediaLog;
   String? _prefetchedPlan;
 
   void _prefetchChatPlan() => prefetchPlan(chat.currentPlan);
@@ -69,7 +87,38 @@ class AppServices {
     final signature = '${plan.id}/${ids.join(',')}';
     if (_prefetchedPlan == signature) return;
     _prefetchedPlan = signature;
-    unawaited(repository.prefetchActions(ids).catchError((Object _) {}));
+    final log = RuntimeLog.instance;
+    final operation = log.newOperation('prefetch');
+    log.record(
+      'media.prefetch_start',
+      operation: operation,
+      fields: {'count': ids.length, 'offline': repository.isOffline},
+    );
+    final timer = Stopwatch()..start();
+    unawaited(
+      repository
+          .prefetchActions(ids)
+          .then((_) {
+            log.record(
+              'media.prefetch_end',
+              operation: operation,
+              fields: {
+                'count': ids.length,
+                'elapsedMs': timer.elapsedMilliseconds,
+              },
+            );
+          })
+          .catchError((Object error) {
+            log.record(
+              'media.prefetch_error',
+              operation: operation,
+              fields: {
+                'errorType': RuntimeLog.errorType(error),
+                'elapsedMs': timer.elapsedMilliseconds,
+              },
+            );
+          }),
+    );
   }
 
   final coach.Catalog? coachCatalog;
@@ -84,6 +133,10 @@ class AppServices {
     final engine = chatEngine;
     if (engine is AiChatEngine) engine.enableUserMemory = enabled;
     await store.setAiMemoryEnabled(enabled);
+    RuntimeLog.instance.record(
+      'settings.ai_memory',
+      fields: {'enabled': enabled},
+    );
   }
 
   Future<void> clearAiMemory() async {
@@ -96,6 +149,7 @@ class AppServices {
         throw StateError('AI memory could not be cleared from local storage');
       }
     }
+    RuntimeLog.instance.record('settings.ai_memory_cleared');
   }
 
   /// Manual forms stay deterministic; AI enters through the chat engine.
@@ -111,6 +165,7 @@ class AppServices {
   /// The output belongs to the App, so page navigation never destroys it.
   Future<void> dispose() async {
     chat.dispose();
+    _mediaLog?.dispose();
     media?.dispose();
     if (chatEngine case final ManagedChatEngine managed) managed.dispose();
     final output = voiceOutput;
@@ -129,6 +184,31 @@ class AppServices {
     final catalog = coachCatalog;
     final profile = coachProfile;
     final id = deviceId;
+    RuntimeLog.instance.record(
+      'chat.engine',
+      fields: {
+        'hasKey': aiConfig.enabled,
+        'hasDeviceIdentity': id != null,
+        'available': catalog != null && profile != null,
+        'catalogCount': catalog?.length ?? 0,
+        'route':
+            !aiConfig.enabled ||
+                catalog == null ||
+                profile == null ||
+                id == null
+            ? 'local'
+            : 'sdk',
+        'reason': !aiConfig.enabled
+            ? 'missing_key'
+            : id == null
+            ? 'identity_unavailable'
+            : catalog == null
+            ? 'catalog_unavailable'
+            : profile == null
+            ? 'profile_unavailable'
+            : 'configured',
+      },
+    );
     if (!aiConfig.enabled || catalog == null || profile == null || id == null) {
       return local;
     }

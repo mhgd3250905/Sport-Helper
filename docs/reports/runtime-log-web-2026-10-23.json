@@ -1,0 +1,56 @@
+{
+  "date": "2026-10-23",
+  "appVersion": "0.1.0+14",
+  "testMode": "Flutter debug web with explicit runtime-log opt-in; existing synthetic safety fixture reused",
+  "export": {
+    "file": ".buildlog/ai-diagnosis/runtime-log-web-export-2026-10-23.json",
+    "sha256": "a28c2eeabb7d1c1e378249ccb6411d076395ae83f24abf768ec358bf183b89c1",
+    "bytes": 35366,
+    "events": 160,
+    "appKeyAbsent": true,
+    "rawPromptAbsent": true,
+    "deviceUuidAbsent": true
+  },
+  "aiTurns": [
+    {
+      "status": "ok",
+      "route": "ai",
+      "elapsedMs": 36394,
+      "steps": 1,
+      "submissions": 1,
+      "reads": 0,
+      "count": 1,
+      "hasPlan": true,
+      "hasActions": false,
+      "promptTokens": 8874,
+      "completionTokens": 2744,
+      "reasoningTokens": 1454
+    }
+  ],
+  "trainingResults": [
+    {
+      "status": "ended_early",
+      "completed": 0,
+      "total": 10,
+      "durationMs": 28027,
+      "elapsedMs": 45537,
+      "success": false
+    }
+  ],
+  "nodesVerified": [
+    "training.started",
+    "training.action.visible",
+    "training.paused",
+    "training.heartbeat.wall",
+    "training.resumed",
+    "training.finished",
+    "training.result.save_started",
+    "training.result.saved",
+    "training.player.closed"
+  ],
+  "relaunchRetainsEarlierAiTurn": true,
+  "browserHotRestartEngineAssertion": 1,
+  "androidFileSavePhysicalAcceptance": "pending_no_device",
+  "physical20Minutes": "pending_no_device",
+  "iosCompileAndPlayback": "pending_mac_device"
+}

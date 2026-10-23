@@ -15,6 +15,7 @@ import 'package:ugk_trainer/ugk_trainer.dart'
     show TrainingMediaRepository, TrainingMediaScope;
 import 'core/storage/local_state_storage.dart';
 import 'data/app_store.dart';
+import 'diagnostics/runtime_log.dart';
 import 'ui/chat/chat_home_page.dart';
 import 'ui/theme/app_theme.dart';
 import 'ui/theme/glass.dart';
@@ -33,9 +34,46 @@ void registerFontLicense() {
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  final storage = SharedPreferencesLocalStateStorage();
+  final log = RuntimeLog.instance = RuntimeLog(
+    enabled: RuntimeLog.buildEnabled,
+    storage: storage,
+  );
+  await log.initialize();
+  log.record(
+    'app.start',
+    fields: {
+      'version': '0.1.0+14',
+      'flavor': TrainingMediaConfig.isInternal ? 'internal' : 'production',
+      'platform': kIsWeb ? 'web' : defaultTargetPlatform.name,
+    },
+  );
+  if (log.enabled) {
+    final previousFlutterError = FlutterError.onError;
+    FlutterError.onError = (details) {
+      log.record(
+        'app.flutter_error',
+        fields: {'errorType': RuntimeLog.errorType(details.exception)},
+      );
+      if (previousFlutterError != null) {
+        previousFlutterError(details);
+      } else {
+        FlutterError.presentError(details);
+      }
+    };
+    final previousPlatformError = PlatformDispatcher.instance.onError;
+    PlatformDispatcher.instance.onError = (error, stack) {
+      log.record(
+        'app.unhandled_error',
+        fields: {'errorType': RuntimeLog.errorType(error)},
+      );
+      return previousPlatformError?.call(error, stack) ?? false;
+    };
+  }
   registerFontLicense();
   // Pre-warm the glass shaders before the first frame (no white flash).
   await LiquidGlassWidgets.initialize();
+  log.record('app.shaders_ready');
   final media = await TrainingMediaRepository.create(
     manifestAsset: TrainingMediaConfig.manifestAsset,
     baseUrls: TrainingMediaConfig.baseUrls,
@@ -43,20 +81,32 @@ Future<void> main() async {
   );
   await media.availableActionIds();
   await media.canDownload();
+  log.record(
+    'app.media_ready',
+    fields: {'count': media.visibleActions.length, 'offline': media.isOffline},
+  );
   final (lib, catalog, voices, coachCatalog) = await AppServices.loadContent(
     media: media,
   );
   final coachProfile = coach.CoachProfile.fromJson(
     jsonDecode(await rootBundle.loadString('assets/coach/smartfit.json')),
   );
-  final storage = SharedPreferencesLocalStateStorage();
+  log.record(
+    'app.catalog_ready',
+    fields: {'count': lib.length, 'catalogCount': coachCatalog.length},
+  );
   final store = AppStore(storage);
   await store.load();
+  log.record('app.storage_ready');
   media.wifiOnly = store.mediaWifiOnly;
   String? deviceId;
   try {
     deviceId = await DeviceIdentity(storage).loadOrCreate();
-  } on Object {
+  } on Object catch (error) {
+    log.record(
+      'app.identity_unavailable',
+      fields: {'errorType': RuntimeLog.errorType(error)},
+    );
     // No persisted identifier means no proxy call; offline training still works.
   }
   final services = AppServices(
@@ -70,6 +120,7 @@ Future<void> main() async {
     deviceId: deviceId,
     media: media,
   );
+  log.record('app.ready');
   runApp(
     LiquidGlassWidgets.wrap(
       // Material theme mode drives the glass brightness.
@@ -102,9 +153,24 @@ class SmartFitApp extends StatefulWidget {
   State<SmartFitApp> createState() => _SmartFitAppState();
 }
 
-class _SmartFitAppState extends State<SmartFitApp> {
+class _SmartFitAppState extends State<SmartFitApp> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    RuntimeLog.instance.record('app.lifecycle', fields: {'state': state.name});
+    unawaited(RuntimeLog.instance.flush());
+  }
+
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    RuntimeLog.instance.record('app.dispose');
+    unawaited(RuntimeLog.instance.flush());
     unawaited(widget.services.dispose());
     super.dispose();
   }

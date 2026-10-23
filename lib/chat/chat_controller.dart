@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
 
 import '../data/app_store.dart';
+import '../diagnostics/runtime_log.dart';
 import '../domain/plan.dart';
 import '../domain/saved_plan.dart';
 import 'chat_models.dart';
@@ -44,6 +45,7 @@ class ChatController extends ChangeNotifier {
   final Set<String> _finishedProgressTurns = {};
   bool _progressEnded = true;
   ChatState _state = const ChatState();
+  String? _diagnosticOperation;
 
   void _onProgress(coach.AgentEvent event) {
     if (!typing ||
@@ -53,6 +55,11 @@ class ChatController extends ChangeNotifier {
     }
     if (_progressTurnId != null && _progressTurnId != event.turnId) return;
     _progressTurnId ??= event.turnId;
+    RuntimeLog.instance.record(
+      'chat.progress',
+      operation: _diagnosticOperation,
+      fields: {'kind': event.kind.name, 'step': event.step},
+    );
     if (event.kind == coach.AgentEventKind.done) {
       _endProgress();
     } else {
@@ -102,7 +109,30 @@ class ChatController extends ChangeNotifier {
   bool _started = false;
 
   /// Runs an app command (`@drawer`, `@library`…) as if a bubble asked.
-  void command(String action) => _actions.add(action);
+  void command(String action) {
+    RuntimeLog.instance.record(
+      'chat.command',
+      fields: {'kind': _commandKind(action)},
+    );
+    _actions.add(action);
+  }
+
+  static String _commandKind(String action) {
+    final kind = action.split(':').first;
+    const commands = {
+      '@drawer',
+      '@library',
+      '@settings',
+      '@custom',
+      '@saved',
+      '@save',
+      '@appearance',
+      '@voice',
+      '@chimes',
+      '@safety',
+    };
+    return commands.contains(kind) ? kind.substring(1) : 'other';
+  }
 
   void start() {
     if (_started) return;
@@ -155,6 +185,7 @@ class ChatController extends ChangeNotifier {
   /// Cancels this turn immediately; a late transport response cannot add cards.
   void cancelRequest() {
     if (!typing) return;
+    _cancelDiagnostic('user_cancel');
     _replyEpoch++;
     typing = false;
     _endProgress();
@@ -166,6 +197,8 @@ class ChatController extends ChangeNotifier {
 
   /// Starts a fresh SDK conversation while retaining saved plans and safety.
   Future<void> newConversation() async {
+    _cancelDiagnostic('new_conversation');
+    RuntimeLog.instance.record('chat.conversation.new');
     _replyEpoch++;
     typing = false;
     _endProgress();
@@ -222,21 +255,70 @@ class ChatController extends ChangeNotifier {
       return;
     }
     final epoch = ++_replyEpoch;
+    final operation = RuntimeLog.instance.newOperation('chat');
+    final watch = Stopwatch()..start();
+    _diagnosticOperation = operation;
+    RuntimeLog.instance.record(
+      'chat.send',
+      operation: operation,
+      fields: {'inputChars': t.length},
+    );
     typing = true;
     _endProgress();
     _progressEnded = false;
     notifyListeners();
     if (prepareReply case final prepare?) {
+      RuntimeLog.instance.record('chat.prepare.begin', operation: operation);
       try {
         await prepare();
-      } on Object {
+        RuntimeLog.instance.record(
+          'chat.prepare.end',
+          operation: operation,
+          fields: const {'success': true},
+        );
+      } on Object catch (error) {
+        RuntimeLog.instance.record(
+          'chat.prepare.end',
+          operation: operation,
+          fields: {'success': false, 'errorType': RuntimeLog.errorType(error)},
+        );
         // Media availability cannot prevent text or a training plan.
       }
       if (epoch != _replyEpoch) return;
     }
-    final reply = await engine.reply(t, _context);
+    if (engine case final DiagnosticChatEngine diagnostic) {
+      diagnostic.diagnosticOperation = operation;
+    } else {
+      RuntimeLog.instance.record(
+        'chat.route',
+        operation: operation,
+        fields: const {'route': 'local', 'reason': 'offline_engine'},
+      );
+    }
+    final ChatReply reply;
+    try {
+      reply = await engine.reply(t, _context);
+    } on Object catch (error) {
+      RuntimeLog.instance.record(
+        'chat.error',
+        operation: operation,
+        fields: {
+          'errorType': RuntimeLog.errorType(error),
+          'elapsedMs': watch.elapsedMilliseconds,
+        },
+      );
+      if (_diagnosticOperation == operation) _diagnosticOperation = null;
+      rethrow;
+    }
     if (replyDelay > Duration.zero) await Future<void>.delayed(replyDelay);
-    if (epoch != _replyEpoch) return;
+    if (epoch != _replyEpoch) {
+      RuntimeLog.instance.record(
+        'chat.reply.discarded',
+        operation: operation,
+        fields: {'elapsedMs': watch.elapsedMilliseconds},
+      );
+      return;
+    }
     typing = false;
     _endProgress();
     _state = reply.state;
@@ -244,6 +326,17 @@ class ChatController extends ChangeNotifier {
     for (final m in reply.messages) {
       _bot(m, aiVisible: reply.aiTurn);
     }
+    RuntimeLog.instance.record(
+      'chat.reply.rendered',
+      operation: operation,
+      fields: {
+        'elapsedMs': watch.elapsedMilliseconds,
+        'count': reply.messages.length,
+        'hasPlan': reply.messages.any((message) => message.plan != null),
+        'hasActions': reply.messages.any((message) => message.actions != null),
+      },
+    );
+    _diagnosticOperation = null;
     // A question with its own options doesn't need the chips too.
     final asks = reply.messages.any((m) => m.options.isNotEmpty);
     suggestions = reply.suggestions.isNotEmpty
@@ -273,7 +366,7 @@ class ChatController extends ChangeNotifier {
     } else if (a == '@safety') {
       startSafetyCheck();
     } else {
-      _actions.add(a);
+      command(a);
     }
   }
 
@@ -315,7 +408,7 @@ class ChatController extends ChangeNotifier {
       return;
     }
     if (isLink) {
-      _actions.add(o.value);
+      command(o.value);
       notifyListeners();
       return;
     }
@@ -407,6 +500,7 @@ class ChatController extends ChangeNotifier {
   }
 
   void _beginSafety({required bool firstRun}) {
+    _cancelDiagnostic('safety_check');
     _replyEpoch++;
     typing = false;
     _endProgress();
@@ -531,12 +625,34 @@ class ChatController extends ChangeNotifier {
 
   String _id() => 'm${_clock().microsecondsSinceEpoch}-${_seq++}';
 
-  Future<void> _persist() => store.setChatLog([
-    for (final m in messages) m.toJson().cast<String, dynamic>(),
-  ]);
+  Future<void> _persist() async {
+    try {
+      await store.setChatLog([
+        for (final m in messages) m.toJson().cast<String, dynamic>(),
+      ]);
+    } on Object catch (error) {
+      RuntimeLog.instance.record(
+        'chat.persist.error',
+        fields: {'errorType': RuntimeLog.errorType(error)},
+      );
+      rethrow;
+    }
+  }
+
+  void _cancelDiagnostic(String reason) {
+    final operation = _diagnosticOperation;
+    if (operation == null) return;
+    RuntimeLog.instance.record(
+      'chat.cancel',
+      operation: operation,
+      fields: {'reason': reason},
+    );
+    _diagnosticOperation = null;
+  }
 
   @override
   void dispose() {
+    _cancelDiagnostic('dispose');
     _replyEpoch++;
     typing = false;
     _endProgress();

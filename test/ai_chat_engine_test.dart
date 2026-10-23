@@ -9,6 +9,7 @@ import 'package:smartfit/chat/chat_models.dart';
 import 'package:smartfit/chat/rule_chat_engine.dart';
 import 'package:smartfit/core/storage/local_state_storage.dart';
 import 'package:smartfit/data/app_store.dart';
+import 'package:smartfit/diagnostics/runtime_log.dart';
 import 'package:smartfit/domain/exercise.dart';
 import 'package:smartfit/domain/plan.dart';
 import 'package:smartfit/domain/plan_generator.dart';
@@ -1647,4 +1648,209 @@ void main() {
       });
     },
   );
+
+  group('runtime diagnostics', () {
+    late RuntimeLog previousLog;
+    late RuntimeLog log;
+
+    setUp(() {
+      previousLog = RuntimeLog.instance;
+      log = RuntimeLog(enabled: true);
+      RuntimeLog.instance = log;
+    });
+
+    tearDown(() => RuntimeLog.instance = previousLog);
+
+    List<Map<String, dynamic>> events([String? name]) => [
+      for (final event
+          in (jsonDecode(log.exportJson()) as Map<String, dynamic>)['events']
+              as List)
+        if (name == null || (event as Map)['event'] == name)
+          Map<String, dynamic>.from(event as Map),
+    ];
+
+    Map<String, dynamic> fields(Map<String, dynamic> event) =>
+        Map<String, dynamic>.from(event['fields'] as Map);
+
+    test(
+      'adopted AI plan and later local command have distinct provenance',
+      () async {
+        final result = planResponse(text: 'private-provider-body');
+        final client = coach.FakeLlmClient([
+          coach.LlmResponse(
+            content: result.content,
+            toolCalls: result.toolCalls,
+            reasoning: 'private-reasoning-body',
+            usage: const coach.TokenUsage(
+              promptTokens: 200,
+              completionTokens: 100,
+              reasoningTokens: 60,
+            ),
+          ),
+        ], latency: Duration.zero);
+        final ai = engine(client);
+        final store = AppStore(_Storage())..safetyAccepted = true;
+        final controller = ChatController(
+          engine: ai,
+          store: store,
+          replyDelay: Duration.zero,
+        );
+        addTearDown(controller.dispose);
+        controller.start();
+        const input = '在家 10 分钟练全身，徒手 private-user-prompt';
+        await controller.send(input);
+        expect(ai.lastResult?.status, coach.TurnStatus.ok);
+        final adopted = fields(events('ai.turn.end').single);
+        expect(adopted, containsPair('route', 'ai'));
+        expect(adopted, containsPair('hasPlan', true));
+        expect(adopted, containsPair('reasoningTokens', 60));
+        expect(adopted, containsPair('submissions', 1));
+        final aiOperation = events('chat.send').single['operation'];
+        for (final event in events().where(
+          (event) => event['operation'] != null,
+        )) {
+          expect(event['operation'], aiOperation);
+        }
+        expect(fields(events('chat.reply.rendered').single)['hasPlan'], isTrue);
+        await controller.send('设置');
+        expect(client.requests, hasLength(1));
+        expect(ai.lastResult, isNull);
+        expect(ai.lastOutcome, isNull);
+        expect(ai.lastFallbackReason, isNull);
+        final localRoute = events('chat.route').last;
+        expect(fields(localRoute), {
+          'route': 'local',
+          'reason': 'local_shortcut',
+        });
+        expect(localRoute['operation'], isNot(aiOperation));
+        final serialized = log.exportJson();
+        for (final private in [
+          input,
+          'private-user-prompt',
+          'private-provider-body',
+          'private-reasoning-body',
+          'AI 徒手训练',
+          'action-library/SKILL.md',
+        ]) {
+          expect(serialized, isNot(contains(private)));
+        }
+      },
+    );
+
+    test(
+      'HTTP auth failure records status and fallback without private server text',
+      () async {
+        final gateway = await _Gateway.start(
+          [],
+          status: HttpStatus.forbidden,
+          errorMessage:
+              'private-app-key-secret provider-body should not export',
+        );
+        addTearDown(gateway.close);
+        final ai = engine(gateway.client());
+        final reply = await ai.reply('在家练全身', const ChatState());
+        expect(texts(reply), startsWith('预设方案'));
+        final requestError = fields(events('ai.request.error').single);
+        expect(requestError['httpStatus'], HttpStatus.forbidden);
+        expect(requestError['kind'], 'auth');
+        expect(requestError['errorType'], 'LlmException');
+        expect(requestError['elapsedMs'], isNonNegative);
+        final end = fields(events('ai.turn.end').single);
+        expect(end['route'], 'fallback');
+        expect(end['status'], 'fallback');
+        expect(end['reason'], ai.lastFallbackReason!.name);
+        expect(events('ai.fallback.begin'), hasLength(1));
+        expect(log.exportJson(), isNot(contains('private-app-key-secret')));
+        expect(log.exportJson(), isNot(contains('provider-body')));
+        expect(log.exportJson(), isNot(contains('127.0.0.1')));
+      },
+    );
+
+    test('retry and tool progress retain only known event metadata', () async {
+      final ai = engine(
+        coach.FakeLlmClient([
+          const coach.LlmException(
+            coach.LlmErrorKind.network,
+            'private-network-error',
+            retryAfter: Duration.zero,
+          ),
+          tool('read', {'path': 'action-library/SKILL.md'}),
+          tool('check_plan', plan().toJson()),
+          planResponse(),
+        ], latency: Duration.zero),
+      );
+      await ai.reply('先检查再排：在家 10 分钟练全身，徒手', const ChatState());
+      expect(ai.lastResult!.status, coach.TurnStatus.ok);
+      expect(events('ai.request.begin'), hasLength(4));
+      expect(events('ai.request.end'), hasLength(3));
+      expect(events('ai.request.error'), hasLength(1));
+      final retry = events(
+        'ai.progress',
+      ).singleWhere((event) => fields(event)['kind'] == 'retrying');
+      expect(fields(retry), containsPair('reason', 'network'));
+      expect(fields(retry), containsPair('attempt', 1));
+      expect(
+        events('ai.progress').map((event) => fields(event)['kind']),
+        containsAll(['reading', 'checking', 'done']),
+      );
+      expect(fields(events('ai.turn.end').single)['reads'], 1);
+      expect(log.exportJson(), isNot(contains('action-library/SKILL.md')));
+      expect(log.exportJson(), isNot(contains('private-network-error')));
+    });
+
+    test(
+      'cancelled late transport completion stays attached to the old operation',
+      () async {
+        final client = _LateClient();
+        final ai = engine(client);
+        final store = AppStore(_Storage())..safetyAccepted = true;
+        final controller = ChatController(
+          engine: ai,
+          store: store,
+          replyDelay: Duration.zero,
+        );
+        addTearDown(controller.dispose);
+        controller.start();
+        final pending = controller.send('在家 10 分钟练全身，徒手');
+        await client.started.future;
+        final oldOperation = events('chat.send').single['operation'];
+        controller.cancelRequest();
+        await pending;
+        await controller.send('有什么建议？');
+        final newOperation = events('chat.send').last['operation'];
+        expect(newOperation, isNot(oldOperation));
+        client.late.complete(planResponse(text: 'private-late-plan'));
+        await Future<void>.delayed(Duration.zero);
+        final oldEnd = events(
+          'ai.request.end',
+        ).singleWhere((event) => event['operation'] == oldOperation);
+        expect(fields(oldEnd)['available'], isFalse);
+        expect(fields(events('ai.turn.end').single)['route'], 'ai');
+        expect(events('ai.turn.end').single['operation'], newOperation);
+        expect(events('ai.turn.cancel').single['operation'], oldOperation);
+        expect(
+          events('chat.reply.discarded').single['operation'],
+          oldOperation,
+        );
+        expect(events('chat.reply.rendered'), hasLength(1));
+        expect(log.exportJson(), isNot(contains('private-late-plan')));
+        expect(controller.messages.last.text, '新的回复');
+      },
+    );
+
+    test(
+      'outer turn timeout is logged separately from request cancellation',
+      () async {
+        final client = _LateClient();
+        final ai = engine(client, deadline: const Duration(milliseconds: 10));
+        final reply = await ai.reply('在家 10 分钟练全身，徒手', const ChatState());
+        expect(texts(reply), startsWith('预设方案'));
+        expect(events('ai.turn.timeout'), hasLength(1));
+        expect(events('ai.request.cancel'), hasLength(1));
+        expect(fields(events('ai.turn.end').single)['reason'], 'timeout');
+        client.late.complete(const coach.LlmResponse(content: 'late response'));
+        await Future<void>.delayed(Duration.zero);
+      },
+    );
+  });
 }

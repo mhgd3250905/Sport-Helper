@@ -1,5 +1,9 @@
 # 版本管理与台账
 
+## 当前内测候选（2026-10-23）
+
+`feat/voice-aac-comparison` 当前 `0.1.0+14`，关于页同步；internal arm64 包为 `com.ugk.smartfit.internal` / versionCode `2014`，49,384,327B，SHA-256 `c26b4a3a744566c354887cc7fd7822ebf31ed0080f918bfb702b874a53885710`。保留已选定的全量 AAC-LC，增加本机运行日志与手动导出；两项 SDK ref 仍固定 `f684e02f38e652633c23fa8946a53d02b6aa3ea2`。仅构建新内测候选，没有新建 +14 生产交付包；没有合并或推送。真机保存与持续训练待有设备时进行。详见 [日志交付及核验](internal-runtime-logs-2026-10-23.md)。以下台账保留原日期的历史快照。
+
 更新日期：2026-10-22（Asia/Shanghai）。本文件是源码里程碑、App 包版本与交付包身份的统一台账；验收证据及待验清单以 [acceptance.md](acceptance.md) 为准，角色与历史交接见 [HANDOVER.md](HANDOVER.md)。
 
 ## 当前版本

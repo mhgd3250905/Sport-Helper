@@ -4,6 +4,7 @@ import 'dart:math';
 
 import 'package:ugk_coach/ugk_coach.dart' as coach;
 
+import '../diagnostics/runtime_log.dart';
 import '../domain/exercise.dart';
 import '../domain/plan.dart';
 import '../domain/plan_validator.dart';
@@ -14,7 +15,11 @@ import 'slot_parser.dart';
 
 /// One SDK session for the app lifetime. Only admitted results cross into UI.
 class AiChatEngine
-    implements ManagedChatEngine, RestorableChatEngine, ProgressChatEngine {
+    implements
+        ManagedChatEngine,
+        RestorableChatEngine,
+        ProgressChatEngine,
+        DiagnosticChatEngine {
   AiChatEngine({
     required this.local,
     required this.catalog,
@@ -42,9 +47,14 @@ class AiChatEngine
   _Turn? _pending;
   Future<coach.CoachTurnResult>? _sdkPending;
   bool _disposed = false;
+  String? _diagnosticOperation;
+
+  @override
+  set diagnosticOperation(String? operation) =>
+      _diagnosticOperation = operation;
 
   late final agent = coach.CoachAgent(
-    client: _CancellableClient(client),
+    client: _CancellableClient(client, () => _pending),
     catalog: () => catalog,
     profile: profile,
     maxResubmits: 2,
@@ -114,6 +124,11 @@ class AiChatEngine
     if (turn == null) return;
     lastOutcome = coach.TurnOutcome.cancelled;
     lastFallbackReason = null;
+    RuntimeLog.instance.record(
+      'ai.turn.cancel',
+      operation: turn.operation,
+      fields: {'elapsedMs': turn.watch.elapsedMilliseconds},
+    );
     turn.cancel.cancel();
     _pending = null;
   }
@@ -174,20 +189,39 @@ class AiChatEngine
 
   @override
   Future<ChatReply> reply(String input, ChatState state) async {
+    final operation =
+        _diagnosticOperation ?? RuntimeLog.instance.newOperation('chat');
+    _diagnosticOperation = null;
     ChatReply empty() => ChatReply(messages: const [], state: state);
-    if (_disposed) return empty();
+    if (_disposed) {
+      RuntimeLog.instance.record(
+        'ai.turn.rejected',
+        operation: operation,
+        fields: const {'reason': 'disposed'},
+      );
+      return empty();
+    }
     // Settle cancellation before accepting a new turn; ordinary sends never queue.
     if (_pending == null && session.isBusy && _sdkPending != null) {
       await _sdkPending;
     }
     if (_disposed) return empty();
     if (_pending != null || session.isBusy) {
+      RuntimeLog.instance.record(
+        'ai.turn.rejected',
+        operation: operation,
+        fields: const {'reason': 'busy'},
+      );
       lastResult = const coach.CoachTurnResult(
         turnId: '',
         status: coach.TurnStatus.busy,
       );
       return empty();
     }
+    // Diagnostics always describe this accepted turn, including local routes.
+    lastResult = null;
+    lastOutcome = null;
+    lastFallbackReason = null;
     final rawLocalReply = local.localReply(input, state);
     // Explicit library navigation stays local. Requests to see/recommend
     // actions belong to the SDK's show_actions tool.
@@ -197,6 +231,11 @@ class AiChatEngine
         ? null
         : _admitLocalCards(rawLocalReply);
     if (localReply != null) {
+      RuntimeLog.instance.record(
+        'chat.route',
+        operation: operation,
+        fields: const {'route': 'local', 'reason': 'local_shortcut'},
+      );
       final adopted = localReply.state.plan;
       if (adopted != null && adopted.id != state.plan?.id) {
         final request = localReply.state.request ?? requestForPlan(adopted);
@@ -213,10 +252,46 @@ class AiChatEngine
       }
       return localReply;
     }
-    if (state.safetyBlocked) return local.reply(input, state);
-    final turn = _Turn(input, state, _slotsFor(input, state));
+    if (state.safetyBlocked) {
+      RuntimeLog.instance.record(
+        'chat.route',
+        operation: operation,
+        fields: const {'route': 'local', 'reason': 'safety'},
+      );
+      return local.reply(input, state);
+    }
+    final turn = _Turn(input, state, _slotsFor(input, state), operation);
     _pending = turn;
+    RuntimeLog.instance.record(
+      'chat.route',
+      operation: operation,
+      fields: const {'route': 'sdk'},
+    );
+    final progress = events.listen((event) {
+      if (_pending != turn) return;
+      turn.step = event.step;
+      RuntimeLog.instance.record(
+        'ai.progress',
+        operation: operation,
+        fields: {
+          'kind': event.kind.name,
+          'step': event.step,
+          if (event.status case final status?) 'status': status.name,
+          if (event.reason case final reason?) 'reason': reason.name,
+          if (event.kind == coach.AgentEventKind.retrying) ...{
+            'attempt': event.attempt,
+            'total': event.maxAttempts,
+            'durationMs': event.delay?.inMilliseconds ?? 0,
+          },
+        },
+      );
+    });
     final timer = Timer(turnTimeout, () {
+      RuntimeLog.instance.record(
+        'ai.turn.timeout',
+        operation: operation,
+        fields: {'elapsedMs': turn.watch.elapsedMilliseconds},
+      );
       turn.timedOut = true;
       turn.cancel.cancel('turn timeout');
     });
@@ -257,6 +332,32 @@ class AiChatEngine
         lastResult = result;
       }
       final accepted = lastResult!;
+      final tokens = accepted.usage;
+      RuntimeLog.instance.record(
+        'ai.turn.end',
+        operation: operation,
+        fields: {
+          'status': accepted.status.name,
+          'route': accepted.status == coach.TurnStatus.ok
+              ? 'ai'
+              : accepted.status == coach.TurnStatus.fallback
+              ? 'fallback'
+              : 'sdk',
+          if (accepted.fallbackReason case final reason?) 'reason': reason.name,
+          if (accepted.error case final error?)
+            'errorType': RuntimeLog.errorType(error),
+          'elapsedMs': turn.watch.elapsedMilliseconds,
+          'steps': accepted.steps,
+          'submissions': accepted.submissions,
+          'reads': accepted.reads.length,
+          'count': accepted.records.length,
+          'hasPlan': accepted.plan != null,
+          'hasActions': accepted.actions != null,
+          'promptTokens': tokens.promptTokens,
+          'completionTokens': tokens.completionTokens,
+          'reasoningTokens': tokens.reasoningTokens,
+        },
+      );
       if (accepted.status == coach.TurnStatus.cancelled ||
           accepted.status == coach.TurnStatus.busy) {
         return empty();
@@ -346,7 +447,17 @@ class AiChatEngine
         ),
         suggestions: plan == null ? const [] : planSuggestions,
       );
-    } on Object {
+    } on Object catch (error) {
+      RuntimeLog.instance.record(
+        'ai.turn.error',
+        operation: operation,
+        fields: {
+          'errorType': RuntimeLog.errorType(error),
+          'elapsedMs': turn.watch.elapsedMilliseconds,
+          'reason': turn.timedOut ? 'timeout' : 'error',
+          'available': !_disposed && _pending == turn,
+        },
+      );
       if (_disposed ||
           _pending != turn ||
           (turn.cancel.isCancelled && !turn.timedOut)) {
@@ -362,6 +473,7 @@ class AiChatEngine
       );
     } finally {
       timer.cancel();
+      unawaited(progress.cancel());
       if (_pending == turn) _pending = null;
     }
   }
@@ -412,6 +524,11 @@ class AiChatEngine
   }
 
   Future<ChatReply> _localFallback(_Turn turn) async {
+    RuntimeLog.instance.record(
+      'ai.fallback.begin',
+      operation: turn.operation,
+      fields: {'elapsedMs': turn.watch.elapsedMilliseconds},
+    );
     final request = turn.slots
         .toRequest(fallbackGoal: turn.state.plan?.goal)
         .copyWith(description: turn.input);
@@ -497,10 +614,14 @@ class AiChatEngine
 }
 
 class _Turn {
-  _Turn(this.input, this.state, this.slots);
+  _Turn(this.input, this.state, this.slots, this.operation);
   final String input;
   final ChatState state;
   final Slots slots;
+  final String operation;
+  final watch = Stopwatch()..start();
+  int step = 0;
+  int attempts = 0;
   final cancel = coach.CancelToken();
   bool timedOut = false;
   ChatReply? fallbackReply;
@@ -520,8 +641,9 @@ class _Turn {
 
 /// Cancellation also wins over a custom transport that ignores its token.
 class _CancellableClient implements coach.LlmClient {
-  _CancellableClient(this.inner);
+  _CancellableClient(this.inner, this.currentTurn);
   final coach.LlmClient inner;
+  final _Turn? Function() currentTurn;
   @override
   String get model => inner.model;
   @override
@@ -530,14 +652,85 @@ class _CancellableClient implements coach.LlmClient {
   Future<coach.LlmResponse> complete(
     coach.LlmRequest request, {
     coach.CancelToken? cancel,
-  }) => Future.any([
-    inner.complete(request, cancel: cancel),
-    if (cancel != null)
-      cancel.whenCancelled.then<coach.LlmResponse>(
-        (_) => throw const coach.LlmException(
-          coach.LlmErrorKind.cancelled,
-          'cancelled',
-        ),
-      ),
-  ]);
+  }) {
+    // Capture before awaiting: a cancelled transport can finish in a later turn.
+    final turn = currentTurn();
+    final operation = turn?.operation;
+    final attempt = turn == null ? 0 : ++turn.attempts;
+    final step = turn?.step ?? 0;
+    final watch = Stopwatch()..start();
+    var finished = false;
+    void record(String event, Map<String, Object?> fields) =>
+        RuntimeLog.instance.record(
+          event,
+          operation: operation,
+          fields: {
+            'model': model,
+            'attempt': attempt,
+            'step': step,
+            'elapsedMs': watch.elapsedMilliseconds,
+            ...fields,
+          },
+        );
+    record('ai.request.begin', const {});
+    Future<coach.LlmResponse> transport() async {
+      try {
+        final response = await inner.complete(request, cancel: cancel);
+        record('ai.request.end', {
+          'status': 'ok',
+          'available': cancel?.isCancelled != true,
+          'count': response.httpAttempts,
+          'promptTokens': response.usage.promptTokens,
+          'completionTokens': response.usage.completionTokens,
+          'reasoningTokens': response.usage.reasoningTokens,
+        });
+        for (final call in response.toolCalls) {
+          // Tool arguments may contain health information, memory or plans.
+          const names = {
+            'read',
+            'ls',
+            'check_plan',
+            'remember',
+            'forget',
+            coach.CoachTools.showPlan,
+            coach.CoachTools.showActions,
+          };
+          record('ai.tool.requested', {
+            'kind': names.contains(call.name) ? call.name : 'unknown',
+          });
+        }
+        return response;
+      } on Object catch (error) {
+        record('ai.request.error', {
+          'errorType': RuntimeLog.errorType(error),
+          'available': cancel?.isCancelled != true,
+          if (error is coach.LlmException) ...{
+            'kind': error.kind.name,
+            'httpStatus':
+                error.statusCode ?? error.responseDiagnostic?.statusCode,
+            'reason': error.responseDiagnostic?.subtype.name,
+            'count': error.httpAttempts,
+            'promptTokens': error.usage.promptTokens,
+            'completionTokens': error.usage.completionTokens,
+            'reasoningTokens': error.usage.reasoningTokens,
+          },
+        });
+        rethrow;
+      } finally {
+        finished = true;
+      }
+    }
+
+    return Future.any([
+      transport(),
+      if (cancel != null)
+        cancel.whenCancelled.then<coach.LlmResponse>((_) {
+          if (!finished) record('ai.request.cancel', const {});
+          throw const coach.LlmException(
+            coach.LlmErrorKind.cancelled,
+            'cancelled',
+          );
+        }),
+    ]);
+  }
 }

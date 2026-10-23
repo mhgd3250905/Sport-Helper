@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:ugk_trainer/ugk_trainer.dart';
 
 import '../domain/exercise.dart';
+import '../diagnostics/runtime_log.dart';
 import 'theme.dart';
 
 /// App styling around the shared, verified on-demand training media view.
-class ExerciseVideo extends StatelessWidget {
+class ExerciseVideo extends StatefulWidget {
   const ExerciseVideo({
     super.key,
     required this.exercise,
@@ -22,7 +23,48 @@ class ExerciseVideo extends StatelessWidget {
   final double radius;
 
   @override
+  State<ExerciseVideo> createState() => _ExerciseVideoState();
+}
+
+class _ExerciseVideoState extends State<ExerciseVideo> {
+  late final String _operation;
+
+  @override
+  void initState() {
+    super.initState();
+    _operation = RuntimeLog.instance.newOperation('video');
+    _record('video.surface.requested');
+  }
+
+  void _record(String event) => RuntimeLog.instance.record(
+    event,
+    operation: _operation,
+    fields: {
+      'actionId': widget.exercise.id,
+      'enabled': widget.playing,
+      'paused': widget.paused,
+    },
+  );
+
+  @override
+  void didUpdateWidget(ExerciseVideo oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.exercise.id != oldWidget.exercise.id ||
+        widget.playing != oldWidget.playing ||
+        widget.paused != oldWidget.paused) {
+      _record('video.surface.updated');
+    }
+  }
+
+  @override
+  void dispose() {
+    _record('video.surface.closed');
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final exercise = widget.exercise;
     final m = exercise.media;
     final stage = sfStageFor(exercise);
     return DrillMediaView(
@@ -35,10 +77,10 @@ class ExerciseVideo extends StatelessWidget {
         lightVideoAsset: m.lightVideo,
         lightPosterAsset: m.lightPoster,
       ),
-      playing: playing,
-      paused: paused,
-      mirrored: mirrored,
-      radius: radius,
+      playing: widget.playing,
+      paused: widget.paused,
+      mirrored: widget.mirrored,
+      radius: widget.radius,
       stage: stage.mediaStage,
       errorColor: stage.onStageMuted,
       errorLabel: '示范暂时加载不了，计时和语音仍可继续',

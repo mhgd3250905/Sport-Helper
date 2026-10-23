@@ -4,12 +4,14 @@ import 'package:flutter/services.dart' show rootBundle;
 import '../app/services.dart';
 import '../app/training_media_config.dart';
 import '../chat/safety_script.dart' show disclaimerText;
+import '../diagnostics/runtime_log.dart';
+import 'runtime_log_settings.dart';
 import 'theme.dart';
 import 'training_media_settings.dart';
 
 const appVersion = TrainingMediaConfig.isInternal
-    ? '0.1.0+12 (内测)'
-    : '0.1.0+12 (MVP)';
+    ? '0.1.0+14 (内测)'
+    : '0.1.0+14 (MVP)';
 
 class AboutPage extends StatelessWidget {
   const AboutPage({super.key});
@@ -88,6 +90,10 @@ class AboutPage extends StatelessWidget {
             ],
             const SfSectionTitle('AI 记忆'),
             const SfPanel(child: _AiMemorySettings()),
+            if (RuntimeLog.instance.enabled) ...[
+              const SfSectionTitle('运行日志'),
+              const SfPanel(child: RuntimeLogSettings()),
+            ],
             const SfSectionTitle('隐私与 AI'),
             SfPanel(
               child: Text(

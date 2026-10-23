@@ -430,6 +430,11 @@ abstract interface class ChatEngine {
   Future<ChatReply> reply(String text, ChatState state);
 }
 
+/// Correlates UI and engine metadata without sharing conversation payloads.
+abstract interface class DiagnosticChatEngine implements ChatEngine {
+  set diagnosticOperation(String? operation);
+}
+
 /// Engines with an in-flight request owned by the home conversation.
 abstract interface class ManagedChatEngine implements ChatEngine {
   void cancelPending();
