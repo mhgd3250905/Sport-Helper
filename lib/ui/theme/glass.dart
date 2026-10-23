@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
+import '../../diagnostics/performance_lab.dart';
+import 'adaptive_glass.dart';
 import 'tokens.dart';
 import 'widgets.dart' show SfControlInk, SfPressedScope;
 
@@ -89,7 +91,13 @@ abstract final class SfGlass {
   /// may still drop it to minimal on a slow device).
   static const overMedia = GlassQuality.standard;
 
-  static GlassQuality resolve(GlassQuality q) => qualityOverride ?? q;
+  static GlassQuality resolve(GlassQuality q, {BuildContext? context}) {
+    final requested = qualityOverride ?? q;
+    if (PerformanceLab.buildEnabled && context != null) {
+      return SfAdaptiveGlassData.maybeOf(context)?.cap(requested) ?? requested;
+    }
+    return requested;
+  }
 
   /// Persisted quality names (AppStore.glassQuality) ⇄ enum.
   static GlassQuality? parse(String? name) {
@@ -131,20 +139,49 @@ class SfGlassSurface extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (PerformanceLab.buildEnabled) {
+      return ListenableBuilder(
+        listenable: PerformanceLab.instance,
+        builder: (context, _) => _surface(context),
+      );
+    }
+    return _surface(context);
+  }
+
+  Widget _surface(BuildContext context) {
     final LiquidShape shape = radius == null
         ? const LiquidOval()
         : LiquidRoundedSuperellipse(borderRadius: radius!);
-    final q = SfGlass.resolve(quality);
-    final glass = GlassContainer(
-      useOwnLayer: true,
-      settings: SfGlass.materialFor(q),
-      quality: q,
-      shape: shape,
-      width: width,
-      height: height,
-      padding: padding,
-      child: child,
-    );
+    final q = SfGlass.resolve(quality, context: context);
+    final Widget glass;
+    if (PerformanceLab.buildEnabled && !PerformanceLab.instance.glassEnabled) {
+      glass = Container(
+        key: const ValueKey('performance-opaque-glass'),
+        width: width,
+        height: height,
+        padding: padding,
+        decoration: ShapeDecoration(
+          color: SfColors.surface.withValues(alpha: 1),
+          shape: radius == null
+              ? const StadiumBorder()
+              : RoundedSuperellipseBorder(
+                  borderRadius: BorderRadius.circular(radius!),
+                ),
+        ),
+        child: child,
+      );
+    } else {
+      glass = GlassContainer(
+        useOwnLayer: true,
+        settings: SfGlass.materialFor(q),
+        quality: q,
+        shape: shape,
+        width: width,
+        height: height,
+        padding: padding,
+        child: child,
+      );
+    }
     if (!SfColors.isDark) return glass;
     if (control) {
       final down = SfPressedScope.of(context);
@@ -162,13 +199,19 @@ class SfGlassSurface extends StatelessWidget {
                 decoration: ShapeDecoration(
                   shape: radius == null
                       ? StadiumBorder(side: side)
-                      : RoundedSuperellipseBorder(borderRadius: BorderRadius.circular(radius!), side: side),
+                      : RoundedSuperellipseBorder(
+                          borderRadius: BorderRadius.circular(radius!),
+                          side: side,
+                        ),
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     stops: const [0, .5],
                     colors: down
-                        ? const [SfControlInk.pressedTop, SfControlInk.pressedFill]
+                        ? const [
+                            SfControlInk.pressedTop,
+                            SfControlInk.pressedFill,
+                          ]
                         : const [SfControlInk.fillTop, SfControlInk.fill],
                   ),
                 ),
@@ -189,16 +232,42 @@ class SfGlassSurface extends StatelessWidget {
             child: DecoratedBox(
               decoration: ShapeDecoration(
                 shape: radius == null
-                    ? const StadiumBorder(side: BorderSide(color: Color(0x1FFFFFFF), width: .8))
+                    ? const StadiumBorder(
+                        side: BorderSide(color: Color(0x1FFFFFFF), width: .8),
+                      )
                     : RoundedSuperellipseBorder(
                         borderRadius: BorderRadius.circular(radius!),
-                        side: const BorderSide(color: Color(0x1FFFFFFF), width: .8),
+                        side: const BorderSide(
+                          color: Color(0x1FFFFFFF),
+                          width: .8,
+                        ),
                       ),
               ),
             ),
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Capture is part of the glass treatment and must also disappear in its
+/// control condition. Production retains the original background source.
+class SfGlassBackgroundSource extends StatelessWidget {
+  const SfGlassBackgroundSource({super.key, required this.child});
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!PerformanceLab.buildEnabled) {
+      return GlassBackgroundSource(child: child);
+    }
+    return ListenableBuilder(
+      listenable: PerformanceLab.instance,
+      child: child,
+      builder: (_, child) => PerformanceLab.instance.glassEnabled
+          ? GlassBackgroundSource(child: child!)
+          : child!,
     );
   }
 }
@@ -241,7 +310,12 @@ class SfGlassField extends StatelessWidget {
             fit: StackFit.expand,
             children: [
               pool(const Alignment(-1.1, 1.05), 1.0, accent, dark ? .22 : .20),
-              pool(const Alignment(1.15, .55), .9, dark ? coolDark : coolLight, dark ? .26 : .30),
+              pool(
+                const Alignment(1.15, .55),
+                .9,
+                dark ? coolDark : coolLight,
+                dark ? .26 : .30,
+              ),
             ],
           ),
         ),
@@ -274,9 +348,24 @@ class SfGlassField extends StatelessWidget {
           fit: StackFit.expand,
           children: [
             pool(const Alignment(-1.0, 1.0), 1.15, accent, dark ? .42 : .38),
-            pool(const Alignment(1.1, .72), .95, dark ? coolDark : skyDeep, dark ? .48 : .30),
-            pool(const Alignment(.15, .98), .55, dark ? const Color(0xFF7FE0C0) : accent, dark ? .20 : .22),
-            pool(const Alignment(-.9, -.55), .9, dark ? coolDark : coolLight, dark ? .18 : .34),
+            pool(
+              const Alignment(1.1, .72),
+              .95,
+              dark ? coolDark : skyDeep,
+              dark ? .48 : .30,
+            ),
+            pool(
+              const Alignment(.15, .98),
+              .55,
+              dark ? const Color(0xFF7FE0C0) : accent,
+              dark ? .20 : .22,
+            ),
+            pool(
+              const Alignment(-.9, -.55),
+              .9,
+              dark ? coolDark : coolLight,
+              dark ? .18 : .34,
+            ),
             pool(const Alignment(.85, -1.0), .7, accent, dark ? .12 : .14),
           ],
         ),
@@ -292,7 +381,12 @@ class SfGlassField extends StatelessWidget {
 /// a control. A new toast replaces the one on screen.
 OverlayEntry? _toastEntry;
 
-void showSfGlassToast(BuildContext context, String text, {required Widget icon, double bottom = 96}) {
+void showSfGlassToast(
+  BuildContext context,
+  String text, {
+  required Widget icon,
+  double bottom = 96,
+}) {
   _toastEntry?.remove();
   _toastEntry = null;
   final overlay = Overlay.maybeOf(context, rootOverlay: true);
@@ -316,7 +410,12 @@ void showSfGlassToast(BuildContext context, String text, {required Widget icon, 
 }
 
 class _SfToastHost extends StatefulWidget {
-  const _SfToastHost({required this.text, required this.icon, required this.bottom, required this.onDone});
+  const _SfToastHost({
+    required this.text,
+    required this.icon,
+    required this.bottom,
+    required this.onDone,
+  });
   final String text;
   final Widget icon;
   final double bottom;
@@ -326,13 +425,17 @@ class _SfToastHost extends StatefulWidget {
   State<_SfToastHost> createState() => _SfToastHostState();
 }
 
-class _SfToastHostState extends State<_SfToastHost> with SingleTickerProviderStateMixin {
+class _SfToastHostState extends State<_SfToastHost>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _c = AnimationController(
     vsync: this,
     duration: SfMotion.medium,
     reverseDuration: SfMotion.fast,
   )..forward();
-  late final CurvedAnimation _a = CurvedAnimation(parent: _c, curve: SfMotion.standard);
+  late final CurvedAnimation _a = CurvedAnimation(
+    parent: _c,
+    curve: SfMotion.standard,
+  );
   Timer? _hold;
 
   @override
@@ -356,7 +459,9 @@ class _SfToastHostState extends State<_SfToastHost> with SingleTickerProviderSta
   @override
   Widget build(BuildContext context) {
     final still = SfMotion.reduced(context);
-    final inset = MediaQuery.viewPaddingOf(context).bottom + MediaQuery.viewInsetsOf(context).bottom;
+    final inset =
+        MediaQuery.viewPaddingOf(context).bottom +
+        MediaQuery.viewInsetsOf(context).bottom;
     final a = _a;
     return Positioned(
       left: SfSpace.x6,
@@ -367,20 +472,50 @@ class _SfToastHostState extends State<_SfToastHost> with SingleTickerProviderSta
           animation: a,
           builder: (_, child) => Opacity(
             opacity: a.value,
-            child: Transform.translate(offset: Offset(0, still ? 0 : 8 * (1 - a.value)), child: child),
+            child: Transform.translate(
+              offset: Offset(0, still ? 0 : 8 * (1 - a.value)),
+              child: child,
+            ),
           ),
           child: Center(
-            child: GlassToast(
-              message: widget.text,
-              icon: widget.icon,
-              type: GlassToastType.success,
-              dismissible: false,
-              settings: SfGlass.materialFor(SfGlass.resolve(SfGlass.control)),
-              quality: SfGlass.resolve(SfGlass.control),
-            ),
+            child: PerformanceLab.buildEnabled
+                ? ListenableBuilder(
+                    listenable: PerformanceLab.instance,
+                    builder: (context, _) => _message(context),
+                  )
+                : _message(context),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _message(BuildContext context) {
+    if (PerformanceLab.buildEnabled && !PerformanceLab.instance.glassEnabled) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: ShapeDecoration(
+          color: SfColors.surface.withValues(alpha: 1),
+          shape: const StadiumBorder(),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            widget.icon,
+            const SizedBox(width: 8),
+            Flexible(child: Text(widget.text)),
+          ],
+        ),
+      );
+    }
+    final quality = SfGlass.resolve(SfGlass.control, context: context);
+    return GlassToast(
+      message: widget.text,
+      icon: widget.icon,
+      type: GlassToastType.success,
+      dismissible: false,
+      settings: SfGlass.materialFor(quality),
+      quality: quality,
     );
   }
 }
@@ -392,10 +527,12 @@ class SfMeasureSize extends SingleChildRenderObjectWidget {
   final ValueChanged<Size> onSize;
 
   @override
-  RenderObject createRenderObject(BuildContext context) => _RenderMeasureSize(onSize);
+  RenderObject createRenderObject(BuildContext context) =>
+      _RenderMeasureSize(onSize);
 
   @override
-  void updateRenderObject(BuildContext context, RenderObject renderObject) => (renderObject as _RenderMeasureSize).onSize = onSize;
+  void updateRenderObject(BuildContext context, RenderObject renderObject) =>
+      (renderObject as _RenderMeasureSize).onSize = onSize;
 }
 
 class _RenderMeasureSize extends RenderProxyBox {

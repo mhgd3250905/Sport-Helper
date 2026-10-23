@@ -38,7 +38,7 @@ class AndroidPerformanceReportPlatform implements PerformanceReportPlatform {
 }
 
 /// All JSON encoding is deferred until export and runs outside the UI isolate.
-class PerformanceReportService {
+class PerformanceReportService extends ChangeNotifier {
   PerformanceReportService({
     FrameRecorder? recorder,
     this.platform = const AndroidPerformanceReportPlatform(),
@@ -49,6 +49,9 @@ class PerformanceReportService {
   final PerformanceReportPlatform platform;
   Future<void>? _initializing;
   bool _metadataReady = false;
+  String renderer = 'unverified';
+  String rendererBackend = 'unverified';
+  bool rendererVerified = false;
 
   Future<void> initialize() => _initializing ??= _initialize();
 
@@ -56,14 +59,14 @@ class PerformanceReportService {
     if (!recorder.enabled) return;
     recorder.setMetadata({
       'appVersion': AppBuildInfo.version,
-      'appBuild': '16',
+      'appBuild': '17',
       'appBaseCommit': AppBuildInfo.performanceBase,
       'sdkRef': AppBuildInfo.sdkRef,
       'appSource': const String.fromEnvironment(
         'SMARTFIT_BUILD_SOURCE',
         defaultValue: 'working_tree',
       ),
-      'measurementKind': 'baseline',
+      'measurementKind': 'raster_controls_v2',
       'flavor': 'internal',
       'buildMode': kReleaseMode
           ? 'release'
@@ -83,6 +86,14 @@ class PerformanceReportService {
       final info = await platform.deviceInfo().timeout(
         const Duration(seconds: 3),
       );
+      final reportedRenderer = '${info['renderer']}'.toLowerCase();
+      rendererVerified =
+          info['rendererVerified'] == true &&
+          (reportedRenderer == 'impeller' || reportedRenderer == 'skia');
+      renderer = rendererVerified ? reportedRenderer : 'unverified';
+      rendererBackend = rendererVerified
+          ? '${info['rendererBackend'] ?? 'unverified'}'
+          : 'unverified';
       recorder.setMetadata({
         'deviceModel': info['model'],
         'deviceManufacturer': info['manufacturer'],
@@ -92,6 +103,10 @@ class PerformanceReportService {
         'appBuildNumber': info['appBuildNumber'],
         'isEmulator': info['isEmulator'],
         'metadataStatus': 'available',
+        'renderer': renderer,
+        'rendererBackend': rendererBackend,
+        'rendererSource': info['rendererSource'] ?? 'unavailable',
+        'rendererVerified': rendererVerified,
       });
       final hz = info['refreshRateHz'];
       if (hz is num && hz.isFinite && hz >= 10 && hz <= 1000) {
@@ -99,6 +114,7 @@ class PerformanceReportService {
         recorder.setMetadata({'refreshRateSource': 'android_display'});
       }
       _metadataReady = true;
+      notifyListeners();
     } on Object {
       _metadataReady = false;
       recorder.setMetadata({'metadataStatus': 'unavailable'});

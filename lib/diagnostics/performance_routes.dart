@@ -18,6 +18,9 @@ class PerformanceRouteObserver extends NavigatorObserver {
     'custom_plan' => 'custom_plan',
     'settings' => 'settings',
     'performance_settings' => 'performance_settings',
+    'performance_lab' => 'performance_lab',
+    'performance_chat' => 'performance_chat',
+    'performance_plan_cards' => 'performance_plan_cards',
     _ => 'other_route',
   };
 

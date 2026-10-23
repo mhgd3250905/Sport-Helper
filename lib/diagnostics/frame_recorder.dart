@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'dart:typed_data';
+import 'dart:ui' show FramePhase;
 
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
@@ -10,6 +11,7 @@ enum FrameScenario {
   filterSwitch,
   actionDetail,
   longChatScroll,
+  planCardScroll,
   planExpand,
   trainingActionSwitch,
   mediaDownloadScroll,
@@ -27,10 +29,12 @@ class FrameRecorder with WidgetsBindingObserver {
     required this.enabled,
     this.maxPages = 32,
     this.maxLabelTransitions = 128,
+    this.maxConditionGroupsPerCase = 16,
     DateTime Function()? clock,
     int Function()? currentFrameNumber,
   }) : assert(maxPages > 0),
        assert(maxLabelTransitions >= 2),
+       assert(maxConditionGroupsPerCase > 0),
        _clock = clock ?? DateTime.now,
        _currentFrameNumber =
            currentFrameNumber ??
@@ -49,13 +53,19 @@ class FrameRecorder with WidgetsBindingObserver {
   final bool enabled;
   final int maxPages;
   final int maxLabelTransitions;
+  final int maxConditionGroupsPerCase;
   final DateTime Function() _clock;
   // Injectable because the test platform dispatcher cannot set engine FrameData.
   final int Function() _currentFrameNumber;
   final _labels = <_FrameLabel>[];
   final _pages = <String, _FrameStats>{};
   final _scenarios = <FrameScenario, _FrameStats>{};
+  final _scenarioConditions = <FrameScenario, _ScenarioConditions>{};
   final _metadata = <String, Object?>{};
+  final _cases = <String, _CaseStats>{};
+  final _firstPageEntries = <String, _PageEntry>{};
+  _CaseStats? _activeCase;
+  _RenderConditions _conditions = const _RenderConditions();
   _FrameStats _total = _FrameStats();
   _FrameStats _otherPages = _FrameStats();
   String _page = 'unknown';
@@ -76,12 +86,15 @@ class FrameRecorder with WidgetsBindingObserver {
   int _evictedLabels = 0;
   int _unavailableFrameKeyBoundaries = 0;
   int _conditionChangesDuringCapture = 0;
+  int _invalidCaseRequests = 0;
   late DateTime _startedAt;
 
   bool get isRunning => _running;
   bool get isCollecting => _attached;
   String get currentPage => _page;
   FrameScenario? get currentScenario => _scenario;
+  String? get currentCaseId => _activeCase?.id;
+  String? get currentCaseVariant => _activeCase?.variant;
 
   /// Calling start repeatedly registers exactly one timings callback/observer.
   void start() {
@@ -144,6 +157,10 @@ class FrameRecorder with WidgetsBindingObserver {
     _otherPages = _FrameStats();
     _pages.clear();
     _scenarios.clear();
+    _scenarioConditions.clear();
+    _cases.clear();
+    _firstPageEntries.clear();
+    _activeCase = null;
     _labels.clear();
     _sessionStartFrameNumber = null;
     _receivedFrames = 0;
@@ -155,6 +172,7 @@ class FrameRecorder with WidgetsBindingObserver {
     _evictedLabels = 0;
     _unavailableFrameKeyBoundaries = 0;
     _conditionChangesDuringCapture = 0;
+    _invalidCaseRequests = 0;
     _startedAt = _clock().toUtc();
     if (_attached) _scheduleBoundary();
   }
@@ -184,6 +202,129 @@ class FrameRecorder with WidgetsBindingObserver {
     _scenario = null;
     _scheduleBoundary();
   }
+
+  /// Starts one of the eight fixed comparison cells. Resampling replaces only
+  /// that cell; old frame labels retain the old object, never the replacement.
+  bool beginCase({
+    required String variant,
+    required FrameScenario scenario,
+    required String fixtureId,
+    required int messageCount,
+  }) {
+    if (!enabled) return false;
+    if (!_variants.contains(variant) ||
+        !_comparisonScenarios.contains(scenario) ||
+        !_pageId.hasMatch(fixtureId) ||
+        messageCount < 0 ||
+        messageCount > 10000) {
+      _invalidCaseRequests++;
+      return false;
+    }
+    // Starting another cell without explicitly ending this one leaves the old
+    // cell incomplete, even if timings for it are reported by a later batch.
+    _activeCase?.completed = false;
+    final id = '${variant}__${scenario.name}';
+    _cases[id]?.retire();
+    final measurement = _CaseStats(
+      id: id,
+      variant: variant,
+      scenario: scenario,
+      fixtureId: fixtureId,
+      messageCount: messageCount,
+      maxConditionGroups: maxConditionGroupsPerCase,
+    );
+    _cases[id] = measurement;
+    _activeCase = measurement;
+    _scenario = scenario;
+    _scheduleBoundary();
+    return true;
+  }
+
+  void endCase({bool completed = true}) {
+    if (!enabled || _activeCase == null) return;
+    _activeCase!.completed = completed;
+    _activeCase = null;
+    _scenario = null;
+    _scheduleBoundary();
+  }
+
+  /// Invalidates a completed cell if delivery of its final engine timings is
+  /// interrupted. Existing frame labels and aggregates remain available, so a
+  /// delayed tail still belongs to its original cell without reopening a case.
+  void invalidateCase(
+    String id, {
+    String reason = 'interrupted_tail_delivery',
+  }) {
+    if (!enabled) return;
+    final measurement = _cases[id];
+    if (measurement == null) return;
+    measurement.completed = false;
+    measurement.invalidationReason = _pageId.hasMatch(reason)
+        ? reason
+        : 'invalidated';
+  }
+
+  /// Actual render state, provided by the live adaptive scope/engine probe.
+  /// Unknown state stays explicit; metadata never substitutes for this state.
+  /// The immutable value is captured with the next engine frame boundary.
+  void setRenderConditions({
+    required bool glassEnabled,
+    required bool starfield,
+    required String glassQuality,
+    required String glassPhase,
+    required bool glassFrost,
+    required String renderer,
+    String rendererBackend = 'unknown',
+    required double adaptiveTargetFrameMs,
+    String theme = 'unknown',
+    double? viewportWidth,
+    double? viewportHeight,
+    double? devicePixelRatio,
+    double? textScale,
+  }) {
+    if (!enabled) return;
+    final next = _RenderConditions(
+      glassEnabled: glassEnabled,
+      starfield: starfield,
+      glassQuality: _conditionId(glassQuality),
+      glassPhase: _conditionId(glassPhase),
+      glassFrost: glassFrost,
+      renderer: switch (renderer.toLowerCase()) {
+        'impeller' => 'Impeller',
+        'skia' => 'Skia',
+        _ => 'unknown',
+      },
+      rendererBackend: _conditionId(rendererBackend),
+      theme: _conditionId(theme),
+      viewportWidth: _positiveDimension(viewportWidth),
+      viewportHeight: _positiveDimension(viewportHeight),
+      devicePixelRatio: _positiveDimension(devicePixelRatio),
+      textScale: _positiveDimension(textScale),
+      adaptiveTargetFrameMs:
+          adaptiveTargetFrameMs.isFinite &&
+              adaptiveTargetFrameMs > 0 &&
+              adaptiveTargetFrameMs <= 100
+          ? adaptiveTargetFrameMs
+          : null,
+    );
+    if (next == _conditions) return;
+    if (_running && _conditions.isSupplied) {
+      _conditionChangesDuringCapture++;
+    }
+    _conditions = next;
+    _scheduleBoundary();
+  }
+
+  static String _conditionId(String value) =>
+      _pageId.hasMatch(value.toLowerCase()) &&
+          value.toLowerCase() != 'adaptive_initial'
+      ? value.toLowerCase()
+      : 'unknown';
+
+  static double? _positiveDimension(double? value) =>
+      value != null && value.isFinite && value > 0 && value <= 100000
+      ? value
+      : null;
 
   /// Defaults to an explicitly reported 60 Hz assumption until set by the app.
   void setRefreshRateHz(double hz) {
@@ -241,6 +382,13 @@ class FrameRecorder with WidgetsBindingObserver {
           _page,
           _scenario,
           _refreshRateHz,
+          conditions: _conditions,
+          measurement: _activeCase,
+          firstPageEntry:
+              _firstPageEntries[_page] ??
+              (_firstPageEntries.length < maxPages
+                  ? (_firstPageEntries[_page] = _PageEntry())
+                  : null),
           active: true,
         ),
       );
@@ -249,6 +397,7 @@ class FrameRecorder with WidgetsBindingObserver {
 
   void _markInactive() {
     if (!_attached || _sessionStartFrameNumber == null) return;
+    _activeCase?.lifecycleInterrupted = true;
     // The last begun frame remains eligible. Subsequent frames until resume
     // are explicitly excluded, even if the engine reports them in a late batch.
     _addLabel(
@@ -257,6 +406,9 @@ class FrameRecorder with WidgetsBindingObserver {
         _page,
         _scenario,
         _refreshRateHz,
+        conditions: _conditions,
+        measurement: _activeCase,
+        firstPageEntry: _firstPageEntries[_page],
         active: false,
       ),
     );
@@ -322,6 +474,9 @@ class FrameRecorder with WidgetsBindingObserver {
         continue;
       }
       _total.add(buildUs, rasterUs, label.refreshRateHz);
+      final vsyncUs = timing.timestampInMicroseconds(FramePhase.vsyncStart);
+      final entry = label.firstPageEntry;
+      entry?.add(buildUs, rasterUs, label.refreshRateHz, vsyncUs);
       final pageStats =
           _pages[label.page] ??
           (_pages.length < maxPages
@@ -335,13 +490,28 @@ class FrameRecorder with WidgetsBindingObserver {
           rasterUs,
           label.refreshRateHz,
         );
+        (_scenarioConditions[scenario] ??= _ScenarioConditions(
+          maxConditionGroupsPerCase,
+        )).add(buildUs, rasterUs, label);
+        label.measurement?.add(
+          buildUs,
+          rasterUs,
+          label,
+          vsyncUs,
+          firstPageEntry: entry?.contains(vsyncUs) ?? false,
+          pageEntryKnown: entry != null,
+        );
+      } else {
+        if (label.measurement case final measurement?) {
+          measurement.excludedPageFrames++;
+        }
       }
     }
   }
 
   /// Snapshot/JSON encoding/file creation belong on the explicit export path.
   Map<String, Object?> snapshot() => {
-    'schema': 1,
+    'schema': 2,
     'reportType': 'frame_performance',
     'app': 'smartfit',
     'startedAt': _startedAt.toIso8601String(),
@@ -352,6 +522,8 @@ class FrameRecorder with WidgetsBindingObserver {
     'currentPage': _page,
     'currentScenario': _scenario?.name,
     'currentRefreshRateHz': _refreshRateHz,
+    'currentCaseId': currentCaseId,
+    'currentRenderConditions': _conditions.snapshot(_refreshRateHz),
     'metadata': Map<String, Object?>.of(_metadata),
     'definitions': {
       'durations':
@@ -394,12 +566,25 @@ class FrameRecorder with WidgetsBindingObserver {
           'starfield, glassQuality or refresh-rate values while running; '
           'initial values and device metadata readiness do not count; '
           'reset clears the count and retains current conditions',
+      'comparisonWindows':
+          'warmupFirst2Seconds is [first case FrameTiming.vsyncStart, +2 s); '
+          'steadyState begins at +2 s; firstPageEntryFirst2Seconds independently '
+          'covers the first observed entry of each page in this round, and may '
+          'overlap warmup or steady state; spikes do not prove shader compilation',
+      'comparisonEligibility':
+          'completed; >=30 s observed case vsync span; steady frames present; '
+          'one actual render condition and one refresh rate; verified renderer; '
+          'variant matches actual switches; long chat >=60 messages; no '
+          'condition overflow or out-of-order case timestamps',
     },
     'retention': {
       'maxPages': maxPages,
       'maxScenarios': FrameScenario.values.length,
       'histogramBucketsPerThread': _DurationStats.bucketCount,
       'maxLabelTransitions': maxLabelTransitions,
+      'maxCases': 8,
+      'maxConditionGroupsPerCase': maxConditionGroupsPerCase,
+      'retainedFirstPageEntries': _firstPageEntries.length,
       'retainedLabelTransitions': _labels.length,
       'evictedLabelTransitions': _evictedLabels,
       'pageOverflow': 'additional page identifiers aggregate in otherPages',
@@ -414,6 +599,7 @@ class FrameRecorder with WidgetsBindingObserver {
     'invalidPageLabelCount': _invalidPageLabels,
     'unavailableFrameKeyBoundaryCount': _unavailableFrameKeyBoundaries,
     'conditionChangesDuringCapture': _conditionChangesDuringCapture,
+    'invalidCaseRequestCount': _invalidCaseRequests,
     'total': _total.snapshot(),
     'pages': {
       for (final entry in _pages.entries) entry.key: entry.value.snapshot(),
@@ -423,11 +609,36 @@ class FrameRecorder with WidgetsBindingObserver {
       for (final entry in _scenarios.entries)
         entry.key.name: entry.value.snapshot(),
     },
+    'cases': {
+      for (final entry in _cases.entries) entry.key: entry.value.snapshot(),
+    },
+    'scenarioConditions': {
+      for (final entry in _scenarioConditions.entries)
+        entry.key.name: entry.value.snapshot(),
+    },
+    'pageEntries': {
+      for (final entry in _firstPageEntries.entries)
+        entry.key: entry.value.snapshot(),
+    },
   };
 
   static final _pageId = RegExp(r'^[a-z][a-z0-9_.]{0,47}$');
   static final _unsafeMetadata = RegExp(r'[\x00-\x1f\\/@]');
-  static const _scenarioExcludedPages = {'settings', 'performance_settings'};
+  static const _scenarioExcludedPages = {
+    'settings',
+    'performance_settings',
+    'performance_lab',
+  };
+  static const _comparisonScenarios = {
+    FrameScenario.longChatScroll,
+    FrameScenario.planCardScroll,
+  };
+  static const _variants = {
+    'glass_on_stars_on',
+    'glass_on_stars_off',
+    'glass_off_stars_on',
+    'glass_off_stars_off',
+  };
   static const _conditionKeys = {
     'theme',
     'appearance',
@@ -445,6 +656,9 @@ class FrameRecorder with WidgetsBindingObserver {
     'systemVersion',
     'refreshRateSource',
     'renderer',
+    'rendererBackend',
+    'rendererSource',
+    'rendererVerified',
     'isEmulator',
     'sdkRef',
     'appSource',
@@ -463,19 +677,389 @@ class FrameRecorder with WidgetsBindingObserver {
 }
 
 class _FrameLabel {
-  const _FrameLabel(
+  _FrameLabel(
     this.startFrameNumber,
     this.page,
     this.scenario,
     this.refreshRateHz, {
     required this.active,
-  });
+    required this.conditions,
+    required this.measurement,
+    required this.firstPageEntry,
+  }) : conditionKey = '${conditions.key}|$refreshRateHz';
 
   final int startFrameNumber;
   final String page;
   final FrameScenario? scenario;
   final double refreshRateHz;
   final bool active;
+  final _RenderConditions conditions;
+  final _CaseStats? measurement;
+  final _PageEntry? firstPageEntry;
+  final String conditionKey;
+}
+
+class _RenderConditions {
+  const _RenderConditions({
+    this.glassEnabled,
+    this.starfield,
+    this.glassQuality = 'unknown',
+    this.glassPhase = 'unknown',
+    this.glassFrost,
+    this.renderer = 'unknown',
+    this.rendererBackend = 'unknown',
+    this.adaptiveTargetFrameMs,
+    this.theme = 'unknown',
+    this.viewportWidth,
+    this.viewportHeight,
+    this.devicePixelRatio,
+    this.textScale,
+  });
+
+  final bool? glassEnabled;
+  final bool? starfield;
+  final String glassQuality;
+  final String glassPhase;
+  final bool? glassFrost;
+  final String renderer;
+  final String rendererBackend;
+  final double? adaptiveTargetFrameMs;
+  final String theme;
+  final double? viewportWidth;
+  final double? viewportHeight;
+  final double? devicePixelRatio;
+  final double? textScale;
+
+  bool get isSupplied => glassEnabled != null;
+  String get key =>
+      '$glassEnabled|$starfield|$glassQuality|$glassPhase|$glassFrost|'
+      '$renderer|$rendererBackend|$adaptiveTargetFrameMs|$theme|$viewportWidth|'
+      '$viewportHeight|$devicePixelRatio|$textScale';
+
+  Map<String, Object?> snapshot(double hz) => {
+    'glassEnabled': glassEnabled,
+    'starfield': starfield,
+    'glassQuality': glassQuality,
+    'glassPhase': glassPhase,
+    'glassFrost': glassFrost,
+    'renderer': renderer,
+    'rendererBackend': rendererBackend,
+    'refreshRateHz': hz,
+    'frameBudgetMs': 1000 / hz,
+    'adaptiveTargetFrameMs': adaptiveTargetFrameMs,
+    'theme': theme,
+    'viewportWidth': viewportWidth,
+    'viewportHeight': viewportHeight,
+    'devicePixelRatio': devicePixelRatio,
+    'textScale': textScale,
+  };
+
+  @override
+  bool operator ==(Object other) =>
+      other is _RenderConditions &&
+      glassEnabled == other.glassEnabled &&
+      starfield == other.starfield &&
+      glassQuality == other.glassQuality &&
+      glassPhase == other.glassPhase &&
+      glassFrost == other.glassFrost &&
+      renderer == other.renderer &&
+      rendererBackend == other.rendererBackend &&
+      adaptiveTargetFrameMs == other.adaptiveTargetFrameMs &&
+      theme == other.theme &&
+      viewportWidth == other.viewportWidth &&
+      viewportHeight == other.viewportHeight &&
+      devicePixelRatio == other.devicePixelRatio &&
+      textScale == other.textScale;
+
+  @override
+  int get hashCode => Object.hash(
+    glassEnabled,
+    starfield,
+    glassQuality,
+    glassPhase,
+    glassFrost,
+    renderer,
+    rendererBackend,
+    adaptiveTargetFrameMs,
+    theme,
+    viewportWidth,
+    viewportHeight,
+    devicePixelRatio,
+    textScale,
+  );
+}
+
+class _PageEntry {
+  int? firstVsyncUs;
+  final _stats = _FrameStats();
+  int _framesBeforeFirstObservation = 0;
+
+  void add(int buildUs, int rasterUs, double hz, int vsyncUs) {
+    firstVsyncUs ??= vsyncUs;
+    if (vsyncUs < firstVsyncUs!) _framesBeforeFirstObservation++;
+    if (contains(vsyncUs)) _stats.add(buildUs, rasterUs, hz);
+  }
+
+  bool contains(int vsyncUs) {
+    final start = firstVsyncUs;
+    return start != null && vsyncUs >= start && vsyncUs - start < 2000000;
+  }
+
+  Map<String, Object?> snapshot() => {
+    'firstVsyncStartUs': firstVsyncUs,
+    'first2Seconds': _stats.snapshot(),
+    'earlierOutOfOrderFrameCount': _framesBeforeFirstObservation,
+  };
+}
+
+class _WindowStats {
+  final allFrames = _FrameStats();
+  final warmup = _FrameStats();
+  final steady = _FrameStats();
+  final firstPageEntry = _FrameStats();
+
+  void add(
+    int buildUs,
+    int rasterUs,
+    double hz, {
+    required bool isWarmup,
+    required bool isSteady,
+    required bool isFirstPageEntry,
+  }) {
+    allFrames.add(buildUs, rasterUs, hz);
+    if (isWarmup) warmup.add(buildUs, rasterUs, hz);
+    if (isSteady) steady.add(buildUs, rasterUs, hz);
+    if (isFirstPageEntry) firstPageEntry.add(buildUs, rasterUs, hz);
+  }
+
+  Map<String, Object?> snapshot() => {
+    'allFrames': allFrames.snapshot(),
+    'warmupFirst2Seconds': warmup.snapshot(),
+    'steadyState': steady.snapshot(),
+    'firstPageEntryFirst2Seconds': firstPageEntry.snapshot(),
+  };
+}
+
+class _ConditionStats {
+  _ConditionStats(this.conditions, this.refreshRateHz);
+
+  final _RenderConditions conditions;
+  final double refreshRateHz;
+  final windows = _WindowStats();
+
+  Map<String, Object?> snapshot() => {
+    'condition': conditions.snapshot(refreshRateHz),
+    ...windows.snapshot(),
+  };
+}
+
+class _ScenarioConditions {
+  _ScenarioConditions(this.maxGroups);
+
+  final int maxGroups;
+  final _groups = <String, (_RenderConditions, double, _FrameStats)>{};
+  int _overflowFrames = 0;
+
+  void add(int buildUs, int rasterUs, _FrameLabel label) {
+    var group = _groups[label.conditionKey];
+    if (group == null) {
+      if (_groups.length >= maxGroups) {
+        _overflowFrames++;
+        return;
+      }
+      group = (label.conditions, label.refreshRateHz, _FrameStats());
+      _groups[label.conditionKey] = group;
+    }
+    group.$3.add(buildUs, rasterUs, label.refreshRateHz);
+  }
+
+  Map<String, Object?> snapshot() => {
+    'groups': [
+      for (final group in _groups.values)
+        {
+          'condition': group.$1.snapshot(group.$2),
+          'frames': group.$3.snapshot(),
+        },
+    ],
+    'overflowFrameCount': _overflowFrames,
+  };
+}
+
+class _CaseStats {
+  _CaseStats({
+    required this.id,
+    required this.variant,
+    required this.scenario,
+    required this.fixtureId,
+    required this.messageCount,
+    required this.maxConditionGroups,
+  });
+
+  final String id;
+  final String variant;
+  final FrameScenario scenario;
+  final String fixtureId;
+  final int messageCount;
+  final int maxConditionGroups;
+  _WindowStats? _windows = _WindowStats();
+  _WindowStats get windows => _windows!;
+  final groups = <String, _ConditionStats>{};
+  final _pages = <String>{};
+  bool completed = false;
+  String? invalidationReason;
+  bool lifecycleInterrupted = false;
+  int excludedPageFrames = 0;
+  bool _retired = false;
+  int? _firstVsyncUs;
+  int? _lastVsyncUs;
+  int _overflowConditionFrames = 0;
+  bool _outOfOrderTimings = false;
+  bool _unknownPageEntry = false;
+  bool _scenarioMismatch = false;
+
+  /// Old frame labels can outlive a resampled matrix cell. Retain only the
+  /// small identity object and discard its histograms immediately.
+  void retire() {
+    _retired = true;
+    _windows = null;
+    groups.clear();
+    _pages.clear();
+  }
+
+  void add(
+    int buildUs,
+    int rasterUs,
+    _FrameLabel label,
+    int vsyncUs, {
+    required bool firstPageEntry,
+    required bool pageEntryKnown,
+  }) {
+    if (_retired) return;
+    if (label.scenario != scenario) {
+      _scenarioMismatch = true;
+      return;
+    }
+    _firstVsyncUs ??= vsyncUs;
+    if (_lastVsyncUs != null && vsyncUs < _lastVsyncUs!) {
+      _outOfOrderTimings = true;
+    }
+    _lastVsyncUs = math.max(_lastVsyncUs ?? vsyncUs, vsyncUs);
+    if (_pages.length < 2) _pages.add(label.page);
+    if (!pageEntryKnown) _unknownPageEntry = true;
+    final elapsed = vsyncUs - _firstVsyncUs!;
+    final isWarmup = elapsed >= 0 && elapsed < 2000000;
+    final isSteady = elapsed >= 2000000;
+    windows.add(
+      buildUs,
+      rasterUs,
+      label.refreshRateHz,
+      isWarmup: isWarmup,
+      isSteady: isSteady,
+      isFirstPageEntry: firstPageEntry,
+    );
+    final _ConditionStats group;
+    if (groups[label.conditionKey] case final existing?) {
+      group = existing;
+    } else if (groups.length < maxConditionGroups) {
+      group = _ConditionStats(label.conditions, label.refreshRateHz);
+      groups[label.conditionKey] = group;
+    } else {
+      _overflowConditionFrames++;
+      return;
+    }
+    group.windows.add(
+      buildUs,
+      rasterUs,
+      label.refreshRateHz,
+      isWarmup: isWarmup,
+      isSteady: isSteady,
+      isFirstPageEntry: firstPageEntry,
+    );
+  }
+
+  double get _durationSeconds =>
+      _firstVsyncUs == null ? 0 : (_lastVsyncUs! - _firstVsyncUs!) / 1000000;
+
+  List<String> get _comparisonIssues {
+    final issues = <String>[];
+    if (!completed) issues.add('incomplete');
+    if (invalidationReason case final reason?) {
+      issues.add('case_invalidated');
+      issues.add(reason);
+    }
+    if (windows.allFrames.count == 0) issues.add('no_frames');
+    if (_durationSeconds < 30) issues.add('observed_span_less_than_30_seconds');
+    if (windows.steady.count == 0) issues.add('no_steady_state_frames');
+    if (groups.length > 1) issues.add('mixed_render_conditions');
+    if (_overflowConditionFrames > 0) issues.add('condition_groups_overflow');
+    if (_outOfOrderTimings) issues.add('out_of_order_vsync_timestamps');
+    if (_unknownPageEntry) issues.add('page_entry_history_unavailable');
+    if (_pages.length > 1) issues.add('multiple_pages');
+    if (_scenarioMismatch) issues.add('scenario_changed_during_case');
+    if (lifecycleInterrupted) issues.add('lifecycle_interrupted');
+    if (excludedPageFrames > 0) issues.add('excluded_page_frames_during_case');
+    if (scenario == FrameScenario.longChatScroll && messageCount < 60) {
+      issues.add('long_chat_has_fewer_than_60_messages');
+    }
+    if (groups.values.any((group) => group.conditions.renderer == 'unknown')) {
+      issues.add('renderer_unknown');
+    }
+    if (groups.values.any((group) {
+      final condition = group.conditions;
+      return !condition.isSupplied ||
+          condition.starfield == null ||
+          condition.glassQuality == 'unknown' ||
+          condition.glassPhase == 'unknown' ||
+          condition.glassFrost == null ||
+          condition.adaptiveTargetFrameMs == null ||
+          condition.theme == 'unknown' ||
+          condition.viewportWidth == null ||
+          condition.viewportHeight == null ||
+          condition.devicePixelRatio == null ||
+          condition.textScale == null;
+    })) {
+      issues.add('actual_render_condition_unknown');
+    }
+    if (groups.values.any((group) {
+      final budget = group.conditions.adaptiveTargetFrameMs;
+      return budget != null &&
+          (budget - 1000 / group.refreshRateHz).abs() > .05;
+    })) {
+      issues.add('adaptive_budget_does_not_match_refresh_rate');
+    }
+    final expectsGlass = variant.startsWith('glass_on_');
+    final expectsStars = variant.endsWith('_stars_on');
+    if (groups.values.any((group) {
+      final condition = group.conditions;
+      return condition.glassEnabled != expectsGlass ||
+          condition.starfield != expectsStars;
+    })) {
+      issues.add('variant_switches_do_not_match_actual_conditions');
+    }
+    return issues;
+  }
+
+  Map<String, Object?> snapshot() {
+    final issues = _comparisonIssues;
+    return {
+      'id': id,
+      'variant': variant,
+      'scenario': scenario.name,
+      'fixtureId': fixtureId,
+      'messageCount': messageCount,
+      'completed': completed,
+      'invalidationReason': invalidationReason,
+      'observedDurationSeconds': _durationSeconds,
+      'firstVsyncStartUs': _firstVsyncUs,
+      'lastVsyncStartUs': _lastVsyncUs,
+      'pages': _pages.toList(),
+      'comparisonReady': issues.isEmpty,
+      'comparisonIssues': issues,
+      'overflowConditionFrameCount': _overflowConditionFrames,
+      ...windows.snapshot(),
+      'conditions': [for (final group in groups.values) group.snapshot()],
+    };
+  }
 }
 
 class _FrameStats {
@@ -555,5 +1139,6 @@ class _DurationStats {
     'p99Ms': _percentile(.99),
     'worstMs': _count == 0 ? null : _worstUs / 1000,
     'overBudgetFrames': _overBudget,
+    'overBudgetRatio': _count == 0 ? null : _overBudget / _count,
   };
 }

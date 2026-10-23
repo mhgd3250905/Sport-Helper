@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Build
 import androidx.core.content.FileProvider
 import io.flutter.embedding.engine.FlutterEngine
+import io.flutter.embedding.engine.renderer.FlutterUiDisplayListener
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import java.io.File
@@ -14,8 +15,15 @@ import java.util.concurrent.RejectedExecutionException
 
 /** The production flavor compiles neither this bridge nor the report provider. */
 class InternalMainActivity : MainActivity() {
+    // FlutterActivity creates its engine after Activity construction. Do not
+    // attribute an earlier engine in the same process to this Activity.
+    private val activityCreatedAtEpochMs = System.currentTimeMillis()
     private var performanceChannel: MethodChannel? = null
     private var pendingShare: MethodChannel.Result? = null
+    private var rendererProbe: InternalRendererProbe? = null
+    private var rendererDisplayListener: FlutterUiDisplayListener? = null
+    private var rendererObservedEngine: FlutterEngine? = null
+    private var rendererDisplayedOnce = false
     private val exportExecutor = Executors.newSingleThreadExecutor { task ->
         Thread(task, "smartfit-performance-export")
     }
@@ -23,6 +31,26 @@ class InternalMainActivity : MainActivity() {
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
+        rendererDisplayListener?.let { listener ->
+            rendererObservedEngine?.renderer?.removeIsDisplayingFlutterUiListener(listener)
+        }
+        rendererProbe?.close()
+        rendererObservedEngine = flutterEngine
+        rendererDisplayedOnce = flutterEngine.renderer.isDisplayingFlutterUi
+        val probe = InternalRendererProbe(activityCreatedAtEpochMs)
+        rendererProbe = probe
+        rendererDisplayListener = object : FlutterUiDisplayListener {
+            override fun onFlutterUiDisplayed() {
+                if (!rendererDisplayedOnce) {
+                    rendererDisplayedOnce = true
+                    probe.onFirstFrameDisplayed()
+                }
+            }
+            override fun onFlutterUiNoLongerDisplayed() = Unit
+        }.also(flutterEngine.renderer::addIsDisplayingFlutterUiListener)
+        // Observe startup before logcat's ring can evict the engine announcement.
+        // The first rendered frame triggers a second read after backend fallback.
+        if (rendererDisplayedOnce) probe.onFirstFrameDisplayed() else probe.refresh()
         performanceChannel = MethodChannel(
             flutterEngine.dartExecutor.binaryMessenger,
             "smartfit/performance"
@@ -31,15 +59,38 @@ class InternalMainActivity : MainActivity() {
                 when (call.method) {
                     "deviceInfo" -> {
                         try {
-                            result.success(deviceInfo())
+                            reportDeviceInfo(result, deviceInfo())
                         } catch (_: Exception) {
                             result.error("device_info_unavailable", "Device information is unavailable.", null)
                         }
                     }
+                    "refreshRenderer" -> reportDeviceInfo(result, emptyMap())
                     "share" -> shareReport(call, result)
                     else -> result.notImplemented()
                 }
             }
+        }
+    }
+
+    private fun reportDeviceInfo(result: MethodChannel.Result, snapshot: Map<String, Any>) {
+        if (closing || isFinishing || isDestroyed) {
+            result.error("device_info_activity_closed", "The activity has closed.", null)
+            return
+        }
+        val accepted = rendererProbe?.refresh { observed ->
+            if (closing || isFinishing || isDestroyed ||
+                observed.source == "android_engine_startup_log_activity_closed"
+            ) {
+                result.error("device_info_activity_closed", "The activity has closed.", null)
+            } else {
+                val evidence = if (rendererDisplayedOnce) observed else {
+                    InternalRendererEvidence.unverified("before_first_frame")
+                }
+                result.success(snapshot + evidence.toMap())
+            }
+        } ?: false
+        if (!accepted) {
+            result.error("device_info_busy", "Renderer information is unavailable or busy.", null)
         }
     }
 
@@ -160,6 +211,13 @@ class InternalMainActivity : MainActivity() {
     }
 
     override fun cleanUpFlutterEngine(flutterEngine: FlutterEngine) {
+        rendererDisplayListener?.let { listener ->
+            rendererObservedEngine?.renderer?.removeIsDisplayingFlutterUiListener(listener)
+        }
+        rendererDisplayListener = null
+        rendererObservedEngine = null
+        rendererProbe?.close()
+        rendererProbe = null
         performanceChannel?.setMethodCallHandler(null)
         performanceChannel = null
         finishShare("share_activity_closed")
@@ -168,6 +226,8 @@ class InternalMainActivity : MainActivity() {
 
     override fun onDestroy() {
         closing = true
+        rendererProbe?.close()
+        rendererProbe = null
         finishShare("share_activity_closed")
         exportExecutor.shutdownNow()
         super.onDestroy()

@@ -21,9 +21,12 @@ import 'diagnostics/frame_recorder.dart';
 import 'diagnostics/performance_report.dart';
 import 'diagnostics/performance_routes.dart';
 import 'diagnostics/performance_vm.dart';
+import 'diagnostics/performance_conditions.dart';
+import 'diagnostics/performance_lab.dart';
 import 'ui/chat/chat_home_page.dart';
 import 'ui/theme/app_theme.dart';
 import 'ui/theme/glass.dart';
+import 'ui/theme/adaptive_glass.dart';
 import 'ui/theme/tokens.dart';
 import 'voice/just_audio_output.dart';
 
@@ -137,7 +140,7 @@ Future<void> main() async {
       brightnessResolver: Theme.maybeBrightnessOf,
       // Benchmarks the device's raster budget and settles premium / standard
       // / minimal; the settled tier is kept so the next launch starts there.
-      adaptiveQuality: true,
+      adaptiveQuality: !FrameRecorder.buildEnabled,
       adaptiveConfig: GlassAdaptiveScopeConfig(
         initialQuality: SfGlass.initialQuality(store.glassQuality),
         // The web's ceiling is standard; keep it there rather than letting a
@@ -145,10 +148,21 @@ Future<void> main() async {
         minQuality: kIsWeb ? GlassQuality.standard : GlassQuality.minimal,
         onQualityChanged: (_, to) => store.setGlassQuality(to.name),
       ),
-      child: TrainingMediaScope(
-        repository: media,
-        child: SmartFitApp(services: services),
-      ),
+      child: FrameRecorder.buildEnabled
+          ? SfAdaptiveGlass(
+              initialQuality: SfGlass.initialQuality(store.glassQuality),
+              onQualityChanged: (_, to) => store.setGlassQuality(to.name),
+              freezeListenable: PerformanceLab.instance,
+              freezeAdaptation: () => PerformanceLab.instance.freezeAdaptation,
+              child: TrainingMediaScope(
+                repository: media,
+                child: SmartFitApp(services: services),
+              ),
+            )
+          : TrainingMediaScope(
+              repository: media,
+              child: SmartFitApp(services: services),
+            ),
     ),
   );
 }
@@ -217,25 +231,23 @@ class _SmartFitAppState extends State<SmartFitApp> with WidgetsBindingObserver {
         builder: (context, child) {
           if (FrameRecorder.buildEnabled) {
             final store = widget.services.store;
-            final rate = View.of(context).display.refreshRate;
-            if (rate.isFinite && rate >= 10 && rate <= 1000) {
-              FrameRecorder.instance.setRefreshRateHz(rate);
-              FrameRecorder.instance.setMetadata({
-                'refreshRateSource': 'flutter_display',
-              });
-            }
             FrameRecorder.instance.setMetadata({
               'appearance': store.appearance,
               'theme': Theme.of(context).brightness.name,
-              'starfield': store.starfield,
-              'glassQuality': store.glassQuality ?? 'adaptive_initial',
               'contentActionCount': widget.services.library.length,
               'chatMessageCount': widget.services.chat.messages.length,
             });
           }
           return Material(
             type: MaterialType.transparency,
-            child: SfPaletteScope(child: child!),
+            child: SfPaletteScope(
+              child: FrameRecorder.buildEnabled
+                  ? PerformanceConditions(
+                      store: widget.services.store,
+                      child: child!,
+                    )
+                  : child!,
+            ),
           );
         },
         // The chat opens with the safety talk on first launch.

@@ -342,6 +342,46 @@ void main() {
       expect(platform.exports, isEmpty);
     });
 
+    test('only a verified native renderer updates actual conditions', () async {
+      final platform = _ReportPlatform()
+        ..readDevice = () async => {
+          ..._device,
+          'renderer': 'impeller',
+          'rendererBackend': 'vulkan',
+          'rendererSource': 'android_engine_startup_log_own_pid',
+          'rendererVerified': true,
+        };
+      final recorder = createRecorder();
+      final service = PerformanceReportService(
+        recorder: recorder,
+        platform: platform,
+      );
+      var changed = 0;
+      service.addListener(() => changed++);
+      await service.initialize();
+      expect(service.renderer, 'impeller');
+      expect(service.rendererBackend, 'vulkan');
+      expect(service.rendererVerified, isTrue);
+      expect(
+        (recorder.snapshot()['metadata'] as Map)['rendererVerified'],
+        isTrue,
+      );
+      expect(changed, 1);
+      platform.readDevice = () async => {
+        ..._device,
+        'renderer': 'skia',
+        'rendererVerified': false,
+      };
+      await service.refreshDeviceInfo();
+      expect(service.renderer, 'unverified');
+      expect(service.rendererVerified, isFalse);
+      expect(
+        (recorder.snapshot()['metadata'] as Map)['renderer'],
+        'unverified',
+      );
+      service.dispose();
+    });
+
     test('filename is ASCII, UTC and safe for the native allowlist', () {
       expect(
         performanceReportFilename(
@@ -394,38 +434,40 @@ void main() {
       },
     );
 
-    testWidgets('production settings contains no performance entry', (
-      tester,
-    ) async {
-      expect(FrameRecorder.buildEnabled, isFalse);
-      final store = AppStore(_MemoryStorage());
-      addTearDown(store.dispose);
-      final services = AppServices(
-        library: ExerciseLibrary([]),
-        catalog: TemplateCatalog([]),
-        store: store,
-        voiceLibrary: VoiceLibrary.empty,
-        voiceOutput: const MutedVoiceOutput(),
-      );
-      tester.view.physicalSize = const Size(1080, 9000);
-      tester.view.devicePixelRatio = 2.5;
-      addTearDown(tester.view.reset);
-      await tester.pumpWidget(
-        AppScope(
-          services: services,
-          child: MaterialApp(
-            theme: buildTheme(SfPalette.light),
-            home: const AboutPage(),
+    testWidgets(
+      'production settings contains no performance entry',
+      (tester) async {
+        expect(FrameRecorder.buildEnabled, isFalse);
+        final store = AppStore(_MemoryStorage());
+        addTearDown(store.dispose);
+        final services = AppServices(
+          library: ExerciseLibrary([]),
+          catalog: TemplateCatalog([]),
+          store: store,
+          voiceLibrary: VoiceLibrary.empty,
+          voiceOutput: const MutedVoiceOutput(),
+        );
+        tester.view.physicalSize = const Size(1080, 9000);
+        tester.view.devicePixelRatio = 2.5;
+        addTearDown(tester.view.reset);
+        await tester.pumpWidget(
+          AppScope(
+            services: services,
+            child: MaterialApp(
+              theme: buildTheme(SfPalette.light),
+              home: const AboutPage(),
+            ),
           ),
-        ),
-      );
-      await tester.pump();
-      expect(
-        find.byKey(const ValueKey('performance-report-open')),
-        findsNothing,
-      );
-      expect(find.text('导出性能报告'), findsNothing);
-    });
+        );
+        await tester.pump();
+        expect(
+          find.byKey(const ValueKey('performance-report-open')),
+          findsNothing,
+        );
+        expect(find.text('导出性能报告'), findsNothing);
+      },
+      skip: FrameRecorder.buildEnabled,
+    );
 
     testWidgets(
       'export disables edits and duplicate taps; success or later cancel preserves statistics',

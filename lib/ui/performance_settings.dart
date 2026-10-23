@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../app/services.dart';
 import '../diagnostics/frame_recorder.dart';
 import '../diagnostics/performance_report.dart';
+import '../diagnostics/performance_lab.dart';
+import 'performance_lab_page.dart';
 import 'theme.dart';
 
 const performanceScenarios = <FrameScenario, String>{
@@ -58,6 +60,54 @@ class _PerformanceSettingsPageState extends State<PerformanceSettingsPage> {
             style: SfType.body,
           ),
           const SizedBox(height: SfSpace.x3),
+          if (PerformanceLab.buildEnabled) ...[
+            const SfSectionTitle('Raster 内测对照'),
+            ListenableBuilder(
+              listenable: PerformanceLab.instance,
+              builder: (context, _) {
+                final lab = PerformanceLab.instance;
+                final persistedStars =
+                    context
+                        .getInheritedWidgetOfExactType<AppScope>()
+                        ?.services
+                        .store
+                        .starfield ??
+                    true;
+                return Column(
+                  children: [
+                    SwitchListTile(
+                      title: const Text('玻璃'),
+                      subtitle: const Text('关闭时使用不透明纯色底；仅本次内测会话生效'),
+                      value: lab.glassEnabled,
+                      onChanged: _busy ? null : lab.setGlassEnabled,
+                    ),
+                    SwitchListTile(
+                      title: const Text('星尘'),
+                      value: lab.starfieldFor(persistedStars),
+                      onChanged: _busy ? null : lab.setStarfieldOverride,
+                    ),
+                  ],
+                );
+              },
+            ),
+            SfPrimaryButton(
+              key: const ValueKey('performance-open-lab'),
+              label: '生成 72 条测试会话 · 八格自动采样',
+              onPressed: _busy
+                  ? null
+                  : () => Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        settings: const RouteSettings(name: 'performance_lab'),
+                        builder: (_) => PerformanceLabPage(service: _service),
+                      ),
+                    ),
+            ),
+            Text(
+              '八格使用同一档位、固定步速和滑动距离；一次约 5 分钟。'
+              '采样后可导出包含稳态和进入尖峰的同一份报告。',
+              style: SfType.caption,
+            ),
+          ],
           Text(_recorder.isRunning ? '记录中' : '记录已暂停', style: SfType.callout),
           Text(
             '当前场景：${performanceScenarios[_recorder.currentScenario] ?? '自动按页面记录'}',

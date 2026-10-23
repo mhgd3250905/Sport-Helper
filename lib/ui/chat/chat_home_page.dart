@@ -10,6 +10,7 @@ import '../../chat/chat_controller.dart';
 import '../../chat/chat_models.dart';
 import '../../domain/exercise.dart';
 import '../../domain/plan.dart';
+import '../../diagnostics/performance_lab.dart';
 import '../about_page.dart';
 import '../custom_plan_page.dart';
 import '../library_page.dart';
@@ -31,10 +32,14 @@ import 'validated_plan_card.dart';
 /// The home screen: one conversation floating in an endless sky. No app
 /// bar, no borders; the plans drawer opens from the input's left icon.
 class ChatHomePage extends StatefulWidget {
-  const ChatHomePage({super.key, this.controller});
+  const ChatHomePage({super.key, this.controller, this.scrollController});
 
   /// Injected by tests; otherwise the app-wide [AppServices.chat].
   final ChatController? controller;
+
+  /// Internal scripted comparisons share the production conversation viewport.
+  /// A supplied controller remains owned by its caller.
+  final ScrollController? scrollController;
 
   @override
   State<ChatHomePage> createState() => _ChatHomePageState();
@@ -43,7 +48,7 @@ class ChatHomePage extends StatefulWidget {
 class _ChatHomePageState extends State<ChatHomePage> {
   late ChatController _chat;
   StreamSubscription<String>? _actions;
-  final _scroll = ScrollController();
+  late final _scroll = widget.scrollController ?? ScrollController();
 
   /// Height of the floating glass dock (chips + input, incl. the bottom
   /// safe area); the conversation reserves it as bottom padding so the
@@ -69,7 +74,7 @@ class _ChatHomePageState extends State<ChatHomePage> {
   @override
   void dispose() {
     _actions?.cancel();
-    _scroll.dispose();
+    if (widget.scrollController == null) _scroll.dispose();
     _input.dispose();
     super.dispose();
   }
@@ -228,9 +233,16 @@ class _ChatHomePageState extends State<ChatHomePage> {
           ],
         ),
         body: ListenableBuilder(
-          listenable: s.store,
+          listenable: PerformanceLab.buildEnabled
+              ? Listenable.merge([s.store, PerformanceLab.instance])
+              : s.store,
           builder: (context, _) => CosmosBackground(
-            animate: s.store.starfield,
+            showStars: PerformanceLab.buildEnabled
+                ? PerformanceLab.instance.starsVisible
+                : true,
+            animate: PerformanceLab.buildEnabled
+                ? PerformanceLab.instance.starfieldFor(s.store.starfield)
+                : s.store.starfield,
             child: Stack(
               fit: StackFit.expand,
               children: [
@@ -246,7 +258,7 @@ class _ChatHomePageState extends State<ChatHomePage> {
                       fit: StackFit.expand,
                       children: [
                         Positioned.fill(
-                          child: GlassBackgroundSource(
+                          child: SfGlassBackgroundSource(
                             child: Stack(
                               fit: StackFit.expand,
                               children: [

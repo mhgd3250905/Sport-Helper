@@ -15,8 +15,17 @@ import '../theme/tokens.dart';
 /// when [animate] is off, under reduced motion, in the background, and
 /// when a page covers the chat (TickerMode), e.g. during a workout.
 class CosmosBackground extends StatefulWidget {
-  const CosmosBackground({super.key, this.animate = true, this.child});
+  const CosmosBackground({
+    super.key,
+    this.animate = true,
+    this.showStars = true,
+    this.child,
+  });
   final bool animate;
+
+  /// Explicit internal off removes the layer; the default preserves the
+  /// existing static stars when the user's animation preference is off.
+  final bool showStars;
   final Widget? child;
 
   @override
@@ -59,7 +68,8 @@ class _CosmosBackgroundState extends State<CosmosBackground>
   }
 
   void _sync() {
-    final want = widget.animate && _foreground && !_reduceMotion;
+    final want =
+        widget.showStars && widget.animate && _foreground && !_reduceMotion;
     if (want && !_ticker.isActive) {
       _base = _time.value;
       _lastFrame = Duration.zero;
@@ -90,13 +100,14 @@ class _CosmosBackgroundState extends State<CosmosBackground>
       fit: StackFit.expand,
       children: [
         SkyFill(palette: p),
-        RepaintBoundary(
-          child: CustomPaint(
-            painter: _StarPainter(_stars, _time, p.dust, p.isDark),
-            isComplex: false,
-            willChange: true,
+        if (widget.showStars)
+          RepaintBoundary(
+            child: CustomPaint(
+              painter: _StarPainter(_stars, _time, p.dust, p.isDark),
+              isComplex: false,
+              willChange: true,
+            ),
           ),
-        ),
         ?widget.child,
       ],
     );
@@ -123,7 +134,10 @@ class SkyFill extends StatelessWidget {
           center: const Alignment(.9, -.95),
           radius: 1.1,
           colors: palette.isDark
-              ? const [Color(0x0AFFFFFF), Color(0x00FFFFFF)] // neutral lift, no blue
+              ? const [
+                  Color(0x0AFFFFFF),
+                  Color(0x00FFFFFF),
+                ] // neutral lift, no blue
               : const [Color(0x0F9DB8AC), Color(0x009DB8AC)],
         ),
       ),
@@ -132,7 +146,16 @@ class SkyFill extends StatelessWidget {
 }
 
 class _Star {
-  const _Star(this.x, this.y, this.r, this.alpha, this.vx, this.vy, this.freq, this.phase);
+  const _Star(
+    this.x,
+    this.y,
+    this.r,
+    this.alpha,
+    this.vx,
+    this.vy,
+    this.freq,
+    this.phase,
+  );
   final double x, y, r, alpha, vx, vy, freq, phase;
 
   /// Fixed seed: the same sky every launch. Nearer (bigger) motes drift a
@@ -157,7 +180,8 @@ class _Star {
 }
 
 class _StarPainter extends CustomPainter {
-  _StarPainter(this.stars, this.time, this.color, this.dark) : super(repaint: time);
+  _StarPainter(this.stars, this.time, this.color, this.dark)
+    : super(repaint: time);
   final List<_Star> stars;
   final ValueListenable<double> time;
   final Color color;
