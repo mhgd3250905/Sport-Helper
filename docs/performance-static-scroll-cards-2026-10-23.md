@@ -43,8 +43,23 @@
 
 ## 验证与交付
 
-全量 Flutter 测试 382 项通过，3 项跳过（1 项内测专用、2 项需显式开启的截图生成）；internal 专项 82 项通过，2 项生产门禁断言由默认全量验证。两项浅色/深色截图生成检查通过。静态分析零问题；Python 性能工具 44 项通过（八格工具 27、既有比较工具 17）。`git diff --check` 通过，依赖锁文件字节与 SDK 固定引用均保持原样。
+全量 Flutter 测试 382 项通过，3 项跳过（1 项内测专用、2 项需显式开启的截图生成）；internal 专项 82 项通过，2 项生产门禁断言由默认全量验证。两项浅色/深色截图生成检查通过。静态分析零问题；Python 性能工具 44 项通过（八格工具 27、既有比较工具 17）。`git diff --check` 通过，依赖锁文件与修前 +17 分支提交 `67d16ab` 字节相同，SDK 固定引用保持原样。
 
-安装包身份在构建完成后附于本节及机器可读交付记录。只有新手机报告才能填写性能达标结果。
+手机包：[SmartFit-0.1.0+18-static-scroll-cards-internal-arm64-v8a-release.apk](../.buildlog/install/SmartFit-0.1.0+18-static-scroll-cards-internal-arm64-v8a-release.apk)。源码提交 `c6f09087a3dd1c3e291bc18e6722223ba52fd91f`；后续交付文档提交不冒充重新打包。
+
+| 安装包检查 | 结果 |
+| --- | --- |
+| 身份 | `com.ugk.smartfit.internal` / versionCode `2018` / arm64-v8a / release / 非 debuggable |
+| 大小 | 49,597,887 字节 |
+| SHA-256 | `88b6f9bf9289e45b7a63d38fe0aa4a52173323a248ed050d8628b35b8fe483e0` |
+| 签名 | v2 验证通过，与 +17 signer 相同，可覆盖安装 |
+| JNI | 实际 arm64 release 的 Android 存储 JNI 门禁通过 |
+| 内测标记 | AOT 含 v3、记录器、列表卡片开关、固定会话及实际打包源码标记；native 探测/分享标记存在；没有 profile VM-service 扩展 |
+| 生产隔离 | 实际 arm64 production release 的 7 项 Dart 内测标记、3 项 native 内测标记及 profile VM-service 扩展全部不存在；静态卡片存在，JNI 与签名检查通过。不交付该无 AI 构建凭据检查包 |
+| 手机性能 | 尚未收到 +18 报告；P99 与超预算目标待复测 |
+
+机器可读身份与检查见 [交付记录](reports/performance-static-scroll-cards-delivery-2026-10-23.json)。只有新手机报告才能填写性能达标结果。
+
+Cockpit 本地服务不可达，旧进度请求仍未确认；保留原 clientRequestId 和参数，不用新请求号绕过。源码、截图、测试结果与包身份已在本地 Git 分支保存。
 
 本轮留在 `feat/performance-baseline`，开哥复测和同意后才合入 main 并推送。图标配色分支保持独立，性能先合，之后再 rebase、复测并按确认顺序合入。`ask_user` 询问气泡仍待本轮合入后开始。
