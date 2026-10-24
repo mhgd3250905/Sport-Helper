@@ -1,6 +1,6 @@
 # SmartFit iOS 1.0.0 (25) 本机发布记录
 
-状态：**TestFlight `1.0.0 (25)` 已上传并处理完成，当前缺少出口合规确认；未提交 App Store 审核**。2026-10-24 18:42（Asia/Shanghai）Xcode 确认上传成功，18:49:45 已观察到处理完成后的 Build 25。处理完成、可测试和正式发布是独立状态。
+状态：**TestFlight `1.0.0 (25)` 已上传、处理完成并保存出口合规，当前显示“准备提交”；未提交 App Store 审核**。2026-10-24 18:42（Asia/Shanghai）Xcode 确认上传成功，18:49:45 观察到处理完成，19:01 保存合规答案，19:02:26 刷新核对后状态仍为“准备提交”。尚未分配测试群组或安装测试。
 
 ## 候选与范围
 
@@ -61,9 +61,9 @@ main 与 release 已分叉开发，本次仅同步 iOS 文件，没有把 releas
 
 - ASC App ID：**`6826550088`**；[App 记录](https://appstoreconnect.apple.com/apps/6826550088) / [TestFlight](https://appstoreconnect.apple.com/apps/6826550088/testflight/ios)。
 - App Store 版本草稿已保存为 **1.0.0 / 准备提交**，与包身份一致。没有点击“添加以供审核”。
-- 18:42 上传成功，TestFlight 已处理完成并显示 **版本 1.0.0，构建版本 25，缺少出口合规证明**。当前还不声明可安装测试。
+- 18:42 上传成功；TestFlight 处理完成后曾提示缺少出口合规。19:01 保存答案后，**版本 1.0.0，构建版本 25，准备提交，90 天后过期**；刷新后“缺少出口合规证明”计数为 0。
 - 未添加测试员或群组，未开启测试通知、外部 Beta Review、正式 App Review 或公开发布。App Privacy 答案与截图已准备在本机，尚未代开哥保存 / 提交商店隐私声明。
 
-出口合规问卷按本轮素材下载的 `Dart HttpClient` / 标准 TLS 实现进入“标准加密算法”分支，目前停在“是否会在法国分发”，尚未保存地区选择。该分类依据 [Dart 3.12.2 的 SecureSocket 实现](https://github.com/dart-lang/sdk/blob/3.12.2/runtime/bin/secure_socket_filter.cc) 作出；[Apple 文档](https://developer.apple.com/help/app-store-connect/reference/app-information/export-compliance-documentation-for-encryption)对非 Apple 系统提供的标准算法及法国分发列出文稿要求。
+出口合规已按素材下载的 `Dart HttpClient` / 标准 TLS 实现选择“标准加密算法”，并根据开哥明确回复“本次不向法国分发”将法国问题保存为“否”。分类依据 [Dart 3.12.2 的 SecureSocket 实现](https://github.com/dart-lang/sdk/blob/3.12.2/runtime/bin/secure_socket_filter.cc)；[Apple 文档](https://developer.apple.com/help/app-store-connect/reference/app-information/export-compliance-documentation-for-encryption)列出标准算法与法国分发的文稿要求。此处保存的是合规问卷，未代选 App Store 国家 / 地区；送审地区需与该答案一致，将来开放法国前重新核对。
 
-下一步：由开哥确认本次是否向法国分发，完成出口合规后核对 Build 25 状态。正式商店资料、隐私声明、真机验收和提交审核由开哥复核。当前无需再提供仓库或签名密钥。
+本轮上传与合规操作已完成，无需再提供账号、密钥或附件。后续由开哥安排测试群组与真机验收，复核正式商店资料、隐私声明和发布地区，再自行提交 App Store 审核。
