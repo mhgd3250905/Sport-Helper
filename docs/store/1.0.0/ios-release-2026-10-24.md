@@ -70,4 +70,8 @@ main 与 release 已分叉开发，本次仅同步 iOS 文件，没有把 releas
 
 ## 后续商店草稿准备
 
-开哥随后要求继续推进。2026-10-24 已通过同一 Playwright 登录态只读核对 Build 25、版本页和 App 信息；Build 状态仍为“准备提交”，未提交审核。新增 [商店草稿交接](ios-submission-handoff.md)、[可填写字段与截图校验信息](ios-app-store-draft.json) 和 [iOS 政策补充稿](ios-policy-supplement-draft.md)。本阶段尚未将这些资料保存到 ASC 或部署网站；待核实字段和后续授权范围在交接中逐项列明。
+开哥随后要求继续推进，并明确确认保存 ASC 草稿。2026-10-24 已通过同一 Playwright 登录态保存副标题、“健康健美”类别、推广文本、描述、关键词、支持和营销 URL、审核备注、无需登录设置、Build 25 关联及手动发布。重新打开页面后，文本与本地填写稿逐项一致，构建与设置保留；没有提交审核。
+
+原六张截图已上传到对应大屏分组。ASC 当前额外将 6.1/6.3 英寸的中等灵动岛显示屏列为必填，因此补拍相同运行源码的 iPhone 15 Pro / iOS 26.5 真实界面三张（1179×2556），未改像素或缩放原图。本轮再次实际完成本地计划 → 训练 → 自然完成，结果 5 分钟 / 6/6 动作，未观察到崩溃。19:40:39 刷新媒体管理后，三个分组各显示 3/10 张截图，无尺寸或上传错误。补拍使用模拟器，不是最终 TestFlight 真机验收；测试后模拟器已关闭。
+
+新增完整截图包 `build/ios-release-evidence/SmartFit-1.0.0-25-all-iPhone-screenshots.zip`，12,857,865 bytes，SHA-256 `36735405be4a9cf6b57d037662d59a274da9e34edb55393d21dcef1f493c9bcd`；原六张包与实际上传 IPA 均保持原哈希。详情见 [商店草稿交接](ios-submission-handoff.md) 及 [字段与九张截图校验信息](ios-app-store-draft.json)。[iOS 政策补充稿](ios-policy-supplement-draft.md) 仍在本机待复核，未部署网站；版权、审核联系人、最终隐私声明、年龄分级及分发地区仍留待定稿，未添加测试群组或邀请。

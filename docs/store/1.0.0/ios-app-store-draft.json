@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "status": "LOCAL_DRAFT_NOT_SAVED_TO_ASC",
+  "status": "ASC_DRAFT_SAVED_NOT_SUBMITTED",
   "preparedDate": "2026-10-24",
   "appId": "6826550088",
   "bundleId": "com.ugk.smartfit",
@@ -30,6 +30,24 @@
     "contactOwnerMustEnterPrivately": true
   },
   "screenshots": [
+    {
+      "path": "build/ios-release-evidence/screenshots/6.1-inch/01-library.png",
+      "width": 1179,
+      "height": 2556,
+      "sha256": "afae350880e857008d9f14348e37a3d4c28f6a3fcde0b326714d430d1251c36e"
+    },
+    {
+      "path": "build/ios-release-evidence/screenshots/6.1-inch/02-training.png",
+      "width": 1179,
+      "height": 2556,
+      "sha256": "4e485123f5f2fd1974bd34f2df16b1e470b873d343ecd1c491704651c50a54c8"
+    },
+    {
+      "path": "build/ios-release-evidence/screenshots/6.1-inch/03-finish.png",
+      "width": 1179,
+      "height": 2556,
+      "sha256": "de647f891fd3a7043e189c2170fcd1c9516d249333c3e9335e91a58c4aec6e00"
+    },
     {
       "path": "build/ios-release-evidence/screenshots/6.5-inch/01-library.png",
       "width": 1242,
@@ -90,5 +108,46 @@
     "public release",
     "TestFlight tester invitations or external Beta App Review",
     "privacy website deployment"
-  ]
+  ],
+  "lastVerifiedAt": "2026-10-24T19:40:39+08:00",
+  "ascSaved": {
+    "subtitle": true,
+    "primaryCategory": true,
+    "promotionalText": true,
+    "description": true,
+    "keywords": true,
+    "supportUrl": true,
+    "marketingUrl": true,
+    "buildAssociation": "1.0.0 (25)",
+    "signInRequired": false,
+    "reviewNotes": true,
+    "releaseOption": "MANUAL",
+    "screenshotsUploaded": 9,
+    "screenshotGroups": {
+      "6.1-inch": 3,
+      "6.7-inch": 3,
+      "6.5-inch": 3
+    },
+    "persistedAfterReload": true,
+    "formalReviewSubmitted": false,
+    "publicReleaseTriggered": false
+  },
+  "additionalScreenshotEvidence": {
+    "reason": "ASC media manager marks medium Dynamic Island iPhone screenshots as required",
+    "deviceType": "iPhone 15 Pro",
+    "iosVersion": "26.5",
+    "imageSize": [
+      1179,
+      2556
+    ],
+    "screenshotsFrom": "simctl io screenshot; unscaled PNG",
+    "candidateSourceUnchanged": true,
+    "trainingCompleted": "5 minutes, 6/6 movements, natural completion",
+    "testFlightDeviceValidation": false
+  },
+  "allScreenshotArchive": {
+    "path": "build/ios-release-evidence/SmartFit-1.0.0-25-all-iPhone-screenshots.zip",
+    "bytes": 12857865,
+    "sha256": "36735405be4a9cf6b57d037662d59a274da9e34edb55393d21dcef1f493c9bcd"
+  }
 }
