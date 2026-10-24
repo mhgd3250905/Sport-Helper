@@ -9,9 +9,11 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 /// Why: on Android a backgrounded Flutter activity without a foreground
 /// service can be throttled or frozen by the system (cached-app freezer,
 /// Doze), which would stall the 100 ms session ticker and the voice cues.
-/// Keeping the screen on is the lowest-risk guard (no permission, no
-/// manifest service, no Play Console declaration). A manual lock with the
-/// power button is still not covered – see docs/development-roadmap.md D-10.
+/// This helper only keeps the display awake. The SDK TrainerPlayer separately
+/// holds TrainingSessionService (mediaPlayback) during a training session;
+/// its Android permissions and Play declaration are documented in
+/// docs/store/1.0.0/play-declarations.md. This display helper alone does not
+/// guarantee behavior after a manual screen lock.
 ///
 /// Reference-counted so nested sessions don't release each other's hold.
 /// Platform errors are swallowed: in widget tests (no plugin) and on

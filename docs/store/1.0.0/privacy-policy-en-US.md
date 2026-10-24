@@ -30,7 +30,11 @@ If you choose to email support, we use the address, message, and attachments you
 
 ## Permissions
 
-`INTERNET` permits the sockets needed for on-device loopback media playback. `ACCESS_NETWORK_STATE` allows the local media component to observe connectivity. Training/audio components may declare `WAKE_LOCK` to maintain necessary playback or screen behavior during a workout. The final signed AAB's merged manifest is the definitive permission inventory.
+`INTERNET` permits the sockets needed for on-device loopback media playback. `ACCESS_NETWORK_STATE` allows the local media component to observe connectivity. The final candidate also declares `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_MEDIA_PLAYBACK`, and `WAKE_LOCK` through the UGK training component's media playback foreground service.
+
+After you start a workout, the training service supports local spoken guidance, chimes, and session timing when the screen is locked or the activity is in the background. The component creates a continuing training notification and a system media session, and holds a time-bounded CPU wake lock during the session; the training page also keeps the screen awake. You can return to the app to pause or end the workout. The service is released at completion, allowing a short closing-audio tail, or when the player is left or disposed. It also stops when the app task is removed. Pausing or muting does not necessarily stop the service immediately: it may remain for the current workout session.
+
+These capabilities support local workout playback and execution. They do not record the microphone, read body sensors, or upload workout or safety-check data. The notification's display surface follows Android's system rules. This release does not request advertising or full-screen notification capabilities. The final signed AAB's merged manifest is the definitive permission and service inventory.
 
 This release does not request runtime access to the camera, microphone, location, contacts, photo library, broad file storage, activity recognition, body sensors, health platforms, advertising identifiers, or notifications.
 

@@ -25,14 +25,46 @@ Google 对只在设备处理且不发离设备的信息与“收集”的区分�
 |---|---|
 | `INTERNET` | 训练视频由同设备回环 HTTP 服务交给系统 WebView。没有向公网收集训练记录的服务配置 |
 | `ACCESS_NETWORK_STATE` | 媒体组件读取连接状态；不读取位置，不建立用户画像 |
-| `WAKE_LOCK`（如合并清单保留） | 跟练时维持必要播放/亮屏行为；不是后台定位或身体传感器权限 |
+| `WAKE_LOCK` | SDK 训练服务在会话期间持有带超时上限的 CPU 唤醒锁；页面另使用亮屏锁。不是后台定位或身体传感器权限 |
+| `FOREGROUND_SERVICE`、`FOREGROUND_SERVICE_MEDIA_PLAYBACK` | 最终候选清单确有声明，来自固定 SDK 的 `com.ugk.trainer.TrainingSessionService`，类型为 `mediaPlayback`。用于用户主动开始的跟练语音/提示音与会话计时，须提交真实 FGS 声明，不能填“未使用前台服务” |
 | AndroidX 动态接收器签名权限（如合并清单出现） | 依赖生成的内部组件隔离权限，不能当成读取用户资料的授权 |
 | 相机、录音、位置、照片/视频广泛访问、联系人、短信、电话、身体传感器、活动识别、Health Connect | 未使用，不申请，相关声明选无；若最终清单出现意外权限，先处理代码/依赖，不靠表单隐瞒 |
 | 广告 ID | 不使用，无广告或广告 SDK |
-| 前台服务、无障碍、VPN、所有文件访问、包安装/查询、后台位置 | 未实现相应产品能力；不得申请特殊用途资格。最终 AAB 清单若不同应先复核 |
+| 无障碍、VPN、所有文件访问、包安装/查询、后台位置 | 未实现相应产品能力，不申请特殊用途资格；真实媒体播放前台服务另按下节申报 |
 | 网络明文 | 公网明文禁用，仅 `localhost` / `127.0.0.1` 本机媒体例外；不是允许任意 HTTP 服务 |
 
 所有准确权限名称、min/target SDK、组件及 debuggable 结论最终由签名 AAB 的合并清单落定，本表不把源码 manifest 当最终产物证据。
+
+## 媒体播放前台服务声明
+
+父任务最终候选清单已确认 `com.ugk.trainer.TrainingSessionService` 为非导出服务，声明 `foregroundServiceType="mediaPlayback"`、`stopWithTask="true"`，以及上述两项 FGS 权限和 `WAKE_LOCK`。这是 SDK 的真实功能，不为通过扫描而删除服务或隐瞒权限。
+
+| Console 问项 | 可审阅答案草稿 |
+|---|---|
+| FGS 类型 / 具体用途 | **Media Playback / 媒体播放**：用户主动开始一次带语音/提示音的健身跟练，锁屏或切到后台时继续播放指导。不要改报并未声明的 health、dataSync、location、microphone 或 full-screen intent |
+| 对应 App 核心功能 | 动作/套路跟练中的本地指导音频和计时；不用于广告、自动启动的背景配乐或常驻联网 |
+| 用户如何启动 | 首页选动作或套路 → 完成安全确认 → 计划页点击开始跟练 → 进入 SDK 训练播放器。不是在 App 冷启动或开机时自动播放 |
+| 若服务延迟启动 | 用户已按开始，但开场提示/训练节奏不能按预期即时开始；不能将一段当前进行的指导播放当成可延后的后台任务 |
+| 若系统中断 | 语音提示或提示音可能断开，锁屏/后台的会话时序也可能受调度影响，用户可能错过换动作/结束提示。这是使用理由，不是本轮已经量化证明的全部后台行为 |
+| 用户如何察觉和停止 | 播放器显示进度并播放指导；SDK 创建“训练进行中”的持续通知和媒体会话。用户可返回 App 暂停/结束训练；结束、不适停止、离开播放器或销毁页面时释放服务，结束语允许短暂尾音后释放。移除任务时服务 `stopWithTask=true`。通知上的外部播放按钮未实现，不要声称可直接从通知暂停/停止 |
+| 运行期限 | 绑定当前训练会话，具有会话结束/退出清理及 CPU 唤醒锁安全超时；不是无限期后台服务 |
+| 演示视频链接 | **待录制并由开哥提供可访问链接；本轮尚未上传视频或通过 FGS 审核** |
+
+English description draft:
+
+> The media playback foreground service supports a workout the user explicitly starts. It keeps locally stored spoken exercise guidance and chimes available when the user locks the screen or leaves the activity, while the current workout timer continues. Deferring the service would delay the guidance the user just requested; interrupting it could cut off exercise-change or completion cues. The app presents workout progress and a training notification. The user can return to the player to pause or end the session. The service is released when the session ends or the player is left, with a short allowance for closing audio. It is not started for advertising, background music on app launch, or remote data collection.
+
+实际实现边界：`TrainerPlayer.keepAlive` 默认开启；即使语音和提示音均关闭，固定 SDK 仍会持有该类型的训练服务，`mediaPlayback` 布尔仅控制系统媒体会话状态，并非 Service 启动开关。暂停时会同步暂停状态，但服务仍跟随会话保留。因此不能把答案写成“只在声音开启或每一段有声播放期间启动”。静音/暂停路径的必要性及持续时间需结合真机证据和 Play 反馈复核，本草稿不保证 Google 会接受所有路径。
+
+演示视频拍摄清单（不是已完成证据）：
+
+1. 显示最终候选身份，打开 App，按正常按钮选择动作/套路并进入训练；不要自动启动音频冒作用户操作。
+2. 在语音/提示音开启的真实训练中展示可听见的指导与计时。
+3. 切到后台或锁屏，展示仍在播放的真实音频及系统训练通知/媒体会话，再回到播放器；Android 不同通知展示规则应如实录制。
+4. 在 App 内暂停/继续，再明确结束或离开训练，展示音频和服务通知停止。不要伪造通知外部控制按钮。
+5. 视频仅用非私人测试记录，不展示密钥、序列号、账号通知或其他应用的私人画面。提供审核人员可访问的真实视频链接，不能把本地文件路径或本清单当成链接。
+
+Google 要求 Android 14+ 的已用 FGS 类型提供用途、延迟/中断影响及触发流程演示，详见[FGS 声明说明](https://support.google.com/googleplay/android-developer/answer/13392821?hl=en)；mediaPlayback 对应后台音视频播放，见[Android 类型定义](https://developer.android.com/develop/background-work/services/fgs/service-types#media)。是否批准由 Play 审核决定，不等于静态 allowlist 或 AAB 扫描通过。
 
 ## 健康与医疗声明
 

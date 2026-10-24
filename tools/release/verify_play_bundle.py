@@ -15,6 +15,13 @@ from xml.etree import ElementTree as ET
 
 ANDROID = "{http://schemas.android.com/apk/res/android}"
 AI_HOSTS = (b"api.uuugk.win", b"ugk-ai-proxy.294851575.workers.dev")
+
+
+def foreground_service_type(value):
+    # bundletool serializes the Android mediaPlayback bit as a numeric enum.
+    return "mediaPlayback" if value in ("mediaPlayback", "2", "0x00000002") else value
+
+
 SECRET_PATTERNS = {
     "provider_secret": re.compile(rb"\bsk-[A-Za-z0-9_-]{32,}\b"),
     "google_api_key": re.compile(rb"AIza[A-Za-z0-9_-]{35}"),
@@ -55,6 +62,12 @@ def inspect(bundle, java, bundletool, expected_build):
         "debuggable": app.get(ANDROID + "debuggable", "false") == "true",
         "allowBackup": app.get(ANDROID + "allowBackup", "true") == "true",
         "permissions": sorted(node.get(ANDROID + "name") for node in manifest.findall("uses-permission")),
+        "foregroundServices": [
+            {"name": node.get(ANDROID + "name"),
+             "type": foreground_service_type(node.get(ANDROID + "foregroundServiceType")),
+             "exported": node.get(ANDROID + "exported", "false") == "true"}
+            for node in app.findall("service") if node.get(ANDROID + "foregroundServiceType")
+        ],
         "secretFindings": [],
         "aiHostStrings": [],
         "native64BitLibraries": [],
@@ -64,6 +77,7 @@ def inspect(bundle, java, bundletool, expected_build):
     allowed_permissions = {
         "android.permission.INTERNET", "android.permission.ACCESS_NETWORK_STATE",
         "android.permission.WAKE_LOCK", "com.ugk.smartfit.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION",
+        "android.permission.FOREGROUND_SERVICE", "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK",
     }
     if (report["applicationId"], report["versionName"], report["versionCode"]) != (
         "com.ugk.smartfit", "1.0.0", expected_build
@@ -73,6 +87,10 @@ def inspect(bundle, java, bundletool, expected_build):
         report["issues"].append("release_manifest_contract_failed")
     if set(report["permissions"]) - allowed_permissions:
         report["issues"].append("unexpected_permissions")
+    if report["foregroundServices"] != [
+        {"name": "com.ugk.trainer.TrainingSessionService", "type": "mediaPlayback", "exported": False}
+    ]:
+        report["issues"].append("unexpected_foreground_service_contract")
     with zipfile.ZipFile(bundle) as archive:
         for name in archive.namelist():
             if name.endswith("/"):
