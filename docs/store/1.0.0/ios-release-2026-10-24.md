@@ -67,3 +67,7 @@ main 与 release 已分叉开发，本次仅同步 iOS 文件，没有把 releas
 出口合规已按素材下载的 `Dart HttpClient` / 标准 TLS 实现选择“标准加密算法”，并根据开哥明确回复“本次不向法国分发”将法国问题保存为“否”。分类依据 [Dart 3.12.2 的 SecureSocket 实现](https://github.com/dart-lang/sdk/blob/3.12.2/runtime/bin/secure_socket_filter.cc)；[Apple 文档](https://developer.apple.com/help/app-store-connect/reference/app-information/export-compliance-documentation-for-encryption)列出标准算法与法国分发的文稿要求。此处保存的是合规问卷，未代选 App Store 国家 / 地区；送审地区需与该答案一致，将来开放法国前重新核对。
 
 本轮上传与合规操作已完成，无需再提供账号、密钥或附件。后续由开哥安排测试群组与真机验收，复核正式商店资料、隐私声明和发布地区，再自行提交 App Store 审核。
+
+## 后续商店草稿准备
+
+开哥随后要求继续推进。2026-10-24 已通过同一 Playwright 登录态只读核对 Build 25、版本页和 App 信息；Build 状态仍为“准备提交”，未提交审核。新增 [商店草稿交接](ios-submission-handoff.md)、[可填写字段与截图校验信息](ios-app-store-draft.json) 和 [iOS 政策补充稿](ios-policy-supplement-draft.md)。本阶段尚未将这些资料保存到 ASC 或部署网站；待核实字段和后续授权范围在交接中逐项列明。

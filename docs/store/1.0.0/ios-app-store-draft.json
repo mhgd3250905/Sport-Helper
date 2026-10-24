@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "status": "LOCAL_DRAFT_NOT_SAVED_TO_ASC",
+  "preparedDate": "2026-10-24",
+  "appId": "6826550088",
+  "bundleId": "com.ugk.smartfit",
+  "version": "1.0.0",
+  "build": "25",
+  "sourceCommit": "638d4917d57ed662d5bb4133efeda33ce5907120",
+  "uploadedIpaSha256": "49d279d7713f81cc7425716546e6528b8097e24d8efb3b4afe469c9127d2dd0c",
+  "locale": "zh-Hans",
+  "appInformation": {
+    "name": "SmartFit 智能健身助手",
+    "subtitle": "动作示范与本地训练计划",
+    "primaryCategory": "Health & Fitness",
+    "secondaryCategory": null
+  },
+  "versionInformation": {
+    "promotionalText": "浏览动作示范，安排本地训练计划，跟随计时、语音与提示音练习。",
+    "description": "SmartFit 为日常健身提供动作浏览、训练计划与跟练工具。\n\n主要功能\n• 浏览动作说明与示范，了解练习方式。\n• 使用本地规则和模板安排训练计划，保存后再次练习。\n• 跟随训练计时、语音指导和提示音完成练习。\n• 在本机查看训练结果，调整外观和音频设置。\n\n部分示范已内置，其他素材可通过 HTTPS 按需下载，并在校验后播放。下载需要网络和流量；可在设置中管理 Wi-Fi 下载与缓存。计时、语音不代表动作识别或姿势评估。\n\n本版本不提供在线 AI 服务。无需注册账号，无广告，当前版本无购买或付费订阅。界面和语音指导主要为简体中文。\n\n隐私\n对话、计划、训练结果和偏好保存在本机。素材下载会向 Cloudflare 分发服务发送普通网络请求，包括 IP 地址、请求时间、请求的素材路径和 HTTP 元数据；不附加聊天、安全回答、完整训练记录、设备 UUID 或 AI 记忆。系统备份及设备迁移可能按设备和用户设置处理本地应用数据。详情请参阅隐私政策。\n\n运动安全\nSmartFit 用于一般健身示范，不是医疗器械，不提供疾病诊断、治疗、治愈或预防服务。存在伤病或其他运动风险时，请先咨询专业人士；训练中出现疼痛、头晕或胸闷等不适时，请立即停止。肌肉高亮仅为教学示意。\n\n支持：mhgd3250905@gmail.com\n隐私政策：https://smartfit-store.pages.dev/privacy/",
+    "keywords": "健身训练,动作示范,拉伸放松,热身练习,训练计划,跟练计时",
+    "supportUrl": "https://smartfit-store.pages.dev/support/",
+    "marketingUrl": "https://smartfit-store.pages.dev/",
+    "copyright": null,
+    "releaseOptionProposal": "MANUAL"
+  },
+  "reviewInformation": {
+    "signInRequired": false,
+    "notes": "SmartFit 1.0.0 (25) is a general fitness demonstration and guided workout app for iPhone. The interface and spoken guidance are primarily in Simplified Chinese. No account, sign-in, subscription, purchase, camera, microphone, location or HealthKit permission is required.\n\nReview path:\n1. Open the app and read the safety notice. Complete the four safety questions truthfully. On a test device, a path with all answers set to No unlocks local plan generation; a Yes answer intentionally restricts training plans while exercise browsing remains available. Safety confirmation can be restarted in 关于与设置.\n2. Enter 跑步前热身 on the home screen, or use 自己选条件 to select 运动前热身. Open the resulting plan and tap the play button (开始训练).\n3. Observe the exercise demonstrations, timer, spoken instructions and pause controls. Allow the plan to finish to see the completion screen. Reviewers do not need to perform the physical exercises to inspect the software flow.\n4. Open 动作库 from the lower-left menu to browse demonstrations. Some media is bundled and other media downloads over HTTPS. Downloads follow the 仅在 Wi-Fi 下载 setting under the media settings; an uncached demonstration may wait for Wi-Fi when that setting is enabled.\n\nThis build preserves the existing AI-labelled interface and memory settings, but no online AI credential is configured. Conversation and workout planning use local rules/templates; online AI responses are unavailable in this build. No API key or reviewer account is needed.\n\nThe app is not a medical device and does not recognize body movements or assess posture. Training audio may continue while a workout is active in the background. Local dialogue, safety answers, plans, results and preferences are stored on the device. Media delivery uses https://smartfit-media.pages.dev/v0.3.0-app/ and Cloudflare; ordinary request metadata is described in the privacy policy.",
+    "contactOwnerMustEnterPrivately": true
+  },
+  "screenshots": [
+    {
+      "path": "build/ios-release-evidence/screenshots/6.5-inch/01-library.png",
+      "width": 1242,
+      "height": 2688,
+      "sha256": "0fa4b3e24b677dd5394608b9ade94888865bf8c8e499b0a7be099c108f12463c"
+    },
+    {
+      "path": "build/ios-release-evidence/screenshots/6.5-inch/02-training.png",
+      "width": 1242,
+      "height": 2688,
+      "sha256": "79df3748a7785eaa3a62c73650bbf640301547dfe2df5d33c3a5ff0949b18105"
+    },
+    {
+      "path": "build/ios-release-evidence/screenshots/6.5-inch/03-finish.png",
+      "width": 1242,
+      "height": 2688,
+      "sha256": "7626239c078f31b2abea9c4415e6ffe0543c4d48cc50dde0fa4f9b9eba7363ca"
+    },
+    {
+      "path": "build/ios-release-evidence/screenshots/6.7-inch/01-library.png",
+      "width": 1290,
+      "height": 2796,
+      "sha256": "2c09647efd29469984d70e8c022e9ec677ed69a6e894358845fe57b989c3457f"
+    },
+    {
+      "path": "build/ios-release-evidence/screenshots/6.7-inch/02-training.png",
+      "width": 1290,
+      "height": 2796,
+      "sha256": "7183fca429abffbdd6faf3208068649991f05434db30542e23b8bdcfbc193fcc"
+    },
+    {
+      "path": "build/ios-release-evidence/screenshots/6.7-inch/03-finish.png",
+      "width": 1290,
+      "height": 2796,
+      "sha256": "95e7ca9153f3f5d071eb84ec9a66d66fa302af4207caaa475f7665de5e3cc4c3"
+    }
+  ],
+  "privacy": {
+    "draft": "docs/store/1.0.0/ios-privacy-draft.md",
+    "policyUrl": "https://smartfit-store.pages.dev/privacy/",
+    "iosPolicySupplement": "docs/store/1.0.0/ios-policy-supplement-draft.md",
+    "finalDeclarationSaved": false
+  },
+  "distribution": {
+    "priceProposal": "FREE",
+    "franceAllowed": false,
+    "otherTerritoriesNotSelectedByAgent": true
+  },
+  "pendingOwnerFields": [
+    "copyright owner",
+    "App Review contact name and international phone number",
+    "final availability territories excluding France",
+    "content-rights and age-rating review",
+    "CDN data-practice review and final App Privacy declaration"
+  ],
+  "notAuthorizedByThisDraft": [
+    "formal App Review submission",
+    "public release",
+    "TestFlight tester invitations or external Beta App Review",
+    "privacy website deployment"
+  ]
+}
