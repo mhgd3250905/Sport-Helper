@@ -87,6 +87,8 @@ class _PlayerPageState extends State<PlayerPage> {
               accent: p.accent,
               accentText: p.accentText,
               onAccent: p.onAccent,
+              pausedColor: p.emphasis,
+              onPaused: p.onEmphasis,
               text: p.text,
               muted: p.muted,
               faint: p.faint,

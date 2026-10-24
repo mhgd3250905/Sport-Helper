@@ -281,6 +281,8 @@ void main() {
         );
         expect(player.theme.brightness, palette.brightness);
         expect(player.theme.accent, palette.accent);
+        expect(player.theme.pausedColor, palette.emphasis);
+        expect(player.theme.onPaused, palette.onEmphasis);
         expect(player.theme.fontFamily, sfFontFamily);
         expect(player.voice!.source, same(s.voiceLibrary));
         expect(player.voice!.output, same(output));

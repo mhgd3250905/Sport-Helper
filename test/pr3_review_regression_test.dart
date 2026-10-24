@@ -14,7 +14,7 @@ import 'package:smartfit/domain/plan.dart';
 import 'package:smartfit/ui/plan_page.dart';
 import 'package:smartfit/ui/player_page.dart';
 import 'package:smartfit/ui/theme.dart';
-import 'package:ugk_trainer/ugk_trainer.dart' show TrainerRingPainter;
+import 'package:ugk_trainer/ugk_trainer.dart' show TrainerRingPainter, TrainerGlassButton;
 
 import 'app_flow_test.dart' show services, tall;
 
@@ -230,7 +230,12 @@ void main() {
           lessThan(0.001),
           reason: 'new phase starts from an empty ring',
         );
-        expect(find.byKey(const ValueKey('tag-paused')), findsOneWidget);
+        expect(find.byKey(const ValueKey('tag-paused')), findsNothing);
+        final resume = tester.widget<TrainerGlassButton>(
+          find.byKey(const ValueKey('pause')),
+        );
+        expect(resume.tooltip, '继续训练');
+        expect(resume.theme.accent, SfColors.emphasis);
         await tester.pump(const Duration(seconds: 1));
         expect(
           ring(),

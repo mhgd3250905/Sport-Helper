@@ -1,15 +1,20 @@
 import 'dart:async';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:smartfit/chat/chat_models.dart';
 import 'package:smartfit/domain/exercise.dart';
 import 'package:smartfit/domain/plan.dart';
 import 'package:smartfit/main.dart';
+import 'package:smartfit/ui/chat/chat_widgets.dart';
 import 'package:smartfit/ui/library_page.dart';
 import 'package:smartfit/ui/plan_page.dart';
 import 'package:smartfit/ui/player_page.dart';
 import 'package:smartfit/ui/theme.dart';
+import 'package:ugk_coach_ui/ugk_coach_ui.dart';
 
 import 'app_flow_test.dart' show services;
 
@@ -76,6 +81,126 @@ void main() {
   );
 
   testWidgets(
+    'real chat rows paint through the status-bar area while input stays safe',
+    (tester) async {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1;
+      tester.view.padding = const FakeViewPadding(top: 32, bottom: 24);
+      tester.view.viewPadding = const FakeViewPadding(top: 32, bottom: 24);
+      addTearDown(tester.view.reset);
+      addTearDown(() async {
+        await tester.pumpWidget(const SizedBox());
+        await tester.pump();
+      });
+      final s = services();
+      await s.store.acceptSafety(blocked: false);
+      await s.store.setAppearance('light');
+      final at = DateTime.now();
+      String line(int i) => '普通消息 $i，用来检查聊天内容滚动。';
+      await s.store.setChatLog([
+        for (var i = 0; i < 24; i++)
+          ChatMessage(
+            id: 'status-message-$i',
+            role: i.isEven ? ChatRole.user : ChatRole.assistant,
+            at: at,
+            text: line(i),
+          ).toJson().cast<String, dynamic>(),
+      ]);
+      final frame = GlobalKey();
+      await tester.pumpWidget(
+        RepaintBoundary(
+          key: frame,
+          child: SmartFitApp(services: s),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final chat = find.byType(CoachChatList);
+      final widget = tester.widget<CoachChatList>(chat);
+      expect(widget.topInset, 32);
+      expect(widget.fadeTop, isFalse);
+      final list = find.descendant(of: chat, matching: find.byType(ListView));
+      expect(
+        tester.widget<ListView>(list).padding!.resolve(TextDirection.ltr).top,
+        80,
+      );
+      final viewport = find.descendant(
+        of: chat,
+        matching: find.byType(Viewport),
+      );
+      expect(tester.getRect(viewport).top, 0);
+      expect(tester.getRect(viewport).bottom, 844);
+      expect(tester.getRect(find.byType(ChatInputBar)).bottom, 820);
+
+      final controller = widget.controller;
+      controller.jumpTo(controller.position.maxScrollExtent);
+      await tester.pumpAndSettle();
+      expect(
+        tester.getTopLeft(find.text(line(0))).dy,
+        greaterThanOrEqualTo(80),
+      );
+      controller.jumpTo(controller.position.maxScrollExtent / 2);
+      await tester.pumpAndSettle();
+
+      // A real, older App bubble moves into y=8..32. Measuring only Scaffold's
+      // y=0 would miss a SafeArea or paint clip around the conversation itself.
+      final row = find.byKey(const ValueKey('status-message-12'));
+      final face = find.descendant(
+        of: row,
+        matching: find.byWidgetPredicate(
+          (widget) =>
+              widget is DecoratedBox &&
+              widget.decoration is BoxDecoration &&
+              (widget.decoration as BoxDecoration).color ==
+                  SfPalette.light.userBubble,
+        ),
+      );
+      expect(face, findsOneWidget);
+      final initial = tester.getRect(face);
+      final offset = controller.offset + 8 - initial.top;
+      expect(offset, inExclusiveRange(0, controller.position.maxScrollExtent));
+      controller.jumpTo(offset);
+      await tester.pumpAndSettle();
+      final rect = tester.getRect(face);
+      expect(rect.top, closeTo(8, .01));
+      expect(rect.bottom, greaterThan(32));
+
+      final boundary =
+          frame.currentContext!.findRenderObject()! as RenderRepaintBoundary;
+      await tester.runAsync(() async {
+        final image = await boundary.toImage(pixelRatio: 1);
+        final bytes = (await image.toByteData(
+          format: ui.ImageByteFormat.rawRgba,
+        ))!;
+        final color = SfPalette.light.userBubble;
+        final expected = [
+          (color.r * 255).round(),
+          (color.g * 255).round(),
+          (color.b * 255).round(),
+          255,
+        ];
+        final x = rect.center.dx.floor();
+        for (var y = 14; y <= 16; y++) {
+          for (var dx = -2; dx <= 2; dx++) {
+            final pixel = (y * image.width + x + dx) * 4;
+            expect(
+              [
+                for (var channel = 0; channel < 4; channel++)
+                  bytes.getUint8(pixel + channel),
+              ],
+              expected,
+              reason:
+                  'The actual bubble must paint below the transparent status bar',
+            );
+          }
+        }
+        image.dispose();
+      });
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
     'chat, library, plan and training keep transparent themed bars and safe controls',
     (tester) async {
       tester.view.physicalSize = const Size(390, 844);
@@ -93,6 +218,13 @@ void main() {
           return null;
         },
       );
+      // SystemChrome caches its last style across widget tests. Start from a
+      // distinct mocked value so this App mount must send its real overlay.
+      SystemChrome.setSystemUIOverlayStyle(
+        const SystemUiOverlayStyle(statusBarColor: Color(0xFF000001)),
+      );
+      await tester.pump();
+      styles.clear();
       addTearDown(
         () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
           SystemChannels.platform,

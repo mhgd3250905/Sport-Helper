@@ -268,7 +268,7 @@ class _ChatHomePageState extends State<ChatHomePage> {
                                 fit: StackFit.expand,
                                 children: [
                                   const SfGlassField(),
-                                  SafeArea(bottom: false, child: _messages()),
+                                  _messages(),
                                 ],
                               ),
                             ),
@@ -363,6 +363,10 @@ class _ChatHomePageState extends State<ChatHomePage> {
         controller: _scroll,
         initiallySeen: _seen,
         dockHeight: _dockHeight,
+        // Keep the viewport behind Android's transparent status bar. The
+        // initial safe clearance belongs to the scrollable content instead.
+        topInset: MediaQuery.paddingOf(context).top,
+        fadeTop: false,
         topColor: SfColors.skyTop,
         timeMarkBuilder: (at, now) => TimeMark(at, now: now),
         typing: _chat.typing

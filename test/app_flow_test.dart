@@ -121,7 +121,7 @@ void main() {
     await output.events.close();
   });
 
-  testWidgets('the player sits in the chat sky, held still, with a paused badge', (tester) async {
+  testWidgets('the player keeps its sky still and shows pause through the resume control', (tester) async {
     final s = services();
     s.store.starfield = true; // even with star dust on, the workout keeps it still
     await showPlayer(tester, s);
@@ -130,7 +130,8 @@ void main() {
     expect(find.text('已暂停'), findsNothing);
     await tester.tap(find.byKey(const ValueKey('pause')));
     await tester.pump();
-    expect(find.text('已暂停'), findsOneWidget);
+    expect(find.text('已暂停'), findsNothing);
+    expect(find.byTooltip('继续训练'), findsOneWidget);
     expect(find.byKey(const ValueKey('counter')), findsOneWidget);
     await tester.pumpWidget(const SizedBox());
   });
@@ -382,6 +383,7 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('generate')));
     await tester.pumpAndSettle();
     expect(find.text('工位肩颈腰放松'), findsWidgets);
-    expect(find.text('开始跟练'), findsOneWidget);
+    expect(find.text('前往训练'), findsOneWidget);
+    expect(find.byKey(const ValueKey('start')).hitTestable(), findsOneWidget);
   });
 }
