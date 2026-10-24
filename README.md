@@ -1,5 +1,7 @@
 # 智能健身助手 SmartFit
 
+2026-10-24 待审：AI 会话与询问状态改由 SDK 纯 Dart `CoachConversationController` 管理，SmartFit 先接入。拟固定 `ugk_coach-v0.5.0` 与依赖兼容的 `ugk_trainer-v0.2.3`，UI 保持 `ugk_coach_ui-v0.1.1`。全量 454 项通过 / 13 原有条件跳过，分析无问题；隔离候选 Git 严格锁文件校验通过，正式发布与远端校验等开哥同意。见[本轮待审回执](docs/coach-conversation-controller-2026-10-24.md)。
+
 2026-10-24 已批准合入并推送补丁，功能源码 `9d2ff7db6f598fe6cf629de02ed3c56ade660f9e`：固定 `ugk_coach_ui-v0.1.1`、`ugk_coach-v0.4.2`、`ugk_trainer-v0.2.2`（均为 SDK `3302d62`），修复套路剂量溢出与中文 Windows Git 包解析。先核对指定 SDK 回归已通过、发布正式 tag，再用原验收 Flutter 3.44.7 从 GitHub 严格验证锁文件后合入 App；锁文件未变化，已有 iOS 更新保留。本任务未写 `release/1.0`。见[补丁验收与发布回执](docs/coach-ui-011-2026-10-24.md)。
 
 2026-10-24 已经开哥批准，将功能源码 `7f3458dabbf8db4d5c65297d72bccc77eeed8c86` 合入并推送 main：SDK tag 升级、`ask_user` 多轮澄清及聊天 UI 下沉完成。固定 coach 0.4.1、trainer 0.2.1、coach_ui 0.1.0 三个正式 tag，从 GitHub 重新验证严格锁文件通过；接口、验证及发布回执见[本轮接入记录](docs/coach-ui-integration-2026-10-24.md)。后续只对齐发布状态文档，`release/1.0` 保持原状。

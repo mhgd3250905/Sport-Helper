@@ -20,7 +20,8 @@ class AiChatEngine
         AppCommandChatEngine,
         RestorableChatEngine,
         ProgressChatEngine,
-        DiagnosticChatEngine {
+        DiagnosticChatEngine,
+        ConversationChatEngine {
   AiChatEngine({
     required this.local,
     required this.catalog,
@@ -46,9 +47,7 @@ class AiChatEngine
   coach.TurnOutcome? lastOutcome;
   coach.FallbackReason? lastFallbackReason;
   _Turn? _pending;
-  Future<coach.CoachTurnResult>? _sdkPending;
   bool _disposed = false;
-  bool _awaitingAnswer = false;
   String? _diagnosticOperation;
 
   @override
@@ -99,6 +98,9 @@ class AiChatEngine
     },
   );
 
+  @override
+  late final conversation = coach.CoachConversationController(agent: agent);
+
   /// Transitional alias for diagnostics and existing App integrations.
   coach.CoachAgent get session => agent;
 
@@ -124,7 +126,7 @@ class AiChatEngine
   void cancelPending() {
     // The controller may still be in its presentation delay after send has
     // returned. A discarded question must not keep the next send in answer mode.
-    _awaitingAnswer = false;
+    conversation.cancel();
     final turn = _pending;
     if (turn == null) return;
     lastOutcome = coach.TurnOutcome.cancelled;
@@ -141,11 +143,10 @@ class AiChatEngine
   @override
   void reset() {
     cancelPending();
-    session.reset();
+    conversation.newConversation();
     lastResult = null;
     lastOutcome = null;
     lastFallbackReason = null;
-    _awaitingAnswer = false;
   }
 
   @override
@@ -153,8 +154,7 @@ class AiChatEngine
     if (_disposed) return;
     _disposed = true;
     cancelPending();
-    session.reset();
-    unawaited(agent.dispose());
+    unawaited(conversation.dispose());
     if (client is coach.OpenAiCompatibleClient) {
       (client as coach.OpenAiCompatibleClient).close();
     }
@@ -201,10 +201,20 @@ class AiChatEngine
   Future<ChatReply> replyAppCommand(String command, ChatState state) =>
       _reply(command, state, trustedAppCommand: true);
 
+  @override
+  Future<ChatReply> replyAnswer(
+    String questionId,
+    String text,
+    ChatState state, {
+    List<String>? choices,
+  }) => _reply(text, state, questionId: questionId, choices: choices);
+
   Future<ChatReply> _reply(
     String input,
     ChatState state, {
     bool trustedAppCommand = false,
+    String? questionId,
+    List<String>? choices,
   }) async {
     final operation =
         _diagnosticOperation ?? RuntimeLog.instance.newOperation('chat');
@@ -219,12 +229,7 @@ class AiChatEngine
       );
       return empty();
     }
-    // Settle cancellation before accepting a new turn; ordinary sends never queue.
-    if (_pending == null && session.isBusy && _sdkPending != null) {
-      await _sdkPending;
-    }
-    if (_disposed) return empty();
-    if (_pending != null || session.isBusy) {
+    if (_pending != null || conversation.state.isWaiting) {
       RuntimeLog.instance.record(
         'ai.turn.rejected',
         operation: operation,
@@ -242,7 +247,9 @@ class AiChatEngine
     lastFallbackReason = null;
     // An answer is an ordinary SDK send in the same task, even when the
     // supplied option text happens to look like a local command or shortcut.
-    final rawLocalReply = _awaitingAnswer && !trustedAppCommand
+    final rawLocalReply =
+        (questionId != null || conversation.state.pendingQuestion != null) &&
+            !trustedAppCommand
         ? null
         : local.localReply(input, state);
     // Explicit library navigation stays local. Requests to see/recommend
@@ -253,7 +260,7 @@ class AiChatEngine
         ? null
         : _admitLocalCards(rawLocalReply);
     if (localReply != null) {
-      if (trustedAppCommand) _awaitingAnswer = false;
+      conversation.invalidateQuestion();
       RuntimeLog.instance.record(
         'chat.route',
         operation: operation,
@@ -319,14 +326,35 @@ class AiChatEngine
       turn.cancel.cancel('turn timeout');
     });
     try {
-      final pending = session.send(
-        input,
-        context: turn.context,
-        cancel: turn.cancel,
-      );
-      _sdkPending = pending;
-      final result = await pending;
+      final received = questionId == null
+          ? await conversation.send(
+              input,
+              context: turn.context,
+              cancel: turn.cancel,
+            )
+          : choices == null
+          ? await conversation.answerText(
+              questionId,
+              input,
+              context: turn.context,
+              cancel: turn.cancel,
+            )
+          : await conversation.answerChoices(
+              questionId,
+              choices,
+              context: turn.context,
+              cancel: turn.cancel,
+            );
       if (_disposed || _pending != turn) return empty();
+      final result =
+          received ??
+          (turn.timedOut
+              ? const coach.CoachTurnResult(
+                  turnId: '',
+                  status: coach.TurnStatus.cancelled,
+                )
+              : null);
+      if (result == null) return empty();
       if (turn.timedOut) {
         final fallback = await _localFallback(turn);
         if (_disposed || _pending != turn) return empty();
@@ -385,10 +413,6 @@ class AiChatEngine
           accepted.status == coach.TurnStatus.busy) {
         return empty();
       }
-      if (accepted.status != coach.TurnStatus.inputTooLong) {
-        _awaitingAnswer =
-            accepted.status == coach.TurnStatus.ok && accepted.question != null;
-      }
       lastFallbackReason = accepted.fallbackReason;
       lastOutcome = switch (accepted.status) {
         coach.TurnStatus.ok =>
@@ -440,9 +464,13 @@ class AiChatEngine
               plan,
             ).copyWith(description: input, equipment: turn.slots.equipment);
       final fallback = accepted.status == coach.TurnStatus.fallback;
+      final output = conversation.state.messages
+          .where((m) => !m.isUser && m.turnId == accepted.turnId)
+          .lastOrNull;
       final text = [
         if (fallback) _fallbackNotice(accepted),
-        if (accepted.text.isNotEmpty) accepted.text,
+        if ((output?.text ?? accepted.text).isNotEmpty)
+          output?.text ?? accepted.text,
         if (fallback && turn.fallbackReply?.state.plan != null && plan == null)
           '当前模板未通过安全检查，请调整条件或自己选条件。',
       ].join('\n');
@@ -455,6 +483,7 @@ class AiChatEngine
             validatedPlan: validated,
             actions: accepted.actions,
             question: accepted.question,
+            conversationMessageId: output?.id,
             request: request,
             options: fallback && plan == null
                 ? turn.fallbackReply?.messages

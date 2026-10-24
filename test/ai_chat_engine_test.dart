@@ -333,6 +333,8 @@ void main() {
           planResponse(),
         ], latency: Duration.zero);
         final ai = engine(client);
+        final agent = ai.agent;
+        expect(ai.conversation.agent, same(agent));
         final controller = controllerFor(ai);
         final busyAtQuestion = <bool>[];
         final subscription = ai.events.listen((event) {
@@ -350,7 +352,7 @@ void main() {
         await controller.send('在家徒手想安排训练');
         final first = controller.messages.last;
         expect(first.question!.mode, coach.AskUserMode.text);
-        expect(first.text, first.question!.question);
+        expect(first.text, isEmpty);
         expect(controller.canAnswerQuestion(first), isTrue);
         expect(controller.suggestions, isEmpty);
         expect(ai.agent.questionsAsked, 1);
@@ -360,13 +362,13 @@ void main() {
         expect(controller.canAnswerQuestion(first), isFalse);
         expect(controller.canAnswerQuestion(second), isTrue);
         expect(ai.agent.questionsAsked, 2);
-        await controller.answerChoices(second, ['腿', '全身']);
+        await controller.answerChoices(second, ['全身', '腿']);
         expect(
           controller.messages.where((m) => m.question != null),
           hasLength(2),
         );
         expect(
-          controller.messages.where((m) => m.text == '你想练多久？'),
+          controller.messages.where((m) => m.question?.question == '你想练多久？'),
           hasLength(1),
         );
         expect(
@@ -383,6 +385,7 @@ void main() {
           ['腿', '全身'],
         );
         expect(ai.agent.turnCount, 3);
+        expect(ai.agent, same(agent));
         expect(ai.agent.questionsAsked, 0);
         expect(busyAtQuestion, [true, true]);
         expect(client.requests, hasLength(3));
@@ -1657,6 +1660,12 @@ void main() {
       expect(texts(reply), startsWith('预设方案 · AI 思考超时，先用本地模板继续。'));
       expect(texts(reply), isNot(contains('重试后')));
       expect(replyPlan(reply), isNotNull);
+      // This App fallback has no controller result; it must not borrow a
+      // previous question/user message identity from SDK presentation history.
+      expect(
+        reply.messages.map((m) => m.conversationMessageId),
+        everyElement(isNull),
+      );
       expect(gateway.bodies, hasLength(1));
     },
   );

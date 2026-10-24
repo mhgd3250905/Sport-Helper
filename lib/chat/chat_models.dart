@@ -56,6 +56,7 @@ class ChatMessage {
     this.options = const [],
     this.chosen,
     this.question,
+    this.conversationMessageId,
     this.questionAnswered = false,
     this.answeredChoices = const [],
     this.plan,
@@ -77,6 +78,9 @@ class ChatMessage {
 
   /// A gate-admitted SDK clarification. It never uses App command options.
   final coach.AskUserQuestion? question;
+
+  /// Identity in the SDK conversation; App message IDs remain presentation IDs.
+  final String? conversationMessageId;
   final bool questionAnswered;
   final List<String> answeredChoices;
 
@@ -110,6 +114,7 @@ class ChatMessage {
     options: options,
     chosen: chosen ?? this.chosen,
     question: question,
+    conversationMessageId: conversationMessageId,
     questionAnswered: questionAnswered ?? this.questionAnswered,
     answeredChoices: answeredChoices ?? this.answeredChoices,
     plan: plan,
@@ -128,6 +133,7 @@ class ChatMessage {
     if (options.isNotEmpty) 'options': [for (final o in options) o.toJson()],
     'chosen': ?chosen,
     'question': ?question?.toJson(),
+    'conversationMessageId': ?conversationMessageId,
     if (questionAnswered) 'questionAnswered': true,
     if (answeredChoices.isNotEmpty) 'answeredChoices': answeredChoices,
     'plan': ?plan?.toJson(),
@@ -169,6 +175,7 @@ class ChatMessage {
           ChatOption.fromJson(Map<String, dynamic>.from(o as Map)),
       ],
       chosen: (j['chosen'] as num?)?.toInt(),
+      conversationMessageId: j['conversationMessageId'] as String?,
       question: j['question'] is Map
           ? coach.AskUserGate.check(jsonEncode(j['question'])).question
           : null,
@@ -417,6 +424,7 @@ class BotMessage {
     this.text, {
     this.options = const [],
     this.question,
+    this.conversationMessageId,
     this.plan,
     this.validatedPlan,
     this.actions,
@@ -427,6 +435,7 @@ class BotMessage {
   final String text;
   final List<ChatOption> options;
   final coach.AskUserQuestion? question;
+  final String? conversationMessageId;
   final TrainingPlan? plan;
   final coach.ValidatedPlan? validatedPlan;
   final coach.ValidatedActions? actions;
@@ -470,6 +479,17 @@ abstract interface class ChatEngine {
 /// awaiting an answer. Model-generated answer text never uses this boundary.
 abstract interface class AppCommandChatEngine implements ChatEngine {
   Future<ChatReply> replyAppCommand(String command, ChatState state);
+}
+
+/// AI conversation ownership and answers are delegated to the pure Dart SDK.
+abstract interface class ConversationChatEngine implements ChatEngine {
+  coach.CoachConversationController get conversation;
+  Future<ChatReply> replyAnswer(
+    String questionId,
+    String text,
+    ChatState state, {
+    List<String>? choices,
+  });
 }
 
 /// Correlates UI and engine metadata without sharing conversation payloads.

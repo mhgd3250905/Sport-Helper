@@ -400,8 +400,10 @@ class _ChatHomePageState extends State<ChatHomePage> {
             enabled: _chat.canAnswerQuestion(m),
             onTextAnswer: (answer) => _chat.answerQuestion(m, answer),
             onChoiceAnswer: (choices) => _chat.answerChoices(m, choices),
-          )
-        else if (hasText)
+          ),
+        if (hasText &&
+            (m.question == null ||
+                (m.text.isNotEmpty && m.text != m.question!.question)))
           MessageBubble(
             message: m,
             optionsActive: !_chat.typing && _chat.isActive(m),

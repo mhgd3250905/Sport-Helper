@@ -26,6 +26,7 @@ class ChatController extends ChangeNotifier {
     if (engine case final ProgressChatEngine progress) {
       _progressSubscription = progress.events.listen(_onProgress);
     }
+    _conversation?.addListener(_onConversationChanged);
   }
 
   final ChatEngine engine;
@@ -47,9 +48,30 @@ class ChatController extends ChangeNotifier {
   ChatState _state = const ChatState();
   String? _diagnosticOperation;
 
-  // Only a question returned in this live SDK session may be answered.
-  // Persisted bubbles are history: SDK tool history is not restored from JSON.
-  String? _activeQuestionId;
+  coach.CoachConversationController? get _conversation =>
+      engine is ConversationChatEngine
+      ? (engine as ConversationChatEngine).conversation
+      : null;
+
+  void _onConversationChanged() {
+    _syncQuestions();
+    notifyListeners();
+  }
+
+  void _syncQuestions() {
+    final conversation = _conversation;
+    if (conversation == null) return;
+    final snapshots = {for (final m in conversation.state.messages) m.id: m};
+    for (var i = 0; i < messages.length; i++) {
+      final m = messages[i];
+      if (m.question == null) continue;
+      final snapshot = snapshots[m.conversationMessageId];
+      messages[i] = m.copyWith(
+        questionAnswered: snapshot?.questionAnswered ?? true,
+        answeredChoices: snapshot?.answeredChoices ?? m.answeredChoices,
+      );
+    }
+  }
 
   void _onProgress(coach.AgentEvent event) {
     if (!typing ||
@@ -160,6 +182,21 @@ class ChatController extends ChangeNotifier {
         // Skip a message an older build wrote differently.
       }
     }
+    _conversation?.restoreHistory([
+      for (final m in messages.where((m) => m.aiVisible))
+        coach.CoachConversationMessage(
+          id: m.conversationMessageId ?? m.id,
+          at: m.at,
+          isUser: m.isUser,
+          text: m.text,
+          question: m.question,
+          questionAnswered: m.questionAnswered,
+          answeredChoices: m.answeredChoices,
+          plan: m.validatedPlan,
+          actions: m.actions,
+        ),
+    ]);
+    _syncQuestions();
     final lastCard = messages.lastWhere((m) => m.isPlan, orElse: () => _none);
     if (lastCard != _none) {
       _state = ChatState(
@@ -212,7 +249,6 @@ class ChatController extends ChangeNotifier {
       managed.reset();
     }
     _state = const ChatState();
-    _activeQuestionId = null;
     _safetyStep = null;
     _safetyMessageId = null;
     messages.clear();
@@ -256,6 +292,8 @@ class ChatController extends ChangeNotifier {
     String text, {
     String? label,
     bool trustedAppCommand = false,
+    String? questionId,
+    List<String>? choices,
   }) async {
     final t = text.trim();
     if (t.isEmpty || typing) return;
@@ -309,7 +347,14 @@ class ChatController extends ChangeNotifier {
     }
     final ChatReply reply;
     try {
-      reply = trustedAppCommand && engine is AppCommandChatEngine
+      reply = questionId != null && engine is ConversationChatEngine
+          ? await (engine as ConversationChatEngine).replyAnswer(
+              questionId,
+              t,
+              _context,
+              choices: choices,
+            )
+          : trustedAppCommand && engine is AppCommandChatEngine
           ? await (engine as AppCommandChatEngine).replyAppCommand(t, _context)
           : await engine.reply(t, _context);
     } on Object catch (error) {
@@ -336,14 +381,11 @@ class ChatController extends ChangeNotifier {
     typing = false;
     _endProgress();
     _state = reply.state;
-    if (reply.inputAccepted) _closeQuestion();
     if (reply.aiTurn) _replace(userMessage.copyWith(aiVisible: true));
     for (final m in reply.messages) {
-      final bubble = _bot(m, aiVisible: reply.aiTurn);
-      if (reply.aiTurn && bubble.question != null) {
-        _activeQuestionId = bubble.id;
-      }
+      _bot(m, aiVisible: reply.aiTurn);
     }
+    _syncQuestions();
     RuntimeLog.instance.record(
       'chat.reply.rendered',
       operation: operation,
@@ -357,7 +399,7 @@ class ChatController extends ChangeNotifier {
     _diagnosticOperation = null;
     // A question with its own options doesn't need the chips too.
     final asks =
-        _activeQuestionId != null ||
+        _conversation?.state.pendingQuestion != null ||
         reply.messages.any((m) => m.options.isNotEmpty || m.question != null);
     suggestions = reply.suggestions.isNotEmpty
         ? reply.suggestions
@@ -393,39 +435,29 @@ class ChatController extends ChangeNotifier {
   /// A question is interactive only after the SDK send returned and while
   /// it remains the newest unanswered question in this live conversation.
   bool canAnswerQuestion(ChatMessage message) {
-    if (typing || inSafetyCheck || message.id != _activeQuestionId) {
-      return false;
-    }
-    final current = messages.where((m) => m.id == message.id).firstOrNull;
-    return current?.question != null && !current!.questionAnswered;
+    final id = message.conversationMessageId;
+    return !typing &&
+        !inSafetyCheck &&
+        id != null &&
+        (_conversation?.canAnswer(id) ?? false);
   }
 
   Future<void> answerQuestion(ChatMessage message, String text) async {
     if (!canAnswerQuestion(message) || text.trim().isEmpty) return;
-    await send(text);
+    await _send(text, questionId: message.conversationMessageId);
   }
 
   Future<void> answerChoices(ChatMessage message, List<String> selected) async {
     if (!canAnswerQuestion(message)) return;
-    final question = message.question!;
-    if (question.mode != coach.AskUserMode.choice ||
-        selected.isEmpty ||
-        selected.toSet().length != selected.length ||
-        (!question.multiple && selected.length != 1) ||
-        selected.any((value) => !question.options.contains(value))) {
-      return;
-    }
-    // Persist the selection for read-only history; never turn it into a command.
-    _replace(message.copyWith(answeredChoices: List.unmodifiable(selected)));
-    await send(selected.join('、'));
+    final id = message.conversationMessageId!;
+    final text = _conversation?.choiceText(id, selected);
+    if (text == null) return;
+    await _send(text, questionId: id, choices: selected);
   }
 
   void _closeQuestion() {
-    final id = _activeQuestionId;
-    _activeQuestionId = null;
-    if (id == null) return;
-    final current = messages.where((m) => m.id == id).firstOrNull;
-    if (current != null) _replace(current.copyWith(questionAnswered: true));
+    _conversation?.invalidateQuestion();
+    _syncQuestions();
   }
 
   /// Can [m]'s options still be tapped?
@@ -664,6 +696,7 @@ class ChatController extends ChangeNotifier {
         text: m.text,
         options: m.options,
         question: m.question,
+        conversationMessageId: m.conversationMessageId,
         plan: plan,
         validatedPlan: validatedPlan,
         actions: m.actions,
@@ -713,6 +746,7 @@ class ChatController extends ChangeNotifier {
 
   @override
   void dispose() {
+    _conversation?.removeListener(_onConversationChanged);
     _cancelDiagnostic('dispose');
     _replyEpoch++;
     typing = false;
