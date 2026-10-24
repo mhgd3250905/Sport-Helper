@@ -1,8 +1,8 @@
 {
-  "status": "restored_main_interface_build24_captures_pending",
-  "release": "1.0.0+24",
+  "status": "build25_preparing_real_phone_captures_and_video_pending",
+  "release": "1.0.0+25",
   "acceptedInterfaceBase": "f5332bfe3746ecbf69d3f5e48c71ba5c90812499",
-  "supersededCaptures": "Do not use build23 redesigned BasicHome screenshots; capture the restored original interface from build24",
+  "supersededCaptures": "Never reuse build23 redesigned screenshots or internal2022 workflow as build25; build24 empty-library screenshots are diagnostic only.",
   "rules": {
     "screenshotsMustBeActualAppCaptures": true,
     "allowInventedInterface": false,
@@ -13,7 +13,12 @@
     "phoneScreenshotMaxSidePx": 3840,
     "longSideMustNotExceedTwiceShortSide": true,
     "recordCaptureViewportAndTransformations": true,
-    "preserveRawCapture": true
+    "preserveRawCapture": true,
+    "phoneScreenshotPreferredAspectRatio": "9:16 (or 16:9); retain raw captures and disclose any padding, never stretch UI or change phone display settings for captures",
+    "phoneScreenshotAspectRatios": [
+      "9:16",
+      "16:9"
+    ]
   },
   "icon": {
     "selection": "A2 full-body zoom, previously approved by owner",
@@ -28,42 +33,43 @@
     "format": "PNG, full square; do not add launcher mask or rounded corners",
     "finalPath": "docs/store/1.0.0/assets/icon-512.png",
     "sha256": "225d25822057ddfc28b15ec3d57213fcec7aa63398a0c5610298529cd140b703",
-    "exportMethod": "Browser canvas export from reviewed A2 1024 source; complete square, 512x512, no source artwork changes"
+    "exportMethod": "Browser canvas export from reviewed A2 1024 source; complete square, 512x512, no source artwork changes",
+    "playUploadStatus": "saved_in_default_listing_draft_not_public"
   },
   "phoneScreenshots": [
     {
       "scene": "Original ChatHome with local conversation and plan choices",
       "altZh": "SmartFit 原对话首页与本地训练计划选项",
       "altEn": "The original SmartFit conversation home and local plan choices",
-      "status": "capture_from_signed_build24",
+      "status": "capture_from_actual_signed_build25_pending",
       "finalPath": null
     },
     {
       "scene": "Original plan card or plan detail prepared through local rules",
       "altZh": "通过本地规则安排的训练计划",
       "altEn": "A workout plan prepared using local rules",
-      "status": "capture_from_signed_build24",
+      "status": "capture_from_actual_signed_build25_pending",
       "finalPath": null
     },
     {
       "scene": "Exercise library with actual available movements",
       "altZh": "动作库中的健身与拉伸示范",
       "altEn": "The exercise library with fitness and stretching demonstrations",
-      "status": "capture_from_signed_build24",
+      "status": "capture_from_actual_signed_build25_pending",
       "finalPath": null
     },
     {
       "scene": "Workout in progress, using only demonstration test data",
       "altZh": "动作跟练中的示范和计时",
       "altEn": "An exercise demonstration and workout timer",
-      "status": "capture_from_signed_build24",
+      "status": "capture_from_actual_signed_build25_pending",
       "finalPath": null
     },
     {
       "scene": "Completed workout and local result",
       "altZh": "完成训练后的本地结果",
       "altEn": "The local result after completing a workout",
-      "status": "capture_from_signed_build24",
+      "status": "capture_from_actual_signed_build25_pending",
       "finalPath": null
     }
   ],
@@ -74,11 +80,12 @@
     ],
     "format": "JPEG without alpha",
     "content": "Only actual app captures and approved artwork; no ranking, awards, pricing badge or unavailable feature claims",
-    "status": "existing_draft_review_against_restored_interface",
+    "status": "local_ready_default_chinese_saved_in_play_draft_not_public",
     "finalPath": "docs/store/1.0.0/assets/feature-graphic-zh-CN.jpg",
     "sha256": "265358996deb8e56f3f6d006ed4ca47b48198ccde71bf520f327d7a6710b8048",
     "englishPath": "docs/store/1.0.0/assets/feature-graphic-en-US.jpg",
-    "englishSha256": "a6a0303ca8c6be26d303b24d58b0a593e5af3a351788a802bbfe3048fc232ed0"
+    "englishSha256": "a6a0303ca8c6be26d303b24d58b0a593e5af3a351788a802bbfe3048fc232ed0",
+    "englishUploadStatus": "local_ready_not_claimed_uploaded"
   },
   "sourceRights": {
     "icon": "Owner approved A2 adoption on 2026-10-24; exact generation/reference record retained in repository",
@@ -98,5 +105,22 @@
     "rawFileHash",
     "finalFileHash",
     "anyPaddingOrCropDisclosure"
-  ]
+  ],
+  "releaseScope": "Accepted original interface and all 93 App exercise metadata entries; owner-approved production media correction and two cue/timing adaptations; legal links added only in existing About privacy area.",
+  "demonstrationVideo": {
+    "status": "not_recorded_or_uploaded",
+    "candidate": "actual_signed_production_1.0.0+25",
+    "youtubeVisibility": "unlisted recommended; review-accessible, no age restriction or ads",
+    "requiredFlow": [
+      "user starts workout with guidance audio",
+      "show real ongoing playback and training notification in background/lock screen",
+      "return to player, pause/resume and finish; show actual stop behavior"
+    ],
+    "allowInternalSubstitute": false,
+    "url": null
+  },
+  "history": {
+    "build24": "AAB uploaded HOLD draft only; production library zero because all 189 releaseEligible flags false; no genuine workout/FGS video possible from that package",
+    "build23": "redesigned UI withdrawn; do not publish its captures"
+  }
 }

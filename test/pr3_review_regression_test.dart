@@ -157,10 +157,16 @@ void main() {
         (total, file) => total + file.lengthSync(),
       );
       expect(bytes, inExclusiveRange(14_000_000, 15_000_000));
-      // The reproducible Python builder verifies every source and destination
-      // SHA-256; its report records the exact checked-in asset inventory.
+      // Preserve the historical builder report. The owner-authorized roster
+      // changes only the main manifest's boolean publication flags.
       final report = _json('tools/media/builtin-assets-report.json');
-      expect((report['bundle'] as Map)['bytes'], bytes);
+      final authorization = _json(
+        'docs/store/1.0.0/production-media-authorization.json',
+      );
+      final rosterDelta =
+          File('$release/app-manifest.json').lengthSync() -
+          (authorization['baselineManifestBytes'] as int);
+      expect((report['bundle'] as Map)['bytes'] + rosterDelta, bytes);
       expect((report['bundle'] as Map)['files'], bundled.length);
       expect(report['validatedOutput'], isTrue);
       expect((report['sourceInputs'] as Map)['unchangedAfterBuild'], isTrue);

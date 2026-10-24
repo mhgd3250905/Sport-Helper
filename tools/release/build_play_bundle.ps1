@@ -1,6 +1,7 @@
 param(
   [Parameter(Mandatory = $true)][string]$SigningPropertiesFile,
   [string]$OutputDirectory,
+  [string]$MediaBaseUrl = 'https://smartfit-media.pages.dev/v0.3.0-app/',
   [string]$FlutterCommand = 'flutter',
   [switch]$Offline
 )
@@ -35,9 +36,13 @@ try {
   $source = (& git rev-parse HEAD).Trim()
   if ($LASTEXITCODE -ne 0) { throw 'Cannot identify release source.' }
   $acceptedSource = 'f5332bfe3746ecbf69d3f5e48c71ba5c90812499'
-  $appDifferences = @(& git diff --name-only $acceptedSource -- lib assets)
-  if ($appDifferences.Count -ne 1 -or $appDifferences[0] -ne 'lib/app/build_info.dart') {
-    throw 'The accepted App interface and business logic must remain unchanged; only version identity may differ.'
+  & python (Join-Path $PSScriptRoot 'validate_release_source.py')
+  if ($LASTEXITCODE -ne 0) { throw 'Unapproved runtime or publication roster changes.' }
+  $mediaUri = [Uri]$MediaBaseUrl
+  if ($mediaUri.Scheme -ne 'https' -or $mediaUri.Host -ne 'smartfit-media.pages.dev' -or
+      $mediaUri.UserInfo -or $mediaUri.Query -or $mediaUri.Fragment -or
+      $mediaUri.AbsolutePath -ne '/v0.3.0-app/' -or -not $mediaUri.IsDefaultPort) {
+    throw 'Only the verified public HTTPS media distribution root may be included.'
   }
   $pubspec = [IO.File]::ReadAllText((Join-Path $projectRoot 'pubspec.yaml'))
   $version = [regex]::Match($pubspec, '(?m)^version:\s*(1\.0\.0)\+(\d+)\s*$')
@@ -64,10 +69,11 @@ try {
   if ($LASTEXITCODE -ne 0) { throw 'Locked dependency resolution failed.' }
   & git diff --exit-code -- pubspec.lock
   if ($LASTEXITCODE -ne 0) { throw 'Locked dependencies changed.' }
-  # Deliberately no AI key, AI endpoint, media mirror or define-from-file.
+  # Public media distribution is separate from AI. No AI credentials or endpoint.
   & $FlutterCommand build appbundle --release --flavor production --no-pub `
     "--build-name=$buildName" "--build-number=$buildNumber" `
-    "--dart-define=SMARTFIT_BUILD_SOURCE=$source"
+    "--dart-define=SMARTFIT_BUILD_SOURCE=$source" `
+    "--dart-define=SMARTFIT_MEDIA_PRIMARY_URL=$MediaBaseUrl"
   if ($LASTEXITCODE -ne 0) { throw 'Signed production app bundle build failed.' }
   if ((& git rev-parse HEAD).Trim() -ne $source -or
       @(& git status --porcelain=v1 --untracked-files=all).Count -ne 0) {
@@ -79,14 +85,16 @@ try {
   $manifest = [ordered]@{
     sourceCommit = $source
     acceptedRuntimeBaseline = $acceptedSource
-    appInterfaceAndBusinessLogic = 'unchanged from the user-accepted baseline'
+    appInterfaceAndBusinessLogic = 'accepted flow retained; publication roster, two content adaptations and policy links corrected'
     applicationId = 'com.ugk.smartfit'
     versionName = $buildName
     versionCode = [int]$buildNumber
     sdkCommit = $sdkRef
     aiKeySupplied = $false
     aiEndpointSupplied = $false
-    mediaMirrorSupplied = $false
+    mediaMirrorSupplied = $true
+    publicMediaBaseUrl = $MediaBaseUrl
+    publishedAppActions = 93
     signing = 'external upload key; no debug-key fallback'
     bundle = $outputBundle
     bytes = (Get-Item -LiteralPath $outputBundle).Length

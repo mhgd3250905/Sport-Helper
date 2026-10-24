@@ -873,13 +873,13 @@
   {
    "id": "s-figure4",
    "kind": "exercise",
-   "version": "1.1.0",
+   "version": "1.1.1",
    "name": {
     "zh": "仰卧 4 字拉伸",
     "en": "Supine Figure-4 Stretch"
    },
-   "bytes": 423985,
-   "sha256": "0599def3211ad45c57ea7f8336ad769d37c6e204ed50a3a8130a35658a65b470"
+   "bytes": 448785,
+   "sha256": "c85997577a4d71122222d4d72db5d790d96244041d400f6ec5d254813adf7631"
   },
   {
    "id": "s-frog",
@@ -981,13 +981,13 @@
   {
    "id": "w-dead-bug",
    "kind": "exercise",
-   "version": "1.1.0",
+   "version": "1.1.1",
    "name": {
     "zh": "死虫式",
     "en": "Dead Bug"
    },
    "bytes": 345944,
-   "sha256": "7a4b94b4cfe4a8aff5b434fd471d78cf5c8298cbe982809467f0dbf23d644561"
+   "sha256": "6fd397df82777780f9d9603859e908a83e310e2ac7653e12610df5737477189d"
   },
   {
    "id": "w-feet-on-chair-bridge",
@@ -1036,7 +1036,7 @@
  ],
  "voiceBundle": {
   "asset": "assets/voice_lc32/v1/manifest.json",
-  "bytes": 337431,
-  "sha256": "5ebcf4211e44ca17930c8426a33bb3df932db0929d5caebd123b0e2d81c756c4"
+  "bytes": 337432,
+  "sha256": "fcfa8364071c3beadc27898706f0acba2f2902d49c85a069d59592aa05c2f125"
  }
 }

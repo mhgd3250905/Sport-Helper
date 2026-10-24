@@ -8370,13 +8370,13 @@
       "line": "cue1",
       "lang": "zh",
       "asset": "assets/voice_lc32/v1/s-figure4/zh/cue1.m4a",
-      "bytes": 16492,
-      "sha256": "b653c9cc1b496b804612b3b5c518ebe012ac126a4ab103ed9294813f3349248d",
-      "decoded_ms": 3390,
-      "duration_ms": 3390,
+      "bytes": 23013,
+      "sha256": "02d4423c340f242ef823ab2007ec52de2455deb1a2aea226b074fb7f2db4d11d",
+      "decoded_ms": 5016,
+      "duration_ms": 4992,
       "source": {
         "asset": "assets/packs/s-figure4/voice/zh/cue1.m4a",
-        "sha256": "8dd7b132adc5e6a60e7c442e46a6aeca30b28fd02e930f873fb2a256623789c0"
+        "sha256": "9a51342ab69e53ff71d55d6a5d8bf9bfc36512b189df8aa2af7d3eb7c06117c9"
       }
     },
     {
@@ -8384,13 +8384,13 @@
       "line": "cue2",
       "lang": "zh",
       "asset": "assets/voice_lc32/v1/s-figure4/zh/cue2.m4a",
-      "bytes": 9738,
-      "sha256": "c6cb4e3262e87ccbc0d7a9e7a531566959eeeba52cb86d943ac142fcb0eac35a",
-      "decoded_ms": 1765,
-      "duration_ms": 1741,
+      "bytes": 13040,
+      "sha256": "c5828279442fbc974e32f67fb5f74141592ccbc9829f6a17f6e2a9d42b5e7e88",
+      "decoded_ms": 2554,
+      "duration_ms": 2554,
       "source": {
         "asset": "assets/packs/s-figure4/voice/zh/cue2.m4a",
-        "sha256": "513c1d3d180b84688618de42a1424f97e645b5d8403b5326416f43b59ff98c1a"
+        "sha256": "d304f359cc45e728b022f25e9a6a77f018a3441b51e3102610aed30e5d34965d"
       }
     },
     {
@@ -8440,13 +8440,13 @@
       "line": "rest",
       "lang": "zh",
       "asset": "assets/voice_lc32/v1/s-figure4/zh/rest.m4a",
-      "bytes": 20068,
-      "sha256": "b1acea4127e34a2bc6a91698e0f1a2ca76cdc2e3bd86ab00435d83bc35ba24f0",
-      "decoded_ms": 4272,
-      "duration_ms": 4272,
+      "bytes": 24805,
+      "sha256": "5fdbc06de91c4331b002d63f4a851046083b0f320b357f7893257ae50730a29e",
+      "decoded_ms": 5433,
+      "duration_ms": 5433,
       "source": {
         "asset": "assets/packs/s-figure4/voice/zh/rest.m4a",
-        "sha256": "45df6ec5454a7887b667af52da00e5dace91f28c38b873542e56548b44682ff5"
+        "sha256": "ebc809bbabdccde91913626719bfb6083395abc78ed1b37c307d86ef60b8ebe3"
       }
     },
     {
@@ -8454,13 +8454,13 @@
       "line": "side_switch",
       "lang": "zh",
       "asset": "assets/voice_lc32/v1/s-figure4/zh/side_switch.m4a",
-      "bytes": 21150,
-      "sha256": "f7e8a1cec4e3f5d4f5de6baba0bcfaf8eb814265bed939ce662127fbe3ace2b0",
-      "decoded_ms": 4551,
-      "duration_ms": 4551,
+      "bytes": 19067,
+      "sha256": "265dbbd6e6d8874570478329bd8bef4a1f812a683fb4addf905cd6e142372e1e",
+      "decoded_ms": 4040,
+      "duration_ms": 4040,
       "source": {
         "asset": "assets/packs/s-figure4/voice/zh/side_switch.m4a",
-        "sha256": "1456a2c004b36b3ae6d0f8ded3c006c7acfdbb1ea4bc406281ee1e4cf061ccfb"
+        "sha256": "495da471450b0a7f67586b997b997c134e477a05e11f250c2f5d9a4faae440c4"
       }
     },
     {

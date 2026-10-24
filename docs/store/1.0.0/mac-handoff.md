@@ -1,37 +1,36 @@
-# Mac / iOS 接力：同一基础版发布分支
+# Mac / iOS 接力：release/1.0
 
-仅说明 Mac 端后续构建方法。**Windows 本轮没有构建、签名、安装或提交 iOS 包。**
+目标候选 **1.0.0+25**，保留原界面和完整93项范围，包含用户批准的生产素材配置/资料适配及必要政策链接。**Windows 没有构建、签名、安装或提交 iOS 包；此文也不声明 +25 Android 包已通过。**
 
-## 版本和源码
+## 源码和依赖
 
-1. 在 Mac 的干净工作副本获取 `origin/release/1.0`。已有改动先保留，不 reset、不覆盖。
-2. 首次跟踪该分支时使用 `git switch --track origin/release/1.0`；已存在则 `git switch release/1.0` 后 `git pull --ff-only origin release/1.0`。
-3. 核对 `git rev-parse HEAD` 与本轮交付回执的 release SHA。Mac 不从会继续开发的 `main` 打此基础候选。
-4. `pubspec.yaml` 和 App 版本常量应为 `1.0.0+24`。若 Apple 平台已占用这个 build，需先核实并按发布规则增加，不能复用旧 build。
-5. `ugk_coach 0.3.3`、`ugk_trainer 0.1.6` 均固定 Git commit `f684e02f38e652633c23fa8946a53d02b6aa3ea2`。执行 `flutter pub get --enforce-lockfile`，不可运行升级命令；确认 `git diff -- pubspec.lock` 为空。
+1. 在 Mac 干净工作副本获取 `origin/release/1.0`；保留已有改动，不 reset、不覆盖。首次跟踪用 `git switch --track origin/release/1.0`，已有分支用 `git switch release/1.0` 和 `git pull --ff-only origin release/1.0`。
+2. 核对 `git rev-parse HEAD` 与主任务最终交付的 +25 SHA。不要从后续继续开发的 main 打此候选。
+3. `pubspec.yaml` 和 App 版本常量应为 `1.0.0+25`。若 Apple 已占用此 build，先按发布台账递增，不复用。
+4. `ugk_coach 0.3.3`、`ugk_trainer 0.1.6` 均固定 `f684e02f38e652633c23fa8946a53d02b6aa3ea2`。运行 `flutter pub get --enforce-lockfile` 并确认 lock 无变化；不带 Windows path override。
 
 ## 构建
 
-仓库包含共享 `production` scheme 及对应 Debug/Release/Profile-production 配置；原 Runner 配置保留。父任务在 Windows 仅检查 XML/PBX 配置合同，Mac 仍须实际编译验证。
+共享 `production` scheme 对应 Debug/Release/Profile-production 配置，原 Runner 配置保留。Windows 的配置合同检查不能替代 Mac 实际编译。
 
-在 `ios/Runner.xcworkspace` 中核对 Runner 的 Apple Team、`com.ugk.smartfit` Bundle ID、provisioning 和发布证书。Apple 签名材料只由 Mac 端保管，不从 Android 上传密钥复制，也不进入 Git。
+在 `ios/Runner.xcworkspace` 核对 Apple Team、`com.ugk.smartfit`、provisioning 和发布证书。Apple 签名材料由 Mac 私下保管，不复制 Android 上传密钥，不进 Git。
 
 ```sh
 flutter analyze
 flutter test
-flutter build ipa --release --flavor production --build-name 1.0.0 --build-number 24
+flutter build ipa --release --flavor production --build-name 1.0.0 --build-number 25 --dart-define=SMARTFIT_MEDIA_PRIMARY_URL=https://smartfit-media.pages.dev/v0.3.0-app/
 ```
 
-此候选**不注入 API Key 或旧开发密钥 dart-define 文件**。沿用已验收 `main@f5332bf` 的原界面与功能，原公开服务地址、可见 AI 入口和本地规则回退不做重设计。不要调用会注入密钥的历史包装脚本，也不要把 Windows 本地覆盖配置、SDK 工作树路径或 Android keystore 搬到 Mac。
+媒体 HTTPS 地址是公开内容分发源，不是 AI 服务地址；必须保留 `v0.3.0-app/` 末尾斜线，其兄弟 `v0.3.0/` 保存视频。**不传 `SMARTFIT_AI_TOKEN`、AI endpoint 或包含旧开发 Key 的 dart-define 文件，不启用 `UGK_INTERNAL_MEDIA_PREVIEW` / `SMARTFIT_INCLUDE_PENDING_MEDIA`。**
 
-## Mac 端必须实际核验
+## Mac 实际核验
 
-- 签名、Bundle ID、版本与源 SHA；无 API Key 注入。
-- 原对话式安全确认、本地规则/模板计划、动作库、训练、完成和记录。
-- AI 入口和记忆设置保持原样可见，空 key 不提供在线 AI 回复；不套用已经废弃的新首页/隐藏入口验收要求。
-- WKWebView 的本机媒体播放、音频、前后台、横竖屏与权限实际行为；不能用 Android 通过替代 iOS 通过。
-- 图标为已批准 A2，iOS 隐私说明/Privacy Manifest 和 App Store Connect 数据声明与实际包一致。
-- 从实际 iOS 候选获取截图；不要把 Android 截图冒作 iPhone 截图。
-- 保留原平台备份行为并在对应隐私声明中准确描述，不能沿用已撤销的“系统备份关闭”承诺。
+- 签名、Bundle ID、版本、源 SHA、固定 SDK、无 API Key；生产可见完整93项，而不是空库或内测越过资格检查。
+- 原对话安全确认、本地规则/模板、动作库、开始跟练、完成记录；已修资料与实际示范/语音一致。
+- 非内置素材走公开 HTTPS、SHA/字节验证及失败回退；Wi-Fi策略、缓存、断网和内置动作符合原逻辑。
+- WKWebView 本机媒体与公开政策页、语音/提示音、锁屏/后台、横竖屏及权限行为；Android 通过不能替代 iOS 通过。
+- 原 AI 入口可见但空 Key 不提供在线回复；不恢复已废弃的新首页/隐藏入口方案。
+- A2 图标、App 内隐私/条款入口、iOS Privacy Manifest、App Store 数据声明与 CDN 实际网络行为一致；不能套用 +24 “无远程素材源”声明。
+- 从实际 iOS 包截取 iPhone 素材；保留平台默认备份说明，不冒称已关闭备份。
 
-测试、导出、上传 TestFlight 和提交 App Store 是不同步骤。此任务没有授权任何 Apple 后台操作；需要由开哥安排 Mac 端签名与后续平台步骤。
+测试、导出、上传 TestFlight、提交 App Store 是独立平台步骤。本轮授权的 Google Play/YouTube/Cloudflare操作不自动变为 Apple 后台授权。

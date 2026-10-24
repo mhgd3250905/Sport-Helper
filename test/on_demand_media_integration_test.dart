@@ -149,22 +149,25 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   test(
-    'default content excludes pending actions from both App and AI catalogs',
+    'production exposes the accepted 93 actions without internal preview',
     () async {
       final (library, _, _, catalog) = await AppServices.loadContent();
       expect(TrainingMediaConfig.includePending, isFalse);
-      // This release intentionally has no approved actions yet. Keeping the
-      // production gate closed must not leave them in the coach's AI catalog.
-      expect(library.all, isEmpty);
-      expect(catalog.drills, isEmpty);
+      final expectedIds = loadPacksSync().exercises.map((e) => e.id).toSet();
+      expect(expectedIds, hasLength(93));
+      expect(library.all.map((e) => e.id).toSet(), expectedIds);
+      expect(catalog.ids.toSet(), expectedIds);
 
       final media = await _repository(pending: false);
       final (withRepository, _, _, coachCatalog) =
           await AppServices.loadContent(media: media);
-      expect(media.visibleActions, isEmpty);
-      expect(withRepository.all, isEmpty);
-      expect(coachCatalog.drills, isEmpty);
-      expect(await media.availableActionIds(), isEmpty);
+      expect(media.allowPending, isFalse);
+      expect(media.visibleActions.map((a) => a.id).toSet(), expectedIds);
+      expect(withRepository.all.map((e) => e.id).toSet(), expectedIds);
+      expect(coachCatalog.ids.toSet(), expectedIds);
+      expect(await media.availableActionIds(), hasLength(27));
+      // A source-only action outside the accepted App roster stays gated.
+      expect(() => media.availableVideo('abs-A'), throwsStateError);
     },
   );
 

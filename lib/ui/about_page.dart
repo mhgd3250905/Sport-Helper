@@ -7,6 +7,7 @@ import '../app/training_media_config.dart';
 import '../chat/safety_script.dart' show disclaimerText;
 import '../diagnostics/runtime_log.dart';
 import '../diagnostics/frame_recorder.dart';
+import 'legal_policy_page.dart';
 import 'performance_settings.dart';
 import 'runtime_log_settings.dart';
 import 'theme.dart';
@@ -116,20 +117,45 @@ class AboutPage extends StatelessWidget {
             ],
             const SfSectionTitle('隐私与 AI'),
             SfPanel(
-              child: Text(
-                '启用 AI 时，你输入的内容、近期对话、当前计划和训练条件会经 '
-                'https://api.uuugk.win/v1 '
-                '发送给 AI 服务，用于生成回复与训练计划。\n\n'
-                'AI 记忆保存在本机；开启时，记住的训练条件会随请求发送给 AI 服务。'
-                '可随时关闭或清除记忆。\n\n'
-                'App 在本机随机生成并保存设备标识，随 AI 请求发送，用于服务器限流：'
-                '每个设备每 10 分钟最多 30 次请求，限制由服务器执行。\n\n'
-                '训练记录和已保存计划保存在本机。断网、请求超时或生成结果校验未通过时，'
-                '使用本地模板生成训练计划。',
-                style: SfType.body.copyWith(
-                  fontSize: 14.5,
-                  color: SfColors.muted,
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '启用 AI 时，你输入的内容、近期对话、当前计划和训练条件会经 '
+                    'https://api.uuugk.win/v1 '
+                    '发送给 AI 服务，用于生成回复与训练计划。\n\n'
+                    'AI 记忆保存在本机；开启时，记住的训练条件会随请求发送给 AI 服务。'
+                    '可随时关闭或清除记忆。\n\n'
+                    'App 在本机随机生成并保存设备标识，随 AI 请求发送，用于服务器限流：'
+                    '每个设备每 10 分钟最多 30 次请求，限制由服务器执行。\n\n'
+                    '训练记录和已保存计划保存在本机。断网、请求超时或生成结果校验未通过时，'
+                    '使用本地模板生成训练计划。',
+                    style: SfType.body.copyWith(
+                      fontSize: 14.5,
+                      color: SfColors.muted,
+                    ),
+                  ),
+                  const SizedBox(height: SfSpace.x2),
+                  Wrap(
+                    spacing: SfSpace.x4,
+                    children: [
+                      SfTextAction(
+                        key: const ValueKey('privacy-policy-open'),
+                        label: '隐私政策',
+                        color: SfColors.accentText,
+                        onPressed: () =>
+                            _showPolicy(context, LegalPolicy.privacy),
+                      ),
+                      SfTextAction(
+                        key: const ValueKey('terms-of-use-open'),
+                        label: '使用条款',
+                        color: SfColors.accentText,
+                        onPressed: () =>
+                            _showPolicy(context, LegalPolicy.terms),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
             const SfSectionTitle('免责声明'),
@@ -244,6 +270,15 @@ class AboutPage extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  void _showPolicy(BuildContext context, LegalPolicy policy) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        settings: RouteSettings(name: 'legal_${policy.name}'),
+        builder: (_) => LegalPolicyPage(policy: policy),
       ),
     );
   }

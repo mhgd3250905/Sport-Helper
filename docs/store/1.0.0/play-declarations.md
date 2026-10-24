@@ -1,34 +1,41 @@
 # Play 表单答案草稿
 
-适用范围：`release/1.0` 的 `1.0.0+24` 候选，界面和功能恢复已验收 `main@f5332bf`，仅不注入 API Key。原 AI 入口、设置、设备 UUID、本地规则回退和系统默认备份保留。本轮没有在 Play 后台进行任何操作。
+适用范围：`release/1.0` 目标候选 **1.0.0+25**。保留原对话首页、完整93项 App 动作范围和本地规则；用户已明确允许修正生产发布资格、figure4四条相关提示/语音及 dead-bug 4秒节奏，并增加必要政策入口。AI Key 为空；远程素材改用 Cloudflare HTTPS。**+25 构建、真机验证、视频、YouTube上传和 Play 送审尚未在此文确认完成。**
 
-## Data safety
+2026-10-24 后台实际：+24 已上传 HOLD 草稿而未送审；设置完成10/11，IARC问卷已完成，受众13+、首版免费、Alpha地区178个、测试名单仅本人邮箱。此前“未操作Play后台”和“无远程素材源”是 +24 前的历史状态，不能用作当前 +25 填表依据。
 
-| 问题 / 数据项 | 草稿答案 | 依据与边界 |
-|---|---|---|
-| 是否收集或分享用户数据 | **待按下述系统备份规则确定，不能仅因 key 为空自动选“否”** | 未发现本候选启用向开发者 AI 服务发送数据的请求；但默认系统备份/迁移可能将应用数据发离当前设备 |
-| 健康信息 / 健身信息 | App 直接处理在本机；系统备份范围需计入判断 | 原安全对话可能保存题目/答案，另有最终状态、计划和训练结果，不能写“不保存逐题回答” |
-| 账号、财务、位置、联系人、用户照片/录音等 | 未发现这些对应采集功能 | 内置示范/音频不是采集用户影像或录音；原对话内容和系统备份按上列单独说明，不能把所有消息数据一概忽略 |
-| 应用活动、诊断和设备标识 | 无启用的 AI/统计上传；本地 UUID、近期对话、记忆设置和系统备份需如实考虑 | UUID 仍会生成，本地 AI 记忆及其开关仍保留；production 内部诊断功能遵循原版构建能力 |
-| 传输中加密 | App 回环请求不等于公网 TLS；系统备份依平台条件判断 | 不把所有 Android/厂商备份一概声明成端到端加密，也不将未确认的外传路径直接填“不适用” |
-| 用户是否创建账号 / 使用第三方账号 | 无账号创建或登录 | 不需要提供测试账号或账号删除网址 |
-| 数据删除 | 清除应用存储/卸载处理本地数据，系统备份需通过相应平台设置管理 | 新对话/清除记忆不等于删除全部训练结果；不提供虚构的开发者云端删除接口 |
-| 安全审查、加密认证或徽章 | 不声明通过任何独立认证 | 当前没有相应证书/审核证据 |
+## Data safety：+25 的填报口径
 
-Google 的本地处理豁免以数据不发离设备为前提；端到端加密豁免要求开发者和中间方均不能读取内容，不能自动套用于每个系统和厂商备份。[官方 Data safety 指南](https://support.google.com/googleplay/android-developer/answer/10787469?hl=en)与[Android Auto Backup](https://developer.android.com/identity/data/autobackup)是本草稿依据。默认备份可能包括 SharedPreferences 和应用文件；是否发生由系统、用户设置和设备条件决定。
++24 的“不收集、不分享”是无远程素材源历史候选的已保存答案，**不可沿用到 +25**。+25 的媒体及政策页面HTTPS请求向Cloudflare暴露IP、请求时间、User-Agent/HTTP元数据和可能含动作标识的资源路径。以下为主任务已确定的 +25 更新口径，仍须由实际Console保存和最终包网络验证落定，不能写成已经更新后台或已获Google批准。
 
-可审阅的备份填表分支：若相关数据确会离设备且不满足官方豁免，按实际范围申报安全问答对应的健康信息、训练结果对应的健身信息、近期对话/偏好对应的应用活动、UUID 对应的设备标识；用途为功能和备份恢复，备份是否可选按用户系统设置填写。若平台实际满足官方端到端不可读等豁免，记录具体依据后再使用相应豁免。当前没有替开哥确认所有分发设备的备份实践，不擅自替全局问题勾“无收集”。
+| Console 数据项 / 问项 | +25 答案及范围 |
+|---|---|
+| 是否收集或分享必须披露的数据 | **是** |
+| Device or other IDs / 设备或其他标识 | **收集：是；分享：是**。对应网络IP及请求技术数据，不是App主动附加本地UUID |
+| App activity → App interactions / 应用活动→应用互动 | **收集：是；分享：是**。对应所请求的素材/页面路径及动作资源交互，不是上传完整训练完成记录 |
+| 是否仅临时处理 | **否 / non-ephemeral**；不承诺无日志或仅在内存中处理 |
+| 是否为用户提供选择 | **必需 / Required**：相关联网素材/页面请求所需的网络处理；不因Wi-Fi策略或不打开页面而把该处理填作可选收集 |
+| 用途 | **应用功能；防欺诈、安全与合规** |
+| 传输中加密 | **是，HTTPS**；本机回环不作为公网传输，系统备份按平台实际条件另述 |
+| 位置 | 不利用IP推导位置，不申报未实现的定位采集；不读取GPS或后台位置 |
+| 健康问答、完整计划与完成记录、聊天/AI记忆 | 保存在本机，不附加给CDN；不将这些内容误报为已上传。请求路径可能含动作标识已按App interactions披露 |
+| 本地设备UUID | 无Key不发AI请求，不附加到媒体CDN；不能把这一事实推出IP未传输 |
+| 删除 | 本地数据由系统清除存储/卸载管理；网络安全/访问日志不承诺App内自动删除或保证立即远程擦除。支持邮箱可受理资料处理请求，按实际规则答复 |
+| 账号 | 无账号创建/登录，无测试凭据或虚构的云端账号删除接口 |
+| 独立安全认证 / 徽章 | 不声明未获得的认证 |
 
-未来如注入有效 AI key 或启用其他远程服务，需另按实际数据、服务商和用途更新声明；本次仅为空 key 原版打包，不因此修改原界面或新增功能。
+Cloudflare作为分发服务的处理范围、请求路径与IP已按上述口径保守申报收集/分享，不笼统套用“CDN全为豁免处理商”。Android默认系统备份/迁移在隐私政策独立披露；allowBackup=true本身不证明App主动上传，也不证明所有平台备份满足同一豁免。
+
+依据：[官方Data safety定义](https://support.google.com/googleplay/android-developer/answer/10787469?hl=en)、[Android Auto Backup](https://developer.android.com/identity/data/autobackup)、[Cloudflare隐私政策](https://www.cloudflare.com/privacypolicy/)。未来启用AI、会员结算或其他联网服务时再次更新；本版本不因未来可能收费而申报当前不存在的购买功能。
 
 ## 权限与 API
 
 | 项目 | 本版本用途 / 建议答案 |
 |---|---|
-| `INTERNET` | 训练视频由同设备回环 HTTP 服务交给系统 WebView。没有向公网收集训练记录的服务配置 |
+| `INTERNET` | 本机回环媒体播放、Cloudflare HTTPS素材下载和公开政策页。下载/页面会产生上述网络元数据，不上传完整训练记录 |
 | `ACCESS_NETWORK_STATE` | 媒体组件读取连接状态；不读取位置，不建立用户画像 |
 | `WAKE_LOCK` | SDK 训练服务在会话期间持有带超时上限的 CPU 唤醒锁；页面另使用亮屏锁。不是后台定位或身体传感器权限 |
-| `FOREGROUND_SERVICE`、`FOREGROUND_SERVICE_MEDIA_PLAYBACK` | 最终候选清单确有声明，来自固定 SDK 的 `com.ugk.trainer.TrainingSessionService`，类型为 `mediaPlayback`。用于用户主动开始的跟练语音/提示音与会话计时，须提交真实 FGS 声明，不能填“未使用前台服务” |
+| `FOREGROUND_SERVICE`、`FOREGROUND_SERVICE_MEDIA_PLAYBACK` | 已核验+24清单确有声明；+25保持同一固定SDK并须重新验最终清单。服务来自固定 SDK 的 `com.ugk.trainer.TrainingSessionService`，类型为 `mediaPlayback`。用于用户主动开始的跟练语音/提示音与会话计时，须提交真实 FGS 声明，不能填“未使用前台服务” |
 | AndroidX 动态接收器签名权限（如合并清单出现） | 依赖生成的内部组件隔离权限，不能当成读取用户资料的授权 |
 | 相机、录音、位置、照片/视频广泛访问、联系人、短信、电话、身体传感器、活动识别、Health Connect | 未使用，不申请，相关声明选无；若最终清单出现意外权限，先处理代码/依赖，不靠表单隐瞒 |
 | 广告 ID | 不使用，无广告或广告 SDK |
@@ -39,7 +46,7 @@ Google 的本地处理豁免以数据不发离设备为前提；端到端加密�
 
 ## 媒体播放前台服务声明
 
-父任务最终候选清单已确认 `com.ugk.trainer.TrainingSessionService` 为非导出服务，声明 `foregroundServiceType="mediaPlayback"`、`stopWithTask="true"`，以及上述两项 FGS 权限和 `WAKE_LOCK`。这是 SDK 的真实功能，不为通过扫描而删除服务或隐瞒权限。
+历史+24候选清单已确认 `com.ugk.trainer.TrainingSessionService` 为非导出服务，声明 `foregroundServiceType="mediaPlayback"`、`stopWithTask="true"`，以及上述两项 FGS 权限和 `WAKE_LOCK`。这是固定SDK的真实功能；+25应按最终合并清单确认，不为通过扫描删除服务或隐瞒权限。
 
 | Console 问项 | 可审阅答案草稿 |
 |---|---|
@@ -50,7 +57,7 @@ Google 的本地处理豁免以数据不发离设备为前提；端到端加密�
 | 若系统中断 | 语音提示或提示音可能断开，锁屏/后台的会话时序也可能受调度影响，用户可能错过换动作/结束提示。这是使用理由，不是本轮已经量化证明的全部后台行为 |
 | 用户如何察觉和停止 | 播放器显示进度并播放指导；SDK 创建“训练进行中”的持续通知和媒体会话。用户可返回 App 暂停/结束训练；结束、不适停止、离开播放器或销毁页面时释放服务，结束语允许短暂尾音后释放。移除任务时服务 `stopWithTask=true`。通知上的外部播放按钮未实现，不要声称可直接从通知暂停/停止 |
 | 运行期限 | 绑定当前训练会话，具有会话结束/退出清理及 CPU 唤醒锁安全超时；不是无限期后台服务 |
-| 演示视频链接 | **待录制并由开哥提供可访问链接；本轮尚未上传视频或通过 FGS 审核** |
+| 演示视频链接 | **待从实际+25生产包录制；用户已授权Agent上传YouTube并填写真实可访问链接。当前未录制/上传，也未通过FGS审核** |
 
 English description draft:
 
@@ -76,29 +83,31 @@ Google 要求 Android 14+ 的已用 FGS 类型提供用途、延迟/中断影响
 - 无穿戴设备、相机动作捕捉、健康平台接入或传感器精度声明。
 - 安全筛查只用于保守限制训练，不是疾病诊断、风险评分或医疗建议。
 - 商店中英文描述及 App 内均保留一般健身与非医疗器械说明；不能宣传治病、疗效、康复保证或自动纠正姿势。
-- 隐私政策正文已准备；**公开 HTML URL 尚缺**。Google 的健康政策要求可公开访问的政策网址，以及 App 内政策链接或正文。[政策原文](https://support.google.com/googleplay/android-developer/answer/16679511?hl=en)
+- 公开隐私URL已部署：https://smartfit-store.pages.dev/privacy/ ，英文 /privacy/en/。+25代码增加原设置隐私区的可点击政策/条款入口；页面真机加载仍待最终包核验。Google 的健康政策要求可公开访问的政策网址，以及 App 内政策链接或正文。[政策原文](https://support.google.com/googleplay/android-developer/answer/16679511?hl=en)
 
-## 其他 App 内容
+## 其他 App 内容：实际后台与当前候选
 
-| 项目 | 草稿答案 / 需开哥确定的部分 |
+| 项目 | 已保存事实 / 后续边界 |
 |---|---|
-| 应用访问权限 / App access | 无需登录，无凭据。原对话首页完成安全确认后使用本地规则/模板进入计划和训练；AI 入口保留可见但无 key 不提供在线 AI 回复。不得指导审核员虚假回答健康问题 |
-| 广告 | 不含广告 |
-| 应用内购买 / 订阅 | 无 |
-| 社区 / 用户互动 / UGC 分享 | 无公开社区、用户间聊天、发布或交换内容 |
-| 新闻、政府、金融、赌博等声明 | 无对应功能；以后台实际问项为准 |
-| 内容分级 | 由开哥完成 IARC。代码未见赌博、付费随机奖励、公开交流或暴力玩法；健身人体/肌肉教学图像需按实际素材回答，不代填最终评级 |
-| 目标年龄 | **待开哥确定**。本版本未宣称面向儿童，也未完成儿童定向合规评估；不可为了绕开问卷随意选择年龄 |
-| 国家/地区、免费或付费、分发设备 | **待开哥确定**；现有构建以手机验证为主，不声称已验证平板、Wear OS、TV 或汽车 |
-| 商店支持邮箱 | `mhgd3250905@gmail.com` |
-| 隐私政策 URL / 发布主体 | **待开哥提供**；不能填写本地路径或占位域名 |
+| App access | 已声明无需登录、无凭据；按真实安全确认、本地计划、动作示范和训练流程审核，不指示审核员虚假回答健康问题 |
+| 广告 | 已声明不含广告，无广告SDK |
+| 当前购买 / 订阅 | 无；当前免费下载。以后会员订阅与免费下载安装不冲突，但实现后必须另更新Billing、隐私和商店声明 |
+| 社区 / 用户交互 / UGC | 无公开社区、用户间交流、内容发布或交换 |
+| 政府 / 金融 | 已声明非政府、无金融产品和服务 |
+| 健康 | 已保存 Activity and Fitness / 活动和健身；没有医疗设备、诊断/治疗或Health Connect能力 |
+| IARC | 用户明确同意IARC条款后已完成问卷。其他所有应用类型；联机内容选是（策划的补充动作素材），无暴力/色情/冒犯性语言/药物/年龄限制商品、无定位共享/数字购买/现金奖励/浏览器；后台生成ESRB Everyone、PEGI 3、USK所有年龄段等。不是App发布审核已通过 |
+| 目标受众 | 已保存13–15岁、16–17岁、18岁以上；不改为仅成年人，也不针对13岁以下儿童营销。内容分级与受众选择分开 |
+| 价格 / 地区 | 首版免费下载；Alpha选择后台178个国家/地区。没有正式生产分发事实 |
+| 测试门槛 | 当前名单仅本人邮箱，0人选择参与；必须真实招募至少12人连续参与14天后再申请正式版权限，不能凭名单条目或本地验收替代 |
+| 支持 / 开发者 | mhgd3250905@gmail.com；公开名称Bboy Ug1yk，不臆造法定主体 |
+| 隐私 / 网站 | https://smartfit-store.pages.dev/privacy/ ； https://smartfit-store.pages.dev/ ，公开无需登录 |
 
 ## 审核说明可用草稿
 
 中文版：
 
-> SmartFit 1.0.0+24 沿用已验收版本的原对话首页、动作库、计划和训练播放器，无需账号。首次在对话中完成安全说明及风险确认后，可使用本地规则和模板安排计划并跟练。原 AI 入口与设置保留可见，本候选不提供在线 AI 回复；请沿实际可用的本地计划、动作示范和训练路径验收。无付费订阅。
+> SmartFit 1.0.0+25 沿用已验收版本的原对话首页、动作库、计划和训练播放器，无需账号。首次在对话中完成安全说明及风险确认后，可使用本地规则和模板安排计划并跟练。原 AI 入口与设置保留可见，本候选不提供在线 AI 回复；部分动作内置，其他示范通过HTTPS按需下载。请沿本地计划、动作示范和训练路径验收。当前无购买或付费订阅；原设置隐私区提供公开政策入口。此说明须在+25实际验证后再用于送审。
 
 English:
 
-> SmartFit 1.0.0+24 retains the accepted conversational home, exercise library, plans, and workout player. No account is required. Complete the original safety conversation, then use local rules and templates to prepare and follow a workout. Existing AI entrances and settings remain visible, but online AI replies are not provided by this candidate. Review the available local planning, demonstration, and workout flow. There is no subscription. The interface and voice guidance are primarily in Simplified Chinese.
+> SmartFit 1.0.0+25 retains the accepted conversational home, exercise library, plans, and workout player. No account is required. Complete the original safety conversation, then use local rules and templates to prepare and follow a workout. Existing AI entrances and settings remain visible, but online AI replies are not provided by this candidate. Some demonstrations are bundled and others are downloaded over HTTPS. Review the local planning, demonstration, and workout flow. There are no purchases or subscriptions in the current version. Public policy links are in the existing privacy section of Settings. Use these instructions for submission only after build25 is actually verified. The interface and voice guidance are primarily in Simplified Chinese.

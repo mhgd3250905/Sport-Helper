@@ -1,20 +1,49 @@
 {
-  "status": "draft_not_submitted",
+  "status": "build25_candidate_text_not_yet_applied_to_final_play_submission",
   "applicationId": "com.ugk.smartfit",
   "versionName": "1.0.0",
-  "buildNumber": 24,
+  "buildNumber": 25,
   "supportEmail": "mhgd3250905@gmail.com",
-  "publisherName": null,
-  "privacyPolicyUrl": null,
+  "publisherName": "Bboy Ug1yk",
+  "privacyPolicyUrl": "https://smartfit-store.pages.dev/privacy/",
   "categorySuggestion": "Health & Fitness",
   "zh-CN": {
-    "title": "SmartFit",
-    "shortDescription": "描述训练场景，按本地模板安排计划，跟随动作示范、计时和语音练习。",
-    "fullDescription": "把训练想法变成可以跟练的计划。\n\nSmartFit 提供对话式训练首页、动作浏览、本地模板计划和训练播放器。描述训练场景、器械和时间，使用已有规则与模板安排计划，再进入动作示范、计时和语音跟练。完成后可查看本机训练记录，并保存计划以便再次使用。\n\n当前功能\n• 在原有对话界面完成安全确认和训练条件选择。\n• 浏览动作说明与可用的内置示范。\n• 按本地模板安排训练并保存计划。\n• 使用跟练计时、语音和提示音。\n• 查看训练结果，调整外观和音频设置。\n\n此上传候选未配置联网 AI 密钥，原有 AI 入口和设置仍然可见；不能在本版本中使用的联网路径保持原状，商店描述不将其宣传为已提供的在线智能服务。可用训练路径以本地规则、模板和实际内置素材为准。部分动作没有内置视频，计时和语音也不代表动作识别或姿势评估。\n\n无需注册账号，无广告。对话、计划、训练结果、设置和设备 UUID 在本机保存；系统备份或设备迁移可按设备和用户设置处理应用数据，不能理解为所有数据永不离开设备。详见隐私政策。\n\nSmartFit 用于一般健身与拉伸示范，不是医疗器械，不诊断、治疗、治愈或预防疾病。存在伤病或其他运动风险时请先咨询医生；训练中如有疼痛、头晕、胸闷等不适，请停止练习并按需就医。肌肉高亮仅为教学示意。\n\n当前界面及语音主要为简体中文。隐私与支持：mhgd3250905@gmail.com"
+    "title": "SmartFit 智能健身助手",
+    "shortDescription": "浏览动作示范，安排本地训练计划，跟随计时、语音与提示音练习。",
+    "fullDescription": "SmartFit 为日常健身提供动作浏览、训练计划与跟练工具。\n\n主要功能\n• 浏览动作说明与示范，了解练习方式。\n• 使用本地规则和模板安排训练计划，保存后再次练习。\n• 跟随训练计时、语音指导和提示音完成练习。\n• 在本机查看训练结果，调整外观和音频设置。\n\n部分示范已内置，其他素材可通过 HTTPS 按需下载，并在校验后播放。下载需要网络和流量；可在设置中管理 Wi-Fi 下载与缓存。计时、语音不代表动作识别或姿势评估。\n\n本版本不提供在线 AI 服务。无需注册账号，无广告，当前版本无购买或付费订阅。界面和语音指导主要为简体中文。\n\n隐私\n对话、计划、训练结果和偏好保存在本机。素材下载会向 Cloudflare 分发服务发送普通网络请求，包括 IP 地址、请求时间、请求的素材路径和 HTTP 元数据；不附加聊天、安全回答、完整训练记录、设备 UUID 或 AI 记忆。系统备份及设备迁移可能按设备和用户设置处理本地应用数据。详情请参阅隐私政策。\n\n运动安全\nSmartFit 用于一般健身示范，不是医疗器械，不提供疾病诊断、治疗、治愈或预防服务。存在伤病或其他运动风险时，请先咨询专业人士；训练中出现疼痛、头晕或胸闷等不适时，请立即停止。肌肉高亮仅为教学示意。\n\n支持：mhgd3250905@gmail.com\n隐私政策：https://smartfit-store.pages.dev/privacy/"
   },
   "en-US": {
-    "title": "SmartFit",
-    "shortDescription": "Plan with local templates, then follow exercise demos, timing, and voice cues.",
-    "fullDescription": "Turn a workout idea into a plan you can follow.\n\nSmartFit retains its conversational training home, exercise library, local planning rules and templates, and guided workout player. Choose your training conditions, use a local template plan, and follow available built-in demonstrations, timing, voice guidance, and chimes. Save plans and view completed workout records on your device.\n\nCurrent features\n• Complete the safety check and choose workout conditions in the original conversation interface.\n• Browse exercise instructions and available built-in demonstrations.\n• Build and save plans using local templates.\n• Follow workout timing, spoken guidance, and chimes.\n• View results and adjust appearance and audio preferences.\n\nThis upload candidate has no online AI key. The existing AI entrances and settings remain visible, and unavailable online paths have not been redesigned. This listing does not promise a working online AI service. Available training follows the local rules, templates, and bundled media. Not every exercise has a built-in video; timing and audio do not provide movement recognition or posture assessment.\n\nNo account is required and the app has no ads. Conversations, plans, results, preferences, and a device UUID are stored locally. Operating-system backup or device transfer may process app data according to the device and user settings; this is not a promise that all data always stays on the device. See the privacy policy.\n\nSmartFit is for general fitness and stretching demonstrations. It is not a medical device and does not diagnose, treat, cure, or prevent medical conditions. Consult a qualified professional if you have exercise-related risks. Stop and seek appropriate help if you experience pain, dizziness, chest discomfort, or other concerning symptoms. Muscle highlights are educational illustrations.\n\nThe interface and voice guidance are primarily in Simplified Chinese. Privacy and support: mhgd3250905@gmail.com"
+    "title": "SmartFit: Exercise & Workout",
+    "shortDescription": "Follow exercise demos, local workout plans, timers, and spoken guidance.",
+    "fullDescription": "SmartFit offers exercise demonstrations, local workout plans, and tools for guided practice.\n\nFeatures\n• Browse exercise instructions and demonstrations.\n• Use local rules and templates to arrange and save workout plans.\n• Follow workout timers, spoken guidance, and chimes.\n• Review results on your device and adjust appearance and audio preferences.\n\nSome demonstrations are built in; other media can be downloaded over HTTPS and played after integrity checks. Downloads require connectivity and data. Manage Wi-Fi download preferences and media cache in settings. Timing and spoken cues do not provide movement recognition or posture assessment.\n\nThis version does not provide online AI responses. No account is required. There are no ads, purchases, or paid subscriptions in the current version. The interface and voice guidance are primarily in Simplified Chinese.\n\nPrivacy\nConversations, plans, results, and preferences are stored on your device. Media downloads send ordinary network requests to Cloudflare's delivery service, including an IP address, request time, requested media path, and HTTP metadata. The app does not attach conversations, safety answers, full workout records, its local device UUID, or AI memories to media requests. Operating-system backup and device transfer may process local app data according to your device and settings. See the privacy policy for details.\n\nExercise safely\nSmartFit is for general fitness demonstrations. It is not a medical device and does not diagnose, treat, cure, or prevent medical conditions. Consult a qualified professional if you have an injury or other exercise-related risks. Stop if you experience pain, dizziness, or chest discomfort. Muscle highlights are educational illustrations.\n\nSupport: mhgd3250905@gmail.com\nPrivacy: https://smartfit-store.pages.dev/privacy/en/"
+  },
+  "websiteUrl": "https://smartfit-store.pages.dev/",
+  "targetAgeGroups": [
+    "13-15",
+    "16-17",
+    "18+"
+  ],
+  "downloadPrice": "free",
+  "currentInAppPurchases": false,
+  "currentSubscription": false,
+  "history": "Build24 bilingual text/artwork saved as Play draft, never submitted; build25 text below must be verified against actual candidate before applying.",
+  "dataSafetyBuild25": {
+    "status": "determined_answers_pending_actual_console_update_and_final_package_check",
+    "categories": [
+      "Device or other IDs",
+      "App activity: App interactions"
+    ],
+    "collected": true,
+    "shared": true,
+    "ephemeral": false,
+    "required": true,
+    "purposes": [
+      "App functionality",
+      "Fraud prevention, security, and compliance"
+    ],
+    "encryptedInTransit": true,
+    "doesNotInferLocationFromIp": true,
+    "doesNotUploadHealthAnswersOrCompletedWorkoutRecords": true,
+    "doesNotPromiseAutomaticNetworkLogDeletion": true
   }
 }

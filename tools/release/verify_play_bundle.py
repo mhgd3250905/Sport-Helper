@@ -92,6 +92,20 @@ def inspect(bundle, java, bundletool, expected_build):
     ]:
         report["issues"].append("unexpected_foreground_service_contract")
     with zipfile.ZipFile(bundle) as archive:
+        asset_root = 'base/assets/flutter_assets/'
+        media = json.loads(archive.read(asset_root + 'assets/training_media/v0.3.0-app/app-manifest.json'))
+        packs = json.loads(archive.read(asset_root + 'assets/packs/index.json'))
+        app_ids = {p['id'] for p in packs['packs'] if p['kind'] == 'exercise'}
+        eligible = {a['id'] for a in media['actions'] if a['releaseEligible']}
+        report['productionMedia'] = {
+            'appActions': len(app_ids), 'eligibleActions': len(eligible),
+            'matchesCompleteAppRoster': eligible == app_ids,
+        }
+        if len(app_ids) != 93 or eligible != app_ids:
+            report['issues'].append('production_media_roster_empty_or_incomplete')
+        deadbug = json.loads(archive.read(asset_root + 'assets/packs/w-dead-bug/pack.json'))
+        if deadbug['media']['repSeconds'] != 4:
+            report['issues'].append('deadbug_timing_not_adapted')
         for name in archive.namelist():
             if name.endswith("/"):
                 continue
@@ -122,7 +136,7 @@ if __name__ == "__main__":
     parser.add_argument("bundle", type=Path)
     parser.add_argument("--java", required=True)
     parser.add_argument("--bundletool", required=True)
-    parser.add_argument("--build", type=int, default=24)
+    parser.add_argument("--build", type=int, default=25)
     parser.add_argument("--report", required=True, type=Path)
     args = parser.parse_args()
     result = inspect(args.bundle.resolve(), args.java, args.bundletool, args.build)

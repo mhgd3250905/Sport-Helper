@@ -37,14 +37,10 @@ class ReleaseContractTest(unittest.TestCase):
         strings = ET.parse(ROOT / "android/app/src/main/res/values/strings.xml").getroot()
         self.assertEqual(strings.find("string[@name='app_name']").text, "智能健身助手")
 
-    def test_app_runtime_and_assets_match_the_accepted_version(self):
-        changed = subprocess.run(
-            ["git", "diff", "--name-only", "f5332bfe3746ecbf69d3f5e48c71ba5c90812499", "--",
-             "lib", "assets", "android/app/src/main/AndroidManifest.xml",
-             "android/app/src/main/res/values/strings.xml", "ios/Runner/Info.plist"],
-            cwd=ROOT, capture_output=True, text=True, check=True,
-        ).stdout.splitlines()
-        self.assertEqual(changed, ["lib/app/build_info.dart"])
+    def test_only_authorized_publication_changes_and_complete_production_roster(self):
+        from validate_release_source import validate
+        self.assertEqual(validate(), {
+            'eligibleAppActions': 93, 'otherActionsStillPending': 96})
 
     def test_ios_production_scheme_has_matching_configurations(self):
         project = (ROOT / "ios/Runner.xcodeproj/project.pbxproj").read_text(encoding="utf-8")
