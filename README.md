@@ -1,12 +1,14 @@
 # SmartFit 1.0 发布打包
 
-当前候选为 **1.0.0+24**，使用用户最后验收的 `main@f5332bf` 界面与业务代码，应用代码仅递增版本号。原对话首页、动作/计划/训练功能与 AI 入口均保留原样；构建时不注入 API Key，不再另做首页或隐藏功能。
+当前发布版本为 **1.0.0+25**，打包源码为 `9d7bcff629be8c33bed6e12b0285314ad514f9d6`。保留用户验收的 `main@f5332bf` 原对话首页、动作/计划/训练及 AI 入口；不注入 API Key，不提供在线 AI 回复。本版本修正完整93项 App 动作的生产素材配置、两处指导资料，并增加原设置中的隐私政策/条款链接。
 
 `release/1.0` 用于上架与审核修复，后续修复再合回继续开发的 `main`。Android applicationId 仍为 `com.ugk.smartfit`；SDK 两项依赖均固定 `f684e02f38e652633c23fa8946a53d02b6aa3ea2`。使用仓库外上传密钥签名，不使用 debug 证书。
 
-构建入口：[build_play_bundle.ps1](tools/release/build_play_bundle.ps1)。[商店草稿](docs/store/1.0.0/README.md)与[Mac 接力](docs/store/1.0.0/mac-handoff.md)另存。`+23` 曾擅自更换首页，已作废，不得上传；本候选恢复验收版。Google Play 后台由开哥操作，本轮没有上传或提交。
+2026-10-24 14:49（Asia/Shanghai），经用户授权提交 Google Play Alpha 封闭测试，提交编号 **1**、16项更改；15:45刷新提交详情，后台记录 **15:02 已发布**，对应 `1.0.0 (25) - Closed test`。这是封闭测试发布，尚未公开 Production。后续仍需真实测试者至少12人连续参与14天，并申请正式发布资格。
 
-以下是原验收版本说明，功能保留原样。
+版本、AAB身份和剩余事项见[当前台账](docs/version-management.md)，验证范围见[验收记录](docs/acceptance.md)，机器可读版本记录见[+25存档](docs/reports/version-save-1.0.0+25-2026-10-24.json)。[发布资料](docs/store/1.0.0/README.md)、[Mac 接力](docs/store/1.0.0/mac-handoff.md)和[构建入口](tools/release/build_play_bundle.ps1)分别管理商店与平台流程。`+23` 已作废；`+24` 是被替代、未送审的历史候选，不能替代本版。
+
+以下保留原功能说明及按当时日期记录的历史版本；其中旧分支、包身份、待验或未推送状态不表示当前 +25 的发布状态。启用在线 AI 的说明仅适用于另行注入 Key 的开发包。
 # 智能健身助手 SmartFit
 
 描述训练场景 → AI 回复与生成规范训练计划（异常时回退本地模板）→ 用预渲染动作直接展示训练小组 → 跟练（计时 / 组 × 次数 / 休息 / 换侧 / 语音播报）。

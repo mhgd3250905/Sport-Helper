@@ -1,6 +1,16 @@
 # 智能健身助手（SmartFit）交接说明
 
-## 当前交接入口（2026-10-23，+15 用户确认通过并保存）
+## 当前交接入口（2026-10-24，+25 已发布Alpha封闭测试）
+
+当前发布分支 `release/1.0`，AAB打包源码 `9d7bcff629be8c33bed6e12b0285314ad514f9d6`，版本 `1.0.0+25`、`com.ugk.smartfit`。本分支仅处理上架/审核问题，后续修复再合回继续开发的main；main基线仍为 `f5332bfe3746ecbf69d3f5e48c71ba5c90812499`。本次文档提交不改变包版本或打包SHA。
+
+用户已授权Agent操作Play/YouTube/Cloudflare。2026-10-24 14:49提交编号1，后台15:02发布；本次15:45刷新详情确认“已发布”，范围是Alpha封闭测试，不是公开Production。中英文商品资料、4张真实截图、[演示视频](https://www.youtube.com/watch?v=tJ6BGgvRjWA)、隐私/条款与FGS媒体播放声明已完成。当前事实见[台账](version-management.md)、[验收范围](acceptance.md)、[版本记录](reports/version-save-1.0.0+25-2026-10-24.json)。
+
+下一步：由开哥组织真实测试者参与，满足至少12人连续14天，再申请正式发布资格；送审时实际参与0人，当前未重新核对参与人数。处理真实审核/测试反馈时继续在release/1.0修复，不改原UI、不注入在线AI Key；不要复用+23新首页或+24空动作库包。SDK两项仍固定 `f684e02f38e652633c23fa8946a53d02b6aa3ea2`。Mac按[接力说明](store/1.0.0/mac-handoff.md)独立构建签名和验收，Android结果不能代替iOS结果。
+
+上传密钥和密码在仓库外保管；Git中只记录公开证书指纹、包哈希和事实回执，不复制私钥、登录态、日志或二进制产物。本次未创建标签、未合main，不结束或转交Cockpit会话。
+
+## +15 历史交接入口（2026-10-23，用户确认通过并保存）
 
 开哥已反馈本次 +15 测试通过，并要求先保存版本、对齐文档和台账。运行源码固定 `15079e6fc57be7c1e0d5b6c5f876784f183ce63e`；保存标签为本地 `smartfit-v0.1.0+15-internal-verified`，分支 `feat/voice-aac-comparison`。internal arm64 APK 49,384,327B，SHA-256 `6ecdc72d0fb48c8b179e288009cfe8279a50be4bef1391ee7dfdedebf48249fb`；本次核对文件身份，沿用该源码的 298 测试、3 项 Python 测试及三 ABI JNI 门禁结果，不重建用户已测包。详见[本轮验收](acceptance.md)、[版本台账](version-management.md)及[版本保存记录](reports/version-save-0.1.0+15-2026-10-23.json)。
 

@@ -1,14 +1,36 @@
-# 当前发布候选：1.0.0+24（2026-10-24）
+# 当前发布台账：1.0.0+25（2026-10-24）
 
-- 依据用户最终指令，界面与业务代码原样取自最后验收的 `main@f5332bf`，应用代码仅递增版本号。
-- 正常生产打包，不注入 API Key；原有 AI 入口、固定地址、规则回退与本地存储行为均不另行修改。
-- applicationId 固定 `com.ugk.smartfit`，SDK coach0.3.3 / trainer0.1.6 均固定 `f684e02f38e652633c23fa8946a53d02b6aa3ea2`。
-- Android 使用独立上传密钥，密钥和密码均在仓库外双盘备份；生产包不回退 debug 签名。
-- `+23` 擅自更换首页的候选已作废。正式候选的源提交、包哈希和真机简检以交付回执为准。
-- 本轮未操作 Google Play 后台，由开哥上传和提交；Mac 从 `release/1.0` 构建并另行签名验证。
+本页管理版本和包身份；验证结果及复用边界见[验收记录](acceptance.md)，下一步见[交接入口](HANDOVER.md)，机器可读记录见[版本存档](reports/version-save-1.0.0+25-2026-10-24.json)。本次收束只更新文档，不递增版本、不重建包、不创建或移动标签。
 
-以下保留既有验收历史。
-# 版本管理与台账
+| 项目 | 当前已确认事实 |
+|---|---|
+| 发布分支 / 打包源码 | `release/1.0`；`9d7bcff629be8c33bed6e12b0285314ad514f9d6` 已推送。后续文档保存提交不冒充新的打包源码 |
+| 阶段基线 / 开发主线 | `main@f5332bfe3746ecbf69d3f5e48c71ba5c90812499`；本轮未将发布分支合回 main |
+| Android 身份 | `com.ugk.smartfit`；versionName `1.0.0`、versionCode `25`；production release、非 debuggable，minSdk24 / targetSdk36 |
+| SDK | `ugk_coach 0.3.3` / `ugk_trainer 0.1.6` 均固定 `f684e02f38e652633c23fa8946a53d02b6aa3ea2`，无本地依赖覆盖 |
+| UI / AI / 素材 | 原验收界面和规则回退保留；不注入 API Key 或 AI endpoint。原 AI 入口仍可见，不提供在线回复；完整93项生产素材可见，其他96项仍待发布 |
+| 本版发布修正 | `s-figure4` 四条相关提示/语音与脚踩地示范一致；`w-dead-bug` 每次交替4秒；原设置增加公开隐私/条款入口 |
+| AAB | `E:/AII-3D/3D-Sport-AI/deliveries/SmartFit-1.0.0+25/SmartFit-1.0.0+25.aab`；86,836,900B |
+| AAB SHA-256 | `8f7eb4a78c8abe5ea91861d70a82e67279cc9c2e5c2c658f1ab38a5bff53ac4e` |
+| 上传签名 | 独立上传证书，SHA-256 `538b26ee50d358a615ea3f3aa50f72c444739b384bad87b4eb015c0600339419`；密钥和密码仓库外双盘备份，无 debug 回退 |
+| Play 提交 | 用户授权 Agent 操作后台；2026-10-24 14:49提交编号1、16项更改，候选 `1.0.0 (25) - Closed test` |
+| 最新远程观察 | 2026-10-24 15:45刷新提交详情，状态“已发布”，后台记录发布时间 **15:02**；范围为 Alpha 封闭测试及其商店/内容资料，未公开 Production |
+| 商店 / 物料 | 首版免费，13岁及以上，无广告、无需账号、当前无购买或订阅；中英文文案、正式图标/置顶图、4张真实截图、真实演示视频、隐私/条款/支持页及FGS声明已保存 |
+| 验证 | 打包源码435项测试通过、13项跳过，分析0问题；8项发布合同及93项素材校验通过。真机只做简测，2/8后提前结束，后台服务和政策入口可用，不冒充整套12分钟通过 |
+| 测试资格边界 | 送审时实际参与者0人、名单仅本人邮箱；尚无新增参与者证据。仍需至少12名真实测试者连续参与14天，再申请正式发布资格 |
+| iOS | Mac 从本分支按[接力说明](store/1.0.0/mac-handoff.md)另行构建签名验证；本轮没有 iOS 包或 App Store 提交 |
+
+公开素材源：`https://smartfit-media.pages.dev/v0.3.0-app/`。隐私政策：[中文](https://smartfit-store.pages.dev/privacy/)；[条款](https://smartfit-store.pages.dev/terms/)；[支持](https://smartfit-store.pages.dev/support/)；[YouTube演示](https://www.youtube.com/watch?v=tJ6BGgvRjWA)。Cloudflare请求的技术元数据已按本版实际网络行为更新数据安全声明，不能沿用 +24 的无远程素材源答案。
+
+发布状态依据是[提交1详情](https://play.google.com/console/u/0/developers/4872134440776463225/app/4974885907919443404/publishing/submission-activity/1/details)的实际页面观察，不是本次构建或新的设备验收。14:49送审回执中的“审核中/快速检查中”保留为当时快照。
+
+## 已替代的发布候选
+
+- `1.0.0+23` 的新首页/隐藏入口方案已撤销，不再使用其包或截图。
+- `1.0.0+24` 恢复原界面但生产清单全待发布，动作库为空；只上传过HOLD草稿，未送审，已由 +25 替换。
+
+以下保留既有验收历史，所述“当前”、main、分支及待验均按原日期理解。
+# 历史版本管理与台账
 
 更新日期：2026-10-23（Asia/Shanghai）。本文件区分当前保存版本、本地主线与历史交付；验收证据以 [acceptance.md](acceptance.md) 为准，交接入口见 [HANDOVER.md](HANDOVER.md)。
 

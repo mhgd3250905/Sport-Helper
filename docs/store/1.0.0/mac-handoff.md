@@ -1,11 +1,11 @@
 # Mac / iOS 接力：release/1.0
 
-目标候选 **1.0.0+25**，保留原界面和完整93项范围，包含用户批准的生产素材配置/资料适配及必要政策链接。**Windows 没有构建、签名、安装或提交 iOS 包；此文也不声明 +25 Android 包已通过。**
+目标版本 **1.0.0+25**，打包源码 `9d7bcff629be8c33bed6e12b0285314ad514f9d6`；其后文档保存提交不改变运行代码或版本。保留原界面和完整93项范围，包含用户批准的生产素材配置/资料适配及必要政策链接。Android已完成简测并于2026-10-24 15:02发布到Alpha封闭测试（本次15:45刷新确认），不是Production公开发布。**Windows没有构建、签名、安装或提交iOS包；Android结果不等于iOS通过。**
 
 ## 源码和依赖
 
 1. 在 Mac 干净工作副本获取 `origin/release/1.0`；保留已有改动，不 reset、不覆盖。首次跟踪用 `git switch --track origin/release/1.0`，已有分支用 `git switch release/1.0` 和 `git pull --ff-only origin release/1.0`。
-2. 核对 `git rev-parse HEAD` 与主任务最终交付的 +25 SHA。不要从后续继续开发的 main 打此候选。
+2. 记录 `git rev-parse HEAD`。Android +25打包源码固定为 `9d7bcff629be8c33bed6e12b0285314ad514f9d6`，后续文档保存提交的HEAD不必与它相等；用 `git merge-base --is-ancestor 9d7bcff629be8c33bed6e12b0285314ad514f9d6 HEAD` 确认祖先关系，并以 `git diff --name-only 9d7bcff629be8c33bed6e12b0285314ad514f9d6..HEAD` 确认仅文档差异。若出现运行代码、资源、依赖或平台配置变化，应按新源码重新验收，不能沿用原包证明。不要从后续继续开发的main打此候选。
 3. `pubspec.yaml` 和 App 版本常量应为 `1.0.0+25`。若 Apple 已占用此 build，先按发布台账递增，不复用。
 4. `ugk_coach 0.3.3`、`ugk_trainer 0.1.6` 均固定 `f684e02f38e652633c23fa8946a53d02b6aa3ea2`。运行 `flutter pub get --enforce-lockfile` 并确认 lock 无变化；不带 Windows path override。
 
