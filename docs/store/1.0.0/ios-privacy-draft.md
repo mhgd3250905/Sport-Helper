@@ -24,7 +24,7 @@
 - 没有相机、麦克风或定位用途说明；`UIBackgroundModes = [audio]` 用于训练语音，`NSAllowsLocalNetworking` 用于设备回环播放器。
 - Release App 含 6 份可解析的 `PrivacyInfo.xcprivacy`：Flutter、shared_preferences_foundation、webview_flutter_wkwebview、connectivity_plus、wakelock_plus、package_info_plus。各份 Tracking 均为 false。
 - UserDefaults 及 Flutter 的 FileTimestamp / SystemBootTime 理由由随包隐私清单提供；最终仍须对签名 IPA 重验，不能用源码清单替代归档检查。
-- 对未签名 Release App 的常见 GitHub token、私钥、OpenAI 风格 token 模式扫描未发现匹配；未发现 `.env`、`.key`、`.pem`、`.p12` 或 `.pfx` 文件。这不是对任意未知秘密的数学证明。
+- 对最终上传的分发 IPA（SHA-256 `49d279d7713f81cc7425716546e6528b8097e24d8efb3b4afe469c9127d2dd0c`）完成常见 GitHub / OpenAI token、私钥和秘密文件检查，未发现凭据或 `.env`、`.key`、`.pem`、`.p12`、`.pfx` 文件；同时核对构建只注入公开素材 CDN。检查覆盖已列出的模式及本轮构建配置。
 - 还未完成最终 TestFlight Build 的真机网络、拒绝权限、后台语音和系统备份验证；不得标为已通过。
 
 ## 官方依据

@@ -1,6 +1,6 @@
 # SmartFit iOS 1.0.0 (25) 本机发布记录
 
-状态：**ARCHIVED，尚未导出 IPA / 上传 TestFlight / 提交审核**。以本文最新回执为准，不能把 Android 的发布结果或 Xcode 归档成功当成 TestFlight 已可用。
+状态：**TestFlight `1.0.0 (25)` 已上传并处理完成，当前缺少出口合规确认；未提交 App Store 审核**。2026-10-24 18:42（Asia/Shanghai）Xcode 确认上传成功，18:49:45 已观察到处理完成后的 Build 25。处理完成、可测试和正式发布是独立状态。
 
 ## 候选与范围
 
@@ -38,26 +38,32 @@ main 与 release 已分叉开发，本次仅同步 iOS 文件，没有把 releas
 ## 本地产物
 
 - 最终归档：`build/ios/archive/Runner.xcarchive`，源码 `638d491`，约 219.6 MB。最终归档已消除默认启动图占位警告。
-- CLI `flutter build ipa` 已完成归档，但导出返回 `No Accounts`、`No profiles for 'com.ugk.smartfit' were found`，当前 IPA 数为 0。Flutter 命令自身可能返回 0，因此已额外检查 IPA 是否实际生成。
-- Xcode GUI 中已确认开哥账号及 `kai sheng` 团队存在。Organizer 能访问 App Store Connect，正在使用 Custom → App Store Connect → Export；已关闭自动管理版本 / Build 号，并跳过自动新建 App 记录。
-- Organizer 停在 Automatically manage signing，后续会创建或更新 App ID / 描述文件。需先完成用户确认的 Bundle ID / App 记录创建步骤，再继续导出和验包。
+- CLI 曾返回 `No Accounts` 和缺少分发描述文件；Xcode GUI 中账号及 `kai sheng` 团队实际存在。已通过 Organizer 自动签名完成分发资源准备和 IPA 导出，无需重新登录或手动导出私钥。
+- **实际上传的 IPA**：`build/ios/ipa/SmartFit-1.0.0-25-upload/smartfit.ipa`，**53,355,310 bytes**，SHA-256 **`49d279d7713f81cc7425716546e6528b8097e24d8efb3b4afe469c9127d2dd0c`**。
+- 本机未安装 Transporter，使用 Organizer Custom → App Store Connect → Upload；关闭自动管理版本 / Build 号。点击 Upload 前已定位该次 Xcode pipeline 的实际临时 IPA，独立验包并保留逐字节一致的副本；上传后临时包哈希仍一致。初次本地导出稿已移到本机私密构建目录，避免与实际上传包混淆。
+- 最终验包通过：`codesign --verify --deep --strict`、Bundle / 版本 / Build、arm64、`get-task-allow=false`、`beta-reports-active=true`、显式匹配 `com.ugk.smartfit` 的 App Store 分发描述文件、无调试设备限制、6 份隐私清单语法。常见 token / 私钥及秘密文件检查未发现凭据；符号文件中一次宽泛匹配已核实为 C++ `highp` 函数标识符，加入标识符边界后无凭据匹配。
 - 截图目录：`build/ios-release-evidence/screenshots/`，不提交 Git。6.7 英寸为真实 1290×2796，6.5 英寸为真实 1242×2688，均通过 `simctl io screenshot` 获取，没有缩放造图。这些是模拟器 Build 25 预检素材，不是 TestFlight 真机验收证明。
-- 两种尺寸均已保存动作库、训练中和完成页，共 6 张。下载包：`build/ios-release-evidence/SmartFit-1.0.0-25-iPhone-screenshots.zip`（9,166,755 bytes，SHA-256 `75088d5d51b355da819236cf30758f518839fe152fc93788b820e81859a70b5a`）；本地候选元数据为同目录的 `candidate-manifest.json`。
+- 两种尺寸均已保存动作库、训练中和完成页，共 6 张。下载包：`build/ios-release-evidence/SmartFit-1.0.0-25-iPhone-screenshots.zip`（9,164,711 bytes，SHA-256 `d63a4462919eb78a801f8576bcdb311a536ca71fc8c120421f35c41916a3233d`）；本地候选元数据为同目录的 `candidate-manifest.json`。
 - 隐私填写草稿：[ios-privacy-draft.md](ios-privacy-draft.md)。尚未在 ASC 保存 App Privacy 答案。
 
 ## Apple 后台与授权边界
 
 指定的 Playwright MCP profile 位于 `/Users/shengkai/.local/share/ugk-browser/chrome-profile`。用户已授权重启原占用浏览器，当前已由 MCP 接管并完成用户亲自认证。没有复制 Cookies、密码、token 或 profile 内容。
 
-已在 `kai sheng` 团队应用列表核对：尚无 SmartFit。已准备但未提交的新建表单为：
+用户已明确确认注册 Bundle ID 并创建以下记录；现已在 `kai sheng` 团队完成：
 
-| 字段 | 待确认值 |
+| 字段 | 已创建值 |
 | --- | --- |
 | 名称 | SmartFit 智能健身助手 |
 | Bundle ID | com.ugk.smartfit |
 | 平台 / 主要语言 | iOS / 简体中文 |
 | SKU / 访问权限 | smartfit-ios-1.0 / 页面默认完全访问权限 |
 
-用户尚待确认注册 Bundle ID 并创建该 ASC 记录。未点击“创建”，未上传 IPA，未开启测试员通知、外部 Beta Review、正式 App Review 或公开发布。
+- ASC App ID：**`6826550088`**；[App 记录](https://appstoreconnect.apple.com/apps/6826550088) / [TestFlight](https://appstoreconnect.apple.com/apps/6826550088/testflight/ios)。
+- App Store 版本草稿已保存为 **1.0.0 / 准备提交**，与包身份一致。没有点击“添加以供审核”。
+- 18:42 上传成功，TestFlight 已处理完成并显示 **版本 1.0.0，构建版本 25，缺少出口合规证明**。当前还不声明可安装测试。
+- 未添加测试员或群组，未开启测试通知、外部 Beta Review、正式 App Review 或公开发布。App Privacy 答案与截图已准备在本机，尚未代开哥保存 / 提交商店隐私声明。
 
-下一步：获得记录身份确认 → 注册 / 创建记录 → Organizer 自动签名导出 → 验签、核对身份 / Profile / 隐私清单并记录 IPA SHA-256 → 上传同一 IPA 到 TestFlight → 等待 Apple 处理并交付 Build 状态。正式审核由开哥操作。
+出口合规问卷按本轮素材下载的 `Dart HttpClient` / 标准 TLS 实现进入“标准加密算法”分支，目前停在“是否会在法国分发”，尚未保存地区选择。该分类依据 [Dart 3.12.2 的 SecureSocket 实现](https://github.com/dart-lang/sdk/blob/3.12.2/runtime/bin/secure_socket_filter.cc) 作出；[Apple 文档](https://developer.apple.com/help/app-store-connect/reference/app-information/export-compliance-documentation-for-encryption)对非 Apple 系统提供的标准算法及法国分发列出文稿要求。
+
+下一步：由开哥确认本次是否向法国分发，完成出口合规后核对 Build 25 状态。正式商店资料、隐私声明、真机验收和提交审核由开哥复核。当前无需再提供仓库或签名密钥。
