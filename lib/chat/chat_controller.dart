@@ -47,6 +47,10 @@ class ChatController extends ChangeNotifier {
   ChatState _state = const ChatState();
   String? _diagnosticOperation;
 
+  // Only a question returned in this live SDK session may be answered.
+  // Persisted bubbles are history: SDK tool history is not restored from JSON.
+  String? _activeQuestionId;
+
   void _onProgress(coach.AgentEvent event) {
     if (!typing ||
         _progressEnded ||
@@ -74,7 +78,7 @@ class ChatController extends ChangeNotifier {
               : '网络不稳，正在重试（${event.attempt}/${event.maxAttempts}）…',
         coach.AgentEventKind.slow => '还在想…',
         coach.AgentEventKind.thinking => progressLabel ?? '正在思考回复',
-        coach.AgentEventKind.done => null,
+        coach.AgentEventKind.askUser || coach.AgentEventKind.done => null,
       };
     }
     notifyListeners();
@@ -185,6 +189,7 @@ class ChatController extends ChangeNotifier {
   /// Cancels this turn immediately; a late transport response cannot add cards.
   void cancelRequest() {
     if (!typing) return;
+    _closeQuestion();
     _cancelDiagnostic('user_cancel');
     _replyEpoch++;
     typing = false;
@@ -207,6 +212,7 @@ class ChatController extends ChangeNotifier {
       managed.reset();
     }
     _state = const ChatState();
+    _activeQuestionId = null;
     _safetyStep = null;
     _safetyMessageId = null;
     messages.clear();
@@ -244,7 +250,13 @@ class ChatController extends ChangeNotifier {
   );
 
   /// The user typed [text] (or tapped a chip / option labelled [label]).
-  Future<void> send(String text, {String? label}) async {
+  Future<void> send(String text, {String? label}) => _send(text, label: label);
+
+  Future<void> _send(
+    String text, {
+    String? label,
+    bool trustedAppCommand = false,
+  }) async {
     final t = text.trim();
     if (t.isEmpty || typing) return;
     final userMessage = _user(label ?? t);
@@ -297,7 +309,9 @@ class ChatController extends ChangeNotifier {
     }
     final ChatReply reply;
     try {
-      reply = await engine.reply(t, _context);
+      reply = trustedAppCommand && engine is AppCommandChatEngine
+          ? await (engine as AppCommandChatEngine).replyAppCommand(t, _context)
+          : await engine.reply(t, _context);
     } on Object catch (error) {
       RuntimeLog.instance.record(
         'chat.error',
@@ -322,9 +336,13 @@ class ChatController extends ChangeNotifier {
     typing = false;
     _endProgress();
     _state = reply.state;
+    if (reply.inputAccepted) _closeQuestion();
     if (reply.aiTurn) _replace(userMessage.copyWith(aiVisible: true));
     for (final m in reply.messages) {
-      _bot(m, aiVisible: reply.aiTurn);
+      final bubble = _bot(m, aiVisible: reply.aiTurn);
+      if (reply.aiTurn && bubble.question != null) {
+        _activeQuestionId = bubble.id;
+      }
     }
     RuntimeLog.instance.record(
       'chat.reply.rendered',
@@ -338,7 +356,9 @@ class ChatController extends ChangeNotifier {
     );
     _diagnosticOperation = null;
     // A question with its own options doesn't need the chips too.
-    final asks = reply.messages.any((m) => m.options.isNotEmpty);
+    final asks =
+        _activeQuestionId != null ||
+        reply.messages.any((m) => m.options.isNotEmpty || m.question != null);
     suggestions = reply.suggestions.isNotEmpty
         ? reply.suggestions
         : (asks ? const [] : _defaults());
@@ -368,6 +388,44 @@ class ChatController extends ChangeNotifier {
     } else {
       command(a);
     }
+  }
+
+  /// A question is interactive only after the SDK send returned and while
+  /// it remains the newest unanswered question in this live conversation.
+  bool canAnswerQuestion(ChatMessage message) {
+    if (typing || inSafetyCheck || message.id != _activeQuestionId) {
+      return false;
+    }
+    final current = messages.where((m) => m.id == message.id).firstOrNull;
+    return current?.question != null && !current!.questionAnswered;
+  }
+
+  Future<void> answerQuestion(ChatMessage message, String text) async {
+    if (!canAnswerQuestion(message) || text.trim().isEmpty) return;
+    await send(text);
+  }
+
+  Future<void> answerChoices(ChatMessage message, List<String> selected) async {
+    if (!canAnswerQuestion(message)) return;
+    final question = message.question!;
+    if (question.mode != coach.AskUserMode.choice ||
+        selected.isEmpty ||
+        selected.toSet().length != selected.length ||
+        (!question.multiple && selected.length != 1) ||
+        selected.any((value) => !question.options.contains(value))) {
+      return;
+    }
+    // Persist the selection for read-only history; never turn it into a command.
+    _replace(message.copyWith(answeredChoices: List.unmodifiable(selected)));
+    await send(selected.join('、'));
+  }
+
+  void _closeQuestion() {
+    final id = _activeQuestionId;
+    _activeQuestionId = null;
+    if (id == null) return;
+    final current = messages.where((m) => m.id == id).firstOrNull;
+    if (current != null) _replace(current.copyWith(questionAnswered: true));
   }
 
   /// Can [m]'s options still be tapped?
@@ -412,7 +470,7 @@ class ChatController extends ChangeNotifier {
       notifyListeners();
       return;
     }
-    await send(o.value, label: o.label);
+    await _send(o.value, label: o.label, trustedAppCommand: o.isCommand);
   }
 
   // ------------------------------------------------------------ plans
@@ -483,7 +541,8 @@ class ChatController extends ChangeNotifier {
   }
 
   /// A saved plan picked in the drawer: show it as a card in the chat.
-  Future<void> showSaved(SavedPlan p) => send('@saved:${p.id}', label: p.name);
+  Future<void> showSaved(SavedPlan p) =>
+      _send('@saved:${p.id}', label: p.name, trustedAppCommand: true);
 
   TrainingPlan? _planById(String id) {
     for (final m in messages.reversed) {
@@ -500,6 +559,7 @@ class ChatController extends ChangeNotifier {
   }
 
   void _beginSafety({required bool firstRun}) {
+    _closeQuestion();
     _cancelDiagnostic('safety_check');
     _replyEpoch++;
     typing = false;
@@ -603,6 +663,7 @@ class ChatController extends ChangeNotifier {
         at: _clock(),
         text: m.text,
         options: m.options,
+        question: m.question,
         plan: plan,
         validatedPlan: validatedPlan,
         actions: m.actions,

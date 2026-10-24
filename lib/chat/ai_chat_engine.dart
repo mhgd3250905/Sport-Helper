@@ -17,6 +17,7 @@ import 'slot_parser.dart';
 class AiChatEngine
     implements
         ManagedChatEngine,
+        AppCommandChatEngine,
         RestorableChatEngine,
         ProgressChatEngine,
         DiagnosticChatEngine {
@@ -47,6 +48,7 @@ class AiChatEngine
   _Turn? _pending;
   Future<coach.CoachTurnResult>? _sdkPending;
   bool _disposed = false;
+  bool _awaitingAnswer = false;
   String? _diagnosticOperation;
 
   @override
@@ -120,6 +122,9 @@ class AiChatEngine
 
   @override
   void cancelPending() {
+    // The controller may still be in its presentation delay after send has
+    // returned. A discarded question must not keep the next send in answer mode.
+    _awaitingAnswer = false;
     final turn = _pending;
     if (turn == null) return;
     lastOutcome = coach.TurnOutcome.cancelled;
@@ -140,6 +145,7 @@ class AiChatEngine
     lastResult = null;
     lastOutcome = null;
     lastFallbackReason = null;
+    _awaitingAnswer = false;
   }
 
   @override
@@ -188,11 +194,23 @@ class AiChatEngine
       );
 
   @override
-  Future<ChatReply> reply(String input, ChatState state) async {
+  Future<ChatReply> reply(String input, ChatState state) =>
+      _reply(input, state);
+
+  @override
+  Future<ChatReply> replyAppCommand(String command, ChatState state) =>
+      _reply(command, state, trustedAppCommand: true);
+
+  Future<ChatReply> _reply(
+    String input,
+    ChatState state, {
+    bool trustedAppCommand = false,
+  }) async {
     final operation =
         _diagnosticOperation ?? RuntimeLog.instance.newOperation('chat');
     _diagnosticOperation = null;
-    ChatReply empty() => ChatReply(messages: const [], state: state);
+    ChatReply empty() =>
+        ChatReply(messages: const [], state: state, inputAccepted: false);
     if (_disposed) {
       RuntimeLog.instance.record(
         'ai.turn.rejected',
@@ -222,7 +240,11 @@ class AiChatEngine
     lastResult = null;
     lastOutcome = null;
     lastFallbackReason = null;
-    final rawLocalReply = local.localReply(input, state);
+    // An answer is an ordinary SDK send in the same task, even when the
+    // supplied option text happens to look like a local command or shortcut.
+    final rawLocalReply = _awaitingAnswer && !trustedAppCommand
+        ? null
+        : local.localReply(input, state);
     // Explicit library navigation stays local. Requests to see/recommend
     // actions belong to the SDK's show_actions tool.
     final opensLibrary = rawLocalReply?.action?.startsWith('@library') ?? false;
@@ -231,6 +253,7 @@ class AiChatEngine
         ? null
         : _admitLocalCards(rawLocalReply);
     if (localReply != null) {
+      if (trustedAppCommand) _awaitingAnswer = false;
       RuntimeLog.instance.record(
         'chat.route',
         operation: operation,
@@ -362,6 +385,10 @@ class AiChatEngine
           accepted.status == coach.TurnStatus.busy) {
         return empty();
       }
+      if (accepted.status != coach.TurnStatus.inputTooLong) {
+        _awaitingAnswer =
+            accepted.status == coach.TurnStatus.ok && accepted.question != null;
+      }
       lastFallbackReason = accepted.fallbackReason;
       lastOutcome = switch (accepted.status) {
         coach.TurnStatus.ok =>
@@ -379,6 +406,7 @@ class AiChatEngine
           return ChatReply(
             messages: const [BotMessage('请把这一条缩短到 500 字以内再发送。')],
             state: state,
+            inputAccepted: false,
           );
         case coach.TurnStatus.error:
           return ChatReply(
@@ -426,6 +454,7 @@ class AiChatEngine
             plan: plan,
             validatedPlan: validated,
             actions: accepted.actions,
+            question: accepted.question,
             request: request,
             options: fallback && plan == null
                 ? turn.fallbackReply?.messages
@@ -692,6 +721,7 @@ class _CancellableClient implements coach.LlmClient {
             'check_plan',
             'remember',
             'forget',
+            'ask_user',
             coach.CoachTools.showPlan,
             coach.CoachTools.showActions,
           };

@@ -52,7 +52,7 @@ class _PlayerPageState extends State<PlayerPage> {
   Widget build(BuildContext context) {
     final s = AppServices.of(context);
     final plan = widget.plan;
-    if (plan.items.any((item) => !s.library.contains(item.exerciseId))) {
+    if (plan.exerciseIds.any((id) => !s.library.contains(id))) {
       return const Scaffold(
         body: SafeArea(child: Center(child: Text('计划包含尚未可用的动作，暂时无法开始。'))),
       );

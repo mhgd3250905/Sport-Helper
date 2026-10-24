@@ -1,5 +1,9 @@
 # 版本管理与台账
 
+## SDK 与共享聊天 UI 候选（2026-10-24，待批准）
+
+开发分支 `feat/sdk-coach-ui-20261024` 基于 main `f5332bfe3746ecbf69d3f5e48c71ba5c90812499`，App 版本仍为 `0.1.0+22`。升级 `ugk_coach-v0.4.1`，接入多轮询问；聊天展示调用独立 `ugk_coach_ui-v0.1.0`。trainer 因 tag 来源冲突仅修改依赖声明并升为 `ugk_trainer-v0.2.1`，训练运行代码不变。新 SDK tag、main 合入和推送均待开哥同意；不得将此候选写成已发布版本。详见[本轮记录](coach-ui-integration-2026-10-24.md)。
+
 更新日期：2026-10-23（Asia/Shanghai）。本文件区分当前保存版本、本地主线与历史交付；验收证据以 [acceptance.md](acceptance.md) 为准，交接入口见 [HANDOVER.md](HANDOVER.md)。
 
 ## 流畅度基线候选（2026-10-23，+16 待手机采集）

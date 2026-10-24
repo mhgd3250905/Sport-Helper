@@ -75,6 +75,21 @@ Future<void> _show(WidgetTester tester, AppServices services) async {
 }
 
 void main() {
+  testWidgets('no Key hides AI memory controls and AI service copy', (
+    tester,
+  ) async {
+    final s = _services(_Storage());
+    addTearDown(s.dispose);
+    await _show(tester, s);
+    expect(find.byKey(const ValueKey('ai-memory-switch')), findsNothing);
+    expect(find.byKey(const ValueKey('ai-memory-clear')), findsNothing);
+    expect(find.text('AI 记忆'), findsNothing);
+    expect(find.text('隐私与 AI'), findsNothing);
+    expect(find.textContaining('api.uuugk.win'), findsNothing);
+    expect(find.text('隐私'), findsOneWidget);
+    await tester.pumpWidget(const SizedBox());
+  });
+
   test(
     'AI service initializes from the saved setting and switches the live agent',
     () async {
@@ -144,7 +159,8 @@ void main() {
     tester,
   ) async {
     final storage = _Storage();
-    final s = _services(storage);
+    final s = _services(storage, ai: true);
+    addTearDown(s.dispose);
     await s.store.aiMemoryStore.save([
       coach.MemoryEntry(
         coach.MemoryKind.equipment,
@@ -175,7 +191,8 @@ void main() {
     tester,
   ) async {
     final storage = _Storage();
-    final s = _services(storage);
+    final s = _services(storage, ai: true);
+    addTearDown(s.dispose);
     await s.store.aiMemoryStore.save([
       coach.MemoryEntry(
         coach.MemoryKind.level,
@@ -201,7 +218,8 @@ void main() {
     tester,
   ) async {
     final storage = _Storage()..failWriteKey = AppStore.key;
-    final s = _services(storage);
+    final s = _services(storage, ai: true);
+    addTearDown(s.dispose);
     await _show(tester, s);
     final toggle = find.byKey(const ValueKey('ai-memory-switch'));
     await tester.tap(toggle);

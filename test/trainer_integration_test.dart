@@ -14,6 +14,7 @@ import 'package:smartfit/ui/theme/celebration.dart';
 import 'package:smartfit/ui/theme/tokens.dart';
 import 'package:smartfit/voice/voice_library.dart';
 import 'package:smartfit/voice/voice_queue.dart';
+import 'package:ugk_coach/ugk_coach.dart' as coach;
 import 'package:ugk_trainer/ugk_trainer.dart' as trainer;
 
 import 'support.dart';
@@ -128,12 +129,12 @@ Future<void> _advance(WidgetTester tester, int seconds) async {
 
 void main() {
   testWidgets(
-    'missing repSeconds waits in the actual App player until completed',
+    'missing repSeconds counts automatically with trainer default pacing',
     (tester) async {
       final packs = loadPacksSync();
       final squat = packs.exercises.firstWhere((p) => p.id == 'h-squat');
-      // Preserve the real pack and assets, changing only the missing metadata
-      // condition that makes ugk_trainer require manual set completion.
+      // Missing pacing metadata uses the SDK's default 3 seconds per rep.
+      // The video's loop length must not become a repetition duration.
       final media = Map<String, dynamic>.from(squat.json['media'] as Map)
         ..remove('repSeconds');
       final withoutRhythm = DrillPack.fromJson({
@@ -146,18 +147,88 @@ void main() {
       expect(library['h-squat'].repSeconds, isNull);
       final s = _services(storage: _Storage(), library: library);
       await _open(tester, s, _plan(id: 'h-squat', reps: true));
-      await _advance(tester, 90); // More than the old 3 reps × 3 sec estimate.
-      expect(find.byKey(const ValueKey('complete-set-button')), findsOneWidget);
+      await _advance(
+        tester,
+        15,
+      ); // 10 seconds prep, then part of 3 × 3 seconds.
+      expect(find.byKey(const ValueKey('complete-set-button')), findsNothing);
       expect(find.text('训练完成！'), findsNothing);
       expect(s.store.sessionResults, isEmpty);
       expect(s.store.history, isEmpty);
-      await tester.tap(find.byKey(const ValueKey('complete-set-button')));
-      await _advance(tester, 2);
+      await _advance(tester, 6);
       expect(find.text('训练完成！'), findsOneWidget);
       final result = s.store.sessionResults.single;
       expect(result.full, isTrue);
       expect(result.items.single.completedSets, 1);
       expect(result.items.single.status, trainer.ItemStatus.completed);
+      await tester.pumpWidget(const SizedBox());
+    },
+  );
+
+  testWidgets(
+    'ordered segments play their own media and save one completed parent set',
+    (tester) async {
+      final base = _plan(id: 'h-squat', reps: true);
+      final plan = base.copyWith(
+        blocks: [
+          base.blocks.single.copyWith(
+            items: [
+              PlanItem(
+                exerciseId: 'h-squat',
+                mode: DoseMode.reps,
+                sets: 1,
+                perSide: false,
+                restSeconds: 0,
+                segments: const [
+                  coach.PlanSegment(
+                    id: 'plank',
+                    exerciseId: 'h-forearm-plank',
+                    mode: coach.DoseMode.time,
+                    workSeconds: 10,
+                  ),
+                  coach.PlanSegment(
+                    id: 'wall',
+                    exerciseId: 'w-wall-sit',
+                    mode: coach.DoseMode.time,
+                    workSeconds: 10,
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      );
+      final storage = _Storage();
+      final s = _services(storage: storage);
+      await s.store.rememberPlan(plan);
+      await _open(tester, s, plan);
+      await _advance(tester, 11);
+      expect(
+        tester.widget<ExerciseVideo>(find.byType(ExerciseVideo)).exercise.id,
+        'h-forearm-plank',
+      );
+      await _advance(tester, 10);
+      expect(
+        tester.widget<ExerciseVideo>(find.byType(ExerciseVideo)).exercise.id,
+        'w-wall-sit',
+      );
+      expect(s.store.sessionResults, isEmpty);
+      await _advance(tester, 11);
+      final result = s.store.sessionResults.single;
+      expect(result.full, isTrue);
+      expect(result.items, hasLength(1));
+      expect(result.items.single.exerciseId, 'h-squat');
+      expect(result.items.single.completedSets, 1);
+      expect(result.items.single.activeSeconds, closeTo(20, .1));
+      expect(s.store.lastPlan!.items.single.segments, hasLength(2));
+      final reloaded = AppStore(storage);
+      await reloaded.load();
+      expect(
+        reloaded.lastPlan!.items.single.segments.map(
+          (segment) => segment.exerciseId,
+        ),
+        ['h-forearm-plank', 'w-wall-sit'],
+      );
       await tester.pumpWidget(const SizedBox());
     },
   );

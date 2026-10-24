@@ -295,6 +295,382 @@ void main() {
     }
   }
 
+  coach.LlmResponse questionResponse(
+    String question, {
+    List<String> options = const [],
+    bool multiple = false,
+  }) => tool('ask_user', {
+    'question': question,
+    'mode': options.isEmpty ? 'text' : 'choice',
+    if (options.isNotEmpty) ...{'options': options, 'multiple': multiple},
+  });
+
+  ChatController controllerFor(
+    AiChatEngine ai, {
+    AppStore? store,
+    Duration replyDelay = Duration.zero,
+  }) {
+    final controller = ChatController(
+      engine: ai,
+      store: store ?? (AppStore(_Storage())..safetyAccepted = true),
+      replyDelay: replyDelay,
+    )..start();
+    addTearDown(controller.dispose);
+    return controller;
+  }
+
+  group('SDK ask_user clarification', () {
+    test(
+      'text and multi-choice answers continue one task through a gated plan',
+      () async {
+        final client = coach.FakeLlmClient([
+          questionResponse('你想练多久？'),
+          questionResponse(
+            '你想重点练哪里？',
+            options: ['腿', '全身', '核心'],
+            multiple: true,
+          ),
+          planResponse(),
+        ], latency: Duration.zero);
+        final ai = engine(client);
+        final controller = controllerFor(ai);
+        final busyAtQuestion = <bool>[];
+        final subscription = ai.events.listen((event) {
+          if (event.kind == coach.AgentEventKind.askUser) {
+            busyAtQuestion.add(ai.agent.isBusy);
+            expect(controller.typing, isTrue);
+            // Result-only rendering: no duplicate or prematurely active bubble.
+            expect(
+              controller.messages.where((m) => m.question != null).length,
+              busyAtQuestion.length - 1,
+            );
+          }
+        });
+        addTearDown(subscription.cancel);
+        await controller.send('在家徒手想安排训练');
+        final first = controller.messages.last;
+        expect(first.question!.mode, coach.AskUserMode.text);
+        expect(first.text, first.question!.question);
+        expect(controller.canAnswerQuestion(first), isTrue);
+        expect(controller.suggestions, isEmpty);
+        expect(ai.agent.questionsAsked, 1);
+        await controller.answerQuestion(first, '10 分钟');
+        final second = controller.messages.last;
+        expect(second.question!.multiple, isTrue);
+        expect(controller.canAnswerQuestion(first), isFalse);
+        expect(controller.canAnswerQuestion(second), isTrue);
+        expect(ai.agent.questionsAsked, 2);
+        await controller.answerChoices(second, ['腿', '全身']);
+        expect(
+          controller.messages.where((m) => m.question != null),
+          hasLength(2),
+        );
+        expect(
+          controller.messages.where((m) => m.text == '你想练多久？'),
+          hasLength(1),
+        );
+        expect(
+          controller.messages.where((m) => m.text == '腿、全身'),
+          hasLength(1),
+        );
+        expect(controller.messages.last.validatedPlan, isNotNull);
+        expect(controller.currentPlan, isNotNull);
+        expect(controller.canAnswerQuestion(second), isFalse);
+        expect(
+          controller.messages
+              .firstWhere((m) => m.id == second.id)
+              .answeredChoices,
+          ['腿', '全身'],
+        );
+        expect(ai.agent.turnCount, 3);
+        expect(ai.agent.questionsAsked, 0);
+        expect(busyAtQuestion, [true, true]);
+        expect(client.requests, hasLength(3));
+        final history = requestText(client.requests.last);
+        expect(history, contains('你想练多久？'));
+        expect(history, contains('10 分钟'));
+        expect(history, contains('你想重点练哪里？'));
+        expect(history, contains('腿、全身'));
+        expect(client.requests.last.messages.last.content, endsWith('腿、全身'));
+      },
+    );
+
+    test(
+      'single-choice validates selection and stale/double taps cannot resubmit',
+      () async {
+        final client = coach.FakeLlmClient([
+          questionResponse('在哪里练？', options: ['在家', '健身房']),
+          questionResponse('今天想练多久？'),
+        ], latency: Duration.zero);
+        final ai = engine(client);
+        final controller = controllerFor(ai);
+        await controller.send('想安排一套训练');
+        final first = controller.messages.last;
+        await controller.answerChoices(first, []);
+        await controller.answerChoices(first, ['在家', '健身房']);
+        await controller.answerChoices(first, ['在家', '在家']);
+        await controller.answerChoices(first, ['不存在']);
+        expect(client.requests, hasLength(1));
+        expect(controller.canAnswerQuestion(first), isTrue);
+        final firstTap = controller.answerChoices(first, ['在家']);
+        final duplicateTap = controller.answerChoices(first, ['健身房']);
+        await Future.wait([firstTap, duplicateTap]);
+        expect(client.requests, hasLength(2));
+        final next = controller.messages.last;
+        expect(controller.canAnswerQuestion(next), isTrue);
+        await controller.answerQuestion(first, '旧问题答案');
+        expect(client.requests, hasLength(2));
+      },
+    );
+
+    test(
+      'free text can answer choices and answer text never invokes App commands',
+      () async {
+        final client = coach.FakeLlmClient([
+          questionResponse('补充你的偏好？', options: ['@settings', '不确定']),
+          const coach.LlmResponse(content: '已记下补充，继续安排。'),
+        ], latency: Duration.zero);
+        final ai = engine(client);
+        final controller = controllerFor(ai);
+        final actions = <String>[];
+        final subscription = controller.actions.listen(actions.add);
+        addTearDown(subscription.cancel);
+        await controller.send('想安排一套训练');
+        await controller.answerQuestion(controller.messages.last, '@settings');
+        expect(client.requests, hasLength(2));
+        expect(client.requests.last.messages.last.content, '@settings');
+        expect(actions, isEmpty);
+        expect(controller.messages.last.text, '已记下补充，继续安排。');
+      },
+    );
+
+    test(
+      'cancelling at askUser prevents question and late replies from appearing',
+      () async {
+        final client = coach.FakeLlmClient([
+          questionResponse('今天想练多久？'),
+          const coach.LlmResponse(content: '新一轮回复'),
+        ], latency: Duration.zero);
+        final ai = engine(client);
+        final controller = controllerFor(ai);
+        final subscription = ai.events.listen((event) {
+          if (event.kind == coach.AgentEventKind.askUser) {
+            controller.cancelRequest();
+          }
+        });
+        addTearDown(subscription.cancel);
+        await controller.send('想安排一套训练');
+        expect(controller.messages.where((m) => m.question != null), isEmpty);
+        expect(controller.typing, isFalse);
+        expect(ai.agent.questionsAsked, 0);
+        expect(ai.agent.turnCount, 0);
+        await controller.send('继续帮我安排');
+        expect(controller.messages.last.text, '新一轮回复');
+      },
+    );
+
+    test(
+      'question serialization is gated and restored bubbles stay read-only',
+      () async {
+        final client = coach.FakeLlmClient([
+          questionResponse('在哪里练？', options: ['在家', '健身房']),
+        ], latency: Duration.zero);
+        final ai = engine(client);
+        final store = AppStore(_Storage())..safetyAccepted = true;
+        final controller = controllerFor(ai, store: store);
+        await controller.send('想安排一套训练');
+        final original = controller.messages.last;
+        final json = original.toJson().cast<String, dynamic>();
+        final restored = ChatMessage.fromJson(json);
+        expect(restored.question!.toJson(), original.question!.toJson());
+        expect(restored.questionAnswered, isFalse);
+        expect(
+          ChatMessage.fromJson({
+            ...json,
+            'question': {'question': 'bad'},
+          }).question,
+          isNull,
+        );
+        await Future<void>.delayed(Duration.zero);
+        final freshClient = coach.FakeLlmClient([], latency: Duration.zero);
+        final fresh = controllerFor(engine(freshClient), store: store);
+        final historical = fresh.messages.firstWhere((m) => m.question != null);
+        expect(fresh.canAnswerQuestion(historical), isFalse);
+        await fresh.answerChoices(historical, ['在家']);
+        expect(freshClient.requests, isEmpty);
+        await controller.answerChoices(original, ['在家']);
+        final answered = controller.messages.firstWhere(
+          (m) => m.id == original.id,
+        );
+        final roundTrip = ChatMessage.fromJson(
+          answered.toJson().cast<String, dynamic>(),
+        );
+        expect(roundTrip.questionAnswered, isTrue);
+        expect(roundTrip.answeredChoices, ['在家']);
+      },
+    );
+
+    test(
+      'new conversation invalidates outstanding question and resets SDK task',
+      () async {
+        final client = coach.FakeLlmClient([
+          questionResponse('今天想练多久？'),
+        ], latency: Duration.zero);
+        final ai = engine(client);
+        final controller = controllerFor(ai);
+        await controller.send('想安排一套训练');
+        final question = controller.messages.last;
+        await controller.newConversation();
+        expect(ai.agent.questionsAsked, 0);
+        expect(ai.agent.history, isEmpty);
+        expect(controller.canAnswerQuestion(question), isFalse);
+        await controller.answerQuestion(question, '10 分钟');
+        expect(client.requests, hasLength(1));
+      },
+    );
+
+    for (final cancellingAnswer in [false, true]) {
+      test(
+        'cancel during replyDelay after ${cancellingAnswer ? 'answer follow-up' : 'initial question'} restores local shortcuts',
+        () async {
+          final client = coach.FakeLlmClient([
+            questionResponse('今天想练多久？'),
+            if (cancellingAnswer) questionResponse('在哪里练？'),
+          ], latency: Duration.zero);
+          final ai = engine(client);
+          final controller = controllerFor(
+            ai,
+            replyDelay: const Duration(milliseconds: 450),
+          );
+          final Future<void> pending;
+          if (cancellingAnswer) {
+            await controller.send('想安排一套训练');
+            pending = controller.answerQuestion(
+              controller.messages.last,
+              '10 分钟',
+            );
+          } else {
+            pending = controller.send('想安排一套训练');
+          }
+          final expectedTurns = cancellingAnswer ? 2 : 1;
+          await Future.doWhile(() async {
+            await Future<void>.delayed(const Duration(milliseconds: 1));
+            return ai.agent.turnCount < expectedTurns || ai.agent.isBusy;
+          }).timeout(const Duration(seconds: 2));
+          // SDK committed the question, but the presentation delay is still open.
+          expect(controller.typing, isTrue);
+          controller.cancelRequest();
+          await pending;
+          expect(
+            controller.messages.where(controller.canAnswerQuestion),
+            isEmpty,
+          );
+          expect(
+            controller.messages.where((m) => m.question != null),
+            hasLength(cancellingAnswer ? 1 : 0),
+          );
+          await controller.send('静音');
+          expect(client.requests, hasLength(expectedTurns));
+          expect(controller.store.voice.voice, isFalse);
+          expect(controller.store.voice.chimes, isFalse);
+        },
+      );
+    }
+
+    test(
+      'saved-plan App navigation stays local during a clarification',
+      () async {
+        final client = coach.FakeLlmClient([
+          questionResponse('今天想练多久？'),
+        ], latency: Duration.zero);
+        final ai = engine(client);
+        final store = AppStore(_Storage())..safetyAccepted = true;
+        final saved = await store.savePlan(
+          plan(id: 'saved-during-clarification'),
+        );
+        final controller = controllerFor(ai, store: store);
+        await controller.send('想安排一套训练');
+        final question = controller.messages.last;
+        await controller.showSaved(saved);
+        expect(client.requests, hasLength(1));
+        expect(controller.messages.last.plan!.id, saved.plan.id);
+        expect(controller.messages.last.validatedPlan, isNotNull);
+        expect(controller.currentPlan!.id, saved.plan.id);
+        expect(controller.canAnswerQuestion(question), isFalse);
+        expect(
+          controller.messages.where((m) => m.isUser).last.text,
+          saved.name,
+        );
+        await controller.send('静音');
+        expect(client.requests, hasLength(1));
+        expect(store.voice.voice, isFalse);
+      },
+    );
+
+    test(
+      'overlong answers retain the live question and SDK answer route for retry',
+      () async {
+        final client = coach.FakeLlmClient([
+          questionResponse('补充你的偏好？', options: ['@settings', '不确定']),
+          const coach.LlmResponse(content: '收到了，会继续安排。'),
+        ], latency: Duration.zero);
+        final ai = engine(client);
+        final controller = controllerFor(ai);
+        final actions = <String>[];
+        final subscription = controller.actions.listen(actions.add);
+        addTearDown(subscription.cancel);
+        await controller.send('想安排一套训练');
+        final question = controller.messages.last;
+        await controller.answerQuestion(question, '长' * 501);
+        expect(ai.lastResult!.status, coach.TurnStatus.inputTooLong);
+        expect(client.requests, hasLength(1));
+        expect(ai.agent.questionsAsked, 1);
+        expect(controller.canAnswerQuestion(question), isTrue);
+        expect(
+          controller.messages
+              .firstWhere((m) => m.id == question.id)
+              .questionAnswered,
+          isFalse,
+        );
+        expect(controller.suggestions, isEmpty);
+        await controller.answerChoices(question, ['@settings']);
+        expect(client.requests, hasLength(2));
+        expect(client.requests.last.messages.last.content, '@settings');
+        expect(actions, isEmpty);
+        expect(controller.canAnswerQuestion(question), isFalse);
+        expect(controller.messages.last.text, '收到了，会继续安排。');
+      },
+    );
+
+    test(
+      'clarification preserves known safety constraints and context on every send',
+      () async {
+        final client = coach.FakeLlmClient([
+          questionResponse('今天重点练哪里？', options: ['腿', '全身']),
+          const coach.LlmResponse(content: '会继续避开手腕支撑动作。'),
+        ], latency: Duration.zero);
+        final ai = engine(client);
+        final first = await ai.reply(
+          '帮我安排训练',
+          const ChatState(
+            coachContext: Slots(
+              scene: 'home',
+              minutes: 10,
+              level: 1,
+              avoid: {'wrist'},
+            ),
+          ),
+        );
+        expect(first.messages.single.question, isNotNull);
+        final second = await ai.reply('全身', first.state);
+        expect(second.state.coachContext!.avoid, contains('wrist'));
+        expect(second.state.coachContext!.minutes, 10);
+        expect(second.state.coachContext!.scene, 'home');
+        expect(requestText(client.requests.last), contains('wrist'));
+      },
+    );
+  });
+
   test(
     'plain SDK text reaches bubbles without inventing cards or App commands',
     () async {
@@ -408,7 +784,9 @@ void main() {
         result.records.map((r) => r.id),
       );
       expect(
-        result.records.every((r) => r.promptVersion.startsWith('agent-v2-')),
+        result.records.every(
+          (r) => r.promptVersion == ai.agent.prompts.version(profile),
+        ),
         isTrue,
       );
       expect(reply.messages, hasLength(1));

@@ -3,6 +3,8 @@
 /// today, a language model later) behind [ChatEngine].
 library;
 
+import 'dart:convert';
+
 import 'package:ugk_coach/ugk_coach.dart' as coach;
 
 import '../domain/exercise.dart';
@@ -53,6 +55,9 @@ class ChatMessage {
     this.text = '',
     this.options = const [],
     this.chosen,
+    this.question,
+    this.questionAnswered = false,
+    this.answeredChoices = const [],
     this.plan,
     this.validatedPlan,
     this.actions,
@@ -69,6 +74,11 @@ class ChatMessage {
 
   /// Index of the option the user picked (options lock once answered).
   final int? chosen;
+
+  /// A gate-admitted SDK clarification. It never uses App command options.
+  final coach.AskUserQuestion? question;
+  final bool questionAnswered;
+  final List<String> answeredChoices;
 
   /// A plan card (assistant only) and the request it was made for.
   final TrainingPlan? plan;
@@ -87,13 +97,21 @@ class ChatMessage {
   bool get isUser => role == ChatRole.user;
   bool get isPlan => plan != null;
 
-  ChatMessage copyWith({int? chosen, bool? aiVisible}) => ChatMessage(
+  ChatMessage copyWith({
+    int? chosen,
+    bool? aiVisible,
+    bool? questionAnswered,
+    List<String>? answeredChoices,
+  }) => ChatMessage(
     id: id,
     role: role,
     at: at,
     text: text,
     options: options,
     chosen: chosen ?? this.chosen,
+    question: question,
+    questionAnswered: questionAnswered ?? this.questionAnswered,
+    answeredChoices: answeredChoices ?? this.answeredChoices,
     plan: plan,
     validatedPlan: validatedPlan,
     actions: actions,
@@ -109,6 +127,9 @@ class ChatMessage {
     if (text.isNotEmpty) 'text': text,
     if (options.isNotEmpty) 'options': [for (final o in options) o.toJson()],
     'chosen': ?chosen,
+    'question': ?question?.toJson(),
+    if (questionAnswered) 'questionAnswered': true,
+    if (answeredChoices.isNotEmpty) 'answeredChoices': answeredChoices,
     'plan': ?plan?.toJson(),
     if (validatedPlan != null || plan?.source == 'ai') 'isAiPlan': true,
     if (actions != null)
@@ -148,6 +169,14 @@ class ChatMessage {
           ChatOption.fromJson(Map<String, dynamic>.from(o as Map)),
       ],
       chosen: (j['chosen'] as num?)?.toInt(),
+      question: j['question'] is Map
+          ? coach.AskUserGate.check(jsonEncode(j['question'])).question
+          : null,
+      questionAnswered: j['questionAnswered'] == true,
+      answeredChoices: [
+        for (final value in j['answeredChoices'] as List? ?? const [])
+          if (value is String) value,
+      ],
       greeting: j['greeting'] == true,
       aiVisible: j['aiVisible'] == true,
       plan: plan,
@@ -387,6 +416,7 @@ class BotMessage {
   const BotMessage(
     this.text, {
     this.options = const [],
+    this.question,
     this.plan,
     this.validatedPlan,
     this.actions,
@@ -396,6 +426,7 @@ class BotMessage {
   final bool greeting;
   final String text;
   final List<ChatOption> options;
+  final coach.AskUserQuestion? question;
   final TrainingPlan? plan;
   final coach.ValidatedPlan? validatedPlan;
   final coach.ValidatedActions? actions;
@@ -409,6 +440,7 @@ class ChatReply {
     this.suggestions = const [],
     this.action,
     this.aiTurn = false,
+    this.inputAccepted = true,
   });
 
   final List<BotMessage> messages;
@@ -420,6 +452,10 @@ class ChatReply {
   /// A command for the app to run after showing the reply (`@library`…).
   final String? action;
   final bool aiTurn;
+
+  /// False when the engine did not consume this input (for example, an
+  /// overlong answer). Keep a live clarification available for a valid retry.
+  final bool inputAccepted;
 }
 
 /// Turns what the user typed into assistant replies. [RuleChatEngine] is
@@ -428,6 +464,12 @@ class ChatReply {
 abstract interface class ChatEngine {
   String get id;
   Future<ChatReply> reply(String text, ChatState state);
+}
+
+/// Explicit actions from App navigation stay local even while the SDK is
+/// awaiting an answer. Model-generated answer text never uses this boundary.
+abstract interface class AppCommandChatEngine implements ChatEngine {
+  Future<ChatReply> replyAppCommand(String command, ChatState state);
 }
 
 /// Correlates UI and engine metadata without sharing conversation payloads.

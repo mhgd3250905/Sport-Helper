@@ -51,14 +51,14 @@ class AppServices {
            );
            if (media != null) {
              unawaited(
-               media
-                   .prefetchActions(plan.items.map((item) => item.exerciseId))
-                   .catchError((Object error) {
-                     RuntimeLog.instance.record(
-                       'media.prefetch_error',
-                       fields: {'errorType': RuntimeLog.errorType(error)},
-                     );
-                   }),
+               media.prefetchActions(plan.exerciseIds).catchError((
+                 Object error,
+               ) {
+                 RuntimeLog.instance.record(
+                   'media.prefetch_error',
+                   fields: {'errorType': RuntimeLog.errorType(error)},
+                 );
+               }),
              );
            }
          },
@@ -83,7 +83,7 @@ class AppServices {
   void prefetchPlan(TrainingPlan? plan) {
     final repository = media;
     if (repository == null || plan == null) return;
-    final ids = plan.items.map((item) => item.exerciseId).toSet();
+    final ids = plan.exerciseIds;
     final signature = '${plan.id}/${ids.join(',')}';
     if (_prefetchedPlan == signature) return;
     _prefetchedPlan = signature;

@@ -91,8 +91,10 @@ class AboutPage extends StatelessWidget {
               const SfSectionTitle('动作素材'),
               const SfPanel(child: TrainingMediaSettings()),
             ],
-            const SfSectionTitle('AI 记忆'),
-            const SfPanel(child: _AiMemorySettings()),
+            if (s.aiConfig.enabled) ...[
+              const SfSectionTitle('AI 记忆'),
+              const SfPanel(child: _AiMemorySettings()),
+            ],
             if (FrameRecorder.buildEnabled) ...[
               const SfSectionTitle('性能'),
               SfPanel(
@@ -114,18 +116,20 @@ class AboutPage extends StatelessWidget {
               const SfSectionTitle('运行日志'),
               const SfPanel(child: RuntimeLogSettings()),
             ],
-            const SfSectionTitle('隐私与 AI'),
+            SfSectionTitle(s.aiConfig.enabled ? '隐私与 AI' : '隐私'),
             SfPanel(
               child: Text(
-                '启用 AI 时，你输入的内容、近期对话、当前计划和训练条件会经 '
-                'https://api.uuugk.win/v1 '
-                '发送给 AI 服务，用于生成回复与训练计划。\n\n'
-                'AI 记忆保存在本机；开启时，记住的训练条件会随请求发送给 AI 服务。'
-                '可随时关闭或清除记忆。\n\n'
-                'App 在本机随机生成并保存设备标识，随 AI 请求发送，用于服务器限流：'
-                '每个设备每 10 分钟最多 30 次请求，限制由服务器执行。\n\n'
-                '训练记录和已保存计划保存在本机。断网、请求超时或生成结果校验未通过时，'
-                '使用本地模板生成训练计划。',
+                s.aiConfig.enabled
+                    ? '启用 AI 时，你输入的内容、近期对话、当前计划和训练条件会经 '
+                          'https://api.uuugk.win/v1 '
+                          '发送给 AI 服务，用于生成回复与训练计划。\n\n'
+                          'AI 记忆保存在本机；开启时，记住的训练条件会随请求发送给 AI 服务。'
+                          '可随时关闭或清除记忆。\n\n'
+                          'App 在本机随机生成并保存设备标识，随 AI 请求发送，用于服务器限流：'
+                          '每个设备每 10 分钟最多 30 次请求，限制由服务器执行。\n\n'
+                          '训练记录和已保存计划保存在本机。断网、请求超时或生成结果校验未通过时，'
+                          '使用本地模板生成训练计划。'
+                    : '训练记录和已保存计划保存在本机。使用本地模板生成训练计划。',
                 style: SfType.body.copyWith(
                   fontSize: 14.5,
                   color: SfColors.muted,

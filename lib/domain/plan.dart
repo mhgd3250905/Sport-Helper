@@ -2,7 +2,11 @@
 /// AI generator produce (docs/plan-schema.md). Plain JSON, ids only.
 library;
 
+import 'package:ugk_coach/ugk_coach.dart' as coach;
+
 import 'exercise.dart';
+
+export 'package:ugk_coach/ugk_coach.dart' show PlanSegment;
 
 enum BlockType {
   warmup('热身'),
@@ -33,6 +37,7 @@ class PlanItem {
     required this.restSeconds,
     this.note,
     this.replacedFrom,
+    this.segments = const [],
   });
 
   final String exerciseId;
@@ -49,6 +54,9 @@ class PlanItem {
   /// Original exercise when the generator swapped it (level, gear, cautions).
   final String? replacedFrom;
 
+  /// Ordered doses in each set. The SDK owns the segment schema and rhythm.
+  final List<coach.PlanSegment> segments;
+
   /// Seconds of work for one side of one set.
   double workFor(Exercise e) => mode == DoseMode.reps
       ? (reps ?? 10) * (e.repSeconds ?? 3.0)
@@ -56,7 +64,16 @@ class PlanItem {
 
   String doseText() {
     final per = perSide ? '每侧 ' : '';
-    final amount = mode == DoseMode.reps ? '$per${reps ?? 10} 次' : '$per${workSeconds ?? 30} 秒';
+    if (segments.isNotEmpty) {
+      final parts = [
+        for (final segment in segments)
+          '${segment.label == null ? '' : '${segment.label} '}$per${segment.mode == coach.DoseMode.reps ? '${segment.reps} 次' : '${segment.workSeconds} 秒'}',
+      ].join(' + ');
+      return sets > 1 ? '$sets 组 × ($parts)' : parts;
+    }
+    final amount = mode == DoseMode.reps
+        ? '$per${reps ?? 10} 次'
+        : '$per${workSeconds ?? 30} 秒';
     return sets > 1 ? '$sets 组 × $amount' : amount;
   }
 
@@ -69,6 +86,7 @@ class PlanItem {
     int? restSeconds,
     DoseMode? mode,
     String? replacedFrom,
+    List<coach.PlanSegment>? segments,
   }) => PlanItem(
     exerciseId: exerciseId ?? this.exerciseId,
     mode: mode ?? this.mode,
@@ -79,6 +97,7 @@ class PlanItem {
     restSeconds: restSeconds ?? this.restSeconds,
     note: note,
     replacedFrom: replacedFrom ?? this.replacedFrom,
+    segments: segments ?? this.segments,
   );
 
   Map<String, Object?> toJson() => {
@@ -91,6 +110,7 @@ class PlanItem {
     'restSeconds': restSeconds,
     'note': ?note,
     'replacedFrom': ?replacedFrom,
+    if (segments.isNotEmpty) 'segments': [for (final s in segments) s.toJson()],
   };
 
   factory PlanItem.fromJson(Map<String, dynamic> j) => PlanItem(
@@ -103,7 +123,23 @@ class PlanItem {
     restSeconds: (j['restSeconds'] as num?)?.toInt() ?? 20,
     note: j['note'] as String?,
     replacedFrom: j['replacedFrom'] as String?,
+    segments: _segmentsFromJson(j),
   );
+
+  static List<coach.PlanSegment> _segmentsFromJson(Map<String, dynamic> item) {
+    if (!item.containsKey('segments')) return const [];
+    // Reuse the SDK decoder so malformed segment data is rejected rather
+    // than quietly repaired or lost while restoring an App plan.
+    final plan = const coach.PlanCodec().decode({
+      'blocks': [
+        {
+          'type': 'main',
+          'items': [item],
+        },
+      ],
+    });
+    return List.unmodifiable(plan.items.single.segments);
+  }
 }
 
 class PlanBlock {
@@ -199,26 +235,34 @@ class TrainingPlan {
   final List<String> safetyNotes;
 
   Iterable<PlanItem> get items => blocks.expand((b) => b.items);
-  Set<String> get exerciseIds => {for (final i in items) i.exerciseId};
+  Set<String> get exerciseIds => {
+    for (final i in items) ...{
+      i.exerciseId,
+      for (final segment in i.segments) segment.exerciseId,
+    },
+  };
 
-  TrainingPlan copyWith({String? id, List<PlanBlock>? blocks, List<String>? notes}) =>
-      TrainingPlan(
-        schemaVersion: schemaVersion,
-        id: id ?? this.id,
-        source: source,
-        templateId: templateId,
-        title: title,
-        summary: summary,
-        goal: goal,
-        scene: scene,
-        equipment: equipment,
-        level: level,
-        targetMinutes: targetMinutes,
-        blocks: blocks ?? this.blocks,
-        avoid: avoid,
-        notes: notes ?? this.notes,
-        safetyNotes: safetyNotes,
-      );
+  TrainingPlan copyWith({
+    String? id,
+    List<PlanBlock>? blocks,
+    List<String>? notes,
+  }) => TrainingPlan(
+    schemaVersion: schemaVersion,
+    id: id ?? this.id,
+    source: source,
+    templateId: templateId,
+    title: title,
+    summary: summary,
+    goal: goal,
+    scene: scene,
+    equipment: equipment,
+    level: level,
+    targetMinutes: targetMinutes,
+    blocks: blocks ?? this.blocks,
+    avoid: avoid,
+    notes: notes ?? this.notes,
+    safetyNotes: safetyNotes,
+  );
 
   Map<String, Object?> toJson() => {
     'schemaVersion': schemaVersion,

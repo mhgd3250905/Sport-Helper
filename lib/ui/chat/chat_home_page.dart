@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:ugk_trainer/ugk_trainer.dart' show SessionResult;
+import 'package:ugk_coach/ugk_coach.dart' as coach;
+import 'package:ugk_coach_ui/ugk_coach_ui.dart';
 
 import '../../app/services.dart';
 import '../../chat/chat_controller.dart';
@@ -24,6 +26,7 @@ import '../theme/tokens.dart';
 import '../theme/widgets.dart';
 import 'action_card.dart';
 import 'chat_widgets.dart';
+import 'coach_ui_adapter.dart';
 import 'cosmos.dart';
 import 'expand_route.dart';
 import 'plan_card.dart';
@@ -336,132 +339,69 @@ class _ChatHomePageState extends State<ChatHomePage> {
   }
 
   Widget _messages() {
-    final rows = <Widget>[];
     final msgs = _chat.messages;
-    final now = DateTime.now();
-    final still = SfMotion.reduced(context);
-    // M4: the messages of one reply land one after another, 120 ms apart
-    // (words first, then the card); the user's own line lands at once.
-    var queued = 0;
-    for (var i = 0; i < msgs.length; i++) {
-      final m = msgs[i];
-      final prev = i == 0 ? null : msgs[i - 1];
-      if (prev == null ||
-          m.at.difference(prev.at) > const Duration(minutes: 45)) {
-        rows.add(TimeMark(m.at, now: now));
-      }
-      final sameSide = prev != null && prev.isUser == m.isUser;
-      rows.add(
-        Padding(
-          key: ValueKey(m.id),
-          padding: EdgeInsets.only(top: sameSide ? SfSpace.x2 : SfSpace.x4),
+    final rows = [
+      for (final m in msgs)
+        CoachChatEntry(
+          id: m.id,
+          at: m.at,
+          isUser: m.isUser,
+          isCard: m.isPlan,
+          greeting: m.greeting,
           child: m.greeting
-              // M5: the greeting drifts up 16 px over 600 ms; nothing under
-              // reduced motion.
-              ? Appear(
-                  animate: !_seen.contains(m.id) && !still,
-                  duration: const Duration(milliseconds: 600),
-                  rise: 16,
-                  scaleFrom: 1,
-                  child: GreetingBlock(text: m.text),
-                )
-              // Entrances: the user's line springs up out of the input bar
-              // (8 px, .96 → 1, 280 ms, emphasized decelerate); the
-              // assistant's words fade and rise one after another; a glass
-              // card lands a beat later on a soft spring from .97.
-              : Appear(
-                  animate: !_seen.contains(m.id),
-                  delay: !_seen.contains(m.id) && !m.isUser && !still
-                      ? SfMotion.replyStagger * queued++ +
-                            (m.isPlan ? SfMotion.replyStagger : Duration.zero)
-                      : Duration.zero,
-                  anchor: m.isUser
-                      ? Alignment.bottomRight
-                      : Alignment.bottomLeft,
-                  rise: m.isUser ? 8 : (m.isPlan ? 14 : 10),
-                  scaleFrom: m.isUser ? .96 : (m.isPlan ? .97 : .98),
-                  duration: m.isUser
-                      ? SfMotion.medium
-                      : (m.isPlan
-                            ? const Duration(milliseconds: 520)
-                            : SfMotion.appear),
-                  curve: m.isUser
-                      ? SfMotion.enter
-                      : (m.isPlan ? SfMotion.spring : SfMotion.standard),
-                  child: RepaintBoundary(
-                    child: _message(m, fresh: !_seen.contains(m.id)),
-                  ),
-                ),
+              ? GreetingBlock(text: m.text)
+              : _message(m, fresh: !_seen.contains(m.id)),
         ),
-      );
-    }
-    if (_chat.typing) {
-      rows.add(
-        Padding(
-          key: ValueKey('typing'),
-          padding: EdgeInsets.only(top: SfSpace.x4),
-          child: TypingBubble(
-            onCancel: _chat.cancelRequest,
-            progressLabel: _chat.progressLabel,
-          ),
-        ),
-      );
-    }
-    final reversed = rows.reversed.toList();
+    ];
     WidgetsBinding.instance.addPostFrameCallback(
       (_) => _seen.addAll(msgs.map((m) => m.id)),
     );
-    return Stack(
-      children: [
-        BackdropGroup(
-          child: ListView.builder(
-            controller: _scroll,
-            reverse: true,
-            padding: EdgeInsets.fromLTRB(
-              SfSpace.x4,
-              48,
-              SfSpace.x4,
-              _dockHeight + SfSpace.x3,
-            ),
-            itemCount: reversed.length,
-            itemBuilder: (_, i) => reversed[i],
-            findChildIndexCallback: (key) {
-              final i = reversed.indexWhere((w) => w.key == key);
-              return i < 0 ? null : i;
-            },
-          ),
-        ),
-        // Messages dissolve into the sky at the top edge.
-        IgnorePointer(
-          child: SizedBox(
-            height: 48,
-            width: double.infinity,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    SfColors.skyTop,
-                    SfColors.skyTop.withValues(alpha: 0),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
+    return withSmartfitCoachUi(
+      context,
+      CoachChatList(
+        entries: rows,
+        controller: _scroll,
+        initiallySeen: _seen,
+        dockHeight: _dockHeight,
+        topColor: SfColors.skyTop,
+        timeMarkBuilder: (at, now) => TimeMark(at, now: now),
+        typing: _chat.typing
+            ? TypingBubble(
+                onCancel: _chat.cancelRequest,
+                progressLabel: _chat.progressLabel,
+              )
+            : null,
+      ),
     );
   }
 
   Widget _message(ChatMessage m, {bool fresh = false}) {
     final library = AppServices.of(context).library;
-    final hasText = m.text.isNotEmpty || m.options.isNotEmpty;
+    final hasText =
+        m.question != null || m.text.isNotEmpty || m.options.isNotEmpty;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (hasText)
+        if (m.question case final question?)
+          CoachQuestionBubble(
+            key: ValueKey('coach-question-${m.id}'),
+            question: CoachQuestionData(
+              id: m.id,
+              question: question.question,
+              mode: question.mode == coach.AskUserMode.text
+                  ? CoachQuestionMode.text
+                  : CoachQuestionMode.choice,
+              options: question.options,
+              multiple: question.multiple,
+              answered: m.questionAnswered,
+              answeredChoices: m.answeredChoices,
+            ),
+            enabled: _chat.canAnswerQuestion(m),
+            onTextAnswer: (answer) => _chat.answerQuestion(m, answer),
+            onChoiceAnswer: (choices) => _chat.answerChoices(m, choices),
+          )
+        else if (hasText)
           MessageBubble(
             message: m,
             optionsActive: !_chat.typing && _chat.isActive(m),

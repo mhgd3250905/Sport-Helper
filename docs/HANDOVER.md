@@ -1,5 +1,9 @@
 # 智能健身助手（SmartFit）交接说明
 
+## 当前开发候选（2026-10-24）
+
+`feat/sdk-coach-ui-20261024` 正在审核 coach 0.4.1 / trainer 0.2.1 tag 升级、询问气泡与 `ugk_coach_ui 0.1.0` 迁移。`release/1.0` 保持原状；App 版本不变，未发布或安装候选包。开哥批准后才能合入两个 main、打 SDK tag 并推送；接口与验证见[本轮记录](coach-ui-integration-2026-10-24.md)。以下为历史交付快照。
+
 ## 当前交接入口（2026-10-23，+15 用户确认通过并保存）
 
 开哥已反馈本次 +15 测试通过，并要求先保存版本、对齐文档和台账。运行源码固定 `15079e6fc57be7c1e0d5b6c5f876784f183ce63e`；保存标签为本地 `smartfit-v0.1.0+15-internal-verified`，分支 `feat/voice-aac-comparison`。internal arm64 APK 49,384,327B，SHA-256 `6ecdc72d0fb48c8b179e288009cfe8279a50be4bef1391ee7dfdedebf48249fb`；本次核对文件身份，沿用该源码的 298 测试、3 项 Python 测试及三 ABI JNI 门禁结果，不重建用户已测包。详见[本轮验收](acceptance.md)、[版本台账](version-management.md)及[版本保存记录](reports/version-save-0.1.0+15-2026-10-23.json)。

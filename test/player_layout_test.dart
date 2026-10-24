@@ -7,7 +7,6 @@ import 'package:smartfit/domain/exercise.dart';
 import 'package:smartfit/domain/plan.dart';
 import 'package:smartfit/ui/player_page.dart';
 import 'package:smartfit/ui/theme.dart';
-import 'package:ugk_trainer/ugk_trainer.dart' show TrainerCountdownRing;
 
 import 'app_flow_test.dart' show services, tall;
 
@@ -26,7 +25,7 @@ void main() {
     final s = services();
     await tester.pumpWidget(AppScope(services: s, child: MaterialApp(theme: buildTheme(), home: const PlayerPage(plan: _two))));
     await tester.pump();
-    Offset ring() => tester.getTopLeft(find.byType(TrainerCountdownRing));
+    Offset ring() => tester.getTopLeft(find.byKey(const ValueKey('ring')));
     Offset pause() => tester.getTopLeft(find.byKey(const ValueKey('pause')));
     final r0 = ring(), p0 = pause();
     for (var i = 0; i < 2; i++) {

@@ -17,6 +17,7 @@ import 'package:smartfit/ui/player_page.dart';
 import 'package:smartfit/ui/theme.dart';
 import 'package:smartfit/ui/training_media_settings.dart';
 import 'package:smartfit/voice/voice_queue.dart';
+import 'package:ugk_coach/ugk_coach.dart' as coach;
 import 'package:ugk_trainer/ugk_trainer.dart' as trainer;
 
 import 'support.dart';
@@ -357,6 +358,88 @@ void main() {
     },
   );
 
+  test('chat plan prefetch includes ordered segment media', () async {
+    final downloadPolicy = Completer<trainer.TrainingMediaNetwork>();
+    var holdDownloads = false;
+    var pendingProbes = 0;
+    final media = await _repository(
+      probe: () async {
+        if (!holdDownloads) return trainer.TrainingMediaNetwork.wifi;
+        pendingProbes++;
+        return downloadPolicy.future;
+      },
+    );
+    final (library, catalog, voices, _) = await AppServices.loadContent(
+      media: media,
+    );
+    final ids = library.all
+        .where((exercise) => !media.readyActionIds.contains(exercise.id))
+        .map((exercise) => exercise.id)
+        .take(2)
+        .toList();
+    expect(ids, hasLength(2));
+    final plan = TrainingPlan(
+      id: 'segment-media',
+      source: 'template',
+      title: '分段预取',
+      summary: '',
+      goal: 'mobility',
+      scene: 'home',
+      equipment: const [],
+      level: 1,
+      targetMinutes: 5,
+      blocks: [
+        PlanBlock(
+          id: 'main',
+          name: '主训练',
+          type: BlockType.main,
+          rounds: 1,
+          restBetweenRoundsSeconds: 0,
+          items: [
+            PlanItem(
+              exerciseId: ids.first,
+              mode: DoseMode.time,
+              sets: 1,
+              perSide: false,
+              restSeconds: 0,
+              segments: [
+                coach.PlanSegment(
+                  id: 'part',
+                  exerciseId: ids.last,
+                  mode: coach.DoseMode.time,
+                  workSeconds: 10,
+                ),
+              ],
+            ),
+          ],
+        ),
+      ],
+    );
+    final services = AppServices(
+      library: library,
+      catalog: catalog,
+      store: AppStore(_Storage()),
+      voiceLibrary: voices,
+      voiceOutput: const MutedVoiceOutput(),
+      media: media,
+    );
+    addTearDown(() async {
+      if (!downloadPolicy.isCompleted) {
+        downloadPolicy.complete(trainer.TrainingMediaNetwork.offline);
+      }
+      await media.prefetchActions(ids);
+    });
+    holdDownloads = true;
+    services.prefetchPlan(plan);
+    for (var i = 0; i < 100 && pendingProbes < ids.length; i++) {
+      await Future<void>.delayed(const Duration(milliseconds: 5));
+    }
+    expect(pendingProbes, greaterThanOrEqualTo(ids.length));
+    for (final id in ids) {
+      expect(media.stateFor(id).phase, trainer.TrainingMediaPhase.queued);
+    }
+  });
+
   testWidgets('pending then failed prefetch never blocks plan, timer or speech', (
     tester,
   ) async {
@@ -424,8 +507,8 @@ void main() {
       findsOneWidget,
     );
     final initialCounter = tester
-        .widget<trainer.TrainerCountdownRing>(
-          find.byType(trainer.TrainerCountdownRing),
+        .widget<trainer.TrainerCountdownDigits>(
+          find.byType(trainer.TrainerCountdownDigits),
         )
         .value;
     for (var i = 0; i < 2; i++) {
@@ -433,8 +516,8 @@ void main() {
     }
     expect(
       tester
-          .widget<trainer.TrainerCountdownRing>(
-            find.byType(trainer.TrainerCountdownRing),
+          .widget<trainer.TrainerCountdownDigits>(
+            find.byType(trainer.TrainerCountdownDigits),
           )
           .value,
       isNot(initialCounter),

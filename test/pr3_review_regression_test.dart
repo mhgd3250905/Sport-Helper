@@ -14,7 +14,7 @@ import 'package:smartfit/domain/plan.dart';
 import 'package:smartfit/ui/plan_page.dart';
 import 'package:smartfit/ui/player_page.dart';
 import 'package:smartfit/ui/theme.dart';
-import 'package:ugk_trainer/ugk_trainer.dart' show TrainerCountdownRing;
+import 'package:ugk_trainer/ugk_trainer.dart' show TrainerRingPainter;
 
 import 'app_flow_test.dart' show services, tall;
 
@@ -194,10 +194,12 @@ void main() {
         }
         // ugk_trainer uses clock.stopwatch: widget-test time is deterministic.
         await tester.pump(const Duration(milliseconds: 400));
-        double ring() => tester
-            .widget<TrainerCountdownRing>(find.byType(TrainerCountdownRing))
-            .progress
-            .value;
+        final ringPaint = find.byKey(const ValueKey('ring'));
+        double ring() =>
+            (tester.widget<CustomPaint>(ringPaint).painter!
+                    as TrainerRingPainter)
+                .progress
+                .value;
         expect(ring(), greaterThan(0.01));
         await tester.tap(find.byKey(const ValueKey('pause')));
         await tester.pump();
@@ -216,10 +218,11 @@ void main() {
           reason: 'still paused: the ring does not move',
         );
         expect(
-          tester
-              .widget<TrainerCountdownRing>(find.byType(TrainerCountdownRing))
-              .dim,
-          isTrue,
+          tester.widget<AnimatedOpacity>(find.ancestor(
+            of: ringPaint,
+            matching: find.byType(AnimatedOpacity),
+          ).first).opacity,
+          .45,
         );
         await tester.pumpWidget(const SizedBox());
       },
