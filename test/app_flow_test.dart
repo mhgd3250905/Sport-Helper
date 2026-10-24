@@ -218,16 +218,14 @@ void main() {
     expect(s.store.savedPlans.single.plan.id, plan.id);
     expect(find.text('已保存'), findsOneWidget);
 
-    // 开始训练 → the card grows into the player (container transform).
+    // Training opens at stable full-screen bounds, hiding the old chat.
     final screen = tester.getRect(find.byType(ChatHomePage));
-    final card = tester.getRect(find.byType(PlanCard));
     await tester.tap(find.byKey(ValueKey('plan-start-${plan.id}')));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 60));
     expect(find.byType(PlayerPage), findsOneWidget);
-    final early = tester.getRect(find.byType(PlayerPage));
-    expect(early.width, lessThan(screen.width)); // still card-sized
-    expect(early.left, greaterThanOrEqualTo(card.left - 1));
+    expect(tester.getRect(find.byType(PlayerPage)), screen);
+    expect(find.byType(ChatHomePage), findsNothing);
     await tester.pump(const Duration(milliseconds: 500));
     expect(tester.getRect(find.byType(PlayerPage)), screen); // full screen
     expect(s.store.lastPlan?.id, plan.id);
@@ -238,8 +236,7 @@ void main() {
     await tester.tap(find.text('结束'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 200));
-    // Folding back into the card.
-    expect(tester.getRect(find.byType(PlayerPage)).width, lessThan(screen.width));
+    expect(find.byType(PlayerPage), findsNothing);
     await tester.pumpAndSettle();
     expect(find.byType(PlayerPage), findsNothing);
     expect(s.store.history, hasLength(1));
@@ -248,7 +245,7 @@ void main() {
     expect(s.chat.messages.last.isPlan, isFalse); // a word after the workout
   });
 
-  testWidgets('reduced motion: the player fades in instead of growing', (tester) async {
+  testWidgets('reduced motion: the player opens directly at full screen', (tester) async {
     tall(tester);
     tester.platformDispatcher.accessibilityFeaturesTestValue =
         const FakeAccessibilityFeatures(disableAnimations: true);
@@ -266,7 +263,7 @@ void main() {
     expect(tester.getRect(find.byType(PlayerPage)), screen);
     expect(
       find.ancestor(of: find.byType(PlayerPage), matching: find.byType(FadeTransition)),
-      findsWidgets,
+      findsNothing,
     );
     await tester.pump(const Duration(milliseconds: 500));
     await tester.tap(find.byKey(const ValueKey('close')));

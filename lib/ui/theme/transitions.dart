@@ -6,8 +6,8 @@ import 'tokens.dart';
 /// HipLab's `hip_routes.dart`): the new page slides in from the right edge
 /// on [SfMotion.enter] (400 ms), back out on [SfMotion.exit] (340 ms);
 /// the page it covers drifts 25 % left and dims a little — one large
-/// move per transition, no scaling. The card → player container transform
-/// is its own route ([CardExpandRoute]) and does not move the chat.
+/// move per transition, no scaling. Video training uses its own immediate
+/// opaque route so the media stage never participates in this transition.
 ///
 /// Reduced motion: a plain cross-fade.
 class SfPageTransitionsBuilder extends PageTransitionsBuilder {

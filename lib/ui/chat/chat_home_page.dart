@@ -24,11 +24,11 @@ import '../theme/glass.dart';
 import '../theme/sf_icons.dart';
 import '../theme/tokens.dart';
 import '../theme/widgets.dart';
+import '../training_route.dart';
 import 'action_card.dart';
 import 'chat_widgets.dart';
 import 'coach_ui_adapter.dart';
 import 'cosmos.dart';
-import 'expand_route.dart';
 import 'plan_card.dart';
 import 'saved_plans_drawer.dart';
 import 'validated_plan_card.dart';
@@ -119,9 +119,8 @@ class _ChatHomePageState extends State<ChatHomePage> {
     unawaited(then());
   }
 
-  /// The card (or drawer tile) grows into the player and folds back into
-  /// the chat afterwards; the summary and the save offer follow.
-  Future<void> _start(TrainingPlan p, {OriginRect? from}) async {
+  /// Open the stable video stage directly; the summary follows back in chat.
+  Future<void> _start(TrainingPlan p) async {
     final s = AppServices.of(context);
     if (p.items.any((item) => !s.library.contains(item.exerciseId))) {
       _toast('计划包含尚未可用的动作，暂时无法开始；已保存计划仍保留。');
@@ -140,8 +139,7 @@ class _ChatHomePageState extends State<ChatHomePage> {
     if (!mounted) return;
     s.prefetchPlan(p);
     final result = await Navigator.of(context).push(
-      CardExpandRoute<SessionResult>(
-        origin: from,
+      TrainingRoute<SessionResult>(
         settings: const RouteSettings(name: 'player'),
         builder: (_) => PlayerPage(plan: p),
       ),
@@ -210,7 +208,7 @@ class _ChatHomePageState extends State<ChatHomePage> {
           store: s.store,
           library: s.library,
           onShow: (p) => _fromDrawer(() => _chat.showSaved(p)),
-          onStart: (p, from) => _fromDrawer(() => _start(p.plan, from: from)),
+          onStart: (p, _) => _fromDrawer(() => _start(p.plan)),
           // Nothing saved yet: close the drawer and put the cursor in the chat.
           onCompose: () => _fromDrawer(() async => _input.requestFocus()),
           // Session and App actions stay in the drawer; the conversation has
@@ -428,7 +426,7 @@ class _ChatHomePageState extends State<ChatHomePage> {
             library: library,
             landing: fresh,
             isSaved: _chat.isSaved,
-            onStart: (plan, from) => _start(plan, from: from),
+            onStart: (plan, _) => _start(plan),
             onSave: _save,
             onOpen: (plan) => _details(m, validatedPlan: plan),
           ),
@@ -439,7 +437,7 @@ class _ChatHomePageState extends State<ChatHomePage> {
             landing: fresh,
             library: library,
             saved: _chat.isSaved(m.plan!),
-            onStart: (from) => _start(m.plan!, from: from),
+            onStart: (_) => _start(m.plan!),
             onSave: () => _save(m.plan!),
             onOpen: () => _details(m),
           ),

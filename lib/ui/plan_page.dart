@@ -11,6 +11,7 @@ import '../domain/session.dart';
 import 'exercise_video.dart';
 import 'player_page.dart';
 import 'theme.dart';
+import 'training_route.dart';
 
 /// A sectioned training article with explicit, independently paused previews.
 /// App validation, replacements and training navigation stay here.
@@ -192,7 +193,7 @@ class _PlanPageState extends State<PlanPage> with WidgetsBindingObserver {
     }
     s.prefetchPlan(_plan);
     await Navigator.of(context).push(
-      MaterialPageRoute<void>(
+      TrainingRoute<void>(
         settings: const RouteSettings(name: 'player'),
         builder: (_) => PlayerPage(plan: _plan),
       ),
