@@ -19,7 +19,11 @@
     },
     "manifests": {
       "files": 5,
-      "bytes": 296632
+      "bytes": 356256
+    },
+    "playback-posters": {
+      "files": 186,
+      "bytes": 1568166
     },
     "theme-covers": {
       "files": 186,
@@ -39,10 +43,10 @@
     }
   },
   "bundle": {
-    "files": 946,
-    "bytes": 92252702
+    "files": 1132,
+    "bytes": 93880492
   },
-  "bundleInventorySha256": "1472bc50689dfd3cdc2987c179ec9f7c637312d741c9255b05d45dae31a85b44",
+  "bundleInventorySha256": "860b9df496ae284394074b63ee173aafc505e1cb3314b037fb7eadca192380b6",
   "sourceInputs": {
     "files": 791,
     "inventorySha256": "3282ac25245f8d495ccb02f424e3e088cf2ed5f00a82875af2cc24c3349cfde2",
@@ -51,5 +55,7 @@
   "protectedPackFilesInventorySha256": "71c643587a4e2703d3c0820f9e94f00032ccf07931a8e725a4d43fc4fdf77626",
   "legacyPackMediaRemaining": 0,
   "cutoutsBundled": false,
-  "validatedOutput": true
+  "validatedOutput": true,
+  "generatedIndexLineEndings": "LF",
+  "inventoryRecheckedAfterNormalization": true
 }

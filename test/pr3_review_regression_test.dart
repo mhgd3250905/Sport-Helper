@@ -14,7 +14,8 @@ import 'package:smartfit/domain/plan.dart';
 import 'package:smartfit/ui/plan_page.dart';
 import 'package:smartfit/ui/player_page.dart';
 import 'package:smartfit/ui/theme.dart';
-import 'package:ugk_trainer/ugk_trainer.dart' show TrainerRingPainter, TrainerGlassButton;
+import 'package:ugk_trainer/ugk_trainer.dart'
+    show TrainerRingPainter, UgkPlayPauseButton;
 
 import 'app_flow_test.dart' show services, tall;
 
@@ -159,15 +160,31 @@ void main() {
         for (final theme in ['dark', 'light']) {
           final media = (entry.value as Map)[theme] as Map;
           final video = media['video'] as Map;
-          expect(video['asset'], '$root/v0.3.0/realistic/$theme/${entry.key}.mp4');
-          final source = [
-            ...(_json('$release/packages/builtin.json')['files'] as List),
-            ...(_json('$release/packages/realistic-$theme.json')['files'] as List),
-          ].cast<Map>().firstWhere((f) => f['path'] == '../v0.3.0/realistic/$theme/${entry.key}.mp4');
+          expect(
+            video['asset'],
+            '$root/v0.3.0/realistic/$theme/${entry.key}.mp4',
+          );
+          final source =
+              [
+                ...(_json('$release/packages/builtin.json')['files'] as List),
+                ...(_json('$release/packages/realistic-$theme.json')['files']
+                    as List),
+              ].cast<Map>().firstWhere(
+                (f) =>
+                    f['path'] == '../v0.3.0/realistic/$theme/${entry.key}.mp4',
+              );
           expect(video['sha256'], source['sha256']);
-          for (final role in ['video', 'poster', 'thumbnail']) {
+          for (final role in [
+            'video',
+            'poster',
+            'thumbnail',
+            'playbackPoster',
+          ]) {
             final descriptor = media[role] as Map;
-            expect(File(descriptor['asset'] as String).lengthSync(), descriptor['bytes']);
+            expect(
+              File(descriptor['asset'] as String).lengthSync(),
+              descriptor['bytes'],
+            );
             expect(descriptor['sha256'], matches(RegExp(r'^[0-9a-f]{64}$')));
           }
         }
@@ -231,23 +248,17 @@ void main() {
           reason: 'new phase starts from an empty ring',
         );
         expect(find.byKey(const ValueKey('tag-paused')), findsNothing);
-        final resume = tester.widget<TrainerGlassButton>(
+        final resume = tester.widget<UgkPlayPauseButton>(
           find.byKey(const ValueKey('pause')),
         );
-        expect(resume.tooltip, '继续训练');
-        expect(resume.theme.accent, SfColors.emphasis);
+        expect(resume.isPlaying, isFalse);
+        expect(resume.strings.resume, '继续训练');
+        expect(resume.theme.pausedColor, SfColors.emphasis);
         await tester.pump(const Duration(seconds: 1));
         expect(
           ring(),
           lessThan(0.001),
           reason: 'still paused: the ring does not move',
-        );
-        expect(
-          tester.widget<AnimatedOpacity>(find.ancestor(
-            of: ringPaint,
-            matching: find.byType(AnimatedOpacity),
-          ).first).opacity,
-          .45,
         );
         await tester.pumpWidget(const SizedBox());
       },
