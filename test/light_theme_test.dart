@@ -54,6 +54,14 @@ void main() {
           e.media.lightPoster,
           'assets/training_media/v0.3.0-app/theme-lossy/light/covers/${e.id}.webp',
         );
+        expect(
+          e.media.playbackPoster,
+          'assets/training_media/v0.3.0-app/theme-lossy/dark/first-frames/${e.id}.webp',
+        );
+        expect(
+          e.media.lightPlaybackPoster,
+          'assets/training_media/v0.3.0-app/theme-lossy/light/first-frames/${e.id}.webp',
+        );
       }
     });
 
@@ -90,37 +98,37 @@ void main() {
       },
     );
 
-    testWidgets(
-      'a demonstration previews the bundled cover in the light App theme',
-      (tester) async {
-        final e = lib['h-squat'];
-        SfColors.palette = SfPalette.light;
-        await tester.pumpWidget(
-          MaterialApp(
-            theme: buildTheme(SfPalette.light),
-            home: Center(
-              child: SizedBox(
-                width: 300,
-                child: ExerciseVideo(exercise: e, playing: false),
-              ),
+    testWidgets('a demonstration previews frame zero of the light video', (
+      tester,
+    ) async {
+      final e = lib['h-squat'];
+      SfColors.palette = SfPalette.light;
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: buildTheme(SfPalette.light),
+          home: Center(
+            child: SizedBox(
+              width: 300,
+              child: ExerciseVideo(exercise: e, playing: false),
             ),
           ),
-        );
-        expect(_assetsIn(tester), contains(e.media.lightPoster));
-        expect(_assetsIn(tester), isNot(contains(e.media.poster)));
-        expect(
-          _assetsIn(tester).where((path) => path.startsWith('assets/packs/')),
-          isEmpty,
-        );
-        final stage = tester.widgetList<ColoredBox>(
-          find.descendant(
-            of: find.byType(ExerciseVideo),
-            matching: find.byType(ColoredBox),
-          ),
-        );
-        expect(stage.first.color, SfPalette.light.mediaStage);
-      },
-    );
+        ),
+      );
+      expect(_assetsIn(tester), contains(e.media.lightPlaybackPoster));
+      expect(_assetsIn(tester), isNot(contains(e.media.lightPoster)));
+      expect(_assetsIn(tester), isNot(contains(e.media.playbackPoster)));
+      expect(
+        _assetsIn(tester).where((path) => path.startsWith('assets/packs/')),
+        isEmpty,
+      );
+      final stage = tester.widgetList<ColoredBox>(
+        find.descendant(
+          of: find.byType(ExerciseVideo),
+          matching: find.byType(ColoredBox),
+        ),
+      );
+      expect(stage.first.color, SfPalette.light.mediaStage);
+    });
 
     testWidgets(
       'theme switches immediately update still and repository theme',
@@ -147,9 +155,14 @@ void main() {
           );
           expect(view.media.theme, palette.isDark ? 'dark' : 'light');
           expect(view.media.videoAvailable, isTrue);
+          expect(view.media.posterTime, 0);
+          expect(
+            view.media.posterAsset,
+            e.media.playbackPosterFor(light: !palette.isDark),
+          );
           expect(
             _assetsIn(tester),
-            contains(palette.isDark ? e.media.poster : e.media.lightPoster),
+            contains(e.media.playbackPosterFor(light: !palette.isDark)),
           );
           expect(tester.takeException(), isNull);
         }

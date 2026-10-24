@@ -187,8 +187,8 @@ void main() {
               .color,
           palette.text,
         );
-        final poster = palette.isDark ? media.poster : media.lightPoster!;
-        final otherPoster = palette.isDark ? media.lightPoster! : media.poster;
+        final poster = media.playbackPosterFor(light: !palette.isDark);
+        final otherPoster = media.playbackPosterFor(light: palette.isDark);
         final stills = tester
             .widgetList<Image>(
               find.descendant(of: video, matching: find.byType(Image)),

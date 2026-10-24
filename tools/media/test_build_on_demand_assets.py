@@ -2,9 +2,13 @@
 
 import json
 from pathlib import Path
+import shutil
+import subprocess
 import tempfile
 import unittest
+from unittest.mock import patch
 
+import build_on_demand_assets as asset_builder
 from build_on_demand_assets import APP_ROOT, AssetError, build, digest
 
 
@@ -141,7 +145,7 @@ class CheckedInBundleTests(unittest.TestCase):
         files = [path for path in root.rglob("*") if path.is_file()]
         self.assertGreater(sum(path.stat().st_size for path in files), 85_000_000)
         self.assertLess(sum(path.stat().st_size for path in files), 100_000_000)
-        self.assertEqual(len(files), 946)
+        self.assertEqual(len(files), 1132)
         main_paths = list(root.rglob("app-manifest.json"))
         self.assertEqual(len(main_paths), 1)
         app = main_paths[0].parent
@@ -171,7 +175,7 @@ class CheckedInBundleTests(unittest.TestCase):
         for aid, themes in local['actions'].items():
             self.assertEqual(set(themes), {'dark', 'light'})
             for theme, media in themes.items():
-                for role in ('video', 'poster', 'thumbnail'):
+                for role in ('video', 'poster', 'thumbnail', 'playbackPoster'):
                     descriptor = media[role]
                     path = APP_ROOT / descriptor['asset']
                     self.assertTrue(path.is_file())
@@ -181,6 +185,11 @@ class CheckedInBundleTests(unittest.TestCase):
                 self.assertEqual(media['video']['sha256'], ref['sha256'])
                 self.assertEqual(media['video']['bytes'], ref['bytes'])
                 self.assertIn('/' + theme + '/', media['poster']['asset'])
+                playback = media['playbackPoster']
+                self.assertEqual(playback['sourceSha256'], media['video']['sha256'])
+                self.assertEqual(playback['sourceFrame'], 0)
+                self.assertEqual(playback['sourceTimeSeconds'], 0)
+                self.assertIn(f'/{theme}/first-frames/', playback['asset'])
 
 
 class OfflineThemeBuildTests(BuiltinAssetsTests):
@@ -209,6 +218,20 @@ class OfflineThemeBuildTests(BuiltinAssetsTests):
             light_videos.append({'path': relative, 'bytes': path.stat().st_size, 'sha256': digest(path)})
         self.put_package('realistic-light', 'video', light_videos)
         self.write_manifest()
+        # Package-integrity fixtures intentionally use fake MP4 bytes. Keep
+        # first-frame extraction isolated while making the two sources visibly
+        # different from the representative keyframe used by list thumbnails.
+        self.first_colors = {'dark': (210, 30, 55), 'light': (35, 180, 65)}
+        self.decode = self.enterContext(patch(
+            'build_on_demand_assets.decode_first_video_frame',
+            side_effect=lambda video: Image.new('RGB', (32, 32), self.first_colors[video.parent.name])))
+
+    def assert_image_color(self, path, expected):
+        from PIL import Image
+        with Image.open(path) as image:
+            actual = image.convert('RGB').getpixel((16, 16))
+        self.assertTrue(all(abs(a - e) <= 5 for a, e in zip(actual, expected)),
+                        f'{path.name}: expected approximately {expected}, got {actual}')
 
     def put_package(self, name, kind, files):
         path = self.source / f'packages/{name}.json'
@@ -226,9 +249,21 @@ class OfflineThemeBuildTests(BuiltinAssetsTests):
         index = json.loads((self.app / 'assets/training_media/v0.3.0-app/assets-index.json').read_bytes())
         for aid in self.selected:
             for theme in ('dark', 'light'):
-                for role in ('video', 'poster', 'thumbnail'):
+                media = index['actions'][aid][theme]
+                for role in ('video', 'poster', 'thumbnail', 'playbackPoster'):
                     ref = index['actions'][aid][theme][role]
                     self.assertEqual(digest(self.app / ref['asset']), ref['sha256'])
+                keyframe = self.source.parent / f'v0.3.0/realistic/{theme}/keyframes/{aid}_2.webp'
+                keyframe_color = (243, 241, 239) if theme == 'light' else (16, 16, 19)
+                for role in ('poster', 'thumbnail'):
+                    self.assertEqual(media[role]['sourceSha256'], digest(keyframe))
+                    self.assert_image_color(self.app / media[role]['asset'], keyframe_color)
+                playback = media['playbackPoster']
+                self.assertEqual(playback['sourceSha256'], media['video']['sha256'])
+                self.assertNotEqual(playback['sourceSha256'], digest(keyframe))
+                self.assertEqual(playback['sourceFrame'], 0)
+                self.assertEqual(playback['sourceTimeSeconds'], 0)
+                self.assert_image_color(self.app / playback['asset'], self.first_colors[theme])
         self.assertEqual(before, self.snapshot(self.source.parent))
         self.assertEqual(metadata, self.metadata.read_bytes())
         self.assertEqual(voice, self.voice.read_bytes())
@@ -250,12 +285,75 @@ class OfflineThemeBuildTests(BuiltinAssetsTests):
         self.assertEqual(before, self.snapshot(self.app))
 
     def test_existing_still_with_no_video_is_indexed_without_fake_video_path(self):
+        # A metadata-backed action can have both themed stills before either
+        # clip exists. Unselected builtin videos are not decode candidates.
+        (self.app / 'assets/packs/index.json').write_text(json.dumps({'packs': [
+            {'id': 'action-32', 'kind': 'exercise'}]}), encoding='utf-8')
+        self.put_package('realistic-dark', 'video', [])
         self.put_package('realistic-light', 'video', [])
         self.write_manifest()
         build(self.source, self.app, apply=True, offline_themes=True)
+        self.decode.assert_not_called()
         index = json.loads((self.app / 'assets/training_media/v0.3.0-app/assets-index.json').read_bytes())
-        self.assertIsNone(index['actions']['action-00']['light']['video'])
-        self.assertIn('/light/', index['actions']['action-00']['light']['poster']['asset'])
+        for theme in ('dark', 'light'):
+            media = index['actions']['action-32'][theme]
+            self.assertIsNone(media['video'])
+            self.assertIsNone(media['playbackPoster'])
+            self.assertIn(f'/{theme}/', media['poster']['asset'])
+            keyframe = self.source.parent / f'v0.3.0/realistic/{theme}/keyframes/action-32_2.webp'
+            self.assertEqual(media['poster']['sourceSha256'], digest(keyframe))
+
+    def test_first_frame_decode_error_does_not_fall_back_or_modify_app(self):
+        self.decode.side_effect = AssetError('first frame decode failed')
+        before = self.snapshot(self.app)
+        with self.assertRaisesRegex(AssetError, 'first frame decode failed'):
+            build(self.source, self.app, apply=True, offline_themes=True)
+        self.assertEqual(before, self.snapshot(self.app))
+        self.assertTrue(self.legacy[0].exists())
+
+
+class FirstVideoFrameTests(unittest.TestCase):
+    @unittest.skipUnless(shutil.which('ffmpeg'), 'ffmpeg is required for the real decode fixture')
+    def test_real_clip_uses_frame_zero_not_the_later_pose(self):
+        from PIL import Image
+        with tempfile.TemporaryDirectory(prefix='smartfit-first-frame-') as name:
+            video = Path(name) / 'two-poses.mp4'
+            first = 'color=c=black:s=48x32:r=2:d=0.5,drawbox=x=4:y=4:w=8:h=24:color=red:t=fill'
+            second = 'color=c=black:s=48x32:r=2:d=0.5,drawbox=x=36:y=4:w=8:h=24:color=blue:t=fill'
+            subprocess.run([
+                'ffmpeg', '-hide_banner', '-loglevel', 'error', '-y',
+                '-f', 'lavfi', '-i', first, '-f', 'lavfi', '-i', second,
+                '-filter_complex', '[0:v][1:v]concat=n=2:v=1:a=0,format=yuv420p',
+                '-c:v', 'libx264', '-crf', '0', str(video)], check=True, capture_output=True)
+            image = asset_builder.decode_first_video_frame(video)
+            self.addCleanup(image.close)
+            self.assertIsInstance(image, Image.Image)
+            self.assertEqual(image.mode, 'RGB')
+            self.assertEqual(image.size, (48, 32))
+            left = image.getpixel((8, 16))
+            right = image.getpixel((40, 16))
+            self.assertGreater(left[0], 200)
+            self.assertLess(max(left[1:]), 30)
+            self.assertLess(max(right), 30)
+            # Check the encoded second frame really has the alternate pose,
+            # rather than accidentally creating an all-red test movie.
+            later = subprocess.run([
+                'ffmpeg', '-hide_banner', '-loglevel', 'error', '-i', str(video),
+                '-vf', r'select=eq(n\,1)', '-frames:v', '1',
+                '-f', 'rawvideo', '-pix_fmt', 'rgb24', 'pipe:1'],
+                check=True, capture_output=True).stdout
+            later_image = Image.frombytes('RGB', (48, 32), later)
+            self.addCleanup(later_image.close)
+            self.assertGreater(later_image.getpixel((40, 16))[2], 200)
+            self.assertLess(max(later_image.getpixel((8, 16))), 30)
+
+    @unittest.skipUnless(shutil.which('ffmpeg'), 'ffmpeg is required for the real decode fixture')
+    def test_invalid_video_raises_asset_error(self):
+        with tempfile.TemporaryDirectory(prefix='smartfit-first-frame-bad-') as name:
+            video = Path(name) / 'invalid.mp4'
+            video.write_bytes(b'not a movie')
+            with self.assertRaises(AssetError):
+                asset_builder.decode_first_video_frame(video)
 
 
 if __name__ == "__main__":

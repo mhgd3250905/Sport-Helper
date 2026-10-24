@@ -82,6 +82,8 @@ class ExerciseMedia {
     this.lightVideo,
     this.lightPoster,
     this.lightVideoAvailable,
+    this.playbackPoster,
+    this.lightPlaybackPoster,
   });
 
   /// Pack id; the WebView player plays `/packs/<id>/demo.mp4`.
@@ -99,6 +101,14 @@ class ExerciseMedia {
   final String? lightVideo;
   final String? lightPoster;
   final bool? lightVideoAvailable;
+
+  /// Frame zero of the same clip; selected card covers stay separate.
+  final String? playbackPoster;
+  final String? lightPlaybackPoster;
+
+  String playbackPosterFor({required bool light}) => light
+      ? (lightPlaybackPoster ?? lightPoster ?? '')
+      : (playbackPoster ?? poster);
 
   bool get hasLight => lightPoster != null;
 
@@ -143,6 +153,8 @@ class ExerciseMedia {
       lightVideo: lightVideo,
       lightPoster: lightPoster,
       lightVideoAvailable: lightVideo != null,
+      playbackPoster: asset('dark', 'playbackPoster'),
+      lightPlaybackPoster: asset('light', 'playbackPoster'),
     );
   }
 

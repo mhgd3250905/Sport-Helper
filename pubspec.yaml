@@ -1,7 +1,7 @@
 name: smartfit
 description: "智能健身助手 — 描述训练场景，按模板生成训练计划，预渲染动作跟练。"
 publish_to: 'none'
-version: 0.1.0+24
+version: 0.1.0+25
 
 environment:
   sdk: ^3.12.0
@@ -55,8 +55,10 @@ flutter:
     - assets/training_media/v0.3.0-app/common-lossy/thumbs/
     - assets/training_media/v0.3.0-app/packages/
     - assets/training_media/v0.3.0-app/theme-lossy/dark/covers/
+    - assets/training_media/v0.3.0-app/theme-lossy/dark/first-frames/
     - assets/training_media/v0.3.0-app/theme-lossy/dark/thumbs/
     - assets/training_media/v0.3.0-app/theme-lossy/light/covers/
+    - assets/training_media/v0.3.0-app/theme-lossy/light/first-frames/
     - assets/training_media/v0.3.0-app/theme-lossy/light/thumbs/
     - assets/training_media/v0.3.0/realistic/dark/
     - assets/training_media/v0.3.0/realistic/light/

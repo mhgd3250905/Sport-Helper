@@ -2,7 +2,8 @@
 """Build hash-verified offline, theme-matched media from a Pose Hub release.
 
 The source release is read-only. The CLI bundles both realistic themes for App
-exercise metadata, plus build-time compressed theme keyframes. The original
+exercise metadata, plus build-time compressed theme keyframes and playback
+posters decoded from each clip's first frame. The original
 small-bundle API is retained with --legacy-small-bundle.
 Relative release paths are preserved so the same manifests work for assets and
 HTTP downloads. No video encoding or manifest rewriting is performed.
@@ -18,10 +19,12 @@ import argparse
 from collections import Counter
 from dataclasses import dataclass
 import hashlib
+import io
 import json
 from pathlib import Path, PurePosixPath
 import re
 import shutil
+import subprocess
 import tempfile
 import zipfile
 
@@ -49,6 +52,25 @@ class MediaFile:
 def digest(path: Path) -> str:
     with path.open("rb") as stream:
         return hashlib.file_digest(stream, "sha256").hexdigest()
+
+
+def decode_first_video_frame(video: Path):
+    """Decode presentation frame zero from the verified clip, at build time."""
+    from PIL import Image
+
+    ffmpeg = shutil.which('ffmpeg')
+    if not ffmpeg:
+        raise AssetError('ffmpeg is required to build playback posters')
+    try:
+        result = subprocess.run(
+            [ffmpeg, '-v', 'error', '-nostdin', '-threads', '1', '-i', str(video),
+             '-map', '0:v:0', '-frames:v', '1', '-threads', '1',
+             '-f', 'image2pipe', '-vcodec', 'png', 'pipe:1'],
+            check=True, capture_output=True, timeout=15)
+        with Image.open(io.BytesIO(result.stdout)) as frame:
+            return frame.convert('RGB')
+    except (subprocess.SubprocessError, OSError, ValueError) as error:
+        raise AssetError(f'Cannot decode video first frame: {video}') from error
 
 
 def inventory_hash(files: list[MediaFile]) -> str:
@@ -283,7 +305,7 @@ def _offline_themes(source: Path, app_root: Path, manifest: dict,
             original = require_inside(source / frame['path'], source.parent)
             checked = checked_file(original, frame, original.relative_to(source.parent).as_posix(), 'source-stills')
             inputs.append(checked)
-            item = {'video': None}
+            item = {'video': None, 'playbackPoster': None}
             if aid in videos:
                 video = videos[aid]
                 original_video = require_inside(source / video['path'], source.parent)
@@ -292,6 +314,23 @@ def _offline_themes(source: Path, app_root: Path, manifest: dict,
                 outputs[copied.relative] = copied
                 item['video'] = {'asset': 'assets/training_media/' + copied.relative,
                                  'bytes': copied.size, 'sha256': copied.sha256}
+                # A selected key pose can differ greatly from playback at 0s.
+                # Keep it for static cards; only the playing surface uses the
+                # exact clip's first frame as its waiting image.
+                relative = f'{source.name}/theme-lossy/{theme}/first-frames/{aid}.webp'
+                target = staging / relative
+                target.parent.mkdir(parents=True, exist_ok=True)
+                with decode_first_video_frame(copied.source) as image:
+                    image.thumbnail((720, 720), Image.Resampling.LANCZOS)
+                    image.save(target, format='WEBP', quality=82, method=6)
+                generated = MediaFile(target, relative, target.stat().st_size,
+                                      digest(target), 'playback-posters')
+                outputs[relative] = generated
+                item['playbackPoster'] = {
+                    'asset': 'assets/training_media/' + relative,
+                    'bytes': generated.size, 'sha256': generated.sha256,
+                    'sourceSha256': copied.sha256,
+                    'sourceFrame': 0, 'sourceTimeSeconds': 0}
             for role, directory, size, quality in [('poster', 'covers', 720, 82), ('thumbnail', 'thumbs', 240, 80)]:
                 relative = f'{source.name}/theme-lossy/{theme}/{directory}/{aid}.webp'
                 target = staging / relative
@@ -309,7 +348,8 @@ def _offline_themes(source: Path, app_root: Path, manifest: dict,
     relative = f'{source.name}/assets-index.json'
     target = staging / relative
     target.parent.mkdir(parents=True, exist_ok=True)
-    target.write_text(json.dumps(asset_index, ensure_ascii=False, separators=(',', ':')) + '\n', encoding='utf-8')
+    target.write_text(json.dumps(asset_index, ensure_ascii=False, separators=(',', ':')) + '\n',
+                      encoding='utf-8', newline='\n')
     outputs[relative] = MediaFile(target, relative, target.stat().st_size, digest(target), 'manifests')
     manifest['_offlineActions'] = ids
     return sorted(outputs.values(), key=lambda item: item.relative)

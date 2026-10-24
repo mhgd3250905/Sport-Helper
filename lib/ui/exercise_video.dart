@@ -72,11 +72,11 @@ class _ExerciseVideoState extends State<ExerciseVideo> {
       media: DrillMedia(
         id: exercise.id,
         videoAsset: light ? m.lightVideo ?? '' : m.video,
-        posterAsset: light ? m.lightPoster ?? '' : m.poster,
+        posterAsset: m.playbackPosterFor(light: light),
         duration: m.loopSeconds,
         posterTime: m.posterSeconds,
         lightVideoAsset: m.lightVideo,
-        lightPosterAsset: m.lightPoster,
+        lightPosterAsset: m.lightPlaybackPoster ?? m.lightPoster,
         theme: light ? 'light' : 'dark',
         videoAvailable: m.videoAvailableFor(light: light),
       ),
