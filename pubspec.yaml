@@ -12,22 +12,22 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   ugk_trainer:
-    version: 0.2.1
+    version: 0.2.2
     git:
       url: https://github.com/mhgd3250905/ugk-3d-pose-sdk.git
       path: packages/ugk_trainer
-      ref: ugk_trainer-v0.2.1
+      ref: ugk_trainer-v0.2.2
   ugk_coach:
-    version: 0.4.1
+    version: 0.4.2
     git:
       url: https://github.com/mhgd3250905/ugk-3d-pose-sdk.git
-      ref: ugk_coach-v0.4.1
+      ref: ugk_coach-v0.4.2
   ugk_coach_ui:
-    version: 0.1.0
+    version: 0.1.1
     git:
       url: https://github.com/mhgd3250905/ugk-3d-pose-sdk.git
       path: packages/ugk_coach_ui
-      ref: ugk_coach_ui-v0.1.0
+      ref: ugk_coach_ui-v0.1.1
   shared_preferences: 2.5.6
   webview_flutter: 4.14.1
   webview_flutter_android: 4.14.1

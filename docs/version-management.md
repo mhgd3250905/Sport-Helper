@@ -1,5 +1,9 @@
 # 版本管理与台账
 
+## 共享聊天 UI 0.1.1 补丁（2026-10-24，待批准）
+
+分支 `fix/coach-ui-011-tags-20261024` 基于远端 main `5b65cd7eab90ccfca32f88752965b0309604a180`，App 版本仍为 `0.1.0+22`。仅升级 SDK tag 及增加集成回归：coach_ui 0.1.1、coach 0.4.2、trainer 0.2.2。前者修剂量布局和动画测量，后两者仅 ASCII 清单和依赖 tag；新 tag 与 main 合入仍待开哥批准。旧 tag、`release/1.0` 和已有 iOS 提交保持原状。详见[补丁记录](coach-ui-011-2026-10-24.md)。
+
 ## SDK 与共享聊天 UI（2026-10-24，已批准合入并推送）
 
 功能源码 `7f3458dabbf8db4d5c65297d72bccc77eeed8c86` 已合入并推送 main，App 版本仍为 `0.1.0+22`。固定 `ugk_coach-v0.4.1`、`ugk_trainer-v0.2.1`、`ugk_coach_ui-v0.1.0`；后两个 tag 已发布且均指向 SDK `f0ea0647586913b205fc6dbb75fc9f97cedc55ce`。trainer 只改依赖声明，运行代码不变。正式远端全新 Git 缓存解析及严格锁文件验证通过，后续提交仅对齐发布状态文档。未安装或上架新 App，`release/1.0` 保持原状。详见[本轮记录](coach-ui-integration-2026-10-24.md)。
