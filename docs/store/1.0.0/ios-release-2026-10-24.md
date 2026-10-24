@@ -1,6 +1,6 @@
 # SmartFit iOS 1.0.0 (25) 本机发布记录
 
-状态：**TestFlight `1.0.0 (25)` 已上传、处理完成并保存出口合规，当前显示“准备提交”；未提交 App Store 审核**。2026-10-24 18:42（Asia/Shanghai）Xcode 确认上传成功，18:49:45 观察到处理完成，19:01 保存合规答案，19:02:26 刷新核对后状态仍为“准备提交”。尚未分配测试群组或安装测试。
+状态：**`1.0.0 (25)` 已正式提交 App Review，刷新回执为“等待审核”**。提交时间 2026-10-24 22:42（Asia/Shanghai），提交 ID `0b95fd74-f230-4210-8681-37b17e095cba`；[Apple 审核回执](https://appstoreconnect.apple.com/apps/6826550088/distribution/reviewsubmissions/details/0b95fd74-f230-4210-8681-37b17e095cba)。版本继续手动发布，尚未批准或公开上架。本轮材料已齐，无需再提供账号、密钥或审核联系人；下文按阶段保留上传、合规和送审记录。
 
 ## 候选与范围
 
@@ -46,7 +46,7 @@ main 与 release 已分叉开发，本次仅同步 iOS 文件，没有把 releas
 - 两种尺寸均已保存动作库、训练中和完成页，共 6 张。下载包：`build/ios-release-evidence/SmartFit-1.0.0-25-iPhone-screenshots.zip`（9,164,711 bytes，SHA-256 `d63a4462919eb78a801f8576bcdb311a536ca71fc8c120421f35c41916a3233d`）；本地候选元数据为同目录的 `candidate-manifest.json`。
 - 隐私填写草稿：[ios-privacy-draft.md](ios-privacy-draft.md)。尚未在 ASC 保存 App Privacy 答案。
 
-## Apple 后台与授权边界
+## Apple 后台与原授权边界（截至 19:02）
 
 指定的 Playwright MCP profile 位于 `/Users/shengkai/.local/share/ugk-browser/chrome-profile`。用户已授权重启原占用浏览器，当前已由 MCP 接管并完成用户亲自认证。没有复制 Cookies、密码、token 或 profile 内容。
 
@@ -87,3 +87,14 @@ main 与 release 已分叉开发，本次仅同步 iOS 文件，没有把 releas
 - 待开哥提供版权显示名、私下填好审核联系人、确认分发范围并完成 Cloudflare 登录后，可继续政策发布、最终校验及送审；同一审核动作不再重复索要授权。
 
 最新详细结果见 [送审交接](ios-submission-handoff.md)、[隐私记录](ios-privacy-draft.md) 与 [待部署政策站](site/README.md)。运行代码、Build 25 分发 IPA 及其哈希保持不变；没有把模拟器截图写成 TestFlight 真机验收。
+
+## 最终送审回执（22:42）
+
+开哥随后提供版权与审核联系人，确认免费、所有可用地区排除法国，并完成 Cloudflare 登录。已私下填入 ASC 联系字段，刷新核对保留，未把联系方式复制进 Git。
+
+- 政策站生产部署 `7e0472a0-049e-4ad5-a32d-70bd65a35957` 成功。仅给中英文隐私及支持页添加 iPhone 说明，同时保留原两个 404 页面及 CSP 等安全响应头。实际 ZIP 402,569 bytes，SHA-256 `3e564295dbccc2b3ee2e9c6e316140aad35ea800f63d9f593c38f64fde82298c`；四个更新路由返回 200，正文哈希与上传稿一致，公开浏览器验证通过。
+- ASC 隐私标签已发布。价格免费；供应范围为当前 174 个国家或地区，法国“未供应”，未来地区不自动加入。Mac 与 Vision Pro 兼容供应均保持关闭。
+- 全部必填校验通过，草稿中只有 `1.0.0 (25)` 一个项目。**22:42:31 提交以供审核，Apple 显示“已提交 1 个项目”**；审核详情提交 ID `0b95fd74-f230-4210-8681-37b17e095cba`，后台提交日期 2026-10-24 22:42。刷新后仍为“等待审核”。
+- 正式分发 IPA、版本、Build、固定 SDK 与运行源码身份未变；仍采用手动发布。没有声称审核已开始、已批准、已公开可下载，也没有新增测试员邀请、公开测试链接或自动监控。
+
+最终字段、未覆盖的真机专项及产物身份见 [送审交接](ios-submission-handoff.md)。当前没有待开哥补填的送审资料。

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "status": "ASC_DRAFT_SAVED_NOT_SUBMITTED",
+  "status": "APP_REVIEW_WAITING_FOR_REVIEW",
   "preparedDate": "2026-10-24",
   "appId": "6826550088",
   "bundleId": "com.ugk.smartfit",
@@ -21,13 +21,13 @@
     "keywords": "健身训练,动作示范,拉伸放松,热身练习,训练计划,跟练计时",
     "supportUrl": "https://smartfit-store.pages.dev/support/",
     "marketingUrl": "https://smartfit-store.pages.dev/",
-    "copyright": null,
-    "releaseOptionProposal": "MANUAL"
+    "releaseOptionProposal": "MANUAL",
+    "copyrightEnteredPrivatelyInAsc": true
   },
   "reviewInformation": {
     "signInRequired": false,
     "notes": "SmartFit 1.0.0 (25) is a general fitness demonstration and guided workout app for iPhone. The interface and spoken guidance are primarily in Simplified Chinese. No account, sign-in, subscription, purchase, camera, microphone, location or HealthKit permission is required.\n\nReview path:\n1. Open the app and read the safety notice. Complete the four safety questions truthfully. On a test device, a path with all answers set to No unlocks local plan generation; a Yes answer intentionally restricts training plans while exercise browsing remains available. Safety confirmation can be restarted in 关于与设置.\n2. Enter 跑步前热身 on the home screen, or use 自己选条件 to select 运动前热身. Open the resulting plan and tap the play button (开始训练).\n3. Observe the exercise demonstrations, timer, spoken instructions and pause controls. Allow the plan to finish to see the completion screen. Reviewers do not need to perform the physical exercises to inspect the software flow.\n4. Open 动作库 from the lower-left menu to browse demonstrations. Some media is bundled and other media downloads over HTTPS. Downloads follow the 仅在 Wi-Fi 下载 setting under the media settings; an uncached demonstration may wait for Wi-Fi when that setting is enabled.\n\nThis build preserves the existing AI-labelled interface and memory settings, but no online AI credential is configured. Conversation and workout planning use local rules/templates; online AI responses are unavailable in this build. No API key or reviewer account is needed.\n\nThe app is not a medical device and does not recognize body movements or assess posture. Training audio may continue while a workout is active in the background. Local dialogue, safety answers, plans, results and preferences are stored on the device. Media delivery uses https://smartfit-media.pages.dev/v0.3.0-app/ and Cloudflare; ordinary request metadata is described in the privacy policy.",
-    "contactOwnerMustEnterPrivately": true
+    "contactEnteredPrivatelyInAsc": true
   },
   "screenshots": [
     {
@@ -89,26 +89,26 @@
     "draft": "docs/store/1.0.0/ios-privacy-draft.md",
     "policyUrl": "https://smartfit-store.pages.dev/privacy/",
     "iosPolicySupplement": "docs/store/1.0.0/ios-policy-supplement-draft.md",
-    "finalDeclarationSaved": false,
+    "finalDeclarationSaved": true,
     "answersSavedInAscDraft": true,
-    "published": false
+    "published": true,
+    "publishedObservedAt": "2026-10-24T22:43:42+08:00"
   },
   "distribution": {
     "priceProposal": "FREE",
     "franceAllowed": false,
-    "otherTerritoriesNotSelectedByAgent": true
+    "otherTerritoriesNotSelectedByAgent": false,
+    "price": "FREE",
+    "availabilitySaved": true,
+    "territoryCount": 174,
+    "futureTerritoriesAutomatic": false
   },
-  "pendingOwnerFields": [
-    "copyright owner display name",
-    "App Review contact entered privately in ASC",
-    "final availability territories excluding France",
-    "Cloudflare login for existing smartfit-store Pages project"
-  ],
+  "pendingOwnerFields": [],
   "notAuthorizedByThisDraft": [
     "public release",
     "TestFlight tester invitations or external Beta App Review"
   ],
-  "lastVerifiedAt": "2026-10-24T19:40:39+08:00",
+  "lastVerifiedAt": "2026-10-24T22:43:42+08:00",
   "ascSaved": {
     "subtitle": true,
     "primaryCategory": true,
@@ -128,8 +128,10 @@
       "6.5-inch": 3
     },
     "persistedAfterReload": true,
-    "formalReviewSubmitted": false,
-    "publicReleaseTriggered": false
+    "formalReviewSubmitted": true,
+    "publicReleaseTriggered": false,
+    "copyrightEnteredPrivatelyInAsc": true,
+    "contactEnteredPrivatelyInAsc": true
   },
   "additionalScreenshotEvidence": {
     "reason": "ASC media manager marks medium Dynamic Island iPhone screenshots as required",
@@ -150,9 +152,9 @@
     "sha256": "36735405be4a9cf6b57d037662d59a274da9e34edb55393d21dcef1f493c9bcd"
   },
   "reviewPreparation": {
-    "state": "AWAITING_REQUIRED_OWNER_DATA",
+    "state": "SUBMITTED_WAITING_FOR_REVIEW",
     "formalAppReviewAuthorized": true,
-    "formalReviewSubmitted": false,
+    "formalReviewSubmitted": true,
     "publicReleaseAuthorized": false,
     "ageRating": "13+",
     "medicalOrTreatmentInformation": "INFREQUENT",
@@ -163,15 +165,51 @@
     "price": "FREE",
     "pricingBase": "USD 0.00",
     "pricingTerritoryCount": 175,
-    "availabilityTerritoriesSaved": false,
+    "availabilityTerritoriesSaved": true,
     "macAvailability": false,
     "visionProAvailability": false,
     "privacyAnswersSavedInDraft": true,
-    "privacyLabelsPublished": false,
-    "privacyWebsiteDeployed": false,
+    "privacyLabelsPublished": true,
+    "privacyWebsiteDeployed": true,
     "privacyWebsiteSource": "docs/store/1.0.0/site/",
-    "cloudflareAuthenticationPending": true,
-    "appleAddForReviewValidation": "REJECTED_MISSING_REQUIRED_METADATA",
-    "lastVerifiedAt": "2026-10-24T20:44:51+08:00"
+    "cloudflareAuthenticationPending": false,
+    "appleAddForReviewValidation": "PASSED",
+    "lastVerifiedAt": "2026-10-24T22:43:42+08:00",
+    "availabilityTerritoryCount": 174,
+    "franceAvailable": false,
+    "futureTerritoriesAutomatic": false
+  },
+  "formalReview": {
+    "submissionId": "0b95fd74-f230-4210-8681-37b17e095cba",
+    "url": "https://appstoreconnect.apple.com/apps/6826550088/distribution/reviewsubmissions/details/0b95fd74-f230-4210-8681-37b17e095cba",
+    "submittedObservedAt": "2026-10-24T22:42:31+08:00",
+    "submittedItemCount": 1,
+    "version": "1.0.0",
+    "build": "25",
+    "state": "WAITING_FOR_REVIEW",
+    "displayStatus": "等待审核",
+    "persistedAfterReload": true,
+    "releaseOption": "MANUAL",
+    "publiclyReleased": false
+  },
+  "privacyWebsiteDeployment": {
+    "project": "smartfit-store",
+    "environment": "production",
+    "deploymentId": "7e0472a0-049e-4ad5-a32d-70bd65a35957",
+    "url": "https://smartfit-store.pages.dev/",
+    "versionUrl": "https://7e0472a0.smartfit-store.pages.dev/",
+    "packagePath": "build/ios-release-private/store-site/SmartFit-store-ios-2026-10-24-preserved-config.zip",
+    "packageBytes": 402569,
+    "packageSha256": "3e564295dbccc2b3ee2e9c6e316140aad35ea800f63d9f593c38f64fde82298c",
+    "preservedOriginal404Pages": true,
+    "preservedOriginalSecurityHeaders": true,
+    "modifiedRoutes": [
+      "/privacy/",
+      "/privacy/en/",
+      "/support/",
+      "/support/en/"
+    ],
+    "deployedContentHashMatchesSource": true,
+    "publicUiVerifiedAt": "2026-10-24T22:45:26+08:00"
   }
 }

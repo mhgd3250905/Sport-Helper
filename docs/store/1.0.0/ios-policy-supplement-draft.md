@@ -1,8 +1,8 @@
 # SmartFit iOS 隐私与支持页面补充稿
 
-状态：**本地待复核，尚未发布网站，尚未保存 ASC App Privacy**。适用 `com.ugk.smartfit` / iOS `1.0.0 (25)`，上传 IPA 身份见 [发布记录](ios-release-2026-10-24.md)。本稿供合并到现有中英文隐私及支持页面，不改变 Android 的现有说明。
+状态：**本稿已用于完成双语政策站 iPhone 补充，网站与 ASC 隐私标签均已发布；App Review 等待审核**。适用 `com.ugk.smartfit` / iOS `1.0.0 (25)`，上传 IPA 身份见 [发布记录](ios-release-2026-10-24.md)。实际发布正文与部署身份以 [站点源码和回执](site/README.md) 为准，下文保留补充稿内容。
 
-2026-10-24 在指定 Playwright 浏览器实际打开公开页面，隐私页仍写“适用 Android 应用”，支持页的数据删除说明也只有 Android。两个页面在浏览器均正常显示；本机程序化请求得到 403，不能据此认定用户浏览器也无法访问。网站本轮未修改。
+2026-10-24 初次核对时，隐私页仅写 Android，支持页也只有 Android 删除说明。现已补充 iPhone 范围、权限、备份与删除操作；四个更新路由返回 200，正文与上传源码一致，浏览器显示正常。初次本机程序化请求的 403 不代表本次发布后页面不可访问。
 
 ## 建议加入隐私政策的 iOS 正文
 
@@ -24,10 +24,10 @@ iOS 系统可能按设备、账户及备份设置，将符合条件的应用数�
 
 iPhone 用户：使用 iOS“删除 App”可删除应用及当前设备上的相关数据；“卸载 App”会保留文稿与数据。请单独管理系统备份。“新对话”“清除记忆”和素材缓存清理各自只处理对应数据。版本 `1.0.0 (25)` 保留 AI 相关界面，但使用本地规则与模板，不提供在线 AI 回复。
 
-## 发布前仍需核对
+## 已执行与保留的核查边界
 
-- 由开哥确认 Cloudflare 实际数据处理和保留规则，再定稿 [App Privacy 答案](ios-privacy-draft.md)，不将本稿当作真机网络报告。
-- 将确认后的内容同步到中文与英文隐私页，并补充支持页；部署需另获网站写入授权。本稿没有自动发布。
-- 发布后通过浏览器匿名核对正文、App 内链接和 ASC 的政策 URL。
+- [App Privacy 答案](ios-privacy-draft.md) 按既有 CDN 网络数据范围保存并发布；不将此稿或模拟器截图写成 TestFlight 真机流量报告。
+- 中英文隐私页与支持页均已补充并部署到原项目，保留原 404 页面与安全响应头；没有变更 Android 业务代码。
+- 已通过公开 HTTP 响应和浏览器核对四个更新页面，ASC 政策 URL 保持原地址；正式 App Review 已于 22:42 提交。
 
 设备删除与卸载行为依据 Apple 的 [Manage storage on iPhone](https://support.apple.com/en-ie/guide/iphone/iph47c931112/ios) 和 [Remove or delete apps from iPhone](https://support.apple.com/en-au/guide/iphone/iph248b543ca/ios)。App Privacy 定义见 [Apple App Privacy Details](https://developer.apple.com/app-store/app-privacy-details/)。
