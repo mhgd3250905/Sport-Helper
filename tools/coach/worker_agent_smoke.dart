@@ -15,6 +15,7 @@ import 'package:smartfit/domain/plan_generator.dart';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
 
 import '../../test/support.dart';
+import 'smoke_observation.dart';
 
 class _Files implements LocalStateStorage {
   _Files(this.root);
@@ -73,13 +74,14 @@ class _ObservedClient implements coach.LlmClient {
       '${jsonEncode({'at': at.toIso8601String(), 'requestIndex': index})}\n',
       mode: FileMode.append,
     );
-    final response = await inner.complete(request, cancel: cancel);
-    responseProtocol.add({
-      'requestIndex': index,
-      'reasoningPresent': response.reasoning != null,
-      'reasoningLength': response.reasoning?.length,
-    });
-    return response;
+    try {
+      final response = await inner.complete(request, cancel: cancel);
+      responseProtocol.add(smokeResponseProtocol(index, response));
+      return response;
+    } on coach.LlmException catch (error) {
+      responseProtocol.add(smokeErrorProtocol(index, error));
+      rethrow;
+    }
   }
 }
 
@@ -186,9 +188,9 @@ void main() {
       final events = <Map<String, Object?>>[];
       await File('${root.path}/metadata.json').writeAsString(
         jsonEncode({
-          'sdkRef': 'fc5e456c44d76b872eb812597ffb5f67bc66bce3',
+          'sdkRef': 'f684e02f38e652633c23fa8946a53d02b6aa3ea2',
           'sdkVersion': '0.3.3',
-          'appVersion': '0.1.0+9',
+          'appVersion': '0.1.0+22',
           'memoryOnly': memoryOnly,
           'actionsOnly': actionsOnly,
           'maxSteps': engine.agent.maxSteps,
@@ -225,6 +227,7 @@ void main() {
       });
       final results = <Map<String, Object?>>[];
       final failures = <String>[];
+      final performanceFailures = <String>[];
       Future<void> run(
         String id,
         String question, {
@@ -365,6 +368,21 @@ void main() {
           'memorySummaryMentionsBeginner': memorySummary.contains('新手'),
         };
         results.add(result);
+        performanceFailures.addAll(
+          smokePerformanceFailures(
+            caseId: id,
+            steps: r.steps,
+            elapsedMs: watch.elapsedMilliseconds,
+            totalTokens: r.usage.totalTokens,
+          ),
+        );
+        final inventedIds = smokeUnknownActionIds(
+          client.responseProtocol,
+          afterRequest: before,
+          containsAction: catalog.contains,
+        );
+        result['inventedIdCount'] = inventedIds.length;
+        if (inventedIds.isNotEmpty) failures.add('$id: invented action ids');
         await File('${root.path}/results.json').writeAsString(
           const JsonEncoder.withIndent('  ').convert(results),
           flush: true,
@@ -461,6 +479,7 @@ void main() {
         await File('${root.path}/verdict.json').writeAsString(
           jsonEncode({
             'failures': failures,
+            'performanceFailures': performanceFailures,
             'maxSteps': engine.agent.maxSteps,
             'memoryOnly': memoryOnly,
             'actionsOnly': actionsOnly,
@@ -472,6 +491,11 @@ void main() {
           failures,
           isEmpty,
           reason: 'See the recorded real Worker results.',
+        );
+        expect(
+          performanceFailures,
+          isEmpty,
+          reason: 'See the six-case speed targets in verdict.json.',
         );
       } finally {
         await subscription.cancel();
