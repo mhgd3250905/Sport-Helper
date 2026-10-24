@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 
 import '../app/services.dart';
 import '../domain/exercise.dart';
+import '../domain/single_exercise_plan.dart';
 import 'exercise_video.dart';
+import 'plan_page.dart';
+import 'safety_check_page.dart';
 import 'theme.dart';
 
 /// Every move in the library, filterable by category; tap to watch. Opened
@@ -170,6 +173,30 @@ Future<void> showExerciseDetails(BuildContext context, Exercise e) =>
                   '注意',
                   '${e.cautions.join('、')}不适时减小幅度或换动作',
                   color: SfColors.caution,
+                ),
+              ],
+              if (!AppServices.of(context).aiConfig.enabled) ...[
+                const SizedBox(height: SfSpace.x5),
+                SfPrimaryButton(
+                  key: const ValueKey('basic-train-action'),
+                  label: '跟练这个动作',
+                  icon: SfGlyph.play,
+                  onPressed: () async {
+                    Navigator.of(c).pop();
+                    if (!await ensureTrainingSafety(context) || !context.mounted) {
+                      return;
+                    }
+                    final s = AppServices.of(context);
+                    final plan = singleExercisePlan(e);
+                    await s.store.rememberPlan(plan);
+                    if (!context.mounted) return;
+                    await Navigator.of(context).push<void>(
+                      MaterialPageRoute(
+                        settings: const RouteSettings(name: 'plan'),
+                        builder: (_) => PlanPage(plan: plan),
+                      ),
+                    );
+                  },
                 ),
               ],
             ],

@@ -41,8 +41,9 @@ class AppServices {
   }) : templates = TemplatePlanGenerator(
          lib: library,
          catalog: catalog,
-         preferredExerciseIds: () => media?.isOffline == true
-             ? media!.readyActionIds
+         preferredExerciseIds: () =>
+             media != null && (media.isOffline || media.baseUrls.isEmpty)
+             ? media.readyActionIds
              : const <String>{},
          onGenerated: (plan) {
            RuntimeLog.instance.record(

@@ -4,7 +4,7 @@
 library;
 
 const disclaimerText =
-    '智能健身助手提供的是通用健身与拉伸建议，不是医疗诊断或康复处方。'
+    'SmartFit 提供的是通用健身与拉伸示范，不是医疗器械，不诊断、治疗、治愈或预防任何疾病。'
     '训练中如出现疼痛、麻木、头晕、胸闷或呼吸困难，请立即停止并及时就医。'
     '有慢性病、伤病或正在康复期，请先咨询医生。动作示范中的肌肉高亮仅为教学示意。';
 
@@ -21,7 +21,8 @@ const safetyDisclaimer = '开始之前，先花 10 秒确认安全。\n\n$discla
 
 const safetyLead = '再确认 4 件事，符合的话点「是」。';
 
-String safetyQuestionText(int i) => '${i + 1}/${safetyQuestions.length}　${safetyQuestions[i]}？';
+String safetyQuestionText(int i) =>
+    '${i + 1}/${safetyQuestions.length}　${safetyQuestions[i]}？';
 
 const safetyAllClear = '好，都没问题。\n现在说说：想练什么、在哪儿、有多少时间？';
 

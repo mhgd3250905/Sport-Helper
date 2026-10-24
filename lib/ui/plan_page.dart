@@ -8,6 +8,7 @@ import '../domain/scenario.dart';
 import '../domain/session.dart';
 import 'exercise_video.dart';
 import 'player_page.dart';
+import 'safety_check_page.dart';
 import 'theme.dart';
 
 /// The generated plan as training groups: one live preview on top (the
@@ -125,12 +126,18 @@ class _PlanPageState extends State<PlanPage> {
             label: '开始跟练',
             emphasized: true,
             onPressed: () async {
+              if (!s.aiConfig.enabled && !await ensureTrainingSafety(context)) {
+                return;
+              }
+              if (!context.mounted) return;
               if (!s.store.trainingAllowed) {
                 showSfToast(
                   context,
                   s.store.safetyAccepted
                       ? '根据你的安全确认，暂不开始训练；可以在动作库里看示范。'
-                      : '请先在对话里完成安全确认，再开始训练。',
+                      : s.aiConfig.enabled
+                      ? '请先在对话里完成安全确认，再开始训练。'
+                      : '请先完成安全确认，再开始训练。',
                   icon: SfGlyph.shield,
                   bottom: 24,
                 );

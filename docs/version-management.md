@@ -1,3 +1,21 @@
+# 发布与历史版本台账
+
+## 当前发布候选：1.0.0+23（2026-10-24，未提交商店）
+
+`release/1.0` 基于 `main@f5332bf`，仅准备基础版上架与审核修复。实际源提交、AAB SHA-256、签名及真机结果记录在交付目录的 `build-manifest.json` 和设备验证回执，不能用下方历史包替代本轮证据。
+
+| 项目 | 当前合同 |
+|---|---|
+| 身份 | SmartFit / `com.ugk.smartfit` / `1.0.0+23`；无 ABI split 的 AAB versionCode 为 23 |
+| SDK | coach 0.3.3、trainer 0.1.6，均固定 `f684e02f38e652633c23fa8946a53d02b6aa3ea2` |
+| 基础版 | 无 AI Key/接口、无远程素材源、无聊天或 AI 引导；动作/套路 → 训练 → 完成 |
+| 签名 | 独立上传密钥；真实值及双份备份在仓库外，release 禁止 debug-key 回退 |
+| 数据 | 本地训练和偏好；Android 系统云备份及设备迁移备份关闭 |
+| 物料 | 见 [1.0 草稿](store/1.0.0/README.md)；正式 A2 图标、Feature Graphic 已准备，手机截图仅从候选真机采集 |
+| 远程状态 | 未在 Play 后台创建/上传/保存/送审；由开哥完成 |
+| Mac | 同分支 production scheme；Apple 签名、编译及 iOS 真机须由 Mac 实际验证 |
+
+以下为历史记录，原有阶段测试数和产物身份保留，不视作本轮验证。
 # 版本管理与台账
 
 更新日期：2026-10-23（Asia/Shanghai）。本文件区分当前保存版本、本地主线与历史交付；验收证据以 [acceptance.md](acceptance.md) 为准，交接入口见 [HANDOVER.md](HANDOVER.md)。

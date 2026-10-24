@@ -9,6 +9,7 @@ import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
 
 import 'app/services.dart';
+import 'chat/ai_coach_config.dart';
 import 'app/build_info.dart';
 import 'app/device_identity.dart';
 import 'app/training_media_config.dart';
@@ -24,6 +25,7 @@ import 'diagnostics/performance_vm.dart';
 import 'diagnostics/performance_conditions.dart';
 import 'diagnostics/performance_lab.dart';
 import 'ui/chat/chat_home_page.dart';
+import 'ui/basic_home_page.dart';
 import 'ui/theme/app_theme.dart';
 import 'ui/theme/glass.dart';
 import 'ui/theme/adaptive_glass.dart';
@@ -96,9 +98,12 @@ Future<void> main() async {
   final (lib, catalog, voices, coachCatalog) = await AppServices.loadContent(
     media: media,
   );
-  final coachProfile = coach.CoachProfile.fromJson(
-    jsonDecode(await rootBundle.loadString('assets/coach/smartfit.json')),
-  );
+  const aiConfig = AiCoachConfig.fromEnvironment();
+  final coachProfile = aiConfig.enabled
+      ? coach.CoachProfile.fromJson(
+          jsonDecode(await rootBundle.loadString('assets/coach/smartfit.json')),
+        )
+      : null;
   log.record(
     'app.catalog_ready',
     fields: {'count': lib.length, 'catalogCount': coachCatalog.length},
@@ -108,14 +113,16 @@ Future<void> main() async {
   log.record('app.state_initialized');
   media.wifiOnly = store.mediaWifiOnly;
   String? deviceId;
-  try {
-    deviceId = await DeviceIdentity(storage).loadOrCreate();
-  } on Object catch (error) {
-    log.record(
-      'app.identity_unavailable',
-      fields: RuntimeLog.errorFields(error),
-    );
-    // No persisted identifier means no proxy call; offline training still works.
+  if (aiConfig.enabled) {
+    try {
+      deviceId = await DeviceIdentity(storage).loadOrCreate();
+    } on Object catch (error) {
+      log.record(
+        'app.identity_unavailable',
+        fields: RuntimeLog.errorFields(error),
+      );
+      // No persisted identifier means no proxy call; offline training still works.
+    }
   }
   final services = AppServices(
     library: lib,
@@ -125,6 +132,7 @@ Future<void> main() async {
     voiceOutput: JustAudioVoiceOutput(),
     coachCatalog: coachCatalog,
     coachProfile: coachProfile,
+    aiConfig: aiConfig,
     deviceId: deviceId,
     media: media,
   );
@@ -204,7 +212,7 @@ class _SmartFitAppState extends State<SmartFitApp> with WidgetsBindingObserver {
     child: ListenableBuilder(
       listenable: widget.services.store,
       builder: (context, _) => MaterialApp(
-        title: '智能健身助手',
+        title: 'SmartFit',
         debugShowCheckedModeBanner: false,
         theme: buildTheme(SfPalette.light),
         darkTheme: buildTheme(SfPalette.dark),
@@ -243,7 +251,9 @@ class _SmartFitAppState extends State<SmartFitApp> with WidgetsBindingObserver {
           );
         },
         // The chat opens with the safety talk on first launch.
-        home: const ChatHomePage(),
+        home: widget.services.aiConfig.enabled
+            ? const ChatHomePage()
+            : const BasicHomePage(),
       ),
     ),
   );

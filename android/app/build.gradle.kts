@@ -1,4 +1,5 @@
 import java.util.Base64
+import java.util.Properties
 
 plugins {
     id("com.android.application")
@@ -7,7 +8,7 @@ plugins {
 }
 
 // All review choices keep the internal application ID. Production never reads
-// these candidate source sets. The local default A2 is awaiting visual approval.
+// these candidate source sets. A2 is the approved production default.
 // Flutter exposes --dart-define values as base64-encoded Gradle dart-defines.
 val iconDefines = providers.gradleProperty("dart-defines").orNull
     .orEmpty().split(",").mapNotNull { encoded ->
@@ -27,6 +28,33 @@ require(smartfitIconVariant in setOf("", "A", "B", "A2")) {
     "smartfitIconVariant / SMARTFIT_ICON_VARIANT must be A, B, or A2 (or omitted)."
 }
 
+// Upload keys and passwords stay outside the repository. Release artifacts
+// must never silently fall back to the Android debug certificate.
+val signingPropertiesPath = providers.environmentVariable("SMARTFIT_SIGNING_PROPERTIES").orNull
+val uploadProperties = Properties()
+if (!signingPropertiesPath.isNullOrBlank()) {
+    val signingFile = file(signingPropertiesPath).canonicalFile
+    require(signingFile.isFile) { "The external upload-signing properties file is missing." }
+    require(!signingFile.toPath().startsWith(rootProject.projectDir.parentFile.canonicalFile.toPath())) {
+        "Upload-signing properties must be outside the App repository."
+    }
+    signingFile.inputStream().use { uploadProperties.load(it) }
+    require(listOf("storeFile", "storePassword", "keyAlias", "keyPassword")
+        .all { !uploadProperties.getProperty(it).isNullOrBlank() }) {
+        "The external upload-signing properties file is incomplete."
+    }
+}
+
+gradle.taskGraph.whenReady {
+    val buildsReleaseArtifact = allTasks.any {
+        it.project == project &&
+            it.name.matches(Regex("(?i)(assemble|bundle|package|validateSigning).*Release.*"))
+    }
+    require(!buildsReleaseArtifact || !signingPropertiesPath.isNullOrBlank()) {
+        "Release artifacts require SMARTFIT_SIGNING_PROPERTIES; debug-key fallback is disabled."
+    }
+}
+
 android {
     namespace = "com.ugk.smartfit"
     compileSdk = flutter.compileSdkVersion
@@ -38,7 +66,7 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
+        // Permanent Google Play identity; do not change after the first upload.
         applicationId = "com.ugk.smartfit"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
@@ -69,11 +97,22 @@ android {
         )
     }
 
+    signingConfigs {
+        if (!signingPropertiesPath.isNullOrBlank()) {
+            create("upload") {
+                storeFile = file(uploadProperties.getProperty("storeFile"))
+                storePassword = uploadProperties.getProperty("storePassword")
+                keyAlias = uploadProperties.getProperty("keyAlias")
+                keyPassword = uploadProperties.getProperty("keyPassword")
+                storeType = "PKCS12"
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = if (signingPropertiesPath.isNullOrBlank()) null
+                else signingConfigs.getByName("upload")
         }
     }
 }

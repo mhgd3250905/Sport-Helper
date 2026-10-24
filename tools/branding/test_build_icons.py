@@ -37,7 +37,8 @@ class IconAssetsTest(unittest.TestCase):
         self.assertNotIn("android/app/src/main", "\n".join(self.assets))
         self.assertNotIn("AppIcon.appiconset/", "\n".join(self.assets))
         project = (icons.ROOT / "ios/Runner.xcodeproj/project.pbxproj").read_text("utf-8")
-        self.assertEqual(project.count("ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;"), 3)
+        # Runner keeps its original three modes and the three production modes.
+        self.assertEqual(project.count("ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;"), 6)
         self.assertNotIn("IconA.internal.xcconfig", project)
         self.assertNotIn("IconB.internal.xcconfig", project)
         self.assertNotIn("IconA2.internal.xcconfig", project)

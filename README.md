@@ -1,5 +1,17 @@
-# 智能健身助手 SmartFit
+# SmartFit 1.0 基础版
 
+`release/1.0` 从 `main@f5332bf` 建立，用于首版上架与审核修复；主线继续开发。审核修复确认后再合回 `main`，不把本分支当作 SDK 跟随分支。
+
+基础闭环：选择动作或固定套路 → 本地安全确认 → 计时跟练 → 完成及本地记录。版本 **1.0.0+23**，Android 身份固定 **com.ugk.smartfit**；正式图标为已批准 A2。
+
+- 默认不注入 AI Key、AI 地址或远程素材地址，界面不显示聊天、AI 记忆和联网生成引导。
+- SDK 两项依赖固定 commit `f684e02f38e652633c23fa8946a53d02b6aa3ea2`（coach 0.3.3 / trainer 0.1.6），禁止使用本地覆盖配置或浮动 main。
+- Android release 必须通过仓库外的 `SMARTFIT_SIGNING_PROPERTIES` 使用上传密钥，已禁用 debug 证书回退。密钥和密码不入 Git。
+- 使用 [无 AI 签名构建脚本](tools/release/build_play_bundle.ps1)；构建只接受干净已提交源码及锁文件。历史 AI 包装脚本不用于本候选。
+- [商店文字与政策草稿](docs/store/1.0.0/README.md)、[Mac/iOS 同分支接力](docs/store/1.0.0/mac-handoff.md)、[版本台账](docs/version-management.md)。实际 AAB、截图和真机结果另存于交付目录的回执。
+- 本任务未操作 Google Play 后台；由开哥上传与提交。公开隐私政策网址、发布主体和后台分发选择待开哥补齐。
+
+## 开发与历史能力（不代表本基础候选已启用）
 描述训练场景 → AI 回复与生成规范训练计划（异常时回退本地模板）→ 用预渲染动作直接展示训练小组 → 跟练（计时 / 组 × 次数 / 休息 / 换侧 / 语音播报）。
 
 主界面是一段对话（[docs/chat-home.md](docs/chat-home.md)）：说想怎么练，助手可回复文字、动作演示卡或计划卡片。动作卡点开看详情；计划卡点「开始训练」直接跟练，「保存」后下次说「上次那个」或从左下角抽屉一键开始。

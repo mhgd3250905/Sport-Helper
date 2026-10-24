@@ -141,6 +141,7 @@ class _TrainingMediaSettingsState extends State<TrainingMediaSettings> {
   Widget build(BuildContext context) {
     final services = AppServices.of(context);
     final repository = services.media!;
+    final downloadsConfigured = repository.baseUrls.isNotEmpty;
     return ListenableBuilder(
       listenable: repository,
       builder: (context, _) {
@@ -148,37 +149,50 @@ class _TrainingMediaSettingsState extends State<TrainingMediaSettings> {
         final downloading =
             state.phase == TrainingMediaPhase.queued ||
             state.phase == TrainingMediaPhase.downloading;
-        final message = switch (state.phase) {
-          TrainingMediaPhase.waitingForWifi => '等待 Wi-Fi；已内置的动作仍可使用',
-          TrainingMediaPhase.offline => '当前离线；已有动作仍可使用，计时和语音不受影响',
-          TrainingMediaPhase.failed => '下载未完成或校验未通过；已保留可用素材，可以重试',
-          TrainingMediaPhase.ready => '完整动作素材已下载并校验',
-          TrainingMediaPhase.queued || TrainingMediaPhase.downloading => null,
-          _ => _message,
-        };
+        final message = !downloadsConfigured
+            ? _message
+            : switch (state.phase) {
+                TrainingMediaPhase.waitingForWifi => '等待 Wi-Fi；已内置的动作仍可使用',
+                TrainingMediaPhase.offline => '当前离线；已有动作仍可使用，计时和语音不受影响',
+                TrainingMediaPhase.failed => '下载未完成或校验未通过；已保留可用素材，可以重试',
+                TrainingMediaPhase.ready => '完整动作素材已下载并校验',
+                TrainingMediaPhase.queued ||
+                TrainingMediaPhase.downloading => null,
+                _ => _message,
+              };
         final total =
             repository.manifest.packages['realistic-dark']!.totalBytes;
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text('完整动作素材 · ${_size(total)}', style: SfType.callout),
-            const SizedBox(height: SfSpace.x1),
-            Text('已内置 32 个动作。其余示范按计划下载；下载期间仍可计时和语音跟练。', style: SfType.caption),
-            SfSwitchRow(
-              key: const ValueKey('media-wifi-only'),
-              title: '仅在 Wi-Fi 下载',
-              subtitle: '关闭后可能使用移动流量',
-              value: repository.wifiOnly,
-              onChanged: (value) async {
-                repository.wifiOnly = value;
-                RuntimeLog.instance.record(
-                  'media.wifi_only.changed',
-                  fields: {'wifiOnly': value},
-                );
-                await services.store.setMediaWifiOnly(value);
-              },
+            Text(
+              downloadsConfigured ? '完整动作素材 · ${_size(total)}' : '内置动作素材',
+              style: SfType.callout,
             ),
-            if (state.phase == TrainingMediaPhase.downloading) ...[
+            const SizedBox(height: SfSpace.x1),
+            Text(
+              downloadsConfigured
+                  ? '已内置 32 个动作。其余示范按计划下载；下载期间仍可计时和语音跟练。'
+                  : '内置动作示范可离线播放；其他动作可查看要点并按计时和语音跟练。',
+              style: SfType.caption,
+            ),
+            if (downloadsConfigured)
+              SfSwitchRow(
+                key: const ValueKey('media-wifi-only'),
+                title: '仅在 Wi-Fi 下载',
+                subtitle: '关闭后可能使用移动流量',
+                value: repository.wifiOnly,
+                onChanged: (value) async {
+                  repository.wifiOnly = value;
+                  RuntimeLog.instance.record(
+                    'media.wifi_only.changed',
+                    fields: {'wifiOnly': value},
+                  );
+                  await services.store.setMediaWifiOnly(value);
+                },
+              ),
+            if (downloadsConfigured &&
+                state.phase == TrainingMediaPhase.downloading) ...[
               LinearProgressIndicator(
                 value: state.totalBytes == 0
                     ? null
@@ -194,16 +208,17 @@ class _TrainingMediaSettingsState extends State<TrainingMediaSettings> {
                 padding: const EdgeInsets.only(top: 8),
                 child: Text(message, style: SfType.caption),
               ),
-            SfTextAction(
-              key: const ValueKey('media-download-default'),
-              icon: SfGlyph.play,
-              label: _working || downloading ? '处理中…' : '下载完整动作素材',
-              onPressed:
-                  _working || downloading || repository.visibleActions.isEmpty
-                  ? null
-                  : () => _download(repository),
-            ),
-            if (repository.visibleActions.isEmpty)
+            if (downloadsConfigured)
+              SfTextAction(
+                key: const ValueKey('media-download-default'),
+                icon: SfGlyph.play,
+                label: _working || downloading ? '处理中…' : '下载完整动作素材',
+                onPressed:
+                    _working || downloading || repository.visibleActions.isEmpty
+                    ? null
+                    : () => _download(repository),
+              ),
+            if (downloadsConfigured && repository.visibleActions.isEmpty)
               Text('当前没有已审核的可下载动作', style: SfType.caption),
             Text('已用缓存 ${_size(_usedBytes)}', style: SfType.caption),
             SfTextAction(

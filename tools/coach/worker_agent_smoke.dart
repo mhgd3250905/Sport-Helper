@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:smartfit/app/build_info.dart';
 import 'package:smartfit/app/device_identity.dart';
 import 'package:smartfit/chat/ai_chat_engine.dart';
 import 'package:smartfit/chat/ai_coach_config.dart';
@@ -109,10 +110,16 @@ void main() {
         reason: 'Choose only one smoke mode.',
       );
       const key = String.fromEnvironment('SMARTFIT_AI_TOKEN');
+      const baseUrl = String.fromEnvironment('SMARTFIT_AI_BASE_URL');
       expect(
         key.trim(),
         isNotEmpty,
         reason: 'Supply Worker key through dart-define.',
+      );
+      expect(
+        const AiCoachConfig(token: key, baseUrl: baseUrl).enabled,
+        isTrue,
+        reason: 'Supply SMARTFIT_AI_BASE_URL as an explicit HTTPS address.',
       );
       final root = Directory(
         '.buildlog/skill-agent-smoke/${DateTime.now().toUtc().toIso8601String().replaceAll(':', '-')}',
@@ -137,6 +144,7 @@ void main() {
       );
       final transport = const AiCoachConfig(
         token: key,
+        baseUrl: baseUrl,
       ).createClient(deviceId: deviceId);
       expect(transport.config.maxRetries, 0);
       final previousRequests = <DateTime>[];
@@ -188,9 +196,9 @@ void main() {
       final events = <Map<String, Object?>>[];
       await File('${root.path}/metadata.json').writeAsString(
         jsonEncode({
-          'sdkRef': 'f684e02f38e652633c23fa8946a53d02b6aa3ea2',
+          'sdkRef': AppBuildInfo.sdkRef,
           'sdkVersion': '0.3.3',
-          'appVersion': '0.1.0+22',
+          'appVersion': AppBuildInfo.version,
           'memoryOnly': memoryOnly,
           'actionsOnly': actionsOnly,
           'maxSteps': engine.agent.maxSteps,

@@ -55,6 +55,12 @@ tools/voice/.raw-cache/
 tools/voice/.voice-cache/
 __pycache__/
 android/key.properties
+*.jks
+*.keystore
+*.p12
+*.pfx
+*.key
+**/signing.properties
 *.apk
 *.aab
 /test/_shots/

@@ -1,0 +1,20 @@
+{
+  "status": "draft_not_submitted",
+  "applicationId": "com.ugk.smartfit",
+  "versionName": "1.0.0",
+  "buildNumber": 23,
+  "supportEmail": "mhgd3250905@gmail.com",
+  "publisherName": null,
+  "privacyPolicyUrl": null,
+  "categorySuggestion": "Health & Fitness",
+  "zh-CN": {
+    "title": "SmartFit",
+    "shortDescription": "选择动作或训练套路，跟随示范与计时练习，在本机记录训练完成情况。",
+    "fullDescription": "从一个动作开始，让日常练习更有条理。\n\nSmartFit 基础版提供动作浏览、固定训练套路和跟练计时。你可以选择单个动作，也可以从已有套路开始，在训练过程中查看可用的内置动作示范，并使用语音和提示音帮助掌握节奏。完成后，训练记录保存在当前设备上。\n\n当前功能\n• 浏览动作库，查看动作说明与可用示范。\n• 从固定训练套路开始，或选择单个动作跟练。\n• 使用训练计时、语音和提示音，按自己的身体情况安排练习。\n• 查看最近训练及上次计划。\n• 调整外观、语音和提示音设置。\n\n本机优先\n无需注册账号。当前基础版没有广告，不开放联网生成、聊天或云端同步。训练记录、计划和偏好设置保存在本机。部分动作没有内置视频；可用的视频示范以 App 实际展示为准，计时和语音不代表动作识别或姿势评估。\n\n开始前请完成安全确认。SmartFit 用于一般健身与拉伸示范，不是医疗器械，不诊断、治疗、治愈或预防任何疾病，也不能替代医生或专业人员的建议。训练中如有疼痛、头晕、胸闷或其他不适，请停止练习并按需就医。动作中的肌肉高亮仅为教学示意。\n\n当前界面及语音主要为简体中文。隐私与支持：mhgd3250905@gmail.com"
+  },
+  "en-US": {
+    "title": "SmartFit",
+    "shortDescription": "Choose exercises, follow routines, and track workouts on your device.",
+    "fullDescription": "Start with one exercise and make everyday practice easier to follow.\n\nSmartFit Basic lets you browse exercises, choose a fixed workout routine, and follow a timed session. Select a single exercise or an existing routine, view the built-in demonstrations available for that exercise, and use voice guidance and chimes to follow the session. Completed workout records stay on your device.\n\nCurrent features\n• Browse exercise instructions and available demonstrations.\n• Start a fixed routine or a single-exercise session.\n• Use workout timing, voice guidance, and chimes.\n• View recent workouts and your last plan.\n• Adjust appearance, voice, and chime settings.\n\nOn-device by default\nNo account is required. This Basic release has no ads, online generation, chat, or cloud sync. Workout records, plans, and preferences are stored locally. Not every exercise includes a built-in video; available demonstrations are shown in the app. Timing and voice guidance do not provide movement recognition or posture assessment.\n\nComplete the safety check before training and choose activity appropriate for your condition. SmartFit provides general fitness and stretching demonstrations. It is not a medical device and does not diagnose, treat, cure, or prevent any medical condition. It does not replace advice from a doctor or qualified professional. Stop if you experience pain, dizziness, chest discomfort, or other concerning symptoms, and seek appropriate medical help. Highlighted muscles are educational illustrations.\n\nThe current interface and voice guidance are primarily in Simplified Chinese. Privacy and support: mhgd3250905@gmail.com"
+  }
+}

@@ -1,0 +1,93 @@
+{
+  "status": "static_art_exported_device_captures_recorded_in_delivery_manifest",
+  "release": "1.0.0+23",
+  "rules": {
+    "screenshotsMustBeActualAppCaptures": true,
+    "allowInventedInterface": false,
+    "allowPrivateUserData": false,
+    "minimumPhoneScreenshots": 2,
+    "maximumPhoneScreenshots": 8,
+    "phoneScreenshotMinSidePx": 320,
+    "phoneScreenshotMaxSidePx": 3840,
+    "longSideMustNotExceedTwiceShortSide": true,
+    "recordCaptureViewportAndTransformations": true,
+    "preserveRawCapture": true
+  },
+  "icon": {
+    "selection": "A2 full-body zoom, previously approved by owner",
+    "source": "assets/brand/source/smartfit-icon-v3-fullbody-zoom.png",
+    "provenance": "tools/branding/fullbody-zoom-provenance.json",
+    "selectionRecord": "tools/branding/production-icon-selection.json",
+    "existing512Candidate": null,
+    "playRequiredPx": [
+      512,
+      512
+    ],
+    "format": "PNG, full square; do not add launcher mask or rounded corners",
+    "finalPath": "docs/store/1.0.0/assets/icon-512.png",
+    "sha256": "225d25822057ddfc28b15ec3d57213fcec7aa63398a0c5610298529cd140b703",
+    "exportMethod": "Browser canvas export from reviewed A2 1024 source; complete square, 512x512, no source artwork changes"
+  },
+  "phoneScreenshots": [
+    {
+      "scene": "Basic home with exercise selection and fixed routines",
+      "altZh": "SmartFit 首页的动作与训练套路入口",
+      "altEn": "SmartFit home with exercise selection and routines",
+      "status": "capture_from_signed_candidate",
+      "finalPath": null
+    },
+    {
+      "scene": "Exercise library with actual available movements",
+      "altZh": "动作库中的健身与拉伸示范",
+      "altEn": "The exercise library with fitness and stretching demonstrations",
+      "status": "capture_from_signed_candidate",
+      "finalPath": null
+    },
+    {
+      "scene": "Workout in progress, using only demonstration test data",
+      "altZh": "动作跟练中的示范和计时",
+      "altEn": "An exercise demonstration and workout timer",
+      "status": "capture_from_signed_candidate",
+      "finalPath": null
+    },
+    {
+      "scene": "Completed workout and local result",
+      "altZh": "完成训练后的本地结果",
+      "altEn": "The local result after completing a workout",
+      "status": "capture_from_signed_candidate",
+      "finalPath": null
+    }
+  ],
+  "featureGraphic": {
+    "requiredPx": [
+      1024,
+      500
+    ],
+    "format": "JPEG without alpha",
+    "content": "Only actual app captures and approved artwork; no ranking, awards, pricing badge or unavailable feature claims",
+    "status": "draft_exported_and_visually_checked",
+    "finalPath": "docs/store/1.0.0/assets/feature-graphic-zh-CN.jpg",
+    "sha256": "265358996deb8e56f3f6d006ed4ca47b48198ccde71bf520f327d7a6710b8048",
+    "englishPath": "docs/store/1.0.0/assets/feature-graphic-en-US.jpg",
+    "englishSha256": "a6a0303ca8c6be26d303b24d58b0a593e5af3a351788a802bbfe3048fc232ed0"
+  },
+  "sourceRights": {
+    "icon": "Owner approved A2 adoption on 2026-10-24; exact generation/reference record retained in repository",
+    "appCaptures": "Capture only this app's signed release candidate using non-private test workouts; remove personal notifications before capture",
+    "trainingDemonstrations": "Review assets/licenses/Drill-media-ATTRIBUTION.md and owner release rights; do not imply live camera recognition",
+    "fonts": "assets/licenses/NotoSansSC-OFL.txt"
+  },
+  "captureEvidenceRequired": [
+    "sourceCommit",
+    "applicationId",
+    "versionName",
+    "versionCode",
+    "signerFingerprint",
+    "captureDate",
+    "deviceClassNotSerial",
+    "viewport",
+    "rawFileHash",
+    "finalFileHash",
+    "anyPaddingOrCropDisclosure"
+  ]
+}
