@@ -1,23 +1,25 @@
 # Play 表单答案草稿
 
-适用范围：`release/1.0` 的 **无 AI、无远程素材地址、无上传服务**基础候选。不是对后续联网版本或 `main` 将来功能的声明。填表前须以最终 AAB/真机回执复核；本轮没有在 Play 后台进行任何操作。
+适用范围：`release/1.0` 的 `1.0.0+24` 候选，界面和功能恢复已验收 `main@f5332bf`，仅不注入 API Key。原 AI 入口、设置、设备 UUID、本地规则回退和系统默认备份保留。本轮没有在 Play 后台进行任何操作。
 
 ## Data safety
 
 | 问题 / 数据项 | 草稿答案 | 依据与边界 |
 |---|---|---|
-| 是否收集或分享用户数据 | **否**，仅在最终候选满足上述配置及禁用系统备份后成立 | 本地访问的数据未发离设备；本机 WebView 回环请求不是开发者收到用户数据 |
-| 健康信息 / 健身信息 | 不向开发者或第三方收集、分享 | 安全筛查只保存完成/限制训练两个状态；计划、训练时间和完成数据留在本机。隐私政策仍须解释这些本地处理 |
-| 个人信息、财务信息、位置、联系人、照片/视频、音频文件、消息、浏览记录 | 不收集、不分享 | 无账号、支付、定位、通信、照片选择或录音采集功能。内置音视频素材不是用户音视频采集 |
-| 应用活动、诊断和设备标识 | 不收集、不分享 | production 不开放内部性能/运行日志导出，也未接入远程行为统计或崩溃 SDK；无 AI 配置时不创建 AI 请求设备 ID |
-| 传输中加密 | 不适用；无用户数据外传时按表单实际跳题处理 | 不为“本地回环 HTTP”虚构 TLS，也不勾选不存在的公网传输 |
+| 是否收集或分享用户数据 | **待按下述系统备份规则确定，不能仅因 key 为空自动选“否”** | 未发现本候选启用向开发者 AI 服务发送数据的请求；但默认系统备份/迁移可能将应用数据发离当前设备 |
+| 健康信息 / 健身信息 | App 直接处理在本机；系统备份范围需计入判断 | 原安全对话可能保存题目/答案，另有最终状态、计划和训练结果，不能写“不保存逐题回答” |
+| 账号、财务、位置、联系人、用户照片/录音等 | 未发现这些对应采集功能 | 内置示范/音频不是采集用户影像或录音；原对话内容和系统备份按上列单独说明，不能把所有消息数据一概忽略 |
+| 应用活动、诊断和设备标识 | 无启用的 AI/统计上传；本地 UUID、近期对话、记忆设置和系统备份需如实考虑 | UUID 仍会生成，本地 AI 记忆及其开关仍保留；production 内部诊断功能遵循原版构建能力 |
+| 传输中加密 | App 回环请求不等于公网 TLS；系统备份依平台条件判断 | 不把所有 Android/厂商备份一概声明成端到端加密，也不将未确认的外传路径直接填“不适用” |
 | 用户是否创建账号 / 使用第三方账号 | 无账号创建或登录 | 不需要提供测试账号或账号删除网址 |
-| 数据删除 | 本地记录由用户清除应用存储或卸载删除；无服务器账户可删 | 如果表单仍要求删除说明，填本地删除方法，不能声称提供尚不存在的云端删除接口 |
+| 数据删除 | 清除应用存储/卸载处理本地数据，系统备份需通过相应平台设置管理 | 新对话/清除记忆不等于删除全部训练结果；不提供虚构的开发者云端删除接口 |
 | 安全审查、加密认证或徽章 | 不声明通过任何独立认证 | 当前没有相应证书/审核证据 |
 
-Google 对只在设备处理且不发离设备的信息与“收集”的区分见[官方 Data safety 指南](https://support.google.com/googleplay/android-developer/answer/10787469?hl=en)。仍须考虑所有已打包 SDK，而不只 App 自己的 Dart 代码。
+Google 的本地处理豁免以数据不发离设备为前提；端到端加密豁免要求开发者和中间方均不能读取内容，不能自动套用于每个系统和厂商备份。[官方 Data safety 指南](https://support.google.com/googleplay/android-developer/answer/10787469?hl=en)与[Android Auto Backup](https://developer.android.com/identity/data/autobackup)是本草稿依据。默认备份可能包括 SharedPreferences 和应用文件；是否发生由系统、用户设置和设备条件决定。
 
-未来如开启 AI、远程素材、同步、统计或诊断上传，需先重新核对数据类别、服务商、用途和传输，更新政策及 Data safety；不能沿用本表的“否”。
+可审阅的备份填表分支：若相关数据确会离设备且不满足官方豁免，按实际范围申报安全问答对应的健康信息、训练结果对应的健身信息、近期对话/偏好对应的应用活动、UUID 对应的设备标识；用途为功能和备份恢复，备份是否可选按用户系统设置填写。若平台实际满足官方端到端不可读等豁免，记录具体依据后再使用相应豁免。当前没有替开哥确认所有分发设备的备份实践，不擅自替全局问题勾“无收集”。
+
+未来如注入有效 AI key 或启用其他远程服务，需另按实际数据、服务商和用途更新声明；本次仅为空 key 原版打包，不因此修改原界面或新增功能。
 
 ## 权限与 API
 
@@ -43,7 +45,7 @@ Google 对只在设备处理且不发离设备的信息与“收集”的区分�
 |---|---|
 | FGS 类型 / 具体用途 | **Media Playback / 媒体播放**：用户主动开始一次带语音/提示音的健身跟练，锁屏或切到后台时继续播放指导。不要改报并未声明的 health、dataSync、location、microphone 或 full-screen intent |
 | 对应 App 核心功能 | 动作/套路跟练中的本地指导音频和计时；不用于广告、自动启动的背景配乐或常驻联网 |
-| 用户如何启动 | 首页选动作或套路 → 完成安全确认 → 计划页点击开始跟练 → 进入 SDK 训练播放器。不是在 App 冷启动或开机时自动播放 |
+| 用户如何启动 | 在原对话首页完成安全确认 → 按原规则/模板准备计划或浏览动作 → 计划页点击开始跟练 → SDK 训练播放器。不是在 App 冷启动或开机时自动播放 |
 | 若服务延迟启动 | 用户已按开始，但开场提示/训练节奏不能按预期即时开始；不能将一段当前进行的指导播放当成可延后的后台任务 |
 | 若系统中断 | 语音提示或提示音可能断开，锁屏/后台的会话时序也可能受调度影响，用户可能错过换动作/结束提示。这是使用理由，不是本轮已经量化证明的全部后台行为 |
 | 用户如何察觉和停止 | 播放器显示进度并播放指导；SDK 创建“训练进行中”的持续通知和媒体会话。用户可返回 App 暂停/结束训练；结束、不适停止、离开播放器或销毁页面时释放服务，结束语允许短暂尾音后释放。移除任务时服务 `stopWithTask=true`。通知上的外部播放按钮未实现，不要声称可直接从通知暂停/停止 |
@@ -80,7 +82,7 @@ Google 要求 Android 14+ 的已用 FGS 类型提供用途、延迟/中断影响
 
 | 项目 | 草稿答案 / 需开哥确定的部分 |
 |---|---|
-| 应用访问权限 / App access | 所有本版本核心功能无需登录；无凭据。训练先完成安全确认；风险回答“是”会保守限制训练，不得指导审核员虚假回答健康问题 |
+| 应用访问权限 / App access | 无需登录，无凭据。原对话首页完成安全确认后使用本地规则/模板进入计划和训练；AI 入口保留可见但无 key 不提供在线 AI 回复。不得指导审核员虚假回答健康问题 |
 | 广告 | 不含广告 |
 | 应用内购买 / 订阅 | 无 |
 | 社区 / 用户互动 / UGC 分享 | 无公开社区、用户间聊天、发布或交换内容 |
@@ -95,8 +97,8 @@ Google 要求 Android 14+ 的已用 FGS 类型提供用途、延迟/中断影响
 
 中文版：
 
-> SmartFit 1.0 为无需账号的基础健身跟练版。首页可选择动作或固定训练套路。首次开始训练前会展示安全说明及四项风险确认；安全状态不允许训练时仍可浏览示范。正常流程为选择动作/套路、开始跟练、完成后查看本地训练记录。此版本不开放聊天或联网生成，不提供付费订阅。所有审核步骤均可在 App 内正常进入。
+> SmartFit 1.0.0+24 沿用已验收版本的原对话首页、动作库、计划和训练播放器，无需账号。首次在对话中完成安全说明及风险确认后，可使用本地规则和模板安排计划并跟练。原 AI 入口与设置保留可见，本候选不提供在线 AI 回复；请沿实际可用的本地计划、动作示范和训练路径验收。无付费订阅。
 
 English:
 
-> SmartFit 1.0 is an account-free basic workout app. Choose an exercise or a fixed routine from the home screen, review the safety information, and complete the safety check before starting training. If training is restricted by the safety check, demonstrations remain available for browsing. The normal flow is selection, timed practice, completion, and local workout history. This version has no chat, online generation, or subscription. The current interface and voice guidance are primarily in Simplified Chinese.
+> SmartFit 1.0.0+24 retains the accepted conversational home, exercise library, plans, and workout player. No account is required. Complete the original safety conversation, then use local rules and templates to prepare and follow a workout. Existing AI entrances and settings remain visible, but online AI replies are not provided by this candidate. Review the available local planning, demonstration, and workout flow. There is no subscription. The interface and voice guidance are primarily in Simplified Chinese.

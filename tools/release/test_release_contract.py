@@ -1,5 +1,6 @@
 """Release identity and platform configuration contracts; no credentials read."""
 import re
+import subprocess
 import unittest
 from pathlib import Path
 from xml.etree import ElementTree as ET
@@ -34,19 +35,16 @@ class ReleaseContractTest(unittest.TestCase):
 
     def test_launcher_name_matches_store_identity(self):
         strings = ET.parse(ROOT / "android/app/src/main/res/values/strings.xml").getroot()
-        self.assertEqual(strings.find("string[@name='app_name']").text, "SmartFit")
+        self.assertEqual(strings.find("string[@name='app_name']").text, "智能健身助手")
 
-    def test_android_backup_is_disabled(self):
-        app = ET.parse(ROOT / "android/app/src/main/AndroidManifest.xml").getroot().find("application")
-        self.assertEqual(app.get(ANDROID + "allowBackup"), "false")
-        self.assertEqual(app.get(ANDROID + "fullBackupContent"), "false")
-        rules = ET.parse(ROOT / "android/app/src/main/res/xml/data_extraction_rules.xml").getroot()
-        required = {"root", "file", "database", "sharedpref", "device_root", "device_file",
-                    "device_database", "device_sharedpref", "external"}
-        for scope in ("cloud-backup", "device-transfer"):
-            exclusions = rules.find(scope).findall("exclude")
-            self.assertEqual({item.get("domain") for item in exclusions}, required)
-            self.assertTrue(all(item.get("path") == "." for item in exclusions))
+    def test_app_runtime_and_assets_match_the_accepted_version(self):
+        changed = subprocess.run(
+            ["git", "diff", "--name-only", "f5332bfe3746ecbf69d3f5e48c71ba5c90812499", "--",
+             "lib", "assets", "android/app/src/main/AndroidManifest.xml",
+             "android/app/src/main/res/values/strings.xml", "ios/Runner/Info.plist"],
+            cwd=ROOT, capture_output=True, text=True, check=True,
+        ).stdout.splitlines()
+        self.assertEqual(changed, ["lib/app/build_info.dart"])
 
     def test_ios_production_scheme_has_matching_configurations(self):
         project = (ROOT / "ios/Runner.xcodeproj/project.pbxproj").read_text(encoding="utf-8")

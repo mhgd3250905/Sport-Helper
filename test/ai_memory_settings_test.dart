@@ -51,10 +51,7 @@ AppServices _services(_Storage storage, {AppStore? store, bool ai = false}) {
           )
         : null,
     aiConfig: ai
-        ? const AiCoachConfig(
-            token: 'memory-test-only',
-            baseUrl: 'https://fixture.invalid/v1',
-          )
+        ? const AiCoachConfig(token: 'memory-test-only')
         : const AiCoachConfig(),
     deviceId: ai ? '7a318be8-d0b7-4c83-8b7a-2a5aaecf9f66' : null,
     chatReplyDelay: Duration.zero,
@@ -147,7 +144,7 @@ void main() {
     tester,
   ) async {
     final storage = _Storage();
-    final s = _services(storage, ai: true);
+    final s = _services(storage);
     await s.store.aiMemoryStore.save([
       coach.MemoryEntry(
         coach.MemoryKind.equipment,
@@ -178,7 +175,7 @@ void main() {
     tester,
   ) async {
     final storage = _Storage();
-    final s = _services(storage, ai: true);
+    final s = _services(storage);
     await s.store.aiMemoryStore.save([
       coach.MemoryEntry(
         coach.MemoryKind.level,
@@ -204,7 +201,7 @@ void main() {
     tester,
   ) async {
     final storage = _Storage()..failWriteKey = AppStore.key;
-    final s = _services(storage, ai: true);
+    final s = _services(storage);
     await _show(tester, s);
     final toggle = find.byKey(const ValueKey('ai-memory-switch'));
     await tester.tap(toggle);

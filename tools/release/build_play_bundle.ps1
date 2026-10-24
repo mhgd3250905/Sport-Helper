@@ -34,6 +34,11 @@ try {
   }
   $source = (& git rev-parse HEAD).Trim()
   if ($LASTEXITCODE -ne 0) { throw 'Cannot identify release source.' }
+  $acceptedSource = 'f5332bfe3746ecbf69d3f5e48c71ba5c90812499'
+  $appDifferences = @(& git diff --name-only $acceptedSource -- lib assets)
+  if ($appDifferences.Count -ne 1 -or $appDifferences[0] -ne 'lib/app/build_info.dart') {
+    throw 'The accepted App interface and business logic must remain unchanged; only version identity may differ.'
+  }
   $pubspec = [IO.File]::ReadAllText((Join-Path $projectRoot 'pubspec.yaml'))
   $version = [regex]::Match($pubspec, '(?m)^version:\s*(1\.0\.0)\+(\d+)\s*$')
   if (-not $version.Success -or [int]$version.Groups[2].Value -le 22) {
@@ -73,6 +78,8 @@ try {
   Copy-Item -LiteralPath $builtBundle -Destination $outputBundle
   $manifest = [ordered]@{
     sourceCommit = $source
+    acceptedRuntimeBaseline = $acceptedSource
+    appInterfaceAndBusinessLogic = 'unchanged from the user-accepted baseline'
     applicationId = 'com.ugk.smartfit'
     versionName = $buildName
     versionCode = [int]$buildNumber
@@ -90,7 +97,7 @@ try {
   $manifest | ConvertTo-Json -Depth 6 | Set-Content `
     -LiteralPath (Join-Path $OutputDirectory 'build-manifest.json') -Encoding utf8NoBOM
   Write-Output "Signed base-edition bundle: $outputBundle"
-  Write-Output "Source: $source; version: $buildName+$buildNumber; AI configuration: absent."
+  Write-Output "Source: $source; version: $buildName+$buildNumber; API key: not supplied."
 } finally {
   foreach ($variable in $isolatedVariables) {
     [Environment]::SetEnvironmentVariable($variable, $savedEnvironment[$variable], 'Process')

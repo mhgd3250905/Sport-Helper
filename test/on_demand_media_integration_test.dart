@@ -40,7 +40,6 @@ class _Output extends MutedVoiceOutput {
 
 Future<trainer.TrainingMediaRepository> _repository({
   bool pending = true,
-  List<Uri> baseUrls = const [],
   trainer.TrainingMediaNetworkProbe? probe,
   void Function(Directory directory)? onCacheDirectory,
 }) async {
@@ -51,7 +50,7 @@ Future<trainer.TrainingMediaRepository> _repository({
   addTearDown(() => directory.delete(recursive: true));
   final media = await trainer.TrainingMediaRepository.create(
     manifestAsset: TrainingMediaConfig.manifestAsset,
-    baseUrls: baseUrls,
+    baseUrls: const [],
     allowPending: pending,
     cacheDirectory: directory.path,
     networkProbe: probe ?? () async => trainer.TrainingMediaNetwork.offline,
@@ -202,51 +201,35 @@ void main() {
     },
   );
 
-  for (final network in [
-    trainer.TrainingMediaNetwork.offline,
-    trainer.TrainingMediaNetwork.wifi,
-  ]) {
-    test(
-      'App without a media source prefers bundled demonstration on ${network.name}',
-      () async {
-        final media = await _repository(probe: () async => network);
-        await media.canDownload();
-        final (library, _, voices, _) = await AppServices.loadContent(
-          media: media,
-        );
-        final services = AppServices(
-          library: library,
-          catalog: TemplateCatalog([_template('n-pelvis-circle')]),
-          store: AppStore(_Storage()),
-          voiceLibrary: voices,
-          voiceOutput: const MutedVoiceOutput(),
-          media: media,
-        );
-        expect(
-          media.isOffline,
-          network == trainer.TrainingMediaNetwork.offline,
-        );
-        expect(media.readyActionIds, isNot(contains('n-pelvis-circle')));
-        final result = await services.generator.generate(
-          const ScenarioRequest(scene: 'office', minutes: 5),
-        );
-        expect(result.issues, isEmpty);
-        expect(result.plan, isNotNull);
-        expect(
-          result.plan!.items.single.exerciseId,
-          isIn(media.readyActionIds),
-        );
-        expect(result.plan!.items.single.replacedFrom, 'n-pelvis-circle');
-        expect(
-          PlanValidator(library).validate(
-            result.plan!,
-            const ScenarioRequest(scene: 'office', minutes: 5),
-          ),
-          isEmpty,
-        );
-      },
+  test('offline App generator prefers a bundled demonstration', () async {
+    final media = await _repository();
+    await media.canDownload();
+    final (library, _, voices, _) = await AppServices.loadContent(media: media);
+    final services = AppServices(
+      library: library,
+      catalog: TemplateCatalog([_template('n-pelvis-circle')]),
+      store: AppStore(_Storage()),
+      voiceLibrary: voices,
+      voiceOutput: const MutedVoiceOutput(),
+      media: media,
     );
-  }
+    expect(media.isOffline, isTrue);
+    expect(media.readyActionIds, isNot(contains('n-pelvis-circle')));
+    final result = await services.generator.generate(
+      const ScenarioRequest(scene: 'office', minutes: 5),
+    );
+    expect(result.issues, isEmpty);
+    expect(result.plan, isNotNull);
+    expect(result.plan!.items.single.exerciseId, isIn(media.readyActionIds));
+    expect(result.plan!.items.single.replacedFrom, 'n-pelvis-circle');
+    expect(
+      PlanValidator(library).validate(
+        result.plan!,
+        const ScenarioRequest(scene: 'office', minutes: 5),
+      ),
+      isEmpty,
+    );
+  });
 
   group('offline preference preserves scenario constraints', () {
     final request = const ScenarioRequest(
@@ -312,7 +295,6 @@ void main() {
       var holdDownloads = false;
       var pendingProbes = 0;
       final media = await _repository(
-        baseUrls: [Uri.parse('https://fixture.invalid/media/')],
         probe: () async {
           if (!holdDownloads) return trainer.TrainingMediaNetwork.wifi;
           pendingProbes++;
@@ -388,7 +370,6 @@ void main() {
     int? holdFromProbe;
     final media = (await tester.runAsync(
       () => _repository(
-        baseUrls: [Uri.parse('https://fixture.invalid/media/')],
         probe: () async {
           probes++;
           return holdFromProbe == null || probes < holdFromProbe
@@ -481,40 +462,12 @@ void main() {
     await tester.pumpWidget(const SizedBox());
   });
 
-  testWidgets('media settings without a source expose no download controls', (
-    tester,
-  ) async {
-    final media = (await tester.runAsync(() => _repository()))!;
-    final services = AppServices(
-      library: loadLibrary(),
-      catalog: loadCatalog(),
-      store: AppStore(_Storage()),
-      voiceLibrary: loadVoices(),
-      voiceOutput: const MutedVoiceOutput(),
-      media: media,
-    );
-    await _open(
-      tester,
-      services,
-      const Scaffold(
-        body: SingleChildScrollView(child: TrainingMediaSettings()),
-      ),
-    );
-    expect(find.text('内置动作素材'), findsOneWidget);
-    expect(find.byKey(const ValueKey('media-wifi-only')), findsNothing);
-    expect(find.byKey(const ValueKey('media-download-default')), findsNothing);
-    expect(find.byKey(const ValueKey('media-clear-cache')), findsOneWidget);
-    expect(find.textContaining('其余示范按计划下载'), findsNothing);
-    await tester.pumpWidget(const SizedBox());
-  });
-
   testWidgets(
     'media settings persist Wi-Fi policy and preserve user data on clear',
     (tester) async {
       late Directory cacheDirectory;
       final media = (await tester.runAsync(
         () => _repository(
-          baseUrls: [Uri.parse('https://fixture.invalid/media/')],
           onCacheDirectory: (directory) => cacheDirectory = directory,
         ),
       ))!;

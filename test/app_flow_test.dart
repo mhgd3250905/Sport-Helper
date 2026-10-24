@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smartfit/app/services.dart';
-import 'package:smartfit/chat/ai_coach_config.dart';
 import 'package:smartfit/core/storage/local_state_storage.dart';
 import 'package:smartfit/data/app_store.dart';
 import 'package:smartfit/main.dart';
@@ -31,7 +30,7 @@ class MemoryStorage implements LocalStateStorage {
   Future<void> write(String key, String value) async => data[key] = value;
 }
 
-AppServices services({VoiceOutput output = const MutedVoiceOutput(), bool ai = true}) {
+AppServices services({VoiceOutput output = const MutedVoiceOutput()}) {
   final store = AppStore(MemoryStorage())
     // A drifting sky never settles: keep it still so pumpAndSettle can.
     ..starfield = false;
@@ -42,10 +41,6 @@ AppServices services({VoiceOutput output = const MutedVoiceOutput(), bool ai = t
     voiceLibrary: VoiceLibrary.empty,
     voiceOutput: output,
     chatReplyDelay: Duration.zero,
-    // Chat UI regressions opt in explicitly; no profile/identity means no HTTP.
-    aiConfig: ai
-        ? const AiCoachConfig(token: 'chat-ui-fixture', baseUrl: 'https://fixture.invalid/v1')
-        : const AiCoachConfig(),
   );
 }
 

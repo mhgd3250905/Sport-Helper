@@ -1,6 +1,8 @@
 {
-  "status": "static_art_exported_device_captures_recorded_in_delivery_manifest",
-  "release": "1.0.0+23",
+  "status": "restored_main_interface_build24_captures_pending",
+  "release": "1.0.0+24",
+  "acceptedInterfaceBase": "f5332bfe3746ecbf69d3f5e48c71ba5c90812499",
+  "supersededCaptures": "Do not use build23 redesigned BasicHome screenshots; capture the restored original interface from build24",
   "rules": {
     "screenshotsMustBeActualAppCaptures": true,
     "allowInventedInterface": false,
@@ -30,31 +32,38 @@
   },
   "phoneScreenshots": [
     {
-      "scene": "Basic home with exercise selection and fixed routines",
-      "altZh": "SmartFit 首页的动作与训练套路入口",
-      "altEn": "SmartFit home with exercise selection and routines",
-      "status": "capture_from_signed_candidate",
+      "scene": "Original ChatHome with local conversation and plan choices",
+      "altZh": "SmartFit 原对话首页与本地训练计划选项",
+      "altEn": "The original SmartFit conversation home and local plan choices",
+      "status": "capture_from_signed_build24",
+      "finalPath": null
+    },
+    {
+      "scene": "Original plan card or plan detail prepared through local rules",
+      "altZh": "通过本地规则安排的训练计划",
+      "altEn": "A workout plan prepared using local rules",
+      "status": "capture_from_signed_build24",
       "finalPath": null
     },
     {
       "scene": "Exercise library with actual available movements",
       "altZh": "动作库中的健身与拉伸示范",
       "altEn": "The exercise library with fitness and stretching demonstrations",
-      "status": "capture_from_signed_candidate",
+      "status": "capture_from_signed_build24",
       "finalPath": null
     },
     {
       "scene": "Workout in progress, using only demonstration test data",
       "altZh": "动作跟练中的示范和计时",
       "altEn": "An exercise demonstration and workout timer",
-      "status": "capture_from_signed_candidate",
+      "status": "capture_from_signed_build24",
       "finalPath": null
     },
     {
       "scene": "Completed workout and local result",
       "altZh": "完成训练后的本地结果",
       "altEn": "The local result after completing a workout",
-      "status": "capture_from_signed_candidate",
+      "status": "capture_from_signed_build24",
       "finalPath": null
     }
   ],
@@ -65,7 +74,7 @@
     ],
     "format": "JPEG without alpha",
     "content": "Only actual app captures and approved artwork; no ranking, awards, pricing badge or unavailable feature claims",
-    "status": "draft_exported_and_visually_checked",
+    "status": "existing_draft_review_against_restored_interface",
     "finalPath": "docs/store/1.0.0/assets/feature-graphic-zh-CN.jpg",
     "sha256": "265358996deb8e56f3f6d006ed4ca47b48198ccde71bf520f327d7a6710b8048",
     "englishPath": "docs/store/1.0.0/assets/feature-graphic-en-US.jpg",

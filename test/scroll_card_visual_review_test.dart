@@ -11,7 +11,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:smartfit/app/services.dart';
-import 'package:smartfit/chat/ai_coach_config.dart';
 import 'package:smartfit/chat/chat_models.dart';
 import 'package:smartfit/data/app_store.dart';
 import 'package:smartfit/diagnostics/performance_lab.dart';
@@ -133,7 +132,6 @@ Future<AppServices> _services(String theme) async {
     voiceLibrary: VoiceLibrary.empty,
     voiceOutput: const MutedVoiceOutput(),
     chatReplyDelay: Duration.zero,
-    aiConfig: const AiCoachConfig(token: 'chat-ui-fixture', baseUrl: 'https://fixture.invalid/v1'),
   );
   final chat = services.chat..start();
   final today = DateTime.now();

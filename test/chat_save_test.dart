@@ -130,8 +130,7 @@ void main() {
     test('first launch: disclaimer → four 否 → accepted, plans allowed', () async {
       final (c, store) = await fresh();
       expect(c.inSafetyCheck, isTrue);
-      expect(c.messages.last.text, contains('不是医疗器械'));
-      expect(c.messages.last.text, contains('不诊断、治疗、治愈或预防任何疾病'));
+      expect(c.messages.last.text, contains('不是医疗诊断'));
       await c.choose(open(c), 0); // 我已了解
       for (var i = 0; i < 4; i++) {
         expect(open(c).text, startsWith('${i + 1}/4'));

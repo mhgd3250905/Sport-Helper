@@ -11,11 +11,10 @@ import 'performance_settings.dart';
 import 'runtime_log_settings.dart';
 import 'theme.dart';
 import 'training_media_settings.dart';
-import 'safety_check_page.dart';
 
 const appVersion = TrainingMediaConfig.isInternal
     ? '${AppBuildInfo.version} (内测)'
-    : AppBuildInfo.version;
+    : '${AppBuildInfo.version} (MVP)';
 
 class AboutPage extends StatelessWidget {
   const AboutPage({super.key});
@@ -92,10 +91,8 @@ class AboutPage extends StatelessWidget {
               const SfSectionTitle('动作素材'),
               const SfPanel(child: TrainingMediaSettings()),
             ],
-            if (s.aiConfig.enabled) ...[
-              const SfSectionTitle('AI 记忆'),
-              const SfPanel(child: _AiMemorySettings()),
-            ],
+            const SfSectionTitle('AI 记忆'),
+            const SfPanel(child: _AiMemorySettings()),
             if (FrameRecorder.buildEnabled) ...[
               const SfSectionTitle('性能'),
               SfPanel(
@@ -117,29 +114,18 @@ class AboutPage extends StatelessWidget {
               const SfSectionTitle('运行日志'),
               const SfPanel(child: RuntimeLogSettings()),
             ],
-            SfSectionTitle(s.aiConfig.enabled ? '隐私与 AI' : '隐私政策'),
+            const SfSectionTitle('隐私与 AI'),
             SfPanel(
               child: Text(
-                s.aiConfig.enabled
-                    ? '启用 AI 时，你输入的内容、近期对话、当前计划和训练条件会经 '
-                          '${s.aiConfig.baseUrl} '
-                          '发送给 AI 服务，用于生成回复与训练计划。\n\n'
-                          'AI 记忆保存在本机；开启时，记住的训练条件会随请求发送给 AI 服务。'
-                          '可随时关闭或清除记忆。\n\n'
-                          'App 在本机随机生成并保存设备标识，随 AI 请求发送，用于服务器限流：'
-                          '每个设备每 10 分钟最多 30 次请求，限制由服务器执行。\n\n'
-                          '训练记录和已保存计划保存在本机。断网、请求超时或生成结果校验未通过时，'
-                          '使用本地模板生成训练计划。'
-                    : 'SmartFit 基础版在本机保存训练记录、完成进度、计划和设置。'
-                          '安全确认只保存是否完成及是否限制训练，不保存逐题回答。\n\n'
-                          '无需注册账号。本版本不包含广告、用户行为统计或远程崩溃上报，'
-                          '不启用联网生成或远程素材下载服务。动作视频通过设备内的回环服务播放，'
-                          '不因此上传你的训练记录。\n\n'
-                          'Android 训练会话使用本地媒体前台服务与唤醒锁，支持语音、提示音和计时；'
-                          '完成或退出训练后释放。系统训练通知的展示受设备设置影响。\n\n'
-                          '清除应用存储或卸载可删除本地记录；仅清理动作素材缓存不会删除训练记录。'
-                          'Android 版本已关闭系统云备份和设备迁移备份；其他平台可能受系统备份设置影响。\n\n'
-                          '隐私与支持联系：mhgd3250905@gmail.com',
+                '启用 AI 时，你输入的内容、近期对话、当前计划和训练条件会经 '
+                'https://api.uuugk.win/v1 '
+                '发送给 AI 服务，用于生成回复与训练计划。\n\n'
+                'AI 记忆保存在本机；开启时，记住的训练条件会随请求发送给 AI 服务。'
+                '可随时关闭或清除记忆。\n\n'
+                'App 在本机随机生成并保存设备标识，随 AI 请求发送，用于服务器限流：'
+                '每个设备每 10 分钟最多 30 次请求，限制由服务器执行。\n\n'
+                '训练记录和已保存计划保存在本机。断网、请求超时或生成结果校验未通过时，'
+                '使用本地模板生成训练计划。',
                 style: SfType.body.copyWith(
                   fontSize: 14.5,
                   color: SfColors.muted,
@@ -166,12 +152,8 @@ class AboutPage extends StatelessWidget {
                     label: '重新做安全确认',
                     // Back to the chat, where the safety talk runs again.
                     onPressed: () {
-                      if (s.aiConfig.enabled) {
-                        Navigator.of(context).popUntil((r) => r.isFirst);
-                        s.chat.startSafetyCheck();
-                      } else {
-                        showSafetyCheck(context, restart: true);
-                      }
+                      Navigator.of(context).popUntil((r) => r.isFirst);
+                      s.chat.startSafetyCheck();
                     },
                   ),
                 ],
@@ -222,7 +204,7 @@ class AboutPage extends StatelessWidget {
                     title: '开源软件许可',
                     onTap: () => showLicensePage(
                       context: context,
-                      applicationName: 'SmartFit',
+                      applicationName: '智能健身助手',
                       applicationVersion: appVersion,
                     ),
                   ),

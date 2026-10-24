@@ -83,7 +83,7 @@ def inspect(bundle, java, bundletool, expected_build):
         "com.ugk.smartfit", "1.0.0", expected_build
     ):
         report["issues"].append("release_identity_mismatch")
-    if report["debuggable"] or report["allowBackup"] or report["targetSdk"] < 36:
+    if report["debuggable"] or report["targetSdk"] < 36:
         report["issues"].append("release_manifest_contract_failed")
     if set(report["permissions"]) - allowed_permissions:
         report["issues"].append("unexpected_permissions")
@@ -122,7 +122,7 @@ if __name__ == "__main__":
     parser.add_argument("bundle", type=Path)
     parser.add_argument("--java", required=True)
     parser.add_argument("--bundletool", required=True)
-    parser.add_argument("--build", type=int, default=23)
+    parser.add_argument("--build", type=int, default=24)
     parser.add_argument("--report", required=True, type=Path)
     args = parser.parse_args()
     result = inspect(args.bundle.resolve(), args.java, args.bundletool, args.build)

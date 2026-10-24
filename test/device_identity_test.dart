@@ -109,10 +109,9 @@ void main() {
     () async {
       final client = const AiCoachConfig(
         token: ' fixture-app-key ',
-        baseUrl: 'https://fixture.invalid/v1',
       ).createClient(deviceId: 'ea2c6891-654f-431b-a1f4-11a9a3e03bea');
       addTearDown(client.close);
-      expect(client.config.baseUrl, 'https://fixture.invalid/v1');
+      expect(client.config.baseUrl, 'https://api.uuugk.win/v1');
       expect(client.model, 'deepseek-v4-flash-0731');
       expect(client.config.maxRetries, 0);
       expect(client.config.timeout, const Duration(seconds: 120));
