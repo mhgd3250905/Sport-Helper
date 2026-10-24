@@ -877,12 +877,12 @@
 		331C8087294A63A400263BE5 /* Build configuration list for PBXNativeTarget "RunnerTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				331C8088294A63A400263BE5 /* Debug */,249021D4217E4FDB00AE95B9 /* Profile */,249021D3217E4FDB00AE95B9 /* Profile */,
-				D1ACA5549955412B8A944DB8 /* Profile-production */,				D108409E82064E1BBBA8F235 /* Profile-production */,				7465CD18FA024766B6BB5C0C /* Debug-production */,
-				331C8089294A63A400263BE5 /* Release */,331C8088294A63A400263BE5 /* Debug */,249021D4217E4FDB00AE95B9 /* Profile */,249021D3217E4FDB00AE95B9 /* Profile */,
-				D1ACA5549955412B8A944DB8 /* Profile-production */,				D108409E82064E1BBBA8F235 /* Profile-production */,				7465CD18FA024766B6BB5C0C /* Debug-production */,				9C19D5E9CF1A428081B7BF2F /* Release-production */,
-				331C808A294A63A400263BE5 /* Profile */,331C8089294A63A400263BE5 /* Release */,331C8088294A63A400263BE5 /* Debug */,249021D4217E4FDB00AE95B9 /* Profile */,249021D3217E4FDB00AE95B9 /* Profile */,
-				D1ACA5549955412B8A944DB8 /* Profile-production */,				D108409E82064E1BBBA8F235 /* Profile-production */,				7465CD18FA024766B6BB5C0C /* Debug-production */,				9C19D5E9CF1A428081B7BF2F /* Release-production */,				6FB03182FF9F4462B3A597EA /* Profile-production */,
+				331C8088294A63A400263BE5 /* Debug */,
+				7465CD18FA024766B6BB5C0C /* Debug-production */,
+				331C8089294A63A400263BE5 /* Release */,
+				9C19D5E9CF1A428081B7BF2F /* Release-production */,
+				331C808A294A63A400263BE5 /* Profile */,
+				6FB03182FF9F4462B3A597EA /* Profile-production */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -890,10 +890,10 @@
 		97C146E91CF9000F007C117D /* Build configuration list for PBXProject "Runner" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				97C147031CF9000F007C117D /* Debug */,331C808A294A63A400263BE5 /* Profile */,331C8089294A63A400263BE5 /* Release */,331C8088294A63A400263BE5 /* Debug */,249021D4217E4FDB00AE95B9 /* Profile */,249021D3217E4FDB00AE95B9 /* Profile */,
-				D1ACA5549955412B8A944DB8 /* Profile-production */,				D108409E82064E1BBBA8F235 /* Profile-production */,				7465CD18FA024766B6BB5C0C /* Debug-production */,				9C19D5E9CF1A428081B7BF2F /* Release-production */,				6FB03182FF9F4462B3A597EA /* Profile-production */,				1D61C1D502F845C194C8AA6E /* Debug-production */,
-				97C147041CF9000F007C117D /* Release */,97C147031CF9000F007C117D /* Debug */,331C808A294A63A400263BE5 /* Profile */,331C8089294A63A400263BE5 /* Release */,331C8088294A63A400263BE5 /* Debug */,249021D4217E4FDB00AE95B9 /* Profile */,249021D3217E4FDB00AE95B9 /* Profile */,
-				D1ACA5549955412B8A944DB8 /* Profile-production */,				D108409E82064E1BBBA8F235 /* Profile-production */,				7465CD18FA024766B6BB5C0C /* Debug-production */,				9C19D5E9CF1A428081B7BF2F /* Release-production */,				6FB03182FF9F4462B3A597EA /* Profile-production */,				1D61C1D502F845C194C8AA6E /* Debug-production */,				9FAFC1E6A51E44B7AA260C56 /* Release-production */,
+				97C147031CF9000F007C117D /* Debug */,
+				1D61C1D502F845C194C8AA6E /* Debug-production */,
+				97C147041CF9000F007C117D /* Release */,
+				9FAFC1E6A51E44B7AA260C56 /* Release-production */,
 				249021D3217E4FDB00AE95B9 /* Profile */,
 				D1ACA5549955412B8A944DB8 /* Profile-production */,
 			);
@@ -903,12 +903,12 @@
 		97C147051CF9000F007C117D /* Build configuration list for PBXNativeTarget "Runner" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				97C147061CF9000F007C117D /* Debug */,97C147041CF9000F007C117D /* Release */,97C147031CF9000F007C117D /* Debug */,331C808A294A63A400263BE5 /* Profile */,331C8089294A63A400263BE5 /* Release */,331C8088294A63A400263BE5 /* Debug */,249021D4217E4FDB00AE95B9 /* Profile */,249021D3217E4FDB00AE95B9 /* Profile */,
-				D1ACA5549955412B8A944DB8 /* Profile-production */,				D108409E82064E1BBBA8F235 /* Profile-production */,				7465CD18FA024766B6BB5C0C /* Debug-production */,				9C19D5E9CF1A428081B7BF2F /* Release-production */,				6FB03182FF9F4462B3A597EA /* Profile-production */,				1D61C1D502F845C194C8AA6E /* Debug-production */,				9FAFC1E6A51E44B7AA260C56 /* Release-production */,				FD2EEEA3161848F5868F4FD7 /* Debug-production */,
-				97C147071CF9000F007C117D /* Release */,97C147061CF9000F007C117D /* Debug */,97C147041CF9000F007C117D /* Release */,97C147031CF9000F007C117D /* Debug */,331C808A294A63A400263BE5 /* Profile */,331C8089294A63A400263BE5 /* Release */,331C8088294A63A400263BE5 /* Debug */,249021D4217E4FDB00AE95B9 /* Profile */,249021D3217E4FDB00AE95B9 /* Profile */,
-				D1ACA5549955412B8A944DB8 /* Profile-production */,				D108409E82064E1BBBA8F235 /* Profile-production */,				7465CD18FA024766B6BB5C0C /* Debug-production */,				9C19D5E9CF1A428081B7BF2F /* Release-production */,				6FB03182FF9F4462B3A597EA /* Profile-production */,				1D61C1D502F845C194C8AA6E /* Debug-production */,				9FAFC1E6A51E44B7AA260C56 /* Release-production */,				FD2EEEA3161848F5868F4FD7 /* Debug-production */,				5237A3F9CACE4142966C9227 /* Release-production */,
-				249021D4217E4FDB00AE95B9 /* Profile */,249021D3217E4FDB00AE95B9 /* Profile */,
-				D1ACA5549955412B8A944DB8 /* Profile-production */,				D108409E82064E1BBBA8F235 /* Profile-production */,
+				97C147061CF9000F007C117D /* Debug */,
+				FD2EEEA3161848F5868F4FD7 /* Debug-production */,
+				97C147071CF9000F007C117D /* Release */,
+				5237A3F9CACE4142966C9227 /* Release-production */,
+				249021D4217E4FDB00AE95B9 /* Profile */,
+				D108409E82064E1BBBA8F235 /* Profile-production */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

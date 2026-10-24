@@ -32,6 +32,10 @@ class ReleaseContractTest(unittest.TestCase):
         self.assertNotIn('signingConfigs.getByName("debug")', gradle)
         self.assertIn('signingConfigs.getByName("upload")', gradle)
 
+    def test_launcher_name_matches_store_identity(self):
+        strings = ET.parse(ROOT / "android/app/src/main/res/values/strings.xml").getroot()
+        self.assertEqual(strings.find("string[@name='app_name']").text, "SmartFit")
+
     def test_android_backup_is_disabled(self):
         app = ET.parse(ROOT / "android/app/src/main/AndroidManifest.xml").getroot().find("application")
         self.assertEqual(app.get(ANDROID + "allowBackup"), "false")
@@ -53,6 +57,60 @@ class ReleaseContractTest(unittest.TestCase):
         for config in configurations:
             self.assertEqual(project.count(f'name = "{config}";'), 3)
         self.assertIn("PRODUCT_BUNDLE_IDENTIFIER = com.ugk.smartfit;", project)
+
+    def test_ios_configuration_references_preserve_target_ownership(self):
+        project = (ROOT / "ios/Runner.xcodeproj/project.pbxproj").read_text(encoding="utf-8")
+        config_pattern = re.compile(
+            r"(?ms)^\t\t(?P<id>[A-F0-9]{24}) /\* "
+            r"(?P<name>(?:Debug|Release|Profile)(?:-production)?) \*/ = \{\n"
+            r"\t\t\tisa = XCBuildConfiguration;\n(?P<body>.*?)^\t\t\};"
+        )
+        definitions = {match["id"]: match.groupdict()
+                       for match in config_pattern.finditer(project)}
+        self.assertEqual(len(definitions), 18)
+        list_pattern = re.compile(
+            r"(?ms)^\t\t(?P<id>[A-F0-9]{24}) /\* [^\r\n]* \*/ = \{\n"
+            r"\t\t\tisa = XCConfigurationList;\n"
+            r"\t\t\tbuildConfigurations = \(\n(?P<refs>.*?)^\t\t\t\);"
+        )
+        # The pre-existing Project, Runner and RunnerTests ownership is fixed.
+        original_owners = {
+            "97C146E91CF9000F007C117D": {
+                "97C147031CF9000F007C117D", "97C147041CF9000F007C117D", "249021D3217E4FDB00AE95B9"},
+            "97C147051CF9000F007C117D": {
+                "97C147061CF9000F007C117D", "97C147071CF9000F007C117D", "249021D4217E4FDB00AE95B9"},
+            "331C8087294A63A400263BE5": {
+                "331C8088294A63A400263BE5", "331C8089294A63A400263BE5", "331C808A294A63A400263BE5"},
+        }
+        lists = list(list_pattern.finditer(project))
+        self.assertEqual({item["id"] for item in lists}, set(original_owners))
+        all_production_refs = []
+        for item in lists:
+            with self.subTest(configuration_list=item["id"]):
+                refs = re.findall(r"\b([A-F0-9]{24}) /\*", item["refs"])
+                self.assertEqual(len(refs), 6)
+                self.assertEqual(len(set(refs)), 6)
+                originals = {ref for ref in refs
+                             if not definitions[ref]["name"].endswith("-production")}
+                self.assertEqual(originals, original_owners[item["id"]])
+                production = {definitions[ref]["name"]: ref for ref in refs
+                              if definitions[ref]["name"].endswith("-production")}
+                self.assertEqual(set(production), {
+                    "Debug-production", "Release-production", "Profile-production"})
+                for ref in originals:
+                    original = definitions[ref]
+                    production_ref = production[original["name"] + "-production"]
+                    clone = definitions[production_ref]
+                    self.assertEqual(
+                        clone["body"].replace(
+                            f'name = "{clone["name"]}";', f'name = {original["name"]};'),
+                        original["body"],
+                    )
+                    all_production_refs.append(production_ref)
+        self.assertEqual(len(set(all_production_refs)), 9)
+        for ref in all_production_refs:
+            # Exactly one definition and one reference in the owning list.
+            self.assertEqual(len(re.findall(r"\b" + ref + r"\b", project)), 2)
 
     def test_build_helper_never_injects_ai_or_download_credentials(self):
         script = (ROOT / "tools/release/build_play_bundle.ps1").read_text(encoding="utf-8")

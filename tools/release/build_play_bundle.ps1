@@ -64,6 +64,10 @@ try {
     "--build-name=$buildName" "--build-number=$buildNumber" `
     "--dart-define=SMARTFIT_BUILD_SOURCE=$source"
   if ($LASTEXITCODE -ne 0) { throw 'Signed production app bundle build failed.' }
+  if ((& git rev-parse HEAD).Trim() -ne $source -or
+      @(& git status --porcelain=v1 --untracked-files=all).Count -ne 0) {
+    throw 'Source changed during the build; discard this intermediate bundle and rebuild the committed source.'
+  }
   $builtBundle = Join-Path $projectRoot 'build/app/outputs/bundle/productionRelease/app-production-release.aab'
   if (-not (Test-Path -LiteralPath $builtBundle)) { throw 'Expected signed bundle not found.' }
   Copy-Item -LiteralPath $builtBundle -Destination $outputBundle
