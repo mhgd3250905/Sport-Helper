@@ -5,7 +5,9 @@ import 'package:ugk_trainer/ugk_trainer.dart' show TrainingMediaPreviewPolicy;
 abstract final class TrainingMediaConfig {
   static const assetRoot = 'assets/training_media/v0.3.0-app';
   static const manifestAsset = '$assetRoot/app-manifest.json';
+  static const assetIndex = '$assetRoot/assets-index.json';
   static const videoRoot = 'assets/training_media/v0.3.0/realistic/dark';
+  static const lightVideoRoot = 'assets/training_media/v0.3.0/realistic/light';
 
   static const includePending =
       TrainingMediaPreviewPolicy.enabled &&

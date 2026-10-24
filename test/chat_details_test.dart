@@ -5,11 +5,14 @@ import 'package:smartfit/ui/about_page.dart';
 import 'package:smartfit/ui/chat/chat_home_page.dart';
 import 'package:smartfit/ui/plan_page.dart';
 import 'package:smartfit/ui/player_page.dart';
+import 'package:smartfit/ui/exercise_video.dart';
 
 import 'app_flow_test.dart' show services, tall;
 
 void main() {
-  testWidgets('appearance changes keep a pushed route and conversation state', (tester) async {
+  testWidgets('appearance changes keep a pushed route and conversation state', (
+    tester,
+  ) async {
     tall(tester);
     final s = services();
     await s.store.acceptSafety(blocked: false);
@@ -36,31 +39,47 @@ void main() {
     await tester.pumpWidget(const SizedBox());
   });
 
-  testWidgets('starting from chat details returns to chat and records recall and summary', (tester) async {
-    tall(tester);
-    final s = services();
-    await s.store.acceptSafety(blocked: false);
-    s.chat.start();
-    await s.chat.send('在办公室午休 10 分钟，肩颈很僵');
-    final plan = s.chat.currentPlan!;
-    await tester.pumpWidget(SmartFitApp(services: s));
-    await tester.pumpAndSettle();
-    await tester.tap(find.byKey(ValueKey('plan-open-${plan.id}')));
-    await tester.pumpAndSettle();
-    expect(find.byType(PlanPage), findsOneWidget);
-    await tester.tap(find.byKey(const ValueKey('start')));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 800));
-    expect(find.byType(PlayerPage), findsOneWidget);
-    expect(s.store.lastPlan?.id, plan.id);
-    await tester.tap(find.byKey(const ValueKey('close')));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('结束'));
-    await tester.pumpAndSettle();
-    expect(find.byType(PlanPage), findsNothing);
-    expect(find.byType(ChatHomePage), findsOneWidget);
-    expect(s.store.history, hasLength(1));
-    expect(s.chat.messages.last.text, contains('这次先到这儿'));
-    await tester.pumpWidget(const SizedBox());
-  });
+  testWidgets(
+    'starting from chat details returns to chat and records recall and summary',
+    (tester) async {
+      tall(tester);
+      final s = services();
+      await s.store.acceptSafety(blocked: false);
+      s.chat.start();
+      await s.chat.send('在办公室午休 10 分钟，肩颈很僵');
+      final plan = s.chat.currentPlan!;
+      await tester.pumpWidget(SmartFitApp(services: s));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(ValueKey('plan-open-${plan.id}')));
+      await tester.pumpAndSettle();
+      expect(find.byType(PlanPage), findsOneWidget);
+      await tester.tap(find.byKey(const ValueKey('start')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 50));
+      final retiringDetails = find.descendant(
+        of: find.byType(PlanPage, skipOffstage: false),
+        matching: find.byType(ExerciseVideo, skipOffstage: false),
+        skipOffstage: false,
+      );
+      expect(
+        tester
+            .widgetList<ExerciseVideo>(retiringDetails)
+            .every((v) => !v.playing),
+        isTrue,
+        reason: 'The old preview stops before the chat-owned trainer starts',
+      );
+      await tester.pump(const Duration(milliseconds: 800));
+      expect(find.byType(PlayerPage), findsOneWidget);
+      expect(s.store.lastPlan?.id, plan.id);
+      await tester.tap(find.byKey(const ValueKey('close')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('结束'));
+      await tester.pumpAndSettle();
+      expect(find.byType(PlanPage), findsNothing);
+      expect(find.byType(ChatHomePage), findsOneWidget);
+      expect(s.store.history, hasLength(1));
+      expect(s.chat.messages.last.text, contains('这次先到这儿'));
+      await tester.pumpWidget(const SizedBox());
+    },
+  );
 }

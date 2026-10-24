@@ -1,5 +1,4 @@
-// Light and dark App themes share realistic-dark training media. Optional
-// light variants remain an interface; contrast and theme switching still hold.
+// Pose-Hub's baked light/dark media follows the App theme without runtime keying.
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smartfit/chat/chat_models.dart';
@@ -10,6 +9,7 @@ import 'package:smartfit/domain/plan_generator.dart';
 import 'package:smartfit/main.dart';
 import 'package:smartfit/ui/exercise_video.dart';
 import 'package:smartfit/ui/theme.dart';
+import 'package:ugk_trainer/ugk_trainer.dart' as trainer;
 
 import 'app_flow_test.dart' show MemoryStorage, services, tall;
 import 'support.dart';
@@ -31,10 +31,10 @@ Iterable<String> _assetsIn(WidgetTester tester) => tester
 void main() {
   tearDown(() => SfColors.palette = SfPalette.dark);
 
-  group('shared realistic-dark media in both App themes', () {
+  group('offline theme-matched realistic media', () {
     final lib = loadLibrary();
 
-    test('the full fixture uses versioned videos and bundled lossy covers', () {
+    test('the full fixture has both versioned videos and theme stills', () {
       expect(lib.length, 93);
       for (final e in lib.all) {
         expect(
@@ -43,22 +43,31 @@ void main() {
         );
         expect(
           e.media.poster,
-          'assets/training_media/v0.3.0-app/common-lossy/covers/${e.id}.webp',
+          'assets/training_media/v0.3.0-app/theme-lossy/dark/covers/${e.id}.webp',
         );
-        expect(e.media.hasLight, isFalse, reason: e.id);
-        expect(e.media.lightVideo, isNull);
-        expect(e.media.lightPoster, isNull);
+        expect(e.media.hasLight, isTrue, reason: e.id);
+        expect(
+          e.media.lightVideo,
+          'assets/training_media/v0.3.0/realistic/light/${e.id}.mp4',
+        );
+        expect(
+          e.media.lightPoster,
+          'assets/training_media/v0.3.0-app/theme-lossy/light/covers/${e.id}.webp',
+        );
       }
     });
 
-    test('both themes pick the same dark render, cover and stage', () {
+    test('each theme selects its own render, cover and stage', () {
       final e = lib['h-squat'];
       for (final palette in [SfPalette.light, SfPalette.dark]) {
         SfColors.palette = palette;
-        expect(sfPoster(e), e.media.poster);
-        expect(sfVideo(e), e.media.video);
-        expect(sfVariant(e), isNull);
-        expect(sfStageFor(e).mediaStage, const Color(0xFF101013));
+        expect(
+          sfPoster(e),
+          palette.isDark ? e.media.poster : e.media.lightPoster,
+        );
+        expect(sfVideo(e), palette.isDark ? e.media.video : e.media.lightVideo);
+        expect(sfVariant(e), palette.isDark ? null : 'light');
+        expect(sfStageFor(e).mediaStage, palette.mediaStage);
       }
     });
 
@@ -97,7 +106,8 @@ void main() {
             ),
           ),
         );
-        expect(_assetsIn(tester), contains(e.media.poster));
+        expect(_assetsIn(tester), contains(e.media.lightPoster));
+        expect(_assetsIn(tester), isNot(contains(e.media.poster)));
         expect(
           _assetsIn(tester).where((path) => path.startsWith('assets/packs/')),
           isEmpty,
@@ -108,9 +118,85 @@ void main() {
             matching: find.byType(ColoredBox),
           ),
         );
-        expect(stage.first.color, const Color(0xFF101013));
+        expect(stage.first.color, SfPalette.light.mediaStage);
       },
     );
+
+    testWidgets(
+      'theme switches immediately update still and repository theme',
+      (tester) async {
+        final e = lib['h-banana'];
+        Widget host(SfPalette palette) => MaterialApp(
+          theme: buildTheme(palette),
+          home: Center(
+            child: SizedBox(
+              width: 300,
+              child: ExerciseVideo(exercise: e, playing: false),
+            ),
+          ),
+        );
+        for (final palette in [
+          SfPalette.dark,
+          SfPalette.light,
+          SfPalette.dark,
+        ]) {
+          await tester.pumpWidget(host(palette));
+          await tester.pumpAndSettle();
+          final view = tester.widget<trainer.DrillMediaView>(
+            find.byType(trainer.DrillMediaView),
+          );
+          expect(view.media.theme, palette.isDark ? 'dark' : 'light');
+          expect(view.media.videoAvailable, isTrue);
+          expect(
+            _assetsIn(tester),
+            contains(palette.isDark ? e.media.poster : e.media.lightPoster),
+          );
+          expect(tester.takeException(), isNull);
+        }
+      },
+    );
+
+    testWidgets('a still-only action is neutral and never falls back to dark', (
+      tester,
+    ) async {
+      final existing = lib['h-squat'];
+      final pack = loadPacksSync().exercises.firstWhere(
+        (p) => p.id == existing.id,
+      );
+      final exercise = Exercise.fromPack(
+        pack,
+        mediaOverride: ExerciseMedia(
+          id: existing.id,
+          video: '',
+          poster: existing.media.poster,
+          loopSeconds: 8,
+          posterSeconds: 0,
+          source: 'Pose-Hub fixture',
+          videoAvailable: false,
+          lightVideoAvailable: false,
+          lightPoster: existing.media.lightPoster,
+        ),
+      );
+      SfColors.palette = SfPalette.light;
+      expect(sfVideo(exercise), isEmpty);
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: buildTheme(SfPalette.light),
+          home: Center(
+            child: SizedBox(
+              width: 300,
+              child: ExerciseVideo(exercise: exercise),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('此动作暂无视频示范'), findsOneWidget);
+      expect(find.text('示范暂时加载不了，计时和语音仍可继续'), findsNothing);
+      expect(_assetsIn(tester), contains(existing.media.lightPoster));
+      expect(_assetsIn(tester), isNot(contains(existing.media.poster)));
+      expect(tester.takeException(), isNull);
+    });
   });
 
   group('contrast (WCAG AA) in both themes', () {
@@ -228,8 +314,7 @@ void main() {
         await s.store.acceptSafety(blocked: false);
         s.chat.start();
         await s.chat.send('在家 15 分钟练核心，徒手');
-        // Hero and strip previews use the same bundled release covers in
-        // either theme, independently of video download availability.
+        // Hero and strip previews switch to each theme's bundled stills.
         final items = s.chat.currentPlan!.items.toList();
         final hero = s.library[items.first.exerciseId];
         final first = s.library[items[1].exerciseId];
@@ -251,8 +336,8 @@ void main() {
             Brightness.light;
         await tester.pumpAndSettle();
         expect(SfColors.isDark, isFalse);
-        expect(_assetsIn(tester), contains(first.media.poster));
-        expect(_assetsIn(tester), contains(hero.media.poster));
+        expect(_assetsIn(tester), contains(first.media.lightPoster));
+        expect(_assetsIn(tester), contains(hero.media.lightPoster));
 
         // 「换深色」 in the conversation overrides the system.
         await tester.enterText(find.byKey(const ValueKey('chat-input')), '换深色');
@@ -263,7 +348,7 @@ void main() {
         expect(SfColors.isDark, isTrue);
         expect(_assetsIn(tester), contains(first.media.poster));
 
-        // 「换浅色」 back: the shared covers remain without losing the chat.
+        // 「换浅色」 back keeps the chat and updates its cover artwork.
         final messages = s.chat.messages.length;
         await tester.enterText(find.byKey(const ValueKey('chat-input')), '换浅色');
         await tester.pump();
@@ -271,7 +356,7 @@ void main() {
         await tester.pumpAndSettle();
         expect(s.store.appearance, 'light');
         expect(SfColors.isDark, isFalse);
-        expect(_assetsIn(tester), contains(first.media.poster));
+        expect(_assetsIn(tester), contains(first.media.lightPoster));
         expect(s.chat.messages.length, greaterThan(messages));
         await tester.pumpWidget(const SizedBox());
       },

@@ -262,6 +262,10 @@ class AppServices {
                   TrainingMediaConfig.includePending)
                 action['id'] as String,
           };
+    final bundledAssets =
+        (jsonDecode(await rootBundle.loadString(TrainingMediaConfig.assetIndex))
+                as Map<String, dynamic>)['actions']
+            as Map<String, dynamic>;
     final visiblePacks = [
       for (final p in packs.exercises)
         if (allowed.contains(p.id)) p,
@@ -278,6 +282,7 @@ class AppServices {
             mediaOverride: ExerciseMedia.fromPoseHub(
               p,
               version: manifest['version'] as String,
+              assets: Map<String, dynamic>.from(bundledAssets[p.id] as Map),
             ),
           ),
       ]),

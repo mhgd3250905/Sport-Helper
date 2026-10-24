@@ -37,10 +37,26 @@ PackSet loadPacksSync() {
 
 /// Keep the full metadata fixture while resolving media through the release
 /// manifest layout. The old pack media paths remain historical metadata only.
-ExerciseLibrary loadLibrary() => ExerciseLibrary([
-  for (final pack in loadPacksSync().exercises)
-    Exercise.fromPack(pack, mediaOverride: ExerciseMedia.fromPoseHub(pack)),
-]);
+ExerciseLibrary loadLibrary() {
+  final assets =
+      (jsonDecode(
+                File(
+                  'assets/training_media/v0.3.0-app/assets-index.json',
+                ).readAsStringSync(),
+              )
+              as Map<String, dynamic>)['actions']
+          as Map<String, dynamic>;
+  return ExerciseLibrary([
+    for (final pack in loadPacksSync().exercises)
+      Exercise.fromPack(
+        pack,
+        mediaOverride: ExerciseMedia.fromPoseHub(
+          pack,
+          assets: Map<String, dynamic>.from(assets[pack.id] as Map),
+        ),
+      ),
+  ]);
+}
 
 VoiceLibrary loadVoices() => VoiceLibrary.fromPacks(
   loadPacksSync(),

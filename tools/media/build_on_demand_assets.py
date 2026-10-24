@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Build the small, hash-verified training-media bundle from a Pose Hub release.
+"""Build hash-verified offline, theme-matched media from a Pose Hub release.
 
-The source release is read-only. Only builtin and realistic-dark submanifests
-are bundled; common.json is used to verify the lossy images, then omitted.
+The source release is read-only. The CLI bundles both realistic themes for App
+exercise metadata, plus build-time compressed theme keyframes. The original
+small-bundle API is retained with --legacy-small-bundle.
 Relative release paths are preserved so the same manifests work for assets and
 HTTP downloads. No video encoding or manifest rewriting is performed.
 
@@ -215,8 +216,118 @@ def verify_output(app_root: Path, files: list[MediaFile]) -> None:
         raise AssetError("pubspec assets do not match the builtin bundle")
 
 
+def _offline_themes(source: Path, app_root: Path, manifest: dict,
+                    files: list[MediaFile], staging: Path) -> list[MediaFile]:
+    """Add only existing release files; never infer that an action has a video."""
+    from PIL import Image
+
+    version = manifest['version']
+    index = json.loads((app_root / 'assets/packs/index.json').read_bytes())
+    ids = sorted(entry['id'] for entry in index['packs']
+                 if entry.get('kind') == 'exercise')
+    available_ids = {entry['id'] for entry in manifest['actions']}
+    if set(ids) - available_ids:
+        raise AssetError('App exercise metadata is absent from the release')
+    inputs = manifest['_buildInputs']
+    outputs = {item.relative: item for item in files}
+    variants = {}
+    for theme in ('dark', 'light'):
+        descriptors = {}
+        frames = {}
+        package_ids = (['builtin'] if theme == 'dark' else []) + [
+            f'realistic-{theme}', f'keyframes-realistic-{theme}']
+        for package_id in package_ids:
+            package = manifest['packages'][package_id]
+            ref = package['manifest']
+            if ref['path'] != f'packages/{package_id}.json':
+                raise AssetError('Unexpected submanifest path')
+            subfile = checked_file(source / ref['path'], ref,
+                                   f'{source.name}/{ref["path"]}', 'manifests')
+            inputs.append(subfile)
+            if package_id == f'realistic-{theme}':
+                outputs[subfile.relative] = subfile
+            entries = json.loads(subfile.source.read_bytes())['files']
+            if len(entries) != package['fileCount'] or sum(f['bytes'] for f in entries) != package['totalBytes']:
+                raise AssetError(f'Package size/count mismatch: {package_id}')
+            for entry in entries:
+                relative = entry['path']
+                parts = PurePosixPath(relative).parts
+                if '\\' in relative or parts[:4] != ('..', f'v{version}', 'realistic', theme):
+                    raise AssetError(f'Unexpected media path: {relative}')
+                if package['kind'] == 'keyframes':
+                    if len(parts) != 6 or parts[4] != 'keyframes' or not parts[5].endswith('.webp'):
+                        raise AssetError(f'Unexpected keyframe path: {relative}')
+                    aid = re.sub(r'_[123]\.webp$', '', parts[5])
+                    if aid in ids and parts[5] == f'{aid}_2.webp':
+                        if aid in frames:
+                            raise AssetError(f'Duplicate poster frame: {aid}/{theme}')
+                        frames[aid] = entry
+                else:
+                    if len(parts) != 5 or not parts[4].endswith('.mp4'):
+                        raise AssetError(f'Unexpected video path: {relative}')
+                    aid = PurePosixPath(relative).stem
+                    if aid in ids:
+                        if aid in descriptors:
+                            raise AssetError(f'Duplicate video: {aid}/{theme}')
+                        descriptors[aid] = entry
+        variants[theme] = (descriptors, frames)
+    asset_index = {'format': 'smartfit-offline-media@1', 'version': version,
+                   'sourceAppManifestSha256': digest(source / 'app-manifest.json'),
+                   'actions': {}}
+    for aid in ids:
+        asset_index['actions'][aid] = {}
+        for theme, (videos, frames) in variants.items():
+            if aid not in frames:
+                raise AssetError(f'Missing {theme} exported still for {aid}; request a Pose-Hub export')
+            frame = frames[aid]
+            original = require_inside(source / frame['path'], source.parent)
+            checked = checked_file(original, frame, original.relative_to(source.parent).as_posix(), 'source-stills')
+            inputs.append(checked)
+            item = {'video': None}
+            if aid in videos:
+                video = videos[aid]
+                original_video = require_inside(source / video['path'], source.parent)
+                copied = checked_file(original_video, video, original_video.relative_to(source.parent).as_posix(), 'videos')
+                inputs.append(copied)
+                outputs[copied.relative] = copied
+                item['video'] = {'asset': 'assets/training_media/' + copied.relative,
+                                 'bytes': copied.size, 'sha256': copied.sha256}
+            for role, directory, size, quality in [('poster', 'covers', 720, 82), ('thumbnail', 'thumbs', 240, 80)]:
+                relative = f'{source.name}/theme-lossy/{theme}/{directory}/{aid}.webp'
+                target = staging / relative
+                target.parent.mkdir(parents=True, exist_ok=True)
+                with Image.open(original) as image:
+                    image = image.convert('RGB')
+                    image.thumbnail((size, size), Image.Resampling.LANCZOS)
+                    image.save(target, format='WEBP', quality=quality, method=6)
+                generated = MediaFile(target, relative, target.stat().st_size, digest(target), 'theme-' + directory)
+                outputs[relative] = generated
+                item[role] = {'asset': 'assets/training_media/' + relative,
+                              'bytes': generated.size, 'sha256': generated.sha256,
+                              'sourceSha256': checked.sha256}
+            asset_index['actions'][aid][theme] = item
+    relative = f'{source.name}/assets-index.json'
+    target = staging / relative
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(json.dumps(asset_index, ensure_ascii=False, separators=(',', ':')) + '\n', encoding='utf-8')
+    outputs[relative] = MediaFile(target, relative, target.stat().st_size, digest(target), 'manifests')
+    manifest['_offlineActions'] = ids
+    return sorted(outputs.values(), key=lambda item: item.relative)
+
+
 def build(source: Path, app_root: Path, *, apply: bool = False,
-          verify_only: bool = False, baseline_apk: Path | None = None) -> dict:
+          verify_only: bool = False, baseline_apk: Path | None = None,
+          offline_themes: bool = False) -> dict:
+    # Temporary generated images never enter the read-only Pose-Hub release.
+    with tempfile.TemporaryDirectory(prefix='smartfit-theme-stills-') as name:
+        return _build(source, app_root, apply=apply, verify_only=verify_only,
+                      baseline_apk=baseline_apk,
+                      offline_staging=Path(name) if offline_themes else None)
+
+
+def _build(source: Path, app_root: Path, *, apply: bool = False,
+           verify_only: bool = False, baseline_apk: Path | None = None,
+           offline_staging: Path | None = None) -> dict:
     source, app_root = source.resolve(), app_root.resolve()
     destination = app_root / "assets" / "training_media"
     if source.is_relative_to(app_root) or app_root.is_relative_to(source.parent):
@@ -225,6 +336,8 @@ def build(source: Path, app_root: Path, *, apply: bool = False,
     if (app_root / "assets").is_symlink() or destination.is_symlink():
         raise AssetError("Application asset roots must not be symlinks")
     manifest, files = load_release(source)
+    if offline_staging is not None:
+        files = _offline_themes(source, app_root, manifest, files, offline_staging)
     inputs = manifest.pop("_buildInputs")
     original_sources = inventory_hash(inputs)
     original_metadata = protected_inventory(app_root)
@@ -274,7 +387,10 @@ def build(source: Path, app_root: Path, *, apply: bool = False,
         "mainCommit": manifest.get("mainCommit"),
         "mainManifestSha256": next(item.sha256 for item in files
                                    if item.relative.endswith("/app-manifest.json")),
-        "bundledSubmanifests": [f"packages/{name}.json" for name in BUNDLED_PACKAGES],
+        "bundledSubmanifests": [f"packages/{name}.json" for name in BUNDLED_PACKAGES] +
+                              (["packages/realistic-light.json"] if offline_staging is not None else []),
+        "offlineThemes": ["dark", "light"] if offline_staging is not None else [],
+        "offlineActionCount": len(manifest.get('_offlineActions', [])),
         "groups": {group: {"files": counts[group],
                            "bytes": sum(item.size for item in files if item.group == group)}
                    for group in sorted(counts)},
@@ -302,10 +418,13 @@ def main() -> None:
     mode.add_argument("--apply", action="store_true")
     mode.add_argument("--verify-only", action="store_true")
     parser.add_argument("--baseline-apk", type=Path)
+    parser.add_argument("--legacy-small-bundle", action="store_true",
+                        help="Retain the original 32-video dark-only bundle")
     parser.add_argument("--report", type=Path)
     args = parser.parse_args()
     report = build(args.source, args.app_root, apply=args.apply,
-                   verify_only=args.verify_only, baseline_apk=args.baseline_apk)
+                   verify_only=args.verify_only, baseline_apk=args.baseline_apk,
+                   offline_themes=not args.legacy_small_bundle)
     encoded = json.dumps(report, ensure_ascii=False, indent=2) + "\n"
     if args.report:
         args.report.write_text(encoded, encoding="utf-8", newline="\n")

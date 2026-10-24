@@ -191,6 +191,9 @@ ThemeData buildTheme([SfPalette p = SfPalette.dark]) {
 SystemUiOverlayStyle _overlay(SfPalette p) =>
     (p.isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark).copyWith(
       statusBarColor: Colors.transparent,
+      statusBarIconBrightness: p.isDark ? Brightness.light : Brightness.dark,
+      statusBarBrightness: p.isDark ? Brightness.dark : Brightness.light,
+      systemStatusBarContrastEnforced: false,
       systemNavigationBarColor: p.skyBottom,
       systemNavigationBarIconBrightness: p.isDark ? Brightness.light : Brightness.dark,
     );

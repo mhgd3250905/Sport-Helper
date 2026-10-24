@@ -87,6 +87,8 @@ void main() {
 
       await tester.tap(find.byKey(const ValueKey('start')));
       await tester.pump();
+      // Allow the retiring card player to stop before the chat pushes training.
+      await tester.pump(const Duration(milliseconds: 50));
       await tester.pump(const Duration(milliseconds: 800));
       expect(find.byType(PlayerPage), findsOneWidget);
       expect(s.chat.currentPlan?.id, modified.id);

@@ -78,8 +78,10 @@ class ExerciseMedia {
     required this.loopSeconds,
     required this.posterSeconds,
     required this.source,
+    this.videoAvailable = true,
     this.lightVideo,
     this.lightPoster,
+    this.lightVideoAvailable,
   });
 
   /// Pack id; the WebView player plays `/packs/<id>/demo.mp4`.
@@ -91,27 +93,58 @@ class ExerciseMedia {
   final double loopSeconds;
   final double posterSeconds;
   final String source;
+  final bool videoAvailable;
 
   /// Light-stage render of the same clip / cover, when the pack has one.
   final String? lightVideo;
   final String? lightPoster;
+  final bool? lightVideoAvailable;
 
-  bool get hasLight => lightVideo != null && lightPoster != null;
+  bool get hasLight => lightPoster != null;
+
+  bool videoAvailableFor({required bool light}) =>
+      light ? (lightVideoAvailable ?? lightVideo != null) : videoAvailable;
 
   String get playerId => id;
 
   factory ExerciseMedia.fromPoseHub(
     DrillPack p, {
     String version = '0.3.0',
-  }) => ExerciseMedia(
-    id: p.id,
-    video: 'assets/training_media/v$version/realistic/dark/${p.id}.mp4',
-    poster:
-        'assets/training_media/v$version-app/common-lossy/covers/${p.id}.webp',
-    loopSeconds: p.media!.loopSeconds,
-    posterSeconds: 0,
-    source: 'Pose-Hub $version',
-  );
+    required Map<String, dynamic> assets,
+  }) {
+    String? asset(String theme, String role) {
+      final entry = (assets[theme] as Map?)?[role];
+      if (entry == null) return null;
+      final path = (entry as Map)['asset'] as String?;
+      if (path == null ||
+          !path.startsWith('assets/training_media/') ||
+          path.contains('..') ||
+          path.contains('\\')) {
+        throw FormatException('Invalid bundled media asset for ${p.id}');
+      }
+      return path;
+    }
+
+    final darkPoster = asset('dark', 'poster');
+    final lightPoster = asset('light', 'poster');
+    if (darkPoster == null || lightPoster == null) {
+      throw FormatException('Both theme stills are required for ${p.id}');
+    }
+    final darkVideo = asset('dark', 'video');
+    final lightVideo = asset('light', 'video');
+    return ExerciseMedia(
+      id: p.id,
+      video: darkVideo ?? '',
+      poster: darkPoster,
+      loopSeconds: p.media?.loopSeconds ?? 8,
+      posterSeconds: 0,
+      source: 'Pose-Hub $version',
+      videoAvailable: darkVideo != null,
+      lightVideo: lightVideo,
+      lightPoster: lightPoster,
+      lightVideoAvailable: lightVideo != null,
+    );
+  }
 
   factory ExerciseMedia.fromPack(DrillPack p) {
     final m = p.media!;

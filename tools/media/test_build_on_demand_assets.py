@@ -136,24 +136,27 @@ class BuiltinAssetsTests(unittest.TestCase):
 
 
 class CheckedInBundleTests(unittest.TestCase):
-    def test_builtin_assets_are_hash_verified_and_under_15mb(self):
+    def test_offline_theme_assets_match_original_manifests_and_their_index(self):
         root = APP_ROOT / "assets" / "training_media"
         files = [path for path in root.rglob("*") if path.is_file()]
-        self.assertGreater(sum(path.stat().st_size for path in files), 14_000_000)
-        self.assertLess(sum(path.stat().st_size for path in files), 15_000_000)
-        self.assertEqual(len(files), 413)
+        self.assertGreater(sum(path.stat().st_size for path in files), 85_000_000)
+        self.assertLess(sum(path.stat().st_size for path in files), 100_000_000)
+        self.assertEqual(len(files), 946)
         main_paths = list(root.rglob("app-manifest.json"))
         self.assertEqual(len(main_paths), 1)
         app = main_paths[0].parent
         manifest = json.loads(main_paths[0].read_bytes())
-        self.assertEqual(len(list(root.rglob("*.mp4"))), 32)
+        self.assertEqual(len(list(root.rglob("*.mp4"))), 191)
         self.assertEqual({path.relative_to(app).as_posix() for path in app.rglob("*.json")},
-                         {"app-manifest.json", "packages/builtin.json", "packages/realistic-dark.json"})
-        for package in ("builtin", "realistic-dark"):
+                         {"app-manifest.json", "assets-index.json", "packages/builtin.json", "packages/realistic-dark.json", "packages/realistic-light.json"})
+        references = {}
+        for package in ("builtin", "realistic-dark", "realistic-light"):
             descriptor = manifest["packages"][package]["manifest"]
             path = app / descriptor["path"]
             self.assertEqual(path.stat().st_size, descriptor["bytes"])
             self.assertEqual(digest(path), descriptor["sha256"])
+            for ref in json.loads(path.read_bytes())['files']:
+                references[ref['path']] = ref
         builtin = json.loads((app / "packages" / "builtin.json").read_bytes())
         for descriptor in builtin["files"]:
             path = app / descriptor["path"]
@@ -162,6 +165,97 @@ class CheckedInBundleTests(unittest.TestCase):
         action_ids = {action["id"] for action in manifest["actions"]}
         for group in ("covers", "thumbs"):
             self.assertEqual({path.stem for path in (app / "common-lossy" / group).glob("*.webp")}, action_ids)
+        local = json.loads((app / 'assets-index.json').read_bytes())
+        self.assertEqual(local['sourceAppManifestSha256'], digest(main_paths[0]))
+        self.assertEqual(len(local['actions']), 93)
+        for aid, themes in local['actions'].items():
+            self.assertEqual(set(themes), {'dark', 'light'})
+            for theme, media in themes.items():
+                for role in ('video', 'poster', 'thumbnail'):
+                    descriptor = media[role]
+                    path = APP_ROOT / descriptor['asset']
+                    self.assertTrue(path.is_file())
+                    self.assertEqual(path.stat().st_size, descriptor['bytes'])
+                    self.assertEqual(digest(path), descriptor['sha256'])
+                ref = references[f'../v0.3.0/realistic/{theme}/{aid}.mp4']
+                self.assertEqual(media['video']['sha256'], ref['sha256'])
+                self.assertEqual(media['video']['bytes'], ref['bytes'])
+                self.assertIn('/' + theme + '/', media['poster']['asset'])
+
+
+class OfflineThemeBuildTests(BuiltinAssetsTests):
+    def setUp(self):
+        super().setUp()
+        from PIL import Image
+        self.manifest['packages']['builtin']['kind'] = 'video'
+        self.manifest['packages']['realistic-dark']['kind'] = 'video'
+        self.selected = ['action-00', 'action-32']
+        (self.app / 'assets/packs/index.json').write_text(json.dumps({'packs': [
+            {'id': aid, 'kind': 'exercise'} for aid in self.selected]}), encoding='utf-8')
+        for theme in ('dark', 'light'):
+            keyframes = []
+            for aid in self.selected:
+                relative = f'../v0.3.0/realistic/{theme}/keyframes/{aid}_2.webp'
+                path = self.source / relative
+                path.parent.mkdir(parents=True, exist_ok=True)
+                Image.new('RGB', (32, 32), '#f3f1ef' if theme == 'light' else '#101013').save(path, format='WEBP', lossless=True)
+                keyframes.append({'path': relative, 'bytes': path.stat().st_size, 'sha256': digest(path)})
+            self.put_package(f'keyframes-realistic-{theme}', 'keyframes', keyframes)
+        light_videos = []
+        for aid in self.selected:
+            relative = f'../v0.3.0/realistic/light/{aid}.mp4'
+            path = self.source / relative
+            path.write_bytes(relative.encode())
+            light_videos.append({'path': relative, 'bytes': path.stat().st_size, 'sha256': digest(path)})
+        self.put_package('realistic-light', 'video', light_videos)
+        self.write_manifest()
+
+    def put_package(self, name, kind, files):
+        path = self.source / f'packages/{name}.json'
+        path.write_text(json.dumps({'files': files}), encoding='utf-8')
+        self.manifest['packages'][name] = {
+            'kind': kind, 'fileCount': len(files), 'totalBytes': sum(f['bytes'] for f in files),
+            'manifest': {'path': f'packages/{name}.json', 'bytes': path.stat().st_size, 'sha256': digest(path)}}
+
+    def test_two_themes_are_offline_and_source_metadata_voice_unchanged(self):
+        before = self.snapshot(self.source.parent)
+        metadata, voice = self.metadata.read_bytes(), self.voice.read_bytes()
+        report = build(self.source, self.app, apply=True, offline_themes=True)
+        self.assertEqual(report['offlineActionCount'], 2)
+        self.assertEqual(report['offlineThemes'], ['dark', 'light'])
+        index = json.loads((self.app / 'assets/training_media/v0.3.0-app/assets-index.json').read_bytes())
+        for aid in self.selected:
+            for theme in ('dark', 'light'):
+                for role in ('video', 'poster', 'thumbnail'):
+                    ref = index['actions'][aid][theme][role]
+                    self.assertEqual(digest(self.app / ref['asset']), ref['sha256'])
+        self.assertEqual(before, self.snapshot(self.source.parent))
+        self.assertEqual(metadata, self.metadata.read_bytes())
+        self.assertEqual(voice, self.voice.read_bytes())
+        self.assertEqual(report, build(self.source, self.app, verify_only=True, offline_themes=True))
+
+    def test_corrupt_light_clip_is_rejected_before_changes(self):
+        (self.source.parent / 'v0.3.0/realistic/light/action-00.mp4').write_bytes(b'bad')
+        before = self.snapshot(self.app)
+        with self.assertRaisesRegex(AssetError, 'mismatch'):
+            build(self.source, self.app, apply=True, offline_themes=True)
+        self.assertEqual(before, self.snapshot(self.app))
+
+    def test_missing_light_still_requests_export_instead_of_dark_fallback(self):
+        self.put_package('keyframes-realistic-light', 'keyframes', [])
+        self.write_manifest()
+        before = self.snapshot(self.app)
+        with self.assertRaisesRegex(AssetError, 'Missing light exported still'):
+            build(self.source, self.app, apply=True, offline_themes=True)
+        self.assertEqual(before, self.snapshot(self.app))
+
+    def test_existing_still_with_no_video_is_indexed_without_fake_video_path(self):
+        self.put_package('realistic-light', 'video', [])
+        self.write_manifest()
+        build(self.source, self.app, apply=True, offline_themes=True)
+        index = json.loads((self.app / 'assets/training_media/v0.3.0-app/assets-index.json').read_bytes())
+        self.assertIsNone(index['actions']['action-00']['light']['video'])
+        self.assertIn('/light/', index['actions']['action-00']['light']['poster']['asset'])
 
 
 if __name__ == "__main__":

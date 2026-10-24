@@ -4,53 +4,52 @@
   "mainManifestSha256": "5997a445f33cffac00dd4d9b213c7887d67e776fbb2ee9940e4f7c44c88c0e8d",
   "bundledSubmanifests": [
     "packages/builtin.json",
-    "packages/realistic-dark.json"
+    "packages/realistic-dark.json",
+    "packages/realistic-light.json"
   ],
+  "offlineThemes": [
+    "dark",
+    "light"
+  ],
+  "offlineActionCount": 93,
   "groups": {
     "covers": {
       "files": 189,
       "bytes": 1402854
     },
     "manifests": {
-      "files": 3,
-      "bytes": 132592
+      "files": 5,
+      "bytes": 296632
+    },
+    "theme-covers": {
+      "files": 186,
+      "bytes": 1623466
+    },
+    "theme-thumbs": {
+      "files": 186,
+      "bytes": 365532
     },
     "thumbs": {
       "files": 189,
       "bytes": 312112
     },
     "videos": {
-      "files": 32,
-      "bytes": 13035872
+      "files": 191,
+      "bytes": 88252106
     }
   },
   "bundle": {
-    "files": 413,
-    "bytes": 14883430
+    "files": 946,
+    "bytes": 92252702
   },
-  "bundleInventorySha256": "c5c300ab1e2a1537832cd0c107ff757c39644e1427f35953d9c3663670856028",
+  "bundleInventorySha256": "1472bc50689dfd3cdc2987c179ec9f7c637312d741c9255b05d45dae31a85b44",
   "sourceInputs": {
-    "files": 414,
-    "inventorySha256": "e5e87e47b6efa72154e5d66a2132371bc1d1c83fc21a86e694b52a4afb330d7e",
+    "files": 791,
+    "inventorySha256": "3282ac25245f8d495ccb02f424e3e088cf2ed5f00a82875af2cc24c3349cfde2",
     "unchangedAfterBuild": true
   },
-  "protectedPackFilesInventorySha256": "2620fbf64231de34eb7bb7832cdf11c58f2870e94a687a28e5f70a90613e81f1",
+  "protectedPackFilesInventorySha256": "71c643587a4e2703d3c0820f9e94f00032ccf07931a8e725a4d43fc4fdf77626",
   "legacyPackMediaRemaining": 0,
   "cutoutsBundled": false,
-  "validatedOutput": true,
-  "baselineApk": {
-    "file": "app-debug.apk",
-    "bytes": 208066987,
-    "sha256": "c44c43c7c54438212806c3b952a559757de1484c0cfad5af4e773fe6488c2c00",
-    "legacyPackMedia": {
-      "files": 372,
-      "bytes": 21982553,
-      "compressedBytes": 21982553
-    },
-    "cutouts": {
-      "files": 4,
-      "bytes": 1751856,
-      "compressedBytes": 1751856
-    }
-  }
+  "validatedOutput": true
 }

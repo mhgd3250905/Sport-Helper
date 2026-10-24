@@ -117,8 +117,14 @@ void main() {
       final observer = TrainingMediaLog(repository, log: log)..start();
       try {
         await repository.ensureVideo('h-squat');
+        // Keep the unavailable-download diagnostic seam using an action that
+        // has no App metadata and is intentionally outside the offline bundle.
+        expect(
+          File('${TrainingMediaConfig.videoRoot}/abs-A.mp4').existsSync(),
+          isFalse,
+        );
         await expectLater(
-          repository.ensureVideo('n-pelvis-circle'),
+          repository.ensureVideo('abs-A'),
           throwsA(isA<StateError>()),
         );
         final resources = events(
@@ -132,7 +138,7 @@ void main() {
         expect(builtin['fields']['source'], 'builtin');
         final remote = resources.singleWhere(
           (event) =>
-              event['fields']['actionId'] == 'n-pelvis-circle' &&
+              event['fields']['actionId'] == 'abs-A' &&
               event['fields']['phase'] == 'offline',
         );
         expect(remote['fields']['phase'], 'offline');

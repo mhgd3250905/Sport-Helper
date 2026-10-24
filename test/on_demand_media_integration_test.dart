@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smartfit/app/services.dart';
 import 'package:smartfit/app/training_media_config.dart';
@@ -43,18 +45,40 @@ Future<trainer.TrainingMediaRepository> _repository({
   bool pending = true,
   trainer.TrainingMediaNetworkProbe? probe,
   void Function(Directory directory)? onCacheDirectory,
+  bool onlyBuiltin = false,
 }) async {
   final directory = await Directory.systemTemp.createTemp(
     'smartfit-media-app-',
   );
   onCacheDirectory?.call(directory);
   addTearDown(() => directory.delete(recursive: true));
+  Set<String>? bundled;
+  if (onlyBuiltin) {
+    // Retain a limited-bundle fixture for download/fallback seam coverage.
+    // The shipping App now bundles every metadata-backed action in both themes.
+    final original =
+        jsonDecode(
+              File(
+                '${TrainingMediaConfig.assetRoot}/packages/builtin.json',
+              ).readAsStringSync(),
+            )
+            as Map<String, dynamic>;
+    final videos = {
+      for (final entry in original['files'] as List)
+        'assets/training_media/${(entry as Map)['path'].toString().substring(3)}',
+    };
+    bundled = (await AssetManifest.loadFromAssetBundle(rootBundle))
+        .listAssets()
+        .where((path) => !path.endsWith('.mp4') || videos.contains(path))
+        .toSet();
+  }
   final media = await trainer.TrainingMediaRepository.create(
     manifestAsset: TrainingMediaConfig.manifestAsset,
     baseUrls: const [],
     allowPending: pending,
     cacheDirectory: directory.path,
     networkProbe: probe ?? () async => trainer.TrainingMediaNetwork.offline,
+    bundledAssetKeys: bundled,
   );
   addTearDown(media.dispose);
   return media;
@@ -187,50 +211,77 @@ void main() {
         );
         expect(
           exercise.media.poster,
-          '${TrainingMediaConfig.assetRoot}/common-lossy/covers/${exercise.id}.webp',
+          '${TrainingMediaConfig.assetRoot}/theme-lossy/dark/covers/${exercise.id}.webp',
         );
-        expect(exercise.media.lightVideo, isNull);
-        expect(exercise.media.lightPoster, isNull);
+        expect(
+          exercise.media.lightVideo,
+          '${TrainingMediaConfig.lightVideoRoot}/${exercise.id}.mp4',
+        );
+        expect(
+          exercise.media.lightPoster,
+          '${TrainingMediaConfig.assetRoot}/theme-lossy/light/covers/${exercise.id}.webp',
+        );
+        expect(exercise.media.videoAvailableFor(light: false), isTrue);
+        expect(exercise.media.videoAvailableFor(light: true), isTrue);
       }
       final ready = await media.availableActionIds();
-      expect(ready, hasLength(32));
+      expect(ready, containsAll(expectedIds));
+      expect(
+        ready,
+        hasLength(98),
+      ); // 93 App actions plus 5 retained builtin clips.
       expect(
         (await media.availableVideo('h-squat'))!.assetKey,
         '${TrainingMediaConfig.videoRoot}/h-squat.mp4',
       );
-      expect(await media.availableVideo('n-pelvis-circle'), isNull);
+      for (final id in ['n-pelvis-circle', 'n-windshield', 'h-banana']) {
+        for (final theme in ['dark', 'light']) {
+          final resource = await media.ensureVideo(id, theme: theme);
+          expect(
+            resource.assetKey,
+            'assets/training_media/v0.3.0/realistic/$theme/$id.mp4',
+          );
+          expect(resource.cachePath, isNull);
+        }
+      }
     },
   );
 
-  test('offline App generator prefers a bundled demonstration', () async {
-    final media = await _repository();
-    await media.canDownload();
-    final (library, _, voices, _) = await AppServices.loadContent(media: media);
-    final services = AppServices(
-      library: library,
-      catalog: TemplateCatalog([_template('n-pelvis-circle')]),
-      store: AppStore(_Storage()),
-      voiceLibrary: voices,
-      voiceOutput: const MutedVoiceOutput(),
-      media: media,
-    );
-    expect(media.isOffline, isTrue);
-    expect(media.readyActionIds, isNot(contains('n-pelvis-circle')));
-    final result = await services.generator.generate(
-      const ScenarioRequest(scene: 'office', minutes: 5),
-    );
-    expect(result.issues, isEmpty);
-    expect(result.plan, isNotNull);
-    expect(result.plan!.items.single.exerciseId, isIn(media.readyActionIds));
-    expect(result.plan!.items.single.replacedFrom, 'n-pelvis-circle');
-    expect(
-      PlanValidator(library).validate(
-        result.plan!,
+  test(
+    'offline App generator keeps the requested bundled demonstration',
+    () async {
+      final media = await _repository();
+      await media.canDownload();
+      final (library, _, voices, _) = await AppServices.loadContent(
+        media: media,
+      );
+      final services = AppServices(
+        library: library,
+        catalog: TemplateCatalog([_template('n-pelvis-circle')]),
+        store: AppStore(_Storage()),
+        voiceLibrary: voices,
+        voiceOutput: const MutedVoiceOutput(),
+        media: media,
+      );
+      expect(media.isOffline, isTrue);
+      expect(media.readyActionIds, contains('n-pelvis-circle'));
+      final result = await services.generator.generate(
         const ScenarioRequest(scene: 'office', minutes: 5),
-      ),
-      isEmpty,
-    );
-  });
+      );
+      expect(result.issues, isEmpty);
+      expect(result.plan, isNotNull);
+      expect(result.plan!.items.single.exerciseId, isIn(media.readyActionIds));
+      expect(result.plan!.items.single.exerciseId, 'n-pelvis-circle');
+      expect(result.plan!.items.single.replacedFrom, isNull);
+      expect(
+        PlanValidator(library).validate(
+          result.plan!,
+          const ScenarioRequest(scene: 'office', minutes: 5),
+        ),
+        isEmpty,
+      );
+    },
+  );
 
   group('offline preference preserves scenario constraints', () {
     final request = const ScenarioRequest(
@@ -296,6 +347,7 @@ void main() {
       var holdDownloads = false;
       var pendingProbes = 0;
       final media = await _repository(
+        onlyBuiltin: true,
         probe: () async {
           if (!holdDownloads) return trainer.TrainingMediaNetwork.wifi;
           pendingProbes++;
@@ -363,6 +415,7 @@ void main() {
     var holdDownloads = false;
     var pendingProbes = 0;
     final media = await _repository(
+      onlyBuiltin: true,
       probe: () async {
         if (!holdDownloads) return trainer.TrainingMediaNetwork.wifi;
         pendingProbes++;
@@ -453,6 +506,7 @@ void main() {
     int? holdFromProbe;
     final media = (await tester.runAsync(
       () => _repository(
+        onlyBuiltin: true,
         probe: () async {
           probes++;
           return holdFromProbe == null || probes < holdFromProbe
@@ -502,7 +556,7 @@ void main() {
             widget is Image &&
             widget.image is AssetImage &&
             (widget.image as AssetImage).assetName ==
-                '${TrainingMediaConfig.assetRoot}/common-lossy/covers/n-pelvis-circle.webp',
+                '${TrainingMediaConfig.assetRoot}/theme-lossy/dark/covers/n-pelvis-circle.webp',
       ),
       findsOneWidget,
     );
@@ -626,7 +680,7 @@ void main() {
       expect(cleared, findsOneWidget);
       expect(await tester.runAsync(media.cacheBytes), 0);
       expect(await tester.runAsync(staleBlob.exists), isFalse);
-      expect(media.readyActionIds, hasLength(32));
+      expect(media.readyActionIds, hasLength(98));
       await reloaded.load();
       expect(reloaded.savedPlans.single.plan.id, plan.id);
       expect(reloaded.lastPlan!.id, plan.id);

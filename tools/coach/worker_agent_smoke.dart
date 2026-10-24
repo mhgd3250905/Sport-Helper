@@ -190,7 +190,7 @@ void main() {
         jsonEncode({
           'sdkRef': 'f684e02f38e652633c23fa8946a53d02b6aa3ea2',
           'sdkVersion': '0.3.3',
-          'appVersion': '0.1.0+22',
+          'appVersion': '0.1.0+23',
           'memoryOnly': memoryOnly,
           'actionsOnly': actionsOnly,
           'maxSteps': engine.agent.maxSteps,

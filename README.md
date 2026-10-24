@@ -1,5 +1,7 @@
 # 智能健身助手 SmartFit
 
+2026-10-24 真机反馈第 1 批待验：动作示范改为 App 动作浅深两套随包离线播放，主题静帧/视频一致；详情改为分段卡片流且中央卡单独播放；Android 全局透明状态栏与安全区同步。内测 `0.1.0+23`，固定新 `ugk_trainer-v0.2.4`，App 全量 460 通过 / 13 原有条件跳过。两个 main 等开哥真机确认，见[根因、素材与待验记录](docs/phone-feedback-batch1-2026-10-24.md)。
+
 2026-10-24 待审：AI 会话与询问状态改由 SDK 纯 Dart `CoachConversationController` 管理，SmartFit 先接入。拟固定 `ugk_coach-v0.5.0` 与依赖兼容的 `ugk_trainer-v0.2.3`，UI 保持 `ugk_coach_ui-v0.1.1`。全量 454 项通过 / 13 原有条件跳过，分析无问题；隔离候选 Git 严格锁文件校验通过，正式发布与远端校验等开哥同意。见[本轮待审回执](docs/coach-conversation-controller-2026-10-24.md)。
 
 2026-10-24 已批准合入并推送补丁，功能源码 `9d2ff7db6f598fe6cf629de02ed3c56ade660f9e`：固定 `ugk_coach_ui-v0.1.1`、`ugk_coach-v0.4.2`、`ugk_trainer-v0.2.2`（均为 SDK `3302d62`），修复套路剂量溢出与中文 Windows Git 包解析。先核对指定 SDK 回归已通过、发布正式 tag，再用原验收 Flutter 3.44.7 从 GitHub 严格验证锁文件后合入 App；锁文件未变化，已有 iOS 更新保留。本任务未写 `release/1.0`。见[补丁验收与发布回执](docs/coach-ui-011-2026-10-24.md)。

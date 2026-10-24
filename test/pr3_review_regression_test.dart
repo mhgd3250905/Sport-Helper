@@ -98,7 +98,7 @@ Widget _host(Widget child) => MaterialApp(
 
 void main() {
   test(
-    'P1: the release bundle contains two submanifests and 32 builtin videos under 15MB',
+    'P1: every App action has verified offline videos and stills in both themes',
     () {
       final index = _json('assets/packs/index.json');
       final versions = {
@@ -127,9 +127,10 @@ void main() {
       expect(packageFiles.map((file) => file.uri.pathSegments.last).toSet(), {
         'builtin.json',
         'realistic-dark.json',
+        'realistic-light.json',
       });
       final packages = manifest['packages'] as Map<String, dynamic>;
-      for (final id in ['builtin', 'realistic-dark']) {
+      for (final id in ['builtin', 'realistic-dark', 'realistic-light']) {
         final descriptor = (packages[id] as Map)['manifest'] as Map;
         final file = File('$release/${descriptor['path']}');
         expect(file.lengthSync(), descriptor['bytes']);
@@ -150,13 +151,32 @@ void main() {
       ).listSync(recursive: true).whereType<File>().toList();
       expect(
         bundled.where((file) => file.path.endsWith('.mp4')),
-        hasLength(32),
+        hasLength(191),
       );
+      final localIndex = _json('$release/assets-index.json')['actions'] as Map;
+      expect(localIndex, hasLength(93));
+      for (final entry in localIndex.entries) {
+        for (final theme in ['dark', 'light']) {
+          final media = (entry.value as Map)[theme] as Map;
+          final video = media['video'] as Map;
+          expect(video['asset'], '$root/v0.3.0/realistic/$theme/${entry.key}.mp4');
+          final source = [
+            ...(_json('$release/packages/builtin.json')['files'] as List),
+            ...(_json('$release/packages/realistic-$theme.json')['files'] as List),
+          ].cast<Map>().firstWhere((f) => f['path'] == '../v0.3.0/realistic/$theme/${entry.key}.mp4');
+          expect(video['sha256'], source['sha256']);
+          for (final role in ['video', 'poster', 'thumbnail']) {
+            final descriptor = media[role] as Map;
+            expect(File(descriptor['asset'] as String).lengthSync(), descriptor['bytes']);
+            expect(descriptor['sha256'], matches(RegExp(r'^[0-9a-f]{64}$')));
+          }
+        }
+      }
       final bytes = bundled.fold<int>(
         0,
         (total, file) => total + file.lengthSync(),
       );
-      expect(bytes, inExclusiveRange(14_000_000, 15_000_000));
+      expect(bytes, inExclusiveRange(85_000_000, 100_000_000));
       // The reproducible Python builder verifies every source and destination
       // SHA-256; its report records the exact checked-in asset inventory.
       final report = _json('tools/media/builtin-assets-report.json');
@@ -297,7 +317,7 @@ void main() {
     expect(swapFinder, findsOneWidget);
     final swap = tester.getSemantics(swapFinder);
     expect(swap.id, isNot(row.id));
-    expect(row, isSemantics(isButton: true, hasTapAction: true));
+    expect(row, isSemantics(isButton: false, hasTapAction: false));
     expect(swap, isSemantics(label: '换一个', isButton: true, hasTapAction: true));
     swap.owner!.performAction(swap.id, SemanticsAction.tap);
     await tester.pumpAndSettle();

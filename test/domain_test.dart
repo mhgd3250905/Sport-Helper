@@ -17,39 +17,51 @@ void main() {
   final gen = TemplatePlanGenerator(lib: lib, catalog: catalog);
 
   group('library', () {
-    test('93 exercises have registered video and bundled poster media', () {
-      expect(lib.length, 93);
-      const root = 'assets/training_media/v0.3.0-app/';
-      Set<String> registered(String package) {
-        final json =
-            jsonDecode(File('${root}packages/$package.json').readAsStringSync())
-                as Map;
-        return {
-          for (final file in json['files'] as List)
-            Uri.parse(root).resolve((file as Map)['path'] as String).path,
-        };
-      }
+    test(
+      '93 exercises have registered offline videos and stills in both themes',
+      () {
+        expect(lib.length, 93);
+        const root = 'assets/training_media/v0.3.0-app/';
+        Set<String> registered(String package) {
+          final json =
+              jsonDecode(
+                    File('${root}packages/$package.json').readAsStringSync(),
+                  )
+                  as Map;
+          return {
+            for (final file in json['files'] as List)
+              Uri.parse(root).resolve((file as Map)['path'] as String).path,
+          };
+        }
 
-      final builtin = registered('builtin');
-      final allVideos = {...builtin, ...registered('realistic-dark')};
-      expect(builtin, hasLength(32));
-      for (final e in lib.all) {
-        expect(allVideos, contains(e.media.video));
-        expect(
-          File(e.media.video).existsSync(),
-          builtin.contains(e.media.video),
-          reason: e.media.video,
-        );
-        expect(
-          File(e.media.poster).existsSync(),
-          isTrue,
-          reason: e.media.poster,
-        );
-        expect(e.cue, isNotEmpty);
-        if (e.alternative != null) expect(lib.contains(e.alternative!), isTrue);
-        if (e.dose.mode == DoseMode.reps) expect(e.repSeconds, greaterThan(0));
-      }
-    });
+        final builtin = registered('builtin');
+        final allVideos = {
+          ...builtin,
+          ...registered('realistic-dark'),
+          ...registered('realistic-light'),
+        };
+        expect(builtin, hasLength(32));
+        for (final e in lib.all) {
+          for (final light in [false, true]) {
+            final video = light ? e.media.lightVideo : e.media.video;
+            final poster = light ? e.media.lightPoster : e.media.poster;
+            expect(video, isNotNull, reason: '${e.id} light=$light');
+            expect(poster, isNotNull, reason: '${e.id} light=$light');
+            expect(allVideos, contains(video));
+            expect(e.media.videoAvailableFor(light: light), isTrue);
+            expect(File(video!).existsSync(), isTrue, reason: video);
+            expect(File(poster!).existsSync(), isTrue, reason: poster);
+          }
+          expect(e.cue, isNotEmpty);
+          if (e.alternative != null) {
+            expect(lib.contains(e.alternative!), isTrue);
+          }
+          if (e.dose.mode == DoseMode.reps) {
+            expect(e.repSeconds, greaterThan(0));
+          }
+        }
+      },
+    );
 
     test(
       'every move is a drill pack with 1–3 cues and its own voice lines',

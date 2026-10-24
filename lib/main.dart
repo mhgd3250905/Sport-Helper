@@ -42,6 +42,7 @@ void registerFontLicense() {
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await configureSystemUi();
   final storage = SharedPreferencesLocalStateStorage();
   final log = RuntimeLog.instance = RuntimeLog(
     enabled: RuntimeLog.buildEnabled,
@@ -157,6 +158,14 @@ Future<void> main() async {
       ),
     ),
   );
+}
+
+/// Keep Android page backgrounds behind the system bars; each page's existing
+/// SafeArea still protects its controls and the palette supplies icon contrast.
+Future<void> configureSystemUi() async {
+  if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
+    await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  }
 }
 
 class SmartFitApp extends StatefulWidget {

@@ -66,16 +66,19 @@ class _ExerciseVideoState extends State<ExerciseVideo> {
   Widget build(BuildContext context) {
     final exercise = widget.exercise;
     final m = exercise.media;
-    final stage = sfStageFor(exercise);
+    final light = Theme.of(context).brightness == Brightness.light;
+    final stage = light ? SfPalette.light : SfPalette.dark;
     return DrillMediaView(
       media: DrillMedia(
         id: exercise.id,
-        videoAsset: m.video,
-        posterAsset: m.poster,
+        videoAsset: light ? m.lightVideo ?? '' : m.video,
+        posterAsset: light ? m.lightPoster ?? '' : m.poster,
         duration: m.loopSeconds,
         posterTime: m.posterSeconds,
         lightVideoAsset: m.lightVideo,
         lightPosterAsset: m.lightPoster,
+        theme: light ? 'light' : 'dark',
+        videoAvailable: m.videoAvailableFor(light: light),
       ),
       playing: widget.playing,
       paused: widget.paused,
@@ -84,6 +87,7 @@ class _ExerciseVideoState extends State<ExerciseVideo> {
       stage: stage.mediaStage,
       errorColor: stage.onStageMuted,
       errorLabel: '示范暂时加载不了，计时和语音仍可继续',
+      unavailableLabel: '此动作暂无视频示范',
     );
   }
 }
