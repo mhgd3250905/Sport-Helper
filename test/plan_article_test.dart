@@ -6,6 +6,8 @@ import 'package:smartfit/domain/plan.dart';
 import 'package:smartfit/ui/exercise_video.dart';
 import 'package:smartfit/ui/plan_page.dart';
 import 'package:smartfit/ui/theme.dart';
+import 'package:ugk_trainer/ugk_trainer.dart'
+    show DrillMediaHandoff, DrillMediaView;
 
 import 'app_flow_test.dart' show services;
 
@@ -103,6 +105,7 @@ Future<AppServices> _show(
   double width = 390,
   double height = 844,
   double scale = 1,
+  SfPalette palette = SfPalette.dark,
   Exercise Function(Exercise)? transform,
 }) async {
   tester.view.physicalSize = Size(width, height);
@@ -123,14 +126,16 @@ Future<AppServices> _show(
     AppScope(
       services: s,
       child: MaterialApp(
-        theme: buildTheme(),
-        builder: (context, child) => MediaQuery(
-          data: MediaQuery.of(context).copyWith(
-            textScaler: TextScaler.linear(scale),
-            padding: const EdgeInsets.only(top: 24, bottom: 24),
-            viewPadding: const EdgeInsets.only(top: 24, bottom: 24),
+        theme: buildTheme(palette),
+        builder: (context, child) => SfPaletteScope(
+          child: MediaQuery(
+            data: MediaQuery.of(context).copyWith(
+              textScaler: TextScaler.linear(scale),
+              padding: const EdgeInsets.only(top: 24, bottom: 24),
+              viewPadding: const EdgeInsets.only(top: 24, bottom: 24),
+            ),
+            child: child!,
           ),
-          child: child!,
         ),
         home: const PlanPage(plan: _plan),
       ),
@@ -159,6 +164,94 @@ ListView _list(WidgetTester tester) =>
     tester.widget<ListView>(find.byKey(const ValueKey('plan-article')));
 
 void main() {
+  tearDown(() => SfColors.palette = SfPalette.dark);
+
+  for (final palette in [SfPalette.light, SfPalette.dark]) {
+    final theme = palette.isDark ? 'dark' : 'light';
+    testWidgets(
+      '$theme article uses themed text and stills and retains manual preview control',
+      (tester) async {
+        final s = await _show(tester, palette: palette);
+        final exercise = s.library['h-catcow-quad'];
+        final media = exercise.media;
+        final video = find.byKey(const ValueKey('article-video-0:0'));
+        expect(Theme.of(tester.element(video)).brightness, palette.brightness);
+        expect(
+          tester.widget<Text>(find.text(_plan.summary)).style!.color,
+          palette.muted,
+        );
+        expect(
+          tester
+              .widget<Text>(find.text('1. ${exercise.cues.first}'))
+              .style!
+              .color,
+          palette.text,
+        );
+        final poster = palette.isDark ? media.poster : media.lightPoster!;
+        final otherPoster = palette.isDark ? media.lightPoster! : media.poster;
+        final stills = tester
+            .widgetList<Image>(
+              find.descendant(of: video, matching: find.byType(Image)),
+            )
+            .map((image) => image.image)
+            .whereType<AssetImage>()
+            .map((image) => image.assetName);
+        expect(stills, contains(poster));
+        expect(stills, isNot(contains(otherPoster)));
+        final surface = tester.widget<DrillMediaView>(
+          find.descendant(of: video, matching: find.byType(DrillMediaView)),
+        );
+        expect(surface.stage, palette.mediaStage);
+        expect(
+          surface.media.videoAsset,
+          palette.isDark ? media.video : media.lightVideo!,
+        );
+        expect(find.byType(DrillMediaHandoff), findsNothing);
+        final control = _toggle('0:0');
+        expect(control.hitTestable(), findsOneWidget);
+        expect(tester.widget<SfCircleButton>(control).iconColor, palette.text);
+        expect(_running(tester), isEmpty);
+
+        await tester.tap(control);
+        await tester.pumpAndSettle();
+        expect(_running(tester), hasLength(1));
+        expect(
+          tester.widget<SfCircleButton>(control).tooltip,
+          '暂停${exercise.name}示范',
+        );
+        await tester.tap(control);
+        await tester.pumpAndSettle();
+        expect(_video(tester, '0:0').playing, isTrue);
+        expect(_video(tester, '0:0').paused, isTrue);
+        expect(_running(tester), isEmpty);
+        await tester.tap(control);
+        await tester.pumpAndSettle();
+        expect(_running(tester), hasLength(1));
+
+        final view = tester.getRect(find.byKey(const ValueKey('plan-article')));
+        final videoRect = tester.getRect(video);
+        _list(tester).controller!.jumpTo(videoRect.bottom - view.top + 2);
+        await tester.pumpAndSettle();
+        expect(
+          tester.getRect(find.byKey(const ValueKey('plan-move-0:0'))).bottom,
+          greaterThan(view.top),
+        );
+        expect(_video(tester, '0:0').playing, isFalse);
+        expect(_running(tester), isEmpty);
+        _list(tester).controller!.jumpTo(0);
+        await tester.pumpAndSettle();
+        expect(_video(tester, '0:0').playing, isFalse);
+        expect(control.hitTestable(), findsOneWidget);
+        expect(
+          tester.widget<SfCircleButton>(control).tooltip,
+          '播放${exercise.name}示范',
+        );
+        expect(_running(tester), isEmpty);
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
+
   testWidgets(
     'article keeps introduction, original sections and global move numbers without autoplay',
     (tester) async {

@@ -124,7 +124,7 @@ class _PlayerPageState extends State<PlayerPage> {
                 output.trainingOperation = _log.operation;
               }
               return ExerciseVideo(
-                key: ValueKey('trainer-media-${request.drill.id}'),
+                key: const ValueKey('trainer-media'),
                 exercise: s.library[request.drill.id],
                 paused: request.paused,
                 mirrored: request.mirrored,
