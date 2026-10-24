@@ -1,5 +1,6 @@
 """Protect the accepted runtime while allowing only the authorized publication fixes."""
 import subprocess
+import plistlib
 from pathlib import Path
 
 from prepare_production_media import check
@@ -15,13 +16,30 @@ ALLOWED = {
     'assets/packs/s-figure4/pack.json',
     'assets/packs/w-dead-bug/pack.json',
     'assets/voice_lc32/v1/manifest.json',
+    'ios/Runner/Info.plist',
     *[f'assets/{base}/s-figure4/{lang}/{name}.m4a'
       for base, lang in [('packs', 'voice/zh'), ('voice_lc32/v1', 'zh')]
       for name in ['cue1', 'cue2', 'side_switch', 'rest']],
 }
 
 
+def validate_ios_info():
+    original = subprocess.run(
+        ['git', 'show', f'{BASELINE}:ios/Runner/Info.plist'],
+        cwd=ROOT, capture_output=True, check=True,
+    ).stdout
+    expected = plistlib.loads(original)
+    expected['CFBundleDisplayName'] = 'SmartFit'
+    expected.pop('UISupportedInterfaceOrientations~ipad', None)
+    expected['NSAppTransportSecurity'] = {'NSAllowsLocalNetworking': True}
+    expected['UIBackgroundModes'] = ['audio']
+    actual = plistlib.loads((ROOT / 'ios/Runner/Info.plist').read_bytes())
+    if actual != expected:
+        raise ValueError('Unexpected iOS Info.plist changes beyond the iPhone release configuration')
+
+
 def validate():
+    validate_ios_info()
     paths = subprocess.run(
         ['git', 'diff', '--name-only', BASELINE, '--', 'lib', 'assets',
          'android/app/src/main/AndroidManifest.xml',
