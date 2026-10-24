@@ -1,6 +1,6 @@
 # 智能健身助手 SmartFit
 
-2026-10-24 待审核开发分支完成 SDK tag 升级、`ask_user` 多轮澄清和聊天 UI 下沉。计划锁定 coach 0.4.1、trainer 0.2.1、coach_ui 0.1.0；接口、验证及待合入步骤见 [本轮接入记录](docs/coach-ui-integration-2026-10-24.md)。尚未合入或推送 main，`release/1.0` 不受本轮改动影响。
+2026-10-24 已经开哥批准，将功能源码 `7f3458dabbf8db4d5c65297d72bccc77eeed8c86` 合入并推送 main：SDK tag 升级、`ask_user` 多轮澄清及聊天 UI 下沉完成。固定 coach 0.4.1、trainer 0.2.1、coach_ui 0.1.0 三个正式 tag，从 GitHub 重新验证严格锁文件通过；接口、验证及发布回执见[本轮接入记录](docs/coach-ui-integration-2026-10-24.md)。后续只对齐发布状态文档，`release/1.0` 保持原状。
 
 描述训练场景 → AI 回复与生成规范训练计划（异常时回退本地模板）→ 用预渲染动作直接展示训练小组 → 跟练（计时 / 组 × 次数 / 休息 / 换侧 / 语音播报）。
 

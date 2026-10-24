@@ -1,8 +1,8 @@
 # 本机验收记录
 
-## SDK 与共享聊天 UI 候选（2026-10-24，待批准）
+## SDK 与共享聊天 UI（2026-10-24，已批准合入并推送）
 
-SmartFit `feat/sdk-coach-ui-20261024`：coach 0.4.1、多轮询问、独立 coach_ui 0.1.0 呈现及 trainer 0.2.1 tag 适配完成。Git tag 来源的最终锁文件验证通过，全套 452 通过 / 13 条件跳过，分析无问题；深浅色原 main golden 逐像素一致，Web release / Android internal debug 编译通过。SDK UI 8 测试、trainer 207 测试通过。候选 tag 仅在隔离验证镜像，未发布或合 main；本轮未安装包或声称真机验收。完整证据、接口和批准后步骤见[本轮接入记录](coach-ui-integration-2026-10-24.md)。以下保留历史验收快照。
+SmartFit 功能源码 `7f3458dabbf8db4d5c65297d72bccc77eeed8c86` 已批准合入并推送 main：coach 0.4.1、多轮询问、独立 coach_ui 0.1.0 呈现及 trainer 0.2.1 tag 适配完成。SDK 两个新 tag 均已发布为 `f0ea064`，随后以全新 Git 缓存从正式 GitHub 远端严格解析成功，App 锁文件无变化。全套 452 通过 / 13 条件跳过，分析无问题；深浅色原 main golden 逐像素一致，Web release / Android internal debug 编译通过。SDK UI 8 测试、trainer 207 测试通过。后续只更新发布状态文档；未安装包或声称真机验收。完整证据、接口和发布回执见[本轮接入记录](coach-ui-integration-2026-10-24.md)。以下保留历史验收快照。
 
 ## +15 用户确认与版本保存（2026-10-23）
 

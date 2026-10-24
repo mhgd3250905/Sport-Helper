@@ -1,14 +1,14 @@
-# SDK tag 升级与共享聊天 UI（2026-10-24，待批准）
+# SDK tag 升级与共享聊天 UI（2026-10-24，已批准合入并推送）
 
-SmartFit 开发分支 `feat/sdk-coach-ui-20261024` 基于 main `f5332bfe3746ecbf69d3f5e48c71ba5c90812499`。SDK 分支 `feat/coach-ui-smartfit-20261024` 已保存为 `f0ea0647586913b205fc6dbb75fc9f97cedc55ce`。两个 main 尚未合入或推送，新 tag 尚未在 SDK 原仓库创建或发布。`release/1.0` 保持 `6c786c08450d5a988db32af025ef0a1f8f5ae331`，未修改其工作树。App 版本仍为 `0.1.0+22`，不是商店发布候选。
+开哥已批准按 SDK → tag → App 远端解析 → App 合入的顺序执行。SDK 功能提交 `f0ea0647586913b205fc6dbb75fc9f97cedc55ce`、SmartFit 功能提交 `7f3458dabbf8db4d5c65297d72bccc77eeed8c86` 均已快进合入并推送各自 main。两个 SDK 新 tag 已发布且固定 `f0ea064`；后续提交仅同步发布状态文档，最终 main 指针以交付回执为准。`release/1.0` 保持 `6c786c08450d5a988db32af025ef0a1f8f5ae331`，未修改其工作树。App 版本仍为 `0.1.0+22`，未安装或上架新包。
 
 ## 依赖与 SHA
 
 | 依赖 tag | 完整 SHA | 状态 |
 | --- | --- | --- |
 | `ugk_coach-v0.4.1` | `88da65ab4e7d6753ab548d779f4168f023dbf9f8` | 已有正式 tag，未修改 coach |
-| `ugk_trainer-v0.2.1` | `f0ea0647586913b205fc6dbb75fc9f97cedc55ce` | 本轮待批准 tag |
-| `ugk_coach_ui-v0.1.0` | `f0ea0647586913b205fc6dbb75fc9f97cedc55ce` | 本轮待批准 tag |
+| `ugk_trainer-v0.2.1` | `f0ea0647586913b205fc6dbb75fc9f97cedc55ce` | 已批准发布并核对远端 |
+| `ugk_coach_ui-v0.1.0` | `f0ea0647586913b205fc6dbb75fc9f97cedc55ce` | 已批准发布并核对远端 |
 
 原目标 trainer `ugk_trainer-v0.2.0` 同样指向 `88da65a`，但其相对 `ugk_coach: path: ../..` 被 Pub 转成提交 ref，与宿主显式 `ugk_coach-v0.4.1` 的 Git 来源冲突，真实解析失败。因此仅将 trainer 的依赖声明改成 coach 正式 tag，并升补丁版 0.2.1；trainer 运行代码保持 0.2.0。SmartFit 三项依赖均锁 tag 及精确版本，不提交本地路径 override。
 
@@ -43,14 +43,17 @@ SDK 新包 `packages/ugk_coach_ui` 仅依赖 Flutter。现有聊天列表、消�
 
 Android `flutter build apk --debug --flavor internal --no-pub` 编译通过，产物为 `build/app/outputs/flutter-apk/app-internal-debug.apk`，仅用于编译验证，未安装或上传。相关文档 104 个相对链接检查无缺失，Git diff 检查通过。独立复核确认询问边界、UI 包隔离与分段适配无阻断。
 
-`flutter pub get --offline --enforce-lockfile` 通过；三项 SDK 依赖均为 Git URL、tag、完整 `resolved-ref`，无路径 override。新 tag 尚未获准发布，故此处从与 SDK 待审提交字节一致的隔离 Git 镜像解析候选 tag。Windows 本机 ANSI 936 会误解码 `git show` 的 UTF-8 中文包描述，Pub 验证采用仅当前进程可见的输出转码包装器；未改原仓库的 SDK blob、系统设置或共享 Pub 缓存内的 SDK 源码。最终锁文件中的地址仍为正式 GitHub 仓库。
+批准前，`flutter pub get --offline --enforce-lockfile` 已从字节一致的隔离 Git 镜像完成预验。正式 tag 推送后，另建空 Git 缓存 `remote-pub-cache`，清除本进程的 Git URL 重写配置，从 `https://github.com/mhgd3250905/ugk-3d-pose-sdk.git` 在线重新执行 `flutter pub get --enforce-lockfile` 成功，锁文件 SHA-256 前后相同；新缓存的 origin 与三个 tag 均已核对。三项依赖保持正式 Git URL、tag 和完整 `resolved-ref`，无本地路径或 main 分支依赖。
 
-本轮 AI 验证使用 fake client 和真实 SDK agent，不读取或注入在线 Key。未声称真实模型服务、多设备、iOS、长时锁屏或手机帧率通过；没有安装 APK、修改手机或操作商店。完整本机日志、基准截图和待发布 tag 的隔离验证镜像位于项目根 `deliveries/sdk-coach-ui-review-20261024/`。
+Windows 本机 ANSI 936 会误解码 `git show` 的 UTF-8 中文包描述，Pub 验证采用仅当前进程可见的输出转码包装器；未改原仓库 SDK blob、系统设置或共享 Pub 缓存内的 SDK 源码，也没有为正式远端验证设置镜像重定向。
 
-## 批准后的顺序
+本轮 AI 验证使用 fake client 和真实 SDK agent，不读取或注入在线 Key。未声称真实模型服务、多设备、iOS、长时锁屏或手机帧率通过；没有安装 APK、修改手机或操作商店。完整本机日志、基准截图、历史预验镜像与正式远端解析日志位于项目根 `deliveries/sdk-coach-ui-review-20261024/`。
 
-1. 核对远端未发生新改动，以审核提交快进合入 SDK main，创建并推送上表两个新 tag 及 main。
-2. 从正式远端再次验证 SmartFit tag 锁文件，快进合入并推送 SmartFit main。
-3. 回报实际远端 SHA；若远端有新提交或代码需要调整，则重新验证差异，不能绕过批准直接覆盖。
+## 合入与发布回执
 
-在批准前，隔离 Git 镜像中的候选 tag 只用于验证解析；它们不代表原仓库已发布。Cockpit 保持非终态工作会话。
+1. SDK main 从 `88da65a` 快进到 `f0ea064` 并普通推送成功，两个 tag 均推送并经 `ls-remote` 确认固定 `f0ea064`，包含 UI 包 README。
+2. 全新 Git 缓存从正式 GitHub 重新 `flutter pub get --enforce-lockfile` 通过且锁文件未变化后，SmartFit main 从 `f5332bf` 快进到 `7f3458d` 并普通推送成功。
+3. 两仓后续只同步批准和发布状态文档，未改变已测功能源码或已发布 tag；文档相对链接和 Git diff 检查通过。
+4. `release/1.0` 本地、远端仍为 `6c786c08450d5a988db32af025ef0a1f8f5ae331`，工作树干净。
+
+最终 main SHA 以发布后的交付回执为准；表中 tag SHA 和功能源码 SHA 保持固定。Cockpit 保持非终态工作会话。

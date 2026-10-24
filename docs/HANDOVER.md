@@ -1,8 +1,8 @@
 # 智能健身助手（SmartFit）交接说明
 
-## 当前开发候选（2026-10-24）
+## 当前主线接入（2026-10-24，已批准合入并推送）
 
-`feat/sdk-coach-ui-20261024` 正在审核 coach 0.4.1 / trainer 0.2.1 tag 升级、询问气泡与 `ugk_coach_ui 0.1.0` 迁移。`release/1.0` 保持原状；App 版本不变，未发布或安装候选包。开哥批准后才能合入两个 main、打 SDK tag 并推送；接口与验证见[本轮记录](coach-ui-integration-2026-10-24.md)。以下为历史交付快照。
+开哥已批准功能源码 `7f3458dabbf8db4d5c65297d72bccc77eeed8c86` 合入并推送 main：coach 0.4.1 / trainer 0.2.1 正式 tag、询问气泡与 `ugk_coach_ui 0.1.0` 迁移完成。先发布 SDK 两个 tag（均固定 `f0ea064`），再从正式 GitHub 远端以全新 Git 缓存验证 App 严格锁文件，最后合入 App。后续只改发布状态文档。`release/1.0` 保持 `6c786c0`；App 版本不变，未安装或上传新包。接口与验证见[本轮记录](coach-ui-integration-2026-10-24.md)。以下为历史交付快照。
 
 ## 当前交接入口（2026-10-23，+15 用户确认通过并保存）
 
