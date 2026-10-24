@@ -89,7 +89,9 @@
     "draft": "docs/store/1.0.0/ios-privacy-draft.md",
     "policyUrl": "https://smartfit-store.pages.dev/privacy/",
     "iosPolicySupplement": "docs/store/1.0.0/ios-policy-supplement-draft.md",
-    "finalDeclarationSaved": false
+    "finalDeclarationSaved": false,
+    "answersSavedInAscDraft": true,
+    "published": false
   },
   "distribution": {
     "priceProposal": "FREE",
@@ -97,17 +99,14 @@
     "otherTerritoriesNotSelectedByAgent": true
   },
   "pendingOwnerFields": [
-    "copyright owner",
-    "App Review contact name and international phone number",
+    "copyright owner display name",
+    "App Review contact entered privately in ASC",
     "final availability territories excluding France",
-    "content-rights and age-rating review",
-    "CDN data-practice review and final App Privacy declaration"
+    "Cloudflare login for existing smartfit-store Pages project"
   ],
   "notAuthorizedByThisDraft": [
-    "formal App Review submission",
     "public release",
-    "TestFlight tester invitations or external Beta App Review",
-    "privacy website deployment"
+    "TestFlight tester invitations or external Beta App Review"
   ],
   "lastVerifiedAt": "2026-10-24T19:40:39+08:00",
   "ascSaved": {
@@ -149,5 +148,30 @@
     "path": "build/ios-release-evidence/SmartFit-1.0.0-25-all-iPhone-screenshots.zip",
     "bytes": 12857865,
     "sha256": "36735405be4a9cf6b57d037662d59a274da9e34edb55393d21dcef1f493c9bcd"
+  },
+  "reviewPreparation": {
+    "state": "AWAITING_REQUIRED_OWNER_DATA",
+    "formalAppReviewAuthorized": true,
+    "formalReviewSubmitted": false,
+    "publicReleaseAuthorized": false,
+    "ageRating": "13+",
+    "medicalOrTreatmentInformation": "INFREQUENT",
+    "healthOrWellnessTopics": true,
+    "contentRights": "THIRD_PARTY_CONTENT_WITH_NECESSARY_RIGHTS",
+    "contentRightsPersistedAfterReload": true,
+    "regulatedMedicalDevice": false,
+    "price": "FREE",
+    "pricingBase": "USD 0.00",
+    "pricingTerritoryCount": 175,
+    "availabilityTerritoriesSaved": false,
+    "macAvailability": false,
+    "visionProAvailability": false,
+    "privacyAnswersSavedInDraft": true,
+    "privacyLabelsPublished": false,
+    "privacyWebsiteDeployed": false,
+    "privacyWebsiteSource": "docs/store/1.0.0/site/",
+    "cloudflareAuthenticationPending": true,
+    "appleAddForReviewValidation": "REJECTED_MISSING_REQUIRED_METADATA",
+    "lastVerifiedAt": "2026-10-24T20:44:51+08:00"
   }
 }

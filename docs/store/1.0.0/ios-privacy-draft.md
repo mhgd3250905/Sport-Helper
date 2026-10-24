@@ -1,6 +1,6 @@
 # iOS App Privacy 填写草稿
 
-核对日期：2026-10-24。适用 `release/1.0` 的 `com.ugk.smartfit` / `1.0.0+25`。这是供开哥复核的答案草稿，尚未保存到 App Store Connect，也不代表已提交审核。
+核对日期：2026-10-24。适用 `release/1.0` 的 `com.ugk.smartfit` / `1.0.0+25`。开哥已进一步授权推进正式审核；本表两类数据的答案和政策 URL 已保存到 ASC 草稿，20:44:51 重新打开页面核对保留。**尚未点击“发布”隐私标签，尚未提交审核**；公开政策站的 iOS 补充仍待 Cloudflare 登录后部署。
 
 本轮用户已确认保留原界面，只是不注入 AI Key；原 AI 记忆设置和说明仍可见。构建仅配置公开素材 CDN，不传 `SMARTFIT_AI_TOKEN`、AI endpoint 或 dart-define 配置文件。空 Key 走本地规则引擎，不创建 AI 客户端。
 
@@ -14,7 +14,7 @@
 | Health / Fitness / Sensitive Info | 不申报云端收集本地训练记录和安全问答 | 问答、计划、训练结果存在本机。此结论依赖空 Key、本地引擎和未加入其他上传组件；不代表设备上没有这些数据 |
 | 联系信息、照片、录音、位置、联系人、购买 | 未发现本版本主动采集上传 | 当前没有相机、麦克风、定位、HealthKit、广告或购买入口。用户主动发出的外部支持邮件须按实际支持处理另行核对 |
 | 跨 App / 网站 Tracking | 否 | 未接入定向广告、广告归因或数据经纪商用途；不需要 ATT 提示 |
-| 隐私政策 URL | `https://smartfit-store.pages.dev/privacy/` | 现有公开正文主要面向 Android，并描述原 AI 入口；开哥送审前需补充 iOS、平台备份和最终 CDN 数据处理范围 |
+| 隐私政策 URL | `https://smartfit-store.pages.dev/privacy/`；已保存到 ASC 草稿 | 现有公开正文主要面向 Android；已准备 [双语站点补充版本](site/README.md)，尚未部署 |
 
 “与用户关联”暂按保守答案填写：当前没有在收集前匿名化 IP / 请求元数据的证据。若后续拿到真实 CDN 配置和日志证据，应按实际情况修订，而不是直接继承此草稿。App Privacy 与 Android Data safety 的选项和定义不同，不能照搬全部字段。
 
@@ -23,9 +23,15 @@
 - 原生 Release 构建已通过；解析后的 `UIDeviceFamily = [1]`、版本 `1.0.0 (25)`。
 - 没有相机、麦克风或定位用途说明；`UIBackgroundModes = [audio]` 用于训练语音，`NSAllowsLocalNetworking` 用于设备回环播放器。
 - Release App 含 6 份可解析的 `PrivacyInfo.xcprivacy`：Flutter、shared_preferences_foundation、webview_flutter_wkwebview、connectivity_plus、wakelock_plus、package_info_plus。各份 Tracking 均为 false。
-- UserDefaults 及 Flutter 的 FileTimestamp / SystemBootTime 理由由随包隐私清单提供；最终仍须对签名 IPA 重验，不能用源码清单替代归档检查。
+- UserDefaults 及 Flutter 的 FileTimestamp / SystemBootTime 理由由随包隐私清单提供；对最终上传分发 IPA 的六份隐私清单语法与签名检查已通过，详见发布记录。
 - 对最终上传的分发 IPA（SHA-256 `49d279d7713f81cc7425716546e6528b8097e24d8efb3b4afe469c9127d2dd0c`）完成常见 GitHub / OpenAI token、私钥和秘密文件检查，未发现凭据或 `.env`、`.key`、`.pem`、`.p12`、`.pfx` 文件；同时核对构建只注入公开素材 CDN。检查覆盖已列出的模式及本轮构建配置。
 - 还未完成最终 TestFlight Build 的真机网络、拒绝权限、后台语音和系统备份验证；不得标为已通过。
+
+## ASC 草稿保存结果
+
+- 数据类型仅为设备 ID、产品交互；两个类型均为 App 功能、与用户身份关联、追踪用途为否。
+- 保存后重新打开页面，两个类型均显示“用于 App 功能”“与用户身份关联”，不再有“设置设备 ID / 设置产品交互”的未完成提示；产品页预览显示标识符与使用数据。
+- 隐私“发布”按钮当前可用，但尚未执行。待政策站实际更新并验证后继续，不把草稿保存写成已经对外发布。
 
 ## 官方依据
 
