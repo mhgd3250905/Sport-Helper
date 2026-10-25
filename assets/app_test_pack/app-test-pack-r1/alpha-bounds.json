@@ -12,6 +12,17 @@
         491
       ]
     },
+    "assets/app_test_pack/app-test-pack-r1/objects/01dcbe93f7d70c41140ecf543d753f1c6680dd1ac1d8f6e9d918bd25cc81c729.webp": {
+      "sourceSha256": "01dcbe93f7d70c41140ecf543d753f1c6680dd1ac1d8f6e9d918bd25cc81c729",
+      "width": 720,
+      "height": 720,
+      "bounds": [
+        250,
+        48,
+        718,
+        673
+      ]
+    },
     "assets/app_test_pack/app-test-pack-r1/objects/031b7919f3a355647c6470f09a422303710d62b5972518c615518da8a7c6d482.webp": {
       "sourceSha256": "031b7919f3a355647c6470f09a422303710d62b5972518c615518da8a7c6d482",
       "width": 240,
@@ -21,6 +32,17 @@
         72,
         240,
         168
+      ]
+    },
+    "assets/app_test_pack/app-test-pack-r1/objects/0f1dea7acc1a9ec308183f84cc7c480440030a9c59917c9abe9b5494f46af6a3.webp": {
+      "sourceSha256": "0f1dea7acc1a9ec308183f84cc7c480440030a9c59917c9abe9b5494f46af6a3",
+      "width": 240,
+      "height": 240,
+      "bounds": [
+        17,
+        15,
+        216,
+        197
       ]
     },
     "assets/app_test_pack/app-test-pack-r1/objects/14857df71a6ba6fe5ab20a53567283478487a7cb25e80cd2cb62d06f84497cf9.webp": {
@@ -45,6 +67,17 @@
         517
       ]
     },
+    "assets/app_test_pack/app-test-pack-r1/objects/24250d9fff928b1cbc9c83e01afba5b94a474fce28f143e02be4c390dbf7127c.webp": {
+      "sourceSha256": "24250d9fff928b1cbc9c83e01afba5b94a474fce28f143e02be4c390dbf7127c",
+      "width": 240,
+      "height": 240,
+      "bounds": [
+        28,
+        15,
+        240,
+        228
+      ]
+    },
     "assets/app_test_pack/app-test-pack-r1/objects/2f7991bf3ebc6a8885aba15876a65d8b9bcd4f48192707d7b7915b677a8f5caf.webp": {
       "sourceSha256": "2f7991bf3ebc6a8885aba15876a65d8b9bcd4f48192707d7b7915b677a8f5caf",
       "width": 720,
@@ -54,6 +87,39 @@
         233,
         720,
         720
+      ]
+    },
+    "assets/app_test_pack/app-test-pack-r1/objects/305b16e40f52e638dfc868ef82dfe6a1ed54c3f34a649d5fd4aaaa99c2d9ac42.webp": {
+      "sourceSha256": "305b16e40f52e638dfc868ef82dfe6a1ed54c3f34a649d5fd4aaaa99c2d9ac42",
+      "width": 240,
+      "height": 240,
+      "bounds": [
+        14,
+        91,
+        226,
+        195
+      ]
+    },
+    "assets/app_test_pack/app-test-pack-r1/objects/44b8e3d87da4cc34ca3a2bd09e31c6f6744bdc34944cc064f34be101efb42d7c.webp": {
+      "sourceSha256": "44b8e3d87da4cc34ca3a2bd09e31c6f6744bdc34944cc064f34be101efb42d7c",
+      "width": 240,
+      "height": 240,
+      "bounds": [
+        45,
+        14,
+        195,
+        228
+      ]
+    },
+    "assets/app_test_pack/app-test-pack-r1/objects/46268abd4e516ab98b08eaa7e97ec65557dc7c54fef1b9a6972e3c4755d35ae4.webp": {
+      "sourceSha256": "46268abd4e516ab98b08eaa7e97ec65557dc7c54fef1b9a6972e3c4755d35ae4",
+      "width": 720,
+      "height": 720,
+      "bounds": [
+        48,
+        183,
+        720,
+        537
       ]
     },
     "assets/app_test_pack/app-test-pack-r1/objects/4637392bf045983d955ff58e47d8775f5f24d67bdefb21fde95d4a1612f3e905.webp": {
@@ -67,6 +133,28 @@
         240
       ]
     },
+    "assets/app_test_pack/app-test-pack-r1/objects/4d37a2fb42c0da26f65dc5e33bd55c9cec7db096175938321be849aa4022aae6.webp": {
+      "sourceSha256": "4d37a2fb42c0da26f65dc5e33bd55c9cec7db096175938321be849aa4022aae6",
+      "width": 240,
+      "height": 240,
+      "bounds": [
+        82,
+        14,
+        239,
+        226
+      ]
+    },
+    "assets/app_test_pack/app-test-pack-r1/objects/60a99c557f1caae7df21844ae04e74e2fd1452963f642f07cebe09ea4981a8f2.webp": {
+      "sourceSha256": "60a99c557f1caae7df21844ae04e74e2fd1452963f642f07cebe09ea4981a8f2",
+      "width": 720,
+      "height": 720,
+      "bounds": [
+        55,
+        47,
+        644,
+        588
+      ]
+    },
     "assets/app_test_pack/app-test-pack-r1/objects/6a97930bc1f210ecbfbdc7cb9c4568320469de5ec413b9d5e9f997f7c71466f9.webp": {
       "sourceSha256": "6a97930bc1f210ecbfbdc7cb9c4568320469de5ec413b9d5e9f997f7c71466f9",
       "width": 720,
@@ -78,6 +166,17 @@
         630
       ]
     },
+    "assets/app_test_pack/app-test-pack-r1/objects/78a842d2a04207338fc7723c8f890e5fad576e64d20899290975c8321186cab5.webp": {
+      "sourceSha256": "78a842d2a04207338fc7723c8f890e5fad576e64d20899290975c8321186cab5",
+      "width": 240,
+      "height": 240,
+      "bounds": [
+        14,
+        59,
+        240,
+        181
+      ]
+    },
     "assets/app_test_pack/app-test-pack-r1/objects/7919cb216c0dc7a27a02821b5a8a035a0d19bbcd50aafbfe1cfef0c3bb95f7d1.webp": {
       "sourceSha256": "7919cb216c0dc7a27a02821b5a8a035a0d19bbcd50aafbfe1cfef0c3bb95f7d1",
       "width": 240,
@@ -87,6 +186,17 @@
         74,
         239,
         165
+      ]
+    },
+    "assets/app_test_pack/app-test-pack-r1/objects/792be245a0294de794fadd7a4498823d142b2c2492451a127cdad6017419ffb9.webp": {
+      "sourceSha256": "792be245a0294de794fadd7a4498823d142b2c2492451a127cdad6017419ffb9",
+      "width": 720,
+      "height": 720,
+      "bounds": [
+        93,
+        196,
+        590,
+        672
       ]
     },
     "assets/app_test_pack/app-test-pack-r1/objects/b99b329d342499e7ff75cd1c9558c1356a954e737bb3808eede4608b8a494682.webp": {
@@ -109,6 +219,50 @@
         64,
         240,
         174
+      ]
+    },
+    "assets/app_test_pack/app-test-pack-r1/objects/ccddb117900ec8ab94bdf3c758471088dc063d018253c1a02462919c6c0907ed.webp": {
+      "sourceSha256": "ccddb117900ec8ab94bdf3c758471088dc063d018253c1a02462919c6c0907ed",
+      "width": 720,
+      "height": 720,
+      "bounds": [
+        140,
+        47,
+        580,
+        678
+      ]
+    },
+    "assets/app_test_pack/app-test-pack-r1/objects/d02cd52c8f903ac9f121127d35542fcdbf348d9ae115824d1a96101121c5b9e2.webp": {
+      "sourceSha256": "d02cd52c8f903ac9f121127d35542fcdbf348d9ae115824d1a96101121c5b9e2",
+      "width": 720,
+      "height": 720,
+      "bounds": [
+        87,
+        47,
+        720,
+        680
+      ]
+    },
+    "assets/app_test_pack/app-test-pack-r1/objects/d382f84f51e400914d7221f8130cdbc9e1353347169cd504678f8a18e1d76f5e.webp": {
+      "sourceSha256": "d382f84f51e400914d7221f8130cdbc9e1353347169cd504678f8a18e1d76f5e",
+      "width": 720,
+      "height": 720,
+      "bounds": [
+        45,
+        277,
+        675,
+        582
+      ]
+    },
+    "assets/app_test_pack/app-test-pack-r1/objects/e3236e0c4737e6a1028071cfcb1c971a536b02b947253c231fbb40fa5fbfdbf8.webp": {
+      "sourceSha256": "e3236e0c4737e6a1028071cfcb1c971a536b02b947253c231fbb40fa5fbfdbf8",
+      "width": 240,
+      "height": 240,
+      "bounds": [
+        29,
+        64,
+        198,
+        226
       ]
     }
   }

@@ -1,0 +1,5597 @@
+{
+  "format": "pose-hub-stacked-alpha-delivery@1",
+  "id": "app-test-pack-r1",
+  "status": "test-unreviewed",
+  "complete": false,
+  "reviewed": false,
+  "releaseEligible": false,
+  "updatedAt": "2026-10-25T05:32:13.680664+00:00",
+  "sourceCatalogSha256": "4cc5e750e915f20ae9360a0cdbffe327b50548acce229fd71f5e29b616783735",
+  "exporterSha256": "74ead126dbd236590e7a7519c921210b5977f22158b4d6bd9d88222a8b10c72a",
+  "readyCount": 12,
+  "totalCount": 219,
+  "pendingCount": 207,
+  "queueState": "running",
+  "pendingIds": [
+    "chest-C",
+    "deltoids-A",
+    "deltoids-B",
+    "deltoids-C",
+    "erectors-A",
+    "erectors-B",
+    "erectors-C",
+    "forearms-A",
+    "forearms-B",
+    "forearms-C",
+    "g-cable-hip-abduction",
+    "g-cable-hip-extension",
+    "glute-max-A",
+    "glute-max-B",
+    "glute-max-C",
+    "h-9090-liftoff",
+    "h-adductor-rock",
+    "h-banana",
+    "h-band-chest-fly",
+    "h-band-face-pull",
+    "h-band-hip-extension",
+    "h-band-hip-ir",
+    "h-band-leg-out",
+    "h-band-pallof",
+    "h-band-pull-apart",
+    "h-band-row",
+    "h-band-shoulder-ir",
+    "h-band-standing-abduction",
+    "h-band-standing-adduction",
+    "h-band-stepout",
+    "h-band-straight-leg-raise",
+    "h-band-triceps-pressdown",
+    "h-bilateral-farmer-hold-native",
+    "h-bilateral-upper-back-hug",
+    "h-bridge-march",
+    "h-bulgarian",
+    "h-butterfly-active",
+    "h-calf-raise",
+    "h-catcow-quad",
+    "h-chair-dip",
+    "h-chair-kickback",
+    "h-chair-lat",
+    "h-chair-progressive-front-split-native",
+    "h-chair-single-leg-hip-thrust",
+    "h-chair-sit-to-stand",
+    "h-chair-step-up",
+    "h-close-stance-forward-fold-native",
+    "h-cobra",
+    "h-couch-stretch",
+    "h-crunch",
+    "h-db-calf-raise",
+    "h-db-curl",
+    "h-db-floor-fly",
+    "h-db-floor-press",
+    "h-db-front-raise",
+    "h-db-hammer-curl",
+    "h-db-kickback",
+    "h-db-lateral",
+    "h-db-overhead-triceps-extension",
+    "h-db-press",
+    "h-db-rdl",
+    "h-db-reverse-fly",
+    "h-db-row",
+    "h-db-shrug",
+    "h-db-split-squat",
+    "h-db-supported-calf-raise",
+    "h-dd-shoulder",
+    "h-donkey-kick",
+    "h-doorframe-forearms-pec-native-r3",
+    "h-fixed-bar-vertical-pull",
+    "h-floor-nordic-hand-reset",
+    "h-forearm-plank",
+    "h-forward-lunge",
+    "h-goblet-squat",
+    "h-good-morning",
+    "h-hip-gate",
+    "h-incline-pushup",
+    "h-knee-hug",
+    "h-knee-wall-dorsiflexion-native",
+    "h-kneeling-instep-stretch",
+    "h-kneeling-pushup",
+    "h-kneeling-thread-needle",
+    "h-lateral-step-lunge",
+    "h-overhead-triceps-stretch",
+    "h-pike-scapular-elevation",
+    "h-plank-side-step",
+    "h-quad-cars",
+    "h-quadruped-open",
+    "h-quadruped-rockback",
+    "h-reverse-clam",
+    "h-reverse-crunch",
+    "h-russian-twist",
+    "h-seated-reachback",
+    "h-short-side-plank",
+    "h-side-er",
+    "h-side-leg-raise",
+    "h-sleeper-stretch",
+    "h-slider-body-saw",
+    "h-standing-forearm-rotation",
+    "h-standing-wrist-deviation",
+    "h-standing-wrist-extensor-stretch",
+    "h-step-jack",
+    "h-straight-arm-hang-native",
+    "h-suitcase-hold",
+    "h-suitcase-march",
+    "h-sumo-pry",
+    "h-superman",
+    "h-supine-bilateral-leg-raise",
+    "h-supine-heel-slide",
+    "h-supine-twist",
+    "h-supported-single-leg-calf",
+    "h-tabletop",
+    "h-tib-raise",
+    "h-towel-isometric-curl",
+    "h-unsupported-star-reach-native",
+    "h-wall-angel",
+    "h-wall-calf",
+    "h-wall-calf-bent-knee",
+    "h-wall-palm-lift",
+    "h-wall-straddle",
+    "h-wall-wrist-flexor-stretch",
+    "hamstrings-A",
+    "hamstrings-B",
+    "hamstrings-C",
+    "hip-abductors-A",
+    "hip-abductors-B",
+    "hip-abductors-C",
+    "hip-flexors-A",
+    "hip-flexors-B",
+    "hip-flexors-C",
+    "lats-A",
+    "lats-B",
+    "lats-C",
+    "n-chair-wiper",
+    "n-half-split",
+    "n-leg-circles",
+    "n-pelvis-circle",
+    "n-prone-hip-ext",
+    "n-prone-ir",
+    "n-seated-ir-drop",
+    "n-seated-knee-lift",
+    "n-seated-squeeze",
+    "n-slider-lateral",
+    "n-squat-shift",
+    "n-straddle-fold",
+    "n-thomas-test",
+    "n-wide-fold",
+    "n-windshield",
+    "o-chair-knee-extension",
+    "o-seated-calf-raise",
+    "o-seated-catcow",
+    "o-seated-fig4",
+    "o-seated-ham",
+    "o-seated-hip-er",
+    "o-seated-sidebend",
+    "o-seated-twist",
+    "o-stand-crossreach",
+    "o-stand-ham",
+    "o-stand-lunge",
+    "o-stand-quad",
+    "o-stand-sidebend",
+    "o-supported-ankle-eversion",
+    "o-supported-ankle-inversion",
+    "o-supported-ankle-pump",
+    "o-supported-hip-airplane",
+    "o-supported-hip-hitch",
+    "o-supported-hip-ir",
+    "o-supported-knee-curl",
+    "o-supported-march",
+    "o-supported-mini-squat",
+    "o-supported-single-leg-rdl",
+    "o-supported-star-reach",
+    "o-wall-hip-hinge-stretch",
+    "obliques-A",
+    "obliques-B",
+    "obliques-C",
+    "quadriceps-A",
+    "quadriceps-B",
+    "quadriceps-C",
+    "rotator-cuff-A",
+    "rotator-cuff-B",
+    "rotator-cuff-C",
+    "s-9090",
+    "s-butterfly",
+    "s-figure4",
+    "s-frog",
+    "s-kneel-hipflex",
+    "s-lizard",
+    "s-pigeon",
+    "s-seated-fold",
+    "scapular-A",
+    "scapular-B",
+    "scapular-C",
+    "serratus-A",
+    "serratus-B",
+    "serratus-C",
+    "t-seated-straddle-lift-1leg",
+    "triceps-A",
+    "triceps-B",
+    "triceps-C",
+    "w-chair-hip-thrust",
+    "w-clamshell",
+    "w-dead-bug",
+    "w-feet-on-chair-bridge",
+    "w-fire-hydrant",
+    "w-prone-swimmer",
+    "w-wall-sit"
+  ],
+  "excluded": [],
+  "queueExcludedIds": [
+    "h-chair-tspine",
+    "h-squat",
+    "w-bird-dog"
+  ],
+  "states": {
+    "abs-A": {
+      "state": "ready-test-unreviewed"
+    },
+    "abs-B": {
+      "state": "ready-test-unreviewed"
+    },
+    "abs-C": {
+      "state": "ready-test-unreviewed"
+    },
+    "adductors-A": {
+      "state": "ready-test-unreviewed"
+    },
+    "adductors-B": {
+      "state": "ready-test-unreviewed"
+    },
+    "adductors-C": {
+      "state": "ready-test-unreviewed"
+    },
+    "chest-A": {
+      "state": "ready-test-unreviewed"
+    },
+    "chest-B": {
+      "state": "ready-test-unreviewed"
+    },
+    "chest-C": {
+      "state": "encoding",
+      "attempt": "chest-C-r1",
+      "updatedAt": "2026-10-25T05:32:13.678984+00:00"
+    },
+    "deltoids-A": {
+      "state": "queued"
+    },
+    "deltoids-B": {
+      "state": "queued"
+    },
+    "deltoids-C": {
+      "state": "queued"
+    },
+    "erectors-A": {
+      "state": "queued"
+    },
+    "erectors-B": {
+      "state": "queued"
+    },
+    "erectors-C": {
+      "state": "queued"
+    },
+    "forearms-A": {
+      "state": "queued"
+    },
+    "forearms-B": {
+      "state": "queued"
+    },
+    "forearms-C": {
+      "state": "queued"
+    },
+    "g-cable-hip-abduction": {
+      "state": "queued"
+    },
+    "g-cable-hip-extension": {
+      "state": "queued"
+    },
+    "glute-max-A": {
+      "state": "queued"
+    },
+    "glute-max-B": {
+      "state": "queued"
+    },
+    "glute-max-C": {
+      "state": "queued"
+    },
+    "h-9090-liftoff": {
+      "state": "queued"
+    },
+    "h-adductor-rock": {
+      "state": "queued"
+    },
+    "h-banana": {
+      "state": "queued"
+    },
+    "h-band-chest-fly": {
+      "state": "queued"
+    },
+    "h-band-face-pull": {
+      "state": "queued"
+    },
+    "h-band-hip-extension": {
+      "state": "queued"
+    },
+    "h-band-hip-ir": {
+      "state": "queued"
+    },
+    "h-band-leg-out": {
+      "state": "queued"
+    },
+    "h-band-pallof": {
+      "state": "queued"
+    },
+    "h-band-pull-apart": {
+      "state": "queued"
+    },
+    "h-band-row": {
+      "state": "queued"
+    },
+    "h-band-shoulder-ir": {
+      "state": "queued"
+    },
+    "h-band-standing-abduction": {
+      "state": "queued"
+    },
+    "h-band-standing-adduction": {
+      "state": "queued"
+    },
+    "h-band-stepout": {
+      "state": "queued"
+    },
+    "h-band-straight-leg-raise": {
+      "state": "queued"
+    },
+    "h-band-triceps-pressdown": {
+      "state": "queued"
+    },
+    "h-bent-knee-calf-raise": {
+      "state": "ready-test-unreviewed"
+    },
+    "h-bilateral-farmer-hold-native": {
+      "state": "pending-latest-transparent-full-layers"
+    },
+    "h-bilateral-upper-back-hug": {
+      "state": "pending-latest-transparent-full-layers"
+    },
+    "h-bridge-march": {
+      "state": "queued"
+    },
+    "h-bulgarian": {
+      "state": "queued"
+    },
+    "h-butterfly-active": {
+      "state": "queued"
+    },
+    "h-calf-raise": {
+      "state": "queued"
+    },
+    "h-catcow-quad": {
+      "state": "queued"
+    },
+    "h-chair-dip": {
+      "state": "queued"
+    },
+    "h-chair-kickback": {
+      "state": "queued"
+    },
+    "h-chair-lat": {
+      "state": "queued"
+    },
+    "h-chair-progressive-front-split-native": {
+      "state": "pending-latest-transparent-full-layers"
+    },
+    "h-chair-single-leg-hip-thrust": {
+      "state": "pending-latest-transparent-full-layers"
+    },
+    "h-chair-sit-to-stand": {
+      "state": "queued"
+    },
+    "h-chair-step-up": {
+      "state": "queued"
+    },
+    "h-chair-tspine": {
+      "state": "ready-test-unreviewed"
+    },
+    "h-close-stance-forward-fold-native": {
+      "state": "pending-latest-transparent-full-layers"
+    },
+    "h-cobra": {
+      "state": "queued"
+    },
+    "h-couch-stretch": {
+      "state": "queued"
+    },
+    "h-crunch": {
+      "state": "queued"
+    },
+    "h-db-calf-raise": {
+      "state": "queued"
+    },
+    "h-db-curl": {
+      "state": "queued"
+    },
+    "h-db-floor-fly": {
+      "state": "pending-latest-transparent-full-layers"
+    },
+    "h-db-floor-press": {
+      "state": "queued"
+    },
+    "h-db-front-raise": {
+      "state": "queued"
+    },
+    "h-db-hammer-curl": {
+      "state": "queued"
+    },
+    "h-db-kickback": {
+      "state": "queued"
+    },
+    "h-db-lateral": {
+      "state": "queued"
+    },
+    "h-db-overhead-triceps-extension": {
+      "state": "pending-latest-transparent-full-layers"
+    },
+    "h-db-press": {
+      "state": "queued"
+    },
+    "h-db-rdl": {
+      "state": "queued"
+    },
+    "h-db-reverse-fly": {
+      "state": "queued"
+    },
+    "h-db-row": {
+      "state": "queued"
+    },
+    "h-db-shrug": {
+      "state": "queued"
+    },
+    "h-db-split-squat": {
+      "state": "queued"
+    },
+    "h-db-supported-calf-raise": {
+      "state": "queued"
+    },
+    "h-dd-shoulder": {
+      "state": "queued"
+    },
+    "h-donkey-kick": {
+      "state": "queued"
+    },
+    "h-doorframe-forearms-pec-native-r3": {
+      "state": "pending-latest-transparent-full-layers"
+    },
+    "h-fixed-bar-vertical-pull": {
+      "state": "pending-latest-transparent-full-layers"
+    },
+    "h-floor-nordic-hand-reset": {
+      "state": "pending-latest-transparent-full-layers"
+    },
+    "h-forearm-plank": {
+      "state": "queued"
+    },
+    "h-forward-lunge": {
+      "state": "pending-latest-transparent-full-layers"
+    },
+    "h-goblet-squat": {
+      "state": "pending-latest-transparent-full-layers"
+    },
+    "h-good-morning": {
+      "state": "queued"
+    },
+    "h-hip-gate": {
+      "state": "queued"
+    },
+    "h-incline-pushup": {
+      "state": "queued"
+    },
+    "h-knee-hug": {
+      "state": "queued"
+    },
+    "h-knee-wall-dorsiflexion-native": {
+      "state": "pending-latest-transparent-full-layers"
+    },
+    "h-kneeling-instep-stretch": {
+      "state": "pending-latest-transparent-full-layers"
+    },
+    "h-kneeling-pushup": {
+      "state": "pending-latest-transparent-full-layers"
+    },
+    "h-kneeling-thread-needle": {
+      "state": "pending-latest-transparent-full-layers"
+    },
+    "h-lateral-step-lunge": {
+      "state": "pending-latest-transparent-full-layers"
+    },
+    "h-overhead-triceps-stretch": {
+      "state": "pending-latest-transparent-full-layers"
+    },
+    "h-pike-scapular-elevation": {
+      "state": "queued"
+    },
+    "h-plank-side-step": {
+      "state": "queued"
+    },
+    "h-quad-cars": {
+      "state": "queued"
+    },
+    "h-quadruped-open": {
+      "state": "pending-latest-transparent-full-layers"
+    },
+    "h-quadruped-rockback": {
+      "state": "pending-latest-transparent-full-layers"
+    },
+    "h-reverse-clam": {
+      "state": "queued"
+    },
+    "h-reverse-crunch": {
+      "state": "queued"
+    },
+    "h-russian-twist": {
+      "state": "queued"
+    },
+    "h-seated-reachback": {
+      "state": "queued"
+    },
+    "h-short-side-plank": {
+      "state": "pending-latest-transparent-full-layers"
+    },
+    "h-side-er": {
+      "state": "queued"
+    },
+    "h-side-leg-raise": {
+      "state": "queued"
+    },
+    "h-sleeper-stretch": {
+      "state": "pending-latest-transparent-full-layers"
+    },
+    "h-slider-body-saw": {
+      "state": "queued"
+    },
+    "h-squat": {
+      "state": "ready-test-unreviewed"
+    },
+    "h-standing-forearm-rotation": {
+      "state": "queued"
+    },
+    "h-standing-wrist-deviation": {
+      "state": "queued"
+    },
+    "h-standing-wrist-extensor-stretch": {
+      "state": "queued"
+    },
+    "h-step-jack": {
+      "state": "queued"
+    },
+    "h-straight-arm-hang-native": {
+      "state": "pending-latest-transparent-full-layers"
+    },
+    "h-suitcase-hold": {
+      "state": "queued"
+    },
+    "h-suitcase-march": {
+      "state": "queued"
+    },
+    "h-sumo-pry": {
+      "state": "queued"
+    },
+    "h-superman": {
+      "state": "queued"
+    },
+    "h-supine-bilateral-leg-raise": {
+      "state": "pending-latest-transparent-full-layers"
+    },
+    "h-supine-heel-slide": {
+      "state": "pending-latest-transparent-full-layers"
+    },
+    "h-supine-twist": {
+      "state": "queued"
+    },
+    "h-supported-single-leg-calf": {
+      "state": "queued"
+    },
+    "h-tabletop": {
+      "state": "queued"
+    },
+    "h-tib-raise": {
+      "state": "queued"
+    },
+    "h-towel-isometric-curl": {
+      "state": "pending-latest-transparent-full-layers"
+    },
+    "h-unsupported-star-reach-native": {
+      "state": "pending-latest-transparent-full-layers"
+    },
+    "h-wall-angel": {
+      "state": "queued"
+    },
+    "h-wall-calf": {
+      "state": "queued"
+    },
+    "h-wall-calf-bent-knee": {
+      "state": "queued"
+    },
+    "h-wall-palm-lift": {
+      "state": "pending-latest-transparent-full-layers"
+    },
+    "h-wall-straddle": {
+      "state": "queued"
+    },
+    "h-wall-wrist-flexor-stretch": {
+      "state": "queued"
+    },
+    "hamstrings-A": {
+      "state": "queued"
+    },
+    "hamstrings-B": {
+      "state": "queued"
+    },
+    "hamstrings-C": {
+      "state": "queued"
+    },
+    "hip-abductors-A": {
+      "state": "queued"
+    },
+    "hip-abductors-B": {
+      "state": "queued"
+    },
+    "hip-abductors-C": {
+      "state": "queued"
+    },
+    "hip-flexors-A": {
+      "state": "queued"
+    },
+    "hip-flexors-B": {
+      "state": "queued"
+    },
+    "hip-flexors-C": {
+      "state": "queued"
+    },
+    "lats-A": {
+      "state": "queued"
+    },
+    "lats-B": {
+      "state": "queued"
+    },
+    "lats-C": {
+      "state": "queued"
+    },
+    "n-chair-wiper": {
+      "state": "queued"
+    },
+    "n-half-split": {
+      "state": "queued"
+    },
+    "n-leg-circles": {
+      "state": "queued"
+    },
+    "n-pelvis-circle": {
+      "state": "queued"
+    },
+    "n-prone-hip-ext": {
+      "state": "queued"
+    },
+    "n-prone-ir": {
+      "state": "queued"
+    },
+    "n-seated-ir-drop": {
+      "state": "queued"
+    },
+    "n-seated-knee-lift": {
+      "state": "queued"
+    },
+    "n-seated-squeeze": {
+      "state": "queued"
+    },
+    "n-slider-lateral": {
+      "state": "queued"
+    },
+    "n-squat-shift": {
+      "state": "queued"
+    },
+    "n-straddle-fold": {
+      "state": "queued"
+    },
+    "n-thomas-test": {
+      "state": "queued"
+    },
+    "n-wide-fold": {
+      "state": "queued"
+    },
+    "n-windshield": {
+      "state": "queued"
+    },
+    "o-chair-knee-extension": {
+      "state": "pending-latest-transparent-full-layers"
+    },
+    "o-seated-calf-raise": {
+      "state": "pending-latest-transparent-full-layers"
+    },
+    "o-seated-catcow": {
+      "state": "queued"
+    },
+    "o-seated-fig4": {
+      "state": "queued"
+    },
+    "o-seated-ham": {
+      "state": "queued"
+    },
+    "o-seated-hip-er": {
+      "state": "queued"
+    },
+    "o-seated-sidebend": {
+      "state": "pending-latest-transparent-full-layers"
+    },
+    "o-seated-twist": {
+      "state": "queued"
+    },
+    "o-stand-crossreach": {
+      "state": "queued"
+    },
+    "o-stand-ham": {
+      "state": "queued"
+    },
+    "o-stand-lunge": {
+      "state": "queued"
+    },
+    "o-stand-quad": {
+      "state": "queued"
+    },
+    "o-stand-sidebend": {
+      "state": "queued"
+    },
+    "o-supported-ankle-eversion": {
+      "state": "queued"
+    },
+    "o-supported-ankle-inversion": {
+      "state": "queued"
+    },
+    "o-supported-ankle-pump": {
+      "state": "queued"
+    },
+    "o-supported-hip-airplane": {
+      "state": "queued"
+    },
+    "o-supported-hip-hitch": {
+      "state": "queued"
+    },
+    "o-supported-hip-ir": {
+      "state": "queued"
+    },
+    "o-supported-knee-curl": {
+      "state": "queued"
+    },
+    "o-supported-march": {
+      "state": "queued"
+    },
+    "o-supported-mini-squat": {
+      "state": "queued"
+    },
+    "o-supported-single-leg-rdl": {
+      "state": "queued"
+    },
+    "o-supported-star-reach": {
+      "state": "queued"
+    },
+    "o-wall-hip-hinge-stretch": {
+      "state": "queued"
+    },
+    "obliques-A": {
+      "state": "queued"
+    },
+    "obliques-B": {
+      "state": "queued"
+    },
+    "obliques-C": {
+      "state": "queued"
+    },
+    "quadriceps-A": {
+      "state": "queued"
+    },
+    "quadriceps-B": {
+      "state": "queued"
+    },
+    "quadriceps-C": {
+      "state": "queued"
+    },
+    "rotator-cuff-A": {
+      "state": "queued"
+    },
+    "rotator-cuff-B": {
+      "state": "queued"
+    },
+    "rotator-cuff-C": {
+      "state": "queued"
+    },
+    "s-9090": {
+      "state": "queued"
+    },
+    "s-butterfly": {
+      "state": "queued"
+    },
+    "s-figure4": {
+      "state": "queued"
+    },
+    "s-frog": {
+      "state": "queued"
+    },
+    "s-kneel-hipflex": {
+      "state": "queued"
+    },
+    "s-lizard": {
+      "state": "queued"
+    },
+    "s-pigeon": {
+      "state": "queued"
+    },
+    "s-seated-fold": {
+      "state": "queued"
+    },
+    "scapular-A": {
+      "state": "queued"
+    },
+    "scapular-B": {
+      "state": "queued"
+    },
+    "scapular-C": {
+      "state": "queued"
+    },
+    "serratus-A": {
+      "state": "queued"
+    },
+    "serratus-B": {
+      "state": "queued"
+    },
+    "serratus-C": {
+      "state": "queued"
+    },
+    "t-seated-straddle-lift-1leg": {
+      "state": "queued"
+    },
+    "triceps-A": {
+      "state": "queued"
+    },
+    "triceps-B": {
+      "state": "queued"
+    },
+    "triceps-C": {
+      "state": "queued"
+    },
+    "w-bird-dog": {
+      "state": "ready-test-unreviewed"
+    },
+    "w-chair-hip-thrust": {
+      "state": "queued"
+    },
+    "w-clamshell": {
+      "state": "queued"
+    },
+    "w-dead-bug": {
+      "state": "queued"
+    },
+    "w-feet-on-chair-bridge": {
+      "state": "queued"
+    },
+    "w-fire-hydrant": {
+      "state": "queued"
+    },
+    "w-prone-swimmer": {
+      "state": "queued"
+    },
+    "w-wall-sit": {
+      "state": "queued"
+    }
+  },
+  "skin": "realistic",
+  "workerThreadEnvironment": {
+    "OPENBLAS_NUM_THREADS": "1",
+    "OMP_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1"
+  },
+  "encoding": {
+    "layout": "top-rgb-bottom-alpha",
+    "width": 720,
+    "height": 1440,
+    "crf": 12,
+    "rgbBleedPixels": 8,
+    "rgbAlphaMode": "straight",
+    "alphaChannelAfterRgbDecode": "red",
+    "matrix": "bt709",
+    "range": "limited"
+  },
+  "actions": [
+    {
+      "id": "abs-A",
+      "nameZh": "空心体支撑",
+      "fps": 30,
+      "frames": 240,
+      "durationSeconds": 8,
+      "coverFrame": 66,
+      "sourceVideos": {
+        "dark": {
+          "root": "release",
+          "path": "realistic/dark/abs-A.mp4",
+          "bytes": 316798,
+          "sha256": "f64d622afbe5d0d1dddc3213c165d457c3fd3d8d3f54c87e493dbdc8d2228f25",
+          "codec": "h264",
+          "profile": "High",
+          "pixelFormat": "yuv420p",
+          "width": 720,
+          "height": 720,
+          "fps": 30.0,
+          "frames": 240,
+          "durationSeconds": 8.0,
+          "videoBitrateBps": 313068,
+          "containerBitrateBps": 316798
+        },
+        "light": {
+          "root": "release",
+          "path": "realistic/light/abs-A.mp4",
+          "bytes": 316682,
+          "sha256": "ca5d5fc3d0961d60e5e191b3b50d22488d66b3a9ff02d94b891254a29b07b7de",
+          "codec": "h264",
+          "profile": "High",
+          "pixelFormat": "yuv420p",
+          "width": 720,
+          "height": 720,
+          "fps": 30.0,
+          "frames": 240,
+          "durationSeconds": 8.0,
+          "videoBitrateBps": 312944,
+          "containerBitrateBps": 316682
+        }
+      },
+      "sourceLayers": {
+        "root": "formal-first-pass",
+        "path": "masters/realistic/abs-A/layer-manifest.json",
+        "bytes": 12943,
+        "sha256": "dfd35b73d61638e95c30ce54c6155468839f10d9d4fc11da8544a634c4a429be"
+      },
+      "sourceSha256": "5bb995a5f2682df6002aaacec742dc58b7470bfc536f8c4acd40765247fb9427",
+      "framing": {
+        "crop": [
+          172,
+          203,
+          873,
+          904
+        ],
+        "sourceSize": [
+          1080,
+          1080
+        ],
+        "targetSize": [
+          1080,
+          1080
+        ],
+        "policy": "union-of-all-body-and-prop-alpha; all-skins-and-frames; fixed-square; 8%-padding",
+        "samples": 1200,
+        "preview": false
+      },
+      "highlight": {
+        "enabled": true,
+        "color": "#f08a3c",
+        "brightness": 0.45
+      },
+      "reviewed": false,
+      "releaseEligible": false,
+      "files": {
+        "video": {
+          "path": "media/abs-A/abs-A.rgb-alpha.mp4",
+          "bytes": 2710527,
+          "sha256": "1e8c690896af18709a1e10d382abc62f0e702e01b9efb82a6d73e8b56190f3b5",
+          "width": 720,
+          "height": 1440,
+          "codec": "h264",
+          "pixelFormat": "yuv420p"
+        },
+        "cover": {
+          "path": "media/abs-A/abs-A.cover.alpha.webp",
+          "bytes": 54820,
+          "sha256": "14857df71a6ba6fe5ab20a53567283478487a7cb25e80cd2cb62d06f84497cf9",
+          "width": 720,
+          "height": 720,
+          "alpha": true
+        },
+        "thumbnail": {
+          "path": "media/abs-A/abs-A.thumbnail.alpha.webp",
+          "bytes": 11758,
+          "sha256": "031b7919f3a355647c6470f09a422303710d62b5972518c615518da8a7c6d482",
+          "width": 240,
+          "height": 240,
+          "alpha": true
+        }
+      },
+      "qa": {
+        "report": {
+          "path": "qa/abs-A/decode-check.json",
+          "bytes": 1072,
+          "sha256": "cd771bb15e6c96dd45198766b74e6b47cbd9c9de37b49e9561ba4ddb684bd9c7"
+        },
+        "metrics": {
+          "framesDecoded": 240,
+          "alphaMae": 0.05118507265946502,
+          "semiTransparentAlphaMae": 1.4933911723484217,
+          "visibleShadowAlphaMae": 1.2237864829756044,
+          "visibleShadowSamples": 839090,
+          "transparentAlphaLeakMax": 44,
+          "compositeRgbMae": {
+            "white": 0.22160675743741426,
+            "dark": 0.2074243666409465,
+            "cyan": 0.21234922357253086
+          },
+          "semiTransparentCompositeRgbMae": {
+            "white": 2.1438491564814073,
+            "dark": 1.658001533812085,
+            "cyan": 1.856587633403301
+          },
+          "sampleFrames": [
+            {
+              "frame": 0,
+              "semiTransparentPixels": 9999,
+              "visibleShadowPixels": 2795,
+              "alphaMae": 0.02939814814814815
+            },
+            {
+              "frame": 66,
+              "semiTransparentPixels": 14811,
+              "visibleShadowPixels": 3821,
+              "alphaMae": 0.042131558641975306
+            },
+            {
+              "frame": 239,
+              "semiTransparentPixels": 9978,
+              "visibleShadowPixels": 2797,
+              "alphaMae": 0.049340277777777775
+            }
+          ],
+          "decodeProtocol": "Decode tagged BT.709 limited-range video to full-range RGB; bottom red is straight alpha.",
+          "passed": true
+        }
+      },
+      "queueSourceKey": "6699ed5170a06a09a957f841d7a57decc343007e09437448cdc2732308529d0a",
+      "exporterSha256": "74ead126dbd236590e7a7519c921210b5977f22158b4d6bd9d88222a8b10c72a",
+      "sourcePlanSha256": "a4547d64b7492615fad2cb0017d949c9948e9756771ef382a8dd31bb0a7129a4",
+      "sourcePlan": "plans/a4547d64b7492615fad2cb0017d949c9948e9756771ef382a8dd31bb0a7129a4.json",
+      "sourceExportManifestSha256": "41d2de525a24f5a984622da4ff3e70787f97784d27f0e9a8749e48140fd12155",
+      "catalogRevision": "abs-A-r2",
+      "availableForApp": true
+    },
+    {
+      "id": "abs-B",
+      "nameZh": "平行杆团身 L 撑",
+      "fps": 30,
+      "frames": 240,
+      "durationSeconds": 8,
+      "coverFrame": 135,
+      "sourceVideos": {
+        "dark": {
+          "root": "release",
+          "path": "realistic/dark/abs-B.mp4",
+          "bytes": 710387,
+          "sha256": "ee934fd879294b4c81962bf32422f2f4cdb72dd1f95da95b0a36aeb641de6416",
+          "codec": "h264",
+          "profile": "High",
+          "pixelFormat": "yuv420p",
+          "width": 720,
+          "height": 720,
+          "fps": 30.0,
+          "frames": 240,
+          "durationSeconds": 8.0,
+          "videoBitrateBps": 706657,
+          "containerBitrateBps": 710387
+        },
+        "light": {
+          "root": "release",
+          "path": "realistic/light/abs-B.mp4",
+          "bytes": 714002,
+          "sha256": "eb5ccb340141e726e452fff57b4a30e6ef2689db1121dafd6004628795533e25",
+          "codec": "h264",
+          "profile": "High",
+          "pixelFormat": "yuv420p",
+          "width": 720,
+          "height": 720,
+          "fps": 30.0,
+          "frames": 240,
+          "durationSeconds": 8.0,
+          "videoBitrateBps": 710272,
+          "containerBitrateBps": 714002
+        }
+      },
+      "sourceLayers": {
+        "root": "formal-first-pass",
+        "path": "masters/realistic/abs-B/layer-manifest.json",
+        "bytes": 22269,
+        "sha256": "e53524c0282acf487a341ca84cdffaaea1c0ef50fa0e825890e3844bfe41ffc1"
+      },
+      "sourceSha256": "89da29d96a7c737a04372fe0b491982a277a145be4e62017d7ae40c4ff4df205",
+      "framing": {
+        "crop": [
+          382,
+          350,
+          757,
+          725
+        ],
+        "sourceSize": [
+          1080,
+          1080
+        ],
+        "targetSize": [
+          1080,
+          1080
+        ],
+        "policy": "union-of-all-body-and-prop-alpha; all-skins-and-frames; fixed-square; 8%-padding",
+        "samples": 1200,
+        "preview": false
+      },
+      "highlight": {
+        "enabled": true,
+        "color": "#f08a3c",
+        "brightness": 0.45
+      },
+      "reviewed": false,
+      "releaseEligible": false,
+      "files": {
+        "video": {
+          "path": "media/abs-B/abs-B.rgb-alpha.mp4",
+          "bytes": 6280647,
+          "sha256": "a7fe1353071e4a5b5d5e0bb647d9022e7bf14d8ea133dad0b1822a75f138e971",
+          "width": 720,
+          "height": 1440,
+          "codec": "h264",
+          "pixelFormat": "yuv420p"
+        },
+        "cover": {
+          "path": "media/abs-B/abs-B.cover.alpha.webp",
+          "bytes": 115588,
+          "sha256": "d02cd52c8f903ac9f121127d35542fcdbf348d9ae115824d1a96101121c5b9e2",
+          "width": 720,
+          "height": 720,
+          "alpha": true
+        },
+        "thumbnail": {
+          "path": "media/abs-B/abs-B.thumbnail.alpha.webp",
+          "bytes": 22628,
+          "sha256": "24250d9fff928b1cbc9c83e01afba5b94a474fce28f143e02be4c390dbf7127c",
+          "width": 240,
+          "height": 240,
+          "alpha": true
+        }
+      },
+      "qa": {
+        "report": {
+          "path": "qa/abs-B/decode-check.json",
+          "bytes": 1074,
+          "sha256": "c169eda790bde77d49f1aaf434fa1d3ea3622613f295bb4887fd8e410e64f471"
+        },
+        "metrics": {
+          "framesDecoded": 240,
+          "alphaMae": 0.15421873392489713,
+          "semiTransparentAlphaMae": 1.3747918589368828,
+          "visibleShadowAlphaMae": 1.052568961707769,
+          "visibleShadowSamples": 4942308,
+          "transparentAlphaLeakMax": 22,
+          "compositeRgbMae": {
+            "white": 0.4190644156164266,
+            "dark": 0.3623249528463649,
+            "cyan": 0.3892611963091564
+          },
+          "semiTransparentCompositeRgbMae": {
+            "white": 1.9162763603121427,
+            "dark": 1.3583320724018142,
+            "cyan": 1.6357642928189338
+          },
+          "sampleFrames": [
+            {
+              "frame": 0,
+              "semiTransparentPixels": 46555,
+              "visibleShadowPixels": 20803,
+              "alphaMae": 0.1310744598765432
+            },
+            {
+              "frame": 135,
+              "semiTransparentPixels": 50323,
+              "visibleShadowPixels": 20876,
+              "alphaMae": 0.17471643518518518
+            },
+            {
+              "frame": 239,
+              "semiTransparentPixels": 47033,
+              "visibleShadowPixels": 20786,
+              "alphaMae": 0.1923900462962963
+            }
+          ],
+          "decodeProtocol": "Decode tagged BT.709 limited-range video to full-range RGB; bottom red is straight alpha.",
+          "passed": true
+        }
+      },
+      "queueSourceKey": "922dfc93f56ad50d4382ea20214da0423a1f55cd26af4b4479f7ce15f9c7f062",
+      "exporterSha256": "74ead126dbd236590e7a7519c921210b5977f22158b4d6bd9d88222a8b10c72a",
+      "sourcePlanSha256": "a4547d64b7492615fad2cb0017d949c9948e9756771ef382a8dd31bb0a7129a4",
+      "sourcePlan": "plans/a4547d64b7492615fad2cb0017d949c9948e9756771ef382a8dd31bb0a7129a4.json",
+      "sourceExportManifestSha256": "48971d7f476bd55f7ac5c29c04034688afa56cbd85cac224fe5e4e8e1f365eb0",
+      "catalogRevision": "abs-B",
+      "availableForApp": true
+    },
+    {
+      "id": "abs-C",
+      "nameZh": "双杠直臂支撑举腿",
+      "fps": 30,
+      "frames": 240,
+      "durationSeconds": 8,
+      "coverFrame": 9,
+      "sourceVideos": {
+        "dark": {
+          "root": "release",
+          "path": "realistic/dark/abs-C.mp4",
+          "bytes": 395314,
+          "sha256": "6b7e34f0acfab83f5e72535c1f3bc3b770b2d6abd17483acf5176a443046f7ac",
+          "codec": "h264",
+          "profile": "High",
+          "pixelFormat": "yuv420p",
+          "width": 720,
+          "height": 720,
+          "fps": 30.0,
+          "frames": 240,
+          "durationSeconds": 8.0,
+          "videoBitrateBps": 391592,
+          "containerBitrateBps": 395314
+        },
+        "light": {
+          "root": "release",
+          "path": "realistic/light/abs-C.mp4",
+          "bytes": 450458,
+          "sha256": "135219d13d60ad8aa81acdc269ac91a8646a9a505f65f80d8d09caaadcb4d930",
+          "codec": "h264",
+          "profile": "High",
+          "pixelFormat": "yuv420p",
+          "width": 720,
+          "height": 720,
+          "fps": 30.0,
+          "frames": 240,
+          "durationSeconds": 8.0,
+          "videoBitrateBps": 446728,
+          "containerBitrateBps": 450458
+        }
+      },
+      "sourceLayers": {
+        "root": "formal-first-pass",
+        "path": "masters/realistic/abs-C/layer-manifest.json",
+        "bytes": 21107,
+        "sha256": "fdfb4e01ed961407a3d3852129b5abd4cb8c2088dc052e8b44fd08696c24b29e"
+      },
+      "sourceSha256": "9e6f2c804d17427c7be83b38a33b3160da764ce8c7224dd0d9c314e8753885b0",
+      "framing": {
+        "crop": [
+          -18,
+          51,
+          1087,
+          1156
+        ],
+        "sourceSize": [
+          1080,
+          1080
+        ],
+        "targetSize": [
+          1080,
+          1080
+        ],
+        "policy": "union-of-all-body-and-prop-alpha; all-skins-and-frames; fixed-square; 8%-padding",
+        "samples": 1200,
+        "preview": false
+      },
+      "highlight": {
+        "enabled": true,
+        "color": "#f08a3c",
+        "brightness": 0.45
+      },
+      "reviewed": false,
+      "releaseEligible": false,
+      "files": {
+        "video": {
+          "path": "media/abs-C/abs-C.rgb-alpha.mp4",
+          "bytes": 5358544,
+          "sha256": "4e4439449ad5af365d2d00a2af407e550c4781cd9312dc50338ef3e1f21bb279",
+          "width": 720,
+          "height": 1440,
+          "codec": "h264",
+          "pixelFormat": "yuv420p"
+        },
+        "cover": {
+          "path": "media/abs-C/abs-C.cover.alpha.webp",
+          "bytes": 71036,
+          "sha256": "01dcbe93f7d70c41140ecf543d753f1c6680dd1ac1d8f6e9d918bd25cc81c729",
+          "width": 720,
+          "height": 720,
+          "alpha": true
+        },
+        "thumbnail": {
+          "path": "media/abs-C/abs-C.thumbnail.alpha.webp",
+          "bytes": 16790,
+          "sha256": "4d37a2fb42c0da26f65dc5e33bd55c9cec7db096175938321be849aa4022aae6",
+          "width": 240,
+          "height": 240,
+          "alpha": true
+        }
+      },
+      "qa": {
+        "report": {
+          "path": "qa/abs-C/decode-check.json",
+          "bytes": 1073,
+          "sha256": "94d75cc8f6401349da1ac2766fd5bab4a6ecc18821a43c891e782b4b787c25e5"
+        },
+        "metrics": {
+          "framesDecoded": 240,
+          "alphaMae": 0.11784304269547326,
+          "semiTransparentAlphaMae": 1.5633451979749953,
+          "visibleShadowAlphaMae": 1.2254354243705552,
+          "visibleShadowSamples": 3845731,
+          "transparentAlphaLeakMax": 48,
+          "compositeRgbMae": {
+            "white": 0.2742941449116941,
+            "dark": 0.21921704335991082,
+            "cyan": 0.24675479841820988
+          },
+          "semiTransparentCompositeRgbMae": {
+            "white": 2.0552493152183136,
+            "dark": 1.2721476777482,
+            "cyan": 1.6817945638581562
+          },
+          "sampleFrames": [
+            {
+              "frame": 0,
+              "semiTransparentPixels": 29497,
+              "visibleShadowPixels": 15095,
+              "alphaMae": 0.09334876543209876
+            },
+            {
+              "frame": 9,
+              "semiTransparentPixels": 30909,
+              "visibleShadowPixels": 16778,
+              "alphaMae": 0.13796489197530865
+            },
+            {
+              "frame": 239,
+              "semiTransparentPixels": 29439,
+              "visibleShadowPixels": 15109,
+              "alphaMae": 0.1450636574074074
+            }
+          ],
+          "decodeProtocol": "Decode tagged BT.709 limited-range video to full-range RGB; bottom red is straight alpha.",
+          "passed": true
+        }
+      },
+      "queueSourceKey": "7c38efb218c9367a21c9f96ae4a425866a74950abecdf6cf3c2e6542f0017193",
+      "exporterSha256": "74ead126dbd236590e7a7519c921210b5977f22158b4d6bd9d88222a8b10c72a",
+      "sourcePlanSha256": "a4547d64b7492615fad2cb0017d949c9948e9756771ef382a8dd31bb0a7129a4",
+      "sourcePlan": "plans/a4547d64b7492615fad2cb0017d949c9948e9756771ef382a8dd31bb0a7129a4.json",
+      "sourceExportManifestSha256": "8cba4c9fbc6d8643b10c1004a67384a6a8be6fc284c20f80ad8f78e45e6df9ab",
+      "catalogRevision": "abs-C-r2",
+      "availableForApp": true
+    },
+    {
+      "id": "adductors-A",
+      "nameZh": "哥萨克蹲",
+      "fps": 30,
+      "frames": 240,
+      "durationSeconds": 8,
+      "coverFrame": 59,
+      "sourceVideos": {
+        "dark": {
+          "root": "release",
+          "path": "realistic/dark/adductors-A.mp4",
+          "bytes": 525344,
+          "sha256": "6271d3bcdff7a3506bbba74b40cfc698d126e9ddf39383f2cddb9c8527c32776",
+          "codec": "h264",
+          "profile": "High",
+          "pixelFormat": "yuv420p",
+          "width": 720,
+          "height": 720,
+          "fps": 30.0,
+          "frames": 240,
+          "durationSeconds": 8.0,
+          "videoBitrateBps": 521614,
+          "containerBitrateBps": 525344
+        },
+        "light": {
+          "root": "release",
+          "path": "realistic/light/adductors-A.mp4",
+          "bytes": 512188,
+          "sha256": "d8d257b169602472b34004d514b0d0d4510e4d01d54fabfd71d0819583875d6d",
+          "codec": "h264",
+          "profile": "High",
+          "pixelFormat": "yuv420p",
+          "width": 720,
+          "height": 720,
+          "fps": 30.0,
+          "frames": 240,
+          "durationSeconds": 8.0,
+          "videoBitrateBps": 508458,
+          "containerBitrateBps": 512188
+        }
+      },
+      "sourceLayers": {
+        "root": "b002",
+        "path": "masters/realistic/adductors-A/layer-manifest.json",
+        "bytes": 12350,
+        "sha256": "93e846836cce978aff865eefc1b2febe965026d98c6ed4d25f5084b68d291197"
+      },
+      "sourceSha256": "202919bb5dddfda4763176c8f67c6f65b988b125da391d9f04c2890525124b4c",
+      "framing": {
+        "crop": [
+          178,
+          132,
+          902,
+          856
+        ],
+        "sourceSize": [
+          1080,
+          1080
+        ],
+        "targetSize": [
+          1080,
+          1080
+        ],
+        "policy": "union-of-all-body-and-prop-alpha; all-skins-and-frames; fixed-square; 8%-padding",
+        "samples": 1200,
+        "preview": false
+      },
+      "highlight": {
+        "enabled": true,
+        "color": "#f08a3c",
+        "brightness": 0.45
+      },
+      "reviewed": false,
+      "releaseEligible": false,
+      "files": {
+        "video": {
+          "path": "media/adductors-A/adductors-A.rgb-alpha.mp4",
+          "bytes": 4713696,
+          "sha256": "02b35d02813c1392454d9fee67e477356e38de0f63e87ed7a47109139fa64005",
+          "width": 720,
+          "height": 1440,
+          "codec": "h264",
+          "pixelFormat": "yuv420p"
+        },
+        "cover": {
+          "path": "media/adductors-A/adductors-A.cover.alpha.webp",
+          "bytes": 64472,
+          "sha256": "792be245a0294de794fadd7a4498823d142b2c2492451a127cdad6017419ffb9",
+          "width": 720,
+          "height": 720,
+          "alpha": true
+        },
+        "thumbnail": {
+          "path": "media/adductors-A/adductors-A.thumbnail.alpha.webp",
+          "bytes": 13422,
+          "sha256": "e3236e0c4737e6a1028071cfcb1c971a536b02b947253c231fbb40fa5fbfdbf8",
+          "width": 240,
+          "height": 240,
+          "alpha": true
+        }
+      },
+      "qa": {
+        "report": {
+          "path": "qa/adductors-A/decode-check.json",
+          "bytes": 1077,
+          "sha256": "60eb3197d104dcd3337ecffc4c5797ad1f53c032b14162c265207897d46592ef"
+        },
+        "metrics": {
+          "framesDecoded": 240,
+          "alphaMae": 0.09213173546810699,
+          "semiTransparentAlphaMae": 1.4735045582488748,
+          "visibleShadowAlphaMae": 1.194023358765486,
+          "visibleShadowSamples": 4101501,
+          "transparentAlphaLeakMax": 46,
+          "compositeRgbMae": {
+            "white": 0.3125260818544239,
+            "dark": 0.27049452642746913,
+            "cyan": 0.2937575794110082
+          },
+          "semiTransparentCompositeRgbMae": {
+            "white": 2.1253774059638335,
+            "dark": 1.3595652908345766,
+            "cyan": 1.7963773819515294
+          },
+          "sampleFrames": [
+            {
+              "frame": 0,
+              "semiTransparentPixels": 27754,
+              "visibleShadowPixels": 17527,
+              "alphaMae": 0.07296296296296297
+            },
+            {
+              "frame": 59,
+              "semiTransparentPixels": 23238,
+              "visibleShadowPixels": 14166,
+              "alphaMae": 0.061182484567901235
+            },
+            {
+              "frame": 239,
+              "semiTransparentPixels": 27761,
+              "visibleShadowPixels": 17526,
+              "alphaMae": 0.11223765432098766
+            }
+          ],
+          "decodeProtocol": "Decode tagged BT.709 limited-range video to full-range RGB; bottom red is straight alpha.",
+          "passed": true
+        }
+      },
+      "queueSourceKey": "07a0b3c87e07391b422b81c17582cd14669e654771c22468a6b477bab43a7733",
+      "exporterSha256": "74ead126dbd236590e7a7519c921210b5977f22158b4d6bd9d88222a8b10c72a",
+      "sourcePlanSha256": "a4547d64b7492615fad2cb0017d949c9948e9756771ef382a8dd31bb0a7129a4",
+      "sourcePlan": "plans/a4547d64b7492615fad2cb0017d949c9948e9756771ef382a8dd31bb0a7129a4.json",
+      "sourceExportManifestSha256": "1bc48ff371fbd332995585bddbbbb6319753ac1acce039b90f1d4918d8333554",
+      "catalogRevision": "adductors-A-r2",
+      "availableForApp": true
+    },
+    {
+      "id": "adductors-B",
+      "nameZh": "屈膝哥本哈根侧撑",
+      "fps": 30,
+      "frames": 240,
+      "durationSeconds": 8,
+      "coverFrame": 72,
+      "sourceVideos": {
+        "dark": {
+          "root": "release",
+          "path": "realistic/dark/adductors-B.mp4",
+          "bytes": 371167,
+          "sha256": "eb04ca0f61305ff9eac289d0ba01d8b7b886a70b87ed793b5e2a2896c4687df5",
+          "codec": "h264",
+          "profile": "High",
+          "pixelFormat": "yuv420p",
+          "width": 720,
+          "height": 720,
+          "fps": 30.0,
+          "frames": 240,
+          "durationSeconds": 8.0,
+          "videoBitrateBps": 367437,
+          "containerBitrateBps": 371167
+        },
+        "light": {
+          "root": "release",
+          "path": "realistic/light/adductors-B.mp4",
+          "bytes": 359634,
+          "sha256": "883179534f33690699f6e6de985a4b629e2faf31eec93847c37d335596338845",
+          "codec": "h264",
+          "profile": "High",
+          "pixelFormat": "yuv420p",
+          "width": 720,
+          "height": 720,
+          "fps": 30.0,
+          "frames": 240,
+          "durationSeconds": 8.0,
+          "videoBitrateBps": 355904,
+          "containerBitrateBps": 359634
+        }
+      },
+      "sourceLayers": {
+        "root": "formal-first-pass",
+        "path": "masters/realistic/adductors-B/layer-manifest.json",
+        "bytes": 15333,
+        "sha256": "1202faa172669e69becac00f4913734df5f0b4fd1daf3828322196daeb7fc62f"
+      },
+      "sourceSha256": "b23813a6e7e8d24e3b5fca8f6f221a3fc82d002f3605c591c9da11b47246763f",
+      "framing": {
+        "crop": [
+          222,
+          234,
+          858,
+          870
+        ],
+        "sourceSize": [
+          1080,
+          1080
+        ],
+        "targetSize": [
+          1080,
+          1080
+        ],
+        "policy": "union-of-all-body-and-prop-alpha; all-skins-and-frames; fixed-square; 8%-padding",
+        "samples": 1200,
+        "preview": false
+      },
+      "highlight": {
+        "enabled": true,
+        "color": "#f08a3c",
+        "brightness": 0.45
+      },
+      "reviewed": false,
+      "releaseEligible": false,
+      "files": {
+        "video": {
+          "path": "media/adductors-B/adductors-B.rgb-alpha.mp4",
+          "bytes": 3699061,
+          "sha256": "0bfe57c861a3c8d3e6e4c54bfe608c1904cbd29acdf560ef4a0d14895bd5c637",
+          "width": 720,
+          "height": 1440,
+          "codec": "h264",
+          "pixelFormat": "yuv420p"
+        },
+        "cover": {
+          "path": "media/adductors-B/adductors-B.cover.alpha.webp",
+          "bytes": 69790,
+          "sha256": "46268abd4e516ab98b08eaa7e97ec65557dc7c54fef1b9a6972e3c4755d35ae4",
+          "width": 720,
+          "height": 720,
+          "alpha": true
+        },
+        "thumbnail": {
+          "path": "media/adductors-B/adductors-B.thumbnail.alpha.webp",
+          "bytes": 16284,
+          "sha256": "78a842d2a04207338fc7723c8f890e5fad576e64d20899290975c8321186cab5",
+          "width": 240,
+          "height": 240,
+          "alpha": true
+        }
+      },
+      "qa": {
+        "report": {
+          "path": "qa/adductors-B/decode-check.json",
+          "bytes": 1073,
+          "sha256": "7126c99750901b9b0cf7d347fca1e076d1b48b566037a5daf233efeb8c948520"
+        },
+        "metrics": {
+          "framesDecoded": 240,
+          "alphaMae": 0.09165474697788066,
+          "semiTransparentAlphaMae": 1.2230150150343895,
+          "visibleShadowAlphaMae": 1.029432389564181,
+          "visibleShadowSamples": 2913389,
+          "transparentAlphaLeakMax": 43,
+          "compositeRgbMae": {
+            "white": 0.3729061937371399,
+            "dark": 0.342097254372428,
+            "cyan": 0.3568447225437243
+          },
+          "semiTransparentCompositeRgbMae": {
+            "white": 1.9107824706004692,
+            "dark": 1.4282541322337192,
+            "cyan": 1.6779531778670884
+          },
+          "sampleFrames": [
+            {
+              "frame": 0,
+              "semiTransparentPixels": 31274,
+              "visibleShadowPixels": 12114,
+              "alphaMae": 0.08130979938271606
+            },
+            {
+              "frame": 72,
+              "semiTransparentPixels": 30812,
+              "visibleShadowPixels": 12231,
+              "alphaMae": 0.0758912037037037
+            },
+            {
+              "frame": 239,
+              "semiTransparentPixels": 31253,
+              "visibleShadowPixels": 12116,
+              "alphaMae": 0.13360339506172839
+            }
+          ],
+          "decodeProtocol": "Decode tagged BT.709 limited-range video to full-range RGB; bottom red is straight alpha.",
+          "passed": true
+        }
+      },
+      "queueSourceKey": "78e4952e121f2a79a690f964fcea4ac520c900b444596979a511aa4979f2872a",
+      "exporterSha256": "74ead126dbd236590e7a7519c921210b5977f22158b4d6bd9d88222a8b10c72a",
+      "sourcePlanSha256": "a4547d64b7492615fad2cb0017d949c9948e9756771ef382a8dd31bb0a7129a4",
+      "sourcePlan": "plans/a4547d64b7492615fad2cb0017d949c9948e9756771ef382a8dd31bb0a7129a4.json",
+      "sourceExportManifestSha256": "e9363b7b99f31df2f4b2c13833474e8c13138c9041c57c2b4fc002fadcfa9035",
+      "catalogRevision": "adductors-B",
+      "availableForApp": true
+    },
+    {
+      "id": "adductors-C",
+      "nameZh": "绳索站姿髋内收",
+      "fps": 30,
+      "frames": 240,
+      "durationSeconds": 8,
+      "coverFrame": 48,
+      "sourceVideos": {
+        "dark": {
+          "root": "release",
+          "path": "realistic/dark/adductors-C.mp4",
+          "bytes": 347917,
+          "sha256": "b20d895c508b9622c24f2ce420ac0b0d325a2999d5b14ad8e541a145cd3d254a",
+          "codec": "h264",
+          "profile": "High",
+          "pixelFormat": "yuv420p",
+          "width": 720,
+          "height": 720,
+          "fps": 30.0,
+          "frames": 240,
+          "durationSeconds": 8.0,
+          "videoBitrateBps": 344579,
+          "containerBitrateBps": 347917
+        },
+        "light": {
+          "root": "release",
+          "path": "realistic/light/adductors-C.mp4",
+          "bytes": 367778,
+          "sha256": "a5989230d6533bdaa0c62d92107593f88d8074d7992fd84bb1e904d513cf0320",
+          "codec": "h264",
+          "profile": "High",
+          "pixelFormat": "yuv420p",
+          "width": 720,
+          "height": 720,
+          "fps": 30.0,
+          "frames": 240,
+          "durationSeconds": 8.0,
+          "videoBitrateBps": 364544,
+          "containerBitrateBps": 367778
+        }
+      },
+      "sourceLayers": {
+        "root": "formal-first-pass",
+        "path": "masters/realistic/adductors-C/layer-manifest.json",
+        "bytes": 23880,
+        "sha256": "b0e97eccf68bc5113fe1771a6eda215252e645c36e745416e1d668abbbef0816"
+      },
+      "sourceSha256": "b1a0891ad220c749449909df3f97a3978d57e6216bd8830122ac73c6c5f535be",
+      "framing": {
+        "crop": [
+          233,
+          35,
+          1084,
+          886
+        ],
+        "sourceSize": [
+          1080,
+          1080
+        ],
+        "targetSize": [
+          1080,
+          1080
+        ],
+        "policy": "union-of-all-body-and-prop-alpha; all-skins-and-frames; fixed-square; 8%-padding",
+        "samples": 1200,
+        "preview": false
+      },
+      "highlight": {
+        "enabled": true,
+        "color": "#f08a3c",
+        "brightness": 0.45
+      },
+      "reviewed": false,
+      "releaseEligible": false,
+      "files": {
+        "video": {
+          "path": "media/adductors-C/adductors-C.rgb-alpha.mp4",
+          "bytes": 3333641,
+          "sha256": "e8300da0f61c0aa47bbed0a508c7662f46db6bad49c9149bb049e01d3578cb90",
+          "width": 720,
+          "height": 1440,
+          "codec": "h264",
+          "pixelFormat": "yuv420p"
+        },
+        "cover": {
+          "path": "media/adductors-C/adductors-C.cover.alpha.webp",
+          "bytes": 70504,
+          "sha256": "ccddb117900ec8ab94bdf3c758471088dc063d018253c1a02462919c6c0907ed",
+          "width": 720,
+          "height": 720,
+          "alpha": true
+        },
+        "thumbnail": {
+          "path": "media/adductors-C/adductors-C.thumbnail.alpha.webp",
+          "bytes": 16068,
+          "sha256": "44b8e3d87da4cc34ca3a2bd09e31c6f6744bdc34944cc064f34be101efb42d7c",
+          "width": 240,
+          "height": 240,
+          "alpha": true
+        }
+      },
+      "qa": {
+        "report": {
+          "path": "qa/adductors-C/decode-check.json",
+          "bytes": 1071,
+          "sha256": "7907397b1da17b887cfb05ad21e3cf2c001faff55e24f86865c89314c1424d72"
+        },
+        "metrics": {
+          "framesDecoded": 240,
+          "alphaMae": 0.09871300315072017,
+          "semiTransparentAlphaMae": 1.2052456846322563,
+          "visibleShadowAlphaMae": 1.2497547064024324,
+          "visibleShadowSamples": 1112952,
+          "transparentAlphaLeakMax": 39,
+          "compositeRgbMae": {
+            "white": 0.3758852639531893,
+            "dark": 0.3549504940414952,
+            "cyan": 0.3610274750300069
+          },
+          "semiTransparentCompositeRgbMae": {
+            "white": 1.9716056606452779,
+            "dark": 1.6732441214886478,
+            "cyan": 1.791530437292945
+          },
+          "sampleFrames": [
+            {
+              "frame": 0,
+              "semiTransparentPixels": 29273,
+              "visibleShadowPixels": 4980,
+              "alphaMae": 0.0901195987654321
+            },
+            {
+              "frame": 48,
+              "semiTransparentPixels": 29415,
+              "visibleShadowPixels": 3582,
+              "alphaMae": 0.08249614197530865
+            },
+            {
+              "frame": 239,
+              "semiTransparentPixels": 29280,
+              "visibleShadowPixels": 4967,
+              "alphaMae": 0.15128858024691358
+            }
+          ],
+          "decodeProtocol": "Decode tagged BT.709 limited-range video to full-range RGB; bottom red is straight alpha.",
+          "passed": true
+        }
+      },
+      "queueSourceKey": "64814d8c7fc13c18f1fbe02e4a9546f7f27adb56008d6ec37d26eff4d2989d50",
+      "exporterSha256": "74ead126dbd236590e7a7519c921210b5977f22158b4d6bd9d88222a8b10c72a",
+      "sourcePlanSha256": "a4547d64b7492615fad2cb0017d949c9948e9756771ef382a8dd31bb0a7129a4",
+      "sourcePlan": "plans/a4547d64b7492615fad2cb0017d949c9948e9756771ef382a8dd31bb0a7129a4.json",
+      "sourceExportManifestSha256": "acad1b92925698580f27bfd0ca5d96e9b25ed0a65182f43c334d2c0248cf5966",
+      "catalogRevision": "adductors-C",
+      "availableForApp": true
+    },
+    {
+      "id": "chest-A",
+      "nameZh": "俯卧撑转侧撑",
+      "fps": 30,
+      "frames": 240,
+      "durationSeconds": 8,
+      "coverFrame": 86,
+      "sourceVideos": {
+        "dark": {
+          "root": "release",
+          "path": "realistic/dark/chest-A.mp4",
+          "bytes": 695312,
+          "sha256": "6a8151d12137e6beef4609482cdb5b05f50e9411369d3605b0735c1e39561e54",
+          "codec": "h264",
+          "profile": "High",
+          "pixelFormat": "yuv420p",
+          "width": 720,
+          "height": 720,
+          "fps": 30.0,
+          "frames": 240,
+          "durationSeconds": 8.0,
+          "videoBitrateBps": 691598,
+          "containerBitrateBps": 695312
+        },
+        "light": {
+          "root": "release",
+          "path": "realistic/light/chest-A.mp4",
+          "bytes": 774886,
+          "sha256": "c14c1b5fc2a29169fe19498cafc1c22bb787af007b72c44de0ff0f37012f3c4d",
+          "codec": "h264",
+          "profile": "High",
+          "pixelFormat": "yuv420p",
+          "width": 720,
+          "height": 720,
+          "fps": 30.0,
+          "frames": 240,
+          "durationSeconds": 8.0,
+          "videoBitrateBps": 771172,
+          "containerBitrateBps": 774886
+        }
+      },
+      "sourceLayers": {
+        "root": "formal-first-pass",
+        "path": "masters/realistic/chest-A/layer-manifest.json",
+        "bytes": 12967,
+        "sha256": "e8bafb968ee89d79c9a03b317387c5e5e84f4d7bf5c5b6e4775a32e4b03bb857"
+      },
+      "sourceSha256": "e464dae95679867ce37ac32e06d056ee8dba868e5b7d843d00c2ca4b00b2668c",
+      "framing": {
+        "crop": [
+          327,
+          321,
+          795,
+          789
+        ],
+        "sourceSize": [
+          1080,
+          1080
+        ],
+        "targetSize": [
+          1080,
+          1080
+        ],
+        "policy": "union-of-all-body-and-prop-alpha; all-skins-and-frames; fixed-square; 8%-padding",
+        "samples": 1200,
+        "preview": false
+      },
+      "highlight": {
+        "enabled": true,
+        "color": "#f08a3c",
+        "brightness": 0.45
+      },
+      "reviewed": false,
+      "releaseEligible": false,
+      "files": {
+        "video": {
+          "path": "media/chest-A/chest-A.rgb-alpha.mp4",
+          "bytes": 4916987,
+          "sha256": "93600962dd3cace2c2e2ed4068699bd0aaf5fd03a03e7567206e68e9a4cc2b09",
+          "width": 720,
+          "height": 1440,
+          "codec": "h264",
+          "pixelFormat": "yuv420p"
+        },
+        "cover": {
+          "path": "media/chest-A/chest-A.cover.alpha.webp",
+          "bytes": 77876,
+          "sha256": "60a99c557f1caae7df21844ae04e74e2fd1452963f642f07cebe09ea4981a8f2",
+          "width": 720,
+          "height": 720,
+          "alpha": true
+        },
+        "thumbnail": {
+          "path": "media/chest-A/chest-A.thumbnail.alpha.webp",
+          "bytes": 15556,
+          "sha256": "0f1dea7acc1a9ec308183f84cc7c480440030a9c59917c9abe9b5494f46af6a3",
+          "width": 240,
+          "height": 240,
+          "alpha": true
+        }
+      },
+      "qa": {
+        "report": {
+          "path": "qa/chest-A/decode-check.json",
+          "bytes": 1075,
+          "sha256": "9ddd689e87e7149e7f58206ae3eaa5430aa6a91c3ac8ad87dd6a4c16ee8beddb"
+        },
+        "metrics": {
+          "framesDecoded": 240,
+          "alphaMae": 0.09815263310185185,
+          "semiTransparentAlphaMae": 1.574816711380464,
+          "visibleShadowAlphaMae": 1.2148196789589143,
+          "visibleShadowSamples": 3226939,
+          "transparentAlphaLeakMax": 29,
+          "compositeRgbMae": {
+            "white": 0.2751390094521605,
+            "dark": 0.23019934735082304,
+            "cyan": 0.2521835615997942
+          },
+          "semiTransparentCompositeRgbMae": {
+            "white": 1.908418922382612,
+            "dark": 1.1180300656824607,
+            "cyan": 1.5257954353259204
+          },
+          "sampleFrames": [
+            {
+              "frame": 0,
+              "semiTransparentPixels": 24320,
+              "visibleShadowPixels": 11323,
+              "alphaMae": 0.07838155864197531
+            },
+            {
+              "frame": 86,
+              "semiTransparentPixels": 34495,
+              "visibleShadowPixels": 15789,
+              "alphaMae": 0.12470871913580248
+            },
+            {
+              "frame": 239,
+              "semiTransparentPixels": 24082,
+              "visibleShadowPixels": 11354,
+              "alphaMae": 0.10620563271604938
+            }
+          ],
+          "decodeProtocol": "Decode tagged BT.709 limited-range video to full-range RGB; bottom red is straight alpha.",
+          "passed": true
+        }
+      },
+      "queueSourceKey": "13cd2c44f3bc6656b86caad64119ea58d8caeca045fa73c31e9c60d514fff777",
+      "exporterSha256": "74ead126dbd236590e7a7519c921210b5977f22158b4d6bd9d88222a8b10c72a",
+      "sourcePlanSha256": "a4547d64b7492615fad2cb0017d949c9948e9756771ef382a8dd31bb0a7129a4",
+      "sourcePlan": "plans/a4547d64b7492615fad2cb0017d949c9948e9756771ef382a8dd31bb0a7129a4.json",
+      "sourceExportManifestSha256": "8d39ca64df5a59a8cc1421242f8cba66fe6070415157b7a2e358deb98c1c0e94",
+      "catalogRevision": "chest-A-r3",
+      "availableForApp": true
+    },
+    {
+      "id": "chest-B",
+      "nameZh": "平行杆深幅俯卧撑",
+      "fps": 30,
+      "frames": 240,
+      "durationSeconds": 8,
+      "coverFrame": 63,
+      "sourceVideos": {
+        "dark": {
+          "root": "release",
+          "path": "realistic/dark/chest-B.mp4",
+          "bytes": 796287,
+          "sha256": "4332e4a290198cfe810641aabaae6f4233ff00d11404cf11f522b78621cbff66",
+          "codec": "h264",
+          "profile": "High",
+          "pixelFormat": "yuv420p",
+          "width": 720,
+          "height": 720,
+          "fps": 30.0,
+          "frames": 240,
+          "durationSeconds": 8.0,
+          "videoBitrateBps": 792557,
+          "containerBitrateBps": 796287
+        },
+        "light": {
+          "root": "release",
+          "path": "realistic/light/chest-B.mp4",
+          "bytes": 789113,
+          "sha256": "f9fbef50c85f05f37e269c15f9a6134089c8e3b08f2afa20ba3d4d299836c03a",
+          "codec": "h264",
+          "profile": "High",
+          "pixelFormat": "yuv420p",
+          "width": 720,
+          "height": 720,
+          "fps": 30.0,
+          "frames": 240,
+          "durationSeconds": 8.0,
+          "videoBitrateBps": 785383,
+          "containerBitrateBps": 789113
+        }
+      },
+      "sourceLayers": {
+        "root": "formal-first-pass",
+        "path": "masters/realistic/chest-B/layer-manifest.json",
+        "bytes": 22288,
+        "sha256": "5303fe9c390e0fd620a0f01fbdd4407063f62868bedf2658da125a3a349c8e82"
+      },
+      "sourceSha256": "b95a523ca32158d5457a53cd97d849e93fc9ec8919ff31e84d3b192f0a68dbc1",
+      "framing": {
+        "crop": [
+          350,
+          326,
+          724,
+          700
+        ],
+        "sourceSize": [
+          1080,
+          1080
+        ],
+        "targetSize": [
+          1080,
+          1080
+        ],
+        "policy": "union-of-all-body-and-prop-alpha; all-skins-and-frames; fixed-square; 8%-padding",
+        "samples": 1200,
+        "preview": false
+      },
+      "highlight": {
+        "enabled": true,
+        "color": "#f08a3c",
+        "brightness": 0.45
+      },
+      "reviewed": false,
+      "releaseEligible": false,
+      "files": {
+        "video": {
+          "path": "media/chest-B/chest-B.rgb-alpha.mp4",
+          "bytes": 7063317,
+          "sha256": "4f554971459dabb55609584fd36a42cf8e5aab0cf637414b4c6401e9d03e2a4f",
+          "width": 720,
+          "height": 1440,
+          "codec": "h264",
+          "pixelFormat": "yuv420p"
+        },
+        "cover": {
+          "path": "media/chest-B/chest-B.cover.alpha.webp",
+          "bytes": 104400,
+          "sha256": "d382f84f51e400914d7221f8130cdbc9e1353347169cd504678f8a18e1d76f5e",
+          "width": 720,
+          "height": 720,
+          "alpha": true
+        },
+        "thumbnail": {
+          "path": "media/chest-B/chest-B.thumbnail.alpha.webp",
+          "bytes": 19224,
+          "sha256": "305b16e40f52e638dfc868ef82dfe6a1ed54c3f34a649d5fd4aaaa99c2d9ac42",
+          "width": 240,
+          "height": 240,
+          "alpha": true
+        }
+      },
+      "qa": {
+        "report": {
+          "path": "qa/chest-B/decode-check.json",
+          "bytes": 1076,
+          "sha256": "1513e495e0e2fa7141b1292b69731eb07d988aba6552ec64090a9ec0c96692af"
+        },
+        "metrics": {
+          "framesDecoded": 240,
+          "alphaMae": 0.14283213573816872,
+          "semiTransparentAlphaMae": 1.4724658043829513,
+          "visibleShadowAlphaMae": 1.1233005170986023,
+          "visibleShadowSamples": 3365509,
+          "transparentAlphaLeakMax": 23,
+          "compositeRgbMae": {
+            "white": 0.3768823409636488,
+            "dark": 0.33418434124228397,
+            "cyan": 0.35323605752743487
+          },
+          "semiTransparentCompositeRgbMae": {
+            "white": 2.182679589355498,
+            "dark": 1.6918659840779433,
+            "cyan": 1.9247400845112097
+          },
+          "sampleFrames": [
+            {
+              "frame": 0,
+              "semiTransparentPixels": 41874,
+              "visibleShadowPixels": 13293,
+              "alphaMae": 0.11984760802469135
+            },
+            {
+              "frame": 63,
+              "semiTransparentPixels": 41368,
+              "visibleShadowPixels": 15835,
+              "alphaMae": 0.11198881172839506
+            },
+            {
+              "frame": 239,
+              "semiTransparentPixels": 41915,
+              "visibleShadowPixels": 13312,
+              "alphaMae": 0.1819675925925926
+            }
+          ],
+          "decodeProtocol": "Decode tagged BT.709 limited-range video to full-range RGB; bottom red is straight alpha.",
+          "passed": true
+        }
+      },
+      "queueSourceKey": "b6803e7fbf210acec5803ee100653e645548028d5b4478cd0c16e0b18e679144",
+      "exporterSha256": "74ead126dbd236590e7a7519c921210b5977f22158b4d6bd9d88222a8b10c72a",
+      "sourcePlanSha256": "a4547d64b7492615fad2cb0017d949c9948e9756771ef382a8dd31bb0a7129a4",
+      "sourcePlan": "plans/a4547d64b7492615fad2cb0017d949c9948e9756771ef382a8dd31bb0a7129a4.json",
+      "sourceExportManifestSha256": "2ea55eb20e655279599e301aab3982701f8983f8603c88c7ea4bc69720dde1a2",
+      "catalogRevision": "chest-B-r2",
+      "availableForApp": true
+    },
+    {
+      "id": "h-bent-knee-calf-raise",
+      "nameZh": "屈膝承重提踵",
+      "fps": 30,
+      "frames": 240,
+      "durationSeconds": 8,
+      "coverFrame": 60,
+      "sourceVideos": {},
+      "sourceLayers": {
+        "root": "capture-h-bent-knee-calf-raise",
+        "path": "masters/realistic/h-bent-knee-calf-raise/layer-manifest.json",
+        "bytes": 8416,
+        "sha256": "5bec9ed48d93dc787b6ca9ea2d58ddd2ae3fcf358f3b1706089054de36692065"
+      },
+      "sourceSha256": "95e8b7c8776d24bcba316df1f9e2103e805bcee952aa24a0b9958abe300c67bc",
+      "framing": {
+        "format": "pose-hub-export-framing@1",
+        "preview": false,
+        "sourceSize": [
+          1080,
+          1080
+        ],
+        "targetSize": [
+          1080,
+          1080
+        ],
+        "crop": [
+          0,
+          0,
+          1080,
+          1080
+        ],
+        "policy": "retain-completed-capture-camera-no-recrop"
+      },
+      "highlight": {
+        "enabled": true,
+        "color": "#f08a3c",
+        "brightness": 0.45
+      },
+      "reviewed": false,
+      "releaseEligible": false,
+      "files": {
+        "video": {
+          "path": "media/h-bent-knee-calf-raise/h-bent-knee-calf-raise.rgb-alpha.mp4",
+          "bytes": 2525734,
+          "sha256": "b2df57eea09fa420c9413a46a98b696d483d4a8cb2e47781369a76dc9574f5c0",
+          "width": 720,
+          "height": 1440,
+          "codec": "h264",
+          "pixelFormat": "yuv420p"
+        },
+        "cover": {
+          "path": "media/h-bent-knee-calf-raise/h-bent-knee-calf-raise.cover.alpha.webp",
+          "bytes": 46474,
+          "sha256": "6a97930bc1f210ecbfbdc7cb9c4568320469de5ec413b9d5e9f997f7c71466f9",
+          "width": 720,
+          "height": 720,
+          "alpha": true
+        },
+        "thumbnail": {
+          "path": "media/h-bent-knee-calf-raise/h-bent-knee-calf-raise.thumbnail.alpha.webp",
+          "bytes": 11066,
+          "sha256": "b99b329d342499e7ff75cd1c9558c1356a954e737bb3808eede4608b8a494682",
+          "width": 240,
+          "height": 240,
+          "alpha": true
+        }
+      },
+      "qa": {
+        "report": {
+          "path": "qa/h-bent-knee-calf-raise/decode-check.json",
+          "bytes": 1077,
+          "sha256": "a336886623945d5f231b28ecdd3c0345a74442308696c6349d2ac08d243b7baf"
+        },
+        "metrics": {
+          "framesDecoded": 240,
+          "alphaMae": 0.05415902295524691,
+          "semiTransparentAlphaMae": 1.4018477098278594,
+          "visibleShadowAlphaMae": 1.1165847044383999,
+          "visibleShadowSamples": 2411680,
+          "transparentAlphaLeakMax": 51,
+          "compositeRgbMae": {
+            "white": 0.2034950408307613,
+            "dark": 0.17974301268861453,
+            "cyan": 0.19226367723336762
+          },
+          "semiTransparentCompositeRgbMae": {
+            "white": 1.9592500337076078,
+            "dark": 1.241928249249062,
+            "cyan": 1.6413894249242311
+          },
+          "sampleFrames": [
+            {
+              "frame": 0,
+              "semiTransparentPixels": 15305,
+              "visibleShadowPixels": 9779,
+              "alphaMae": 0.038051697530864195
+            },
+            {
+              "frame": 60,
+              "semiTransparentPixels": 16075,
+              "visibleShadowPixels": 10438,
+              "alphaMae": 0.043875385802469136
+            },
+            {
+              "frame": 239,
+              "semiTransparentPixels": 15305,
+              "visibleShadowPixels": 9779,
+              "alphaMae": 0.05166473765432099
+            }
+          ],
+          "decodeProtocol": "Decode tagged BT.709 limited-range video to full-range RGB; bottom red is straight alpha.",
+          "passed": true
+        }
+      },
+      "queueSourceKey": "1dad0bdc62d460b968773bae6149f8ceea2eed5ae0a899bd7fbd17e2f1a5bf5e",
+      "exporterSha256": "74ead126dbd236590e7a7519c921210b5977f22158b4d6bd9d88222a8b10c72a",
+      "sourcePlanSha256": "8deae4ff891363cfb750db4050416893903e80f9ba1ef3fe1c4d6f307d1ba512",
+      "sourcePlan": "plans/8deae4ff891363cfb750db4050416893903e80f9ba1ef3fe1c4d6f307d1ba512.json",
+      "sourceExportManifestSha256": "fb68db4a7d8c8ae9ce80be9779b345ec2edf4f97b82182c09ab84aa997eb4d64",
+      "catalogRevision": "h-bent-knee-calf-raise-rr7",
+      "availableForApp": true
+    },
+    {
+      "id": "h-chair-tspine",
+      "nameZh": "跪姿椅面胸椎伸展",
+      "fps": 30,
+      "frames": 240,
+      "durationSeconds": 8,
+      "coverFrame": 66,
+      "sourceVideos": {
+        "dark": {
+          "root": "release",
+          "path": "realistic/dark/h-chair-tspine.mp4",
+          "bytes": 354621,
+          "sha256": "80eda12a9c0700c9bbf2c641607304e44016c1071facc2651f3262d0774c381e",
+          "codec": "h264",
+          "profile": "High",
+          "pixelFormat": "yuv420p",
+          "width": 720,
+          "height": 720,
+          "fps": 30.0,
+          "frames": 240,
+          "durationSeconds": 8.0,
+          "videoBitrateBps": 350891,
+          "containerBitrateBps": 354621
+        },
+        "light": {
+          "root": "release",
+          "path": "realistic/light/h-chair-tspine.mp4",
+          "bytes": 408735,
+          "sha256": "f40c4435262449ce32eacc5093b46d2fa40c561e055fd9becacf8a1f49276c81",
+          "codec": "h264",
+          "profile": "High",
+          "pixelFormat": "yuv420p",
+          "width": 720,
+          "height": 720,
+          "fps": 30.0,
+          "frames": 240,
+          "durationSeconds": 8.0,
+          "videoBitrateBps": 404997,
+          "containerBitrateBps": 408735
+        }
+      },
+      "sourceLayers": {
+        "root": "formal-first-pass",
+        "path": "masters/realistic/h-chair-tspine/layer-manifest.json",
+        "bytes": 16504,
+        "sha256": "130f00c9fd64c07f6973b02d5fcf5881de085beacb9faf76ee3f3adea0a910a6"
+      },
+      "sourceSha256": "a7eb8f18bc72ed2a82fd66a196cbb66f0c92aa25c5a7400272261ab6c90f9602",
+      "framing": {
+        "crop": [
+          206,
+          134,
+          923,
+          851
+        ],
+        "sourceSize": [
+          1080,
+          1080
+        ],
+        "targetSize": [
+          1080,
+          1080
+        ],
+        "policy": "union-of-all-body-and-prop-alpha; all-skins-and-frames; fixed-square; 8%-padding",
+        "samples": 1200,
+        "preview": false
+      },
+      "highlight": {
+        "enabled": true,
+        "color": "#f08a3c",
+        "brightness": 0.45
+      },
+      "reviewed": false,
+      "releaseEligible": false,
+      "files": {
+        "video": {
+          "path": "media/h-chair-tspine/h-chair-tspine.rgb-alpha.mp4",
+          "bytes": 3195609,
+          "sha256": "d25a61cd5812b1ab0c3ffa38f6119888c91e3666e3fb481739220c4809e598b8",
+          "width": 720,
+          "height": 1440,
+          "codec": "h264",
+          "pixelFormat": "yuv420p"
+        },
+        "cover": {
+          "path": "media/h-chair-tspine/h-chair-tspine.cover.alpha.webp",
+          "bytes": 62118,
+          "sha256": "1e472cce1e70c6f076de3c0c8b1db8c4bc452b1062ee4fd5caf4d9a793e9291b",
+          "width": 720,
+          "height": 720,
+          "alpha": true
+        },
+        "thumbnail": {
+          "path": "media/h-chair-tspine/h-chair-tspine.thumbnail.alpha.webp",
+          "bytes": 14294,
+          "sha256": "c1da0c39745fd8d383919c38adbd589bd6da2f92e1eecc16367e93549ba481f9",
+          "width": 240,
+          "height": 240,
+          "alpha": true
+        }
+      },
+      "qa": {
+        "report": {
+          "path": "qa/h-chair-tspine/decode-check.json",
+          "bytes": 1072,
+          "sha256": "ec105447c4e3d43fa3d32cc1872f6d3ca3f83c5699d362dec1b8d60b3c0d0a75"
+        },
+        "metrics": {
+          "framesDecoded": 240,
+          "alphaMae": 0.097733297968107,
+          "semiTransparentAlphaMae": 1.36140674692645,
+          "visibleShadowAlphaMae": 1.1518709181084577,
+          "visibleShadowSamples": 3421208,
+          "transparentAlphaLeakMax": 50,
+          "compositeRgbMae": {
+            "white": 0.29835624303412206,
+            "dark": 0.2530698490012003,
+            "cyan": 0.2751375359010631
+          },
+          "semiTransparentCompositeRgbMae": {
+            "white": 1.6932132102853295,
+            "dark": 0.9717090824972531,
+            "cyan": 1.3401195673810815
+          },
+          "sampleFrames": [
+            {
+              "frame": 0,
+              "semiTransparentPixels": 30278,
+              "visibleShadowPixels": 14950,
+              "alphaMae": 0.08302276234567901
+            },
+            {
+              "frame": 66,
+              "semiTransparentPixels": 29482,
+              "visibleShadowPixels": 14209,
+              "alphaMae": 0.08000192901234568
+            },
+            {
+              "frame": 239,
+              "semiTransparentPixels": 30233,
+              "visibleShadowPixels": 14931,
+              "alphaMae": 0.1288406635802469
+            }
+          ],
+          "decodeProtocol": "Decode tagged BT.709 limited-range video to full-range RGB; bottom red is straight alpha.",
+          "passed": true
+        }
+      },
+      "queueSourceKey": "857cf595d69abcd3995dd39727f7625bed48068c8091d04fc4988d21514629b2",
+      "exporterSha256": "74ead126dbd236590e7a7519c921210b5977f22158b4d6bd9d88222a8b10c72a",
+      "sourcePlanSha256": "a4547d64b7492615fad2cb0017d949c9948e9756771ef382a8dd31bb0a7129a4",
+      "sourcePlan": "plans/a4547d64b7492615fad2cb0017d949c9948e9756771ef382a8dd31bb0a7129a4.json",
+      "sourceExportManifestSha256": "5451510ea55cf1fa23e6a8ef3f56de41d1869a90451b78054043b4062e9c1943",
+      "catalogRevision": "h-chair-tspine",
+      "availableForApp": true
+    },
+    {
+      "id": "h-squat",
+      "nameZh": "徒手深蹲",
+      "fps": 30,
+      "frames": 240,
+      "durationSeconds": 8,
+      "coverFrame": 63,
+      "sourceVideos": {
+        "dark": {
+          "root": "release",
+          "path": "realistic/dark/h-squat.mp4",
+          "bytes": 457758,
+          "sha256": "671fbe632a8b2e909cbf41e2773057a79169273df2151cf8ff419be3c9b3c000",
+          "codec": "h264",
+          "profile": "High",
+          "pixelFormat": "yuv420p",
+          "width": 720,
+          "height": 720,
+          "fps": 30.0,
+          "frames": 240,
+          "durationSeconds": 8.0,
+          "videoBitrateBps": 454044,
+          "containerBitrateBps": 457758
+        },
+        "light": {
+          "root": "release",
+          "path": "realistic/light/h-squat.mp4",
+          "bytes": 483212,
+          "sha256": "72e0d1df60e245ebdea27ff5b0e0119a2615ace39d5ffb234834f09c9f3e1f41",
+          "codec": "h264",
+          "profile": "High",
+          "pixelFormat": "yuv420p",
+          "width": 720,
+          "height": 720,
+          "fps": 30.0,
+          "frames": 240,
+          "durationSeconds": 8.0,
+          "videoBitrateBps": 479498,
+          "containerBitrateBps": 483212
+        }
+      },
+      "sourceLayers": {
+        "root": "b001",
+        "path": "masters/realistic/h-squat/layer-manifest.json",
+        "bytes": 12329,
+        "sha256": "6c018605b4708b9f9b3b7a54c96e191ecaf0fda7c681606d67156b58d087ca03"
+      },
+      "sourceSha256": "130708ceb65c46ba8d4b2c222730a218aba85f331523c910981f37909a29d9a0",
+      "framing": {
+        "crop": [
+          -148,
+          -54,
+          985,
+          1079
+        ],
+        "sourceSize": [
+          1080,
+          1080
+        ],
+        "targetSize": [
+          1080,
+          1080
+        ],
+        "policy": "union-of-all-body-and-prop-alpha; all-skins-and-frames; fixed-square; 8%-padding",
+        "samples": 1200,
+        "preview": false
+      },
+      "highlight": {
+        "enabled": true,
+        "color": "#f08a3c",
+        "brightness": 0.45
+      },
+      "reviewed": false,
+      "releaseEligible": false,
+      "files": {
+        "video": {
+          "path": "media/h-squat/h-squat.rgb-alpha.mp4",
+          "bytes": 5341936,
+          "sha256": "68ec4e23139e87be25c2a326867fd60945c43efe3410d0685f09341d429d3ee8",
+          "width": 720,
+          "height": 1440,
+          "codec": "h264",
+          "pixelFormat": "yuv420p"
+        },
+        "cover": {
+          "path": "media/h-squat/h-squat.cover.alpha.webp",
+          "bytes": 60290,
+          "sha256": "2f7991bf3ebc6a8885aba15876a65d8b9bcd4f48192707d7b7915b677a8f5caf",
+          "width": 720,
+          "height": 720,
+          "alpha": true
+        },
+        "thumbnail": {
+          "path": "media/h-squat/h-squat.thumbnail.alpha.webp",
+          "bytes": 14066,
+          "sha256": "4637392bf045983d955ff58e47d8775f5f24d67bdefb21fde95d4a1612f3e905",
+          "width": 240,
+          "height": 240,
+          "alpha": true
+        }
+      },
+      "qa": {
+        "report": {
+          "path": "qa/h-squat/decode-check.json",
+          "bytes": 1077,
+          "sha256": "49cf9b1ef0cfcf9e438cd7f13a15ce0c7a8cd942456b8921c0c33d8178779967"
+        },
+        "metrics": {
+          "framesDecoded": 240,
+          "alphaMae": 0.08404786361882716,
+          "semiTransparentAlphaMae": 1.6870377195234747,
+          "visibleShadowAlphaMae": 1.2509891541461298,
+          "visibleShadowSamples": 2705089,
+          "transparentAlphaLeakMax": 40,
+          "compositeRgbMae": {
+            "white": 0.2723318410279493,
+            "dark": 0.24319300304355282,
+            "cyan": 0.25680187167781204
+          },
+          "semiTransparentCompositeRgbMae": {
+            "white": 2.2080543173913063,
+            "dark": 1.5065794883238088,
+            "cyan": 1.8634870860881234
+          },
+          "sampleFrames": [
+            {
+              "frame": 0,
+              "semiTransparentPixels": 16073,
+              "visibleShadowPixels": 7957,
+              "alphaMae": 0.049837962962962966
+            },
+            {
+              "frame": 63,
+              "semiTransparentPixels": 23111,
+              "visibleShadowPixels": 14655,
+              "alphaMae": 0.06999228395061728
+            },
+            {
+              "frame": 239,
+              "semiTransparentPixels": 16075,
+              "visibleShadowPixels": 7972,
+              "alphaMae": 0.08695408950617284
+            }
+          ],
+          "decodeProtocol": "Decode tagged BT.709 limited-range video to full-range RGB; bottom red is straight alpha.",
+          "passed": true
+        }
+      },
+      "queueSourceKey": "e33f55e276af299a500dce75934f5e1c515897ee7ab0d847abbf22f341985716",
+      "exporterSha256": "74ead126dbd236590e7a7519c921210b5977f22158b4d6bd9d88222a8b10c72a",
+      "sourcePlanSha256": "a4547d64b7492615fad2cb0017d949c9948e9756771ef382a8dd31bb0a7129a4",
+      "sourcePlan": "plans/a4547d64b7492615fad2cb0017d949c9948e9756771ef382a8dd31bb0a7129a4.json",
+      "sourceExportManifestSha256": "5451510ea55cf1fa23e6a8ef3f56de41d1869a90451b78054043b4062e9c1943",
+      "catalogRevision": "h-squat-r2",
+      "availableForApp": true
+    },
+    {
+      "id": "w-bird-dog",
+      "nameZh": "鸟狗式",
+      "fps": 30,
+      "frames": 240,
+      "durationSeconds": 8,
+      "coverFrame": 66,
+      "sourceVideos": {
+        "dark": {
+          "root": "release",
+          "path": "realistic/dark/w-bird-dog.mp4",
+          "bytes": 415671,
+          "sha256": "70be1b526bfaf53622a8f612e65ee220635993b98abd5d741927564ebf1a553d",
+          "codec": "h264",
+          "profile": "High",
+          "pixelFormat": "yuv420p",
+          "width": 720,
+          "height": 720,
+          "fps": 30.0,
+          "frames": 240,
+          "durationSeconds": 8.0,
+          "videoBitrateBps": 411941,
+          "containerBitrateBps": 415671
+        },
+        "light": {
+          "root": "release",
+          "path": "realistic/light/w-bird-dog.mp4",
+          "bytes": 428786,
+          "sha256": "4fdabcf93fc318528c00850b4502071ace58288ca6e0215d2023366ff2e647af",
+          "codec": "h264",
+          "profile": "High",
+          "pixelFormat": "yuv420p",
+          "width": 720,
+          "height": 720,
+          "fps": 30.0,
+          "frames": 240,
+          "durationSeconds": 8.0,
+          "videoBitrateBps": 425072,
+          "containerBitrateBps": 428786
+        }
+      },
+      "sourceLayers": {
+        "root": "formal-first-pass",
+        "path": "masters/realistic/w-bird-dog/layer-manifest.json",
+        "bytes": 12997,
+        "sha256": "b57e96ffd8a7cb24acdecdea430d5d88b0b58265e310b869455f1a2a34931ee1"
+      },
+      "sourceSha256": "dab74045f23ba07ec1d5fd8edb06a21ef295ec8dbef431ace6b23efe9d0a8c05",
+      "framing": {
+        "crop": [
+          271,
+          267,
+          810,
+          806
+        ],
+        "sourceSize": [
+          1080,
+          1080
+        ],
+        "targetSize": [
+          1080,
+          1080
+        ],
+        "policy": "union-of-all-body-and-prop-alpha; all-skins-and-frames; fixed-square; 8%-padding",
+        "samples": 1200,
+        "preview": false
+      },
+      "highlight": {
+        "enabled": true,
+        "color": "#f08a3c",
+        "brightness": 0.45
+      },
+      "reviewed": false,
+      "releaseEligible": false,
+      "files": {
+        "video": {
+          "path": "media/w-bird-dog/w-bird-dog.rgb-alpha.mp4",
+          "bytes": 3448036,
+          "sha256": "6a8bf802517a09a86c814fd5e851392dee52b0c6217d17fee380dff5c94fa0cc",
+          "width": 720,
+          "height": 1440,
+          "codec": "h264",
+          "pixelFormat": "yuv420p"
+        },
+        "cover": {
+          "path": "media/w-bird-dog/w-bird-dog.cover.alpha.webp",
+          "bytes": 66872,
+          "sha256": "000c3c329acb00eb83e9503a35bcf66365b7f6caf75d1aede6cfed7c9ae22b1d",
+          "width": 720,
+          "height": 720,
+          "alpha": true
+        },
+        "thumbnail": {
+          "path": "media/w-bird-dog/w-bird-dog.thumbnail.alpha.webp",
+          "bytes": 13814,
+          "sha256": "7919cb216c0dc7a27a02821b5a8a035a0d19bbcd50aafbfe1cfef0c3bb95f7d1",
+          "width": 240,
+          "height": 240,
+          "alpha": true
+        }
+      },
+      "qa": {
+        "report": {
+          "path": "qa/w-bird-dog/decode-check.json",
+          "bytes": 1074,
+          "sha256": "5626f0dcea99faf9da8b6988d40f8e0fb6f5a33969f8ddfda9eccd159f607f03"
+        },
+        "metrics": {
+          "framesDecoded": 240,
+          "alphaMae": 0.07880979134516461,
+          "semiTransparentAlphaMae": 1.372314066906159,
+          "visibleShadowAlphaMae": 1.119625957903318,
+          "visibleShadowSamples": 2212906,
+          "transparentAlphaLeakMax": 37,
+          "compositeRgbMae": {
+            "white": 0.2626026931155693,
+            "dark": 0.23257200038580247,
+            "cyan": 0.24643256494341564
+          },
+          "semiTransparentCompositeRgbMae": {
+            "white": 1.9505745243202806,
+            "dark": 1.3691460055096418,
+            "cyan": 1.6577208016287608
+          },
+          "sampleFrames": [
+            {
+              "frame": 0,
+              "semiTransparentPixels": 18750,
+              "visibleShadowPixels": 6860,
+              "alphaMae": 0.050326003086419754
+            },
+            {
+              "frame": 66,
+              "semiTransparentPixels": 28726,
+              "visibleShadowPixels": 11473,
+              "alphaMae": 0.07924575617283951
+            },
+            {
+              "frame": 239,
+              "semiTransparentPixels": 18738,
+              "visibleShadowPixels": 6837,
+              "alphaMae": 0.0788329475308642
+            }
+          ],
+          "decodeProtocol": "Decode tagged BT.709 limited-range video to full-range RGB; bottom red is straight alpha.",
+          "passed": true
+        }
+      },
+      "queueSourceKey": "d713f6ae07d8ee4df5eaf4d5ccbb2053af68b52e822af36d0bf6ddaaa17d6541",
+      "exporterSha256": "74ead126dbd236590e7a7519c921210b5977f22158b4d6bd9d88222a8b10c72a",
+      "sourcePlanSha256": "a4547d64b7492615fad2cb0017d949c9948e9756771ef382a8dd31bb0a7129a4",
+      "sourcePlan": "plans/a4547d64b7492615fad2cb0017d949c9948e9756771ef382a8dd31bb0a7129a4.json",
+      "sourceExportManifestSha256": "5451510ea55cf1fa23e6a8ef3f56de41d1869a90451b78054043b4062e9c1943",
+      "catalogRevision": "w-bird-dog",
+      "availableForApp": true
+    }
+  ],
+  "sizes": {
+    "packedMp4Bytes": 52587735,
+    "alphaWebpBytes": 1049210,
+    "deliveryMediaBytes": 53636945,
+    "originalDarkMp4Bytes": 5386576,
+    "originalLightMp4Bytes": 5605474,
+    "originalBothThemesMp4Bytes": 10992050,
+    "baselineComparableActionCount": 11,
+    "baselineComparablePackedBytes": 50062001,
+    "packedVsOneDarkRatio": 9.293844735505449,
+    "packedVsBothThemesRatio": 4.55438257649847,
+    "comparisonScope": "Only ready actions with both original baseline themes; fresh captures excluded from ratios."
+  },
+  "failures": [
+    {
+      "id": "abs-B",
+      "error": "Unable to allocate 13.3 MiB for an array with shape (1080, 1080, 3) and data type float32",
+      "at": "2026-10-25T04:04:17.777661+00:00",
+      "attempt": "abs-B-r1",
+      "log": "logs/abs-B-r1.log",
+      "record": {
+        "path": "failures/abs-B/e53855d84a0946fbab527333a10c2698.json",
+        "bytes": 223,
+        "sha256": "a6b5613a5a66727eed3c1563b977877c437c926c432a15a529438f6950106df0"
+      }
+    },
+    {
+      "id": "abs-C",
+      "error": "",
+      "at": "2026-10-25T04:04:19.804782+00:00",
+      "attempt": "abs-C-r1",
+      "log": "logs/abs-C-r1.log",
+      "record": {
+        "path": "failures/abs-C/e0470bc294a64777bcf5bd0927eac9c2.json",
+        "bytes": 134,
+        "sha256": "00cfa655218c6b6f2c2aead99a4917ee19ae3393df7d40acf18b676786be5568"
+      }
+    }
+  ],
+  "trainingSemantics": {
+    "format": "pose-hub-test-semantics-summary@1",
+    "status": "test-unreviewed",
+    "reviewed": false,
+    "releaseEligible": false,
+    "inheritedActionCount": 142,
+    "updatedActionIds": [
+      "g-cable-hip-abduction",
+      "g-cable-hip-extension",
+      "h-band-chest-fly",
+      "h-band-face-pull",
+      "h-band-hip-extension",
+      "h-band-shoulder-ir",
+      "h-band-standing-abduction",
+      "h-band-standing-adduction",
+      "h-band-stepout",
+      "h-band-straight-leg-raise",
+      "h-band-triceps-pressdown",
+      "h-bent-knee-calf-raise",
+      "h-bilateral-farmer-hold-native",
+      "h-bilateral-upper-back-hug",
+      "h-chair-progressive-front-split-native",
+      "h-chair-single-leg-hip-thrust",
+      "h-chair-sit-to-stand",
+      "h-close-stance-forward-fold-native",
+      "h-db-calf-raise",
+      "h-db-floor-fly",
+      "h-db-front-raise",
+      "h-db-hammer-curl",
+      "h-db-kickback",
+      "h-db-overhead-triceps-extension",
+      "h-db-shrug",
+      "h-db-split-squat",
+      "h-db-supported-calf-raise",
+      "h-donkey-kick",
+      "h-doorframe-forearms-pec-native-r3",
+      "h-fixed-bar-vertical-pull",
+      "h-floor-nordic-hand-reset",
+      "h-forward-lunge",
+      "h-goblet-squat",
+      "h-knee-wall-dorsiflexion-native",
+      "h-kneeling-instep-stretch",
+      "h-kneeling-pushup",
+      "h-kneeling-thread-needle",
+      "h-lateral-step-lunge",
+      "h-overhead-triceps-stretch",
+      "h-pike-scapular-elevation",
+      "h-plank-side-step",
+      "h-quadruped-open",
+      "h-quadruped-rockback",
+      "h-short-side-plank",
+      "h-sleeper-stretch",
+      "h-slider-body-saw",
+      "h-standing-forearm-rotation",
+      "h-standing-wrist-deviation",
+      "h-standing-wrist-extensor-stretch",
+      "h-straight-arm-hang-native",
+      "h-suitcase-hold",
+      "h-suitcase-march",
+      "h-supine-bilateral-leg-raise",
+      "h-supine-heel-slide",
+      "h-supported-single-leg-calf",
+      "h-towel-isometric-curl",
+      "h-unsupported-star-reach-native",
+      "h-wall-calf-bent-knee",
+      "h-wall-palm-lift",
+      "h-wall-wrist-flexor-stretch",
+      "o-chair-knee-extension",
+      "o-seated-calf-raise",
+      "o-seated-hip-er",
+      "o-seated-sidebend",
+      "o-stand-ham",
+      "o-supported-ankle-eversion",
+      "o-supported-ankle-inversion",
+      "o-supported-ankle-pump",
+      "o-supported-hip-airplane",
+      "o-supported-hip-hitch",
+      "o-supported-hip-ir",
+      "o-supported-knee-curl",
+      "o-supported-march",
+      "o-supported-mini-squat",
+      "o-supported-single-leg-rdl",
+      "o-supported-star-reach",
+      "o-wall-hip-hinge-stretch"
+    ],
+    "updatedActionCount": 77,
+    "pendingAuthoringIds": [],
+    "definitionCompleteIds": [
+      "abs-A",
+      "abs-B",
+      "abs-C",
+      "adductors-A",
+      "adductors-B",
+      "adductors-C",
+      "chest-A",
+      "chest-B",
+      "chest-C",
+      "deltoids-A",
+      "deltoids-B",
+      "deltoids-C",
+      "erectors-A",
+      "erectors-B",
+      "erectors-C",
+      "forearms-A",
+      "forearms-B",
+      "forearms-C",
+      "glute-max-A",
+      "glute-max-B",
+      "glute-max-C",
+      "h-9090-liftoff",
+      "h-adductor-rock",
+      "h-banana",
+      "h-band-hip-ir",
+      "h-band-leg-out",
+      "h-band-pallof",
+      "h-band-pull-apart",
+      "h-band-row",
+      "h-bridge-march",
+      "h-bulgarian",
+      "h-butterfly-active",
+      "h-calf-raise",
+      "h-catcow-quad",
+      "h-chair-dip",
+      "h-chair-kickback",
+      "h-chair-lat",
+      "h-chair-step-up",
+      "h-chair-tspine",
+      "h-cobra",
+      "h-couch-stretch",
+      "h-crunch",
+      "h-db-curl",
+      "h-db-floor-press",
+      "h-db-lateral",
+      "h-db-press",
+      "h-db-rdl",
+      "h-db-reverse-fly",
+      "h-db-row",
+      "h-dd-shoulder",
+      "h-forearm-plank",
+      "h-good-morning",
+      "h-hip-gate",
+      "h-incline-pushup",
+      "h-knee-hug",
+      "h-quad-cars",
+      "h-reverse-clam",
+      "h-reverse-crunch",
+      "h-russian-twist",
+      "h-seated-reachback",
+      "h-side-er",
+      "h-side-leg-raise",
+      "h-squat",
+      "h-step-jack",
+      "h-sumo-pry",
+      "h-superman",
+      "h-supine-twist",
+      "h-tabletop",
+      "h-tib-raise",
+      "h-wall-angel",
+      "h-wall-calf",
+      "h-wall-straddle",
+      "hamstrings-A",
+      "hamstrings-B",
+      "hamstrings-C",
+      "hip-abductors-A",
+      "hip-abductors-B",
+      "hip-abductors-C",
+      "hip-flexors-A",
+      "hip-flexors-B",
+      "hip-flexors-C",
+      "lats-A",
+      "lats-B",
+      "lats-C",
+      "n-chair-wiper",
+      "n-half-split",
+      "n-leg-circles",
+      "n-pelvis-circle",
+      "n-prone-hip-ext",
+      "n-prone-ir",
+      "n-seated-ir-drop",
+      "n-seated-knee-lift",
+      "n-seated-squeeze",
+      "n-slider-lateral",
+      "n-squat-shift",
+      "n-straddle-fold",
+      "n-thomas-test",
+      "n-wide-fold",
+      "n-windshield",
+      "o-seated-catcow",
+      "o-seated-fig4",
+      "o-seated-ham",
+      "o-seated-twist",
+      "o-stand-crossreach",
+      "o-stand-lunge",
+      "o-stand-quad",
+      "o-stand-sidebend",
+      "obliques-A",
+      "obliques-B",
+      "obliques-C",
+      "quadriceps-A",
+      "quadriceps-B",
+      "quadriceps-C",
+      "rotator-cuff-A",
+      "rotator-cuff-B",
+      "rotator-cuff-C",
+      "s-9090",
+      "s-butterfly",
+      "s-figure4",
+      "s-frog",
+      "s-kneel-hipflex",
+      "s-lizard",
+      "s-pigeon",
+      "s-seated-fold",
+      "scapular-A",
+      "scapular-B",
+      "scapular-C",
+      "serratus-A",
+      "serratus-B",
+      "serratus-C",
+      "t-seated-straddle-lift-1leg",
+      "triceps-A",
+      "triceps-B",
+      "triceps-C",
+      "w-bird-dog",
+      "w-chair-hip-thrust",
+      "w-clamshell",
+      "w-dead-bug",
+      "w-feet-on-chair-bridge",
+      "w-fire-hydrant",
+      "w-prone-swimmer",
+      "w-wall-sit"
+    ],
+    "definitionCompleteCount": 142,
+    "incompleteActionIds": [
+      "g-cable-hip-abduction",
+      "g-cable-hip-extension",
+      "h-band-chest-fly",
+      "h-band-face-pull",
+      "h-band-hip-extension",
+      "h-band-shoulder-ir",
+      "h-band-standing-abduction",
+      "h-band-standing-adduction",
+      "h-band-stepout",
+      "h-band-straight-leg-raise",
+      "h-band-triceps-pressdown",
+      "h-bent-knee-calf-raise",
+      "h-bilateral-farmer-hold-native",
+      "h-bilateral-upper-back-hug",
+      "h-chair-progressive-front-split-native",
+      "h-chair-single-leg-hip-thrust",
+      "h-chair-sit-to-stand",
+      "h-close-stance-forward-fold-native",
+      "h-db-calf-raise",
+      "h-db-floor-fly",
+      "h-db-front-raise",
+      "h-db-hammer-curl",
+      "h-db-kickback",
+      "h-db-overhead-triceps-extension",
+      "h-db-shrug",
+      "h-db-split-squat",
+      "h-db-supported-calf-raise",
+      "h-donkey-kick",
+      "h-doorframe-forearms-pec-native-r3",
+      "h-fixed-bar-vertical-pull",
+      "h-floor-nordic-hand-reset",
+      "h-forward-lunge",
+      "h-goblet-squat",
+      "h-knee-wall-dorsiflexion-native",
+      "h-kneeling-instep-stretch",
+      "h-kneeling-pushup",
+      "h-kneeling-thread-needle",
+      "h-lateral-step-lunge",
+      "h-overhead-triceps-stretch",
+      "h-pike-scapular-elevation",
+      "h-plank-side-step",
+      "h-quadruped-open",
+      "h-quadruped-rockback",
+      "h-short-side-plank",
+      "h-sleeper-stretch",
+      "h-slider-body-saw",
+      "h-standing-forearm-rotation",
+      "h-standing-wrist-deviation",
+      "h-standing-wrist-extensor-stretch",
+      "h-straight-arm-hang-native",
+      "h-suitcase-hold",
+      "h-suitcase-march",
+      "h-supine-bilateral-leg-raise",
+      "h-supine-heel-slide",
+      "h-supported-single-leg-calf",
+      "h-towel-isometric-curl",
+      "h-unsupported-star-reach-native",
+      "h-wall-calf-bent-knee",
+      "h-wall-palm-lift",
+      "h-wall-wrist-flexor-stretch",
+      "o-chair-knee-extension",
+      "o-seated-calf-raise",
+      "o-seated-hip-er",
+      "o-seated-sidebend",
+      "o-stand-ham",
+      "o-supported-ankle-eversion",
+      "o-supported-ankle-inversion",
+      "o-supported-ankle-pump",
+      "o-supported-hip-airplane",
+      "o-supported-hip-hitch",
+      "o-supported-hip-ir",
+      "o-supported-knee-curl",
+      "o-supported-march",
+      "o-supported-mini-squat",
+      "o-supported-single-leg-rdl",
+      "o-supported-star-reach",
+      "o-wall-hip-hinge-stretch"
+    ],
+    "unresolvedById": {
+      "g-cable-hip-abduction": [
+        {
+          "field": "cautions",
+          "reason": "保留有来源的完整注意事项于cautionNotes.zh；未把一般动作约束、肌群或未定位不适推定为身体部位筛选标签。空数组不表示没有需关注部位。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "未建立该动作经审核的结构化禁忌清单；空数组不表示没有禁忌，不从一般动作演示推定疾病适用性。"
+        },
+        {
+          "field": "defaultDose.reps",
+          "reason": "未找到该精确动作的训练重复次数处方，不从片内重复数推算。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "没有明确的训练组间休息处方；片内准备、回程和休息秒数不作训练restSeconds。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数，不按演示循环次数填组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未给可确认的训练剂量范围；起步单值即使存在也不扩成范围。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确ID经确认的难度分级来源，不按负重、幅度或制作清单默认值猜等级。"
+        }
+      ],
+      "g-cable-hip-extension": [
+        {
+          "field": "cautions",
+          "reason": "保留有来源的完整注意事项于cautionNotes.zh；未把一般动作约束、肌群或未定位不适推定为身体部位筛选标签。空数组不表示没有需关注部位。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "未建立该动作经审核的结构化禁忌清单；空数组不表示没有禁忌，不从一般动作演示推定疾病适用性。"
+        },
+        {
+          "field": "defaultDose.reps",
+          "reason": "未找到该精确动作的训练重复次数处方，不从片内重复数推算。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "没有明确的训练组间休息处方；片内准备、回程和休息秒数不作训练restSeconds。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数，不按演示循环次数填组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未给可确认的训练剂量范围；起步单值即使存在也不扩成范围。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确ID经确认的难度分级来源，不按负重、幅度或制作清单默认值猜等级。"
+        }
+      ],
+      "h-band-chest-fly": [
+        {
+          "field": "cautions",
+          "reason": "保留有来源的完整注意事项于cautionNotes.zh；未把一般动作约束、肌群或未定位不适推定为身体部位筛选标签。空数组不表示没有需关注部位。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "未建立该动作经审核的结构化禁忌清单；空数组不表示没有禁忌，不从一般动作演示推定疾病适用性。"
+        },
+        {
+          "field": "defaultDose.reps",
+          "reason": "来源仅给尝试次数范围，已原样保存在doseRange.reps，未指定唯一默认次数。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "没有明确的训练组间休息处方；片内准备、回程和休息秒数不作训练restSeconds。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数，不按演示循环次数填组数。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确ID经确认的难度分级来源，不按负重、幅度或制作清单默认值猜等级。"
+        }
+      ],
+      "h-band-face-pull": [
+        {
+          "field": "cautions",
+          "reason": "没有该精确动作已确认的身体部位筛选标签；来源中的动作边界写入cautionNotes.zh，不把一般约束推定为部位标签。空数组不表示无需注意。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "没有该动作已确认的结构化禁忌清单。空数组不表示没有禁忌，也不由一般动作提示推断疾病适用性。"
+        },
+        {
+          "field": "defaultDose.reps",
+          "reason": "未找到该精确动作的训练重复次数；不按母片循环数、动画轨道或相关动作剂量换算。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "未找到明确训练组间休息；母片准备、回程和停顿不等于训练休息。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数；母片循环次数不是训练组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未提供已确认的训练剂量范围；不从动画时长、幅度或相近动作推导。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确修订已确认的难度分级；不按负重、幅度或候选清单默认值推定等级。"
+        }
+      ],
+      "h-band-hip-extension": [
+        {
+          "field": "cautions",
+          "reason": "保留有来源的完整注意事项于cautionNotes.zh；未把一般动作约束、肌群或未定位不适推定为身体部位筛选标签。空数组不表示没有需关注部位。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "未建立该动作经审核的结构化禁忌清单；空数组不表示没有禁忌，不从一般动作演示推定疾病适用性。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "没有明确的训练组间休息处方；片内准备、回程和休息秒数不作训练restSeconds。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未给可确认的训练剂量范围；起步单值即使存在也不扩成范围。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确ID经确认的难度分级来源，不按负重、幅度或制作清单默认值猜等级。"
+        }
+      ],
+      "h-band-shoulder-ir": [
+        {
+          "field": "contraindications",
+          "reason": "未建立该动作经审核的结构化禁忌清单；空数组不表示没有禁忌，不从一般动作演示推定疾病适用性。"
+        },
+        {
+          "field": "defaultDose.reps",
+          "reason": "来源仅给尝试次数范围，已原样保存在doseRange.reps，未指定唯一默认次数。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "没有明确的训练组间休息处方；片内准备、回程和休息秒数不作训练restSeconds。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确ID经确认的难度分级来源，不按负重、幅度或制作清单默认值猜等级。"
+        }
+      ],
+      "h-band-standing-abduction": [
+        {
+          "field": "cautions",
+          "reason": "保留有来源的完整注意事项于cautionNotes.zh；未把一般动作约束、肌群或未定位不适推定为身体部位筛选标签。空数组不表示没有需关注部位。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "未建立该动作经审核的结构化禁忌清单；空数组不表示没有禁忌，不从一般动作演示推定疾病适用性。"
+        },
+        {
+          "field": "defaultDose.reps",
+          "reason": "未找到该精确动作的训练重复次数处方，不从片内重复数推算。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "没有明确的训练组间休息处方；片内准备、回程和休息秒数不作训练restSeconds。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数，不按演示循环次数填组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未给可确认的训练剂量范围；起步单值即使存在也不扩成范围。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确ID经确认的难度分级来源，不按负重、幅度或制作清单默认值猜等级。"
+        }
+      ],
+      "h-band-standing-adduction": [
+        {
+          "field": "cautions",
+          "reason": "保留有来源的完整注意事项于cautionNotes.zh；未把一般动作约束、肌群或未定位不适推定为身体部位筛选标签。空数组不表示没有需关注部位。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "未建立该动作经审核的结构化禁忌清单；空数组不表示没有禁忌，不从一般动作演示推定疾病适用性。"
+        },
+        {
+          "field": "defaultDose.reps",
+          "reason": "未找到该精确动作的训练重复次数处方，不从片内重复数推算。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "没有明确的训练组间休息处方；片内准备、回程和休息秒数不作训练restSeconds。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数，不按演示循环次数填组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未给可确认的训练剂量范围；起步单值即使存在也不扩成范围。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确ID经确认的难度分级来源，不按负重、幅度或制作清单默认值猜等级。"
+        }
+      ],
+      "h-band-stepout": [
+        {
+          "field": "cautions",
+          "reason": "保留有来源的完整注意事项于cautionNotes.zh；未把一般动作约束、肌群或未定位不适推定为身体部位筛选标签。空数组不表示没有需关注部位。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "未建立该动作经审核的结构化禁忌清单；空数组不表示没有禁忌，不从一般动作演示推定疾病适用性。"
+        },
+        {
+          "field": "defaultDose.reps",
+          "reason": "未找到该精确动作的训练重复次数处方，不从片内重复数推算。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "没有明确的训练组间休息处方；片内准备、回程和休息秒数不作训练restSeconds。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数，不按演示循环次数填组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未给可确认的训练剂量范围；起步单值即使存在也不扩成范围。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确ID经确认的难度分级来源，不按负重、幅度或制作清单默认值猜等级。"
+        }
+      ],
+      "h-band-straight-leg-raise": [
+        {
+          "field": "cautions",
+          "reason": "保留有来源的完整注意事项于cautionNotes.zh；未把一般动作约束、肌群或未定位不适推定为身体部位筛选标签。空数组不表示没有需关注部位。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "未建立该动作经审核的结构化禁忌清单；空数组不表示没有禁忌，不从一般动作演示推定疾病适用性。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "没有明确的训练组间休息处方；片内准备、回程和休息秒数不作训练restSeconds。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未给可确认的训练剂量范围；起步单值即使存在也不扩成范围。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确ID经确认的难度分级来源，不按负重、幅度或制作清单默认值猜等级。"
+        }
+      ],
+      "h-band-triceps-pressdown": [
+        {
+          "field": "cautions",
+          "reason": "保留有来源的完整注意事项于cautionNotes.zh；未把一般动作约束、肌群或未定位不适推定为身体部位筛选标签。空数组不表示没有需关注部位。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "未建立该动作经审核的结构化禁忌清单；空数组不表示没有禁忌，不从一般动作演示推定疾病适用性。"
+        },
+        {
+          "field": "defaultDose.reps",
+          "reason": "来源仅给尝试次数范围，已原样保存在doseRange.reps，未指定唯一默认次数。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "没有明确的训练组间休息处方；片内准备、回程和休息秒数不作训练restSeconds。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数，不按演示循环次数填组数。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确ID经确认的难度分级来源，不按负重、幅度或制作清单默认值猜等级。"
+        }
+      ],
+      "h-bent-knee-calf-raise": [
+        {
+          "field": "cautionNotes.zh",
+          "reason": "未提炼出独立于动作要领和常见错误的明确注意事项；空数组不表示无需注意。"
+        },
+        {
+          "field": "cautions",
+          "reason": "没有该精确动作已确认的身体部位筛选标签；来源中的动作边界写入cautionNotes.zh，不把一般约束推定为部位标签。空数组不表示无需注意。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "没有该动作已确认的结构化禁忌清单。空数组不表示没有禁忌，也不由一般动作提示推断疾病适用性。"
+        },
+        {
+          "field": "defaultDose.reps",
+          "reason": "未找到该精确动作的训练重复次数；不按母片循环数、动画轨道或相关动作剂量换算。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "未找到明确训练组间休息；母片准备、回程和停顿不等于训练休息。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数；母片循环次数不是训练组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未提供已确认的训练剂量范围；不从动画时长、幅度或相近动作推导。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确修订已确认的难度分级；不按负重、幅度或候选清单默认值推定等级。"
+        }
+      ],
+      "h-bilateral-farmer-hold-native": [
+        {
+          "field": "cautions",
+          "reason": "没有该精确动作已确认的身体部位筛选标签；来源中的动作边界写入cautionNotes.zh，不把一般约束推定为部位标签。空数组不表示无需注意。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "没有该动作已确认的结构化禁忌清单。空数组不表示没有禁忌，也不由一般动作提示推断疾病适用性。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "未找到明确训练组间休息；母片准备、回程和停顿不等于训练休息。"
+        },
+        {
+          "field": "defaultDose.seconds",
+          "reason": "未找到该精确动作的训练保持秒数。8秒或10秒母片及保持段不是处方。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数；母片循环次数不是训练组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未提供已确认的训练剂量范围；不从动画时长、幅度或相近动作推导。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确修订已确认的难度分级；不按负重、幅度或候选清单默认值推定等级。"
+        }
+      ],
+      "h-bilateral-upper-back-hug": [
+        {
+          "field": "cautionNotes.zh",
+          "reason": "未提炼出独立于动作要领和常见错误的明确注意事项；空数组不表示无需注意。"
+        },
+        {
+          "field": "cautions",
+          "reason": "没有该精确动作已确认的身体部位筛选标签；来源中的动作边界写入cautionNotes.zh，不把一般约束推定为部位标签。空数组不表示无需注意。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "没有该动作已确认的结构化禁忌清单。空数组不表示没有禁忌，也不由一般动作提示推断疾病适用性。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "未找到明确训练组间休息；母片准备、回程和停顿不等于训练休息。"
+        },
+        {
+          "field": "defaultDose.seconds",
+          "reason": "未找到该精确动作的训练保持秒数。8秒或10秒母片及保持段不是处方。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数；母片循环次数不是训练组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未提供已确认的训练剂量范围；不从动画时长、幅度或相近动作推导。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确修订已确认的难度分级；不按负重、幅度或候选清单默认值推定等级。"
+        }
+      ],
+      "h-chair-progressive-front-split-native": [
+        {
+          "field": "cautions",
+          "reason": "没有该精确动作已确认的身体部位筛选标签；来源中的动作边界写入cautionNotes.zh，不把一般约束推定为部位标签。空数组不表示无需注意。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "没有该动作已确认的结构化禁忌清单。空数组不表示没有禁忌，也不由一般动作提示推断疾病适用性。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "未找到明确训练组间休息；母片准备、回程和停顿不等于训练休息。"
+        },
+        {
+          "field": "defaultDose.seconds",
+          "reason": "未找到该精确动作的训练保持秒数。8秒或10秒母片及保持段不是处方。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数；母片循环次数不是训练组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未提供已确认的训练剂量范围；不从动画时长、幅度或相近动作推导。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确修订已确认的难度分级；不按负重、幅度或候选清单默认值推定等级。"
+        }
+      ],
+      "h-chair-single-leg-hip-thrust": [
+        {
+          "field": "cautions",
+          "reason": "没有该精确动作已确认的身体部位筛选标签；来源中的动作边界写入cautionNotes.zh，不把一般约束推定为部位标签。空数组不表示无需注意。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "没有该动作已确认的结构化禁忌清单。空数组不表示没有禁忌，也不由一般动作提示推断疾病适用性。"
+        },
+        {
+          "field": "defaultDose.reps",
+          "reason": "未找到该精确动作的训练重复次数；不按母片循环数、动画轨道或相关动作剂量换算。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "未找到明确训练组间休息；母片准备、回程和停顿不等于训练休息。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数；母片循环次数不是训练组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未提供已确认的训练剂量范围；不从动画时长、幅度或相近动作推导。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确修订已确认的难度分级；不按负重、幅度或候选清单默认值推定等级。"
+        }
+      ],
+      "h-chair-sit-to-stand": [
+        {
+          "field": "cautions",
+          "reason": "保留有来源的完整注意事项于cautionNotes.zh；未把一般动作约束、肌群或未定位不适推定为身体部位筛选标签。空数组不表示没有需关注部位。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "未建立该动作经审核的结构化禁忌清单；空数组不表示没有禁忌，不从一般动作演示推定疾病适用性。"
+        },
+        {
+          "field": "defaultDose.reps",
+          "reason": "未找到该精确动作的训练重复次数处方，不从片内重复数推算。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "没有明确的训练组间休息处方；片内准备、回程和休息秒数不作训练restSeconds。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数，不按演示循环次数填组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未给可确认的训练剂量范围；起步单值即使存在也不扩成范围。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确ID经确认的难度分级来源，不按负重、幅度或制作清单默认值猜等级。"
+        }
+      ],
+      "h-close-stance-forward-fold-native": [
+        {
+          "field": "cautions",
+          "reason": "没有该精确动作已确认的身体部位筛选标签；来源中的动作边界写入cautionNotes.zh，不把一般约束推定为部位标签。空数组不表示无需注意。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "没有该动作已确认的结构化禁忌清单。空数组不表示没有禁忌，也不由一般动作提示推断疾病适用性。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "未找到明确训练组间休息；母片准备、回程和停顿不等于训练休息。"
+        },
+        {
+          "field": "defaultDose.seconds",
+          "reason": "未找到该精确动作的训练保持秒数。8秒或10秒母片及保持段不是处方。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数；母片循环次数不是训练组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未提供已确认的训练剂量范围；不从动画时长、幅度或相近动作推导。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确修订已确认的难度分级；不按负重、幅度或候选清单默认值推定等级。"
+        }
+      ],
+      "h-db-calf-raise": [
+        {
+          "field": "cautions",
+          "reason": "保留有来源的完整注意事项于cautionNotes.zh；未把一般动作约束、肌群或未定位不适推定为身体部位筛选标签。空数组不表示没有需关注部位。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "未建立该动作经审核的结构化禁忌清单；空数组不表示没有禁忌，不从一般动作演示推定疾病适用性。"
+        },
+        {
+          "field": "defaultDose.reps",
+          "reason": "未找到该精确动作的训练重复次数处方，不从片内重复数推算。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "没有明确的训练组间休息处方；片内准备、回程和休息秒数不作训练restSeconds。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数，不按演示循环次数填组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未给可确认的训练剂量范围；起步单值即使存在也不扩成范围。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确ID经确认的难度分级来源，不按负重、幅度或制作清单默认值猜等级。"
+        }
+      ],
+      "h-db-floor-fly": [
+        {
+          "field": "cautionNotes.zh",
+          "reason": "未提炼出独立于动作要领和常见错误的明确注意事项；空数组不表示无需注意。"
+        },
+        {
+          "field": "cautions",
+          "reason": "没有该精确动作已确认的身体部位筛选标签；来源中的动作边界写入cautionNotes.zh，不把一般约束推定为部位标签。空数组不表示无需注意。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "没有该动作已确认的结构化禁忌清单。空数组不表示没有禁忌，也不由一般动作提示推断疾病适用性。"
+        },
+        {
+          "field": "defaultDose.reps",
+          "reason": "未找到该精确动作的训练重复次数；不按母片循环数、动画轨道或相关动作剂量换算。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "未找到明确训练组间休息；母片准备、回程和停顿不等于训练休息。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数；母片循环次数不是训练组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未提供已确认的训练剂量范围；不从动画时长、幅度或相近动作推导。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确修订已确认的难度分级；不按负重、幅度或候选清单默认值推定等级。"
+        }
+      ],
+      "h-db-front-raise": [
+        {
+          "field": "cautions",
+          "reason": "保留有来源的完整注意事项于cautionNotes.zh；未把一般动作约束、肌群或未定位不适推定为身体部位筛选标签。空数组不表示没有需关注部位。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "未建立该动作经审核的结构化禁忌清单；空数组不表示没有禁忌，不从一般动作演示推定疾病适用性。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "没有明确的训练组间休息处方；片内准备、回程和休息秒数不作训练restSeconds。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未给可确认的训练剂量范围；起步单值即使存在也不扩成范围。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确ID经确认的难度分级来源，不按负重、幅度或制作清单默认值猜等级。"
+        }
+      ],
+      "h-db-hammer-curl": [
+        {
+          "field": "cautions",
+          "reason": "保留有来源的完整注意事项于cautionNotes.zh；未把一般动作约束、肌群或未定位不适推定为身体部位筛选标签。空数组不表示没有需关注部位。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "未建立该动作经审核的结构化禁忌清单；空数组不表示没有禁忌，不从一般动作演示推定疾病适用性。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "没有明确的训练组间休息处方；片内准备、回程和休息秒数不作训练restSeconds。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未给可确认的训练剂量范围；起步单值即使存在也不扩成范围。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确ID经确认的难度分级来源，不按负重、幅度或制作清单默认值猜等级。"
+        }
+      ],
+      "h-db-kickback": [
+        {
+          "field": "cautions",
+          "reason": "保留有来源的完整注意事项于cautionNotes.zh；未把一般动作约束、肌群或未定位不适推定为身体部位筛选标签。空数组不表示没有需关注部位。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "未建立该动作经审核的结构化禁忌清单；空数组不表示没有禁忌，不从一般动作演示推定疾病适用性。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "没有明确的训练组间休息处方；片内准备、回程和休息秒数不作训练restSeconds。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未给可确认的训练剂量范围；起步单值即使存在也不扩成范围。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确ID经确认的难度分级来源，不按负重、幅度或制作清单默认值猜等级。"
+        }
+      ],
+      "h-db-overhead-triceps-extension": [
+        {
+          "field": "cautionNotes.zh",
+          "reason": "未提炼出独立于动作要领和常见错误的明确注意事项；空数组不表示无需注意。"
+        },
+        {
+          "field": "cautions",
+          "reason": "没有该精确动作已确认的身体部位筛选标签；来源中的动作边界写入cautionNotes.zh，不把一般约束推定为部位标签。空数组不表示无需注意。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "没有该动作已确认的结构化禁忌清单。空数组不表示没有禁忌，也不由一般动作提示推断疾病适用性。"
+        },
+        {
+          "field": "defaultDose.reps",
+          "reason": "未找到该精确动作的训练重复次数；不按母片循环数、动画轨道或相关动作剂量换算。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "未找到明确训练组间休息；母片准备、回程和停顿不等于训练休息。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数；母片循环次数不是训练组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未提供已确认的训练剂量范围；不从动画时长、幅度或相近动作推导。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确修订已确认的难度分级；不按负重、幅度或候选清单默认值推定等级。"
+        }
+      ],
+      "h-db-shrug": [
+        {
+          "field": "cautions",
+          "reason": "保留有来源的完整注意事项于cautionNotes.zh；未把一般动作约束、肌群或未定位不适推定为身体部位筛选标签。空数组不表示没有需关注部位。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "未建立该动作经审核的结构化禁忌清单；空数组不表示没有禁忌，不从一般动作演示推定疾病适用性。"
+        },
+        {
+          "field": "defaultDose.reps",
+          "reason": "来源仅给尝试次数范围，已原样保存在doseRange.reps，未指定唯一默认次数。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "没有明确的训练组间休息处方；片内准备、回程和休息秒数不作训练restSeconds。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确ID经确认的难度分级来源，不按负重、幅度或制作清单默认值猜等级。"
+        }
+      ],
+      "h-db-split-squat": [
+        {
+          "field": "cautions",
+          "reason": "保留有来源的完整注意事项于cautionNotes.zh；未把一般动作约束、肌群或未定位不适推定为身体部位筛选标签。空数组不表示没有需关注部位。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "未建立该动作经审核的结构化禁忌清单；空数组不表示没有禁忌，不从一般动作演示推定疾病适用性。"
+        },
+        {
+          "field": "defaultDose.reps",
+          "reason": "未找到该精确动作的训练重复次数处方，不从片内重复数推算。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "没有明确的训练组间休息处方；片内准备、回程和休息秒数不作训练restSeconds。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数，不按演示循环次数填组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未给可确认的训练剂量范围；起步单值即使存在也不扩成范围。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确ID经确认的难度分级来源，不按负重、幅度或制作清单默认值猜等级。"
+        }
+      ],
+      "h-db-supported-calf-raise": [
+        {
+          "field": "cautions",
+          "reason": "保留有来源的完整注意事项于cautionNotes.zh；未把一般动作约束、肌群或未定位不适推定为身体部位筛选标签。空数组不表示没有需关注部位。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "未建立该动作经审核的结构化禁忌清单；空数组不表示没有禁忌，不从一般动作演示推定疾病适用性。"
+        },
+        {
+          "field": "defaultDose.reps",
+          "reason": "未找到该精确动作的训练重复次数处方，不从片内重复数推算。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "没有明确的训练组间休息处方；片内准备、回程和休息秒数不作训练restSeconds。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数，不按演示循环次数填组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未给可确认的训练剂量范围；起步单值即使存在也不扩成范围。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确ID经确认的难度分级来源，不按负重、幅度或制作清单默认值猜等级。"
+        }
+      ],
+      "h-donkey-kick": [
+        {
+          "field": "cautions",
+          "reason": "保留有来源的完整注意事项于cautionNotes.zh；未把一般动作约束、肌群或未定位不适推定为身体部位筛选标签。空数组不表示没有需关注部位。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "未建立该动作经审核的结构化禁忌清单；空数组不表示没有禁忌，不从一般动作演示推定疾病适用性。"
+        },
+        {
+          "field": "defaultDose.reps",
+          "reason": "未找到该精确动作的训练重复次数处方，不从片内重复数推算。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "没有明确的训练组间休息处方；片内准备、回程和休息秒数不作训练restSeconds。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数，不按演示循环次数填组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未给可确认的训练剂量范围；起步单值即使存在也不扩成范围。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确ID经确认的难度分级来源，不按负重、幅度或制作清单默认值猜等级。"
+        }
+      ],
+      "h-doorframe-forearms-pec-native-r3": [
+        {
+          "field": "cautions",
+          "reason": "没有该精确动作已确认的身体部位筛选标签；来源中的动作边界写入cautionNotes.zh，不把一般约束推定为部位标签。空数组不表示无需注意。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "没有该动作已确认的结构化禁忌清单。空数组不表示没有禁忌，也不由一般动作提示推断疾病适用性。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "未找到明确训练组间休息；母片准备、回程和停顿不等于训练休息。"
+        },
+        {
+          "field": "defaultDose.seconds",
+          "reason": "未找到该精确动作的训练保持秒数。8秒或10秒母片及保持段不是处方。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数；母片循环次数不是训练组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未提供已确认的训练剂量范围；不从动画时长、幅度或相近动作推导。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确修订已确认的难度分级；不按负重、幅度或候选清单默认值推定等级。"
+        }
+      ],
+      "h-fixed-bar-vertical-pull": [
+        {
+          "field": "cautions",
+          "reason": "没有该精确动作已确认的身体部位筛选标签；来源中的动作边界写入cautionNotes.zh，不把一般约束推定为部位标签。空数组不表示无需注意。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "没有该动作已确认的结构化禁忌清单。空数组不表示没有禁忌，也不由一般动作提示推断疾病适用性。"
+        },
+        {
+          "field": "defaultDose.reps",
+          "reason": "未找到该精确动作的训练重复次数；不按母片循环数、动画轨道或相关动作剂量换算。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "未找到明确训练组间休息；母片准备、回程和停顿不等于训练休息。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数；母片循环次数不是训练组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未提供已确认的训练剂量范围；不从动画时长、幅度或相近动作推导。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确修订已确认的难度分级；不按负重、幅度或候选清单默认值推定等级。"
+        }
+      ],
+      "h-floor-nordic-hand-reset": [
+        {
+          "field": "cautions",
+          "reason": "没有该精确动作已确认的身体部位筛选标签；来源中的动作边界写入cautionNotes.zh，不把一般约束推定为部位标签。空数组不表示无需注意。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "没有该动作已确认的结构化禁忌清单。空数组不表示没有禁忌，也不由一般动作提示推断疾病适用性。"
+        },
+        {
+          "field": "defaultDose.reps",
+          "reason": "未找到该精确动作的训练重复次数；不按母片循环数、动画轨道或相关动作剂量换算。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "未找到明确训练组间休息；母片准备、回程和停顿不等于训练休息。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数；母片循环次数不是训练组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未提供已确认的训练剂量范围；不从动画时长、幅度或相近动作推导。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确修订已确认的难度分级；不按负重、幅度或候选清单默认值推定等级。"
+        }
+      ],
+      "h-forward-lunge": [
+        {
+          "field": "cautionNotes.zh",
+          "reason": "未提炼出独立于动作要领和常见错误的明确注意事项；空数组不表示无需注意。"
+        },
+        {
+          "field": "cautions",
+          "reason": "没有该精确动作已确认的身体部位筛选标签；来源中的动作边界写入cautionNotes.zh，不把一般约束推定为部位标签。空数组不表示无需注意。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "没有该动作已确认的结构化禁忌清单。空数组不表示没有禁忌，也不由一般动作提示推断疾病适用性。"
+        },
+        {
+          "field": "defaultDose.reps",
+          "reason": "未找到该精确动作的训练重复次数；不按母片循环数、动画轨道或相关动作剂量换算。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "未找到明确训练组间休息；母片准备、回程和停顿不等于训练休息。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数；母片循环次数不是训练组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未提供已确认的训练剂量范围；不从动画时长、幅度或相近动作推导。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确修订已确认的难度分级；不按负重、幅度或候选清单默认值推定等级。"
+        }
+      ],
+      "h-goblet-squat": [
+        {
+          "field": "cautionNotes.zh",
+          "reason": "未提炼出独立于动作要领和常见错误的明确注意事项；空数组不表示无需注意。"
+        },
+        {
+          "field": "cautions",
+          "reason": "没有该精确动作已确认的身体部位筛选标签；来源中的动作边界写入cautionNotes.zh，不把一般约束推定为部位标签。空数组不表示无需注意。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "没有该动作已确认的结构化禁忌清单。空数组不表示没有禁忌，也不由一般动作提示推断疾病适用性。"
+        },
+        {
+          "field": "defaultDose.reps",
+          "reason": "未找到该精确动作的训练重复次数；不按母片循环数、动画轨道或相关动作剂量换算。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "未找到明确训练组间休息；母片准备、回程和停顿不等于训练休息。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数；母片循环次数不是训练组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未提供已确认的训练剂量范围；不从动画时长、幅度或相近动作推导。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确修订已确认的难度分级；不按负重、幅度或候选清单默认值推定等级。"
+        }
+      ],
+      "h-knee-wall-dorsiflexion-native": [
+        {
+          "field": "cautions",
+          "reason": "没有该精确动作已确认的身体部位筛选标签；来源中的动作边界写入cautionNotes.zh，不把一般约束推定为部位标签。空数组不表示无需注意。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "没有该动作已确认的结构化禁忌清单。空数组不表示没有禁忌，也不由一般动作提示推断疾病适用性。"
+        },
+        {
+          "field": "defaultDose.reps",
+          "reason": "未找到该精确动作的训练重复次数；不按母片循环数、动画轨道或相关动作剂量换算。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "未找到明确训练组间休息；母片准备、回程和停顿不等于训练休息。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数；母片循环次数不是训练组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未提供已确认的训练剂量范围；不从动画时长、幅度或相近动作推导。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确修订已确认的难度分级；不按负重、幅度或候选清单默认值推定等级。"
+        }
+      ],
+      "h-kneeling-instep-stretch": [
+        {
+          "field": "cautionNotes.zh",
+          "reason": "未提炼出独立于动作要领和常见错误的明确注意事项；空数组不表示无需注意。"
+        },
+        {
+          "field": "cautions",
+          "reason": "没有该精确动作已确认的身体部位筛选标签；来源中的动作边界写入cautionNotes.zh，不把一般约束推定为部位标签。空数组不表示无需注意。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "没有该动作已确认的结构化禁忌清单。空数组不表示没有禁忌，也不由一般动作提示推断疾病适用性。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "未找到明确训练组间休息；母片准备、回程和停顿不等于训练休息。"
+        },
+        {
+          "field": "defaultDose.seconds",
+          "reason": "未找到该精确动作的训练保持秒数。8秒或10秒母片及保持段不是处方。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数；母片循环次数不是训练组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未提供已确认的训练剂量范围；不从动画时长、幅度或相近动作推导。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确修订已确认的难度分级；不按负重、幅度或候选清单默认值推定等级。"
+        }
+      ],
+      "h-kneeling-pushup": [
+        {
+          "field": "cautionNotes.zh",
+          "reason": "未提炼出独立于动作要领和常见错误的明确注意事项；空数组不表示无需注意。"
+        },
+        {
+          "field": "cautions",
+          "reason": "没有该精确动作已确认的身体部位筛选标签；来源中的动作边界写入cautionNotes.zh，不把一般约束推定为部位标签。空数组不表示无需注意。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "没有该动作已确认的结构化禁忌清单。空数组不表示没有禁忌，也不由一般动作提示推断疾病适用性。"
+        },
+        {
+          "field": "defaultDose.reps",
+          "reason": "未找到该精确动作的训练重复次数；不按母片循环数、动画轨道或相关动作剂量换算。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "未找到明确训练组间休息；母片准备、回程和停顿不等于训练休息。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数；母片循环次数不是训练组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未提供已确认的训练剂量范围；不从动画时长、幅度或相近动作推导。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确修订已确认的难度分级；不按负重、幅度或候选清单默认值推定等级。"
+        }
+      ],
+      "h-kneeling-thread-needle": [
+        {
+          "field": "cautions",
+          "reason": "没有该精确动作已确认的身体部位筛选标签；来源中的动作边界写入cautionNotes.zh，不把一般约束推定为部位标签。空数组不表示无需注意。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "没有该动作已确认的结构化禁忌清单。空数组不表示没有禁忌，也不由一般动作提示推断疾病适用性。"
+        },
+        {
+          "field": "defaultDose.reps",
+          "reason": "未找到该精确动作的训练重复次数；不按母片循环数、动画轨道或相关动作剂量换算。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "未找到明确训练组间休息；母片准备、回程和停顿不等于训练休息。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数；母片循环次数不是训练组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未提供已确认的训练剂量范围；不从动画时长、幅度或相近动作推导。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确修订已确认的难度分级；不按负重、幅度或候选清单默认值推定等级。"
+        }
+      ],
+      "h-lateral-step-lunge": [
+        {
+          "field": "cautions",
+          "reason": "没有该精确动作已确认的身体部位筛选标签；来源中的动作边界写入cautionNotes.zh，不把一般约束推定为部位标签。空数组不表示无需注意。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "没有该动作已确认的结构化禁忌清单。空数组不表示没有禁忌，也不由一般动作提示推断疾病适用性。"
+        },
+        {
+          "field": "defaultDose.reps",
+          "reason": "未找到该精确动作的训练重复次数；不按母片循环数、动画轨道或相关动作剂量换算。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "未找到明确训练组间休息；母片准备、回程和停顿不等于训练休息。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数；母片循环次数不是训练组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未提供已确认的训练剂量范围；不从动画时长、幅度或相近动作推导。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确修订已确认的难度分级；不按负重、幅度或候选清单默认值推定等级。"
+        }
+      ],
+      "h-overhead-triceps-stretch": [
+        {
+          "field": "cautionNotes.zh",
+          "reason": "未提炼出独立于动作要领和常见错误的明确注意事项；空数组不表示无需注意。"
+        },
+        {
+          "field": "cautions",
+          "reason": "没有该精确动作已确认的身体部位筛选标签；来源中的动作边界写入cautionNotes.zh，不把一般约束推定为部位标签。空数组不表示无需注意。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "没有该动作已确认的结构化禁忌清单。空数组不表示没有禁忌，也不由一般动作提示推断疾病适用性。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "未找到明确训练组间休息；母片准备、回程和停顿不等于训练休息。"
+        },
+        {
+          "field": "defaultDose.seconds",
+          "reason": "未找到该精确动作的训练保持秒数。8秒或10秒母片及保持段不是处方。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数；母片循环次数不是训练组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未提供已确认的训练剂量范围；不从动画时长、幅度或相近动作推导。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确修订已确认的难度分级；不按负重、幅度或候选清单默认值推定等级。"
+        }
+      ],
+      "h-pike-scapular-elevation": [
+        {
+          "field": "contraindications",
+          "reason": "未建立该动作经审核的结构化禁忌清单；空数组不表示没有禁忌，不从一般动作演示推定疾病适用性。"
+        },
+        {
+          "field": "defaultDose.reps",
+          "reason": "来源仅给尝试次数范围，已原样保存在doseRange.reps，未指定唯一默认次数。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "没有明确的训练组间休息处方；片内准备、回程和休息秒数不作训练restSeconds。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确ID经确认的难度分级来源，不按负重、幅度或制作清单默认值猜等级。"
+        }
+      ],
+      "h-plank-side-step": [
+        {
+          "field": "contraindications",
+          "reason": "未建立该动作经审核的结构化禁忌清单；空数组不表示没有禁忌，不从一般动作演示推定疾病适用性。"
+        },
+        {
+          "field": "countingSemantics",
+          "reason": "已描述实际动作单位和示范顺序；训练处方采用单方向、单腿、双侧轮次或负重侧的完整计数口径未明确，需后续确认。"
+        },
+        {
+          "field": "defaultDose.reps",
+          "reason": "未找到该精确动作的训练重复次数处方，不从片内重复数推算。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "没有明确的训练组间休息处方；片内准备、回程和休息秒数不作训练restSeconds。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数，不按演示循环次数填组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未给可确认的训练剂量范围；起步单值即使存在也不扩成范围。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确ID经确认的难度分级来源，不按负重、幅度或制作清单默认值猜等级。"
+        }
+      ],
+      "h-quadruped-open": [
+        {
+          "field": "cautionNotes.zh",
+          "reason": "未提炼出独立于动作要领和常见错误的明确注意事项；空数组不表示无需注意。"
+        },
+        {
+          "field": "cautions",
+          "reason": "没有该精确动作已确认的身体部位筛选标签；来源中的动作边界写入cautionNotes.zh，不把一般约束推定为部位标签。空数组不表示无需注意。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "没有该动作已确认的结构化禁忌清单。空数组不表示没有禁忌，也不由一般动作提示推断疾病适用性。"
+        },
+        {
+          "field": "defaultDose.reps",
+          "reason": "未找到该精确动作的训练重复次数；不按母片循环数、动画轨道或相关动作剂量换算。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "未找到明确训练组间休息；母片准备、回程和停顿不等于训练休息。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数；母片循环次数不是训练组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未提供已确认的训练剂量范围；不从动画时长、幅度或相近动作推导。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确修订已确认的难度分级；不按负重、幅度或候选清单默认值推定等级。"
+        }
+      ],
+      "h-quadruped-rockback": [
+        {
+          "field": "cautionNotes.zh",
+          "reason": "未提炼出独立于动作要领和常见错误的明确注意事项；空数组不表示无需注意。"
+        },
+        {
+          "field": "cautions",
+          "reason": "没有该精确动作已确认的身体部位筛选标签；来源中的动作边界写入cautionNotes.zh，不把一般约束推定为部位标签。空数组不表示无需注意。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "没有该动作已确认的结构化禁忌清单。空数组不表示没有禁忌，也不由一般动作提示推断疾病适用性。"
+        },
+        {
+          "field": "defaultDose.reps",
+          "reason": "未找到该精确动作的训练重复次数；不按母片循环数、动画轨道或相关动作剂量换算。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "未找到明确训练组间休息；母片准备、回程和停顿不等于训练休息。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数；母片循环次数不是训练组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未提供已确认的训练剂量范围；不从动画时长、幅度或相近动作推导。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确修订已确认的难度分级；不按负重、幅度或候选清单默认值推定等级。"
+        }
+      ],
+      "h-short-side-plank": [
+        {
+          "field": "cautionNotes.zh",
+          "reason": "未提炼出独立于动作要领和常见错误的明确注意事项；空数组不表示无需注意。"
+        },
+        {
+          "field": "cautions",
+          "reason": "没有该精确动作已确认的身体部位筛选标签；来源中的动作边界写入cautionNotes.zh，不把一般约束推定为部位标签。空数组不表示无需注意。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "没有该动作已确认的结构化禁忌清单。空数组不表示没有禁忌，也不由一般动作提示推断疾病适用性。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "未找到明确训练组间休息；母片准备、回程和停顿不等于训练休息。"
+        },
+        {
+          "field": "defaultDose.seconds",
+          "reason": "未找到该精确动作的训练保持秒数。8秒或10秒母片及保持段不是处方。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数；母片循环次数不是训练组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未提供已确认的训练剂量范围；不从动画时长、幅度或相近动作推导。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确修订已确认的难度分级；不按负重、幅度或候选清单默认值推定等级。"
+        }
+      ],
+      "h-sleeper-stretch": [
+        {
+          "field": "cautions",
+          "reason": "没有该精确动作已确认的身体部位筛选标签；来源中的动作边界写入cautionNotes.zh，不把一般约束推定为部位标签。空数组不表示无需注意。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "没有该动作已确认的结构化禁忌清单。空数组不表示没有禁忌，也不由一般动作提示推断疾病适用性。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "未找到明确训练组间休息；母片准备、回程和停顿不等于训练休息。"
+        },
+        {
+          "field": "defaultDose.seconds",
+          "reason": "未找到该精确动作的训练保持秒数。8秒或10秒母片及保持段不是处方。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数；母片循环次数不是训练组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未提供已确认的训练剂量范围；不从动画时长、幅度或相近动作推导。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确修订已确认的难度分级；不按负重、幅度或候选清单默认值推定等级。"
+        }
+      ],
+      "h-slider-body-saw": [
+        {
+          "field": "contraindications",
+          "reason": "未建立该动作经审核的结构化禁忌清单；空数组不表示没有禁忌，不从一般动作演示推定疾病适用性。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "没有明确的训练组间休息处方；片内准备、回程和休息秒数不作训练restSeconds。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未给可确认的训练剂量范围；起步单值即使存在也不扩成范围。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确ID经确认的难度分级来源，不按负重、幅度或制作清单默认值猜等级。"
+        }
+      ],
+      "h-standing-forearm-rotation": [
+        {
+          "field": "cautions",
+          "reason": "保留有来源的完整注意事项于cautionNotes.zh；未把一般动作约束、肌群或未定位不适推定为身体部位筛选标签。空数组不表示没有需关注部位。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "未建立该动作经审核的结构化禁忌清单；空数组不表示没有禁忌，不从一般动作演示推定疾病适用性。"
+        },
+        {
+          "field": "countingSemantics",
+          "reason": "已描述实际动作单位和示范顺序；训练处方采用单方向、单腿、双侧轮次或负重侧的完整计数口径未明确，需后续确认。"
+        },
+        {
+          "field": "defaultDose.reps",
+          "reason": "未找到该精确动作的训练重复次数处方，不从片内重复数推算。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "没有明确的训练组间休息处方；片内准备、回程和休息秒数不作训练restSeconds。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数，不按演示循环次数填组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未给可确认的训练剂量范围；起步单值即使存在也不扩成范围。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确ID经确认的难度分级来源，不按负重、幅度或制作清单默认值猜等级。"
+        }
+      ],
+      "h-standing-wrist-deviation": [
+        {
+          "field": "cautions",
+          "reason": "保留有来源的完整注意事项于cautionNotes.zh；未把一般动作约束、肌群或未定位不适推定为身体部位筛选标签。空数组不表示没有需关注部位。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "未建立该动作经审核的结构化禁忌清单；空数组不表示没有禁忌，不从一般动作演示推定疾病适用性。"
+        },
+        {
+          "field": "defaultDose.reps",
+          "reason": "来源仅给尝试次数范围，已原样保存在doseRange.reps，未指定唯一默认次数。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "没有明确的训练组间休息处方；片内准备、回程和休息秒数不作训练restSeconds。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数，不按演示循环次数填组数。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确ID经确认的难度分级来源，不按负重、幅度或制作清单默认值猜等级。"
+        }
+      ],
+      "h-standing-wrist-extensor-stretch": [
+        {
+          "field": "cautions",
+          "reason": "保留有来源的完整注意事项于cautionNotes.zh；未把一般动作约束、肌群或未定位不适推定为身体部位筛选标签。空数组不表示没有需关注部位。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "未建立该动作经审核的结构化禁忌清单；空数组不表示没有禁忌，不从一般动作演示推定疾病适用性。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "没有明确的训练组间休息处方；片内准备、回程和休息秒数不作训练restSeconds。"
+        },
+        {
+          "field": "defaultDose.seconds",
+          "reason": "源只说明拉伸或静态保持及片内时序，未给训练保持时长；不以8秒循环或片内保持平台换算。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数，不按演示循环次数填组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未给可确认的训练剂量范围；起步单值即使存在也不扩成范围。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确ID经确认的难度分级来源，不按负重、幅度或制作清单默认值猜等级。"
+        }
+      ],
+      "h-straight-arm-hang-native": [
+        {
+          "field": "cautions",
+          "reason": "没有该精确动作已确认的身体部位筛选标签；来源中的动作边界写入cautionNotes.zh，不把一般约束推定为部位标签。空数组不表示无需注意。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "没有该动作已确认的结构化禁忌清单。空数组不表示没有禁忌，也不由一般动作提示推断疾病适用性。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "未找到明确训练组间休息；母片准备、回程和停顿不等于训练休息。"
+        },
+        {
+          "field": "defaultDose.seconds",
+          "reason": "未找到该精确动作的训练保持秒数。8秒或10秒母片及保持段不是处方。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数；母片循环次数不是训练组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未提供已确认的训练剂量范围；不从动画时长、幅度或相近动作推导。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确修订已确认的难度分级；不按负重、幅度或候选清单默认值推定等级。"
+        }
+      ],
+      "h-suitcase-hold": [
+        {
+          "field": "cautions",
+          "reason": "保留有来源的完整注意事项于cautionNotes.zh；未把一般动作约束、肌群或未定位不适推定为身体部位筛选标签。空数组不表示没有需关注部位。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "未建立该动作经审核的结构化禁忌清单；空数组不表示没有禁忌，不从一般动作演示推定疾病适用性。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "没有明确的训练组间休息处方；片内准备、回程和休息秒数不作训练restSeconds。"
+        },
+        {
+          "field": "defaultDose.seconds",
+          "reason": "源只说明拉伸或静态保持及片内时序，未给训练保持时长；不以8秒循环或片内保持平台换算。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数，不按演示循环次数填组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未给可确认的训练剂量范围；起步单值即使存在也不扩成范围。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确ID经确认的难度分级来源，不按负重、幅度或制作清单默认值猜等级。"
+        }
+      ],
+      "h-suitcase-march": [
+        {
+          "field": "cautions",
+          "reason": "保留有来源的完整注意事项于cautionNotes.zh；未把一般动作约束、肌群或未定位不适推定为身体部位筛选标签。空数组不表示没有需关注部位。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "未建立该动作经审核的结构化禁忌清单；空数组不表示没有禁忌，不从一般动作演示推定疾病适用性。"
+        },
+        {
+          "field": "countingSemantics",
+          "reason": "已描述实际动作单位和示范顺序；训练处方采用单方向、单腿、双侧轮次或负重侧的完整计数口径未明确，需后续确认。"
+        },
+        {
+          "field": "defaultDose.reps",
+          "reason": "来源仅给尝试次数范围，已原样保存在doseRange.reps，未指定唯一默认次数。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "没有明确的训练组间休息处方；片内准备、回程和休息秒数不作训练restSeconds。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数，不按演示循环次数填组数。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确ID经确认的难度分级来源，不按负重、幅度或制作清单默认值猜等级。"
+        }
+      ],
+      "h-supine-bilateral-leg-raise": [
+        {
+          "field": "cautionNotes.zh",
+          "reason": "未提炼出独立于动作要领和常见错误的明确注意事项；空数组不表示无需注意。"
+        },
+        {
+          "field": "cautions",
+          "reason": "没有该精确动作已确认的身体部位筛选标签；来源中的动作边界写入cautionNotes.zh，不把一般约束推定为部位标签。空数组不表示无需注意。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "没有该动作已确认的结构化禁忌清单。空数组不表示没有禁忌，也不由一般动作提示推断疾病适用性。"
+        },
+        {
+          "field": "defaultDose.reps",
+          "reason": "未找到该精确动作的训练重复次数；不按母片循环数、动画轨道或相关动作剂量换算。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "未找到明确训练组间休息；母片准备、回程和停顿不等于训练休息。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数；母片循环次数不是训练组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未提供已确认的训练剂量范围；不从动画时长、幅度或相近动作推导。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确修订已确认的难度分级；不按负重、幅度或候选清单默认值推定等级。"
+        }
+      ],
+      "h-supine-heel-slide": [
+        {
+          "field": "cautions",
+          "reason": "没有该精确动作已确认的身体部位筛选标签；来源中的动作边界写入cautionNotes.zh，不把一般约束推定为部位标签。空数组不表示无需注意。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "没有该动作已确认的结构化禁忌清单。空数组不表示没有禁忌，也不由一般动作提示推断疾病适用性。"
+        },
+        {
+          "field": "defaultDose.reps",
+          "reason": "未找到该精确动作的训练重复次数；不按母片循环数、动画轨道或相关动作剂量换算。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "未找到明确训练组间休息；母片准备、回程和停顿不等于训练休息。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数；母片循环次数不是训练组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未提供已确认的训练剂量范围；不从动画时长、幅度或相近动作推导。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确修订已确认的难度分级；不按负重、幅度或候选清单默认值推定等级。"
+        }
+      ],
+      "h-supported-single-leg-calf": [
+        {
+          "field": "cautions",
+          "reason": "保留有来源的完整注意事项于cautionNotes.zh；未把一般动作约束、肌群或未定位不适推定为身体部位筛选标签。空数组不表示没有需关注部位。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "未建立该动作经审核的结构化禁忌清单；空数组不表示没有禁忌，不从一般动作演示推定疾病适用性。"
+        },
+        {
+          "field": "defaultDose.reps",
+          "reason": "未找到该精确动作的训练重复次数处方，不从片内重复数推算。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "没有明确的训练组间休息处方；片内准备、回程和休息秒数不作训练restSeconds。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数，不按演示循环次数填组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未给可确认的训练剂量范围；起步单值即使存在也不扩成范围。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确ID经确认的难度分级来源，不按负重、幅度或制作清单默认值猜等级。"
+        }
+      ],
+      "h-towel-isometric-curl": [
+        {
+          "field": "cautions",
+          "reason": "没有该精确动作已确认的身体部位筛选标签；来源中的动作边界写入cautionNotes.zh，不把一般约束推定为部位标签。空数组不表示无需注意。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "没有该动作已确认的结构化禁忌清单。空数组不表示没有禁忌，也不由一般动作提示推断疾病适用性。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "未找到明确训练组间休息；母片准备、回程和停顿不等于训练休息。"
+        },
+        {
+          "field": "defaultDose.seconds",
+          "reason": "未找到该精确动作的训练保持秒数。8秒或10秒母片及保持段不是处方。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数；母片循环次数不是训练组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未提供已确认的训练剂量范围；不从动画时长、幅度或相近动作推导。"
+        },
+        {
+          "field": "equipment",
+          "reason": "nonelastic-towel按实际非弹性毛巾含义保留；taxonomy尚无该器材，不映射为band或滑垫。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确修订已确认的难度分级；不按负重、幅度或候选清单默认值推定等级。"
+        },
+        {
+          "field": "scenes",
+          "reason": "非弹性卷束毛巾尚无taxonomy场景归属；不冒用弹力带的健身房规则。"
+        }
+      ],
+      "h-unsupported-star-reach-native": [
+        {
+          "field": "cautions",
+          "reason": "没有该精确动作已确认的身体部位筛选标签；来源中的动作边界写入cautionNotes.zh，不把一般约束推定为部位标签。空数组不表示无需注意。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "没有该动作已确认的结构化禁忌清单。空数组不表示没有禁忌，也不由一般动作提示推断疾病适用性。"
+        },
+        {
+          "field": "defaultDose.reps",
+          "reason": "未找到该精确动作的训练重复次数；不按母片循环数、动画轨道或相关动作剂量换算。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "未找到明确训练组间休息；母片准备、回程和停顿不等于训练休息。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数；母片循环次数不是训练组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未提供已确认的训练剂量范围；不从动画时长、幅度或相近动作推导。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确修订已确认的难度分级；不按负重、幅度或候选清单默认值推定等级。"
+        }
+      ],
+      "h-wall-calf-bent-knee": [
+        {
+          "field": "cautions",
+          "reason": "保留有来源的完整注意事项于cautionNotes.zh；未把一般动作约束、肌群或未定位不适推定为身体部位筛选标签。空数组不表示没有需关注部位。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "未建立该动作经审核的结构化禁忌清单；空数组不表示没有禁忌，不从一般动作演示推定疾病适用性。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "没有明确的训练组间休息处方；片内准备、回程和休息秒数不作训练restSeconds。"
+        },
+        {
+          "field": "defaultDose.seconds",
+          "reason": "源只说明拉伸或静态保持及片内时序，未给训练保持时长；不以8秒循环或片内保持平台换算。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数，不按演示循环次数填组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未给可确认的训练剂量范围；起步单值即使存在也不扩成范围。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确ID经确认的难度分级来源，不按负重、幅度或制作清单默认值猜等级。"
+        }
+      ],
+      "h-wall-palm-lift": [
+        {
+          "field": "cautions",
+          "reason": "没有该精确动作已确认的身体部位筛选标签；来源中的动作边界写入cautionNotes.zh，不把一般约束推定为部位标签。空数组不表示无需注意。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "没有该动作已确认的结构化禁忌清单。空数组不表示没有禁忌，也不由一般动作提示推断疾病适用性。"
+        },
+        {
+          "field": "defaultDose.reps",
+          "reason": "未找到该精确动作的训练重复次数；不按母片循环数、动画轨道或相关动作剂量换算。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "未找到明确训练组间休息；母片准备、回程和停顿不等于训练休息。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数；母片循环次数不是训练组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未提供已确认的训练剂量范围；不从动画时长、幅度或相近动作推导。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确修订已确认的难度分级；不按负重、幅度或候选清单默认值推定等级。"
+        }
+      ],
+      "h-wall-wrist-flexor-stretch": [
+        {
+          "field": "contraindications",
+          "reason": "未建立该动作经审核的结构化禁忌清单；空数组不表示没有禁忌，不从一般动作演示推定疾病适用性。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "没有明确的训练组间休息处方；片内准备、回程和休息秒数不作训练restSeconds。"
+        },
+        {
+          "field": "defaultDose.seconds",
+          "reason": "源只说明拉伸或静态保持及片内时序，未给训练保持时长；不以8秒循环或片内保持平台换算。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数，不按演示循环次数填组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未给可确认的训练剂量范围；起步单值即使存在也不扩成范围。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确ID经确认的难度分级来源，不按负重、幅度或制作清单默认值猜等级。"
+        }
+      ],
+      "o-chair-knee-extension": [
+        {
+          "field": "cautionNotes.zh",
+          "reason": "未提炼出独立于动作要领和常见错误的明确注意事项；空数组不表示无需注意。"
+        },
+        {
+          "field": "cautions",
+          "reason": "没有该精确动作已确认的身体部位筛选标签；来源中的动作边界写入cautionNotes.zh，不把一般约束推定为部位标签。空数组不表示无需注意。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "没有该动作已确认的结构化禁忌清单。空数组不表示没有禁忌，也不由一般动作提示推断疾病适用性。"
+        },
+        {
+          "field": "defaultDose.reps",
+          "reason": "未找到该精确动作的训练重复次数；不按母片循环数、动画轨道或相关动作剂量换算。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "未找到明确训练组间休息；母片准备、回程和停顿不等于训练休息。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数；母片循环次数不是训练组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未提供已确认的训练剂量范围；不从动画时长、幅度或相近动作推导。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确修订已确认的难度分级；不按负重、幅度或候选清单默认值推定等级。"
+        }
+      ],
+      "o-seated-calf-raise": [
+        {
+          "field": "cautionNotes.zh",
+          "reason": "未提炼出独立于动作要领和常见错误的明确注意事项；空数组不表示无需注意。"
+        },
+        {
+          "field": "cautions",
+          "reason": "没有该精确动作已确认的身体部位筛选标签；来源中的动作边界写入cautionNotes.zh，不把一般约束推定为部位标签。空数组不表示无需注意。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "没有该动作已确认的结构化禁忌清单。空数组不表示没有禁忌，也不由一般动作提示推断疾病适用性。"
+        },
+        {
+          "field": "defaultDose.reps",
+          "reason": "未找到该精确动作的训练重复次数；不按母片循环数、动画轨道或相关动作剂量换算。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "未找到明确训练组间休息；母片准备、回程和停顿不等于训练休息。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数；母片循环次数不是训练组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未提供已确认的训练剂量范围；不从动画时长、幅度或相近动作推导。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确修订已确认的难度分级；不按负重、幅度或候选清单默认值推定等级。"
+        }
+      ],
+      "o-seated-hip-er": [
+        {
+          "field": "cautions",
+          "reason": "保留有来源的完整注意事项于cautionNotes.zh；未把一般动作约束、肌群或未定位不适推定为身体部位筛选标签。空数组不表示没有需关注部位。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "未建立该动作经审核的结构化禁忌清单；空数组不表示没有禁忌，不从一般动作演示推定疾病适用性。"
+        },
+        {
+          "field": "defaultDose.reps",
+          "reason": "未找到该精确动作的训练重复次数处方，不从片内重复数推算。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "没有明确的训练组间休息处方；片内准备、回程和休息秒数不作训练restSeconds。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数，不按演示循环次数填组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未给可确认的训练剂量范围；起步单值即使存在也不扩成范围。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确ID经确认的难度分级来源，不按负重、幅度或制作清单默认值猜等级。"
+        }
+      ],
+      "o-seated-sidebend": [
+        {
+          "field": "cautionNotes.zh",
+          "reason": "未提炼出独立于动作要领和常见错误的明确注意事项；空数组不表示无需注意。"
+        },
+        {
+          "field": "cautions",
+          "reason": "没有该精确动作已确认的身体部位筛选标签；来源中的动作边界写入cautionNotes.zh，不把一般约束推定为部位标签。空数组不表示无需注意。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "没有该动作已确认的结构化禁忌清单。空数组不表示没有禁忌，也不由一般动作提示推断疾病适用性。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "未找到明确训练组间休息；母片准备、回程和停顿不等于训练休息。"
+        },
+        {
+          "field": "defaultDose.seconds",
+          "reason": "未找到该精确动作的训练保持秒数。8秒或10秒母片及保持段不是处方。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数；母片循环次数不是训练组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未提供已确认的训练剂量范围；不从动画时长、幅度或相近动作推导。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确修订已确认的难度分级；不按负重、幅度或候选清单默认值推定等级。"
+        }
+      ],
+      "o-stand-ham": [
+        {
+          "field": "cautions",
+          "reason": "保留有来源的完整注意事项于cautionNotes.zh；未把一般动作约束、肌群或未定位不适推定为身体部位筛选标签。空数组不表示没有需关注部位。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "未建立该动作经审核的结构化禁忌清单；空数组不表示没有禁忌，不从一般动作演示推定疾病适用性。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "没有明确的训练组间休息处方；片内准备、回程和休息秒数不作训练restSeconds。"
+        },
+        {
+          "field": "defaultDose.seconds",
+          "reason": "源只说明拉伸或静态保持及片内时序，未给训练保持时长；不以8秒循环或片内保持平台换算。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数，不按演示循环次数填组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未给可确认的训练剂量范围；起步单值即使存在也不扩成范围。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确ID经确认的难度分级来源，不按负重、幅度或制作清单默认值猜等级。"
+        }
+      ],
+      "o-supported-ankle-eversion": [
+        {
+          "field": "cautions",
+          "reason": "保留有来源的完整注意事项于cautionNotes.zh；未把一般动作约束、肌群或未定位不适推定为身体部位筛选标签。空数组不表示没有需关注部位。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "未建立该动作经审核的结构化禁忌清单；空数组不表示没有禁忌，不从一般动作演示推定疾病适用性。"
+        },
+        {
+          "field": "defaultDose.reps",
+          "reason": "未找到该精确动作的训练重复次数处方，不从片内重复数推算。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "没有明确的训练组间休息处方；片内准备、回程和休息秒数不作训练restSeconds。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数，不按演示循环次数填组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未给可确认的训练剂量范围；起步单值即使存在也不扩成范围。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确ID经确认的难度分级来源，不按负重、幅度或制作清单默认值猜等级。"
+        }
+      ],
+      "o-supported-ankle-inversion": [
+        {
+          "field": "cautions",
+          "reason": "保留有来源的完整注意事项于cautionNotes.zh；未把一般动作约束、肌群或未定位不适推定为身体部位筛选标签。空数组不表示没有需关注部位。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "未建立该动作经审核的结构化禁忌清单；空数组不表示没有禁忌，不从一般动作演示推定疾病适用性。"
+        },
+        {
+          "field": "defaultDose.reps",
+          "reason": "未找到该精确动作的训练重复次数处方，不从片内重复数推算。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "没有明确的训练组间休息处方；片内准备、回程和休息秒数不作训练restSeconds。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数，不按演示循环次数填组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未给可确认的训练剂量范围；起步单值即使存在也不扩成范围。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确ID经确认的难度分级来源，不按负重、幅度或制作清单默认值猜等级。"
+        }
+      ],
+      "o-supported-ankle-pump": [
+        {
+          "field": "cautions",
+          "reason": "保留有来源的完整注意事项于cautionNotes.zh；未把一般动作约束、肌群或未定位不适推定为身体部位筛选标签。空数组不表示没有需关注部位。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "未建立该动作经审核的结构化禁忌清单；空数组不表示没有禁忌，不从一般动作演示推定疾病适用性。"
+        },
+        {
+          "field": "countingSemantics",
+          "reason": "已描述实际动作单位和示范顺序；训练处方采用单方向、单腿、双侧轮次或负重侧的完整计数口径未明确，需后续确认。"
+        },
+        {
+          "field": "defaultDose.reps",
+          "reason": "未找到该精确动作的训练重复次数处方，不从片内重复数推算。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "没有明确的训练组间休息处方；片内准备、回程和休息秒数不作训练restSeconds。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数，不按演示循环次数填组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未给可确认的训练剂量范围；起步单值即使存在也不扩成范围。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确ID经确认的难度分级来源，不按负重、幅度或制作清单默认值猜等级。"
+        }
+      ],
+      "o-supported-hip-airplane": [
+        {
+          "field": "cautions",
+          "reason": "保留有来源的完整注意事项于cautionNotes.zh；未把一般动作约束、肌群或未定位不适推定为身体部位筛选标签。空数组不表示没有需关注部位。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "未建立该动作经审核的结构化禁忌清单；空数组不表示没有禁忌，不从一般动作演示推定疾病适用性。"
+        },
+        {
+          "field": "defaultDose.reps",
+          "reason": "来源仅给尝试次数范围，已原样保存在doseRange.reps，未指定唯一默认次数。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "没有明确的训练组间休息处方；片内准备、回程和休息秒数不作训练restSeconds。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数，不按演示循环次数填组数。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确ID经确认的难度分级来源，不按负重、幅度或制作清单默认值猜等级。"
+        }
+      ],
+      "o-supported-hip-hitch": [
+        {
+          "field": "contraindications",
+          "reason": "未建立该动作经审核的结构化禁忌清单；空数组不表示没有禁忌，不从一般动作演示推定疾病适用性。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "没有明确的训练组间休息处方；片内准备、回程和休息秒数不作训练restSeconds。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未给可确认的训练剂量范围；起步单值即使存在也不扩成范围。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确ID经确认的难度分级来源，不按负重、幅度或制作清单默认值猜等级。"
+        }
+      ],
+      "o-supported-hip-ir": [
+        {
+          "field": "contraindications",
+          "reason": "未建立该动作经审核的结构化禁忌清单；空数组不表示没有禁忌，不从一般动作演示推定疾病适用性。"
+        },
+        {
+          "field": "defaultDose.reps",
+          "reason": "来源仅给尝试次数范围，已原样保存在doseRange.reps，未指定唯一默认次数。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "没有明确的训练组间休息处方；片内准备、回程和休息秒数不作训练restSeconds。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确ID经确认的难度分级来源，不按负重、幅度或制作清单默认值猜等级。"
+        }
+      ],
+      "o-supported-knee-curl": [
+        {
+          "field": "cautions",
+          "reason": "保留有来源的完整注意事项于cautionNotes.zh；未把一般动作约束、肌群或未定位不适推定为身体部位筛选标签。空数组不表示没有需关注部位。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "未建立该动作经审核的结构化禁忌清单；空数组不表示没有禁忌，不从一般动作演示推定疾病适用性。"
+        },
+        {
+          "field": "defaultDose.reps",
+          "reason": "未找到该精确动作的训练重复次数处方，不从片内重复数推算。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "没有明确的训练组间休息处方；片内准备、回程和休息秒数不作训练restSeconds。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数，不按演示循环次数填组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未给可确认的训练剂量范围；起步单值即使存在也不扩成范围。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确ID经确认的难度分级来源，不按负重、幅度或制作清单默认值猜等级。"
+        }
+      ],
+      "o-supported-march": [
+        {
+          "field": "cautions",
+          "reason": "保留有来源的完整注意事项于cautionNotes.zh；未把一般动作约束、肌群或未定位不适推定为身体部位筛选标签。空数组不表示没有需关注部位。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "未建立该动作经审核的结构化禁忌清单；空数组不表示没有禁忌，不从一般动作演示推定疾病适用性。"
+        },
+        {
+          "field": "countingSemantics",
+          "reason": "已描述实际动作单位和示范顺序；训练处方采用单方向、单腿、双侧轮次或负重侧的完整计数口径未明确，需后续确认。"
+        },
+        {
+          "field": "defaultDose.reps",
+          "reason": "未找到该精确动作的训练重复次数处方，不从片内重复数推算。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "没有明确的训练组间休息处方；片内准备、回程和休息秒数不作训练restSeconds。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数，不按演示循环次数填组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未给可确认的训练剂量范围；起步单值即使存在也不扩成范围。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确ID经确认的难度分级来源，不按负重、幅度或制作清单默认值猜等级。"
+        }
+      ],
+      "o-supported-mini-squat": [
+        {
+          "field": "cautions",
+          "reason": "保留有来源的完整注意事项于cautionNotes.zh；未把一般动作约束、肌群或未定位不适推定为身体部位筛选标签。空数组不表示没有需关注部位。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "未建立该动作经审核的结构化禁忌清单；空数组不表示没有禁忌，不从一般动作演示推定疾病适用性。"
+        },
+        {
+          "field": "defaultDose.reps",
+          "reason": "未找到该精确动作的训练重复次数处方，不从片内重复数推算。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "没有明确的训练组间休息处方；片内准备、回程和休息秒数不作训练restSeconds。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数，不按演示循环次数填组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未给可确认的训练剂量范围；起步单值即使存在也不扩成范围。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确ID经确认的难度分级来源，不按负重、幅度或制作清单默认值猜等级。"
+        }
+      ],
+      "o-supported-single-leg-rdl": [
+        {
+          "field": "cautions",
+          "reason": "保留有来源的完整注意事项于cautionNotes.zh；未把一般动作约束、肌群或未定位不适推定为身体部位筛选标签。空数组不表示没有需关注部位。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "未建立该动作经审核的结构化禁忌清单；空数组不表示没有禁忌，不从一般动作演示推定疾病适用性。"
+        },
+        {
+          "field": "defaultDose.reps",
+          "reason": "未找到该精确动作的训练重复次数处方，不从片内重复数推算。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "没有明确的训练组间休息处方；片内准备、回程和休息秒数不作训练restSeconds。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数，不按演示循环次数填组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未给可确认的训练剂量范围；起步单值即使存在也不扩成范围。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确ID经确认的难度分级来源，不按负重、幅度或制作清单默认值猜等级。"
+        }
+      ],
+      "o-supported-star-reach": [
+        {
+          "field": "cautions",
+          "reason": "保留有来源的完整注意事项于cautionNotes.zh；未把一般动作约束、肌群或未定位不适推定为身体部位筛选标签。空数组不表示没有需关注部位。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "未建立该动作经审核的结构化禁忌清单；空数组不表示没有禁忌，不从一般动作演示推定疾病适用性。"
+        },
+        {
+          "field": "countingSemantics",
+          "reason": "已描述实际动作单位和示范顺序；训练处方采用单方向、单腿、双侧轮次或负重侧的完整计数口径未明确，需后续确认。"
+        },
+        {
+          "field": "defaultDose.reps",
+          "reason": "未找到该精确动作的训练重复次数处方，不从片内重复数推算。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "没有明确的训练组间休息处方；片内准备、回程和休息秒数不作训练restSeconds。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数，不按演示循环次数填组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未给可确认的训练剂量范围；起步单值即使存在也不扩成范围。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确ID经确认的难度分级来源，不按负重、幅度或制作清单默认值猜等级。"
+        }
+      ],
+      "o-wall-hip-hinge-stretch": [
+        {
+          "field": "cautions",
+          "reason": "保留有来源的完整注意事项于cautionNotes.zh；未把一般动作约束、肌群或未定位不适推定为身体部位筛选标签。空数组不表示没有需关注部位。"
+        },
+        {
+          "field": "contraindications",
+          "reason": "未建立该动作经审核的结构化禁忌清单；空数组不表示没有禁忌，不从一般动作演示推定疾病适用性。"
+        },
+        {
+          "field": "defaultDose.restSeconds",
+          "reason": "没有明确的训练组间休息处方；片内准备、回程和休息秒数不作训练restSeconds。"
+        },
+        {
+          "field": "defaultDose.seconds",
+          "reason": "源只说明拉伸或静态保持及片内时序，未给训练保持时长；不以8秒循环或片内保持平台换算。"
+        },
+        {
+          "field": "defaultDose.sets",
+          "reason": "该精确动作源未明确训练组数，不按演示循环次数填组数。"
+        },
+        {
+          "field": "doseRange",
+          "reason": "源未给可确认的训练剂量范围；起步单值即使存在也不扩成范围。"
+        },
+        {
+          "field": "level",
+          "reason": "未找到该精确ID经确认的难度分级来源，不按负重、幅度或制作清单默认值猜等级。"
+        }
+      ]
+    },
+    "batches": [
+      {
+        "batchId": "pr14-r1",
+        "source": {
+          "path": "catalog/semantic-sources/952a2745295a3965547d782b097720bcc73932d31b9b0a858bea0542895ca585/semantics-pr14-r1.json",
+          "bytes": 199876,
+          "sha256": "952a2745295a3965547d782b097720bcc73932d31b9b0a858bea0542895ca585",
+          "sourcePath": "catalog/test/semantics-pr14-r1.json"
+        },
+        "updatedActionIds": [
+          "g-cable-hip-abduction",
+          "g-cable-hip-extension",
+          "h-band-chest-fly",
+          "h-band-hip-extension",
+          "h-band-shoulder-ir",
+          "h-band-standing-abduction",
+          "h-band-standing-adduction",
+          "h-band-stepout",
+          "h-band-straight-leg-raise",
+          "h-band-triceps-pressdown",
+          "h-chair-sit-to-stand",
+          "h-db-calf-raise",
+          "h-db-front-raise",
+          "h-db-hammer-curl",
+          "h-db-kickback",
+          "h-db-shrug",
+          "h-db-split-squat",
+          "h-db-supported-calf-raise",
+          "h-donkey-kick",
+          "h-pike-scapular-elevation",
+          "h-plank-side-step",
+          "h-slider-body-saw",
+          "h-standing-forearm-rotation",
+          "h-standing-wrist-deviation",
+          "h-standing-wrist-extensor-stretch",
+          "h-suitcase-hold",
+          "h-suitcase-march",
+          "h-supported-single-leg-calf",
+          "h-wall-calf-bent-knee",
+          "h-wall-wrist-flexor-stretch",
+          "o-seated-hip-er",
+          "o-stand-ham",
+          "o-supported-ankle-eversion",
+          "o-supported-ankle-inversion",
+          "o-supported-ankle-pump",
+          "o-supported-hip-airplane",
+          "o-supported-hip-hitch",
+          "o-supported-hip-ir",
+          "o-supported-knee-curl",
+          "o-supported-march",
+          "o-supported-mini-squat",
+          "o-supported-single-leg-rdl",
+          "o-supported-star-reach",
+          "o-wall-hip-hinge-stretch"
+        ],
+        "actionCount": 44,
+        "definitionCompleteIds": [],
+        "incompleteActionIds": [
+          "g-cable-hip-abduction",
+          "g-cable-hip-extension",
+          "h-band-chest-fly",
+          "h-band-hip-extension",
+          "h-band-shoulder-ir",
+          "h-band-standing-abduction",
+          "h-band-standing-adduction",
+          "h-band-stepout",
+          "h-band-straight-leg-raise",
+          "h-band-triceps-pressdown",
+          "h-chair-sit-to-stand",
+          "h-db-calf-raise",
+          "h-db-front-raise",
+          "h-db-hammer-curl",
+          "h-db-kickback",
+          "h-db-shrug",
+          "h-db-split-squat",
+          "h-db-supported-calf-raise",
+          "h-donkey-kick",
+          "h-pike-scapular-elevation",
+          "h-plank-side-step",
+          "h-slider-body-saw",
+          "h-standing-forearm-rotation",
+          "h-standing-wrist-deviation",
+          "h-standing-wrist-extensor-stretch",
+          "h-suitcase-hold",
+          "h-suitcase-march",
+          "h-supported-single-leg-calf",
+          "h-wall-calf-bent-knee",
+          "h-wall-wrist-flexor-stretch",
+          "o-seated-hip-er",
+          "o-stand-ham",
+          "o-supported-ankle-eversion",
+          "o-supported-ankle-inversion",
+          "o-supported-ankle-pump",
+          "o-supported-hip-airplane",
+          "o-supported-hip-hitch",
+          "o-supported-hip-ir",
+          "o-supported-knee-curl",
+          "o-supported-march",
+          "o-supported-mini-squat",
+          "o-supported-single-leg-rdl",
+          "o-supported-star-reach",
+          "o-wall-hip-hinge-stretch"
+        ]
+      },
+      {
+        "batchId": "latest-r1",
+        "source": {
+          "path": "catalog/semantic-sources/ffb3fbe7c402be97481b483ef0c7db2644b96bc22d5176b03eacf41f0c0e7526/semantics-latest-r1.json",
+          "bytes": 174723,
+          "sha256": "ffb3fbe7c402be97481b483ef0c7db2644b96bc22d5176b03eacf41f0c0e7526",
+          "sourcePath": "catalog/test/semantics-latest-r1.json"
+        },
+        "updatedActionIds": [
+          "h-band-face-pull",
+          "h-bent-knee-calf-raise",
+          "h-bilateral-farmer-hold-native",
+          "h-bilateral-upper-back-hug",
+          "h-chair-progressive-front-split-native",
+          "h-chair-single-leg-hip-thrust",
+          "h-close-stance-forward-fold-native",
+          "h-db-floor-fly",
+          "h-db-overhead-triceps-extension",
+          "h-doorframe-forearms-pec-native-r3",
+          "h-fixed-bar-vertical-pull",
+          "h-floor-nordic-hand-reset",
+          "h-forward-lunge",
+          "h-goblet-squat",
+          "h-knee-wall-dorsiflexion-native",
+          "h-kneeling-instep-stretch",
+          "h-kneeling-pushup",
+          "h-kneeling-thread-needle",
+          "h-lateral-step-lunge",
+          "h-overhead-triceps-stretch",
+          "h-quadruped-open",
+          "h-quadruped-rockback",
+          "h-short-side-plank",
+          "h-sleeper-stretch",
+          "h-straight-arm-hang-native",
+          "h-supine-bilateral-leg-raise",
+          "h-supine-heel-slide",
+          "h-towel-isometric-curl",
+          "h-unsupported-star-reach-native",
+          "h-wall-palm-lift",
+          "o-chair-knee-extension",
+          "o-seated-calf-raise",
+          "o-seated-sidebend"
+        ],
+        "actionCount": 33,
+        "definitionCompleteIds": [],
+        "incompleteActionIds": [
+          "h-band-face-pull",
+          "h-bent-knee-calf-raise",
+          "h-bilateral-farmer-hold-native",
+          "h-bilateral-upper-back-hug",
+          "h-chair-progressive-front-split-native",
+          "h-chair-single-leg-hip-thrust",
+          "h-close-stance-forward-fold-native",
+          "h-db-floor-fly",
+          "h-db-overhead-triceps-extension",
+          "h-doorframe-forearms-pec-native-r3",
+          "h-fixed-bar-vertical-pull",
+          "h-floor-nordic-hand-reset",
+          "h-forward-lunge",
+          "h-goblet-squat",
+          "h-knee-wall-dorsiflexion-native",
+          "h-kneeling-instep-stretch",
+          "h-kneeling-pushup",
+          "h-kneeling-thread-needle",
+          "h-lateral-step-lunge",
+          "h-overhead-triceps-stretch",
+          "h-quadruped-open",
+          "h-quadruped-rockback",
+          "h-short-side-plank",
+          "h-sleeper-stretch",
+          "h-straight-arm-hang-native",
+          "h-supine-bilateral-leg-raise",
+          "h-supine-heel-slide",
+          "h-towel-isometric-curl",
+          "h-unsupported-star-reach-native",
+          "h-wall-palm-lift",
+          "o-chair-knee-extension",
+          "o-seated-calf-raise",
+          "o-seated-sidebend"
+        ]
+      }
+    ],
+    "sourceFiles": [
+      {
+        "path": "catalog/catalog.json",
+        "bytes": 581839,
+        "sha256": "40610dbb71b58886ebe001409ae15161761747b4f776e74a252e7b1f8df6e983",
+        "sourcePath": "catalog/catalog.json"
+      },
+      {
+        "path": "catalog/semantic-sources/952a2745295a3965547d782b097720bcc73932d31b9b0a858bea0542895ca585/semantics-pr14-r1.json",
+        "bytes": 199876,
+        "sha256": "952a2745295a3965547d782b097720bcc73932d31b9b0a858bea0542895ca585",
+        "sourcePath": "catalog/test/semantics-pr14-r1.json"
+      },
+      {
+        "path": "catalog/semantic-sources/ffb3fbe7c402be97481b483ef0c7db2644b96bc22d5176b03eacf41f0c0e7526/semantics-latest-r1.json",
+        "bytes": 174723,
+        "sha256": "ffb3fbe7c402be97481b483ef0c7db2644b96bc22d5176b03eacf41f0c0e7526",
+        "sourcePath": "catalog/test/semantics-latest-r1.json"
+      }
+    ],
+    "requiredForPlanning": [
+      "category",
+      "level",
+      "position",
+      "unilateral",
+      "scenes",
+      "cues.zh",
+      "defaultDose.mode",
+      "defaultDose.sets",
+      "defaultDose.reps|seconds",
+      "defaultDose.restSeconds"
+    ],
+    "videoLoopIsTrainingDose": false,
+    "revisionSha256": "3b497e0b57b4617f96bb3a9a8b66358e367f44823c0c0d22df9b024c2497a500"
+  },
+  "catalog": {
+    "path": "catalog/snapshots/2bdb9a3d96f77287b2b7ee522586f077caef840d99433719c1d4a6d9602292e6.json",
+    "bytes": 1378285,
+    "sha256": "2bdb9a3d96f77287b2b7ee522586f077caef840d99433719c1d4a6d9602292e6"
+  }
+}

@@ -233,6 +233,10 @@ class _ExerciseDetailsState extends State<_ExerciseDetails> {
                 fontWeight: FontWeight.w800,
               ),
             ),
+            if (s.testCatalog != null) ...[
+              const SizedBox(height: SfSpace.x1),
+              Text('App 测试版 · 未审', style: SfType.caption),
+            ],
             const SizedBox(height: SfSpace.x1),
             Text(
               [

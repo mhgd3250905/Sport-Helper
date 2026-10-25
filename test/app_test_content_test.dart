@@ -173,6 +173,55 @@ void main() {
 
   final realPack = Platform.environment['SMARTFIT_CATALOG_TEST_PACK'];
   test(
+    'bundled catalog and semantic assets form the actual internal library',
+    () async {
+      final index =
+          jsonDecode(await File(AppTestPackConfig.indexAsset).readAsString())
+              as Map;
+      final pack = (await AppTestPack.load(
+        (path) => File(path).readAsString(),
+        enabled: true,
+      ))!;
+      final catalog = await AppTestCatalog.load(
+        deliveryCatalogJson: await File(
+          index['catalogAsset'] as String,
+        ).readAsString(),
+        bundledMedia: pack.actions,
+        readSemanticCatalog: (path) async {
+          final asset = (index['semanticSources'] as Map?)?[path];
+          return asset == null ? null : File(asset as String).readAsBytes();
+        },
+      );
+      expect(catalog.semanticStatus, AppTestSemanticStatus.verified);
+      final packs = await PackSet.load((path) => File(path).readAsString());
+      final legacy = ExerciseLibrary.fromPacks(packs);
+      final content = AppTestContent.build(
+        catalog: catalog,
+        legacyLibrary: legacy,
+      );
+      expect(catalog.entries.length, pack.catalog.length);
+      expect(content.library.length, catalog.trainingEligibleIds.length);
+      expect(content.coachCatalog.length, content.library.length);
+      for (final old in legacy.all) {
+        expect(content.library.contains(old.id), isTrue, reason: old.id);
+      }
+      for (final pending in catalog.entries.values.where(
+        (e) => !e.trainingEligible,
+      )) {
+        expect(content.library.contains(pending.id), isFalse);
+        expect(content.coachCatalog[pending.id], isNull);
+        if (pack.actions[pending.id] case final media?) {
+          expect(pending.media, same(media));
+        }
+      }
+      // ignore: avoid_print
+      print(
+        'Bundled ${catalog.entries.length} entries / ${content.library.length} complete / ${pack.actions.length} transparent media.',
+      );
+    },
+  );
+
+  test(
     'current complete definitions retain every historical pack ID',
     () async {
       final source = Directory(realPack!);

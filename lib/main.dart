@@ -117,7 +117,11 @@ Future<void> main() async {
         if (entry is! String || !entry.startsWith('assets/app_test_pack/')) {
           return null;
         }
-        return (await rootBundle.load(entry)).buffer.asUint8List();
+        final bytes = await rootBundle.load(entry);
+        return bytes.buffer.asUint8List(
+          bytes.offsetInBytes,
+          bytes.lengthInBytes,
+        );
       },
     );
     testContent = AppTestContent.build(

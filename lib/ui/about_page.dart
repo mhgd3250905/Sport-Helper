@@ -88,7 +88,19 @@ class AboutPage extends StatelessWidget {
                 ],
               ),
             ),
-            if (s.media != null) ...[
+            if (s.testCatalog case final testCatalog?) ...[
+              const SfSectionTitle('动作素材（App 测试版，未审）'),
+              SfPanel(
+                child: Text(
+                  '目录 ${testCatalog.entries.length} 个动作，'
+                  '已内置 ${testCatalog.entries.values.where((e) => e.media != null).length} 个透明动作。\n'
+                  '${testCatalog.trainingEligibleIds.length} 个训练说明齐全；'
+                  '${testCatalog.entries.length - testCatalog.trainingEligibleIds.length} 个训练说明待补。\n'
+                  '保留旧版内置素材作为回退，其余素材随测试构建分批补入。',
+                  style: SfType.callout,
+                ),
+              ),
+            ] else if (s.media != null) ...[
               const SfSectionTitle('动作素材'),
               const SfPanel(child: TrainingMediaSettings()),
             ],
