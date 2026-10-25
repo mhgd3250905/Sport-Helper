@@ -164,9 +164,9 @@ class TemplatePlanGenerator implements PlanGenerator {
 
   /// Can the user do [e] in this scenario?
   String? blockerFor(Exercise e, ScenarioRequest r) {
-    final have = r.availableEquipment;
-    for (final q in e.equipment) {
-      if (!have.contains(q)) return '没有${q.zh}';
+    final have = r.availableEquipment.map((q) => q.name).toSet();
+    for (final q in e.effectiveEquipmentIds) {
+      if (!have.contains(q)) return '没有${equipmentLabel(q)}';
     }
     if (r.scene == 'office' && e.isFloor) return '办公室不方便趴地';
     if (e.level > r.level + 1) return '难度偏高';

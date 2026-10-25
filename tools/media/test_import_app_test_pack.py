@@ -84,6 +84,23 @@ class ImportAppTestPackTests(unittest.TestCase):
         self.assertIs(index['internalOnly'], True)
         self.assertEqual(before, self.inventory(self.root))
 
+    def test_declared_semantic_catalog_is_verified_and_bundled_immutably(self):
+        data = json.dumps({'format': 'pose-hub-catalog', 'formatVersion': 1,
+                           'version': '0.3.0', 'drills': []}).encode()
+        path = self.source / 'catalog/catalog.json'
+        path.parent.mkdir()
+        path.write_bytes(data)
+        descriptor = {**self.spec('catalog/catalog.json').__dict__, 'version': '0.3.0'}
+        pack = replace(self.pack, catalog=json.dumps({'semanticCatalog': descriptor}).encode())
+        before = self.inventory(self.source)
+        index = self.run_import(pack, apply=True)
+        self.assertEqual((self.app / index['semanticSources']['catalog/catalog.json']).read_bytes(), data)
+        self.assertEqual(before, self.inventory(self.source))
+        self.assertEqual(index, self.run_import(pack, apply=True))
+        path.write_bytes(data + b' ')
+        with self.assertRaises(importer.ImportError):
+            self.run_import(pack, apply=True)
+
     def test_import_append_idempotent_preserves_source_stable_media_and_history(self):
         source_before = self.inventory(self.source)
         first = self.run_import(apply=True)

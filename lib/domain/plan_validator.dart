@@ -84,9 +84,10 @@ class PlanValidator {
             if (avoid.contains(c)) issues.add('${e.name} 会加重$c部负担');
           }
           if (r != null) {
-            for (final q in e.equipment) {
-              if (!r.availableEquipment.contains(q)) {
-                issues.add('${e.name} 需要${q.zh}');
+            final have = r.availableEquipment.map((q) => q.name).toSet();
+            for (final q in e.effectiveEquipmentIds) {
+              if (!have.contains(q)) {
+                issues.add('${e.name} 需要${equipmentLabel(q)}');
               }
             }
             if (r.scene == 'office' && e.isFloor) {

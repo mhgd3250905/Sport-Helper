@@ -8,6 +8,7 @@ import '../diagnostics/training_log.dart';
 import '../voice/just_audio_output.dart' as diagnostic_voice;
 import 'chat/cosmos.dart';
 import 'action_issue_actions.dart';
+import 'alpha_artwork.dart';
 import 'exercise_video.dart';
 import 'theme/celebration.dart';
 import 'theme/glass.dart';
@@ -110,6 +111,9 @@ class _PlayerPageState extends State<PlayerPage> {
               final e = s.library.tryGet(id);
               if (e == null) return null;
               final m = e.media;
+              final alphaThumb = SfAlphaCards.enabledOf(context)
+                  ? m.alphaThumbnail
+                  : null;
               return TrainerDrill(
                 id: id,
                 name: e.name,
@@ -117,11 +121,11 @@ class _PlayerPageState extends State<PlayerPage> {
                 media: DrillMedia(
                   id: m.playerId,
                   videoAsset: m.video,
-                  posterAsset: m.poster,
+                  posterAsset: alphaThumb ?? m.poster,
                   duration: m.loopSeconds,
                   posterTime: m.posterSeconds,
                   lightVideoAsset: m.lightVideo,
-                  lightPosterAsset: m.lightPoster,
+                  lightPosterAsset: alphaThumb ?? m.lightPoster,
                 ),
               );
             },

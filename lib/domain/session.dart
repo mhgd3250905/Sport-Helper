@@ -15,7 +15,9 @@ coach.TrainingPlan trainerPlan(TrainingPlan plan) =>
 
 Map<String, trainer.Rhythm> trainerRhythms(ExerciseLibrary library) => {
   for (final e in library.all)
-    if (e.repSeconds case final double seconds when seconds > 0)
+    if (e.trainingRhythm case final rhythm?)
+      e.id: rhythm
+    else if (e.repSeconds case final double seconds when seconds > 0)
       e.id: trainer.Rhythm.fromRepSeconds(seconds),
 };
 

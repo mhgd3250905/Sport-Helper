@@ -1,6 +1,9 @@
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 
 import '../domain/exercise.dart';
+import 'alpha_bounds.dart';
 import 'theme/glass.dart';
 import 'theme/tokens.dart';
 
@@ -136,12 +139,10 @@ class SfAlphaArtwork extends StatelessWidget {
               ),
             ),
             if (alpha?.isNotEmpty == true)
-              Image.asset(
-                alpha!,
+              SfAlphaAsset(
+                asset: alpha!,
                 key: ValueKey('alpha-artwork-image-${exercise.id}'),
                 fit: BoxFit.contain,
-                gaplessPlayback: true,
-                excludeFromSemantics: true,
                 errorBuilder: (_, _, _) => fallback(),
               )
             else
@@ -151,4 +152,88 @@ class SfAlphaArtwork extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Static alpha media, usable by catalog entries without training semantics.
+/// Source bytes stay unchanged; cropping is a drawImageRect using import-time
+/// bounds. Missing/stale metadata falls back to the original image framing.
+class SfAlphaAsset extends StatelessWidget {
+  const SfAlphaAsset({
+    super.key,
+    required this.asset,
+    this.fit = BoxFit.contain,
+    this.alignment = Alignment.topCenter,
+    this.semanticLabel,
+    this.errorBuilder,
+  });
+  final String asset;
+  final BoxFit fit;
+  final Alignment alignment;
+  final String? semanticLabel;
+  final ImageErrorWidgetBuilder? errorBuilder;
+
+  @override
+  Widget build(BuildContext context) => FutureBuilder<SfAlphaBounds>(
+    future: SfAlphaBounds.load(DefaultAssetBundle.of(context)),
+    builder: (context, snapshot) => Semantics(
+      image: true,
+      label: semanticLabel,
+      excludeSemantics: semanticLabel == null,
+      child: Image.asset(
+        asset,
+        fit: fit,
+        alignment: alignment,
+        excludeFromSemantics: true,
+        gaplessPlayback: true,
+        errorBuilder: errorBuilder ?? (_, _, _) => const SizedBox.shrink(),
+        frameBuilder: (context, child, frame, synchronous) {
+          // Wait for the cached bounds before the first visible frame, so the
+          // figure never jumps from uncropped to cropped after loading.
+          if (!snapshot.hasData) return const SizedBox.expand();
+          final source = snapshot.data!.entries[asset];
+          if (source == null || child is! RawImage || child.image == null) {
+            return child;
+          }
+          return CustomPaint(
+            painter: _AlphaPainter(child.image!, source, fit, alignment),
+            child: const SizedBox.expand(),
+          );
+        },
+      ),
+    ),
+  );
+}
+
+class _AlphaPainter extends CustomPainter {
+  _AlphaPainter(this.image, this.bounds, this.fit, this.alignment);
+  final ui.Image image;
+  final Rect bounds;
+  final BoxFit fit;
+  final Alignment alignment;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final source = Rect.fromLTRB(
+      bounds.left * image.width,
+      bounds.top * image.height,
+      bounds.right * image.width,
+      bounds.bottom * image.height,
+    );
+    final sizes = applyBoxFit(fit, source.size, size);
+    final input = alignment.inscribe(sizes.source, source);
+    final output = alignment.inscribe(sizes.destination, Offset.zero & size);
+    canvas.drawImageRect(
+      image,
+      input,
+      output,
+      Paint()..filterQuality = FilterQuality.medium,
+    );
+  }
+
+  @override
+  bool shouldRepaint(_AlphaPainter oldDelegate) =>
+      image != oldDelegate.image ||
+      bounds != oldDelegate.bounds ||
+      fit != oldDelegate.fit ||
+      alignment != oldDelegate.alignment;
 }

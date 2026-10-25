@@ -73,6 +73,16 @@ CoachUiStyle smartfitCoachUiStyle() {
       timeLabel: _timeLabel,
     ),
     builders: CoachUiBuilders(
+      media: (context, request) =>
+          SfAlphaCards.enabledOf(context) &&
+              request.asset.startsWith('assets/app_test_pack/')
+          ? SfAlphaAsset(
+              asset: request.asset,
+              fit: request.cutout ? request.fit : BoxFit.contain,
+              alignment: request.cutout ? request.alignment : Alignment.center,
+              semanticLabel: request.semanticLabel,
+            )
+          : null,
       pressable: (_, c) => SfPressable(
         onTap: c.onTap,
         semanticLabel: c.semanticLabel,
@@ -212,9 +222,12 @@ CoachRoutine toCoachRoutine(TrainingPlan p, ExerciseLibrary library) {
   final moves = [
     for (final id in p.exerciseIds) library.tryGet(id),
   ].whereType<Exercise>();
-  const extra = {Equipment.band, Equipment.dumbbell, Equipment.slider};
-  final gear = {for (final e in moves) ...e.equipment.where(extra.contains)};
-  final gearText = gear.isEmpty ? '徒手' : gear.map((e) => e.zh).join('、');
+  const furniture = {'none', 'mat', 'chair', 'wall', 'block'};
+  final gear = {
+    for (final e in moves)
+      ...e.effectiveEquipmentIds.where((id) => !furniture.contains(id)),
+  };
+  final gearText = gear.isEmpty ? '徒手' : gear.map(equipmentLabel).join('、');
   final minutes = (SessionBuilder(library).planSeconds(p) / 60).round();
   final duration = minutes < 1 ? '不到 1 分钟' : '$minutes 分钟';
   final items = [

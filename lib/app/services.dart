@@ -23,6 +23,7 @@ import '../voice/voice_asset_bundle.dart';
 import '../voice/voice_library.dart';
 import 'training_media_config.dart';
 import 'app_test_pack.dart';
+import 'app_test_catalog.dart';
 
 /// Everything pages need, created once at start-up.
 class AppServices {
@@ -39,6 +40,7 @@ class AppServices {
     this.memoryStore,
     this.chatReplyDelay = const Duration(milliseconds: 450),
     this.media,
+    this.testCatalog,
   }) : templates = TemplatePlanGenerator(
          lib: library,
          catalog: catalog,
@@ -70,6 +72,7 @@ class AppServices {
   }
 
   final ExerciseLibrary library;
+  final AppTestCatalog? testCatalog;
   final TemplateCatalog catalog;
   final AppStore store;
   final VoiceSource voiceLibrary;

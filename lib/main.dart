@@ -10,6 +10,8 @@ import 'package:ugk_coach/ugk_coach.dart' as coach;
 
 import 'app/services.dart';
 import 'app/app_test_pack.dart';
+import 'app/app_test_catalog.dart';
+import 'app/app_test_content.dart';
 import 'app/build_info.dart';
 import 'app/device_identity.dart';
 import 'app/training_media_config.dart';
@@ -100,12 +102,42 @@ Future<void> main() async {
     media: media,
     testPack: testPack,
   );
+  AppTestContent? testContent;
+  if (AppTestPackConfig.fullCatalog && testPack != null) {
+    final index =
+        jsonDecode(await rootBundle.loadString(AppTestPackConfig.indexAsset))
+            as Map<String, dynamic>;
+    final testCatalog = await AppTestCatalog.load(
+      deliveryCatalogJson: await rootBundle.loadString(
+        index['catalogAsset'] as String,
+      ),
+      bundledMedia: testPack.actions,
+      readSemanticCatalog: (relativePath) async {
+        final entry = (index['semanticSources'] as Map?)?[relativePath];
+        if (entry is! String || !entry.startsWith('assets/app_test_pack/')) {
+          return null;
+        }
+        return (await rootBundle.load(entry)).buffer.asUint8List();
+      },
+    );
+    testContent = AppTestContent.build(
+      catalog: testCatalog,
+      legacyLibrary: lib,
+    );
+  }
+  final activeLibrary = testContent?.library ?? lib;
+  final activeCoachCatalog = testContent?.coachCatalog ?? coachCatalog;
   final coachProfile = coach.CoachProfile.fromJson(
     jsonDecode(await rootBundle.loadString('assets/coach/smartfit.json')),
   );
   log.record(
     'app.catalog_ready',
-    fields: {'count': lib.length, 'catalogCount': coachCatalog.length},
+    fields: {
+      'count': activeLibrary.length,
+      'catalogCount': activeCoachCatalog.length,
+      if (testContent != null)
+        'browseCount': testContent.catalog.entries.length,
+    },
   );
   final store = AppStore(storage);
   await store.load();
@@ -122,12 +154,13 @@ Future<void> main() async {
     // No persisted identifier means no proxy call; offline training still works.
   }
   final services = AppServices(
-    library: lib,
+    library: activeLibrary,
     catalog: catalog,
     store: store,
     voiceLibrary: voices,
     voiceOutput: JustAudioVoiceOutput(),
-    coachCatalog: coachCatalog,
+    coachCatalog: activeCoachCatalog,
+    testCatalog: testContent?.catalog,
     coachProfile: coachProfile,
     deviceId: deviceId,
     media: media,

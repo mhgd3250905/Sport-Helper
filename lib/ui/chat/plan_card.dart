@@ -29,14 +29,16 @@ class PlanCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final alphaCards = SfAlphaCards.enabledOf(context);
     final hero = plan.items.firstOrNull?.exerciseId;
+    final alphaHero = SfAlphaCards.hasCover(
+      hero == null ? null : library.tryGet(hero),
+      enabled: alphaCards,
+    );
     return SfAlphaCardScope(
-      active: SfAlphaCards.hasCover(
-        hero == null ? null : library.tryGet(hero),
-        enabled: alphaCards,
-      ),
+      active: alphaHero,
       child: withSmartfitCoachUi(
         context,
         CoachPlanCard(
+          cutoutTopInset: alphaHero ? 0 : null,
           plan: toCoachRoutine(plan, library),
           library: CoachExerciseLibrary([
             for (final id in plan.exerciseIds)

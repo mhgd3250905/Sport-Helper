@@ -11,6 +11,7 @@ import 'package:smartfit/data/app_store.dart';
 import 'package:smartfit/domain/exercise.dart';
 import 'package:smartfit/domain/plan.dart';
 import 'package:smartfit/ui/alpha_artwork.dart';
+import 'package:smartfit/ui/alpha_bounds.dart';
 import 'package:smartfit/ui/chat/coach_ui_adapter.dart';
 import 'package:smartfit/ui/chat/plan_card.dart';
 import 'package:smartfit/ui/exercise_video.dart';
@@ -102,6 +103,7 @@ Future<void> _capture(WidgetTester tester, String name) async {
   final assets = _images(tester).toSet();
   final context = tester.element(find.byType(PlanCard));
   await tester.runAsync(() async {
+    await SfAlphaBounds.load(DefaultAssetBundle.of(context));
     await Future.wait([
       for (final asset in assets) precacheImage(AssetImage(asset), context),
     ]);
@@ -113,6 +115,37 @@ Future<void> _capture(WidgetTester tester, String name) async {
   await tester.runAsync(() async {
     final image = await boundary.toImage(pixelRatio: 2);
     try {
+      final rgba = (await image.toByteData())!.buffer.asUint8List();
+      final face = tester.getRect(
+        find.byKey(const ValueKey('alpha-card-face')),
+      );
+      final card = tester.getRect(find.byType(PlanCard));
+      int? firstForegroundY;
+      var foregroundPixels = 0;
+      for (var y = (card.top * 2).ceil(); y < (face.top * 2).floor(); y++) {
+        final background = (y * image.width) * 4;
+        for (
+          var x = ((card.left + 30) * 2).ceil();
+          x < ((card.right - 90) * 2).floor();
+          x++
+        ) {
+          final pixel = (y * image.width + x) * 4;
+          final delta =
+              (rgba[pixel] - rgba[background]).abs() +
+              (rgba[pixel + 1] - rgba[background + 1]).abs() +
+              (rgba[pixel + 2] - rgba[background + 2]).abs();
+          if (delta > 35) {
+            firstForegroundY ??= y;
+            foregroundPixels++;
+          }
+        }
+      }
+      expect(
+        foregroundPixels,
+        greaterThan(10),
+        reason: 'Decoded figure must actually paint above the card face',
+      );
+      expect(face.top - firstForegroundY! / 2, inInclusiveRange(12, 16));
       final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
       final output = File('.buildlog/alpha-static-cards/$name.png');
       await output.parent.create(recursive: true);

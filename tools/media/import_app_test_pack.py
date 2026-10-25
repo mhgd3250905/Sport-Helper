@@ -292,6 +292,7 @@ def import_pack(source: Path, app: Path, pack: TestPack, *, internal_opt_in: boo
     # The CLI imports verified records while the producer keeps adding batches.
     # The strict Python API remains useful for explicit integrity assertions.
     validate_pack(source, replace(pack, actions=()), video_probe=video_probe)
+    semantics = read_semantic_sources(source, pack)
     # App-owned temporary staging, never inside the producer's source tree.
     # Keep generated images alive until immutable App objects are copied.
     with tempfile.TemporaryDirectory(prefix='smartfit-alpha-frame-zero-') as staging:
@@ -331,11 +332,73 @@ def import_pack(source: Path, app: Path, pack: TestPack, *, internal_opt_in: boo
                        'RGBA alpha WebP covers/thumbnails', 'delivered QA report hash/pass',
                        'actual RGB-decoded frame zero with lower red alpha'],
             'sourceQueueMayContinue': True, 'originalSourcesModified': False}
-        return _import_validated_files(app, pack, files, apply=apply, validation=validation)
+        index = _import_validated_files(app, pack, files, apply=apply, validation=validation,
+                                        semantics=semantics)
+        if apply:
+            write_alpha_bounds(app, index)
+        return index
+
+
+def read_semantic_sources(source: Path, pack: TestPack) -> dict[str, bytes]:
+    """Bundle the declared training definitions; never guess another directory."""
+    manifest = _json(pack.manifest, 'manifest')
+    catalog = _json(pack.catalog, 'catalog')
+    declared = [value for value in (manifest.get('semanticCatalog'), catalog.get('semanticCatalog'))
+                if value is not None]
+    if not declared:
+        return {}
+    if any(value != declared[0] for value in declared):
+        raise ImportError('Manifest/catalog semantic descriptors differ')
+    descriptor = declared[0]
+    if not isinstance(descriptor, dict):
+        raise ImportError('Invalid semantic catalog descriptor')
+    spec = _descriptor(descriptor)
+    data = checked_file(source, spec).read_bytes()
+    if len(data) != spec.bytes or hashlib.sha256(data).hexdigest() != spec.sha256:
+        raise ImportError('Semantic source changed during validation')
+    decoded = _json(data, 'semantic catalog')
+    if (decoded.get('format') != 'pose-hub-catalog' or decoded.get('formatVersion') != 1
+            or decoded.get('version') != descriptor.get('version')
+            or not isinstance(decoded.get('drills'), list)):
+        raise ImportError('Semantic catalog format/version mismatch')
+    return {spec.path: data}
+
+
+def write_alpha_bounds(app: Path, index: dict) -> dict:
+    """Analyze immutable cover/thumb alpha; do not reframe video posters."""
+    from PIL import Image
+    assets = {}
+    for action in index['actions'].values():
+        for role in ('alphaCover', 'alphaThumbnail'):
+            descriptor = action[role]
+            path = relative_file(app, descriptor['asset'])
+            if digest(path) != descriptor['sha256']:
+                raise ImportError('Alpha bounds source hash mismatch')
+            with Image.open(path) as image:
+                bounds = image.convert('RGBA').getchannel('A').getbbox()
+                if bounds is None:
+                    continue
+                assets[descriptor['asset']] = {
+                    'sourceSha256': descriptor['sha256'],
+                    'width': image.width, 'height': image.height,
+                    'bounds': list(bounds),
+                }
+    result = {'format': 'smartfit-alpha-bounds@1', 'assets': dict(sorted(assets.items()))}
+    destination = app / 'assets' / 'app_test_pack' / index['id'] / 'alpha-bounds.json'
+    # Derived metadata only; existing media and video frame-zero bytes stay intact.
+    data = (json.dumps(result, indent=2) + '\n').encode('utf8')
+    temporary = destination.with_suffix('.json.tmp')
+    try:
+        temporary.write_bytes(data)
+        os.replace(temporary, destination)
+    finally:
+        temporary.unlink(missing_ok=True)
+    return result
 
 
 def _import_validated_files(app: Path, pack: TestPack,
-                            files: list[tuple[Path, str, dict]], *, apply: bool, validation: dict) -> dict:
+                            files: list[tuple[Path, str, dict]], *, apply: bool, validation: dict,
+                            semantics: dict[str, bytes] | None = None) -> dict:
     base = (app.resolve() / 'assets' / 'app_test_pack').resolve()
     if not base.is_relative_to(app.resolve()):
         raise ImportError('App-test output escapes the workspace')
@@ -382,6 +445,10 @@ def _import_validated_files(app: Path, pack: TestPack,
     index['validatedMetadataAsset'] = f'{prefix}/validation/{validation_hash}.json'
     index['pendingIds'] = validation['pendingIds']
     index['sourceEncoding'] = pack.encoding
+    if semantics:
+        index['semanticSources'] = {
+            relative: f'{prefix}/sources/{hashlib.sha256(data).hexdigest()}.semantic.json'
+            for relative, data in semantics.items()}
     if not apply:
         return index
     # Copy only after validation of the whole incoming batch and existing index.
@@ -392,6 +459,8 @@ def _import_validated_files(app: Path, pack: TestPack,
         _write_immutable(target / 'objects' / (descriptor['sha256'] + path.suffix.lower()), data, target)
     _write_immutable(target / 'sources' / f'{manifest_hash}.manifest.json', pack.manifest, target)
     _write_immutable(target / 'sources' / f'{catalog_hash}.catalog.json', pack.catalog, target)
+    for data in (semantics or {}).values():
+        _write_immutable(target / 'sources' / f'{hashlib.sha256(data).hexdigest()}.semantic.json', data, target)
     _write_immutable(target / 'validation' / f'{validation_hash}.json', validation_bytes, target)
     data = (json.dumps(index, ensure_ascii=False, indent=2) + '\n').encode('utf8')
     if index_path.exists():

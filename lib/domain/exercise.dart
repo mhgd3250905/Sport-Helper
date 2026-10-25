@@ -4,6 +4,7 @@
 library;
 
 import '../packs/drill_pack.dart';
+import 'package:ugk_trainer/engine.dart' show Rhythm;
 
 enum DoseMode { reps, time }
 
@@ -36,6 +37,29 @@ enum Equipment {
   final String zh;
   static Equipment byName(String s) =>
       values.firstWhere((v) => v.name == s, orElse: () => none);
+}
+
+String equipmentLabel(String id) {
+  for (final equipment in Equipment.values) {
+    if (equipment.name == id) return equipment.zh;
+  }
+  return const {
+        'cable': '绳索器械',
+        'dip-bars': '双杠',
+        'foam-roller': '泡沫轴',
+        'ghd': 'GHD训练器',
+        'hip-abductor-machine': '髋外展训练器',
+        'kettlebell': '壶铃',
+        'landmine': '地雷架',
+        'leg-extension-machine': '腿屈伸训练器',
+        'parallettes': '小双杠',
+        'pullup-bar': '单杠',
+        'reverse-hyper': '反向挺身器',
+        'rings': '吊环',
+        'roman-chair': '罗马椅',
+        'swiss-ball': '健身球',
+      }[id] ??
+      id;
 }
 
 /// Floor positions need a mat and are left out at the office.
@@ -198,11 +222,13 @@ class Exercise {
     required this.unilateral,
     required this.category,
     required this.equipment,
+    this.equipmentIds,
     required this.position,
     required this.level,
     required this.scenes,
     required this.dose,
     required this.repSeconds,
+    this.trainingRhythm,
     required this.cues,
     required this.cautions,
     required this.alternative,
@@ -215,6 +241,11 @@ class Exercise {
   final bool unilateral;
   final ExerciseCategory category;
   final List<Equipment> equipment;
+
+  /// Keep authored equipment IDs, including equipment outside the old form.
+  final List<String>? equipmentIds;
+  List<String> get effectiveEquipmentIds =>
+      equipmentIds ?? [for (final item in equipment) item.name];
   final String position;
 
   /// 1 入门 · 2 基础 · 3 进阶.
@@ -224,6 +255,7 @@ class Exercise {
 
   /// Seconds per repetition in the clip (reps mode only).
   final double? repSeconds;
+  final Rhythm? trainingRhythm;
 
   /// Key points in the order they are spoken (1–3).
   final List<String> cues;

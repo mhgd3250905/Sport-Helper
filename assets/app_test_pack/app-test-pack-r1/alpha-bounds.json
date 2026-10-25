@@ -1,0 +1,115 @@
+{
+  "format": "smartfit-alpha-bounds@1",
+  "assets": {
+    "assets/app_test_pack/app-test-pack-r1/objects/000c3c329acb00eb83e9503a35bcf66365b7f6caf75d1aede6cfed7c9ae22b1d.webp": {
+      "sourceSha256": "000c3c329acb00eb83e9503a35bcf66365b7f6caf75d1aede6cfed7c9ae22b1d",
+      "width": 720,
+      "height": 720,
+      "bounds": [
+        47,
+        225,
+        718,
+        491
+      ]
+    },
+    "assets/app_test_pack/app-test-pack-r1/objects/031b7919f3a355647c6470f09a422303710d62b5972518c615518da8a7c6d482.webp": {
+      "sourceSha256": "031b7919f3a355647c6470f09a422303710d62b5972518c615518da8a7c6d482",
+      "width": 240,
+      "height": 240,
+      "bounds": [
+        24,
+        72,
+        240,
+        168
+      ]
+    },
+    "assets/app_test_pack/app-test-pack-r1/objects/14857df71a6ba6fe5ab20a53567283478487a7cb25e80cd2cb62d06f84497cf9.webp": {
+      "sourceSha256": "14857df71a6ba6fe5ab20a53567283478487a7cb25e80cd2cb62d06f84497cf9",
+      "width": 720,
+      "height": 720,
+      "bounds": [
+        76,
+        221,
+        720,
+        499
+      ]
+    },
+    "assets/app_test_pack/app-test-pack-r1/objects/1e472cce1e70c6f076de3c0c8b1db8c4bc452b1062ee4fd5caf4d9a793e9291b.webp": {
+      "sourceSha256": "1e472cce1e70c6f076de3c0c8b1db8c4bc452b1062ee4fd5caf4d9a793e9291b",
+      "width": 720,
+      "height": 720,
+      "bounds": [
+        47,
+        197,
+        720,
+        517
+      ]
+    },
+    "assets/app_test_pack/app-test-pack-r1/objects/2f7991bf3ebc6a8885aba15876a65d8b9bcd4f48192707d7b7915b677a8f5caf.webp": {
+      "sourceSha256": "2f7991bf3ebc6a8885aba15876a65d8b9bcd4f48192707d7b7915b677a8f5caf",
+      "width": 720,
+      "height": 720,
+      "bounds": [
+        165,
+        233,
+        720,
+        720
+      ]
+    },
+    "assets/app_test_pack/app-test-pack-r1/objects/4637392bf045983d955ff58e47d8775f5f24d67bdefb21fde95d4a1612f3e905.webp": {
+      "sourceSha256": "4637392bf045983d955ff58e47d8775f5f24d67bdefb21fde95d4a1612f3e905",
+      "width": 240,
+      "height": 240,
+      "bounds": [
+        53,
+        76,
+        240,
+        240
+      ]
+    },
+    "assets/app_test_pack/app-test-pack-r1/objects/6a97930bc1f210ecbfbdc7cb9c4568320469de5ec413b9d5e9f997f7c71466f9.webp": {
+      "sourceSha256": "6a97930bc1f210ecbfbdc7cb9c4568320469de5ec413b9d5e9f997f7c71466f9",
+      "width": 720,
+      "height": 720,
+      "bounds": [
+        63,
+        60,
+        430,
+        630
+      ]
+    },
+    "assets/app_test_pack/app-test-pack-r1/objects/7919cb216c0dc7a27a02821b5a8a035a0d19bbcd50aafbfe1cfef0c3bb95f7d1.webp": {
+      "sourceSha256": "7919cb216c0dc7a27a02821b5a8a035a0d19bbcd50aafbfe1cfef0c3bb95f7d1",
+      "width": 240,
+      "height": 240,
+      "bounds": [
+        14,
+        74,
+        239,
+        165
+      ]
+    },
+    "assets/app_test_pack/app-test-pack-r1/objects/b99b329d342499e7ff75cd1c9558c1356a954e737bb3808eede4608b8a494682.webp": {
+      "sourceSha256": "b99b329d342499e7ff75cd1c9558c1356a954e737bb3808eede4608b8a494682",
+      "width": 240,
+      "height": 240,
+      "bounds": [
+        19,
+        18,
+        145,
+        212
+      ]
+    },
+    "assets/app_test_pack/app-test-pack-r1/objects/c1da0c39745fd8d383919c38adbd589bd6da2f92e1eecc16367e93549ba481f9.webp": {
+      "sourceSha256": "c1da0c39745fd8d383919c38adbd589bd6da2f92e1eecc16367e93549ba481f9",
+      "width": 240,
+      "height": 240,
+      "bounds": [
+        14,
+        64,
+        240,
+        174
+      ]
+    }
+  }
+}

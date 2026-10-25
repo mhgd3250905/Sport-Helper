@@ -607,11 +607,11 @@ packages:
     dependency: "direct main"
     description:
       path: "packages/ugk_coach_ui"
-      ref: "ugk_coach_ui-v0.1.2"
-      resolved-ref: ee83dc39c8ecb6b933d521948168c590965f7a40
+      ref: "ugk_coach_ui-v0.1.3"
+      resolved-ref: "159dadf058ef47f701e36a496668265f9fd3fc0d"
       url: "https://github.com/mhgd3250905/ugk-3d-pose-sdk.git"
     source: git
-    version: "0.1.2"
+    version: "0.1.3"
   ugk_trainer:
     dependency: "direct main"
     description:

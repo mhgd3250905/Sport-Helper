@@ -8,6 +8,8 @@ abstract final class AppTestPackConfig {
       String.fromEnvironment('FLUTTER_APP_FLAVOR') == 'internal' &&
       bool.fromEnvironment('SMARTFIT_APP_TEST_PACK');
   static const indexAsset = 'assets/app_test_pack/app-test-pack-r1/index.json';
+  static const fullCatalog =
+      enabled && bool.fromEnvironment('SMARTFIT_FULL_TEST_CATALOG');
 }
 
 /// Build-validated, locally bundled test media. This is never a release gate

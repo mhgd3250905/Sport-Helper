@@ -5,6 +5,7 @@ import '../app/services.dart';
 import '../domain/exercise.dart';
 import 'action_issue_actions.dart';
 import 'alpha_artwork.dart';
+import 'app_test_library_page.dart';
 import 'exercise_video.dart';
 import 'theme.dart';
 
@@ -24,6 +25,10 @@ class _LibraryPageState extends State<LibraryPage> {
 
   @override
   Widget build(BuildContext context) {
+    final testCatalog = AppServices.of(context).testCatalog;
+    if (testCatalog != null) {
+      return AppTestLibraryPage(catalog: testCatalog, initial: widget.initial);
+    }
     final lib = AppServices.of(context).library;
     final list = lib.all
         .where((e) => _cat == null || e.category == _cat)
@@ -233,9 +238,9 @@ class _ExerciseDetailsState extends State<_ExerciseDetails> {
               [
                 e.category.zh,
                 levelZh(e.level),
-                e.equipment.isEmpty
+                e.effectiveEquipmentIds.isEmpty
                     ? '徒手'
-                    : e.equipment.map((q) => q.zh).join('/'),
+                    : e.effectiveEquipmentIds.map(equipmentLabel).join('/'),
                 if (e.unilateral) '左右各做',
               ].join(' · '),
               style: SfType.label,
@@ -352,7 +357,7 @@ class _Tile extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: SfSpace.x1),
             child: Text(
-              '${e.category.zh} · ${levelZh(e.level)} · ${e.equipment.isEmpty ? '徒手' : e.equipment.map((q) => q.zh).join('/')}',
+              '${e.category.zh} · ${levelZh(e.level)} · ${e.effectiveEquipmentIds.isEmpty ? '徒手' : e.effectiveEquipmentIds.map(equipmentLabel).join('/')}',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: SfType.caption.copyWith(color: SfColors.muted),
