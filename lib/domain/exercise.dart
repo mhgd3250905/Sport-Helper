@@ -84,6 +84,12 @@ class ExerciseMedia {
     this.lightVideoAvailable,
     this.playbackPoster,
     this.lightPlaybackPoster,
+    this.packedAlphaVideo,
+    this.alphaPlaybackPoster,
+    this.alphaCover,
+    this.alphaThumbnail,
+    this.revision,
+    this.appTestOnly = false,
   });
 
   /// Pack id; the WebView player plays `/packs/<id>/demo.mp4`.
@@ -105,6 +111,16 @@ class ExerciseMedia {
   /// Frame zero of the same clip; selected card covers stay separate.
   final String? playbackPoster;
   final String? lightPlaybackPoster;
+  final String? packedAlphaVideo;
+  final String? alphaPlaybackPoster;
+  final String? alphaCover;
+  final String? alphaThumbnail;
+  final String? revision;
+  final bool appTestOnly;
+
+  bool get hasPackedAlpha =>
+      packedAlphaVideo?.isNotEmpty == true &&
+      alphaPlaybackPoster?.isNotEmpty == true;
 
   String playbackPosterFor({required bool light}) => light
       ? (lightPlaybackPoster ?? lightPoster ?? '')
@@ -113,7 +129,8 @@ class ExerciseMedia {
   bool get hasLight => lightPoster != null;
 
   bool videoAvailableFor({required bool light}) =>
-      light ? (lightVideoAvailable ?? lightVideo != null) : videoAvailable;
+      hasPackedAlpha ||
+      (light ? (lightVideoAvailable ?? lightVideo != null) : videoAvailable);
 
   String get playerId => id;
 

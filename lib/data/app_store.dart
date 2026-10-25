@@ -6,6 +6,8 @@ import 'package:ugk_trainer/ugk_trainer.dart' show SessionResult;
 import '../app/user_memory_store.dart';
 import '../core/storage/local_state_storage.dart';
 import '../diagnostics/runtime_log.dart';
+import '../diagnostics/action_issue.dart';
+import '../diagnostics/action_issue_store.dart';
 import '../domain/plan.dart';
 import '../domain/saved_plan.dart';
 import '../voice/voice_queue.dart';
@@ -49,10 +51,16 @@ class HistoryEntry {
 
 /// On-device state, one JSON value under `smartfit.state.v1`.
 class AppStore extends ChangeNotifier {
-  AppStore(this._storage);
+  AppStore(this._storage, {this.actionIssueEnabled = actionIssueBuildEnabled});
 
   static const key = 'smartfit.state.v1';
   final LocalStateStorage _storage;
+  final bool actionIssueEnabled;
+
+  late final actionIssueStore = LocalActionIssueStore(
+    _storage,
+    enabled: actionIssueEnabled,
+  );
 
   /// Memories have their own key and survive disabling the capability.
   late final LocalUserMemoryStore aiMemoryStore = LocalUserMemoryStore(

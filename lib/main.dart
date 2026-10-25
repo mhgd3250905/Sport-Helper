@@ -9,6 +9,7 @@ import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
 
 import 'app/services.dart';
+import 'app/app_test_pack.dart';
 import 'app/build_info.dart';
 import 'app/device_identity.dart';
 import 'app/training_media_config.dart';
@@ -94,8 +95,10 @@ Future<void> main() async {
     'app.media_ready',
     fields: {'count': media.visibleActions.length, 'offline': media.isOffline},
   );
+  final testPack = await AppTestPack.load(rootBundle.loadString);
   final (lib, catalog, voices, coachCatalog) = await AppServices.loadContent(
     media: media,
+    testPack: testPack,
   );
   final coachProfile = coach.CoachProfile.fromJson(
     jsonDecode(await rootBundle.loadString('assets/coach/smartfit.json')),

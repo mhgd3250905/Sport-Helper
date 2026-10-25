@@ -14,6 +14,7 @@ class ExerciseVideo extends StatefulWidget {
     this.paused = false,
     this.mirrored = false,
     this.radius = 16,
+    this.playbackHandle,
   });
 
   final Exercise exercise;
@@ -21,6 +22,7 @@ class ExerciseVideo extends StatefulWidget {
   final bool paused;
   final bool mirrored;
   final double radius;
+  final DrillMediaPlaybackHandle? playbackHandle;
 
   @override
   State<ExerciseVideo> createState() => _ExerciseVideoState();
@@ -79,6 +81,9 @@ class _ExerciseVideoState extends State<ExerciseVideo> {
         lightPosterAsset: m.lightPlaybackPoster ?? m.lightPoster,
         theme: light ? 'light' : 'dark',
         videoAvailable: m.videoAvailableFor(light: light),
+        packedAlphaVideoAsset: m.packedAlphaVideo,
+        packedAlphaPosterAsset: m.alphaPlaybackPoster,
+        bundledOnly: m.appTestOnly,
       ),
       playing: widget.playing,
       paused: widget.paused,
@@ -88,6 +93,7 @@ class _ExerciseVideoState extends State<ExerciseVideo> {
       errorColor: stage.onStageMuted,
       errorLabel: '示范暂时加载不了，计时和语音仍可继续',
       unavailableLabel: '此动作暂无视频示范',
+      playbackHandle: widget.playbackHandle,
     );
   }
 }

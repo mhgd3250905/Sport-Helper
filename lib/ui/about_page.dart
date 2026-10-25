@@ -8,6 +8,7 @@ import '../chat/safety_script.dart' show disclaimerText;
 import '../diagnostics/runtime_log.dart';
 import '../diagnostics/frame_recorder.dart';
 import 'performance_settings.dart';
+import 'action_issue_settings.dart';
 import 'runtime_log_settings.dart';
 import 'theme.dart';
 import 'training_media_settings.dart';
@@ -115,6 +116,12 @@ class AboutPage extends StatelessWidget {
             if (RuntimeLog.instance.enabled) ...[
               const SfSectionTitle('运行日志'),
               const SfPanel(child: RuntimeLogSettings()),
+            ],
+            if (s.store.actionIssueStore.enabled) ...[
+              const SfSectionTitle('动作问题标记（内测）'),
+              SfPanel(
+                child: ActionIssueSettings(store: s.store.actionIssueStore),
+              ),
             ],
             SfSectionTitle(s.aiConfig.enabled ? '隐私与 AI' : '隐私'),
             SfPanel(

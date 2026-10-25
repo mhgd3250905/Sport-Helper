@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ugk_coach_ui/ugk_coach_ui.dart';
 import '../../domain/exercise.dart';
 import '../../domain/plan.dart';
+import '../alpha_artwork.dart';
 import 'coach_ui_adapter.dart';
 import 'expand_route.dart';
 
@@ -25,19 +26,30 @@ class PlanCard extends StatelessWidget {
   static const exerciseHeight = CoachPlanCard.exerciseHeight;
   static const setHeight = CoachPlanCard.setHeight;
   @override
-  Widget build(BuildContext context) => withSmartfitCoachUi(
-    context,
-    CoachPlanCard(
-      plan: toCoachRoutine(plan, library),
-      library: CoachExerciseLibrary([
-        for (final id in plan.exerciseIds)
-          if (library.tryGet(id) case final e?) toCoachExercise(e),
-      ]),
-      saved: saved,
-      landing: landing,
-      onStart: onStart,
-      onSave: onSave,
-      onOpen: onOpen,
-    ),
-  );
+  Widget build(BuildContext context) {
+    final alphaCards = SfAlphaCards.enabledOf(context);
+    final hero = plan.items.firstOrNull?.exerciseId;
+    return SfAlphaCardScope(
+      active: SfAlphaCards.hasCover(
+        hero == null ? null : library.tryGet(hero),
+        enabled: alphaCards,
+      ),
+      child: withSmartfitCoachUi(
+        context,
+        CoachPlanCard(
+          plan: toCoachRoutine(plan, library),
+          library: CoachExerciseLibrary([
+            for (final id in plan.exerciseIds)
+              if (library.tryGet(id) case final e?)
+                toCoachExercise(e, alphaCards: alphaCards),
+          ]),
+          saved: saved,
+          landing: landing,
+          onStart: onStart,
+          onSave: onSave,
+          onOpen: onOpen,
+        ),
+      ),
+    );
+  }
 }

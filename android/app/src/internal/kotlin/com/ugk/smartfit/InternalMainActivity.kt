@@ -19,6 +19,7 @@ class InternalMainActivity : MainActivity() {
     // attribute an earlier engine in the same process to this Activity.
     private val activityCreatedAtEpochMs = System.currentTimeMillis()
     private var performanceChannel: MethodChannel? = null
+    private var actionIssueDownloads: ActionIssueDownloadsExporter? = null
     private var pendingShare: MethodChannel.Result? = null
     private var rendererProbe: InternalRendererProbe? = null
     private var rendererDisplayListener: FlutterUiDisplayListener? = null
@@ -31,6 +32,11 @@ class InternalMainActivity : MainActivity() {
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
+        actionIssueDownloads?.close()
+        actionIssueDownloads = ActionIssueDownloadsExporter(
+            this,
+            flutterEngine.dartExecutor.binaryMessenger
+        )
         rendererDisplayListener?.let { listener ->
             rendererObservedEngine?.renderer?.removeIsDisplayingFlutterUiListener(listener)
         }
@@ -211,6 +217,8 @@ class InternalMainActivity : MainActivity() {
     }
 
     override fun cleanUpFlutterEngine(flutterEngine: FlutterEngine) {
+        actionIssueDownloads?.close()
+        actionIssueDownloads = null
         rendererDisplayListener?.let { listener ->
             rendererObservedEngine?.renderer?.removeIsDisplayingFlutterUiListener(listener)
         }
@@ -226,6 +234,8 @@ class InternalMainActivity : MainActivity() {
 
     override fun onDestroy() {
         closing = true
+        actionIssueDownloads?.close()
+        actionIssueDownloads = null
         rendererProbe?.close()
         rendererProbe = null
         finishShare("share_activity_closed")

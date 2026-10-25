@@ -7,6 +7,7 @@ import '../domain/session.dart' show trainerPlan, trainerRhythms;
 import '../diagnostics/training_log.dart';
 import '../voice/just_audio_output.dart' as diagnostic_voice;
 import 'chat/cosmos.dart';
+import 'action_issue_actions.dart';
 import 'exercise_video.dart';
 import 'theme/celebration.dart';
 import 'theme/glass.dart';
@@ -29,6 +30,8 @@ class PlayerPage extends StatefulWidget {
 class _PlayerPageState extends State<PlayerPage> {
   final _log = TrainingLog();
   diagnostic_voice.JustAudioVoiceOutput? _voiceOutput;
+  DrillMediaPlaybackHandle? _issuePlayback;
+  String? _visibleActionId;
 
   String? _audioBeginning() {
     _log.audioBeginning();
@@ -45,6 +48,7 @@ class _PlayerPageState extends State<PlayerPage> {
       }
     }
     _log.dispose();
+    _issuePlayback?.dispose();
     super.dispose();
   }
 
@@ -68,6 +72,10 @@ class _PlayerPageState extends State<PlayerPage> {
       output.trainingOperation = _log.operation;
     }
     final p = SfColors.palette;
+    final issueStore = s.store.actionIssueStore;
+    final issuePlayback = issueStore.enabled
+        ? (_issuePlayback ??= DrillMediaPlaybackHandle())
+        : null;
     return CosmosBackground(
       animate: false,
       child: Stack(
@@ -118,6 +126,7 @@ class _PlayerPageState extends State<PlayerPage> {
               );
             },
             mediaBuilder: (context, request) {
+              _visibleActionId = request.drill.id;
               _log.visibleAction(request.drill.id, paused: request.paused);
               if (s.voiceOutput
                   case final diagnostic_voice.JustAudioVoiceOutput output) {
@@ -129,10 +138,12 @@ class _PlayerPageState extends State<PlayerPage> {
                 paused: request.paused,
                 mirrored: request.mirrored,
                 radius: request.theme.radius,
+                playbackHandle: issuePlayback,
               );
             },
             voice: s.trainerVoice(),
             onFinished: (result) async {
+              _visibleActionId = null;
               _log.finished(result);
               _log.saving();
               try {
@@ -153,6 +164,19 @@ class _PlayerPageState extends State<PlayerPage> {
             tick: widget.tick,
             notificationIcon: 'drawable/ic_stat_training',
           ),
+          if (issuePlayback != null)
+            Positioned(
+              right: 12,
+              top: (MediaQuery.sizeOf(context).height - 48) / 2,
+              child: ActionIssueMarkButton(
+                key: const ValueKey('player-action-issue'),
+                store: issueStore,
+                library: s.library,
+                playbackHandle: issuePlayback,
+                actionIdAtTap: () => _visibleActionId,
+                iconOnly: true,
+              ),
+            ),
         ],
       ),
     );

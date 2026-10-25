@@ -22,6 +22,7 @@ import '../packs/drill_pack.dart';
 import '../voice/voice_asset_bundle.dart';
 import '../voice/voice_library.dart';
 import 'training_media_config.dart';
+import 'app_test_pack.dart';
 
 /// Everything pages need, created once at start-up.
 class AppServices {
@@ -247,7 +248,7 @@ class AppServices {
   /// packs (assets/packs/, docs/drill-pack-spec.md); templates stay
   /// app-specific (assets/library/templates.json).
   static Future<(ExerciseLibrary, TemplateCatalog, VoiceLibrary, coach.Catalog)>
-  loadContent({TrainingMediaRepository? media}) async {
+  loadContent({TrainingMediaRepository? media, AppTestPack? testPack}) async {
     final packs = await PackSet.load(rootBundle.loadString);
     final manifest =
         jsonDecode(
@@ -279,10 +280,14 @@ class AppServices {
         for (final p in visiblePacks)
           Exercise.fromPack(
             p,
-            mediaOverride: ExerciseMedia.fromPoseHub(
-              p,
-              version: manifest['version'] as String,
-              assets: Map<String, dynamic>.from(bundledAssets[p.id] as Map),
+            mediaOverride: _testMedia(
+              testPack,
+              p.id,
+              ExerciseMedia.fromPoseHub(
+                p,
+                version: manifest['version'] as String,
+                assets: Map<String, dynamic>.from(bundledAssets[p.id] as Map),
+              ),
             ),
           ),
       ]),
@@ -297,6 +302,12 @@ class AppServices {
       ),
     );
   }
+
+  static ExerciseMedia _testMedia(
+    AppTestPack? pack,
+    String id,
+    ExerciseMedia fallback,
+  ) => pack?.actions[id]?.applyTo(fallback) ?? fallback;
 
   static AppServices of(BuildContext context) =>
       context.dependOnInheritedWidgetOfExactType<AppScope>()!.services;

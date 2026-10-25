@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:ugk_trainer/ugk_trainer.dart' show DrillMediaPlaybackHandle;
 
 import '../app/services.dart';
 import '../domain/exercise.dart';
+import 'action_issue_actions.dart';
+import 'alpha_artwork.dart';
 import 'exercise_video.dart';
 import 'theme.dart';
 
@@ -126,57 +129,136 @@ Future<void> showExerciseDetails(BuildContext context, Exercise e) =>
       routeSettings: const RouteSettings(name: 'exercise_details'),
       isScrollControlled: true,
       sheetAnimationStyle: SfMotion.sheet,
-      builder: (c) => SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(
-            SfSpace.x4,
-            0,
-            SfSpace.x4,
-            SfSpace.x4,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ExerciseVideo(exercise: e, radius: SfRadius.lg),
-              const SizedBox(height: SfSpace.x4),
-              Text(
-                e.name,
-                style: SfType.title.copyWith(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w800,
+      builder: (_) => _ExerciseDetails(exercise: e),
+    );
+
+class _ExerciseDetails extends StatefulWidget {
+  const _ExerciseDetails({required this.exercise});
+  final Exercise exercise;
+
+  @override
+  State<_ExerciseDetails> createState() => _ExerciseDetailsState();
+}
+
+class _ExerciseDetailsState extends State<_ExerciseDetails> {
+  DrillMediaPlaybackHandle? _playback;
+  bool _playVideo = false;
+
+  @override
+  void dispose() {
+    _playback?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final e = widget.exercise;
+    final s = AppServices.of(context);
+    final store = s.store.actionIssueStore;
+    final playback = store.enabled
+        ? (_playback ??= DrillMediaPlaybackHandle())
+        : null;
+    final alphaPreview =
+        !_playVideo &&
+        SfAlphaCards.hasCover(e, enabled: SfAlphaCards.enabledOf(context));
+    return SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(
+          SfSpace.x4,
+          0,
+          SfSpace.x4,
+          SfSpace.x4,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (alphaPreview)
+              SfPressable(
+                key: const ValueKey('library-alpha-play'),
+                semanticLabel: '播放${e.name}示范',
+                onTap: () => setState(() => _playVideo = true),
+                child: Stack(
+                  children: [
+                    SfAlphaArtwork(exercise: e),
+                    Positioned(
+                      right: SfSpace.x3,
+                      bottom: SfSpace.x3,
+                      child: IgnorePointer(
+                        child: ExcludeSemantics(
+                          child: SfControlFace(
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                SfIcon(
+                                  SfGlyph.play,
+                                  size: 18,
+                                  color: SfColors.text,
+                                ),
+                                const SizedBox(width: SfSpace.x2),
+                                Text('播放示范', style: SfType.callout),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
+              )
+            else
+              ExerciseVideo(
+                exercise: e,
+                radius: SfRadius.lg,
+                playbackHandle: playback,
               ),
-              const SizedBox(height: SfSpace.x1),
-              Text(
-                [
-                  e.category.zh,
-                  levelZh(e.level),
-                  e.equipment.isEmpty
-                      ? '徒手'
-                      : e.equipment.map((q) => q.zh).join('/'),
-                  if (e.unilateral) '左右各做',
-                ].join(' · '),
-                style: SfType.label,
+            if (playback != null)
+              ActionIssueMarkButton(
+                key: const ValueKey('library-action-issue'),
+                store: store,
+                library: s.library,
+                playbackHandle: playback,
+                actionIdAtTap: () => e.id,
               ),
-              const SizedBox(height: SfSpace.x4),
-              _detailLine(SfGlyph.figure, '练到', e.muscles.join('、')),
+            const SizedBox(height: SfSpace.x4),
+            Text(
+              e.name,
+              style: SfType.title.copyWith(
+                fontSize: 22,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: SfSpace.x1),
+            Text(
+              [
+                e.category.zh,
+                levelZh(e.level),
+                e.equipment.isEmpty
+                    ? '徒手'
+                    : e.equipment.map((q) => q.zh).join('/'),
+                if (e.unilateral) '左右各做',
+              ].join(' · '),
+              style: SfType.label,
+            ),
+            const SizedBox(height: SfSpace.x4),
+            _detailLine(SfGlyph.figure, '练到', e.muscles.join('、')),
+            const SizedBox(height: SfSpace.x3),
+            _detailLine(SfGlyph.subtitles, '要领', e.cue),
+            if (e.cautions.isNotEmpty) ...[
               const SizedBox(height: SfSpace.x3),
-              _detailLine(SfGlyph.subtitles, '要领', e.cue),
-              if (e.cautions.isNotEmpty) ...[
-                const SizedBox(height: SfSpace.x3),
-                _detailLine(
-                  SfGlyph.bandage,
-                  '注意',
-                  '${e.cautions.join('、')}不适时减小幅度或换动作',
-                  color: SfColors.caution,
-                ),
-              ],
+              _detailLine(
+                SfGlyph.bandage,
+                '注意',
+                '${e.cautions.join('、')}不适时减小幅度或换动作',
+                color: SfColors.caution,
+              ),
             ],
-          ),
+          ],
         ),
       ),
     );
+  }
+}
 
 Widget _detailLine(SfGlyph icon, String label, String text, {Color? color}) =>
     Row(
@@ -227,26 +309,32 @@ class _Tile extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          DecoratedBox(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(SfRadius.lg),
-              boxShadow: SfColors.cardShadow,
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(SfRadius.lg),
-              child: AspectRatio(
-                aspectRatio: 1,
-                child: ColoredBox(
-                  color: stage.mediaStage,
-                  child: Image.asset(
-                    sfPoster(e),
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, _, _) => const SizedBox.shrink(),
+          if (SfAlphaCards.hasCover(
+            e,
+            enabled: SfAlphaCards.enabledOf(context),
+          ))
+            SfAlphaArtwork(exercise: e, thumbnail: true)
+          else
+            DecoratedBox(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(SfRadius.lg),
+                boxShadow: SfColors.cardShadow,
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(SfRadius.lg),
+                child: AspectRatio(
+                  aspectRatio: 1,
+                  child: ColoredBox(
+                    color: stage.mediaStage,
+                    child: Image.asset(
+                      sfPoster(e),
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
           Padding(
             padding: const EdgeInsets.fromLTRB(
               SfSpace.x1,

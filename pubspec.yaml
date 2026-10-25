@@ -1,7 +1,7 @@
 name: smartfit
 description: "智能健身助手 — 描述训练场景，按模板生成训练计划，预渲染动作跟练。"
 publish_to: 'none'
-version: 0.1.0+27
+version: 0.1.0+28
 
 environment:
   sdk: ^3.12.0
@@ -12,11 +12,11 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   ugk_trainer:
-    version: 0.2.8
+    version: 0.2.9
     git:
       url: https://github.com/mhgd3250905/ugk-3d-pose-sdk.git
       path: packages/ugk_trainer
-      ref: ugk_trainer-v0.2.8
+      ref: ugk_trainer-v0.2.9
   ugk_coach:
     version: 0.5.0
     git:
@@ -258,6 +258,10 @@ flutter:
     - assets/voice_lc32/v1/w-wall-sit/zh/
     # END drill packs
     - assets/library/
+    - assets/app_test_pack/app-test-pack-r1/
+    - assets/app_test_pack/app-test-pack-r1/objects/
+    - assets/app_test_pack/app-test-pack-r1/sources/
+    - assets/app_test_pack/app-test-pack-r1/validation/
     - assets/media_player/
     - assets/licenses/
   # Noto Sans SC variable (wght 100–900), SIL OFL 1.1 — subset to GB2312 +

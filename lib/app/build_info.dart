@@ -1,8 +1,8 @@
 /// Build identity for diagnostics; native exports also include the installed
 /// package's actual Android versionCode (which includes the ABI offset).
 abstract final class AppBuildInfo {
-  static const version = '0.1.0+26';
+  static const version = '0.1.0+28';
   static const sdkRef =
-      'ugk_coach-v0.5.0 / ugk_trainer-v0.2.7 / ugk_coach_ui-v0.1.2';
-  static const performanceBase = 'c35068003fe484f793ce051134444ae3b0172c4d';
+      'ugk_coach-v0.5.0 / ugk_trainer-v0.2.9 / ugk_coach_ui-v0.1.2';
+  static const performanceBase = '868cde10ee81c5ac960634d9dc172f6de1bae0b6';
 }

@@ -4,6 +4,7 @@ import 'package:ugk_coach_ui/ugk_coach_ui.dart';
 import '../../domain/exercise.dart';
 import '../../domain/plan.dart';
 import '../../domain/session.dart';
+import '../alpha_artwork.dart';
 import '../theme.dart' show levelZh;
 import '../theme/glass.dart';
 import '../theme/media_theme.dart';
@@ -94,12 +95,19 @@ CoachUiStyle smartfitCoachUiStyle() {
         color: c.color,
         boxed: c.boxed,
       ),
-      surface: (_, c) => SfScrollCardSurface(
-        radius: c.radius,
-        padding: c.padding,
-        width: c.width,
-        child: c.child,
-      ),
+      surface: (context, c) => SfAlphaCardScope.of(context)
+          ? SfAlphaCardSurface(
+              radius: c.radius,
+              padding: c.padding,
+              width: c.width,
+              child: c.child,
+            )
+          : SfScrollCardSurface(
+              radius: c.radius,
+              padding: c.padding,
+              width: c.width,
+              child: c.child,
+            ),
       icon: (_, c) => SfIcon(
         _glyph(c.glyph),
         size: c.size,
@@ -166,16 +174,39 @@ String _timeLabel(DateTime at, DateTime now) {
   };
 }
 
-CoachExercise toCoachExercise(Exercise e) => CoachExercise(
-  id: e.id,
-  name: e.name,
-  poster: sfPoster(e),
-  stage: coachMediaPalette(sfStageFor(e)),
-  categoryLabel: e.category.zh,
-  cues: e.cues,
-  cutout: SfCutouts.has(e) ? SfCutouts.asset(e) : null,
-  stillCutout: SfCutouts.has(e) ? SfCutouts.asset(e, still: true) : null,
-);
+CoachExercise toCoachExercise(
+  Exercise e, {
+  bool alphaCards = SfAlphaCards.enabled,
+}) {
+  final alpha = SfAlphaCards.hasCover(e, enabled: alphaCards);
+  final palette = sfStageFor(e);
+  return CoachExercise(
+    id: e.id,
+    name: e.name,
+    // The SDK's hero uses cutout; its strip, rows and flying destinations
+    // share poster. Their two alpha stills depict the same selected pose.
+    poster: alpha ? e.media.alphaThumbnail ?? e.media.alphaCover! : sfPoster(e),
+    stage: alpha
+        ? CoachMediaPalette(
+            mediaStage: Colors.transparent,
+            onStage: palette.text,
+            onStageMuted: palette.muted,
+          )
+        : coachMediaPalette(palette),
+    categoryLabel: e.category.zh,
+    cues: e.cues,
+    cutout: alpha
+        ? e.media.alphaCover
+        : SfCutouts.has(e)
+        ? SfCutouts.asset(e)
+        : null,
+    stillCutout: alpha
+        ? e.media.alphaCover
+        : SfCutouts.has(e)
+        ? SfCutouts.asset(e, still: true)
+        : null,
+  );
+}
 
 CoachRoutine toCoachRoutine(TrainingPlan p, ExerciseLibrary library) {
   final moves = [
