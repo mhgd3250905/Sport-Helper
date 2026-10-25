@@ -49,3 +49,9 @@ SDK media builder 同时覆盖紧凑封面、展开飞行静帧和缩略图；�
 `SMARTFIT_FULL_TEST_CATALOG=true` 仅与内部 App test pack 同时启用时生效。动作库显示全部目录条目；缺少训练字段的条目显示“训练说明待补”，已有素材仍可播放、标记。AI 只接收字段结构完整的训练定义，更新 catalog 后重新判断，不维护固定准入 ID 清单。原始器材 ID、hold 与执行节奏保留，8 秒视频循环不充当训练剂量；陌生器材不会转换为徒手。源目录声明的 semantic catalog 按字节数、SHA 和版本校验后内容寻址内置，不访问运行机器的绝对源目录。
 
 目录解析/映射 14 项、目录页 6 项、含语义文件打包的导入器 21 项定向测试通过。完整目录与问题标记按独立构建开关分步启用；+29 release 仅启用透明卡片，不启用完整目录和问题入口。
+
+## 0.1.0+30 问题标记
+
+在 +29 的内部构建参数上增加 `SMARTFIT_ACTION_ISSUES=true`，完整目录开关仍关闭。两个入口已在同一红米 Profile 包实际验证：播放页抓取 `h-chair-tspine` / 修订 `h-chair-tspine` / 3.948 秒，动作详情抓取 `h-squat` / 修订 `h-squat-r2` / 4.549 秒。标签和备注可保存，恢复原输入法后，设置一键输出 `Download/SmartFit/SmartFit-action-issues-*.json`，无需文件选择器。
+
+两条设备验收记录均注明自动验证、非素材缺陷。两次导出不清空本机标记；JSON 带 `schemaVersion`、UTC 标记时间与实际视频秒数，不包含 AI Key。运行性能沿用上方已开启问题入口的四场景 Profile 结果；本次只启用已验证的构建开关，不重复跑全量测试。
