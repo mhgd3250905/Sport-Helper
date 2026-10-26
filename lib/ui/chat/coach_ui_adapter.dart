@@ -6,9 +6,9 @@ import '../../domain/plan.dart';
 import '../../domain/session.dart';
 import '../alpha_artwork.dart';
 import '../theme.dart' show levelZh;
-import '../theme/glass.dart';
 import '../theme/media_theme.dart';
 import '../theme/sf_icons.dart';
+import '../theme/solid_surface.dart';
 import '../theme/tokens.dart';
 import '../theme/widgets.dart';
 
@@ -42,11 +42,11 @@ CoachUiStyle smartfitCoachUiStyle() {
       userBubble: p.userBubble,
       assistantBubble: p.assistantBubble,
       stage: coachMediaPalette(p),
-      emphasis: p.emphasis,
-      onEmphasis: p.onEmphasis,
-      onMedia: Colors.white,
-      mediaScrim: const Color(0x66000000),
-      landingHighlight: Colors.white,
+      emphasis: p.accent,
+      onEmphasis: p.onAccent,
+      onMedia: p.text,
+      mediaScrim: p.surfaceHigh,
+      landingHighlight: p.surfaceHigh,
     ),
     typography: CoachUiTypography(
       body: SfType.body,
@@ -92,18 +92,25 @@ CoachUiStyle smartfitCoachUiStyle() {
         haptic: SfHaptic.values[c.haptic.index],
         child: c.child,
       ),
-      controlFace: (_, c) => SfControlFace(
-        padding: c.padding,
-        minHeight: c.minHeight,
-        child: c.child,
-      ),
+      controlFace: (_, c) => SfColors.isDark
+          ? ConstrainedBox(
+              constraints: BoxConstraints(minHeight: c.minHeight),
+              child: SfSolidSurface(
+                level: SfSurfaceLevel.raised,
+                radius: c.minHeight / 2,
+                padding: c.padding,
+                control: true,
+                child: c.child,
+              ),
+            )
+          : c.child,
       textAction: (_, c) => SfTextAction(
         label: c.label,
         onPressed: c.onPressed,
         icon: c.icon == null ? null : _glyph(c.icon!),
         iconFilled: c.iconFilled,
         color: c.color,
-        boxed: c.boxed,
+        boxed: false,
       ),
       surface: (context, c) => SfAlphaCardScope.of(context)
           ? SfAlphaCardSurface(
@@ -112,7 +119,7 @@ CoachUiStyle smartfitCoachUiStyle() {
               width: c.width,
               child: c.child,
             )
-          : SfScrollCardSurface(
+          : SfSolidSurface(
               radius: c.radius,
               padding: c.padding,
               width: c.width,
@@ -130,33 +137,24 @@ CoachUiStyle smartfitCoachUiStyle() {
         tooltip: '开始训练',
         onTap: c.onTap,
         haptic: SfHaptic.medium,
-        child: SizedBox.square(
-          dimension: 48,
-          child: Builder(
-            builder: (context) {
-              final dark = SfColors.palette.mediaStage.computeLuminance() < .2;
-              final palette = dark ? SfPalette.dark : SfPalette.light;
-              return SfTactile(
-                key: const ValueKey('start-disc'),
-                style: SfTactileStyle.accent(
-                  dark: dark,
-                  color: palette.emphasis,
-                ),
-                pressed: SfPressedScope.of(context),
-                radius: 24,
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 2),
-                    child: SfIcon(
-                      SfGlyph.play,
-                      size: 18,
-                      filled: true,
-                      color: palette.onEmphasis,
-                    ),
-                  ),
-                ),
-              );
-            },
+        child: Container(
+          key: const ValueKey('start-disc'),
+          width: 48,
+          height: 48,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: SfColors.accent,
+          ),
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.only(left: 2),
+              child: SfIcon(
+                SfGlyph.play,
+                size: 18,
+                filled: true,
+                color: SfColors.onAccent,
+              ),
+            ),
           ),
         ),
       ),

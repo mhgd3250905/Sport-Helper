@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../domain/exercise.dart';
 import 'alpha_bounds.dart';
-import 'theme/glass.dart';
+import 'theme/solid_surface.dart';
 import 'theme/tokens.dart';
 
 /// The second UI rollout is separate from packed-video playback.
@@ -77,7 +77,7 @@ class SfAlphaCardSurface extends StatelessWidget {
       children: [
         Positioned.fill(
           top: SfAlphaCards.rise,
-          child: SfScrollCardSurface(
+          child: SfSolidSurface(
             key: const ValueKey('alpha-card-face'),
             radius: radius,
             child: const SizedBox.expand(),
@@ -132,7 +132,7 @@ class SfAlphaArtwork extends StatelessWidget {
           children: [
             Positioned.fill(
               top: SfAlphaCards.rise,
-              child: SfScrollCardSurface(
+              child: SfSolidSurface(
                 key: ValueKey('alpha-artwork-face-${exercise.id}'),
                 radius: radius,
                 child: const SizedBox.expand(),

@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:ugk_trainer/ugk_trainer.dart' show SessionResult;
 import 'package:ugk_coach/ugk_coach.dart' as coach;
 import 'package:ugk_coach_ui/ugk_coach_ui.dart';
@@ -19,11 +18,10 @@ import '../library_page.dart';
 import '../plan_page.dart';
 import '../player_page.dart';
 import '../theme/app_theme.dart';
-import '../theme/fixed_glass_policy.dart';
-import '../theme/glass.dart';
+import '../theme/measure_size.dart';
+import '../theme/solid_surface.dart';
 import '../theme/sf_icons.dart';
 import '../theme/tokens.dart';
-import '../theme/widgets.dart';
 import '../training_route.dart';
 import 'action_card.dart';
 import 'chat_widgets.dart';
@@ -54,9 +52,9 @@ class _ChatHomePageState extends State<ChatHomePage> {
   StreamSubscription<String>? _actions;
   late final _scroll = widget.scrollController ?? ScrollController();
 
-  /// Height of the floating glass dock (chips + input, incl. the bottom
+  /// Height of the input dock (chips + input, incl. the bottom
   /// safe area); the conversation reserves it as bottom padding so the
-  /// newest message can always scroll clear of the glass.
+  /// newest message can always scroll clear of the controls.
   double _dockHeight = 112;
   final _scaffold = GlobalKey<ScaffoldState>();
   final _input = FocusNode();
@@ -176,7 +174,11 @@ class _ChatHomePageState extends State<ChatHomePage> {
 
   void _toast(String text, {SfGlyph icon = SfGlyph.checkCircle}) {
     if (!mounted) return;
-    showSfToast(context, text, icon: icon);
+    showSfSolidToast(
+      context,
+      text,
+      icon: SfIcon(icon, size: 18, color: SfColors.accentText, filled: true),
+    );
   }
 
   Future<void> _send(String text, {String? label}) async {
@@ -245,94 +247,54 @@ class _ChatHomePageState extends State<ChatHomePage> {
             animate: PerformanceLab.buildEnabled
                 ? PerformanceLab.instance.starfieldFor(s.store.starfield)
                 : s.store.starfield,
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                // Cards paint a static face; the scrolling conversation is
-                // not a texture capture source. Only the internal legacy-card
-                // comparison restores that boundary. The fixed input keeps
-                // its glass; every conversation uses static suggestion chips.
-                LiquidGlassScope(
-                  child: ListenableBuilder(
-                    listenable: _chat,
-                    builder: (context, _) => _withMeasuredGlassDefault(
-                      context,
-                      Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          Positioned.fill(
-                            child: SfGlassBackgroundSource(
-                              child: Stack(
-                                fit: StackFit.expand,
-                                children: [
-                                  const SfGlassField(),
-                                  _messages(),
-                                ],
+            child: ListenableBuilder(
+              listenable: _chat,
+              builder: (context, _) => Stack(
+                fit: StackFit.expand,
+                children: [
+                  Positioned.fill(child: _messages()),
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    child: SfMeasureSize(
+                      onSize: (s) {
+                        if (mounted && (s.height - _dockHeight).abs() > .5) {
+                          setState(() => _dockHeight = s.height);
+                        }
+                      },
+                      child: ColoredBox(
+                        color: SfColors.surfaceLow,
+                        child: SafeArea(
+                          top: false,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              SuggestionStrip(
+                                items: _chat.typing
+                                    ? const []
+                                    : _chat.suggestions,
+                                onTap: _send,
                               ),
-                            ),
-                          ),
-                          Positioned(
-                            left: 0,
-                            right: 0,
-                            bottom: 0,
-                            child: SfMeasureSize(
-                              onSize: (s) {
-                                if (mounted &&
-                                    (s.height - _dockHeight).abs() > .5) {
-                                  setState(() => _dockHeight = s.height);
-                                }
-                              },
-                              child: SafeArea(
-                                top: false,
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    SuggestionStrip(
-                                      items: _chat.typing
-                                          ? const []
-                                          : _chat.suggestions,
-                                      onTap: _send,
-                                    ),
-                                    ChatInputBar(
-                                      focusNode: _input,
-                                      onSend: _send,
-                                      enabled: !_chat.typing,
-                                      onPlans: () =>
-                                          _scaffold.currentState?.openDrawer(),
-                                    ),
-                                  ],
-                                ),
+                              ChatInputBar(
+                                focusNode: _input,
+                                onSend: _send,
+                                enabled: !_chat.typing,
+                                onPlans: () =>
+                                    _scaffold.currentState?.openDrawer(),
                               ),
-                            ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
       ),
-    );
-  }
-
-  Widget _withMeasuredGlassDefault(BuildContext context, Widget child) {
-    // The existing chat notification rebuild also covers newly received and
-    // cleared plans. Do not inspect messages from a scroll listener or ticker.
-    // An explicit experiment/screenshot scope must remain authoritative.
-    if (SfFixedGlassScope.maybeOf(context) != null) return child;
-    final hasPlanCards = _chat.messages.any(
-      (message) =>
-          !message.greeting &&
-          (message.validatedPlan != null ||
-              (message.isPlan && message.plan!.source != 'ai')),
-    );
-    return SfFixedGlassScope(
-      isPlanContext: hasPlanCards,
-      policy: SfFixedGlassPolicy.chat,
-      child: child,
     );
   }
 

@@ -7,21 +7,27 @@ import 'transitions.dart';
 /// Material theme built from the tokens, so stock widgets (app bars,
 /// switches, dialogs, sheets, snack bars, chips) already look like ours.
 ThemeData buildTheme([SfPalette p = SfPalette.dark]) {
-  final scheme = (p.isDark ? const ColorScheme.dark() : const ColorScheme.light()).copyWith(
-    primary: p.accent,
-    onPrimary: p.onAccent,
-    secondary: p.accent,
-    onSecondary: p.onAccent,
-    tertiary: p.emphasis,
-    onTertiary: p.onEmphasis,
-    surface: p.surface,
-    onSurface: p.text,
-    onSurfaceVariant: p.muted,
-    surfaceContainerHighest: p.surfaceHigh,
-    outline: p.line,
-    outlineVariant: p.line,
-    error: p.danger,
-  );
+  final scheme =
+      (p.isDark ? const ColorScheme.dark() : const ColorScheme.light())
+          .copyWith(
+            primary: p.accent,
+            onPrimary: p.onAccent,
+            secondary: p.accent,
+            onSecondary: p.onAccent,
+            tertiary: p.emphasis,
+            onTertiary: p.onEmphasis,
+            surface: p.surface,
+            onSurface: p.text,
+            onSurfaceVariant: p.muted,
+            surfaceContainerLowest: p.surfaceLow,
+            surfaceContainerLow: p.surfaceLow,
+            surfaceContainer: p.surface,
+            surfaceContainerHigh: p.surfaceHigh,
+            surfaceContainerHighest: p.surfaceHigh,
+            outline: p.line,
+            outlineVariant: p.line,
+            error: p.danger,
+          );
   final base = ThemeData(
     brightness: p.brightness,
     useMaterial3: true,
@@ -41,7 +47,11 @@ ThemeData buildTheme([SfPalette p = SfPalette.dark]) {
     ),
     iconTheme: IconThemeData(color: p.text, size: 22),
     dividerColor: p.line,
-    dividerTheme: DividerThemeData(color: p.isDark ? p.surfaceHigh : p.line, thickness: 1, space: 1),
+    dividerTheme: DividerThemeData(
+      color: p.isDark ? p.surfaceHigh : p.line,
+      thickness: 1,
+      space: 1,
+    ),
     appBarTheme: AppBarTheme(
       backgroundColor: p.background,
       surfaceTintColor: Colors.transparent,
@@ -50,13 +60,18 @@ ThemeData buildTheme([SfPalette p = SfPalette.dark]) {
       scrolledUnderElevation: 0,
       centerTitle: false,
       titleSpacing: 4,
-      titleTextStyle: label.copyWith(fontSize: 20, fontWeight: FontWeight.w700, height: 1.3),
+      titleTextStyle: label.copyWith(
+        fontSize: 20,
+        fontWeight: FontWeight.w700,
+        height: 1.3,
+      ),
       systemOverlayStyle: _overlay(p),
     ),
     // M2: one push / pop for every plain page on every platform.
     pageTransitionsTheme: PageTransitionsTheme(
       builders: {
-        for (final p in TargetPlatform.values) p: const SfPageTransitionsBuilder(),
+        for (final p in TargetPlatform.values)
+          p: const SfPageTransitionsBuilder(),
       },
     ),
     bottomSheetTheme: BottomSheetThemeData(
@@ -72,16 +87,28 @@ ThemeData buildTheme([SfPalette p = SfPalette.dark]) {
     dialogTheme: DialogThemeData(
       backgroundColor: p.surface,
       surfaceTintColor: Colors.transparent,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(SfRadius.lg)),
-      titleTextStyle: label.copyWith(fontSize: 18, fontWeight: FontWeight.w700, height: 1.35),
-      contentTextStyle: label.copyWith(fontSize: 15, height: 1.6, color: p.muted),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(SfRadius.lg),
+      ),
+      titleTextStyle: label.copyWith(
+        fontSize: 18,
+        fontWeight: FontWeight.w700,
+        height: 1.35,
+      ),
+      contentTextStyle: label.copyWith(
+        fontSize: 15,
+        height: 1.6,
+        color: p.muted,
+      ),
     ),
     popupMenuTheme: PopupMenuThemeData(
       color: p.surfaceHigh,
       surfaceTintColor: Colors.transparent,
       elevation: p.isDark ? 0 : 3,
       shadowColor: p.shadow,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(SfRadius.md)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(SfRadius.md),
+      ),
       textStyle: label.copyWith(fontSize: 15),
     ),
     snackBarTheme: SnackBarThemeData(
@@ -92,7 +119,9 @@ ThemeData buildTheme([SfPalette p = SfPalette.dark]) {
         color: p.isDark ? p.text : p.background,
       ),
       elevation: 0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(SfRadius.md)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(SfRadius.md),
+      ),
     ),
     listTileTheme: ListTileThemeData(textColor: p.text, iconColor: p.muted),
     cardTheme: CardThemeData(
@@ -102,7 +131,7 @@ ThemeData buildTheme([SfPalette p = SfPalette.dark]) {
       margin: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(SfRadius.md + 2),
-        side: p.isDark ? BorderSide.none : BorderSide(color: p.line),
+        side: BorderSide(color: p.line),
       ),
     ),
     textButtonTheme: TextButtonThemeData(
@@ -142,13 +171,19 @@ ThemeData buildTheme([SfPalette p = SfPalette.dark]) {
       shape: const StadiumBorder(),
       showCheckmark: false,
       labelStyle: label.copyWith(fontSize: 14),
-      secondaryLabelStyle: label.copyWith(fontSize: 14, color: p.accentText, fontWeight: FontWeight.w600),
+      secondaryLabelStyle: label.copyWith(
+        fontSize: 14,
+        color: p.accentText,
+        fontWeight: FontWeight.w600,
+      ),
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       checkmarkColor: p.accentText,
     ),
     switchTheme: SwitchThemeData(
       thumbColor: WidgetStateProperty.resolveWith(
-        (s) => s.contains(WidgetState.selected) ? (p.isDark ? p.background : Colors.white) : p.muted,
+        (s) => s.contains(WidgetState.selected)
+            ? (p.isDark ? p.background : Colors.white)
+            : p.muted,
       ),
       trackColor: WidgetStateProperty.resolveWith(
         (s) => s.contains(WidgetState.selected) ? p.accent : p.surfaceHigh,
@@ -189,14 +224,19 @@ ThemeData buildTheme([SfPalette p = SfPalette.dark]) {
 }
 
 SystemUiOverlayStyle _overlay(SfPalette p) =>
-    (p.isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark).copyWith(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: p.isDark ? Brightness.light : Brightness.dark,
-      statusBarBrightness: p.isDark ? Brightness.dark : Brightness.light,
-      systemStatusBarContrastEnforced: false,
-      systemNavigationBarColor: p.skyBottom,
-      systemNavigationBarIconBrightness: p.isDark ? Brightness.light : Brightness.dark,
-    );
+    (p.isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark)
+        .copyWith(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: p.isDark
+              ? Brightness.light
+              : Brightness.dark,
+          statusBarBrightness: p.isDark ? Brightness.dark : Brightness.light,
+          systemStatusBarContrastEnforced: false,
+          systemNavigationBarColor: p.skyBottom,
+          systemNavigationBarIconBrightness: p.isDark
+              ? Brightness.light
+              : Brightness.dark,
+        );
 
 /// The status / navigation bar style for a page drawn on the sky.
 SystemUiOverlayStyle get sfOverlay => _overlay(SfColors.palette);
@@ -226,7 +266,9 @@ class _SfPaletteScopeState extends State<SfPaletteScope> {
     if (b != _applied) {
       final first = _applied == null;
       _applied = b;
-      SfColors.palette = b == Brightness.dark ? SfPalette.dark : SfPalette.light;
+      SfColors.palette = b == Brightness.dark
+          ? SfPalette.dark
+          : SfPalette.light;
       if (!first) (context as Element).visitChildren(_rebuildAll);
     }
     return AnnotatedRegion<SystemUiOverlayStyle>(

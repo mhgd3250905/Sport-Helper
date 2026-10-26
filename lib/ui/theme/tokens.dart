@@ -31,6 +31,7 @@ class SfPalette {
     required this.skyBottom,
     required this.dust,
     required this.background,
+    required this.surfaceLow,
     required this.surface,
     required this.surfaceHigh,
     required this.line,
@@ -67,6 +68,9 @@ class SfPalette {
 
   /// Plain pages (library, about …) and the system navigation bar.
   final Color background;
+
+  /// Level 0: fixed page furniture, underneath cards and raised controls.
+  final Color surfaceLow;
 
   /// Level 1: cards, the input capsule, sheets, dialogs, the drawer.
   final Color surface;
@@ -126,9 +130,11 @@ class SfPalette {
   bool get isDark => brightness == Brightness.dark;
 
   /// Selected chip / option fill.
-  Color get accentSoft => accent.withValues(alpha: isDark ? .16 : .12);
+  Color get accentSoft =>
+      Color.alphaBlend(accent.withValues(alpha: isDark ? .18 : .12), surface);
 
-  Color get emphasisSoft => emphasis.withValues(alpha: isDark ? .16 : .12);
+  Color get emphasisSoft =>
+      Color.alphaBlend(emphasis.withValues(alpha: isDark ? .16 : .12), surface);
 
   static const dark = SfPalette(
     brightness: Brightness.dark,
@@ -136,9 +142,10 @@ class SfPalette {
     skyBottom: Color(0xFF0B0B0D),
     dust: Color(0xFFDDE3F2),
     background: Color(0xFF0B0C10),
-    surface: Color(0xFF15171C),
-    surfaceHigh: Color(0xFF1F2228),
-    line: Color(0xFF272A31),
+    surfaceLow: Color(0xFF111A1E),
+    surface: Color(0xFF19262B),
+    surfaceHigh: Color(0xFF26383E),
+    line: Color(0xFF34484F),
     accent: SfBrand.teal,
     accentText: SfBrand.teal,
     onAccent: Color(0xFF092F30),
@@ -156,9 +163,9 @@ class SfPalette {
     thumb: Color(0xFF2A2D34),
     scrim: Color(0xA6000000),
     track: Color(0x1FFFFFFF),
-    userBubble: Color(0xFF162F25), // mint tint, solid (flat, z = 0)
-    assistantBubble: Color(0xFF152E2F), // teal tint, solid (flat, z = 0)
-    shadow: Color(0x00000000),
+    userBubble: Color(0xFF1B3F3D),
+    assistantBubble: Color(0xFF19262B),
+    shadow: Color(0x24000000),
   );
 
   static const light = SfPalette(
@@ -167,9 +174,10 @@ class SfPalette {
     skyBottom: Color(0xFFEEF0EC),
     dust: Color(0xFF7D8781),
     background: Color(0xFFF4F5F3),
+    surfaceLow: Color(0xFFF4F8F5),
     surface: Color(0xFFFFFFFF),
-    surfaceHigh: Color(0xFFEEF0EE),
-    line: Color(0xFFE1E4E1),
+    surfaceHigh: Color(0xFFEBF2EE),
+    line: Color(0xFFD7E3DC),
     accent: Color(0xFF0F7976),
     accentText: Color(0xFF0A6C69),
     onAccent: Color(0xFFFFFFFF),
@@ -187,9 +195,9 @@ class SfPalette {
     thumb: Color(0xFFFFFFFF),
     scrim: Color(0x8C000000),
     track: Color(0x14000000),
-    userBubble: Color(0xFFE6F7EB), // light mint tint, solid (flat, z = 0)
-    assistantBubble: Color(0xFFE1F3F3), // light teal tint, solid (flat, z = 0)
-    shadow: Color(0x121D2B25),
+    userBubble: Color(0xFFDCEFEA),
+    assistantBubble: Color(0xFFFFFFFF),
+    shadow: Color(0x0A142E24),
   );
 }
 
@@ -204,6 +212,7 @@ abstract final class SfColors {
   static Color get skyBottom => palette.skyBottom;
   static Color get dust => palette.dust;
   static Color get background => palette.background;
+  static Color get surfaceLow => palette.surfaceLow;
   static Color get surface => palette.surface;
   static Color get surfaceHigh => palette.surfaceHigh;
   static Color get line => palette.line;
@@ -229,18 +238,12 @@ abstract final class SfColors {
   static Color get userBubble => palette.userBubble;
   static Color get assistantBubble => palette.assistantBubble;
 
-  /// Card elevation: none on dark (tone steps carry it), a faint two-layer
-  /// ink shadow on light (never coloured).
-  static List<BoxShadow>? get cardShadow => palette.isDark
-      ? null
-      : [
-          BoxShadow(color: palette.shadow, blurRadius: 24, offset: const Offset(0, 8)),
-          const BoxShadow(color: Color(0x08000000), blurRadius: 2, offset: Offset(0, 1)),
-        ];
+  /// Short elevation shadow. Surface tones and the outline carry the hierarchy.
+  static List<BoxShadow> get cardShadow => [
+    BoxShadow(color: palette.shadow, blurRadius: 4, offset: const Offset(0, 2)),
+  ];
 
-  /// Hairline for level-1 surfaces: light only.
-  static BorderSide get cardEdge =>
-      palette.isDark ? BorderSide.none : BorderSide(color: palette.line);
+  static BorderSide get cardEdge => BorderSide(color: palette.line);
 }
 
 /// Type scale. Six steps; weight and colour carry the rest of the
@@ -248,35 +251,70 @@ abstract final class SfColors {
 abstract final class SfType {
   /// 完成页 title.
   static TextStyle get display => TextStyle(
-    fontSize: 30, height: 1.2, fontWeight: FontWeight.w800, letterSpacing: -.3, color: SfColors.text);
+    fontSize: 30,
+    height: 1.2,
+    fontWeight: FontWeight.w800,
+    letterSpacing: -.3,
+    color: SfColors.text,
+  );
 
   /// The chat's greeting: large type floating in the sky, no bubble.
   static TextStyle get greeting => TextStyle(
-    fontSize: 28, height: 1.3, fontWeight: FontWeight.w700, letterSpacing: -.2, color: SfColors.text);
+    fontSize: 28,
+    height: 1.3,
+    fontWeight: FontWeight.w700,
+    letterSpacing: -.2,
+    color: SfColors.text,
+  );
 
   /// Card / page / exercise titles.
   static TextStyle get title => TextStyle(
-    fontSize: 20, height: 1.3, fontWeight: FontWeight.w700, letterSpacing: -.1, color: SfColors.text);
+    fontSize: 20,
+    height: 1.3,
+    fontWeight: FontWeight.w700,
+    letterSpacing: -.1,
+    color: SfColors.text,
+  );
 
   /// Section heads, sheet titles.
   static TextStyle get headline => TextStyle(
-    fontSize: 17, height: 1.35, fontWeight: FontWeight.w600, color: SfColors.text);
+    fontSize: 17,
+    height: 1.35,
+    fontWeight: FontWeight.w600,
+    color: SfColors.text,
+  );
 
   /// Conversation and running text.
   static TextStyle get body => TextStyle(
-    fontSize: 16, height: 1.6, fontWeight: FontWeight.w400, color: SfColors.text);
+    fontSize: 16,
+    height: 1.6,
+    fontWeight: FontWeight.w400,
+    color: SfColors.text,
+  );
 
   /// List rows, chips, buttons inside cards.
   static TextStyle get callout => TextStyle(
-    fontSize: 15, height: 1.4, fontWeight: FontWeight.w500, color: SfColors.text);
+    fontSize: 15,
+    height: 1.4,
+    fontWeight: FontWeight.w500,
+    color: SfColors.text,
+  );
 
   /// Meta lines (时长 · 动作数 · 器械), doses.
   static TextStyle get label => TextStyle(
-    fontSize: 13, height: 1.4, fontWeight: FontWeight.w400, color: SfColors.muted);
+    fontSize: 13,
+    height: 1.4,
+    fontWeight: FontWeight.w400,
+    color: SfColors.muted,
+  );
 
   /// Time marks, hints, footnotes.
   static TextStyle get caption => TextStyle(
-    fontSize: 12, height: 1.4, fontWeight: FontWeight.w400, color: SfColors.faint);
+    fontSize: 12,
+    height: 1.4,
+    fontWeight: FontWeight.w400,
+    color: SfColors.faint,
+  );
 
   /// Numbers that tick (counter, progress).
   static const tabular = [FontFeature.tabularFigures()];
@@ -344,7 +382,10 @@ abstract final class SfMotion {
   static const pageReverse = Duration(milliseconds: 340);
 
   /// Sheets rise on the page timing.
-  static const sheet = AnimationStyle(duration: page, reverseDuration: pageReverse);
+  static const sheet = AnimationStyle(
+    duration: page,
+    reverseDuration: pageReverse,
+  );
 
   /// Items arriving together, one after another.
   static const stagger = Duration(milliseconds: 40);

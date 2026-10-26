@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import '../theme/fixed_glass_policy.dart';
-import '../theme/glass.dart';
 import '../theme/sf_icons.dart';
+import '../theme/solid_surface.dart';
 import '../theme/tokens.dart';
 import '../theme/widgets.dart';
 import 'chat_bubble_adapter.dart';
@@ -58,12 +57,10 @@ class SuggestionStrip extends StatelessWidget {
             semanticLabel: items[i],
             haptic: SfHaptic.selection,
             onTap: () => onTap(items[i]),
-            // Liquid glass: discovery chips are controls, so they float on
-            // glass over the colour field (standard quality).
-            child: SfFixedGlassSurface(
-              role: SfFixedGlassRole.suggestions,
+            child: SfSolidSurface(
+              level: SfSurfaceLevel.raised,
               radius: dark ? 20 : 18,
-              height: dark ? SfControlInk.minHeight : 36,
+              height: dark ? 40 : 36,
               padding: const EdgeInsets.symmetric(horizontal: 14),
               control: true,
               child: Row(
@@ -138,12 +135,8 @@ class _ChatInputBarState extends State<ChatInputBar> {
     final ready = _text.text.trim().isNotEmpty && widget.enabled;
     return Padding(
       padding: const EdgeInsets.fromLTRB(SfSpace.x3, 0, SfSpace.x3, SfSpace.x3),
-      // Liquid glass: the input is the chat's persistent bar, so it gets
-      // the premium material when the device allows (adaptive ceiling).
-      child: SfFixedGlassSurface(
-        role: SfFixedGlassRole.input,
+      child: SfSolidSurface(
         radius: 26,
-        quality: SfGlass.bar,
         child: Material(
           type: MaterialType.transparency,
           child: ConstrainedBox(
@@ -164,13 +157,20 @@ class _ChatInputBarState extends State<ChatInputBar> {
                         onTap: widget.onPlans,
                         child: Center(
                           child: SfColors.isDark
-                              ? SfControlFace(
-                                  circle: true,
-                                  padding: EdgeInsets.zero,
-                                  child: SfIcon(
-                                    SfGlyph.bookmark,
-                                    size: 19,
-                                    color: SfColors.text.withValues(alpha: .9),
+                              ? SfSolidSurface(
+                                  level: SfSurfaceLevel.raised,
+                                  width: 40,
+                                  height: 40,
+                                  radius: 20,
+                                  control: true,
+                                  child: Center(
+                                    child: SfIcon(
+                                      SfGlyph.bookmark,
+                                      size: 19,
+                                      color: SfColors.text.withValues(
+                                        alpha: .9,
+                                      ),
+                                    ),
                                   ),
                                 )
                               : SfIcon(
@@ -227,18 +227,17 @@ class _ChatInputBarState extends State<ChatInputBar> {
                         semanticLabel: '发送',
                         onTap: ready ? _submit : null,
                         scale: .9,
-                        child: AnimatedContainer(
-                          duration: SfMotion.fast,
+                        child: Container(
                           width: 36,
                           height: 36,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: ready
                                 ? SfColors.accent
-                                : SfColors.text.withValues(alpha: .08),
+                                : SfColors.surfaceHigh,
                           ),
-                          // M9: the arrow grows into place as the disc
-                          // turns accent; reduced motion: colour only.
+                          // Keep the existing send affordance without
+                          // animating the capsule's surface colour.
                           child: Center(
                             child: AnimatedScale(
                               scale: ready || SfMotion.reduced(context)
