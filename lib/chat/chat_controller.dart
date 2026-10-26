@@ -294,6 +294,8 @@ class ChatController extends ChangeNotifier {
     bool trustedAppCommand = false,
     String? questionId,
     List<String>? choices,
+    Map<String, List<String>>? formAnswers,
+    bool skipQuestion = false,
   }) async {
     final t = text.trim();
     if (t.isEmpty || typing) return;
@@ -353,6 +355,8 @@ class ChatController extends ChangeNotifier {
               t,
               _context,
               choices: choices,
+              formAnswers: formAnswers,
+              skipQuestion: skipQuestion,
             )
           : trustedAppCommand && engine is AppCommandChatEngine
           ? await (engine as AppCommandChatEngine).replyAppCommand(t, _context)
@@ -453,6 +457,39 @@ class ChatController extends ChangeNotifier {
     final text = _conversation?.choiceText(id, selected);
     if (text == null) return;
     await _send(text, questionId: id, choices: selected);
+  }
+
+  Future<void> answerForm(
+    ChatMessage message,
+    Map<String, List<String>> answers,
+  ) async {
+    if (!canAnswerQuestion(message)) return;
+    final question = message.question!;
+    final snapshot = {
+      for (final entry in answers.entries)
+        entry.key: List<String>.unmodifiable(entry.value),
+    };
+    // This is only the visible user bubble. The SDK receives the original
+    // grouped values and owns validation, option ordering and task state.
+    final label = [
+      for (final field in question.fields)
+        if (snapshot[field.key]?.isNotEmpty ?? false)
+          '${field.label}：${snapshot[field.key]!.join('、')}',
+    ].join('；');
+    await _send(
+      label,
+      questionId: message.conversationMessageId,
+      formAnswers: snapshot,
+    );
+  }
+
+  Future<void> skipQuestion(ChatMessage message) async {
+    if (!canAnswerQuestion(message)) return;
+    await _send(
+      message.question!.skipLabel,
+      questionId: message.conversationMessageId,
+      skipQuestion: true,
+    );
   }
 
   void _closeQuestion() {

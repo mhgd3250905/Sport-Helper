@@ -556,10 +556,60 @@ void main() {
             widget is Image &&
             widget.image is AssetImage &&
             (widget.image as AssetImage).assetName ==
-                '${TrainingMediaConfig.assetRoot}/theme-lossy/dark/covers/n-pelvis-circle.webp',
+                '${TrainingMediaConfig.assetRoot}/theme-lossy/dark/first-frames/n-pelvis-circle.webp',
       ),
       findsOneWidget,
     );
+    // Playback uses this exact clip's frame-zero poster, rather than the
+    // separately selected catalogue cover. Verify its receipt and decoded UI.
+    const waitingPosterPath =
+        '${TrainingMediaConfig.assetRoot}/theme-lossy/dark/first-frames/n-pelvis-circle.webp';
+    final posterFinder = find.byKey(
+      const ValueKey('drill-poster-$waitingPosterPath'),
+    );
+    final legacyIndex = jsonDecode(
+      File('${TrainingMediaConfig.assetRoot}/assets-index.json')
+          .readAsStringSync(),
+    ) as Map<String, dynamic>;
+    final darkMedia =
+        ((legacyIndex['actions'] as Map)['n-pelvis-circle'] as Map)['dark']
+            as Map;
+    final posterReceipt = darkMedia['playbackPoster'] as Map;
+    expect(posterReceipt['asset'], waitingPosterPath);
+    expect(posterReceipt['sourceFrame'], 0);
+    expect(posterReceipt['sourceTimeSeconds'], 0);
+    expect(
+      posterReceipt['sourceSha256'],
+      (darkMedia['video'] as Map)['sha256'],
+    );
+    final posterBytes = (await tester.runAsync(
+      () => rootBundle.load(waitingPosterPath),
+    ))!;
+    expect(posterBytes.lengthInBytes, posterReceipt['bytes']);
+    expect(
+      coach.sha256Hex(posterBytes.buffer.asUint8List(
+        posterBytes.offsetInBytes,
+        posterBytes.lengthInBytes,
+      )),
+      posterReceipt['sha256'],
+    );
+    final image = tester.widget<Image>(posterFinder);
+    await tester.runAsync(
+      () => precacheImage(image.image, tester.element(posterFinder)),
+    );
+    await tester.pump();
+    void expectCorrectWaitingImage() {
+      final current = tester.widget<Image>(posterFinder);
+      expect(current.image, isA<AssetImage>());
+      expect((current.image as AssetImage).assetName, waitingPosterPath);
+      final pixels = find.descendant(
+        of: posterFinder,
+        matching: find.byType(RawImage),
+      );
+      expect(pixels, findsOneWidget);
+      expect(tester.widget<RawImage>(pixels).image, isNotNull);
+    }
+    expectCorrectWaitingImage();
     final initialCounter = tester
         .widget<trainer.TrainerCountdownDigits>(
           find.byType(trainer.TrainerCountdownDigits),
@@ -589,18 +639,33 @@ void main() {
     expect(find.text('示范暂时加载不了，计时和语音仍可继续'), findsOneWidget);
     final spokenBefore = output.spoken.length;
     final chimesBefore = output.chimes.length;
+    final counterAfterFailure = tester
+        .widget<trainer.TrainerCountdownDigits>(
+          find.byType(trainer.TrainerCountdownDigits),
+        )
+        .value;
+    expectCorrectWaitingImage();
     for (var i = 0; i < 14; i++) {
       await tester.pump(const Duration(seconds: 1));
     }
     expect(output.spoken.length, greaterThan(spokenBefore));
     expect(output.chimes.length, greaterThan(chimesBefore));
+    expect(
+      tester
+          .widget<trainer.TrainerCountdownDigits>(
+            find.byType(trainer.TrainerCountdownDigits),
+          )
+          .value,
+      isNot(counterAfterFailure),
+    );
+    expectCorrectWaitingImage();
     expect(find.byKey(const ValueKey('pause')), findsOneWidget);
     expect(tester.takeException(), isNull);
     await tester.pumpWidget(const SizedBox());
   });
 
   testWidgets(
-    'media settings persist Wi-Fi policy and preserve user data on clear',
+    'video-cache confirmation preserves existing policy and user data',
     (tester) async {
       late Directory cacheDirectory;
       final media = (await tester.runAsync(
@@ -646,14 +711,8 @@ void main() {
           total: 2,
         ),
       );
-      await _open(
-        tester,
-        services,
-        const Scaffold(
-          body: SingleChildScrollView(child: TrainingMediaSettings()),
-        ),
-      );
-      final usage = find.text('已用缓存 1.0 MB');
+      await _open(tester, services, const TrainingMediaSettings());
+      final usage = find.text('1.0 MB');
       for (var i = 0; i < 1000 && usage.evaluate().isEmpty; i++) {
         await tester.runAsync(
           () => Future<void>.delayed(const Duration(milliseconds: 5)),
@@ -661,16 +720,15 @@ void main() {
         await tester.pump();
       }
       expect(usage, findsOneWidget);
-      final toggle = find.byKey(const ValueKey('media-wifi-only'));
-      expect(tester.widget<SfSwitchRow>(toggle).value, isTrue);
-      await tester.tap(toggle);
-      await tester.pump();
-      expect(media.wifiOnly, isFalse);
+      expect(media.wifiOnly, isTrue);
       final reloaded = AppStore(storage);
       await reloaded.load();
-      expect(reloaded.mediaWifiOnly, isFalse);
+      expect(reloaded.mediaWifiOnly, isTrue);
       await tester.tap(find.byKey(const ValueKey('media-clear-cache')));
-      final cleared = find.text('缓存已清理，内置动作、计划和训练记录保留');
+      await tester.pumpAndSettle();
+      expect(await tester.runAsync(media.cacheBytes), 1000000);
+      await tester.tap(find.byKey(const ValueKey('media-clear-confirm')));
+      final cleared = find.text('动作视频缓存已清除');
       for (var i = 0; i < 1000 && cleared.evaluate().isEmpty; i++) {
         await tester.runAsync(
           () => Future<void>.delayed(const Duration(milliseconds: 5)),
@@ -685,7 +743,7 @@ void main() {
       expect(reloaded.savedPlans.single.plan.id, plan.id);
       expect(reloaded.lastPlan!.id, plan.id);
       expect(reloaded.history.single.completed, 1);
-      expect(reloaded.mediaWifiOnly, isFalse);
+      expect(reloaded.mediaWifiOnly, isTrue);
       await tester.pumpWidget(const SizedBox());
     },
   );

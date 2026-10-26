@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:smartfit/app/app_test_catalog.dart';
+import 'package:smartfit/app/app_test_content.dart';
 import 'package:smartfit/chat/ai_chat_engine.dart';
 import 'package:smartfit/chat/chat_controller.dart';
 import 'package:smartfit/chat/chat_models.dart';
@@ -17,6 +19,7 @@ import 'package:smartfit/domain/plan_validator.dart';
 import 'package:smartfit/domain/saved_plan.dart';
 import 'package:smartfit/domain/session.dart';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
+import 'package:ugk_trainer/ugk_trainer.dart' show PoseHubActionLibrary;
 
 import 'support.dart';
 
@@ -163,15 +166,33 @@ class _Gateway {
 }
 
 void main() {
-  final library = loadLibrary();
-  final packs = loadPacksSync();
-  final catalog = const coach.DrillPackAdapter().build(
-    version: 'smartfit-test-assets',
-    packs: {for (final pack in packs.exercises) pack.id: pack.json},
-  );
+  late ExerciseLibrary library;
+  late coach.Catalog catalog;
   late coach.CoachProfile profile;
 
-  setUpAll(() {
+  setUpAll(() async {
+    // Read official SDK assets directly: initializing a widget binding here
+    // would replace HttpClient and invalidate the loopback wire tests below.
+    final config = File('.dart_tool/package_config.json');
+    final packages =
+        (jsonDecode(config.readAsStringSync()) as Map)['packages'] as List;
+    final trainer = packages.cast<Map>().singleWhere(
+      (p) => p['name'] == 'ugk_trainer',
+    );
+    final root = config.absolute.uri.resolve("${trainer['rootUri']}/");
+    final bytes = await File.fromUri(
+      root.resolve(
+        '${PoseHubActionLibrary.assetRoot.replaceFirst('packages/ugk_trainer/', '')}catalog.json',
+      ),
+    ).readAsBytes();
+    expect(coach.sha256Hex(bytes), PoseHubActionLibrary.catalogSha256);
+    final sdk = coach.PoseHubAppTestCatalog.fromBytes(bytes);
+    final content = AppTestContent.build(
+      catalog: AppTestCatalog.fromSdk(sdk),
+      legacyLibrary: loadLibrary(),
+    );
+    library = content.library;
+    catalog = content.coachCatalog;
     profile = coach.CoachProfile.fromJson(
       jsonDecode(File('assets/coach/smartfit.json').readAsStringSync()),
     );
@@ -203,46 +224,72 @@ void main() {
 
   TrainingPlan plan({
     String id = 'model-plan-one',
-    List<String> ids = const ['h-calf-raise'],
+    List<String> ids = const ['h-side-leg-raise'],
     String scene = 'home',
     int minutes = 10,
     int level = 1,
     Set<String> avoid = const {},
-  }) => TrainingPlan(
-    id: id,
-    source: 'ai',
-    title: 'AI 徒手训练',
-    summary: '按已确认条件编排。',
-    goal: 'fullbody',
-    scene: scene,
-    equipment: const [],
-    level: level,
-    targetMinutes: minutes,
-    avoid: avoid,
-    blocks: [
-      PlanBlock(
-        id: 'main',
-        name: '主训练',
-        type: BlockType.main,
-        rounds: 1,
-        restBetweenRoundsSeconds: 0,
-        items: [
-          for (final id in ids)
-            PlanItem(
-              exerciseId: id,
-              mode: library.tryGet(id)?.dose.mode ?? DoseMode.reps,
-              sets: 1,
-              reps: library.tryGet(id)?.dose.mode == DoseMode.time ? null : 10,
-              workSeconds: library.tryGet(id)?.dose.mode == DoseMode.time
-                  ? 30
-                  : null,
-              perSide: library.tryGet(id)?.unilateral ?? false,
-              restSeconds: 10,
-            ),
-        ],
-      ),
-    ],
-  );
+  }) {
+    // Realistic fixture doses: SDK 0.7 validates elapsed time as well as the
+    // targetMinutes label. Multiple rounds cover long-duration boundary cases.
+    final rounds = (minutes / 12).ceil().clamp(1, 6);
+    final perItem =
+        (minutes * 60 -
+            10 -
+            (rounds - 1) * 15 -
+            rounds * (ids.length - 1) * 15) /
+        (rounds * ids.length);
+    PlanItem item(String id) {
+      final exercise = library.tryGet(id);
+      final timed = exercise?.dose.mode == DoseMode.time;
+      final sides = exercise?.unilateral == true ? 2 : 1;
+      const sets = 6;
+      final repSeconds = catalog[id] == null
+          ? 3.0
+          : const coach.PlanDuration().repSeconds(catalog[id]!);
+      final work = ((perItem / sets - (sides == 2 ? 5 : 0)) / sides);
+      final seconds = work.floor().clamp(10, 120);
+      final reps = (work / repSeconds).floor().clamp(1, 30);
+      final actualWork = timed ? seconds.toDouble() : reps * repSeconds;
+      final rest =
+          ((perItem - sets * (actualWork * sides + (sides == 2 ? 5 : 0))) /
+                  (sets - 1))
+              .round()
+              .clamp(0, 180);
+      return PlanItem(
+        exerciseId: id,
+        mode: timed ? DoseMode.time : DoseMode.reps,
+        sets: sets,
+        reps: timed ? null : reps,
+        workSeconds: timed ? seconds : null,
+        perSide: sides == 2,
+        restSeconds: rest,
+      );
+    }
+
+    return TrainingPlan(
+      id: id,
+      source: 'ai',
+      title: 'AI 徒手训练',
+      summary: '按已确认条件编排。',
+      goal: 'fullbody',
+      scene: scene,
+      equipment: const [],
+      level: level,
+      targetMinutes: minutes,
+      avoid: avoid,
+      blocks: [
+        PlanBlock(
+          id: 'main',
+          name: '主训练',
+          type: BlockType.main,
+          rounds: rounds,
+          restBetweenRoundsSeconds: 15,
+          items: [for (final id in ids) item(id)],
+        ),
+      ],
+    );
+  }
 
   coach.LlmResponse tool(
     String name,
@@ -320,94 +367,97 @@ void main() {
   }
 
   group('SDK ask_user clarification', () {
-    test(
-      'text and multi-choice answers continue one task through a gated plan',
-      () async {
-        final client = coach.FakeLlmClient([
-          questionResponse('你想练多久？'),
-          questionResponse(
-            '你想重点练哪里？',
-            options: ['腿', '全身', '核心'],
-            multiple: true,
-          ),
-          planResponse(),
-        ], latency: Duration.zero);
-        final ai = engine(client);
-        final agent = ai.agent;
-        expect(ai.conversation.agent, same(agent));
-        final controller = controllerFor(ai);
-        final busyAtQuestion = <bool>[];
-        final subscription = ai.events.listen((event) {
-          if (event.kind == coach.AgentEventKind.askUser) {
-            busyAtQuestion.add(ai.agent.isBusy);
-            expect(controller.typing, isTrue);
-            // Result-only rendering: no duplicate or prematurely active bubble.
-            expect(
-              controller.messages.where((m) => m.question != null).length,
-              busyAtQuestion.length - 1,
-            );
-          }
-        });
-        addTearDown(subscription.cancel);
-        await controller.send('在家徒手想安排训练');
-        final first = controller.messages.last;
-        expect(first.question!.mode, coach.AskUserMode.text);
-        expect(first.text, isEmpty);
-        expect(controller.canAnswerQuestion(first), isTrue);
-        expect(controller.suggestions, isEmpty);
-        expect(ai.agent.questionsAsked, 1);
-        await controller.answerQuestion(first, '10 分钟');
-        final second = controller.messages.last;
-        expect(second.question!.multiple, isTrue);
-        expect(controller.canAnswerQuestion(first), isFalse);
-        expect(controller.canAnswerQuestion(second), isTrue);
-        expect(ai.agent.questionsAsked, 2);
-        await controller.answerChoices(second, ['全身', '腿']);
-        expect(
-          controller.messages.where((m) => m.question != null),
-          hasLength(2),
-        );
-        expect(
-          controller.messages.where((m) => m.question?.question == '你想练多久？'),
-          hasLength(1),
-        );
-        expect(
-          controller.messages.where((m) => m.text == '腿、全身'),
-          hasLength(1),
-        );
-        expect(controller.messages.last.validatedPlan, isNotNull);
-        expect(controller.currentPlan, isNotNull);
-        expect(controller.canAnswerQuestion(second), isFalse);
-        expect(
-          controller.messages
-              .firstWhere((m) => m.id == second.id)
-              .answeredChoices,
-          ['腿', '全身'],
-        );
-        expect(ai.agent.turnCount, 3);
-        expect(ai.agent, same(agent));
-        expect(ai.agent.questionsAsked, 0);
-        expect(busyAtQuestion, [true, true]);
-        expect(client.requests, hasLength(3));
-        final history = requestText(client.requests.last);
-        expect(history, contains('你想练多久？'));
-        expect(history, contains('10 分钟'));
-        expect(history, contains('你想重点练哪里？'));
-        expect(history, contains('腿、全身'));
-        expect(client.requests.last.messages.last.content, endsWith('腿、全身'));
-      },
-    );
+    test('one grouped form continues one task through a gated plan', () async {
+      final mat = catalog.taxonomy.equipmentLabel('mat');
+      final chair = catalog.taxonomy.equipmentLabel('chair');
+      final client = coach.FakeLlmClient([
+        tool('ask_user', {
+          'question': '补充本次训练条件',
+          'mode': 'form',
+          'fields': [
+            {
+              'key': 'equipment',
+              'label': '器械',
+              'options': ['徒手', mat, chair],
+              'multiple': true,
+            },
+            {
+              'key': 'minutes',
+              'label': '时长',
+              'options': ['5 分钟', '10 分钟', '15 分钟'],
+              'multiple': false,
+            },
+          ],
+          'skipLabel': '直接出方案',
+        }),
+        planResponse(),
+      ], latency: Duration.zero);
+      final ai = engine(client);
+      final agent = ai.agent;
+      expect(ai.conversation.agent, same(agent));
+      final controller = controllerFor(ai);
+      final busyAtQuestion = <bool>[];
+      final subscription = ai.events.listen((event) {
+        if (event.kind == coach.AgentEventKind.askUser) {
+          busyAtQuestion.add(ai.agent.isBusy);
+          expect(controller.typing, isTrue);
+          expect(controller.messages.where((m) => m.question != null), isEmpty);
+        }
+      });
+      addTearDown(subscription.cancel);
+      await controller.send('在家想安排一套训练');
+      final question = controller.messages.last;
+      expect(question.question!.mode, coach.AskUserMode.form);
+      expect(question.question!.fields.map((f) => f.key), [
+        'equipment',
+        'minutes',
+      ]);
+      expect(question.text, isEmpty);
+      expect(controller.canAnswerQuestion(question), isTrue);
+      expect(controller.suggestions, isEmpty);
+      expect(ai.agent.questionsAsked, 1);
+      // Reverse answer-map/option order: SDK serializes in field/option order.
+      await controller.answerForm(question, {
+        'minutes': ['10 分钟'],
+        'equipment': [chair, mat],
+      });
+      expect(
+        controller.messages.where((m) => m.question != null),
+        hasLength(1),
+      );
+      expect(controller.messages.last.validatedPlan, isNotNull);
+      expect(controller.currentPlan, isNotNull);
+      expect(controller.canAnswerQuestion(question), isFalse);
+      expect(
+        controller.messages
+            .firstWhere((m) => m.id == question.id)
+            .questionAnswered,
+        isTrue,
+      );
+      expect(ai.agent.turnCount, 2);
+      expect(ai.agent, same(agent));
+      expect(ai.agent.questionsAsked, 0);
+      expect(busyAtQuestion, [true]);
+      expect(client.requests, hasLength(2));
+      final history = requestText(client.requests.last);
+      expect(history, contains('补充本次训练条件'));
+      expect(history, contains('10 分钟'));
+      expect(
+        client.requests.last.messages.last.content,
+        endsWith('器械：$mat、$chair；时长：10 分钟'),
+      );
+    });
 
     test(
       'single-choice validates selection and stale/double taps cannot resubmit',
       () async {
         final client = coach.FakeLlmClient([
           questionResponse('在哪里练？', options: ['在家', '健身房']),
-          questionResponse('今天想练多久？'),
+          const coach.LlmResponse(content: '按你的选择继续讲解。'),
         ], latency: Duration.zero);
         final ai = engine(client);
         final controller = controllerFor(ai);
-        await controller.send('想安排一套训练');
+        await controller.send('请帮我讲解训练动作');
         final first = controller.messages.last;
         await controller.answerChoices(first, []);
         await controller.answerChoices(first, ['在家', '健身房']);
@@ -420,7 +470,7 @@ void main() {
         await Future.wait([firstTap, duplicateTap]);
         expect(client.requests, hasLength(2));
         final next = controller.messages.last;
-        expect(controller.canAnswerQuestion(next), isTrue);
+        expect(controller.canAnswerQuestion(next), isFalse);
         await controller.answerQuestion(first, '旧问题答案');
         expect(client.requests, hasLength(2));
       },
@@ -438,7 +488,7 @@ void main() {
         final actions = <String>[];
         final subscription = controller.actions.listen(actions.add);
         addTearDown(subscription.cancel);
-        await controller.send('想安排一套训练');
+        await controller.send('请帮我讲解训练动作');
         await controller.answerQuestion(controller.messages.last, '@settings');
         expect(client.requests, hasLength(2));
         expect(client.requests.last.messages.last.content, '@settings');
@@ -462,7 +512,7 @@ void main() {
           }
         });
         addTearDown(subscription.cancel);
-        await controller.send('想安排一套训练');
+        await controller.send('请帮我讲解训练动作');
         expect(controller.messages.where((m) => m.question != null), isEmpty);
         expect(controller.typing, isFalse);
         expect(ai.agent.questionsAsked, 0);
@@ -481,7 +531,7 @@ void main() {
         final ai = engine(client);
         final store = AppStore(_Storage())..safetyAccepted = true;
         final controller = controllerFor(ai, store: store);
-        await controller.send('想安排一套训练');
+        await controller.send('请帮我讲解训练动作');
         final original = controller.messages.last;
         final json = original.toJson().cast<String, dynamic>();
         final restored = ChatMessage.fromJson(json);
@@ -521,7 +571,7 @@ void main() {
         ], latency: Duration.zero);
         final ai = engine(client);
         final controller = controllerFor(ai);
-        await controller.send('想安排一套训练');
+        await controller.send('请帮我讲解训练动作');
         final question = controller.messages.last;
         await controller.newConversation();
         expect(ai.agent.questionsAsked, 0);
@@ -538,7 +588,7 @@ void main() {
         () async {
           final client = coach.FakeLlmClient([
             questionResponse('今天想练多久？'),
-            if (cancellingAnswer) questionResponse('在哪里练？'),
+            if (cancellingAnswer) const coach.LlmResponse(content: '会继续讲解。'),
           ], latency: Duration.zero);
           final ai = engine(client);
           final controller = controllerFor(
@@ -547,13 +597,13 @@ void main() {
           );
           final Future<void> pending;
           if (cancellingAnswer) {
-            await controller.send('想安排一套训练');
+            await controller.send('请帮我讲解训练动作');
             pending = controller.answerQuestion(
               controller.messages.last,
               '10 分钟',
             );
           } else {
-            pending = controller.send('想安排一套训练');
+            pending = controller.send('请帮我讲解训练动作');
           }
           final expectedTurns = cancellingAnswer ? 2 : 1;
           await Future.doWhile(() async {
@@ -592,7 +642,7 @@ void main() {
           plan(id: 'saved-during-clarification'),
         );
         final controller = controllerFor(ai, store: store);
-        await controller.send('想安排一套训练');
+        await controller.send('请帮我讲解训练动作');
         final question = controller.messages.last;
         await controller.showSaved(saved);
         expect(client.requests, hasLength(1));
@@ -622,7 +672,7 @@ void main() {
         final actions = <String>[];
         final subscription = controller.actions.listen(actions.add);
         addTearDown(subscription.cancel);
-        await controller.send('想安排一套训练');
+        await controller.send('请帮我讲解训练动作');
         final question = controller.messages.last;
         await controller.answerQuestion(question, '长' * 501);
         expect(ai.lastResult!.status, coach.TurnStatus.inputTooLong);
@@ -654,7 +704,7 @@ void main() {
         ], latency: Duration.zero);
         final ai = engine(client);
         final first = await ai.reply(
-          '帮我安排训练',
+          '帮我讲解训练动作',
           const ChatState(
             coachContext: Slots(
               scene: 'home',
@@ -795,7 +845,7 @@ void main() {
       expect(reply.messages, hasLength(1));
       expect(texts(reply), '按条件排好了，可以开始。');
       expect(texts(reply), isNot(contains(hidden)));
-      expect(replyPlan(reply)!.exerciseIds, {'h-calf-raise'});
+      expect(replyPlan(reply)!.exerciseIds, {'h-side-leg-raise'});
       expect(events.map((e) => e.kind), [
         coach.AgentEventKind.thinking,
         coach.AgentEventKind.reading,
@@ -863,7 +913,7 @@ void main() {
           jsonDecode(client.requests[1].messages.last.content) as Map;
       expect(feedback['ok'], isFalse);
       expect(jsonEncode(feedback['errors']), contains('unknown_exercise'));
-      expect(replyPlan(reply)!.exerciseIds, {'h-calf-raise'});
+      expect(replyPlan(reply)!.exerciseIds, {'h-side-leg-raise'});
       expect(texts(reply), isNot(contains('CHECK-FAILED-PRIVATE')));
       expect(texts(reply), isNot(contains('unknown-drill')));
     },
@@ -886,6 +936,12 @@ void main() {
     expect(texts(reply), isNot(contains('重试后')));
     expect(texts(reply), isNot(contains('STEP-PRIVATE')));
     expect(replyPlan(reply), isNotNull);
+    expect(
+      replyPlan(reply)!.items
+          .expand((item) => library[item.exerciseId].effectiveEquipmentIds)
+          .where((id) => id != 'none'),
+      isEmpty,
+    );
   });
 
   test(
@@ -1227,7 +1283,7 @@ void main() {
       expect(feedback.content, contains('unknown-drill'));
       expect(feedback.content, contains('h-db-row'));
       expect(feedback.content, contains('h-squat'));
-      expect(replyPlan(reply)!.exerciseIds, {'h-calf-raise'});
+      expect(replyPlan(reply)!.exerciseIds, {'h-side-leg-raise'});
       expect(replyPlan(reply)!.avoid, contains('膝'));
       expect(texts(reply), isNot(contains('不合格原始文字')));
     },
@@ -1443,6 +1499,12 @@ void main() {
       expect(selected.exerciseIds, ai.lastResult!.plan!.plan.exerciseIds);
       expect(selected.avoid, contains('膝'));
       expect(
+        selected.items
+            .expand((item) => library[item.exerciseId].effectiveEquipmentIds)
+            .where((id) => id != 'none'),
+        isEmpty,
+      );
+      expect(
         PlanValidator(library).validate(selected, reply.state.request),
         isEmpty,
       );
@@ -1529,7 +1591,7 @@ void main() {
           .expand((m) => m.toolCalls)
           .single;
       expect(oldTool.name, 'show_plan');
-      expect(oldTool.arguments, contains('h-calf-raise'));
+      expect(oldTool.arguments, contains('h-side-leg-raise'));
       expect(
         client.requests[2].messages.any(
           (m) =>
@@ -1684,8 +1746,19 @@ void main() {
       ], latency: Duration.zero);
       final ai = engine(client);
       final confirmed = await ai.reply('办公室，徒手，保护膝', const ChatState());
-      final fallback = await ai.reply('10 分钟全身', confirmed.state);
+      final fallback = await ai.reply('10 分钟肩颈放松', confirmed.state);
       final selected = replyPlan(fallback)!;
+      final pelvis = selected.items.singleWhere(
+        (item) => item.exerciseId == 'n-pelvis-circle',
+      );
+      final canonicalDose = catalog['n-pelvis-circle']!.defaultDose;
+      expect(canonicalDose.mode, coach.DoseMode.reps);
+      expect(pelvis.mode.name, canonicalDose.mode.name);
+      expect(pelvis.sets, canonicalDose.sets);
+      expect(pelvis.reps, canonicalDose.reps);
+      expect(pelvis.workSeconds, canonicalDose.seconds);
+      expect(pelvis.restSeconds, canonicalDose.restSeconds);
+      expect(pelvis.perSide, catalog['n-pelvis-circle']!.unilateral);
       expect(selected.scene, 'office');
       expect(selected.avoid, contains('膝'));
       expect(fallback.state.coachContext!.equipment, isEmpty);
@@ -1701,8 +1774,33 @@ void main() {
       for (final item in selected.items) {
         final exercise = library[item.exerciseId];
         expect(exercise.isFloor, isFalse, reason: exercise.id);
+        expect(
+          exercise.effectiveEquipmentIds.where((id) => id != 'none'),
+          isEmpty,
+          reason: exercise.id,
+        );
         expect(exercise.cautions, isNot(contains('膝')), reason: exercise.id);
       }
+      // The old full-body template cannot reach ten minutes with only the
+      // explicitly available, knee-safe office actions. Keep that limitation
+      // honest: the SDK must reject its short card rather than label it 10 min.
+      final limited = engine(
+        coach.FakeLlmClient([
+          for (var i = 0; i < 5; i++)
+            const coach.LlmException(
+              coach.LlmErrorKind.network,
+              'test offline',
+              retryAfter: Duration.zero,
+            ),
+        ], latency: Duration.zero),
+      );
+      final rejected = await limited.reply('10 分钟全身', confirmed.state);
+      expect(limited.lastResult!.status, coach.TurnStatus.fallback);
+      expect(limited.lastResult!.plan, isNull);
+      expect(replyPlan(rejected), isNull);
+      expect(rejected.state.coachContext!.scene, 'office');
+      expect(rejected.state.coachContext!.avoid, contains('膝'));
+      expect(rejected.state.coachContext!.equipment, isEmpty);
     },
   );
 
@@ -1814,20 +1912,43 @@ void main() {
   );
 
   test(
-    '100 and 120 minute inputs clamp to 60 as whole numbers before the SDK gate',
+    '100 and 120 minute inputs keep integer App limits and SDK rejects false 60-minute fulfilment',
     () async {
-      final client = coach.FakeLlmClient([
-        planResponse(value: plan(minutes: 60)),
-        planResponse(value: plan(minutes: 60)),
-      ], latency: Duration.zero);
-      final ai = engine(client);
+      // SDK 0.7 also parses the original user message. It must not accept a
+      // 60-minute card as fulfilling an explicit 100/120-minute request.
       for (final minutes in [100, 120]) {
+        final client = coach.FakeLlmClient([
+          for (var attempt = 0; attempt < 3; attempt++)
+            planResponse(value: plan(minutes: 60)),
+        ], latency: Duration.zero);
+        final ai = engine(client);
         final reply = await ai.reply('在家 $minutes 分钟练全身，徒手', const ChatState());
-        expect(ai.lastResult!.status, coach.TurnStatus.ok);
         expect(reply.state.coachContext!.minutes, 60);
-        expect(replyPlan(reply)!.targetMinutes, 60);
+        expect(reply.state.coachContext!.minutes, isA<int>());
+        expect(ai.lastResult!.status, coach.TurnStatus.fallback);
+        expect(ai.lastResult!.submissions, 3);
+        expect(replyPlan(reply), isNull);
+        expect(ai.lastResult!.plan, isNull);
+        expect(texts(reply), startsWith('预设方案'));
+        expect(client.requests, hasLength(3));
+        final feedback =
+            jsonDecode(client.requests[1].messages.last.content) as Map;
+        expect(
+          (feedback['errors'] as List).cast<Map>(),
+          contains(
+            predicate<Map>(
+              (issue) =>
+                  issue['code'] == 'context_conflict' &&
+                  issue['path'] == 'targetMinutes' &&
+                  issue['expected'].toString().contains('$minutes'),
+            ),
+          ),
+        );
+        expect(
+          client.requests.first.messages.last.content,
+          endsWith('在家 $minutes 分钟练全身，徒手'),
+        );
       }
-      expect(client.requests, hasLength(2));
     },
   );
 
@@ -2020,7 +2141,7 @@ void main() {
       expect(first.id, isNot('model-reused-id'));
       expect(second.id, isNot('model-reused-id'));
       expect(first.id, isNot(second.id));
-      expect(first.exerciseIds, {'h-calf-raise'});
+      expect(first.exerciseIds, {'h-side-leg-raise'});
       expect(second.exerciseIds, {'h-squat'});
       final storage = _Storage();
       final store = AppStore(storage);

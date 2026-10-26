@@ -43,6 +43,14 @@ class PoseHubMediaException implements Exception {
   String toString() => message;
 }
 
+/// Optional settings capability. Only this repository's current version and
+/// catalogue are managed; bundled images, other versions and user data stay.
+abstract interface class PoseHubVideoCache {
+  /// Published video bytes on disk, excluding images and unfinished downloads.
+  Future<int> videoCacheBytes();
+  Future<void> clearVideoCache();
+}
+
 /// Internal platform boundary, so the public service also compiles for Web.
 abstract interface class PoseHubMediaFileStore {
   Uri get mediaBaseUri;
@@ -61,5 +69,8 @@ abstract interface class PoseHubMediaFileStore {
     void Function() onVerifying,
   );
   Future<Uri> materialize(coach.PoseHubPackFile file, Uri source);
+  void cancelVideoDownloads();
+  Future<int> videoCacheBytes();
+  Future<void> clearVideoCache();
   void dispose();
 }

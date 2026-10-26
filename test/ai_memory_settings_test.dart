@@ -10,6 +10,7 @@ import 'package:smartfit/chat/ai_coach_config.dart';
 import 'package:smartfit/core/storage/local_state_storage.dart';
 import 'package:smartfit/data/app_store.dart';
 import 'package:smartfit/ui/about_page.dart';
+import 'package:smartfit/ui/settings_widgets.dart';
 import 'package:smartfit/ui/theme.dart';
 import 'package:smartfit/voice/voice_library.dart';
 import 'package:smartfit/voice/voice_queue.dart';
@@ -72,6 +73,12 @@ Future<void> _show(WidgetTester tester, AppServices services) async {
     ),
   );
   await tester.pumpAndSettle();
+}
+
+Future<void> _confirmClear(WidgetTester tester) async {
+  await tester.tap(find.byKey(const ValueKey('ai-memory-clear')));
+  await tester.pumpAndSettle();
+  await tester.tap(find.byKey(const ValueKey('ai-memory-confirm')));
 }
 
 void main() {
@@ -170,16 +177,16 @@ void main() {
     ]);
     await _show(tester, s);
     final toggle = find.byKey(const ValueKey('ai-memory-switch'));
-    expect(tester.widget<SfSwitchRow>(toggle).value, isTrue);
+    expect(tester.widget<SfSettingsSwitchRow>(toggle).value, isTrue);
     await tester.tap(toggle);
     await tester.pumpAndSettle();
-    expect(tester.widget<SfSwitchRow>(toggle).value, isFalse);
+    expect(tester.widget<SfSettingsSwitchRow>(toggle).value, isFalse);
     final restarted = AppStore(storage);
     await restarted.load();
     expect(restarted.aiMemoryEnabled, isFalse);
     expect((await restarted.aiMemoryStore.load()).single.text, '家里有哑铃');
 
-    await tester.tap(find.byKey(const ValueKey('ai-memory-clear')));
+    await _confirmClear(tester);
     await tester.pumpAndSettle();
     expect(await restarted.aiMemoryStore.load(), isEmpty);
     expect(find.text('AI 记忆已清除'), findsOneWidget);
@@ -202,15 +209,39 @@ void main() {
     ]);
     storage.failWriteKey = LocalUserMemoryStore.key;
     await _show(tester, s);
-    await tester.tap(find.byKey(const ValueKey('ai-memory-clear')));
+    await _confirmClear(tester);
     await tester.pumpAndSettle();
     expect(find.text('清除记忆失败，请重试'), findsOneWidget);
     expect(find.text('AI 记忆已清除'), findsNothing);
     expect((await s.store.aiMemoryStore.load()).single.text, '新手');
     storage.failWriteKey = null;
-    await tester.tap(find.byKey(const ValueKey('ai-memory-clear')));
+    await _confirmClear(tester);
     await tester.pumpAndSettle();
     expect(await s.store.aiMemoryStore.load(), isEmpty);
+    await tester.pumpWidget(const SizedBox());
+  });
+
+  testWidgets('cancelling memory confirmation preserves remembered data', (
+    tester,
+  ) async {
+    final storage = _Storage();
+    final services = _services(storage, ai: true);
+    addTearDown(services.dispose);
+    await services.store.aiMemoryStore.save([
+      coach.MemoryEntry(
+        coach.MemoryKind.level,
+        '新手',
+        at: DateTime.utc(2026, 10, 21),
+      ),
+    ]);
+    await _show(tester, services);
+    await tester.tap(find.byKey(const ValueKey('ai-memory-clear')));
+    await tester.pumpAndSettle();
+    expect((await services.store.aiMemoryStore.load()).single.text, '新手');
+    await tester.tap(find.text('取消'));
+    await tester.pumpAndSettle();
+    expect((await services.store.aiMemoryStore.load()).single.text, '新手');
+    expect(find.text('AI 记忆已清除'), findsNothing);
     await tester.pumpWidget(const SizedBox());
   });
 
@@ -224,7 +255,7 @@ void main() {
     final toggle = find.byKey(const ValueKey('ai-memory-switch'));
     await tester.tap(toggle);
     await tester.pumpAndSettle();
-    expect(tester.widget<SfSwitchRow>(toggle).value, isFalse);
+    expect(tester.widget<SfSettingsSwitchRow>(toggle).value, isFalse);
     expect(find.text('记忆开关保存失败，请重试'), findsOneWidget);
     storage.failWriteKey = null;
     await tester.tap(toggle);

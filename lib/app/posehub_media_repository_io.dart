@@ -14,6 +14,7 @@ Future<PoseHubMediaFileStore> createPoseHubMediaStore({
   required String packVersion,
   required String? rootDirectory,
   required List<coach.PoseHubPackFile> files,
+  required List<coach.PoseHubPackFile> videos,
   required List<Uri> mediaBaseUrls,
   required bool allowInsecureLocalhost,
   required Duration timeout,
@@ -61,6 +62,7 @@ Future<PoseHubMediaFileStore> createPoseHubMediaStore({
   return _FileStore(
     canonical,
     files,
+    videos,
     allowInsecureLocalhost,
     timeout,
     maxRedirects,
@@ -110,6 +112,7 @@ class _FileStore implements PoseHubMediaFileStore {
   _FileStore(
     this.root,
     this.files,
+    this.videos,
     this.allowLocal,
     this.timeout,
     this.maxRedirects,
@@ -117,10 +120,11 @@ class _FileStore implements PoseHubMediaFileStore {
 
   final Directory root;
   final List<coach.PoseHubPackFile> files;
+  final List<coach.PoseHubPackFile> videos;
   final bool allowLocal;
   final Duration timeout;
   final int maxRedirects;
-  final _clients = <HttpClient>{};
+  final _clients = <HttpClient, String>{};
   final _random = Random.secure();
   bool _disposed = false;
 
@@ -233,7 +237,7 @@ class _FileStore implements PoseHubMediaFileStore {
     final client = HttpClient()
       ..connectionTimeout = timeout
       ..autoUncompress = false;
-    _clients.add(client);
+    _clients[client] = file.path;
     try {
       var current = url;
       for (var redirects = 0; ; redirects++) {
@@ -373,10 +377,53 @@ class _FileStore implements PoseHubMediaFileStore {
   }
 
   @override
+  void cancelVideoDownloads() {
+    final videoPaths = videos.map((file) => file.path).toSet();
+    for (final entry in _clients.entries.toList()) {
+      if (videoPaths.contains(entry.value)) entry.key.close(force: true);
+    }
+  }
+
+  @override
+  Future<int> videoCacheBytes() async {
+    _check();
+    var bytes = 0;
+    for (final video in videos) {
+      final target = await _target(video.path);
+      try {
+        final stat = await target.stat();
+        if (stat.type == FileSystemEntityType.file) bytes += stat.size;
+      } on FileSystemException {
+        // A download/clear may change an entry during this usage snapshot.
+      }
+    }
+    return bytes;
+  }
+
+  @override
+  Future<void> clearVideoCache() async {
+    _check();
+    for (final video in videos) {
+      final target = await _target(video.path);
+      if (await target.exists()) await target.delete();
+      if (!await target.parent.exists()) continue;
+      final filename = target.uri.pathSegments.last;
+      final ownedPart = RegExp(
+        '^${RegExp.escape(filename)}\\.\\d+_\\d+_\\d+\\.part\$',
+      );
+      await for (final entry in target.parent.list(followLinks: false)) {
+        if (entry is File && ownedPart.hasMatch(entry.uri.pathSegments.last)) {
+          await entry.delete();
+        }
+      }
+    }
+  }
+
+  @override
   void dispose() {
     if (_disposed) return;
     _disposed = true;
-    for (final client in _clients.toList()) {
+    for (final client in _clients.keys.toList()) {
       client.close(force: true);
     }
   }

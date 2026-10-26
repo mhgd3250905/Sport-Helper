@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smartfit/app/services.dart';
+import 'package:smartfit/app/training_media_config.dart';
 import 'package:smartfit/core/storage/local_state_storage.dart';
 import 'package:smartfit/data/app_store.dart';
 import 'package:smartfit/diagnostics/action_issue.dart';
@@ -370,6 +371,12 @@ void main() {
         };
       });
       await _show(tester, services, const AboutPage());
+      await tester.scrollUntilVisible(
+        find.byKey(const ValueKey('action-issues-open')), 250,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.tap(find.byKey(const ValueKey('action-issues-open')));
+      await tester.pumpAndSettle();
       final export = find.byKey(const ValueKey('action-issues-export'));
       await tester.ensureVisible(export);
       await tester.pumpAndSettle();
@@ -387,5 +394,6 @@ void main() {
       expect(services.store.actionIssueStore.count, 1);
       await tester.pumpWidget(const SizedBox.shrink());
     },
+    skip: !TrainingMediaConfig.isInternal,
   );
 }

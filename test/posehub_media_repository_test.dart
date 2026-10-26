@@ -933,6 +933,281 @@ void main() {
   );
 
   test(
+    'video cache usage and clear preserve images, data and other versions',
+    () async {
+      final repo = await create(
+        bundled: (file) async => fixture.bodies[file.path],
+      );
+      expect(repo, isA<PoseHubVideoCache>());
+      final cache = repo as PoseHubVideoCache;
+      await repo.ensureAction(fixture.first.id);
+      await repo.ensureFile(fixture.catalog.allActions.last.video);
+      final video = fixture.first.video;
+      final target = File.fromUri(video.resolve(repo.mediaBaseUri));
+      expect(
+        await cache.videoCacheBytes(),
+        fixture.catalog.allActions.fold<int>(
+          0,
+          (n, action) => n + action.video.bytes,
+        ),
+      );
+      // Usage counts actual published video bytes, rather than image/metadata sizes.
+      await target.writeAsBytes([1, 2, 3]);
+      final stale = File('${target.path}.123_456_789.part');
+      await stale.writeAsBytes([4, 5]);
+      final preserved = <File, List<int>>{};
+      for (final directory in [
+        '${support.path}/training-data',
+        '${support.path}/posehub/app-test-pack-r1-v2',
+        '${support.path}/posehub-media/r1-v2/${fixture.revision}',
+        '${support.path}/posehub-media/r1-v3/${'b' * 64}',
+      ]) {
+        final isTrainingData = directory.endsWith('/training-data');
+        final keep = isTrainingData
+            ? File('$directory/history.json')
+            : File.fromUri(Directory(directory).uri.resolve(video.path));
+        final bytes = isTrainingData
+            ? utf8.encode('keep-user-data')
+            : fixture.bodies[video.path]!;
+        await keep.parent.create(recursive: true);
+        await keep.writeAsBytes(bytes);
+        preserved[keep] = bytes;
+      }
+      expect(
+        await cache.videoCacheBytes(),
+        3 + fixture.catalog.allActions.last.video.bytes,
+      );
+      await cache.clearVideoCache();
+      expect(await cache.videoCacheBytes(), 0);
+      expect(await stale.exists(), isFalse);
+      for (final action in fixture.catalog.allActions) {
+        expect(
+          await File.fromUri(action.video.resolve(repo.mediaBaseUri)).exists(),
+          isFalse,
+        );
+      }
+      for (final image in [fixture.first.cover, fixture.first.thumbnail]) {
+        expect(
+          await File.fromUri(image.resolve(repo.mediaBaseUri)).readAsBytes(),
+          fixture.bodies[image.path],
+        );
+      }
+      for (final keep in preserved.entries) {
+        expect(await keep.key.readAsBytes(), keep.value);
+      }
+      await noParts(repo);
+    },
+  );
+
+  test(
+    'clear cancels in-flight video and prevents late publish before redownload',
+    () async {
+      fixture = _Fixture(videoBytes: 32768);
+      final release = Completer<void>();
+      final oldServerDone = Completer<void>();
+      var firstRequest = true;
+      handler = (request) async {
+        final bytes = fixture.bodies[fixture.first.video.path]!;
+        if (!firstRequest) {
+          request.response.contentLength = bytes.length;
+          request.response.add(bytes);
+          await request.response.close();
+          return;
+        }
+        firstRequest = false;
+        try {
+          request.response.bufferOutput = false;
+          request.response.contentLength = bytes.length;
+          request.response.add(bytes.sublist(0, bytes.length ~/ 2));
+          await request.response.flush();
+          await release.future;
+          request.response.add(bytes.sublist(bytes.length ~/ 2));
+          await request.response.close();
+        } catch (_) {
+          // The client intentionally closes this socket during cache retirement.
+        } finally {
+          oldServerDone.complete();
+        }
+      };
+      final repo = await create(progressInterval: Duration.zero);
+      final cache = repo as PoseHubVideoCache;
+      final file = fixture.first.video;
+      final old = repo.ensureFile(file);
+      final cancelled = expectLater(
+        old,
+        throwsA(
+          isA<PoseHubMediaException>().having(
+            (e) => e.code,
+            'code',
+            'cache_cleared',
+          ),
+        ),
+      );
+      try {
+        await _until(() => repo.watchFile(file).value.receivedBytes > 0);
+        final clearing = cache.clearVideoCache();
+        expect(cache.clearVideoCache(), same(clearing));
+        await clearing.timeout(const Duration(seconds: 2));
+        await cancelled;
+        expect(await cache.videoCacheBytes(), 0);
+        expect(
+          await File.fromUri(file.resolve(repo.mediaBaseUri)).exists(),
+          isFalse,
+        );
+        await noParts(repo);
+        release.complete();
+        await oldServerDone.future;
+        expect(
+          await File.fromUri(file.resolve(repo.mediaBaseUri)).exists(),
+          isFalse,
+        );
+        await noParts(repo);
+        final uri = await repo.ensureFile(file);
+        expect(
+          await File.fromUri(uri).readAsBytes(),
+          fixture.bodies[file.path],
+        );
+        expect(await cache.videoCacheBytes(), file.bytes);
+        expect(requested.length, 2);
+      } finally {
+        if (!release.isCompleted) release.complete();
+      }
+    },
+  );
+
+  test(
+    'queued old videos settle and new requests wait for the clear barrier',
+    () async {
+      fixture = _Fixture(videoBytes: 32768);
+      final release = Completer<void>();
+      var firstRequest = true;
+      var cleared = false;
+      handler = (request) async {
+        final bytes = fixture.bodies[request.uri.path.substring(1)]!;
+        if (firstRequest) {
+          firstRequest = false;
+          try {
+            request.response.bufferOutput = false;
+            request.response.contentLength = bytes.length;
+            request.response.add(bytes.sublist(0, bytes.length ~/ 2));
+            await request.response.flush();
+            await release.future;
+            request.response.add(bytes.sublist(bytes.length ~/ 2));
+            await request.response.close();
+          } catch (_) {}
+        } else {
+          expect(
+            cleared,
+            isTrue,
+            reason: 'No new transport can start before clear completes.',
+          );
+          request.response.contentLength = bytes.length;
+          request.response.add(bytes);
+          await request.response.close();
+        }
+      };
+      final repo = await create(
+        concurrent: 1,
+        progressInterval: Duration.zero,
+        bundled: (file) async => fixture.bodies[file.path],
+      );
+      final cache = repo as PoseHubVideoCache;
+      final first = fixture.first.video;
+      final second = fixture.catalog.allActions.last.video;
+      final old = repo.ensureFile(first);
+      final oldCancelled = expectLater(
+        old,
+        throwsA(isA<PoseHubMediaException>()),
+      );
+      await _until(() => repo.watchFile(first).value.receivedBytes > 0);
+      final queued = repo.ensureFile(second);
+      final queuedCancelled = expectLater(
+        queued,
+        throwsA(isA<PoseHubMediaException>()),
+      );
+      await _until(
+        () => repo.watchFile(second).value.phase == PoseHubDownloadPhase.queued,
+      );
+      final clearing = cache.clearVideoCache();
+      clearing.then<void>((_) {
+        cleared = true;
+      });
+      final next = repo.ensureFile(second);
+      expect(repo.ensureFile(second), same(next));
+      final nextAction = repo.ensureAction(fixture.catalog.allActions.last.id);
+      expect(
+        repo.ensureAction(fixture.catalog.allActions.last.id),
+        same(nextAction),
+      );
+      try {
+        await clearing.timeout(const Duration(seconds: 2));
+        await Future.wait([oldCancelled, queuedCancelled]);
+        expect(await next, second.resolve(repo.mediaBaseUri));
+        expect(await nextAction, repo.mediaBaseUri);
+        expect(requested, ['/${first.path}', '/${second.path}']);
+        expect(await cache.videoCacheBytes(), second.bytes);
+        await noParts(repo);
+      } finally {
+        release.complete();
+      }
+    },
+  );
+
+  test(
+    'clearing videos preserves a healthy in-flight image download',
+    () async {
+      fixture = _Fixture(videoBytes: 49152, coverBytes: 32768);
+      final imageGate = Completer<void>();
+      final videoGate = Completer<void>();
+      handler = (request) async {
+        final bytes = fixture.bodies[request.uri.path.substring(1)]!;
+        final isVideo = request.uri.path.endsWith('.mp4');
+        try {
+          request.response.bufferOutput = false;
+          request.response.contentLength = bytes.length;
+          request.response.add(bytes.sublist(0, bytes.length ~/ 2));
+          await request.response.flush();
+          await (isVideo ? videoGate.future : imageGate.future);
+          request.response.add(bytes.sublist(bytes.length ~/ 2));
+          await request.response.close();
+        } catch (_) {}
+      };
+      final repo = await create(progressInterval: Duration.zero);
+      final cache = repo as PoseHubVideoCache;
+      final image = fixture.first.cover;
+      final video = fixture.first.video;
+      final imageWork = repo.ensureFile(image);
+      final videoWork = repo.ensureFile(video);
+      final cancelled = expectLater(
+        videoWork,
+        throwsA(isA<PoseHubMediaException>()),
+      );
+      try {
+        await _until(
+          () =>
+              repo.watchFile(image).value.receivedBytes > 0 &&
+              repo.watchFile(video).value.receivedBytes > 0,
+        );
+        await cache.clearVideoCache().timeout(const Duration(seconds: 2));
+        await cancelled;
+        expect(await cache.videoCacheBytes(), 0);
+        imageGate.complete();
+        final uri = await imageWork;
+        expect(
+          await File.fromUri(uri).readAsBytes(),
+          fixture.bodies[image.path],
+        );
+        expect(repo.watchFile(image).value.phase, PoseHubDownloadPhase.ready);
+        videoGate.complete();
+        await noParts(repo);
+      } finally {
+        if (!imageGate.isCompleted) imageGate.complete();
+        if (!videoGate.isCompleted) videoGate.complete();
+      }
+    },
+  );
+
+  test(
     'action failure returns immediately and retry shares healthy pending files',
     () async {
       final cover = fixture.first.cover;

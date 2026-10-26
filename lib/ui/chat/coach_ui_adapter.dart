@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:ugk_coach/ugk_coach.dart' as coach;
 import 'package:ugk_coach_ui/ugk_coach_ui.dart';
 
+import '../../chat/chat_models.dart' show ChatMessage;
 import '../../domain/exercise.dart';
 import '../../domain/plan.dart';
 import '../../domain/session.dart';
@@ -25,6 +27,33 @@ CoachMediaPalette coachMediaPalette(SfPalette p) => CoachMediaPalette(
   onStage: p.onStage,
   onStageMuted: p.onStageMuted,
 );
+
+CoachQuestionData toCoachQuestionData(ChatMessage message) {
+  final question = message.question!;
+  return CoachQuestionData(
+    id: message.id,
+    question: question.question,
+    mode: switch (question.mode) {
+      coach.AskUserMode.text => CoachQuestionMode.text,
+      coach.AskUserMode.choice => CoachQuestionMode.choice,
+      coach.AskUserMode.form => CoachQuestionMode.form,
+    },
+    options: question.options,
+    multiple: question.multiple,
+    answered: message.questionAnswered,
+    answeredChoices: message.answeredChoices,
+    fields: [
+      for (final field in question.fields)
+        CoachQuestionField(
+          key: field.key,
+          label: field.label,
+          options: field.options,
+          multiple: field.multiple,
+        ),
+    ],
+    skipLabel: question.skipLabel,
+  );
+}
 
 CoachUiStyle smartfitCoachUiStyle() {
   final p = SfColors.palette;

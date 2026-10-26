@@ -142,16 +142,15 @@ AppServices poseHubUiServices({
   required coach.PoseHubAppTestCatalog catalog,
   required PoseHubMediaRepository? media,
   ExerciseLibrary? library,
-  Future<void>? imagesReady,
+  VoiceOutput voiceOutput = const MutedVoiceOutput(),
 }) => AppServices(
   library: library ?? ExerciseLibrary([]),
   catalog: TemplateCatalog([]),
   store: AppStore(PoseHubUiStorage())..starfield = false,
   voiceLibrary: VoiceLibrary.empty,
-  voiceOutput: const MutedVoiceOutput(),
+  voiceOutput: voiceOutput,
   poseHubCatalog: catalog,
   poseHubMedia: media,
-  poseHubImagesReady: imagesReady,
 );
 
 Widget poseHubUiApp({

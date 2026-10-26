@@ -8,11 +8,17 @@ import 'action_issue.dart';
 /// One separate value in the same local storage boundary as AppStore.
 /// A record becomes visible only after the durable write succeeds.
 class LocalActionIssueStore extends ChangeNotifier {
-  LocalActionIssueStore(this.storage, {this.enabled = actionIssueBuildEnabled});
+  LocalActionIssueStore(this.storage, {bool enabled = actionIssueBuildEnabled})
+    : available = enabled;
 
   static const storageKey = 'smartfit.action-issues.v1';
+  static const recordingKey = 'smartfit.action-issues.recording.v1';
   final LocalStateStorage storage;
-  final bool enabled;
+  final bool available;
+  bool _recordingEnabled = true;
+  bool _preferenceLoaded = false;
+  bool _preferenceInvalid = false;
+  bool get enabled => available && _recordingEnabled;
   final List<ActionIssue> _records = [];
   Future<void> _tail = Future.value();
   bool _loaded = false;
@@ -21,10 +27,39 @@ class LocalActionIssueStore extends ChangeNotifier {
   List<ActionIssue> get records => List.unmodifiable(_records);
   int get count => _records.length;
 
-  Future<void> load() => enabled ? _enqueue(_load) : Future.value();
+  Future<void> load() => available ? _enqueue(_load) : Future.value();
+
+  Future<void> loadRecordingPreference() =>
+      available ? _enqueue(_loadRecordingPreference) : Future.value();
+
+  Future<void> _loadRecordingPreference() async {
+    if (_preferenceLoaded) return;
+    Object? value;
+    try {
+      final raw = await storage.read(recordingKey);
+      value = raw == null ? true : jsonDecode(raw);
+    } on Object {
+      value = null;
+    }
+    _preferenceInvalid = value is! bool;
+    _recordingEnabled = value is bool ? value : false;
+    _preferenceLoaded = true;
+    notifyListeners();
+  }
+
+  Future<void> setRecordingEnabled(bool enabled) => _enqueue(() async {
+    _requireAvailable();
+    await _loadRecordingPreference();
+    if (_recordingEnabled == enabled && !_preferenceInvalid) return;
+    await storage.write(recordingKey, jsonEncode(enabled));
+    _recordingEnabled = enabled;
+    _preferenceInvalid = false;
+    notifyListeners();
+  });
 
   Future<void> _load() async {
     if (_loaded) return;
+    await _loadRecordingPreference();
     final raw = await storage.read(storageKey);
     if (raw != null) {
       final decoded = jsonDecode(raw) as Map<String, dynamic>;
@@ -52,8 +87,9 @@ class LocalActionIssueStore extends ChangeNotifier {
   }) {
     final selected = List<ActionIssueTag>.of(tags);
     return _enqueue(() async {
-      _requireEnabled();
+      _requireAvailable();
       await _load();
+      _requireEnabled();
       String id;
       do {
         id =
@@ -75,13 +111,17 @@ class LocalActionIssueStore extends ChangeNotifier {
 
   /// Queued behind pending writes, for a consistent export snapshot.
   Future<List<ActionIssue>> snapshot() => _enqueue(() async {
-    _requireEnabled();
+    _requireAvailable();
     await _load();
     return records;
   });
 
   void _requireEnabled() {
     if (!enabled) throw StateError('Action issue review is internal-only');
+  }
+
+  void _requireAvailable() {
+    if (!available) throw StateError('Action issue review is internal-only');
   }
 
   String _encode(List<ActionIssue> records) => jsonEncode({

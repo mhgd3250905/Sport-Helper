@@ -45,7 +45,6 @@ class AppServices {
     this.testCatalog,
     this.poseHubCatalog,
     this.poseHubMedia,
-    this.poseHubImagesReady,
   }) : templates = TemplatePlanGenerator(
          lib: library,
          catalog: catalog,
@@ -80,7 +79,6 @@ class AppServices {
   final AppTestCatalog? testCatalog;
   final coach.PoseHubAppTestCatalog? poseHubCatalog;
   final PoseHubMediaRepository? poseHubMedia;
-  final Future<void>? poseHubImagesReady;
   late final SmartFitPoseHubMediaPreparer? poseHubPreparer =
       poseHubCatalog == null
       ? null

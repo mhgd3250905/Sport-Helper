@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:ugk_trainer/ugk_trainer.dart' show DrillMediaPlaybackHandle;
+import 'package:ugk_trainer/ugk_trainer.dart'
+    show DrillMediaPlaybackHandle, PoseHubSinglePracticePage;
 
 import '../app/services.dart';
 import '../domain/exercise.dart';
@@ -8,6 +9,7 @@ import 'alpha_artwork.dart';
 import 'exercise_video.dart';
 import 'posehub_library_page.dart';
 import 'theme.dart';
+import 'theme/trainer_theme.dart';
 
 /// Every move in the library, filterable by category; tap to watch. Opened
 /// from the chat ("看看动作库", "有哪些拉伸动作" → [initial]) or the drawer.
@@ -128,14 +130,32 @@ class _LibraryPageState extends State<LibraryPage> {
 }
 
 /// Shared action details for the library and validated coach action cards.
-Future<void> showExerciseDetails(BuildContext context, Exercise e) =>
-    showModalBottomSheet<void>(
-      context: context,
-      routeSettings: const RouteSettings(name: 'exercise_details'),
-      isScrollControlled: true,
-      sheetAnimationStyle: SfMotion.sheet,
-      builder: (_) => _ExerciseDetails(exercise: e),
+Future<void> showExerciseDetails(BuildContext context, Exercise e) {
+  final services = AppServices.of(context);
+  final action = services.poseHubCatalog?.tryGet(e.id);
+  if (action != null) {
+    return Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        builder: (_) => PoseHubSinglePracticePage(
+          action: action,
+          mediaBaseUri:
+              services.poseHubMedia?.mediaBaseUri ??
+              Uri(scheme: 'file', path: '/__posehub_cache_unavailable__/'),
+          mediaPreparer: services.poseHubPreparer,
+          theme: SmartFitTrainerTheme.of(context),
+          voice: services.trainerVoice(),
+        ),
+      ),
     );
+  }
+  return showModalBottomSheet<void>(
+    context: context,
+    routeSettings: const RouteSettings(name: 'exercise_details'),
+    isScrollControlled: true,
+    sheetAnimationStyle: SfMotion.sheet,
+    builder: (_) => _ExerciseDetails(exercise: e),
+  );
+}
 
 class _ExerciseDetails extends StatefulWidget {
   const _ExerciseDetails({required this.exercise});

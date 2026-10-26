@@ -13,7 +13,8 @@ export 'posehub_media_repository_types.dart'
         PoseHubBundledFileLoader,
         PoseHubDownloadPhase,
         PoseHubDownloadState,
-        PoseHubMediaException;
+        PoseHubMediaException,
+        PoseHubVideoCache;
 
 abstract interface class PoseHubMediaRepository {
   static Future<PoseHubMediaRepository> create({
@@ -102,6 +103,7 @@ Future<PoseHubMediaRepository> _create({
     packVersion: packVersion,
     rootDirectory: rootDirectory,
     files: files.values.toList(),
+    videos: catalog.allActions.map((action) => action.video).toList(),
     mediaBaseUrls: bases,
     allowInsecureLocalhost: allowInsecureLocalhost,
     timeout: timeout,
@@ -119,7 +121,7 @@ Future<PoseHubMediaRepository> _create({
   );
 }
 
-class _Repository implements PoseHubMediaRepository {
+class _Repository implements PoseHubMediaRepository, PoseHubVideoCache {
   _Repository(
     this.catalog,
     this.files,
@@ -150,24 +152,34 @@ class _Repository implements PoseHubMediaRepository {
   final _fileJobs = <String, Future<Uri>>{};
   final _contentJobs = <String, Future<Uri>>{};
   final _actionJobs = <String, Future<Uri>>{};
+  final _afterClearFiles = <String, Future<Uri>>{};
+  final _afterClearActions = <String, Future<Uri>>{};
   final _fileStates = <String, ValueNotifier<PoseHubDownloadState>>{};
   final _actionStates = <String, ValueNotifier<PoseHubDownloadState>>{};
   final _actionsForFile = <String, Set<String>>{};
   final _filesForHash = <String, List<coach.PoseHubPackFile>>{};
   final _images = <String>{};
   final _lastProgress = <String, DateTime>{};
-  final _queue = <Completer<void>>[];
+  final _queue = <({Completer<void> ready, int? generation})>[];
   int _active = 0;
+  int _generation = 0;
+  Future<void>? _clearing;
   bool _disposed = false;
 
   @override
   Uri get mediaBaseUri => store.mediaBaseUri;
 
-  void _check() {
+  void _check([int? generation]) {
     if (_disposed) {
       throw const PoseHubMediaException(
         'disposed',
         'Media preparation stopped.',
+      );
+    }
+    if (generation != null && generation != _generation) {
+      throw const PoseHubMediaException(
+        'cache_cleared',
+        'Video preparation stopped while its cache was cleared.',
       );
     }
   }
@@ -298,8 +310,17 @@ class _Repository implements PoseHubMediaRepository {
     } catch (error, stack) {
       return Future.error(error, stack);
     }
+    if (_clearing case final barrier?) {
+      return _afterClear(
+        _afterClearFiles,
+        file.path,
+        barrier,
+        () => ensureFile(file),
+      );
+    }
     if (_fileJobs[file.path] case final job?) return job;
-    final job = Future<Uri>.microtask(() => _ensureFile(file));
+    final generation = _images.contains(file.path) ? null : _generation;
+    final job = Future<Uri>.microtask(() => _ensureFile(file, generation));
     _fileJobs[file.path] = job;
     job.then<void>(
       (_) {
@@ -312,20 +333,21 @@ class _Repository implements PoseHubMediaRepository {
     return job;
   }
 
-  Future<Uri> _ensureFile(coach.PoseHubPackFile file) async {
+  Future<Uri> _ensureFile(coach.PoseHubPackFile file, int? generation) async {
     try {
+      _check(generation);
       _set(file, PoseHubDownloadPhase.checking);
       final cached = await store.cached(file);
-      _check();
+      _check(generation);
       if (cached != null) {
         _set(file, PoseHubDownloadPhase.ready, received: file.bytes);
         return cached;
       }
-      final content = await _content(file);
-      _check();
+      final content = await _content(file, generation);
+      _check(generation);
       _set(file, PoseHubDownloadPhase.verifying, received: file.bytes);
       final uri = await store.materialize(file, content);
-      _check();
+      _check(generation);
       _set(file, PoseHubDownloadPhase.ready, received: file.bytes);
       return uri;
     } catch (error) {
@@ -335,9 +357,9 @@ class _Repository implements PoseHubMediaRepository {
     }
   }
 
-  Future<Uri> _content(coach.PoseHubPackFile file) {
+  Future<Uri> _content(coach.PoseHubPackFile file, int? generation) {
     if (_contentJobs[file.sha256] case final job?) return job;
-    final job = Future<Uri>.microtask(() => _prepareContent(file));
+    final job = Future<Uri>.microtask(() => _prepareContent(file, generation));
     _contentJobs[file.sha256] = job;
     job.then<void>(
       (_) {
@@ -350,11 +372,11 @@ class _Repository implements PoseHubMediaRepository {
     return job;
   }
 
-  Future<void> _acquire() async {
-    _check();
+  Future<void> _acquire(int? generation) async {
+    _check(generation);
     if (_active >= maxConcurrent) {
       final waiter = Completer<void>();
-      _queue.add(waiter);
+      _queue.add((ready: waiter, generation: generation));
       await waiter.future;
     } else {
       _active++;
@@ -365,18 +387,21 @@ class _Repository implements PoseHubMediaRepository {
     if (_queue.isEmpty) {
       _active--;
     } else {
-      _queue.removeAt(0).complete();
+      _queue.removeAt(0).ready.complete();
     }
   }
 
-  Future<Uri> _prepareContent(coach.PoseHubPackFile file) async {
+  Future<Uri> _prepareContent(
+    coach.PoseHubPackFile file,
+    int? generation,
+  ) async {
     _contentState(file, PoseHubDownloadPhase.queued);
-    await _acquire();
+    await _acquire(generation);
     try {
-      _check();
+      _check(generation);
       _contentState(file, PoseHubDownloadPhase.checking);
       final reusable = await store.reusable(file);
-      _check();
+      _check(generation);
       if (reusable != null) return reusable;
       void progress(int n) =>
           _contentState(file, PoseHubDownloadPhase.downloading, received: n);
@@ -387,7 +412,7 @@ class _Repository implements PoseHubMediaRepository {
       );
       if (_images.contains(file.path) && loadBundle != null) {
         final bytes = await loadBundle!(file).timeout(timeout);
-        _check();
+        _check(generation);
         if (bytes != null) {
           return await store.bundled(file, bytes, progress, verifying);
         }
@@ -400,7 +425,7 @@ class _Repository implements PoseHubMediaRepository {
       }
       Object? failure;
       for (final base in bases) {
-        _check();
+        _check(generation);
         _contentState(file, PoseHubDownloadPhase.downloading);
         try {
           return await store.download(
@@ -412,7 +437,7 @@ class _Repository implements PoseHubMediaRepository {
         } catch (error) {
           // A disposed consumer does not start a new mirror request. Each
           // failed transport has already closed and removed its own temp file.
-          _check();
+          _check(generation);
           failure = error;
         }
       }
@@ -429,6 +454,14 @@ class _Repository implements PoseHubMediaRepository {
       action = _action(actionId);
     } catch (error, stack) {
       return Future.error(error, stack);
+    }
+    if (_clearing case final barrier?) {
+      return _afterClear(
+        _afterClearActions,
+        actionId,
+        barrier,
+        () => ensureAction(actionId),
+      );
     }
     if (_actionJobs[actionId] case final job?) return job;
     final job = Future.wait(
@@ -447,13 +480,102 @@ class _Repository implements PoseHubMediaRepository {
     return job;
   }
 
+  Future<Uri> _afterClear(
+    Map<String, Future<Uri>> waiting,
+    String key,
+    Future<void> barrier,
+    Future<Uri> Function() start,
+  ) {
+    if (waiting[key] case final existing?) return existing;
+    late Future<Uri> next;
+    void forget() {
+      if (identical(waiting[key], next)) waiting.remove(key);
+    }
+
+    next = barrier.then((_) {
+      forget();
+      return start();
+    });
+    waiting[key] = next;
+    next.then<void>(
+      (_) => forget(),
+      onError: (Object _, StackTrace _) => forget(),
+    );
+    return next;
+  }
+
+  @override
+  Future<int> videoCacheBytes() async {
+    _check();
+    await _clearing;
+    _check();
+    return store.videoCacheBytes();
+  }
+
+  @override
+  Future<void> clearVideoCache() {
+    try {
+      _check();
+    } catch (error, stack) {
+      return Future.error(error, stack);
+    }
+    if (_clearing case final existing?) return existing;
+    final job = Future<void>.microtask(_clearVideos);
+    _clearing = job;
+    job.then<void>(
+      (_) {
+        _clearing = null;
+      },
+      onError: (Object _, StackTrace _) {
+        _clearing = null;
+      },
+    );
+    return job;
+  }
+
+  Future<void> _clearVideos() async {
+    // SDK TrainingMediaRepository uses the same retire/cancel/await ordering.
+    // Here the retirement and filesystem deletion are scoped to videos only.
+    _generation++;
+    final old = [
+      for (final entry in _fileJobs.entries)
+        if (!_images.contains(entry.key)) entry.value,
+    ];
+    final queuedVideos = _queue
+        .where((entry) => entry.generation != null)
+        .toList();
+    _queue.removeWhere((entry) => entry.generation != null);
+    for (final queued in queuedVideos) {
+      queued.ready.completeError(
+        const PoseHubMediaException(
+          'cache_cleared',
+          'Video preparation stopped while its cache was cleared.',
+        ),
+      );
+    }
+    store.cancelVideoDownloads();
+    await Future.wait(
+      old.map(
+        (job) => job.then<void>((_) {}, onError: (Object _, StackTrace _) {}),
+      ),
+    );
+    _check();
+    await store.clearVideoCache();
+    _check();
+    for (final action in catalog.allActions) {
+      if (_fileStates.containsKey(action.video.path)) {
+        _set(action.video, PoseHubDownloadPhase.idle);
+      }
+    }
+  }
+
   @override
   void dispose() {
     if (_disposed) return;
     _disposed = true;
     store.dispose();
     for (final queued in _queue) {
-      queued.completeError(
+      queued.ready.completeError(
         const PoseHubMediaException('disposed', 'Media preparation stopped.'),
       );
     }

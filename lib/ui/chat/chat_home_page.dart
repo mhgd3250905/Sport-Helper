@@ -47,7 +47,8 @@ class ChatHomePage extends StatefulWidget {
   State<ChatHomePage> createState() => _ChatHomePageState();
 }
 
-class _ChatHomePageState extends State<ChatHomePage> {
+class _ChatHomePageState extends State<ChatHomePage>
+    with WidgetsBindingObserver {
   late ChatController _chat;
   StreamSubscription<String>? _actions;
   late final _scroll = widget.scrollController ?? ScrollController();
@@ -63,6 +64,31 @@ class _ChatHomePageState extends State<ChatHomePage> {
   final _seen = <String>{};
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  void _dismissInput() {
+    _input.unfocus(disposition: UnfocusDisposition.scope);
+    unawaited(SystemChannels.textInput.invokeMethod<void>('TextInput.hide'));
+  }
+
+  void _openDrawer() {
+    _dismissInput();
+    _scaffold.currentState?.openDrawer();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if ((state == AppLifecycleState.inactive ||
+            state == AppLifecycleState.resumed) &&
+        (ModalRoute.of(context)?.isCurrent ?? false)) {
+      _dismissInput();
+    }
+  }
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (_actions != null) return;
@@ -75,6 +101,7 @@ class _ChatHomePageState extends State<ChatHomePage> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _actions?.cancel();
     if (widget.scrollController == null) _scroll.dispose();
     _input.dispose();
@@ -93,26 +120,31 @@ class _ChatHomePageState extends State<ChatHomePage> {
       case '@custom':
         _push(const CustomPlanPage());
       case '@drawer':
-        _scaffold.currentState?.openDrawer();
+        _openDrawer();
     }
   }
 
-  Future<void> _push(Widget page) => Navigator.of(context).push(
-    MaterialPageRoute<void>(
-      settings: RouteSettings(
-        name: switch (page) {
-          LibraryPage() => 'library',
-          AboutPage() => 'settings',
-          CustomPlanPage() => 'custom_plan',
-          _ => 'other',
-        },
+  Future<void> _push(Widget page) async {
+    _dismissInput();
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        settings: RouteSettings(
+          name: switch (page) {
+            LibraryPage() => 'library',
+            AboutPage() => 'settings',
+            CustomPlanPage() => 'custom_plan',
+            _ => 'other',
+          },
+        ),
+        builder: (_) => page,
       ),
-      builder: (_) => page,
-    ),
-  );
+    );
+    if (mounted) _dismissInput();
+  }
 
   /// Close the drawer first so the chat (or the player) is what you see.
   void _fromDrawer(Future<void> Function() then) {
+    _dismissInput();
     _scaffold.currentState?.closeDrawer();
     unawaited(then());
   }
@@ -136,6 +168,7 @@ class _ChatHomePageState extends State<ChatHomePage> {
     if (!await _chat.started(p)) return;
     if (!mounted) return;
     s.prefetchPlan(p);
+    _dismissInput();
     final result = await Navigator.of(context).push(
       TrainingRoute<SessionResult>(
         settings: const RouteSettings(name: 'player'),
@@ -143,6 +176,7 @@ class _ChatHomePageState extends State<ChatHomePage> {
       ),
     );
     if (!mounted) return;
+    _dismissInput();
     if (result != null) {
       _chat.finished(
         p,
@@ -159,6 +193,7 @@ class _ChatHomePageState extends State<ChatHomePage> {
   }
 
   Future<void> _details(ChatMessage m, {TrainingPlan? validatedPlan}) async {
+    _dismissInput();
     final plan = await Navigator.of(context).push<TrainingPlan>(
       MaterialPageRoute(
         settings: const RouteSettings(name: 'plan'),
@@ -169,7 +204,9 @@ class _ChatHomePageState extends State<ChatHomePage> {
         ),
       ),
     );
-    if (mounted && plan != null) await _start(plan);
+    if (!mounted) return;
+    _dismissInput();
+    if (plan != null) await _start(plan);
   }
 
   void _toast(String text, {SfGlyph icon = SfGlyph.checkCircle}) {
@@ -285,8 +322,7 @@ class _ChatHomePageState extends State<ChatHomePage> {
                                   focusNode: _input,
                                   onSend: _send,
                                   enabled: !_chat.typing,
-                                  onPlans: () =>
-                                      _scaffold.currentState?.openDrawer(),
+                                  onPlans: _openDrawer,
                                 ),
                               ],
                             ),
@@ -355,20 +391,15 @@ class _ChatHomePageState extends State<ChatHomePage> {
         if (m.question case final question?)
           CoachQuestionBubble(
             key: ValueKey('coach-question-${m.id}'),
-            question: CoachQuestionData(
-              id: m.id,
-              question: question.question,
-              mode: question.mode == coach.AskUserMode.text
-                  ? CoachQuestionMode.text
-                  : CoachQuestionMode.choice,
-              options: question.options,
-              multiple: question.multiple,
-              answered: m.questionAnswered,
-              answeredChoices: m.answeredChoices,
-            ),
+            question: toCoachQuestionData(m),
             enabled: _chat.canAnswerQuestion(m),
-            onTextAnswer: (answer) => _chat.answerQuestion(m, answer),
+            onTextAnswer: (answer) =>
+                question.mode == coach.AskUserMode.form &&
+                    answer == question.skipLabel
+                ? _chat.skipQuestion(m)
+                : _chat.answerQuestion(m, answer),
             onChoiceAnswer: (choices) => _chat.answerChoices(m, choices),
+            onFormAnswer: (answers) => _chat.answerForm(m, answers),
           ),
         if (hasText &&
             (m.question == null ||

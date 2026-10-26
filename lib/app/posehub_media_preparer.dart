@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
 import 'package:ugk_trainer/ugk_trainer.dart' as sdk;
 
+import '../diagnostics/runtime_log.dart';
 import 'posehub_media_repository.dart';
 
 /// Each SDK consumer owns a subscription, while the repository owns downloads.
@@ -23,6 +24,11 @@ class SmartFitPoseHubMediaPreparer implements sdk.PoseHubMediaPreparer {
     }
     late StreamController<sdk.PoseHubMediaPreparationEvent> stream;
     void Function()? removeProgress;
+    void Function()? removeVideoProgress;
+    final log = RuntimeLog.instance;
+    final operation = log.newOperation('posehub_prepare');
+    final elapsed = Stopwatch();
+    var downloadedVideo = false;
     var active = false;
     var terminal = false;
     final expectedTotal = action.files.values.fold<int>(
@@ -33,11 +39,31 @@ class SmartFitPoseHubMediaPreparer implements sdk.PoseHubMediaPreparer {
       active = false;
       removeProgress?.call();
       removeProgress = null;
+      removeVideoProgress?.call();
+      removeVideoProgress = null;
     }
 
     void finish(sdk.PoseHubMediaPreparationEvent event) {
       if (!active || terminal) return;
       terminal = true;
+      elapsed.stop();
+      log.record(
+        event is sdk.PoseHubMediaReady
+            ? 'posehub.prepare.ready'
+            : 'posehub.prepare.failed',
+        operation: operation,
+        fields: {
+          'actionId': action.id,
+          'source': downloadedVideo
+              ? 'network'
+              : event is sdk.PoseHubMediaReady
+              ? 'local_verified'
+              : 'not_prepared',
+          'verified': event is sdk.PoseHubMediaReady,
+          'elapsedMs': elapsed.elapsedMilliseconds,
+          'totalBytes': action.video.bytes,
+        },
+      );
       stream.add(event);
       retire();
       unawaited(stream.close());
@@ -46,6 +72,7 @@ class SmartFitPoseHubMediaPreparer implements sdk.PoseHubMediaPreparer {
     stream = StreamController<sdk.PoseHubMediaPreparationEvent>(
       onListen: () {
         active = true;
+        elapsed.start();
         try {
           final state = repository.watchAction(action.id);
           void progress() {
@@ -66,6 +93,24 @@ class SmartFitPoseHubMediaPreparer implements sdk.PoseHubMediaPreparer {
 
           state.addListener(progress);
           removeProgress = () => state.removeListener(progress);
+          if (log.enabled) {
+            final videoState = repository.watchFile(action.video);
+            void videoProgress() {
+              if (videoState.value.phase == PoseHubDownloadPhase.downloading) {
+                downloadedVideo = true;
+              }
+            }
+
+            videoState.addListener(videoProgress);
+            removeVideoProgress = () =>
+                videoState.removeListener(videoProgress);
+            videoProgress();
+            log.record(
+              'posehub.prepare.requested',
+              operation: operation,
+              fields: {'actionId': action.id},
+            );
+          }
           progress();
           unawaited(
             Future<Uri>.sync(

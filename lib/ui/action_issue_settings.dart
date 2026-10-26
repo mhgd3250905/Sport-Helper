@@ -77,7 +77,7 @@ class _ActionIssueSettingsState extends State<ActionIssueSettings> {
 
   @override
   Widget build(BuildContext context) {
-    if (!widget.store.enabled) return const SizedBox.shrink();
+    if (!widget.store.available) return const SizedBox.shrink();
     return ListenableBuilder(
       listenable: widget.store,
       builder: (context, _) => Column(

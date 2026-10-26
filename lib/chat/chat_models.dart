@@ -489,6 +489,8 @@ abstract interface class ConversationChatEngine implements ChatEngine {
     String text,
     ChatState state, {
     List<String>? choices,
+    Map<String, List<String>>? formAnswers,
+    bool skipQuestion = false,
   });
 }
 

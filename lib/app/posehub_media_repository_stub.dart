@@ -7,6 +7,7 @@ Future<PoseHubMediaFileStore> createPoseHubMediaStore({
   required String packVersion,
   required String? rootDirectory,
   required List<coach.PoseHubPackFile> files,
+  required List<coach.PoseHubPackFile> videos,
   required List<Uri> mediaBaseUrls,
   required bool allowInsecureLocalhost,
   required Duration timeout,

@@ -1,12 +1,31 @@
 import 'package:flutter/material.dart';
-import 'package:ugk_trainer/ugk_trainer.dart';
 
+import '../app/posehub_media_repository.dart';
 import '../app/services.dart';
-import '../app/training_media_config.dart';
-import '../diagnostics/runtime_log.dart';
-import '../diagnostics/training_media_log.dart';
-import 'theme.dart';
+import 'settings_widgets.dart';
+import 'theme/settings_tokens.dart';
 
+Future<int> trainingVideoCacheBytes(AppServices services) {
+  final repository = services.poseHubMedia;
+  if (repository is PoseHubVideoCache) {
+    return (repository as PoseHubVideoCache).videoCacheBytes();
+  }
+  return services.media?.cacheBytes() ?? Future.value(0);
+}
+
+Future<void> clearTrainingVideoCache(AppServices services) async {
+  final repository = services.poseHubMedia;
+  if (repository is PoseHubVideoCache) {
+    await (repository as PoseHubVideoCache).clearVideoCache();
+  } else {
+    await services.media?.clearCache();
+  }
+}
+
+String trainingCacheSize(int bytes) =>
+    '${(bytes / 1000000).toStringAsFixed(1)} MB';
+
+/// Video-only cache management. Catalog images and personal data are retained.
 class TrainingMediaSettings extends StatefulWidget {
   const TrainingMediaSettings({super.key});
   @override
@@ -14,214 +33,139 @@ class TrainingMediaSettings extends StatefulWidget {
 }
 
 class _TrainingMediaSettingsState extends State<TrainingMediaSettings> {
-  int _usedBytes = 0;
+  AppServices? _services;
+  int? _bytes;
   bool _working = false;
-  int _operation = 0;
+  bool _readError = false;
   String? _message;
+  int _generation = 0;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _refresh();
+    final services = AppServices.of(context);
+    if (!identical(_services, services)) {
+      _services = services;
+      _refresh();
+    }
   }
 
   Future<void> _refresh() async {
-    final bytes = await AppServices.of(context).media!.cacheBytes();
-    if (_usedBytes != bytes) {
-      RuntimeLog.instance.record('media.cache.usage', fields: {'bytes': bytes});
+    final generation = ++_generation;
+    try {
+      final bytes = await trainingVideoCacheBytes(_services!);
+      if (mounted && generation == _generation) {
+        setState(() {
+          _bytes = bytes;
+          _readError = false;
+        });
+      }
+    } on Object {
+      if (mounted && generation == _generation) {
+        setState(() => _readError = true);
+      }
     }
-    if (mounted) setState(() => _usedBytes = bytes);
   }
 
-  Future<void> _download(TrainingMediaRepository repository) async {
-    final operation = ++_operation;
-    final log = RuntimeLog.instance;
-    final logOperation = log.newOperation('package');
-    final watch = Stopwatch()..start();
-    log.record(
-      'media.package.requested',
-      operation: logOperation,
-      fields: {
-        'kind': 'realistic-dark',
-        'wifiOnly': repository.wifiOnly,
-        'offline': repository.isOffline,
-      },
+  Future<void> _clear() async {
+    if (_working) return;
+    final confirmed = await sfSettingsConfirm(
+      context,
+      title: '清除动作视频缓存？',
+      message: '动作图片、已保存计划、训练记录和 AI 记忆都会保留。之后播放未缓存动作时会重新下载视频。',
+      confirmLabel: '清除缓存',
+      confirmKey: const ValueKey('media-clear-confirm'),
     );
+    if (!confirmed || !mounted) return;
     setState(() {
       _working = true;
       _message = null;
     });
     try {
-      await repository.downloadPackage();
-      log.record(
-        'media.package.completed',
-        operation: logOperation,
-        fields: {
-          'kind': 'realistic-dark',
-          'verified': true,
-          'elapsedMs': watch.elapsedMilliseconds,
-        },
-      );
-      if (mounted && operation == _operation) {
-        setState(() => _message = '完整动作素材已下载并校验');
-      }
-    } on Object catch (error) {
-      final state = repository.stateFor('realistic-dark');
-      log.record(
-        'media.package.failed',
-        operation: logOperation,
-        fields: {
-          'phase': state.phase.name,
-          'reason': TrainingMediaLog.failureReason(state.error),
-          'errorType': RuntimeLog.errorType(error),
-          'elapsedMs': watch.elapsedMilliseconds,
-        },
-      );
-      if (mounted && operation == _operation) {
-        setState(
-          () => _message = switch (state.phase) {
-            TrainingMediaPhase.waitingForWifi => '等待 Wi-Fi；已内置的动作仍可使用',
-            TrainingMediaPhase.offline => '当前离线；已有动作仍可使用，计时和语音不受影响',
-            _ => '下载未完成或校验未通过；已保留可用素材，可以重试',
-          },
-        );
-      }
+      await clearTrainingVideoCache(_services!);
+      if (mounted) setState(() => _message = '动作视频缓存已清除');
+    } on Object {
+      if (mounted) setState(() => _message = '缓存暂时无法清理，请稍后重试');
     } finally {
-      if (mounted && operation == _operation) {
+      if (mounted) {
         setState(() => _working = false);
         await _refresh();
       }
     }
   }
 
-  Future<void> _clear(TrainingMediaRepository repository) async {
-    final operation = ++_operation;
-    final log = RuntimeLog.instance;
-    final logOperation = log.newOperation('cache');
-    log.record(
-      'media.cache.clear_requested',
-      operation: logOperation,
-      fields: {'bytes': _usedBytes},
-    );
-    setState(() {
-      _working = true;
-      _message = null;
-    });
-    try {
-      await repository.clearCache();
-      log.record(
-        'media.cache.cleared',
-        operation: logOperation,
-        fields: {'success': true},
-      );
-      if (mounted && operation == _operation) {
-        setState(() => _message = '缓存已清理，内置动作、计划和训练记录保留');
-      }
-    } on Object catch (error) {
-      log.record(
-        'media.cache.clear_failed',
-        operation: logOperation,
-        fields: {'errorType': RuntimeLog.errorType(error)},
-      );
-      if (mounted && operation == _operation) {
-        setState(() => _message = '缓存暂时无法清理，请稍后重试');
-      }
-    } finally {
-      if (mounted && operation == _operation) {
-        setState(() => _working = false);
-        await _refresh();
-      }
-    }
+  @override
+  void dispose() {
+    _generation++;
+    super.dispose();
   }
-
-  static String _size(int bytes) =>
-      '${(bytes / 1000000).toStringAsFixed(1)} MB';
 
   @override
   Widget build(BuildContext context) {
-    final services = AppServices.of(context);
-    final repository = services.media!;
-    return ListenableBuilder(
-      listenable: repository,
-      builder: (context, _) {
-        final state = repository.stateFor('realistic-dark');
-        final downloading =
-            state.phase == TrainingMediaPhase.queued ||
-            state.phase == TrainingMediaPhase.downloading;
-        final message = switch (state.phase) {
-          TrainingMediaPhase.waitingForWifi => '等待 Wi-Fi；已内置的动作仍可使用',
-          TrainingMediaPhase.offline => '当前离线；已有动作仍可使用，计时和语音不受影响',
-          TrainingMediaPhase.failed => '下载未完成或校验未通过；已保留可用素材，可以重试',
-          TrainingMediaPhase.ready => '完整动作素材已下载并校验',
-          TrainingMediaPhase.queued || TrainingMediaPhase.downloading => null,
-          _ => _message,
-        };
-        final total =
-            repository.manifest.packages['realistic-dark']!.totalBytes;
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+    final tokens = SfSettingsTokens.of(context);
+    final repository = _services!.poseHubMedia;
+    final canClear =
+        repository is PoseHubVideoCache || _services!.media != null;
+    return SfSettingsScaffold(
+      title: '动作视频缓存',
+      children: [
+        const SizedBox(height: 12),
+        SfSettingsGroup(
           children: [
-            Text('完整动作素材 · ${_size(total)}', style: SfType.callout),
-            const SizedBox(height: SfSpace.x1),
-            Text('已内置 32 个动作。其余示范按计划下载；下载期间仍可计时和语音跟练。', style: SfType.caption),
-            SfSwitchRow(
-              key: const ValueKey('media-wifi-only'),
-              title: '仅在 Wi-Fi 下载',
-              subtitle: '关闭后可能使用移动流量',
-              value: repository.wifiOnly,
-              onChanged: (value) async {
-                repository.wifiOnly = value;
-                RuntimeLog.instance.record(
-                  'media.wifi_only.changed',
-                  fields: {'wifiOnly': value},
-                );
-                await services.store.setMediaWifiOnly(value);
-              },
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('已用缓存', style: tokens.detail),
+                  const SizedBox(height: 8),
+                  Text(
+                    _readError
+                        ? '暂时无法读取'
+                        : _bytes == null
+                        ? '正在读取…'
+                        : trainingCacheSize(_bytes!),
+                    key: const ValueKey('media-cache-size'),
+                    style: tokens.title.copyWith(
+                      fontSize: 28,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  Text(
+                    '已缓存的动作可离线训练。这里只清除动作视频，动作图片和个人训练数据会保留。',
+                    style: tokens.body,
+                  ),
+                ],
+              ),
             ),
-            if (state.phase == TrainingMediaPhase.downloading) ...[
-              LinearProgressIndicator(
-                value: state.totalBytes == 0
-                    ? null
-                    : (state.receivedBytes / state.totalBytes).clamp(0.0, 1.0),
-              ),
-              Text(
-                '${_size(state.receivedBytes)} / ${_size(state.totalBytes)}',
-                style: SfType.caption,
-              ),
-            ],
-            if (message != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: Text(message, style: SfType.caption),
-              ),
-            SfTextAction(
-              key: const ValueKey('media-download-default'),
-              icon: SfGlyph.play,
-              label: _working || downloading ? '处理中…' : '下载完整动作素材',
-              onPressed:
-                  _working || downloading || repository.visibleActions.isEmpty
-                  ? null
-                  : () => _download(repository),
-            ),
-            if (repository.visibleActions.isEmpty)
-              Text('当前没有已审核的可下载动作', style: SfType.caption),
-            Text('已用缓存 ${_size(_usedBytes)}', style: SfType.caption),
-            SfTextAction(
+            SfSettingsRow(
               key: const ValueKey('media-clear-cache'),
-              icon: SfGlyph.bookmark,
-              label: '清理缓存',
-              onPressed: () => _clear(repository),
+              title: _working ? '正在清除…' : '清除视频缓存',
+              icon: Icons.delete_outline_rounded,
+              tone: SfSettingsTone.red,
+              destructive: true,
+              onTap: canClear && !_working ? _clear : null,
             ),
-            if (repository.allowPending)
-              Text(
-                TrainingMediaConfig.isInternal
-                    ? '内测预览：包含待审核动作'
-                    : '开发预览：包含待审核动作',
-                style: SfType.caption,
-              ),
           ],
-        );
-      },
+        ),
+        if (_readError)
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: TextButton(
+              onPressed: _refresh,
+              child: Text('重新读取', style: tokens.title),
+            ),
+          ),
+        if (_message != null)
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Semantics(
+              liveRegion: true,
+              child: Text(_message!, style: tokens.body),
+            ),
+          ),
+      ],
     );
   }
 }

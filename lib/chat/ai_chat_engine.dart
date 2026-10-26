@@ -7,8 +7,10 @@ import 'package:ugk_coach/ugk_coach.dart' as coach;
 import '../diagnostics/runtime_log.dart';
 import '../domain/exercise.dart';
 import '../domain/plan.dart';
+import '../domain/plan_generator.dart';
 import '../domain/plan_validator.dart';
 import '../domain/scenario.dart';
+import '../domain/template.dart';
 import 'chat_models.dart';
 import 'rule_chat_engine.dart';
 import 'slot_parser.dart';
@@ -207,7 +209,16 @@ class AiChatEngine
     String text,
     ChatState state, {
     List<String>? choices,
-  }) => _reply(text, state, questionId: questionId, choices: choices);
+    Map<String, List<String>>? formAnswers,
+    bool skipQuestion = false,
+  }) => _reply(
+    text,
+    state,
+    questionId: questionId,
+    choices: choices,
+    formAnswers: formAnswers,
+    skipQuestion: skipQuestion,
+  );
 
   Future<ChatReply> _reply(
     String input,
@@ -215,6 +226,8 @@ class AiChatEngine
     bool trustedAppCommand = false,
     String? questionId,
     List<String>? choices,
+    Map<String, List<String>>? formAnswers,
+    bool skipQuestion = false,
   }) async {
     final operation =
         _diagnosticOperation ?? RuntimeLog.instance.newOperation('chat');
@@ -329,6 +342,19 @@ class AiChatEngine
       final received = questionId == null
           ? await conversation.send(
               input,
+              context: turn.context,
+              cancel: turn.cancel,
+            )
+          : skipQuestion
+          ? await conversation.skipQuestion(
+              questionId,
+              context: turn.context,
+              cancel: turn.cancel,
+            )
+          : formAnswers != null
+          ? await conversation.answerForm(
+              questionId,
+              formAnswers,
               context: turn.context,
               cancel: turn.cancel,
             )
@@ -595,14 +621,94 @@ class AiChatEngine
       pending: turn.slots,
       request: turn.state.request == null ? null : request,
     );
-    final reply = await local.reply(turn.input, state);
-    final unsafe = reply.messages.any(
-      (m) =>
-          m.plan != null &&
-          PlanValidator(local.lib).validate(m.plan!, request).isNotEmpty,
-    );
-    if (!unsafe) return reply;
-    final generated = await local.templates.generate(request);
+    // The ordinary local planner assumes common home/office equipment. An AI
+    // fallback must instead honor the same explicit equipment facts as the SDK.
+    var fallback = local;
+    if (turn.slots.equipment case final equipment?) {
+      final allowed = equipment.map((e) => e.name).toSet();
+      final library = ExerciseLibrary([
+        for (final exercise in local.lib.all)
+          if (exercise.effectiveEquipmentIds.every(
+            (id) => id == 'none' || allowed.contains(id),
+          ))
+            exercise,
+      ]);
+      // Old host templates can carry an obsolete unit. Use the SDK default
+      // dose only for incompatible entries, before the existing duration fit.
+      PlanItem canonicalItem(PlanItem item) {
+        final drill = catalog[item.exerciseId];
+        if (drill == null || item.mode.name == drill.defaultDose.mode.name) {
+          return item;
+        }
+        final dose = drill.defaultDose;
+        return PlanItem(
+          exerciseId: item.exerciseId,
+          mode: dose.mode == coach.DoseMode.reps
+              ? DoseMode.reps
+              : DoseMode.time,
+          sets: dose.sets,
+          reps: dose.reps,
+          workSeconds: dose.seconds,
+          restSeconds: dose.restSeconds,
+          perSide: drill.unilateral,
+          note: item.note,
+          replacedFrom: item.replacedFrom,
+          segments: item.segments,
+        );
+      }
+
+      final templates = TemplateCatalog([
+        for (final template in local.templates.catalog.templates)
+          PlanTemplate(
+            id: template.id,
+            name: template.name,
+            summary: template.summary,
+            goal: template.goal,
+            scenes: template.scenes,
+            equipment: template.equipment,
+            minutes: template.minutes,
+            minLevel: template.minLevel,
+            maxLevel: template.maxLevel,
+            keywords: template.keywords,
+            blocks: [
+              for (final block in template.blocks)
+                block.copyWith(items: block.items.map(canonicalItem).toList()),
+            ],
+          ),
+      ]);
+      fallback = RuleChatEngine(
+        lib: library,
+        parser: local.parser,
+        templates: TemplatePlanGenerator(
+          lib: library,
+          catalog: templates,
+          matcher: local.templates.matcher,
+          preferredExerciseIds: local.templates.preferredExerciseIds,
+          onGenerated: local.templates.onGenerated,
+        ),
+      );
+    }
+    // A previously adopted card may contain equipment no longer available.
+    // Generate afresh before the filtered planner tries to edit those IDs.
+    final oldPlanUnavailable =
+        state.plan?.items.any(
+          (item) =>
+              !fallback.lib.contains(item.exerciseId) ||
+              item.segments.any(
+                (segment) => !fallback.lib.contains(segment.exerciseId),
+              ),
+        ) ??
+        false;
+    if (!oldPlanUnavailable) {
+      final reply = await fallback.reply(turn.input, state);
+      final unsafe = reply.messages.any(
+        (m) =>
+            m.plan != null &&
+            PlanValidator(fallback.lib).validate(m.plan!, request).isNotEmpty,
+      );
+      if (!unsafe) return reply;
+    }
+    final generated = await fallback.templates.generate(request);
     final plan = generated.plan;
     return ChatReply(
       messages: [
