@@ -1,0 +1,153 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face{font-family:SC;src:url(../../../assets/fonts/NotoSansSC.ttf)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:SC,"Noto Sans CJK SC",sans-serif;background:#DCE3E6;color:#17262C;padding:40px;display:flex;gap:40px;align-items:flex-start;width:max-content}
+:root{--bg:#F2F4F5;--s:#fff;--sh:#E8EEF1;--line:#E3E9EC;--ac:#137B70;--acs:#DCEFEA;--act:#0B5F55;--mu:#51616C;--fa:#8695A0;--coral:#E8775E;--danger:#D43F3F}
+.art{display:flex;flex-direction:column;gap:14px}
+.cap{font-size:20px;font-weight:700;color:#23343B}.cap small{display:block;font-size:13px;font-weight:400;color:#51616C;margin-top:4px;max-width:390px;line-height:1.5}
+.phone{width:390px;height:844px;background:var(--bg);border-radius:44px;overflow:hidden;position:relative;box-shadow:0 30px 60px rgba(20,40,50,.18);border:8px solid #111}
+.status{height:44px;display:flex;justify-content:space-between;align-items:center;padding:0 26px;font-size:14px;font-weight:600}
+.bar{height:52px;display:flex;align-items:center;padding:0 12px;gap:6px}
+.back{width:40px;height:40px;border-radius:20px;display:grid;place-items:center;font-size:22px;color:#17262C}
+.lt{font-size:30px;font-weight:800;letter-spacing:.5px;padding:4px 20px 12px}
+.scroll{position:absolute;top:96px;left:0;right:0;bottom:0;overflow:hidden}
+/* library */
+.search{margin:0 20px;height:46px;border-radius:23px;background:var(--s);display:flex;align-items:center;gap:10px;padding:0 16px;color:var(--fa);font-size:15px;box-shadow:0 1px 2px rgba(23,38,44,.05),0 0 0 1px var(--line)}
+.chips{display:flex;gap:8px;padding:14px 20px 0;white-space:nowrap}
+.chip{height:34px;padding:0 14px;border-radius:17px;background:var(--s);box-shadow:0 0 0 1px var(--line);font-size:14px;display:flex;align-items:center;gap:4px;color:#2B3B42}
+.chip.on{background:#17262C;color:#fff;box-shadow:none}
+.chip.dd{color:var(--mu)}.chip.dd b{font-weight:400;font-size:11px;margin-left:2px}
+.chip.sel{background:var(--acs);color:var(--act);box-shadow:0 0 0 1px #BFE0D8}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:16px 20px}
+.card{background:var(--s);border-radius:22px;overflow:hidden;box-shadow:0 1px 2px rgba(23,38,44,.04),0 6px 16px rgba(23,38,44,.05)}
+.card .pic{aspect-ratio:1/1;background:radial-gradient(120% 90% at 50% 85%,#E3ECEE 0%,#F4F7F8 60%,#fff 100%);display:grid;place-items:center;position:relative}
+.card .pic img{width:92%;height:92%;object-fit:contain;filter:drop-shadow(0 6px 6px rgba(0,0,0,.08))}
+.card .nm{padding:10px 14px 14px;font-size:15px;font-weight:600;line-height:1.35;min-height:62px}
+/* settings */
+.sec{font-size:13px;color:var(--fa);font-weight:600;padding:18px 32px 8px;letter-spacing:.5px}
+.group{margin:0 16px;background:var(--s);border-radius:22px;box-shadow:0 1px 2px rgba(23,38,44,.04),0 6px 16px rgba(23,38,44,.04);overflow:hidden}
+.row{display:flex;align-items:center;gap:14px;padding:14px 16px;min-height:60px;position:relative}
+.row+.row:before{content:"";position:absolute;left:64px;right:0;top:0;height:1px;background:var(--line)}
+.ic{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;font-size:17px;flex:none}
+.t{flex:1}.t .a{font-size:16px;font-weight:500}.t .b{font-size:12.5px;color:var(--fa);margin-top:2px}
+.val{font-size:14px;color:var(--fa)}.chev{color:#B4C0C7;font-size:18px}
+.tg{width:50px;height:30px;border-radius:15px;background:var(--ac);position:relative;flex:none}
+.tg:after{content:"";position:absolute;right:3px;top:3px;width:24px;height:24px;border-radius:12px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.tg.off{background:#D3DCE0}.tg.off:after{right:auto;left:3px}
+.seg{display:flex;background:var(--sh);border-radius:14px;padding:3px;margin:14px 16px 6px}
+.seg div{flex:1;text-align:center;padding:9px 0;border-radius:11px;font-size:14px;color:var(--mu);display:flex;flex-direction:column;align-items:center;gap:4px}
+.seg .on{background:#fff;color:#17262C;font-weight:600;box-shadow:0 1px 3px rgba(23,38,44,.12)}
+.sw{width:30px;height:20px;border-radius:6px;border:1px solid #CBD5DA}
+.danger .a{color:var(--danger)}
+.appcard{margin:8px 16px 0;padding:18px;border-radius:22px;background:var(--s);display:flex;gap:14px;align-items:center;box-shadow:0 6px 16px rgba(23,38,44,.04)}
+.appcard img{width:56px;height:56px;border-radius:14px}
+.foot{text-align:center;font-size:12px;color:var(--fa);padding:14px 0 30px}
+/* trainer */
+.stage{height:430px;position:relative;display:grid;place-items:center;background:var(--bg)}
+.stage img{height:340px}
+.pill{position:absolute;top:14px;right:16px;height:28px;padding:0 10px;border-radius:14px;background:rgba(255,255,255,.85);box-shadow:0 0 0 1px var(--line);display:flex;align-items:center;gap:6px;font-size:12px;color:var(--mu)}
+.spin{width:12px;height:12px;border-radius:6px;border:2px solid #CFE3DE;border-top-color:var(--ac)}
+.ghost{margin:0 20px;border-radius:22px;border:1.5px dashed #C3CED3;height:250px;display:grid;place-items:center;color:var(--fa);font-size:14px;text-align:center;line-height:1.7}
+.note{position:absolute;left:16px;right:16px;bottom:18px;background:#17262C;color:#E9F1F3;border-radius:16px;padding:12px 14px;font-size:12.5px;line-height:1.6}
+/* chat plan card */
+.chatbg{background:var(--bg);padding:0 16px}
+.bub{background:#fff;border-radius:20px;padding:14px 16px;font-size:15px;line-height:1.6;box-shadow:0 0 0 1px var(--line);margin:8px 0 0}
+.pc{background:#fff;border-radius:26px;position:relative;box-shadow:0 0 0 1px var(--line),0 8px 20px rgba(23,38,44,.06);margin-top:70px}
+.pc .hero{position:absolute;left:50%;transform:translateX(-50%);top:-64px;height:236px;filter:drop-shadow(0 10px 8px rgba(0,0,0,.12))}
+.pc .ex{position:absolute;right:14px;top:14px;height:32px;padding:0 12px;border-radius:16px;background:var(--sh);font-size:13px;display:flex;align-items:center;color:var(--mu)}
+.pc .body{padding:220px 18px 18px}
+.pt{font-size:22px;font-weight:800}.pm{font-size:13px;color:var(--fa);margin-top:4px}
+.strip{display:flex;gap:8px;margin-top:14px;align-items:center}
+.strip i{width:44px;height:44px;border-radius:12px;background:#EEF3F4;display:grid;place-items:center;overflow:hidden}.strip i img{height:40px}
+.play{margin-left:auto;width:52px;height:52px;border-radius:26px;background:var(--ac);display:grid;place-items:center;color:#fff;font-size:18px}
+.pcx{background:#fff;border-radius:26px;box-shadow:0 0 0 1px var(--line),0 8px 20px rgba(23,38,44,.06);margin-top:14px;padding:22px 18px 10px}
+.hd{display:flex;align-items:flex-start;justify-content:space-between}
+.lr{display:flex;align-items:center;gap:12px;padding:8px 0}.lr .n{width:16px;color:var(--fa);font-size:13px}.lr i{width:44px;height:44px;border-radius:12px;background:#EEF3F4;display:grid;place-items:center;overflow:hidden}.lr i img{height:40px}.lr .x{flex:1;font-size:15px}.lr .d{font-size:13px;color:var(--fa)}
+.mark{position:absolute;border:2px solid var(--coral);border-radius:12px}
+.tag{position:absolute;background:var(--coral);color:#fff;font-size:11px;padding:2px 7px;border-radius:8px}
+</style></head><body>
+
+<!-- 1 library -->
+<div class="art"><div class="cap">① 动作库<small>两列网格；卡片上图下名，无 ID/总数/状态。搜索下第一行“类型”单选，第二行“部位 / 器械”下拉多选，选中后变青绿实心并显示选中项。</small></div>
+<div class="phone"><div class="status"><span>22:38</span><span>●●● 88</span></div>
+<div class="bar"><div class="back">←</div></div>
+<div class="scroll" style="top:96px">
+<div class="lt" style="padding-top:0">动作库</div>
+<div class="search">⌕ <span>搜索动作</span></div>
+<div class="chips"><div class="chip on">全部</div><div class="chip">力量</div><div class="chip">拉伸放松</div></div>
+<div class="chips" style="padding-top:8px"><div class="chip dd">部位<b>▾</b></div><div class="chip sel">徒手 · 椅子<b>▾</b></div><div class="chip dd" style="margin-left:auto;box-shadow:none;background:none;color:var(--fa)">清除</div></div>
+<div class="grid">
+<div class="card"><div class="pic"><img src="img/h-chair-sit-to-stand.webp"></div><div class="nm">普通椅双脚坐站</div></div>
+<div class="card"><div class="pic"><img src="img/h-chair-tspine.webp"></div><div class="nm">跪姿椅面胸椎伸展</div></div>
+<div class="card"><div class="pic"><img src="img/adductors-A.webp"></div><div class="nm">哥萨克蹲</div></div>
+<div class="card"><div class="pic"><img src="img/h-bulgarian.webp"></div><div class="nm">椅子保加利亚分腿蹲</div></div>
+<div class="card"><div class="pic"><img src="img/h-couch-stretch.webp"></div><div class="nm">沙发拉伸（后脚搭矮凳）</div></div>
+<div class="card"><div class="pic"><img src="img/h-cobra.webp"></div><div class="nm">眼镜蛇式</div></div>
+</div></div></div></div>
+
+<!-- 2 settings top -->
+<div class="art"><div class="cap">② 设置（上）<small>大标题+分组列表；每行左侧色块图标、主文案一行、说明一行以内。去掉“离线动作素材”统计段落，改成可操作的缓存行。</small></div>
+<div class="phone"><div class="status"><span>22:38</span><span>●●● 88</span></div>
+<div class="bar"><div class="back">←</div></div>
+<div class="scroll"><div class="lt" style="padding-top:0">设置</div>
+<div class="sec">外观</div>
+<div class="group"><div class="seg"><div><span class="sw" style="background:#0C1117"></span>深空</div><div><span class="sw" style="background:#fff"></span>浅色</div><div class="on"><span class="sw" style="background:linear-gradient(90deg,#fff 50%,#0C1117 50%)"></span>跟随系统</div></div>
+<div class="row"><div class="ic" style="background:#EEE8FB;color:#6B4FD0">✦</div><div class="t"><div class="a">星尘动效</div><div class="b">背景星尘缓慢漂移</div></div><div class="tg"></div></div></div>
+<div class="sec">训练</div>
+<div class="group">
+<div class="row"><div class="ic" style="background:var(--acs);color:var(--ac)">🗣</div><div class="t"><div class="a">教练语音</div><div class="b">开始、计数、休息和下一个动作</div></div><div class="tg"></div></div>
+<div class="row"><div class="ic" style="background:#FDEDE8;color:var(--coral)">♪</div><div class="t"><div class="a">提示音</div><div class="b">换动作和最后几秒</div></div><div class="tg"></div></div>
+<div class="row"><div class="ic" style="background:#E7F0FA;color:#3E7BC2">⇩</div><div class="t"><div class="a">动作视频缓存</div><div class="b">已缓存的动作可离线训练</div></div><div class="val">86 MB</div><div class="chev">›</div></div>
+</div>
+<div class="sec">AI 教练</div>
+<div class="group">
+<div class="row"><div class="ic" style="background:#FFF4DE;color:#C98A12">◎</div><div class="t"><div class="a">AI 记忆</div><div class="b">记住训练水平、器械和偏好</div></div><div class="tg"></div></div>
+<div class="row danger"><div class="ic" style="background:#FCE9E9;color:var(--danger)">⌫</div><div class="t"><div class="a">清除记忆</div></div><div class="chev">›</div></div>
+</div></div></div></div>
+
+<!-- 3 settings bottom -->
+<div class="art"><div class="cap">③ 设置（下，含关于）<small>关于做成 App 名片+列表；长文（隐私、许可）进二级页。内测工具单独一组，正式版隐藏。</small></div>
+<div class="phone"><div class="status"><span>22:38</span><span>●●● 88</span></div>
+<div class="bar" style="background:rgba(242,244,245,.9)"><div class="back">←</div><div style="font-size:17px;font-weight:700">设置</div></div>
+<div class="scroll">
+<div class="sec" style="padding-top:6px">关于</div>
+<div class="appcard"><img src="smartfit-icon-v4-crop.png"><div><div style="font-size:18px;font-weight:700">智能健身助手</div><div style="font-size:13px;color:var(--fa);margin-top:3px">版本 0.1.0 (34) · 内测</div></div></div>
+<div class="group" style="margin-top:12px">
+<div class="row"><div class="ic" style="background:var(--acs);color:var(--ac)">🔒</div><div class="t"><div class="a">隐私与 AI</div></div><div class="chev">›</div></div>
+<div class="row"><div class="ic" style="background:#FFF4DE;color:#C98A12">!</div><div class="t"><div class="a">免责声明</div></div><div class="val">重新确认</div><div class="chev">›</div></div>
+<div class="row"><div class="ic" style="background:#E7F0FA;color:#3E7BC2">©</div><div class="t"><div class="a">素材与字体许可</div></div><div class="chev">›</div></div>
+<div class="row"><div class="ic" style="background:#EEF1F3;color:#51616C">{ }</div><div class="t"><div class="a">开源软件许可</div></div><div class="chev">›</div></div>
+</div>
+<div class="sec">内测工具 <span style="font-weight:400">· 正式版不显示</span></div>
+<div class="group">
+<div class="row"><div class="ic" style="background:#EEF1F3;color:#51616C">⚑</div><div class="t"><div class="a">动作问题标记</div></div><div class="tg off"></div></div>
+<div class="row"><div class="ic" style="background:#EEF1F3;color:#51616C">≋</div><div class="t"><div class="a">导出性能报告</div></div><div class="chev">›</div></div>
+<div class="row"><div class="ic" style="background:#EEF1F3;color:#51616C">☰</div><div class="t"><div class="a">运行日志</div></div><div class="chev">›</div></div>
+</div>
+<div class="foot">动作示范由 Pose-Hub 预渲染 · 人物基于 Blender Studio Snow（CC BY 4.0）</div>
+</div></div></div>
+
+<!-- 4 trainer -->
+<div class="art"><div class="cap">④ 训练页 · 视频未就绪<small>不再有准备页。站位图（=视频首帧）立即出现，计时和播报照常；视频下好原位淡入。仅右上角一个轻提示，下完自动消失。</small></div>
+<div class="phone"><div class="status"><span>20:56</span><span>●●● 89</span></div>
+<div class="bar"><div class="back">✕</div><div style="font-size:15px;color:var(--mu)">1 / 8 · 坐姿猫牛式</div></div>
+<div class="scroll"><div class="stage"><img src="img/h-catcow-quad.webp"><div class="pill"><span class="spin"></span>视频加载中</div></div>
+<div class="ghost">倒计时、播报、控制区<br>沿用现 SDK 训练页，不改</div>
+<div class="note">断网/失败：保持站位图继续练，后台静默重试；不出现字节、百分比和报错弹窗。后续动作在当前动作和休息时预取。</div>
+</div></div></div>
+
+<!-- 5 plan cards -->
+<div class="art"><div class="cap">⑤ 套路卡两处调整<small>收起态：首个人物放大约 30%，头部继续出框，卡片顶部多让出空间。展开态：标题区上留白 22px，“收起”与标题首行对齐，副信息降一级。</small></div>
+<div class="phone"><div class="status"><span>16:32</span><span>●●● 90</span></div>
+<div class="scroll chatbg" style="top:44px">
+<div class="bub">理解：把坐椅上的扶椅扭转去掉，其余动作保留，整套仍保持在 10 分钟内。</div>
+<div class="pc"><img class="hero" src="img/h-chair-sit-to-stand.webp"><div class="ex">展开 ⌄</div>
+<div class="body" style="padding-top:184px"><div class="pt">办公室久坐拉伸放松</div><div class="pm">10 分钟 · 8 个动作 · 徒手</div>
+<div class="strip"><i><img src="img/h-chair-tspine.webp"></i><i><img src="img/h-catcow-quad.webp"></i><i><img src="img/h-couch-stretch.webp"></i><i><img src="img/h-cobra.webp"></i><i><img src="img/adductors-A.webp"></i><div class="play">▶</div></div></div></div>
+<div class="pcx"><div class="hd"><div><div class="pt" style="font-size:20px">办公室久坐拉伸</div><div class="pm">8 分钟 · 8 个动作 · 徒手</div></div><div class="ex" style="position:static;height:32px;padding:0 12px;border-radius:16px;background:var(--sh);font-size:13px;display:flex;align-items:center;color:var(--mu)">收起 ⌃</div></div>
+<div style="height:10px"></div>
+<div class="lr"><span class="n">1</span><i><img src="img/h-catcow-quad.webp"></i><span class="x">坐姿猫牛式</span><span class="d">40 秒</span></div>
+<div class="lr"><span class="n">2</span><i><img src="img/h-chair-tspine.webp"></i><span class="x">坐姿四字前压</span><span class="d">每侧 30 秒</span></div>
+</div>
+</div></div></div>
+</body></html>
