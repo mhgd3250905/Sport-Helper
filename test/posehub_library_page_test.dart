@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:smartfit/app/posehub_pack_installation.dart';
 import 'package:smartfit/ui/exercise_video.dart';
 import 'package:smartfit/ui/library_page.dart';
+import 'package:smartfit/ui/posehub_download_status.dart';
 import 'package:smartfit/ui/posehub_library_page.dart';
 import 'package:smartfit/ui/theme.dart';
 import 'package:smartfit/ui/theme/trainer_theme.dart';
@@ -17,7 +17,7 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   late coach.PoseHubAppTestCatalog catalog;
   late PoseHubUiVideoPlatform platform;
-  final base = Uri.parse('file:///verified-posehub-pack/');
+  final base = Uri.parse('file:///ui-contract-pack/');
 
   setUpAll(() async => catalog = await PoseHubActionLibrary.load());
   setUp(() {
@@ -33,34 +33,23 @@ void main() {
   });
 
   testWidgets(
-    'library waits for one shared installation, then uses SDK browser',
+    'library first frame shows metadata while an action is still preparing',
     (tester) async {
       final ready = Completer<Uri>();
-      var calls = 0;
-      final installation = PoseHubPackInstallation.forTesting(
-        enabled: true,
-        install: () {
-          calls++;
-          return ready.future;
-        },
+      final media = PoseHubUiRepository(
+        mediaBaseUri: base,
+        onEnsureAction: (_) => ready.future,
       );
-      final services = poseHubUiServices(
-        catalog: catalog,
-        installation: installation,
-      );
+      final preparing = media.ensureAction(catalog.allActions.first.id);
+      final services = poseHubUiServices(catalog: catalog, media: media);
       final app = poseHubUiApp(
         palette: SfPalette.light,
         services: services,
         home: const LibraryPage(),
       );
       await tester.pumpWidget(app);
-      expect(find.byKey(const ValueKey('posehub-preparing')), findsOneWidget);
-      expect(find.byType(PoseHubActionBrowser), findsNothing);
-      await tester.pumpWidget(app);
-      await tester.pump();
-      expect(calls, 1);
-      ready.complete(base);
-      await tester.pumpAndSettle();
+      expect(ready.isCompleted, isFalse);
+      expect(find.byType(PoseHubActionBrowser), findsOneWidget);
       final browser = tester.widget<PoseHubActionBrowser>(
         find.byType(PoseHubActionBrowser),
       );
@@ -68,39 +57,65 @@ void main() {
       expect(browser.mediaBaseUri, base);
       expect(browser.theme!.background, SfPalette.light.background);
       expect(find.text('动作库 · 219'), findsOneWidget);
+      ready.complete(base);
+      await preparing;
       await tester.pumpWidget(const SizedBox.shrink());
-      installation.dispose();
+      media.dispose();
     },
   );
 
-  testWidgets('failed preparation retries without the old media resolver', (
-    tester,
-  ) async {
-    var calls = 0;
-    final installation = PoseHubPackInstallation.forTesting(
-      enabled: true,
-      install: () async {
-        if (++calls == 1) throw StateError('test installation failure');
-        return base;
-      },
-    );
-    await tester.pumpWidget(
-      poseHubUiApp(
-        palette: SfPalette.dark,
-        home: PoseHubLibraryPage(catalog: catalog, media: installation),
-      ),
-    );
-    await tester.pumpAndSettle();
-    expect(find.byKey(const ValueKey('posehub-prepare-error')), findsOneWidget);
-    expect(find.byType(PoseHubActionBrowser), findsNothing);
-    await tester.tap(find.byKey(const ValueKey('posehub-prepare-retry')));
-    await tester.pumpAndSettle();
-    expect(calls, 2);
-    expect(find.byType(PoseHubActionBrowser), findsOneWidget);
-    await tester.pumpWidget(const SizedBox.shrink());
-    installation.dispose();
-  });
+  testWidgets(
+    'failed action preparation never blocks library scroll or search',
+    (tester) async {
+      final media = PoseHubUiRepository(
+        mediaBaseUri: base,
+        onEnsureAction: (_) async => throw StateError('UI transfer failure'),
+      );
+      await expectLater(
+        media.ensureAction(catalog.allActions.first.id),
+        throwsStateError,
+      );
+      await tester.pumpWidget(
+        poseHubUiApp(
+          palette: SfPalette.dark,
+          home: PoseHubLibraryPage(catalog: catalog, media: media),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.byType(PoseHubActionBrowser), findsOneWidget);
+      final list = find.byKey(const ValueKey('posehub-action-list'));
+      final before = tester
+          .state<ScrollableState>(
+            find.descendant(of: list, matching: find.byType(Scrollable)),
+          )
+          .position
+          .pixels;
+      await tester.drag(list, const Offset(0, -500));
+      await tester.pumpAndSettle();
+      final after = tester
+          .state<ScrollableState>(
+            find.descendant(of: list, matching: find.byType(Scrollable)),
+          )
+          .position
+          .pixels;
+      expect(after, greaterThan(before));
+      await tester.enterText(
+        find.byKey(const ValueKey('posehub-search')),
+        catalog.allActions.last.id,
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('显示 1 个动作'), findsOneWidget);
+      expect(
+        find.byKey(ValueKey('posehub-action-${catalog.allActions.last.id}')),
+        findsOneWidget,
+      );
+      await tester.pumpWidget(const SizedBox.shrink());
+      media.dispose();
+    },
+  );
 
+  // SDK 0.4.1 navigation/control regression only. Its provider hook is pending;
+  // these interactions do not claim that SDK pages initiate Repo downloads.
   for (final palette in [SfPalette.light, SfPalette.dark]) {
     testWidgets(
       'SDK browse/search/pending/manual practice, ${palette.brightness.name}',
@@ -108,14 +123,11 @@ void main() {
         tester.view.physicalSize = const Size(390, 844);
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
-        final installation = PoseHubPackInstallation.forTesting(
-          enabled: true,
-          install: () async => base,
-        );
+        final media = PoseHubUiRepository(mediaBaseUri: base);
         await tester.pumpWidget(
           poseHubUiApp(
             palette: palette,
-            home: PoseHubLibraryPage(catalog: catalog, media: installation),
+            home: PoseHubLibraryPage(catalog: catalog, media: media),
           ),
         );
         await tester.pumpAndSettle();
@@ -208,7 +220,7 @@ void main() {
         expect(tester.takeException(), isNull);
         await tester.pumpWidget(const SizedBox.shrink());
         await tester.pump();
-        installation.dispose();
+        media.dispose();
       },
     );
   }
@@ -217,17 +229,14 @@ void main() {
     'pack media waits, preserves controls and exposes no invented position',
     (tester) async {
       final ready = Completer<Uri>();
-      final installation = PoseHubPackInstallation.forTesting(
-        enabled: true,
-        install: () => ready.future,
+      final media = PoseHubUiRepository(
+        mediaBaseUri: base,
+        onEnsureAction: (_) => ready.future,
       );
       final action = catalog.allActions.first;
       final second = catalog.allActions[1];
       final handle = DrillMediaPlaybackHandle();
-      final services = poseHubUiServices(
-        catalog: catalog,
-        installation: installation,
-      );
+      final services = poseHubUiServices(catalog: catalog, media: media);
       Widget show({
         coach.PoseHubPackAction? selected,
         bool playing = true,
@@ -250,10 +259,7 @@ void main() {
         ),
       );
       await tester.pumpWidget(show());
-      expect(
-        find.byKey(const ValueKey('posehub-media-preparing')),
-        findsOneWidget,
-      );
+      expect(find.byType(PoseHubDownloadStatus), findsOneWidget);
       expect(find.byType(DrillMediaView), findsNothing);
       var snapshot = await handle.capture();
       expect(snapshot!.mediaId, action.id);
@@ -266,14 +272,14 @@ void main() {
       await tester.pump();
       await tester.pumpWidget(show(paused: true, mirrored: true));
       await tester.pump();
-      final media = tester.widget<PoseHubPackMedia>(
+      final playback = tester.widget<PoseHubPackMedia>(
         find.byType(PoseHubPackMedia),
       );
-      expect(media.paused, isTrue);
+      expect(playback.paused, isTrue);
       expect(platform.commands, contains((1, 'pause', null)));
       expect(find.byType(Transform), findsWidgets);
       await tester.pumpWidget(show(selected: second, playing: false));
-      await tester.pump();
+      await tester.pumpAndSettle();
       snapshot = await handle.capture();
       expect(snapshot!.mediaId, second.id);
       expect(snapshot.ready, isFalse);
@@ -287,7 +293,7 @@ void main() {
       await tester.pump();
       expect(await handle.capture(), isNull);
       handle.dispose();
-      installation.dispose();
+      media.dispose();
     },
   );
 

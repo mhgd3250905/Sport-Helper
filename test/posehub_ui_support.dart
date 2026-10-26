@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:smartfit/app/posehub_pack_installation.dart';
+import 'package:smartfit/app/posehub_media_repository.dart';
 import 'package:smartfit/app/services.dart';
 import 'package:smartfit/core/storage/local_state_storage.dart';
 import 'package:smartfit/data/app_store.dart';
@@ -20,9 +20,127 @@ class PoseHubUiStorage implements LocalStateStorage {
   Future<void> write(String key, String value) async => values[key] = value;
 }
 
+/// UI-only contract stub. This never reads bytes, downloads or verifies SHA.
+/// Screenshot callers may point it at independently verified original files.
+class PoseHubUiRepository implements PoseHubMediaRepository {
+  PoseHubUiRepository({
+    required this.mediaBaseUri,
+    this.onEnsureFile,
+    this.onEnsureAction,
+  });
+
+  @override
+  final Uri mediaBaseUri;
+  final Future<Uri> Function(coach.PoseHubPackFile file)? onEnsureFile;
+  final Future<Uri> Function(String actionId)? onEnsureAction;
+  final fileRequests = <coach.PoseHubPackFile>[];
+  final actionRequests = <String>[];
+  final _fileStates = <String, ValueNotifier<PoseHubDownloadState>>{};
+  final _actionStates = <String, ValueNotifier<PoseHubDownloadState>>{};
+  bool _disposed = false;
+
+  @override
+  ValueNotifier<PoseHubDownloadState> watchFile(coach.PoseHubPackFile file) =>
+      _fileStates.putIfAbsent(
+        file.path,
+        () => ValueNotifier(
+          const PoseHubDownloadState(phase: PoseHubDownloadPhase.idle),
+        ),
+      );
+
+  @override
+  ValueNotifier<PoseHubDownloadState> watchAction(String actionId) =>
+      _actionStates.putIfAbsent(
+        actionId,
+        () => ValueNotifier(
+          const PoseHubDownloadState(phase: PoseHubDownloadPhase.idle),
+        ),
+      );
+
+  void setFileState(coach.PoseHubPackFile file, PoseHubDownloadState state) {
+    if (!_disposed) watchFile(file).value = state;
+  }
+
+  void setActionState(String actionId, PoseHubDownloadState state) {
+    if (!_disposed) watchAction(actionId).value = state;
+  }
+
+  @override
+  Future<Uri> ensureFile(coach.PoseHubPackFile file) {
+    fileRequests.add(file);
+    setFileState(
+      file,
+      const PoseHubDownloadState(phase: PoseHubDownloadPhase.checking),
+    );
+    return Future<Uri>.sync(
+      () => onEnsureFile?.call(file) ?? file.resolve(mediaBaseUri),
+    ).then(
+      (uri) {
+        setFileState(
+          file,
+          PoseHubDownloadState(
+            phase: PoseHubDownloadPhase.ready,
+            receivedBytes: file.bytes,
+            totalBytes: file.bytes,
+          ),
+        );
+        return uri;
+      },
+      onError: (Object error, StackTrace stack) {
+        setFileState(
+          file,
+          PoseHubDownloadState(
+            phase: PoseHubDownloadPhase.failed,
+            error: error,
+          ),
+        );
+        Error.throwWithStackTrace(error, stack);
+      },
+    );
+  }
+
+  @override
+  Future<Uri> ensureAction(String actionId) {
+    actionRequests.add(actionId);
+    setActionState(
+      actionId,
+      const PoseHubDownloadState(phase: PoseHubDownloadPhase.checking),
+    );
+    return Future<Uri>.sync(
+      () => onEnsureAction?.call(actionId) ?? mediaBaseUri,
+    ).then(
+      (uri) {
+        setActionState(
+          actionId,
+          const PoseHubDownloadState(phase: PoseHubDownloadPhase.ready),
+        );
+        return uri;
+      },
+      onError: (Object error, StackTrace stack) {
+        setActionState(
+          actionId,
+          PoseHubDownloadState(
+            phase: PoseHubDownloadPhase.failed,
+            error: error,
+          ),
+        );
+        Error.throwWithStackTrace(error, stack);
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _disposed = true;
+    for (final notifier in [..._fileStates.values, ..._actionStates.values]) {
+      notifier.dispose();
+    }
+  }
+}
+
 AppServices poseHubUiServices({
   required coach.PoseHubAppTestCatalog catalog,
-  required PoseHubPackInstallation installation,
+  required PoseHubMediaRepository media,
   ExerciseLibrary? library,
 }) => AppServices(
   library: library ?? ExerciseLibrary([]),
@@ -31,7 +149,7 @@ AppServices poseHubUiServices({
   voiceLibrary: VoiceLibrary.empty,
   voiceOutput: const MutedVoiceOutput(),
   poseHubCatalog: catalog,
-  poseHubMedia: installation,
+  poseHubMedia: media,
 );
 
 Widget poseHubUiApp({

@@ -24,7 +24,7 @@ import '../voice/voice_library.dart';
 import 'training_media_config.dart';
 import 'app_test_pack.dart';
 import 'app_test_catalog.dart';
-import 'posehub_pack_installation.dart';
+import 'posehub_media_repository.dart';
 
 /// Everything pages need, created once at start-up.
 class AppServices {
@@ -77,7 +77,7 @@ class AppServices {
   final ExerciseLibrary library;
   final AppTestCatalog? testCatalog;
   final coach.PoseHubAppTestCatalog? poseHubCatalog;
-  final PoseHubPackInstallation? poseHubMedia;
+  final PoseHubMediaRepository? poseHubMedia;
   final TemplateCatalog catalog;
   final AppStore store;
   final VoiceSource voiceLibrary;

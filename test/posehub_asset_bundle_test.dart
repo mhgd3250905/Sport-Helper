@@ -4,9 +4,9 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smartfit/app/posehub_asset_bundle.dart';
-import 'package:smartfit/app/posehub_pack_installation.dart';
 import 'package:ugk_coach/ugk_coach.dart';
 import 'package:ugk_trainer/ugk_trainer.dart';
+import 'posehub_ui_support.dart' show PoseHubUiRepository;
 
 class _Delegate extends CachingAssetBundle {
   final reads = <String>[];
@@ -40,7 +40,7 @@ void main() {
   tearDown(() async => root.delete(recursive: true));
 
   test(
-    'cover and thumbnail resolve exact SDK paths from one local installation',
+    'cover and thumbnail prepare only their exact files, without the video',
     () async {
       final action = catalog.allActions.first;
       final cover = File.fromUri(action.cover.resolve(root.uri));
@@ -49,12 +49,12 @@ void main() {
       await cover.writeAsBytes([1, 2, 3, 4]);
       await thumbnail.writeAsBytes([5, 6]);
       final ready = Completer<Uri>();
-      var installs = 0;
-      final installation = PoseHubPackInstallation.forTesting(
-        enabled: true,
-        install: () {
-          installs++;
-          return ready.future;
+      var preparations = 0;
+      final installation = PoseHubUiRepository(
+        mediaBaseUri: root.uri,
+        onEnsureFile: (file) {
+          preparations++;
+          return ready.future.then(file.resolve);
         },
       );
       addTearDown(installation.dispose);
@@ -65,12 +65,14 @@ void main() {
       );
       final coverRead = bundle.load(_key(action.id, 'cover'));
       final thumbnailRead = bundle.load(_key(action.id, 'thumbnail'));
-      expect(installs, 1);
+      expect(preparations, 2);
+      expect(installation.actionRequests, isEmpty);
       ready.complete(root.uri);
       expect(_bytes(await coverRead), [1, 2, 3, 4]);
       expect(_bytes(await thumbnailRead), [5, 6]);
       expect(_bytes(await bundle.load(_key(action.id, 'cover'))), [1, 2, 3, 4]);
-      expect(installs, 1);
+      expect(preparations, 3);
+      expect(installation.actionRequests, isEmpty);
       // Only the two selected small files exist. The bundle must not request the
       // archive, SDK assets or any retired media from its Dart asset delegate.
       expect(delegate.reads, isEmpty);
@@ -84,12 +86,12 @@ void main() {
   test(
     'unknown IDs, roles and malformed keys fail before installation',
     () async {
-      var installs = 0;
-      final installation = PoseHubPackInstallation.forTesting(
-        enabled: true,
-        install: () async {
-          installs++;
-          return root.uri;
+      var preparations = 0;
+      final installation = PoseHubUiRepository(
+        mediaBaseUri: root.uri,
+        onEnsureFile: (file) async {
+          preparations++;
+          return file.resolve(root.uri);
         },
       );
       addTearDown(installation.dispose);
@@ -109,41 +111,38 @@ void main() {
         bundle.load('${PoseHubAssetBundle.prefix}%ZZ/cover'),
         throwsArgumentError,
       );
-      expect(installs, 0);
+      expect(preparations, 0);
       expect(delegate.reads, isEmpty);
     },
   );
 
-  test(
-    'ordinary assets delegate unchanged without installing a pack',
-    () async {
-      var installs = 0;
-      final installation = PoseHubPackInstallation.forTesting(
-        enabled: true,
-        install: () async {
-          installs++;
-          return root.uri;
-        },
-      );
-      addTearDown(installation.dispose);
-      final bundle = PoseHubAssetBundle(
-        catalog: catalog,
-        installation: installation,
-        delegate: delegate,
-      );
-      expect(await bundle.load('assets/ordinary.png'), same(delegate.data));
-      expect(delegate.reads, ['assets/ordinary.png']);
-      expect(installs, 0);
-    },
-  );
+  test('ordinary assets delegate unchanged without preparing media', () async {
+    var preparations = 0;
+    final installation = PoseHubUiRepository(
+      mediaBaseUri: root.uri,
+      onEnsureFile: (file) async {
+        preparations++;
+        return file.resolve(root.uri);
+      },
+    );
+    addTearDown(installation.dispose);
+    final bundle = PoseHubAssetBundle(
+      catalog: catalog,
+      installation: installation,
+      delegate: delegate,
+    );
+    expect(await bundle.load('assets/ordinary.png'), same(delegate.data));
+    expect(delegate.reads, ['assets/ordinary.png']);
+    expect(preparations, 0);
+  });
 
   test(
-    'installation failure propagates without trying an alternate media source',
+    'file preparation failure propagates without an alternate media source',
     () async {
-      final failure = StateError('local installation failed');
-      final installation = PoseHubPackInstallation.forTesting(
-        enabled: true,
-        install: () async => throw failure,
+      final failure = StateError('file preparation failed');
+      final installation = PoseHubUiRepository(
+        mediaBaseUri: root.uri,
+        onEnsureFile: (_) async => throw failure,
       );
       addTearDown(installation.dispose);
       final bundle = PoseHubAssetBundle(

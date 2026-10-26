@@ -11,7 +11,10 @@ import 'app/services.dart';
 import 'app/app_test_catalog.dart';
 import 'app/app_test_content.dart';
 import 'app/posehub_asset_bundle.dart';
-import 'app/posehub_pack_installation.dart';
+import 'app/posehub_bundled_images.dart';
+import 'app/posehub_media_config.dart';
+import 'app/posehub_media_delivery.dart';
+import 'app/posehub_media_repository.dart';
 import 'app/build_info.dart';
 import 'app/device_identity.dart';
 import 'app/training_media_config.dart';
@@ -80,12 +83,49 @@ Future<void> main() async {
     };
   }
   registerFontLicense();
-  final poseHubCatalog = PoseHubPackConfig.enabled
+  final poseHubCatalog = PoseHubMediaConfig.enabled
       ? await PoseHubActionLibrary.load()
       : null;
-  final poseHubMedia = poseHubCatalog == null
-      ? null
-      : PoseHubPackInstallation();
+  PoseHubMediaRepository? poseHubMedia;
+  if (poseHubCatalog != null) {
+    PoseHubBundledImages? images;
+    try {
+      images = await PoseHubBundledImages.load(
+        catalogRevision: PoseHubActionLibrary.catalogSha256,
+      );
+    } on Object catch (error) {
+      log.record(
+        'posehub.bundled_images_unavailable',
+        fields: RuntimeLog.errorFields(error),
+      );
+    }
+    var delivery = PoseHubMediaDelivery.unavailable();
+    try {
+      delivery = await PoseHubMediaDelivery.load(
+        catalogRevision: PoseHubActionLibrary.catalogSha256,
+        mediaBaseUrl: PoseHubMediaConfig.mediaBaseUrl,
+      );
+    } on Object catch (error) {
+      log.record(
+        'posehub.delivery_unavailable',
+        fields: RuntimeLog.errorFields(error),
+      );
+    }
+    try {
+      poseHubMedia = await PoseHubMediaRepository.create(
+        catalog: poseHubCatalog,
+        catalogRevision: PoseHubActionLibrary.catalogSha256,
+        mediaBaseUrl: delivery.mediaBaseUrl,
+        bundledFileLoader: images?.loadFile,
+        downloadUrlResolver: delivery.urlFor,
+      );
+    } on Object catch (error) {
+      log.record(
+        'posehub.cache_unavailable',
+        fields: RuntimeLog.errorFields(error),
+      );
+    }
+  }
   final media = poseHubCatalog != null
       ? null
       : await TrainingMediaRepository.create(

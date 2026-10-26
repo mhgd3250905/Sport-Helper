@@ -61,3 +61,4 @@ android/key.properties
 pubspec_overrides.yaml
 # Immutable release payload is restored and verified by the build helper.
 /assets/posehub/*.zip
+/assets/posehub/images/

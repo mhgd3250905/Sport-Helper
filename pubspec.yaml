@@ -1,7 +1,7 @@
 name: smartfit
 description: "智能健身助手 — 描述训练场景，按模板生成训练计划，预渲染动作跟练。"
 publish_to: 'none'
-version: 0.1.0+33
+version: 0.1.0+34
 
 environment:
   sdk: ^3.12.0
@@ -37,6 +37,8 @@ dependencies:
   wakelock_plus: 1.8.1
   cupertino_icons: ^1.0.8
   web: 1.1.1
+  crypto: 3.0.7
+  path_provider: 2.1.6
 
 dev_dependencies:
   shared_preferences_platform_interface: 2.4.2
@@ -257,10 +259,13 @@ flutter:
     - assets/voice_lc32/v1/w-wall-sit/zh/
     # END drill packs
     - assets/library/
-    - path: assets/posehub/posehub-app-test-pack-r1-v2.zip
+    - path: assets/posehub/images-index.json
       flavors:
         - internal
-    - path: assets/posehub/posehub-app-test-pack-r1-v2.descriptor.json
+    - path: assets/posehub/media-delivery.json
+      flavors:
+        - internal
+    - path: assets/posehub/images/a1655e5c64055c14af35850b5468390d9d11161e53a87a0cbe7780ec7ed25dc0/
       flavors:
         - internal
     - assets/media_player/

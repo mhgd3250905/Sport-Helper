@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
 import 'package:ugk_trainer/ugk_trainer.dart';
 
-import '../app/posehub_pack_installation.dart';
+import '../app/posehub_media_repository.dart';
 import '../app/services.dart';
 import '../domain/exercise.dart';
 import '../diagnostics/runtime_log.dart';
 import 'theme.dart';
 import 'theme/trainer_theme.dart';
+import 'posehub_download_status.dart';
 
 /// App styling around the shared, verified on-demand training media view.
 class ExerciseVideo extends StatefulWidget {
@@ -78,7 +79,7 @@ class _ExerciseVideoState extends State<ExerciseVideo> {
     if (action != null) {
       return _PoseHubExerciseVideo(
         action: action,
-        installation: services?.poseHubMedia,
+        repo: services?.poseHubMedia,
         playing: widget.playing,
         paused: widget.paused,
         mirrored: widget.mirrored,
@@ -121,7 +122,7 @@ class _ExerciseVideoState extends State<ExerciseVideo> {
 class _PoseHubExerciseVideo extends StatefulWidget {
   const _PoseHubExerciseVideo({
     required this.action,
-    required this.installation,
+    required this.repo,
     required this.playing,
     required this.paused,
     required this.mirrored,
@@ -130,7 +131,7 @@ class _PoseHubExerciseVideo extends StatefulWidget {
   });
 
   final coach.PoseHubPackAction action;
-  final PoseHubPackInstallation? installation;
+  final PoseHubMediaRepository? repo;
   final bool playing, paused, mirrored;
   final double radius;
   final DrillMediaPlaybackHandle? playbackHandle;
@@ -148,7 +149,9 @@ class _PoseHubExerciseVideoState extends State<_PoseHubExerciseVideo>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _ready = widget.installation?.ensureInstalled();
+    final lifecycle = WidgetsBinding.instance.lifecycleState;
+    _backgrounded = lifecycle != null && lifecycle != AppLifecycleState.resumed;
+    _ready = _prepare();
     _bindIdentity();
   }
 
@@ -158,11 +161,22 @@ class _PoseHubExerciseVideoState extends State<_PoseHubExerciseVideo>
     controller: null,
   );
 
+  Future<Uri>? _prepare() {
+    final repo = widget.repo;
+    if (repo == null) return null;
+    if (widget.playing) return repo.ensureAction(widget.action.id);
+    return repo.ensureFile(widget.action.cover).then((_) => repo.mediaBaseUri);
+  }
+
   @override
   void didUpdateWidget(_PoseHubExerciseVideo oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (!identical(oldWidget.installation, widget.installation)) {
-      _ready = widget.installation?.ensureInstalled();
+    if (!identical(oldWidget.repo, widget.repo) ||
+        oldWidget.action.id != widget.action.id ||
+        oldWidget.action.cover.sha256 != widget.action.cover.sha256 ||
+        oldWidget.action.video.sha256 != widget.action.video.sha256 ||
+        oldWidget.playing != widget.playing) {
+      _ready = _prepare();
     }
     if (!identical(oldWidget.playbackHandle, widget.playbackHandle)) {
       oldWidget.playbackHandle?.unbind(this);
@@ -179,7 +193,7 @@ class _PoseHubExerciseVideoState extends State<_PoseHubExerciseVideo>
   }
 
   void _retry() {
-    final ready = widget.installation?.ensureInstalled();
+    final ready = _prepare();
     setState(() {
       _ready = ready;
     });
@@ -208,13 +222,15 @@ class _PoseHubExerciseVideoState extends State<_PoseHubExerciseVideo>
                 key: ValueKey('posehub-exercise-media-${widget.action.id}'),
                 action: widget.action,
                 baseUri: snapshot.data!,
-                playing: widget.playing && TickerMode.valuesOf(context).enabled,
+                playing:
+                    widget.playing &&
+                    !_backgrounded &&
+                    TickerMode.valuesOf(context).enabled,
                 paused: widget.paused || _backgrounded,
                 theme: theme,
               ),
             );
           }
-          final failed = snapshot.hasError || widget.installation == null;
           return AspectRatio(
             aspectRatio: 1,
             child: ColoredBox(
@@ -222,30 +238,18 @@ class _PoseHubExerciseVideoState extends State<_PoseHubExerciseVideo>
               child: Center(
                 child: Padding(
                   padding: const EdgeInsets.all(SfSpace.x4),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        failed ? '动作素材暂时无法准备' : '正在准备动作素材',
-                        key: ValueKey(
-                          failed
-                              ? 'posehub-media-error'
-                              : 'posehub-media-preparing',
+                  child: widget.repo != null
+                      ? PoseHubDownloadStatus(
+                          repo: widget.repo!,
+                          actionId: widget.action.id,
+                          onRetry: _retry,
+                        )
+                      : Text(
+                          '动作素材暂时无法准备',
+                          key: const ValueKey('posehub-media-error'),
+                          style: theme.label,
+                          textAlign: TextAlign.center,
                         ),
-                        style: theme.label,
-                        textAlign: TextAlign.center,
-                      ),
-                      if (failed && widget.installation != null)
-                        TextButton(
-                          key: const ValueKey('posehub-media-retry'),
-                          onPressed: _retry,
-                          style: TextButton.styleFrom(
-                            foregroundColor: theme.accentText,
-                          ),
-                          child: const Text('重试'),
-                        ),
-                    ],
-                  ),
                 ),
               ),
             ),

@@ -1,5 +1,7 @@
 // Actual SDK widget previews with verified original pack images.
 // This captures covers and controls, not native video or device performance.
+// UI FakeRepo only resolves the independently verified installed-v2 source;
+// this test does not validate downloads/cache integrity or SDK provider hooks.
 // SMARTFIT_POSEHUB_TEST_PACK=<installed root> SF_SCREENSHOT_DIR=<output>
 // flutter test --no-pub test_screens/posehub_library_review_test.dart --update-goldens
 import 'dart:io';
@@ -7,7 +9,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:smartfit/app/posehub_pack_installation.dart';
 import 'package:smartfit/ui/library_page.dart';
 import 'package:smartfit/ui/theme.dart';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
@@ -76,23 +77,17 @@ void main() {
         tester.view.physicalSize = const Size(1170, 2532);
         tester.view.devicePixelRatio = 3;
         addTearDown(tester.view.reset);
-        // This screenshot test lives outside test/ to stay opt-in.
-        // ignore: invalid_use_of_visible_for_testing_member
-        final installation = PoseHubPackInstallation.forTesting(
-          enabled: true,
-          install: () async => Directory(installedRoot!).absolute.uri,
+        final media = PoseHubUiRepository(
+          mediaBaseUri: Directory(installedRoot!).absolute.uri,
         );
-        final services = poseHubUiServices(
-          catalog: catalog,
-          installation: installation,
-        );
+        final services = poseHubUiServices(catalog: catalog, media: media);
         // Start real file decoding outside the fake widget clock, before any
         // Image.file starts a pending stream that would await that same clock.
         await tester.pumpWidget(
           poseHubUiApp(palette: palette, home: const SizedBox.shrink()),
         );
         final imageContext = tester.element(find.byType(SizedBox).first);
-        final base = Directory(installedRoot!).absolute.uri;
+        final base = Directory(installedRoot).absolute.uri;
         final previewFiles = {
           for (final action in catalog.allActions.take(12)) action.thumbnail,
           for (final action in catalog.pendingActions) action.thumbnail,
@@ -150,7 +145,7 @@ void main() {
         expect(tester.takeException(), isNull);
         await tester.pumpWidget(const SizedBox.shrink());
         await tester.pump();
-        installation.dispose();
+        media.dispose();
       },
       skip: installedRoot == null,
     );

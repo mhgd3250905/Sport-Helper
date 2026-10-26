@@ -3,9 +3,9 @@ import 'package:ugk_coach/ugk_coach.dart';
 
 import 'posehub_asset_reader_stub.dart'
     if (dart.library.io) 'posehub_asset_reader_io.dart';
-import 'posehub_pack_installation.dart';
+import 'posehub_media_repository.dart';
 
-/// Resolves existing App/SDK asset-image slots from the same installed pack.
+/// Resolves existing App/SDK asset-image slots from the verified file cache.
 /// This contains no copied media or alternate catalogue.
 class PoseHubAssetBundle extends CachingAssetBundle {
   PoseHubAssetBundle({
@@ -16,7 +16,7 @@ class PoseHubAssetBundle extends CachingAssetBundle {
 
   static const prefix = 'posehub-r1/';
   final PoseHubAppTestCatalog catalog;
-  final PoseHubPackInstallation installation;
+  final PoseHubMediaRepository installation;
   final AssetBundle delegate;
 
   static bool handles(String key) => key.startsWith(prefix);
@@ -31,8 +31,8 @@ class PoseHubAssetBundle extends CachingAssetBundle {
     final action = catalog.tryGet(Uri.decodeComponent(parts[0]));
     if (action == null) throw const FormatException('Unknown pack action');
     final file = parts[1] == 'cover' ? action.cover : action.thumbnail;
-    final base = await installation.ensureInstalled();
-    final bytes = await readPoseHubAsset(file.resolve(base));
+    final localFile = await installation.ensureFile(file);
+    final bytes = await readPoseHubAsset(localFile);
     return ByteData.sublistView(bytes);
   }
 }

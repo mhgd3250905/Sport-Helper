@@ -7,7 +7,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:smartfit/app/app_test_catalog.dart';
 import 'package:smartfit/app/app_test_content.dart';
 import 'package:smartfit/app/posehub_asset_bundle.dart';
-import 'package:smartfit/app/posehub_pack_installation.dart';
 import 'package:smartfit/app/services.dart';
 import 'package:smartfit/data/app_store.dart';
 import 'package:smartfit/domain/exercise.dart';
@@ -26,6 +25,7 @@ import 'package:ugk_trainer/ugk_trainer.dart' as trainer;
 
 import 'app_flow_test.dart' show MemoryStorage;
 import 'support.dart';
+import 'posehub_ui_support.dart' show PoseHubUiRepository;
 
 /// Read the real installed-path bundle in setUpAll's real async zone. Widget
 /// fake-async tests then decode those same bytes without stranding file handles.
@@ -115,7 +115,7 @@ void main() {
   late ExerciseLibrary library;
   late coach.PoseHubAppTestCatalog sdk;
   late Directory installed;
-  late PoseHubPackInstallation installation;
+  late PoseHubUiRepository installation;
   late AssetBundle bundle;
 
   setUpAll(() async {
@@ -135,10 +135,7 @@ void main() {
         await target.writeAsBytes(image);
       }
     }
-    installation = PoseHubPackInstallation.forTesting(
-      enabled: true,
-      install: () async => installed.uri,
-    );
+    installation = PoseHubUiRepository(mediaBaseUri: installed.uri);
     final source = PoseHubAssetBundle(catalog: sdk, installation: installation);
     final images = <String, ByteData>{};
     for (final id in _plan().exerciseIds) {

@@ -95,7 +95,8 @@ class AboutPage extends StatelessWidget {
                   '动作库 ${poseHub.allActions.length} 个动作，均可浏览与单练。\n'
                   '${poseHub.semanticCompleteActions.length} 个训练说明完整；'
                   '${poseHub.pendingActions.length} 个训练说明待补。\n'
-                  '素材随内测安装包提供，首次使用时在本机准备。',
+                  '图片可离线浏览，视频在播放前按动作下载；'
+                  '已缓存动作可离线使用。',
                   style: SfType.callout,
                 ),
               ),
