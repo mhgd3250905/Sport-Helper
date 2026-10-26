@@ -32,6 +32,12 @@ android {
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
+    androidResources {
+        // The whole immutable media pack is already an archive. Stream it
+        // directly from the APK during the one-time local installation.
+        noCompress += "zip"
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17

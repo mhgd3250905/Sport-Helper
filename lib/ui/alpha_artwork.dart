@@ -3,6 +3,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 
 import '../domain/exercise.dart';
+import '../app/posehub_asset_bundle.dart';
 import 'alpha_bounds.dart';
 import 'theme/solid_surface.dart';
 import 'theme/tokens.dart';
@@ -173,35 +174,48 @@ class SfAlphaAsset extends StatelessWidget {
   final ImageErrorWidgetBuilder? errorBuilder;
 
   @override
-  Widget build(BuildContext context) => FutureBuilder<SfAlphaBounds>(
-    future: SfAlphaBounds.load(DefaultAssetBundle.of(context)),
-    builder: (context, snapshot) => Semantics(
-      image: true,
-      label: semanticLabel,
-      excludeSemantics: semanticLabel == null,
-      child: Image.asset(
+  Widget build(BuildContext context) {
+    if (PoseHubAssetBundle.handles(asset)) {
+      return Image.asset(
         asset,
         fit: fit,
         alignment: alignment,
-        excludeFromSemantics: true,
+        semanticLabel: semanticLabel,
+        excludeFromSemantics: semanticLabel == null,
         gaplessPlayback: true,
         errorBuilder: errorBuilder ?? (_, _, _) => const SizedBox.shrink(),
-        frameBuilder: (context, child, frame, synchronous) {
-          // Wait for the cached bounds before the first visible frame, so the
-          // figure never jumps from uncropped to cropped after loading.
-          if (!snapshot.hasData) return const SizedBox.expand();
-          final source = snapshot.data!.entries[asset];
-          if (source == null || child is! RawImage || child.image == null) {
-            return child;
-          }
-          return CustomPaint(
-            painter: _AlphaPainter(child.image!, source, fit, alignment),
-            child: const SizedBox.expand(),
-          );
-        },
+      );
+    }
+    return FutureBuilder<SfAlphaBounds>(
+      future: SfAlphaBounds.load(DefaultAssetBundle.of(context)),
+      builder: (context, snapshot) => Semantics(
+        image: true,
+        label: semanticLabel,
+        excludeSemantics: semanticLabel == null,
+        child: Image.asset(
+          asset,
+          fit: fit,
+          alignment: alignment,
+          excludeFromSemantics: true,
+          gaplessPlayback: true,
+          errorBuilder: errorBuilder ?? (_, _, _) => const SizedBox.shrink(),
+          frameBuilder: (context, child, frame, synchronous) {
+            // Wait for the cached bounds before the first visible frame, so the
+            // figure never jumps from uncropped to cropped after loading.
+            if (!snapshot.hasData) return const SizedBox.expand();
+            final source = snapshot.data!.entries[asset];
+            if (source == null || child is! RawImage || child.image == null) {
+              return child;
+            }
+            return CustomPaint(
+              painter: _AlphaPainter(child.image!, source, fit, alignment),
+              child: const SizedBox.expand(),
+            );
+          },
+        ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 class _AlphaPainter extends CustomPainter {

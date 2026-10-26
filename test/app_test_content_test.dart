@@ -11,6 +11,8 @@ import 'package:smartfit/domain/scenario.dart';
 import 'package:smartfit/domain/session.dart';
 import 'package:smartfit/domain/template.dart';
 import 'package:smartfit/packs/drill_pack.dart';
+import 'package:ugk_trainer/engine.dart' as trainer;
+import 'package:ugk_trainer/ugk_trainer.dart' show PoseHubActionLibrary;
 
 Map<String, Object?> _row(String id) => {
   'id': id,
@@ -68,8 +70,8 @@ Future<AppTestCatalog> _catalog({bool media = false}) => AppTestCatalog.load(
   bundledMedia: media ? {'complete': _alpha} : {},
 );
 
-Exercise _legacy() => const Exercise(
-  id: 'complete',
+Exercise _legacy({String id = 'complete'}) => Exercise(
+  id: id,
   name: '旧名',
   muscles: [],
   unilateral: false,
@@ -84,7 +86,7 @@ Exercise _legacy() => const Exercise(
   cautions: [],
   alternative: null,
   media: ExerciseMedia(
-    id: 'complete',
+    id: id,
     video: 'assets/old.mp4',
     poster: 'assets/old.jpg',
     loopSeconds: 99,
@@ -94,6 +96,8 @@ Exercise _legacy() => const Exercise(
 );
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   test(
     'complete definitions retain unknown gear and real hold timing',
     () async {
@@ -173,51 +177,112 @@ void main() {
 
   final realPack = Platform.environment['SMARTFIT_CATALOG_TEST_PACK'];
   test(
-    'bundled catalog and semantic assets form the actual internal library',
+    'SDK projection drives the full execution library without old media fallback',
     () async {
-      final index =
-          jsonDecode(await File(AppTestPackConfig.indexAsset).readAsString())
-              as Map;
-      final pack = (await AppTestPack.load(
-        (path) => File(path).readAsString(),
-        enabled: true,
-      ))!;
-      final catalog = await AppTestCatalog.load(
-        deliveryCatalogJson: await File(
-          index['catalogAsset'] as String,
-        ).readAsString(),
-        bundledMedia: pack.actions,
-        readSemanticCatalog: (path) async {
-          final asset = (index['semanticSources'] as Map?)?[path];
-          return asset == null ? null : File(asset as String).readAsBytes();
-        },
-      );
-      expect(catalog.semanticStatus, AppTestSemanticStatus.verified);
-      final packs = await PackSet.load((path) => File(path).readAsString());
-      final legacy = ExerciseLibrary.fromPacks(packs);
+      final sdk = await PoseHubActionLibrary.load();
+      final catalog = AppTestCatalog.fromSdk(sdk);
+      final ai = catalog.toCoachCatalog()!;
       final content = AppTestContent.build(
         catalog: catalog,
-        legacyLibrary: legacy,
+        legacyLibrary: ExerciseLibrary([_legacy(id: sdk.allActions.first.id)]),
       );
-      expect(catalog.entries.length, pack.catalog.length);
-      expect(content.library.length, catalog.trainingEligibleIds.length);
-      expect(content.coachCatalog.length, content.library.length);
-      for (final old in legacy.all) {
-        expect(content.library.contains(old.id), isTrue, reason: old.id);
+      expect(content.library.length, 211);
+      expect(content.coachCatalog, same(ai));
+      expect(content.library.all.map((exercise) => exercise.id), ai.ids);
+      expect(content.rhythms.keys, ai.ids);
+      for (final exercise in content.library.all) {
+        final source = ai[exercise.id]!;
+        final rawDose = source.raw['defaultDose']! as Map;
+        expect(exercise.dose.sets, rawDose['sets'], reason: exercise.id);
+        expect(exercise.dose.reps, rawDose['reps'], reason: exercise.id);
+        expect(
+          exercise.dose.seconds,
+          rawDose['seconds'] ?? rawDose['workSeconds'],
+          reason: exercise.id,
+        );
+        expect(
+          exercise.dose.restSeconds,
+          rawDose['restSeconds'],
+          reason: exercise.id,
+        );
+        expect(exercise.effectiveEquipmentIds, source.equipment);
+        expect(exercise.trainingRhythm, same(content.rhythms[exercise.id]));
+        final cover = 'posehub-r1/${Uri.encodeComponent(exercise.id)}/cover';
+        final thumbnail =
+            'posehub-r1/${Uri.encodeComponent(exercise.id)}/thumbnail';
+        expect(exercise.media.videoAvailable, isTrue);
+        expect(exercise.media.lightVideoAvailable, isTrue);
+        expect(exercise.media.video, isEmpty);
+        expect(exercise.media.poster, cover);
+        expect(exercise.media.lightPoster, cover);
+        expect(exercise.media.alphaCover, cover);
+        expect(exercise.media.alphaThumbnail, thumbnail);
+        expect(exercise.media.packedAlphaVideo, isNull);
+        expect(exercise.media.playbackPoster, isNull);
+        expect(exercise.media.alphaPlaybackPoster, isNull);
+        expect(exercise.media.revision, catalog.entries[exercise.id]!.revision);
       }
-      for (final pending in catalog.entries.values.where(
-        (e) => !e.trainingEligible,
-      )) {
+      for (final pending in sdk.pendingActions) {
         expect(content.library.contains(pending.id), isFalse);
         expect(content.coachCatalog[pending.id], isNull);
-        if (pack.actions[pending.id] case final media?) {
-          expect(pending.media, same(media));
+        expect(content.rhythms.containsKey(pending.id), isFalse);
+      }
+    },
+  );
+
+  test(
+    'unknown SDK execution stays self-paced while canonical rhythms retain holds',
+    () async {
+      final sdk = await PoseHubActionLibrary.load();
+      final catalog = AppTestCatalog.fromSdk(sdk);
+      final content = AppTestContent.build(
+        catalog: catalog,
+        legacyLibrary: ExerciseLibrary([]),
+      );
+      final oldRhythms = trainer.rhythmsFromCatalog(content.coachCatalog);
+      final unknown = sdk.semanticCompleteActions.where((action) {
+        final rhythm = catalog.entries[action.id]!.training!.rhythm;
+        return rhythm != null &&
+            rhythm.containsKey('execution') &&
+            rhythm['execution'] == null;
+      }).toList();
+      expect(unknown, hasLength(69));
+      for (final action in unknown) {
+        final exercise = content.library[action.id];
+        final rhythm = content.rhythms[action.id]!;
+        expect(rhythm.phases, isEmpty, reason: action.id);
+        expect(rhythm.counted, isFalse, reason: action.id);
+        expect(exercise.repSeconds, isNull, reason: action.id);
+        expect(
+          exercise.media.loopSeconds,
+          (action.raw['rhythm']! as Map)['durationSeconds'],
+        );
+        if (exercise.dose.mode == DoseMode.reps) {
+          expect(rhythm, same(trainer.Rhythm.selfPacedReps));
+          expect(rhythm.selfPaced, isTrue);
+        } else {
+          expect(rhythm, same(trainer.Rhythm.timedHold));
+          expect(rhythm.selfPaced, isFalse);
         }
       }
-      // ignore: avoid_print
-      print(
-        'Bundled ${catalog.entries.length} entries / ${content.library.length} complete / ${pack.actions.length} transparent media.',
+      // The original canonical definitions keep the established helper and
+      // holdSeconds rule; media duration never enters either code path.
+      final canonical = sdk.semanticCompleteActions.where(
+        (action) => action.availableForTraining,
       );
+      expect(canonical, hasLength(142));
+      for (final action in canonical) {
+        final training = catalog.entries[action.id]!.training!;
+        var expected = oldRhythms[action.id]!;
+        if (training.holdSeconds case final hold? when expected.counted) {
+          expected = expected.withHold(hold);
+        }
+        expect(
+          content.rhythms[action.id]!.toJson(),
+          expected.toJson(),
+          reason: action.id,
+        );
+      }
     },
   );
 

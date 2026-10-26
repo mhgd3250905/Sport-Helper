@@ -8,14 +8,15 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
 
 import 'app/services.dart';
-import 'app/app_test_pack.dart';
 import 'app/app_test_catalog.dart';
 import 'app/app_test_content.dart';
+import 'app/posehub_asset_bundle.dart';
+import 'app/posehub_pack_installation.dart';
 import 'app/build_info.dart';
 import 'app/device_identity.dart';
 import 'app/training_media_config.dart';
 import 'package:ugk_trainer/ugk_trainer.dart'
-    show TrainingMediaRepository, TrainingMediaScope;
+    show PoseHubActionLibrary, TrainingMediaRepository, TrainingMediaScope;
 import 'core/storage/local_state_storage.dart';
 import 'data/app_store.dart';
 import 'diagnostics/runtime_log.dart';
@@ -79,44 +80,36 @@ Future<void> main() async {
     };
   }
   registerFontLicense();
-  final media = await TrainingMediaRepository.create(
-    manifestAsset: TrainingMediaConfig.manifestAsset,
-    baseUrls: TrainingMediaConfig.baseUrls,
-    allowPending: TrainingMediaConfig.includePending,
-  );
-  await media.availableActionIds();
-  await media.canDownload();
-  log.record(
-    'app.media_ready',
-    fields: {'count': media.visibleActions.length, 'offline': media.isOffline},
-  );
-  final testPack = await AppTestPack.load(rootBundle.loadString);
-  final (lib, catalog, voices, coachCatalog) = await AppServices.loadContent(
-    media: media,
-    testPack: testPack,
-  );
-  AppTestContent? testContent;
-  if (AppTestPackConfig.fullCatalog && testPack != null) {
-    final index =
-        jsonDecode(await rootBundle.loadString(AppTestPackConfig.indexAsset))
-            as Map<String, dynamic>;
-    final testCatalog = await AppTestCatalog.load(
-      deliveryCatalogJson: await rootBundle.loadString(
-        index['catalogAsset'] as String,
-      ),
-      bundledMedia: testPack.actions,
-      readSemanticCatalog: (relativePath) async {
-        final entry = (index['semanticSources'] as Map?)?[relativePath];
-        if (entry is! String || !entry.startsWith('assets/app_test_pack/')) {
-          return null;
-        }
-        final bytes = await rootBundle.load(entry);
-        return bytes.buffer.asUint8List(
-          bytes.offsetInBytes,
-          bytes.lengthInBytes,
+  final poseHubCatalog = PoseHubPackConfig.enabled
+      ? await PoseHubActionLibrary.load()
+      : null;
+  final poseHubMedia = poseHubCatalog == null
+      ? null
+      : PoseHubPackInstallation();
+  final media = poseHubCatalog != null
+      ? null
+      : await TrainingMediaRepository.create(
+          manifestAsset: TrainingMediaConfig.manifestAsset,
+          baseUrls: TrainingMediaConfig.baseUrls,
+          allowPending: TrainingMediaConfig.includePending,
         );
+  if (media != null) {
+    await media.availableActionIds();
+    await media.canDownload();
+    log.record(
+      'app.media_ready',
+      fields: {
+        'count': media.visibleActions.length,
+        'offline': media.isOffline,
       },
     );
+  }
+  final (lib, catalog, voices, coachCatalog) = await AppServices.loadContent(
+    media: media,
+  );
+  AppTestContent? testContent;
+  if (poseHubCatalog != null) {
+    final testCatalog = AppTestCatalog.fromSdk(poseHubCatalog);
     testContent = AppTestContent.build(
       catalog: testCatalog,
       legacyLibrary: lib,
@@ -139,7 +132,7 @@ Future<void> main() async {
   final store = AppStore(storage);
   await store.load();
   log.record('app.state_initialized');
-  media.wifiOnly = store.mediaWifiOnly;
+  if (media != null) media.wifiOnly = store.mediaWifiOnly;
   String? deviceId;
   try {
     deviceId = await DeviceIdentity(storage).loadOrCreate();
@@ -158,6 +151,8 @@ Future<void> main() async {
     voiceOutput: JustAudioVoiceOutput(),
     coachCatalog: activeCoachCatalog,
     testCatalog: testContent?.catalog,
+    poseHubCatalog: poseHubCatalog,
+    poseHubMedia: poseHubMedia,
     coachProfile: coachProfile,
     deviceId: deviceId,
     media: media,
@@ -168,12 +163,20 @@ Future<void> main() async {
     installPerformanceServiceExtension();
     unawaited(PerformanceReportService.instance.initialize());
   }
-  runApp(
-    TrainingMediaScope(
-      repository: media,
-      child: SmartFitApp(services: services),
-    ),
-  );
+  Widget application = SmartFitApp(services: services);
+  if (poseHubCatalog != null && poseHubMedia != null) {
+    application = DefaultAssetBundle(
+      bundle: PoseHubAssetBundle(
+        catalog: poseHubCatalog,
+        installation: poseHubMedia,
+      ),
+      child: application,
+    );
+  }
+  if (media != null) {
+    application = TrainingMediaScope(repository: media, child: application);
+  }
+  runApp(application);
 }
 
 /// Keep Android page backgrounds behind the system bars; each page's existing

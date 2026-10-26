@@ -1,23 +1,73 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smartfit/app/app_test_pack.dart';
 import 'package:smartfit/domain/exercise.dart';
 
-/// Use the actual importer output and its immutable catalog snapshot. Mutations
-/// below affect decoded in-memory fixtures only, never delivered asset files.
+/// A small isolated legacy-import fixture. The retired delivery is deliberately
+/// not a source for either these generic admission checks or current App media.
 class _Fixture {
   _Fixture(this.index, this.catalog);
 
-  factory _Fixture.bundled() {
-    final index =
-        jsonDecode(File(AppTestPackConfig.indexAsset).readAsStringSync())
-            as Map<String, dynamic>;
-    final catalog =
-        jsonDecode(File(index['catalogAsset'] as String).readAsStringSync())
-            as Map<String, dynamic>;
-    return _Fixture(index, catalog);
+  factory _Fixture.memory() {
+    final videoHash = 'a' * 64;
+    Map<String, dynamic> file(String name) => {
+      'asset': 'assets/app_test_pack/fixture/$name',
+      'bytes': 128,
+      'sha256': 'b' * 64,
+    };
+    return _Fixture(
+      {
+        'format': 'smartfit-app-test-pack-index@1',
+        'id': 'memory-fixture',
+        'catalogAsset': 'assets/app_test_pack/fixture/catalog.json',
+        'status': 'test-unreviewed',
+        'reviewed': false,
+        'releaseEligible': false,
+        'internalOnly': true,
+        'pendingIds': ['pending-action'],
+        'actions': {
+          'ready-action': {
+            'packedVideo': {
+              ...file('ready.rgb-alpha.mp4'),
+              'sha256': videoHash,
+              'width': 720,
+              'height': 1440,
+              'codec': 'h264',
+              'durationSeconds': 6,
+            },
+            'alphaPlaybackPoster': {
+              ...file('ready.first.webp'),
+              'sourceSha256': videoHash,
+              'sourceFrame': 0,
+              'sourceTimeSeconds': 0,
+            },
+            'alphaCover': file('ready.cover.webp'),
+            'alphaThumbnail': file('ready.thumb.webp'),
+          },
+        },
+      },
+      {
+        'format': 'pose-hub-app-test-catalog@1',
+        'id': 'memory-fixture',
+        'reviewed': false,
+        'releaseEligible': false,
+        'actions': [
+          for (final ready in [true, false])
+            {
+              'id': ready ? 'ready-action' : 'pending-action',
+              'nameZh': ready ? '已备素材' : '待备素材',
+              'revision': 'fixture-r1',
+              'state': ready ? 'ready-test-unreviewed' : 'pending',
+              'availableForApp': ready,
+              'rhythm': {
+                'durationSeconds': 6,
+                'videoLoopIsTrainingDose': false,
+              },
+            },
+        ],
+      },
+    );
   }
 
   final Map<String, dynamic> index;
@@ -60,14 +110,17 @@ void main() {
     });
 
     test(
-      'actual index maps verified media and retains the complete catalog',
+      'isolated index maps verified media and retains pending catalog rows',
       () async {
-        final fixture = _Fixture.bundled();
+        final fixture = _Fixture.memory();
         final pack = await fixture.load();
 
-        expect(pack.id, 'app-test-pack-r1');
+        expect(pack.id, fixture.index['id']);
         expect(pack.catalog, hasLength(fixture.entries.length));
-        expect(pack.catalog.length, greaterThan(93));
+        expect(
+          pack.catalog.keys,
+          unorderedEquals(['ready-action', 'pending-action']),
+        );
         expect(pack.actions.keys, unorderedEquals(fixture.media.keys));
         expect(fixture.reads, [
           AppTestPackConfig.indexAsset,
@@ -102,7 +155,7 @@ void main() {
     test(
       'pending catalog metadata stays visible without media admission',
       () async {
-        final fixture = _Fixture.bundled();
+        final fixture = _Fixture.memory();
         final pending = fixture.entries.firstWhere(
           (entry) => entry['id'] == fixture.pendingId,
         );
@@ -123,7 +176,7 @@ void main() {
     test(
       'app-test index cannot be admitted as reviewed production media',
       () async {
-        final fixture = _Fixture.bundled();
+        final fixture = _Fixture.memory();
         fixture.index['releaseEligible'] = true;
         await expectLater(fixture.load(), throwsA(isA<FormatException>()));
       },
@@ -137,7 +190,7 @@ void main() {
       test(
         'rejects frame-zero poster with mismatched ${mismatch.$1}',
         () async {
-          final fixture = _Fixture.bundled();
+          final fixture = _Fixture.memory();
           fixture.descriptor(
             fixture.readyId,
             'alphaPlaybackPoster',
@@ -150,7 +203,7 @@ void main() {
     test(
       'index media cannot override a pending catalog readiness state',
       () async {
-        final fixture = _Fixture.bundled();
+        final fixture = _Fixture.memory();
         final metadata = fixture.entries.firstWhere(
           (entry) => entry['id'] == fixture.readyId,
         );
@@ -163,22 +216,12 @@ void main() {
   });
 
   test(
-    'applying real alpha media preserves both opaque theme fallbacks',
+    'applying verified alpha media preserves both opaque theme fallbacks',
     () async {
-      final fixture = _Fixture.bundled();
+      final fixture = _Fixture.memory();
       final pack = await fixture.load();
-      final legacy =
-          (jsonDecode(
-                    File(
-                      'assets/training_media/v0.3.0-app/assets-index.json',
-                    ).readAsStringSync(),
-                  )
-                  as Map<String, dynamic>)['actions']
-              as Map<String, dynamic>;
-      final id = pack.actions.keys.firstWhere(legacy.containsKey);
-      final themes = legacy[id] as Map<String, dynamic>;
-      String path(String theme, String role) =>
-          ((themes[theme] as Map)[role] as Map)['asset'] as String;
+      final id = fixture.readyId;
+      String path(String theme, String role) => 'assets/fixture/$theme/$role';
       final fallback = ExerciseMedia(
         id: id,
         video: path('dark', 'video'),

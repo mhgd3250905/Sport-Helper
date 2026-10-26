@@ -88,7 +88,18 @@ class AboutPage extends StatelessWidget {
                 ],
               ),
             ),
-            if (s.testCatalog case final testCatalog?) ...[
+            if (s.poseHubCatalog case final poseHub?) ...[
+              const SfSectionTitle('离线动作素材'),
+              SfPanel(
+                child: Text(
+                  '动作库 ${poseHub.allActions.length} 个动作，均可浏览与单练。\n'
+                  '${poseHub.semanticCompleteActions.length} 个训练说明完整；'
+                  '${poseHub.pendingActions.length} 个训练说明待补。\n'
+                  '素材随内测安装包提供，首次使用时在本机准备。',
+                  style: SfType.callout,
+                ),
+              ),
+            ] else if (s.testCatalog case final testCatalog?) ...[
               const SfSectionTitle('动作素材（App 测试版，未审）'),
               SfPanel(
                 child: Text(

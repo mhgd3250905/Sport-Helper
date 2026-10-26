@@ -11,7 +11,7 @@ import 'action_issue_actions.dart';
 import 'alpha_artwork.dart';
 import 'exercise_video.dart';
 import 'theme/celebration.dart';
-import 'theme/tokens.dart';
+import 'theme/trainer_theme.dart';
 
 /// App styling, assets and storage injected into the shared training player.
 class PlayerPage extends StatefulWidget {
@@ -71,7 +71,6 @@ class _PlayerPageState extends State<PlayerPage> {
       output.beforeSessionBegin = _audioBeginning;
       output.trainingOperation = _log.operation;
     }
-    final p = SfColors.palette;
     final issueStore = s.store.actionIssueStore;
     final issuePlayback = issueStore.enabled
         ? (_issuePlayback ??= DrillMediaPlaybackHandle())
@@ -85,29 +84,7 @@ class _PlayerPageState extends State<PlayerPage> {
             plan: trainerPlan(plan),
             rhythms: trainerRhythms(s.library),
             strings: TrainerStrings.zh(),
-            theme: TrainerTheme(
-              brightness: p.brightness,
-              background: p.background,
-              surface: p.surface,
-              surfaceHigh: p.surfaceHigh,
-              border: p.line,
-              shadow: p.shadow,
-              track: Color.alphaBlend(p.track, p.surfaceHigh),
-              ringKnob: p.isDark ? p.text : p.surface,
-              accent: p.accent,
-              accentSubtle: p.accentSoft,
-              accentText: p.accentText,
-              onAccent: p.onAccent,
-              pausedColor: p.emphasis,
-              onPaused: p.onEmphasis,
-              text: p.text,
-              muted: p.muted,
-              faint: p.faint,
-              caution: p.caution,
-              danger: p.danger,
-              mediaStage: p.mediaStage,
-              fontFamily: sfFontFamily,
-            ),
+            theme: SmartFitTrainerTheme.of(context),
             drillOf: (id) {
               final e = s.library.tryGet(id);
               if (e == null) return null;

@@ -5,8 +5,8 @@ import '../app/services.dart';
 import '../domain/exercise.dart';
 import 'action_issue_actions.dart';
 import 'alpha_artwork.dart';
-import 'app_test_library_page.dart';
 import 'exercise_video.dart';
+import 'posehub_library_page.dart';
 import 'theme.dart';
 
 /// Every move in the library, filterable by category; tap to watch. Opened
@@ -25,9 +25,9 @@ class _LibraryPageState extends State<LibraryPage> {
 
   @override
   Widget build(BuildContext context) {
-    final testCatalog = AppServices.of(context).testCatalog;
-    if (testCatalog != null) {
-      return AppTestLibraryPage(catalog: testCatalog, initial: widget.initial);
+    final services = AppServices.of(context);
+    if (services.poseHubCatalog case final catalog?) {
+      return PoseHubLibraryPage(catalog: catalog, media: services.poseHubMedia);
     }
     final lib = AppServices.of(context).library;
     final list = lib.all

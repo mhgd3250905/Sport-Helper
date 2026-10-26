@@ -4,6 +4,7 @@ import 'package:ugk_coach_ui/ugk_coach_ui.dart';
 import '../../domain/exercise.dart';
 import '../../domain/plan.dart';
 import '../../domain/session.dart';
+import '../../app/posehub_asset_bundle.dart';
 import '../alpha_artwork.dart';
 import '../theme.dart' show levelZh;
 import '../theme/media_theme.dart';
@@ -77,7 +78,8 @@ CoachUiStyle smartfitCoachUiStyle() {
     builders: CoachUiBuilders(
       media: (context, request) =>
           SfAlphaCards.enabledOf(context) &&
-              request.asset.startsWith('assets/app_test_pack/')
+              (request.asset.startsWith('assets/app_test_pack/') ||
+                  PoseHubAssetBundle.handles(request.asset))
           ? SfAlphaAsset(
               asset: request.asset,
               fit: request.cutout ? request.fit : BoxFit.contain,

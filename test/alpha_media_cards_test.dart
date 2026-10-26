@@ -2,16 +2,17 @@ import 'dart:io';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:smartfit/app/app_test_pack.dart';
+import 'package:smartfit/app/app_test_catalog.dart';
+import 'package:smartfit/app/app_test_content.dart';
+import 'package:smartfit/app/posehub_asset_bundle.dart';
+import 'package:smartfit/app/posehub_pack_installation.dart';
 import 'package:smartfit/app/services.dart';
 import 'package:smartfit/data/app_store.dart';
 import 'package:smartfit/domain/exercise.dart';
 import 'package:smartfit/domain/plan.dart';
 import 'package:smartfit/ui/alpha_artwork.dart';
-import 'package:smartfit/ui/alpha_bounds.dart';
 import 'package:smartfit/ui/chat/coach_ui_adapter.dart';
 import 'package:smartfit/ui/chat/plan_card.dart';
 import 'package:smartfit/ui/exercise_video.dart';
@@ -20,28 +21,23 @@ import 'package:smartfit/ui/theme.dart';
 import 'package:smartfit/voice/voice_library.dart';
 import 'package:smartfit/voice/voice_queue.dart';
 import 'package:ugk_coach_ui/ugk_coach_ui.dart';
+import 'package:ugk_coach/ugk_coach.dart' as coach;
 import 'package:ugk_trainer/ugk_trainer.dart' as trainer;
 
 import 'app_flow_test.dart' show MemoryStorage;
 import 'support.dart';
 
-Exercise _withMedia(Exercise e, ExerciseMedia media) => Exercise(
-  id: e.id,
-  name: e.name,
-  muscles: e.muscles,
-  unilateral: e.unilateral,
-  category: e.category,
-  equipment: e.equipment,
-  position: e.position,
-  level: e.level,
-  scenes: e.scenes,
-  dose: e.dose,
-  repSeconds: e.repSeconds,
-  cues: e.cues,
-  cautions: e.cautions,
-  alternative: e.alternative,
-  media: media,
-);
+/// Read the real installed-path bundle in setUpAll's real async zone. Widget
+/// fake-async tests then decode those same bytes without stranding file handles.
+class _InstalledImageFixture extends CachingAssetBundle {
+  _InstalledImageFixture(this.delegate, this.images);
+  final AssetBundle delegate;
+  final Map<String, ByteData> images;
+
+  @override
+  Future<ByteData> load(String key) =>
+      images.containsKey(key) ? Future.value(images[key]!) : delegate.load(key);
+}
 
 TrainingPlan _plan() => const TrainingPlan(
   id: 'alpha-static',
@@ -96,89 +92,74 @@ Iterable<String> _images(WidgetTester tester) => tester
     .whereType<AssetImage>()
     .map((asset) => asset.assetName);
 
-Future<void> _capture(WidgetTester tester, String name) async {
-  if (!const bool.fromEnvironment('SMARTFIT_CAPTURE_ALPHA_CARDS')) return;
-  // pumpAndSettle alone can end before asynchronous asset decoding finishes.
-  // A visual-review capture must contain real decoded figures, not an empty slot.
-  final assets = _images(tester).toSet();
-  final context = tester.element(find.byType(PlanCard));
-  await tester.runAsync(() async {
-    await SfAlphaBounds.load(DefaultAssetBundle.of(context));
-    await Future.wait([
-      for (final asset in assets) precacheImage(AssetImage(asset), context),
-    ]);
-  });
-  await tester.pumpAndSettle();
-  final boundary = tester.renderObject<RenderRepaintBoundary>(
-    find.byKey(const ValueKey('alpha-preview-page')),
+Future<List<int>> _fixtureImage() async {
+  final recorder = ui.PictureRecorder();
+  ui.Canvas(recorder).drawRect(
+    const ui.Rect.fromLTWH(0, 0, 4, 4),
+    ui.Paint()..color = const ui.Color(0xff2d9672),
   );
-  await tester.runAsync(() async {
-    final image = await boundary.toImage(pixelRatio: 2);
-    try {
-      final rgba = (await image.toByteData())!.buffer.asUint8List();
-      final face = tester.getRect(
-        find.byKey(const ValueKey('alpha-card-face')),
-      );
-      final card = tester.getRect(find.byType(PlanCard));
-      int? firstForegroundY;
-      var foregroundPixels = 0;
-      for (var y = (card.top * 2).ceil(); y < (face.top * 2).floor(); y++) {
-        final background = (y * image.width) * 4;
-        for (
-          var x = ((card.left + 30) * 2).ceil();
-          x < ((card.right - 90) * 2).floor();
-          x++
-        ) {
-          final pixel = (y * image.width + x) * 4;
-          final delta =
-              (rgba[pixel] - rgba[background]).abs() +
-              (rgba[pixel + 1] - rgba[background + 1]).abs() +
-              (rgba[pixel + 2] - rgba[background + 2]).abs();
-          if (delta > 35) {
-            firstForegroundY ??= y;
-            foregroundPixels++;
-          }
-        }
-      }
-      expect(
-        foregroundPixels,
-        greaterThan(10),
-        reason: 'Decoded figure must actually paint above the card face',
-      );
-      expect(face.top - firstForegroundY! / 2, inInclusiveRange(12, 16));
-      final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
-      final output = File('.buildlog/alpha-static-cards/$name.png');
-      await output.parent.create(recursive: true);
-      await output.writeAsBytes(bytes!.buffer.asUint8List());
-    } finally {
-      image.dispose();
-    }
-  });
+  final picture = recorder.endRecording();
+  final image = await picture.toImage(4, 4);
+  try {
+    final data = (await image.toByteData(format: ui.ImageByteFormat.png))!;
+    return data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+  } finally {
+    image.dispose();
+    picture.dispose();
+  }
 }
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   late ExerciseLibrary plain;
   late ExerciseLibrary library;
+  late coach.PoseHubAppTestCatalog sdk;
+  late Directory installed;
+  late PoseHubPackInstallation installation;
+  late AssetBundle bundle;
 
   setUpAll(() async {
-    if (const bool.fromEnvironment('SMARTFIT_CAPTURE_ALPHA_CARDS')) {
-      await (FontLoader(
-        sfFontFamily,
-      )..addFont(rootBundle.load('assets/fonts/NotoSansSC.ttf'))).load();
-    }
     plain = loadLibrary();
-    final pack = (await AppTestPack.load(
-      (path) => File(path).readAsString(),
+    sdk = await trainer.PoseHubActionLibrary.load();
+    library = AppTestContent.build(
+      catalog: AppTestCatalog.fromSdk(sdk),
+      legacyLibrary: plain,
+    ).library;
+    installed = await Directory.systemTemp.createTemp('smartfit-alpha-cards-');
+    final image = await _fixtureImage();
+    for (final id in _plan().exerciseIds) {
+      final action = sdk.tryGet(id)!;
+      for (final file in [action.cover, action.thumbnail]) {
+        final target = File.fromUri(file.resolve(installed.uri));
+        await target.parent.create(recursive: true);
+        await target.writeAsBytes(image);
+      }
+    }
+    installation = PoseHubPackInstallation.forTesting(
       enabled: true,
-    ))!;
-    library = ExerciseLibrary([
-      for (final e in plain.all)
-        _withMedia(e, pack.actions[e.id]?.applyTo(e.media) ?? e.media),
-    ]);
+      install: () async => installed.uri,
+    );
+    final source = PoseHubAssetBundle(catalog: sdk, installation: installation);
+    final images = <String, ByteData>{};
+    for (final id in _plan().exerciseIds) {
+      for (final role in ['cover', 'thumbnail']) {
+        final key =
+            '${PoseHubAssetBundle.prefix}${Uri.encodeComponent(id)}/$role';
+        images[key] = await source.load(key);
+      }
+    }
+    bundle = _InstalledImageFixture(source, images);
     expect(library['h-squat'].media.alphaCover, isNotNull);
     expect(library['w-bird-dog'].media.alphaThumbnail, isNotNull);
   });
 
+  tearDownAll(() async {
+    installation.dispose();
+    PaintingBinding.instance.imageCache
+      ..clear()
+      ..clearLiveImages();
+    await installed.delete(recursive: true);
+  });
   tearDown(() => SfColors.palette = SfPalette.dark);
 
   Future<void> pump(
@@ -192,12 +173,15 @@ void main() {
     tester.view.physicalSize = const Size(360, 800);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
-    Widget app = SfAlphaCardsScope(
-      enabled: enabled,
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        theme: buildTheme(palette),
-        home: child,
+    Widget app = DefaultAssetBundle(
+      bundle: bundle,
+      child: SfAlphaCardsScope(
+        enabled: enabled,
+        child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          theme: buildTheme(palette),
+          home: child,
+        ),
       ),
     );
     if (services != null) app = AppScope(services: services, child: app);
@@ -276,10 +260,9 @@ void main() {
         final oldStart = tester.getRect(start);
         final oldExpand = tester.getRect(expand);
         final oldSize = tester.getSize(find.byType(PlanCard));
-        expect(
-          _images(tester),
-          isNot(contains(library['h-squat'].media.alphaCover)),
-        );
+        // The SDK cover is shared by both treatments; alpha mode changes the
+        // painted face and cutout layout, not the identity of its image source.
+        expect(find.byKey(const ValueKey('alpha-card-face')), findsNothing);
 
         await pump(tester, card(), palette: palette);
         expect(tester.getSize(find.byType(PlanCard)), oldSize);
@@ -301,7 +284,6 @@ void main() {
         final cardRect = tester.getRect(find.byType(PlanCard));
         expect(face.top - cardRect.top, SfAlphaCards.rise);
         expect(tester.takeException(), isNull);
-        await _capture(tester, 'plan-${palette.brightness.name}-decoded');
 
         await tester.tap(start);
         expect(starts, 1);
@@ -415,46 +397,6 @@ void main() {
       expect(find.byType(SfAlphaArtwork), findsNothing);
       expect(_images(tester), contains(library['h-squat'].media.lightPoster));
       expect(tester.takeException(), isNull);
-    },
-  );
-
-  testWidgets(
-    'alpha popup cover starts the existing player with its frame-zero poster',
-    (tester) async {
-      final services = makeServices();
-      addTearDown(services.dispose);
-      final e = library['h-squat'];
-      await pump(
-        tester,
-        Scaffold(
-          body: Builder(
-            builder: (context) => TextButton(
-              onPressed: () => showExerciseDetails(context, e),
-              child: const Text('查看示范'),
-            ),
-          ),
-        ),
-        services: services,
-      );
-      await tester.tap(find.text('查看示范'));
-      await tester.pumpAndSettle();
-      expect(find.byType(ExerciseVideo), findsNothing);
-      expect(_images(tester), contains(e.media.alphaCover));
-      final semantics = tester.ensureSemantics();
-      expect(find.bySemanticsLabel('播放${e.name}示范'), findsOneWidget);
-      await tester.tap(find.byKey(const ValueKey('library-alpha-play')));
-      await tester.pumpAndSettle();
-      final video = tester.widget<ExerciseVideo>(find.byType(ExerciseVideo));
-      final view = tester.widget<trainer.DrillMediaView>(
-        find.byType(trainer.DrillMediaView),
-      );
-      expect(video.exercise.id, e.id);
-      expect(view.media.packedAlphaPosterAsset, e.media.alphaPlaybackPoster);
-      expect(view.media.packedAlphaPosterAsset, isNot(e.media.alphaCover));
-      expect(tester.takeException(), isNull);
-      semantics.dispose();
-      await tester.pumpWidget(const SizedBox());
-      await tester.pumpAndSettle();
     },
   );
 }

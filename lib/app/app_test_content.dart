@@ -39,7 +39,14 @@ class AppTestContent {
           'version': catalog.semanticSource?.version ?? '0.0.0',
           'drills': <Object?>[],
         });
-    final rhythms = trainer.rhythmsFromCatalog(coachCatalog);
+    final rhythms = trainer.rhythmsFromCatalog(
+      coachCatalog,
+      overrides: {
+        for (final entry in catalog.entries.values)
+          if (entry.training case final training?)
+            entry.id: ?_executionRhythm(training),
+      },
+    );
     final exercises = <Exercise>[];
     final unknown = <String, List<String>>{};
     for (final entry in catalog.entries.values) {
@@ -62,16 +69,29 @@ class AppTestContent {
         rhythm = rhythm.withHold(hold);
         rhythms[entry.id] = rhythm;
       }
+      final sdkCover = catalog.isSdkBound
+          ? _sdkImageAsset(entry.id, 'cover')
+          : null;
       final fallback =
-          legacyLibrary.tryGet(entry.id)?.media ??
+          (catalog.isSdkBound ? null : legacyLibrary.tryGet(entry.id)?.media) ??
           ExerciseMedia(
             id: entry.id,
             video: '',
-            poster: '',
-            loopSeconds: entry.media?.loopSeconds ?? 0,
+            poster: sdkCover ?? '',
+            loopSeconds:
+                entry.media?.loopSeconds ??
+                ((entry.raw['rhythm'] as Map?)?['durationSeconds'] as num?)
+                    ?.toDouble() ??
+                0,
             posterSeconds: 0,
-            source: 'Pose-Hub App test (unreviewed)',
-            videoAvailable: false,
+            source: 'Pose-Hub ${catalog.id}',
+            videoAvailable: catalog.isSdkBound,
+            lightPoster: sdkCover,
+            lightVideoAvailable: catalog.isSdkBound ? true : null,
+            alphaCover: sdkCover,
+            alphaThumbnail: catalog.isSdkBound
+                ? _sdkImageAsset(entry.id, 'thumbnail')
+                : null,
             revision: entry.revision,
             appTestOnly: true,
           );
@@ -119,6 +139,22 @@ class AppTestContent {
       unmappedEquipment: Map.unmodifiable(unknown),
     );
   }
+}
+
+String _sdkImageAsset(String id, String role) =>
+    'posehub-r1/${Uri.encodeComponent(id)}/$role';
+
+/// Pack rhythm metadata describes the rendered media. Only an explicit
+/// execution rhythm may pace a workout; unknown execution stays manual.
+trainer.Rhythm? _executionRhythm(AppTestTrainingDefinition training) {
+  final metadata = training.rhythm;
+  if (metadata == null || !metadata.containsKey('execution')) return null;
+  if (metadata['execution'] case final Map execution) {
+    return trainer.Rhythm.fromJson(Map<String, dynamic>.from(execution));
+  }
+  return training.drill.defaultDose.mode == coach.DoseMode.reps
+      ? trainer.Rhythm.selfPacedReps
+      : trainer.Rhythm.timedHold;
 }
 
 Equipment? _knownEquipment(String id) {

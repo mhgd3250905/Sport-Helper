@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:ugk_coach/ugk_coach.dart' as coach;
 import 'package:ugk_trainer/ugk_trainer.dart';
 
+import '../app/posehub_pack_installation.dart';
+import '../app/services.dart';
 import '../domain/exercise.dart';
 import '../diagnostics/runtime_log.dart';
 import 'theme.dart';
+import 'theme/trainer_theme.dart';
 
 /// App styling around the shared, verified on-demand training media view.
 class ExerciseVideo extends StatefulWidget {
@@ -67,6 +71,21 @@ class _ExerciseVideoState extends State<ExerciseVideo> {
   @override
   Widget build(BuildContext context) {
     final exercise = widget.exercise;
+    final services = context
+        .dependOnInheritedWidgetOfExactType<AppScope>()
+        ?.services;
+    final action = services?.poseHubCatalog?.tryGet(exercise.id);
+    if (action != null) {
+      return _PoseHubExerciseVideo(
+        action: action,
+        installation: services?.poseHubMedia,
+        playing: widget.playing,
+        paused: widget.paused,
+        mirrored: widget.mirrored,
+        radius: widget.radius,
+        playbackHandle: widget.playbackHandle,
+      );
+    }
     final m = exercise.media;
     final light = Theme.of(context).brightness == Brightness.light;
     final stage = light ? SfPalette.light : SfPalette.dark;
@@ -94,6 +113,145 @@ class _ExerciseVideoState extends State<ExerciseVideo> {
       errorLabel: '示范暂时加载不了，计时和语音仍可继续',
       unavailableLabel: '此动作暂无视频示范',
       playbackHandle: widget.playbackHandle,
+    );
+  }
+}
+
+/// A pack action never falls through to the older App asset resolver.
+class _PoseHubExerciseVideo extends StatefulWidget {
+  const _PoseHubExerciseVideo({
+    required this.action,
+    required this.installation,
+    required this.playing,
+    required this.paused,
+    required this.mirrored,
+    required this.radius,
+    required this.playbackHandle,
+  });
+
+  final coach.PoseHubPackAction action;
+  final PoseHubPackInstallation? installation;
+  final bool playing, paused, mirrored;
+  final double radius;
+  final DrillMediaPlaybackHandle? playbackHandle;
+
+  @override
+  State<_PoseHubExerciseVideo> createState() => _PoseHubExerciseVideoState();
+}
+
+class _PoseHubExerciseVideoState extends State<_PoseHubExerciseVideo>
+    with WidgetsBindingObserver {
+  Future<Uri>? _ready;
+  bool _backgrounded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _ready = widget.installation?.ensureInstalled();
+    _bindIdentity();
+  }
+
+  void _bindIdentity() => widget.playbackHandle?.bind(
+    owner: this,
+    mediaId: widget.action.id,
+    controller: null,
+  );
+
+  @override
+  void didUpdateWidget(_PoseHubExerciseVideo oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!identical(oldWidget.installation, widget.installation)) {
+      _ready = widget.installation?.ensureInstalled();
+    }
+    if (!identical(oldWidget.playbackHandle, widget.playbackHandle)) {
+      oldWidget.playbackHandle?.unbind(this);
+    }
+    _bindIdentity();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    final backgrounded = state != AppLifecycleState.resumed;
+    if (backgrounded != _backgrounded && mounted) {
+      setState(() => _backgrounded = backgrounded);
+    }
+  }
+
+  void _retry() {
+    final ready = widget.installation?.ensureInstalled();
+    setState(() {
+      _ready = ready;
+    });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    widget.playbackHandle?.unbind(this);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = SmartFitTrainerTheme.of(context);
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(widget.radius),
+      child: FutureBuilder<Uri>(
+        future: _ready,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done &&
+              snapshot.hasData) {
+            return Transform.flip(
+              flipX: widget.mirrored,
+              child: PoseHubPackMedia(
+                key: ValueKey('posehub-exercise-media-${widget.action.id}'),
+                action: widget.action,
+                baseUri: snapshot.data!,
+                playing: widget.playing && TickerMode.valuesOf(context).enabled,
+                paused: widget.paused || _backgrounded,
+                theme: theme,
+              ),
+            );
+          }
+          final failed = snapshot.hasError || widget.installation == null;
+          return AspectRatio(
+            aspectRatio: 1,
+            child: ColoredBox(
+              color: theme.mediaStage,
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(SfSpace.x4),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        failed ? '动作素材暂时无法准备' : '正在准备动作素材',
+                        key: ValueKey(
+                          failed
+                              ? 'posehub-media-error'
+                              : 'posehub-media-preparing',
+                        ),
+                        style: theme.label,
+                        textAlign: TextAlign.center,
+                      ),
+                      if (failed && widget.installation != null)
+                        TextButton(
+                          key: const ValueKey('posehub-media-retry'),
+                          onPressed: _retry,
+                          style: TextButton.styleFrom(
+                            foregroundColor: theme.accentText,
+                          ),
+                          child: const Text('重试'),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 }

@@ -24,6 +24,7 @@ import '../voice/voice_library.dart';
 import 'training_media_config.dart';
 import 'app_test_pack.dart';
 import 'app_test_catalog.dart';
+import 'posehub_pack_installation.dart';
 
 /// Everything pages need, created once at start-up.
 class AppServices {
@@ -41,6 +42,8 @@ class AppServices {
     this.chatReplyDelay = const Duration(milliseconds: 450),
     this.media,
     this.testCatalog,
+    this.poseHubCatalog,
+    this.poseHubMedia,
   }) : templates = TemplatePlanGenerator(
          lib: library,
          catalog: catalog,
@@ -73,6 +76,8 @@ class AppServices {
 
   final ExerciseLibrary library;
   final AppTestCatalog? testCatalog;
+  final coach.PoseHubAppTestCatalog? poseHubCatalog;
+  final PoseHubPackInstallation? poseHubMedia;
   final TemplateCatalog catalog;
   final AppStore store;
   final VoiceSource voiceLibrary;

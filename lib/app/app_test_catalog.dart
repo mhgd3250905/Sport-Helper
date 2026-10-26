@@ -118,7 +118,56 @@ class AppTestCatalog {
     required this.semanticStatus,
     required this.semanticProblem,
     required this.semanticSource,
+    this._sdkAiCatalog,
   });
+
+  /// Keeps the SDK's validated projection and raw objects intact. Historical
+  /// availability flags are not the SDK's semantic-completeness admission gate.
+  factory AppTestCatalog.fromSdk(coach.PoseHubAppTestCatalog sdk) {
+    final ai = sdk.toAiCatalog();
+    final source = AppTestSemanticSource(
+      path: sdk.semanticCatalogFile.path,
+      version: sdk.semanticCatalogVersion,
+      bytes: sdk.semanticCatalogFile.bytes,
+      sha256: sdk.semanticCatalogFile.sha256,
+    );
+    final entries = <String, AppTestCatalogEntry>{};
+    for (final action in sdk.allActions) {
+      final drill = ai[action.id];
+      final rawEquipment = action.raw['equipment'];
+      entries[action.id] = AppTestCatalogEntry._(
+        id: action.id,
+        nameZh: action.nameZh,
+        equipment:
+            drill?.equipment ??
+            List<String>.unmodifiable(
+              rawEquipment is List ? rawEquipment.cast<String>() : const [],
+            ),
+        revision: action.raw['revision'] as String?,
+        media: null,
+        mediaFiles: action.raw['files']! as Map<String, Object?>,
+        declaredAvailableForApp: action.availableForApp,
+        training: drill == null
+            ? null
+            : AppTestTrainingDefinition._(drill, drill.raw, source),
+        trainingProblems: drill == null
+            ? List<String>.unmodifiable(
+                action.rawTrainingSemantics['missingRequiredFields']! as List,
+              )
+            : const [],
+        raw: action.raw,
+      );
+    }
+    return AppTestCatalog._(
+      null,
+      id: sdk.id,
+      entries: Map.unmodifiable(entries),
+      semanticStatus: AppTestSemanticStatus.verified,
+      semanticProblem: null,
+      semanticSource: source,
+      sdkAiCatalog: ai,
+    );
+  }
 
   final String id;
   final Map<String, AppTestCatalogEntry> entries;
@@ -126,6 +175,11 @@ class AppTestCatalog {
   final String? semanticProblem;
   final AppTestSemanticSource? semanticSource;
   final Map<String, Object?>? _semanticJson;
+  final coach.Catalog? _sdkAiCatalog;
+
+  /// SDK media is resolved from the installed whole pack by the host. It must
+  /// never inherit an old bundled asset for the same action ID.
+  bool get isSdkBound => _sdkAiCatalog != null;
 
   Iterable<String> get trainingEligibleIds => entries.values
       .where((entry) => entry.trainingEligible)
@@ -135,6 +189,7 @@ class AppTestCatalog {
   /// Original raw rhythm/defaultDose fields remain available to the trainer's
   /// existing rhythmsFromCatalog helper.
   coach.Catalog? toCoachCatalog() {
+    if (_sdkAiCatalog case final ai?) return ai;
     final source = _semanticJson;
     if (source == null && !entries.values.any((e) => e.trainingEligible)) {
       return null;

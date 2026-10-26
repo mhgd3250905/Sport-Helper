@@ -20,6 +20,7 @@ class InternalMainActivity : MainActivity() {
     private val activityCreatedAtEpochMs = System.currentTimeMillis()
     private var performanceChannel: MethodChannel? = null
     private var actionIssueDownloads: ActionIssueDownloadsExporter? = null
+    private var poseHubPackInstaller: PoseHubPackInstaller? = null
     private var pendingShare: MethodChannel.Result? = null
     private var rendererProbe: InternalRendererProbe? = null
     private var rendererDisplayListener: FlutterUiDisplayListener? = null
@@ -32,6 +33,11 @@ class InternalMainActivity : MainActivity() {
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
+        poseHubPackInstaller?.close()
+        poseHubPackInstaller = PoseHubPackInstaller(
+            applicationContext,
+            flutterEngine.dartExecutor.binaryMessenger
+        )
         actionIssueDownloads?.close()
         actionIssueDownloads = ActionIssueDownloadsExporter(
             this,
@@ -217,6 +223,8 @@ class InternalMainActivity : MainActivity() {
     }
 
     override fun cleanUpFlutterEngine(flutterEngine: FlutterEngine) {
+        poseHubPackInstaller?.close()
+        poseHubPackInstaller = null
         actionIssueDownloads?.close()
         actionIssueDownloads = null
         rendererDisplayListener?.let { listener ->
@@ -234,6 +242,8 @@ class InternalMainActivity : MainActivity() {
 
     override fun onDestroy() {
         closing = true
+        poseHubPackInstaller?.close()
+        poseHubPackInstaller = null
         actionIssueDownloads?.close()
         actionIssueDownloads = null
         rendererProbe?.close()

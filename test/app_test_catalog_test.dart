@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:smartfit/app/app_test_catalog.dart';
 import 'package:smartfit/app/app_test_pack.dart';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
+import 'package:ugk_trainer/ugk_trainer.dart' show PoseHubActionLibrary;
 
 Map<String, Object?> _definition(String id) => {
   'id': id,
@@ -109,6 +110,46 @@ Future<AppTestCatalog> _load(Map<String, Object?> semantic) =>
     );
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  test(
+    'SDK binding preserves the exact AI projection and source objects',
+    () async {
+      final sdk = await PoseHubActionLibrary.load();
+      final result = AppTestCatalog.fromSdk(sdk);
+      final ai = result.toCoachCatalog()!;
+      expect(result.toCoachCatalog(), same(ai));
+      expect(result.isSdkBound, isTrue);
+      expect(result.semanticStatus, AppTestSemanticStatus.verified);
+      expect(result.semanticSource!.sha256, sdk.semanticCatalogFile.sha256);
+      expect(result.entries.keys, sdk.allActions.map((action) => action.id));
+      expect(result.trainingEligibleIds, ai.ids);
+      expect(ai.ids, sdk.toAiCatalog().ids);
+
+      for (final action in sdk.allActions) {
+        final entry = result.entries[action.id]!;
+        expect(entry.raw, same(action.raw), reason: action.id);
+        expect(entry.mediaFiles, same(action.raw['files']), reason: action.id);
+        expect(entry.media, isNull, reason: action.id);
+        expect(entry.trainingEligible, action.trainingDefinitionComplete);
+        if (entry.training case final training?) {
+          expect(training.drill, same(ai[action.id]));
+          expect(training.raw, same(ai[action.id]!.raw));
+          expect(training.defaultDose, same(ai[action.id]!.raw['defaultDose']));
+        } else {
+          expect(
+            entry.trainingProblems,
+            action.rawTrainingSemantics['missingRequiredFields'],
+          );
+        }
+      }
+      final pending = result.entries['h-towel-isometric-curl']!;
+      expect(pending.raw['level'], isNull);
+      expect((pending.raw['defaultDose']! as Map)['seconds'], isNull);
+      expect(() => pending.raw['level'] = 1, throwsUnsupportedError);
+    },
+  );
+
   test(
     'inline catalog completion admits an ID without legacy source changes',
     () async {
