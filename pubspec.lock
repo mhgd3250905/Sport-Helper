@@ -93,10 +93,10 @@ packages:
     dependency: "direct main"
     description:
       name: cupertino_icons
-      sha256: "41e005c33bd814be4d3096aff55b1908d419fde52ca656c8c47719ec745873cd"
+      sha256: ba631d1c7f7bef6b729a622b7b752645a2d076dba9976925b8f25725a30e1ee6
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.9"
+    version: "1.0.8"
   dbus:
     dependency: transitive
     description:
@@ -285,14 +285,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.1.0"
-  liquid_glass_widgets:
-    dependency: "direct main"
-    description:
-      name: liquid_glass_widgets
-      sha256: "67358b806f0ac1c1dbd93b0cac004587d843e26dc2f5fb17baadcebf21120ac8"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.14.0"
   logging:
     dependency: transitive
     description:
@@ -607,20 +599,20 @@ packages:
     dependency: "direct main"
     description:
       path: "packages/ugk_coach_ui"
-      ref: "ugk_coach_ui-v0.1.3"
-      resolved-ref: "159dadf058ef47f701e36a496668265f9fd3fc0d"
+      ref: "ugk_coach_ui-v0.2.1"
+      resolved-ref: c6e261e75dc8647ccc2767bc253af664957c516b
       url: "https://github.com/mhgd3250905/ugk-3d-pose-sdk.git"
     source: git
-    version: "0.1.3"
+    version: "0.2.1"
   ugk_trainer:
     dependency: "direct main"
     description:
       path: "packages/ugk_trainer"
-      ref: "ugk_trainer-v0.2.9"
-      resolved-ref: "953be22414f23128af879dc62686db200db34265"
+      ref: "ugk_trainer-v0.3.1"
+      resolved-ref: c6e261e75dc8647ccc2767bc253af664957c516b
       url: "https://github.com/mhgd3250905/ugk-3d-pose-sdk.git"
     source: git
-    version: "0.2.9"
+    version: "0.3.1"
   uuid:
     dependency: transitive
     description:

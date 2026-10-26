@@ -8,13 +8,13 @@
 
 指定源图来自开哥的 [Drive 文件夹](https://drive.google.com/drive/folders/1VVi2cGjoaW3luCksQFunMG6OKRZ0Z45U)：A 为 `smartfit-icon-v3.png` 全身版，B 为 `smartfit-icon-v4-crop.png` 半身版，均为 1024×1024、不透明、满版无圆角。B 原图已经裁掉下方腿部，生成过程没有追加裁切或重绘。
 
-Android 使用独立薄荷到青绿渐变背景，整图前景缩为 46dp，其 65.05dp 对角线落在 66dp 安全圆内。五种 Android 密度和全部现有 iOS appicon 槽位已生成。圆形/圆角预览见 [遮罩对照](screenshots/icon-brand/icon-mask-preview.png)。79 份候选资源及选定 B 后的 38 份受保护默认资源均通过校验。Android 默认使用 B 的 legacy/round/adaptive 图标，iOS 默认 AppIcon 的全部既有槽位使用 B；生成器仍只生成候选，不隐式覆写生产资源。
+Android 使用独立薄荷到青绿渐变背景，整图前景缩为 46dp，其 65.05dp 对角线落在 66dp 安全圆内。五种 Android 密度和全部现有 iOS appicon 槽位已生成。圆形/圆角预览见 [遮罩对照](../../deliveries/flat-release-20261026/retired-evidence/manifest.json)。79 份候选资源及选定 B 后的 38 份受保护默认资源均通过校验。Android 默认使用 B 的 legacy/round/adaptive 图标，iOS 默认 AppIcon 的全部既有槽位使用 B；生成器仍只生成候选，不隐式覆写生产资源。
 
 `--dart-define=SMARTFIT_ICON_VARIANT=A|B` 只给 internal sourceSet 注入所选资源；省略参数采用已选定的 B 默认图标。Gradle property 也可显式选择，冲突参数直接失败。Windows 未执行 iOS 编译/签名，两个候选 xcconfig 不改既有 scheme、bundle ID 或签名。
 
 ## 颜色与范围
 
-只改主色、强调色、气泡颜色 token 及颜色用途映射；没有改变主题布局、玻璃、星尘、模糊、阴影、列表或动画。SDK/lock 与 main 一致，固定 `f684e02f38e652633c23fa8946a53d02b6aa3ea2`。所有聊天建议条静态、输入框原真玻璃、静态滚动卡和 RepaintBoundary/裁剪完整保留；预热关闭。
+本次只改主色、强调色、气泡颜色 token 及颜色用途映射，没有改变主题布局、星尘、列表、动画或 SDK；固定 SDK `f684e02f38e652633c23fa8946a53d02b6aa3ea2`。此为历史配色对照，原呈现细节见[历史证据归档清单](../../deliveries/flat-release-20261026/retired-evidence/manifest.json)，不作为当前扁平候选验收。
 
 | 用途 | 浅色 | 深色 |
 | --- | --- | --- |
@@ -46,16 +46,16 @@ Android 使用独立薄荷到青绿渐变背景，整图前景缩为 46dp，其 
 
 rebase 后强制 lockfile 的 pub get 通过。全量 Flutter **420 通过 / 13 跳过**；内测材质/默认配置与品牌专项 **23 通过 / 4 跳过**；静态分析零问题；Python 图标完整性及默认 B 保护等 **13 通过**；四张截图测试通过。必要检查完成后未重复无关测试，也未启动模拟器。
 
-截图使用当前源码的正式 Flutter 组件、固定内存会话，390×844 @3x；WidgetTester、星尘静止、shader-free `SfGlass.minimal`，用于颜色/布局审阅，**不是真机截图或性能证据**。独立视觉复核未见文字重叠、异常截断、卡片溢出或按钮错位。
+截图使用当时源码的正式 Flutter 组件、固定内存会话，390×844 @3x；WidgetTester、星尘静止，用于历史颜色和布局审阅，不是真机截图或性能证据。原始环境参数及原图见[历史证据归档清单](../../deliveries/flat-release-20261026/retired-evidence/manifest.json)。独立视觉复核当时未见文字重叠、异常截断、卡片溢出或按钮错位。
 
 | 页面 | 浅色 | 深色 |
 | --- | --- | --- |
-| 首页 | [查看](screenshots/icon-brand/home-light.png) | [查看](screenshots/icon-brand/home-dark.png) |
-| 聊天 | [查看](screenshots/icon-brand/chat-light.png) | [查看](screenshots/icon-brand/chat-dark.png) |
+| 首页 | [查看](../../deliveries/flat-release-20261026/retired-evidence/manifest.json) | [查看](../../deliveries/flat-release-20261026/retired-evidence/manifest.json) |
+| 聊天 | [查看](../../deliveries/flat-release-20261026/retired-evidence/manifest.json) | [查看](../../deliveries/flat-release-20261026/retired-evidence/manifest.json) |
 
 卡片与建议条相对旧 +17 预览的表面变化来自已合入 main 的性能修复，品牌分支相对 main 没有改变这些路径。图标/品牌包未重新做性能采样，不把颜色预览作为性能改善证据。
 
-机器可读记录含两包 hash、选中资源、测试和手机安装核验（如已执行）：[交付 JSON](reports/icon-brand-delivery-2026-10-23.json)。旧 +17/profile 交付已被本轮替代，原包留存，不能用于覆盖当前 +21。
+机器可读记录含两包 hash、选中资源、测试和手机安装核验（如已执行）：[交付 JSON](../../deliveries/flat-release-20261026/retired-evidence/manifest.json)。旧 +17/profile 交付已被本轮替代，原包留存，不能用于覆盖当前 +21。
 
 ## 回归与源码范围
 

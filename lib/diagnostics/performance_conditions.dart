@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 
 import '../data/app_store.dart';
-import '../ui/theme/adaptive_glass.dart';
-import '../ui/theme/glass.dart';
 import 'frame_recorder.dart';
 import 'performance_lab.dart';
 import 'performance_report.dart';
 
-/// Updates labels only when a render condition changes, never per timing.
+/// Changes immutable frame labels only when live render conditions change.
 class PerformanceConditions extends StatelessWidget {
   const PerformanceConditions({
     super.key,
@@ -27,68 +25,31 @@ class PerformanceConditions extends StatelessWidget {
       ]),
       child: child,
       builder: (context, child) {
-        final scope = SfAdaptiveGlassData.maybeOf(context);
         final service = PerformanceReportService.instance;
-        final lab = PerformanceLab.instance;
-        final view = View.of(context);
         final media = MediaQuery.of(context);
-        final actualStars =
-            lab.starfieldFor(store.starfield) && !media.disableAnimations;
-        final rate = scope?.refreshRateHz ?? view.display.refreshRate;
+        final rate = View.of(context).display.refreshRate;
+        final stars =
+            PerformanceLab.instance.starfieldFor(store.starfield) &&
+            !media.disableAnimations;
         final recorder = FrameRecorder.instance;
         recorder.setRefreshRateHz(rate);
         recorder.setMetadata({
           'appearance': store.appearance,
           'theme': Theme.of(context).brightness.name,
           'refreshRateSource': 'flutter_display',
-          'starfield': actualStars,
-          'scrollCardGlassEnabled': lab.scrollingGlassEnabled,
-          'glassQuality': lab.glassEnabled
-              ? scope?.effectiveQuality.name ?? 'unknown'
-              : 'off',
+          'starfield': stars,
+          'material': PerformanceLab.material,
         });
         recorder.setRenderConditions(
-          glassEnabled: lab.glassEnabled,
-          scrollCardGlassEnabled: lab.scrollingGlassEnabled,
-          starfield: actualStars,
-          glassQuality: lab.glassEnabled
-              ? scope?.effectiveQuality.name ?? 'unknown'
-              : 'off',
-          glassPhase: scope?.phase ?? 'unknown',
-          // SmartFit's clear material has no premium frost; report the actual
-          // material rather than the adaptive adapter's permission flag.
-          glassFrost:
-              lab.glassEnabled &&
-              SfGlass.materialFor(
-                    scope?.effectiveQuality ?? SfGlass.control,
-                  ).frost >
-                  0,
+          starfield: stars,
           renderer: service.renderer,
           rendererBackend: service.rendererBackend,
-          adaptiveTargetFrameMs: scope?.targetFrameMs ?? (1000 / rate),
+          rendererVerified: service.rendererVerified,
           theme: Theme.of(context).brightness.name,
           viewportWidth: media.size.width,
           viewportHeight: media.size.height,
           devicePixelRatio: media.devicePixelRatio,
           textScale: media.textScaler.scale(1),
-          fixedGlassPolicy: lab.fixedGlassPresentRoles.isEmpty
-              ? null
-              : lab.fixedGlassPolicy,
-          fixedGlassPlanContext: lab.fixedGlassPlanContext,
-          fixedGlassPresentRoles: lab.fixedGlassPresentRoles,
-          fixedGlassConfigurationId: lab.fixedGlassConfigurationId,
-          prewarmEnabled: lab.prewarmEnabled,
-          prewarmStatus: lab.prewarmStatus,
-          prewarmDurationMs: lab.prewarmDurationMs,
-          prewarmLogicalWidth: lab.prewarmLogicalWidth,
-          prewarmLogicalHeight: lab.prewarmLogicalHeight,
-          prewarmPixelRatio: lab.prewarmPixelRatio,
-          fixedGlassBaseBlur: SfGlass.materialFor(
-            scope?.effectiveQuality ?? SfGlass.control,
-          ).blur,
-          fixedGlassBaseSaturation: SfGlass.materialFor(
-            scope?.effectiveQuality ?? SfGlass.control,
-          ).saturation,
         );
         return child!;
       },

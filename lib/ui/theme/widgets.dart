@@ -4,7 +4,6 @@ import 'sf_icons.dart';
 import 'tokens.dart';
 
 export 'components.dart';
-export 'tactile.dart';
 
 /// Button pyramid (docs/design-language.md §4, after HipLab R3–R5):
 ///
@@ -22,10 +21,15 @@ export 'tactile.dart';
 
 /// Whether the nearest [SfPressable] is held down.
 class SfPressedScope extends InheritedWidget {
-  const SfPressedScope({super.key, required this.pressed, required super.child});
+  const SfPressedScope({
+    super.key,
+    required this.pressed,
+    required super.child,
+  });
   final bool pressed;
   static bool of(BuildContext context) =>
-      context.dependOnInheritedWidgetOfExactType<SfPressedScope>()?.pressed ?? false;
+      context.dependOnInheritedWidgetOfExactType<SfPressedScope>()?.pressed ??
+      false;
   @override
   bool updateShouldNotify(SfPressedScope old) => old.pressed != pressed;
 }
@@ -111,25 +115,33 @@ class _SfPressableState extends State<SfPressable> {
     );
     child = FocusableActionDetector(
       enabled: enabled,
-      mouseCursor: enabled ? SystemMouseCursors.click : SystemMouseCursors.basic,
+      mouseCursor: enabled
+          ? SystemMouseCursors.click
+          : SystemMouseCursors.basic,
       onShowFocusHighlight: (value) {
         if (_showFocus != value) setState(() => _showFocus = value);
       },
       actions: {
-        ActivateIntent: CallbackAction<ActivateIntent>(onInvoke: (_) {
-          if (enabled) _tap();
-          return null;
-        }),
-        ButtonActivateIntent: CallbackAction<ButtonActivateIntent>(onInvoke: (_) {
-          if (enabled) _tap();
-          return null;
-        }),
+        ActivateIntent: CallbackAction<ActivateIntent>(
+          onInvoke: (_) {
+            if (enabled) _tap();
+            return null;
+          },
+        ),
+        ButtonActivateIntent: CallbackAction<ButtonActivateIntent>(
+          onInvoke: (_) {
+            if (enabled) _tap();
+            return null;
+          },
+        ),
       },
       child: DecoratedBox(
         position: DecorationPosition.foreground,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(SfRadius.sm),
-          border: _showFocus ? Border.all(color: SfColors.accentText, width: 2) : null,
+          border: _showFocus
+              ? Border.all(color: SfColors.accentText, width: 2)
+              : null,
         ),
         child: child,
       ),
@@ -159,41 +171,15 @@ class _SfPressableState extends State<SfPressable> {
   }
 }
 
-/// A stadium face whose fill deepens while pressed.
-/// Dark-mode ink for idle tappable controls (round 5, user feedback: in
-/// dark the idle buttons read as bare text). A tinted white fill with a
-/// soft top highlight and a rim bright enough for WCAG 1.4.11 (≥ 3:1 for
-/// the control boundary against the sky, the glass card and the assistant
-/// bubble; see test/dark_controls_contrast_test.dart). Light mode never
-/// uses these.
-abstract final class SfControlInk {
-  /// Fill, top (with highlight) → body.
-  static const fillTop = Color(0x24FFFFFF); // 14 %
-  static const fill = Color(0x17FFFFFF); // 9 %
-  static const pressedTop = Color(0x3DFFFFFF); // 24 %
-  static const pressedFill = Color(0x2EFFFFFF); // 18 %
-
-  /// The rim. 40 % white: the 20–28 % range measured < 3:1 on the sky.
-  static const rim = Color(0x66FFFFFF);
-  static const pressedRim = Color(0x8CFFFFFF);
-  static const rimWidth = 1.0;
-
-  /// Visible height of a dark idle pill.
-  static const minHeight = 40.0;
-
-  static BorderSide side(bool down) => BorderSide(color: down ? pressedRim : rim, width: rimWidth);
-}
-
-/// Paints [SfControlInk] behind an idle control in dark mode (capsule when
-/// [radius] is null) and follows [SfPressedScope] for the pressed state.
-/// In light mode it returns [child] untouched, so light output is unchanged.
-class SfControlFace extends StatelessWidget {
-  const SfControlFace({
+/// An opaque control face. Press feedback changes its solid tone; the
+/// surrounding pressable owns scale, semantics and activation.
+class SfSolidControlFace extends StatelessWidget {
+  const SfSolidControlFace({
     super.key,
     required this.child,
     this.radius,
     this.padding = const EdgeInsets.symmetric(horizontal: 14),
-    this.minHeight = SfControlInk.minHeight,
+    this.minHeight = 40,
     this.circle = false,
   });
   final Widget child;
@@ -204,31 +190,27 @@ class SfControlFace extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (!SfColors.isDark) return child;
     final down = SfPressedScope.of(context);
-    final side = SfControlInk.side(down);
+    final side = SfColors.cardEdge;
     final ShapeBorder shape = circle
         ? CircleBorder(side: side)
         : radius == null
         ? StadiumBorder(side: side)
-        : RoundedRectangleBorder(borderRadius: BorderRadius.circular(radius!), side: side);
-    return AnimatedContainer(
-      key: const ValueKey('sf-control-face'),
-      duration: down ? SfMotion.press : SfMotion.release,
-      curve: Curves.easeOut,
-      constraints: BoxConstraints(minHeight: minHeight, minWidth: circle ? minHeight : 0),
+        : RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(radius!),
+            side: side,
+          );
+    return Container(
+      key: const ValueKey('sf-solid-control-face'),
+      constraints: BoxConstraints(
+        minHeight: minHeight,
+        minWidth: circle ? minHeight : 0,
+      ),
       padding: padding,
       alignment: circle ? Alignment.center : null,
       decoration: ShapeDecoration(
         shape: shape,
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          stops: const [0, .5],
-          colors: down
-              ? const [SfControlInk.pressedTop, SfControlInk.pressedFill]
-              : const [SfControlInk.fillTop, SfControlInk.fill],
-        ),
+        color: down ? SfColors.surface : SfColors.surfaceHigh,
       ),
       child: child,
     );
@@ -236,7 +218,12 @@ class SfControlFace extends StatelessWidget {
 }
 
 class _Face extends StatelessWidget {
-  const _Face({required this.color, required this.pressedColor, required this.child, this.border});
+  const _Face({
+    required this.color,
+    required this.pressedColor,
+    required this.child,
+    this.border,
+  });
   final Color color;
   final Color pressedColor;
   final BorderSide? border;
@@ -355,7 +342,7 @@ class SfSecondaryButton extends StatelessWidget {
           pressedColor: SfColors.isDark
               ? Color.lerp(fill, Colors.white, .05)!
               : SfColors.surfaceHigh,
-          border: SfColors.isDark ? SfControlInk.side(false) : BorderSide(color: SfColors.line),
+          border: SfColors.cardEdge,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: SfSpace.x5),
             child: Row(
@@ -368,7 +355,12 @@ class SfSecondaryButton extends StatelessWidget {
                 ],
                 Text(
                   label,
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, height: 1.2, color: fg),
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    height: 1.2,
+                    color: fg,
+                  ),
                 ),
               ],
             ),
@@ -396,8 +388,7 @@ class SfTextAction extends StatelessWidget {
   final bool iconFilled;
   final Color? color;
 
-  /// Dark only: draw it as an idle glass pill ([SfControlFace]) while it
-  /// is tappable. Light is unchanged.
+  /// Adds a solid capsule in the dark theme while the action is tappable.
   final bool boxed;
 
   @override
@@ -411,7 +402,15 @@ class SfTextAction extends StatelessWidget {
           SfIcon(icon!, size: 18, filled: iconFilled, color: fg),
           const SizedBox(width: 6),
         ],
-        Text(label, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, height: 1.2, color: fg)),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            height: 1.2,
+            color: fg,
+          ),
+        ),
       ],
     );
     return SfPressable(
@@ -424,7 +423,10 @@ class SfTextAction extends StatelessWidget {
           child: pill
               ? Center(
                   widthFactor: 1,
-                  child: SfControlFace(padding: const EdgeInsets.symmetric(horizontal: 14), child: row),
+                  child: SfSolidControlFace(
+                    padding: const EdgeInsets.symmetric(horizontal: 14),
+                    child: row,
+                  ),
                 )
               : row,
         ),
@@ -472,10 +474,18 @@ class SfCircleButton extends StatelessWidget {
             width: size,
             height: size,
             decoration: BoxDecoration(
-              color: down ? Color.lerp(bg, SfColors.isDark ? Colors.white : Colors.black, .06) : bg,
+              color: down
+                  ? Color.lerp(
+                      bg,
+                      SfColors.isDark ? Colors.white : Colors.black,
+                      .06,
+                    )
+                  : bg,
               shape: BoxShape.circle,
               border: SfColors.isDark
-                  ? (fill == null && onPressed != null ? Border.fromBorderSide(SfControlInk.side(down)) : null)
+                  ? (fill == null && onPressed != null
+                        ? Border.fromBorderSide(SfColors.cardEdge)
+                        : null)
                   : fill != null
                   ? null
                   : Border.all(color: SfColors.line),
@@ -485,13 +495,18 @@ class SfCircleButton extends StatelessWidget {
               duration: SfMotion.fast,
               transitionBuilder: (child, a) => FadeTransition(
                 opacity: a,
-                child: ScaleTransition(scale: Tween(begin: .7, end: 1.0).animate(a), child: child),
+                child: ScaleTransition(
+                  scale: Tween(begin: .7, end: 1.0).animate(a),
+                  child: child,
+                ),
               ),
               child: SfIcon(
                 icon,
                 key: ValueKey(icon),
                 size: size * (size > 50 ? .42 : .45),
-                color: onPressed == null ? SfColors.faint : (iconColor ?? SfColors.text),
+                color: onPressed == null
+                    ? SfColors.faint
+                    : (iconColor ?? SfColors.text),
                 filled: filled,
                 strokeWidth: size > 50 ? 1.75 : 2,
               ),
@@ -545,7 +560,10 @@ class SfMediaTag extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => DecoratedBox(
-    decoration: ShapeDecoration(color: SfColors.scrim, shape: const StadiumBorder()),
+    decoration: ShapeDecoration(
+      color: SfColors.scrim,
+      shape: const StadiumBorder(),
+    ),
     child: Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
       child: Row(
@@ -557,7 +575,12 @@ class SfMediaTag extends StatelessWidget {
           ],
           Text(
             label,
-            style: const TextStyle(fontSize: 13, height: 1.2, fontWeight: FontWeight.w500, color: Colors.white),
+            style: const TextStyle(
+              fontSize: 13,
+              height: 1.2,
+              fontWeight: FontWeight.w500,
+              color: Colors.white,
+            ),
           ),
         ],
       ),
@@ -567,7 +590,13 @@ class SfMediaTag extends StatelessWidget {
 
 /// A choice row inside a sheet: tonal tile, icon + label.
 class SfSheetOption extends StatelessWidget {
-  const SfSheetOption({super.key, required this.icon, required this.label, required this.onTap, this.color});
+  const SfSheetOption({
+    super.key,
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.color,
+  });
   final SfGlyph icon;
   final String label;
   final VoidCallback onTap;
@@ -588,10 +617,18 @@ class SfSheetOption extends StatelessWidget {
         ),
         child: Row(
           children: [
-            SfIcon(icon, size: 20, color: color ?? SfColors.muted, filled: true),
+            SfIcon(
+              icon,
+              size: 20,
+              color: color ?? SfColors.muted,
+              filled: true,
+            ),
             const SizedBox(width: SfSpace.x3),
             Expanded(
-              child: Text(label, style: SfType.callout.copyWith(color: color ?? SfColors.text)),
+              child: Text(
+                label,
+                style: SfType.callout.copyWith(color: color ?? SfColors.text),
+              ),
             ),
             SfIcon(SfGlyph.chevronRight, size: 16, color: SfColors.faint),
           ],
@@ -608,10 +645,20 @@ class SfSectionTitle extends StatelessWidget {
   final Widget? trailing;
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.fromLTRB(SfSpace.x1, SfSpace.x6, SfSpace.x1, SfSpace.x2),
+    padding: const EdgeInsets.fromLTRB(
+      SfSpace.x1,
+      SfSpace.x6,
+      SfSpace.x1,
+      SfSpace.x2,
+    ),
     child: Row(
       children: [
-        Expanded(child: Text(text, style: SfType.label.copyWith(fontWeight: FontWeight.w600))),
+        Expanded(
+          child: Text(
+            text,
+            style: SfType.label.copyWith(fontWeight: FontWeight.w600),
+          ),
+        ),
         ?trailing,
       ],
     ),

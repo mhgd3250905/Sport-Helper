@@ -1,1377 +1,328 @@
 import 'dart:convert';
-import 'dart:math' as math;
 import 'dart:ui' show FrameTiming;
-
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smartfit/diagnostics/frame_recorder.dart';
-import 'package:smartfit/ui/theme/fixed_glass_policy.dart';
 
+// Synthetic engine inputs test the recorder; these are never device results.
 void main() {
   final binding = TestWidgetsFlutterBinding.ensureInitialized();
   late FrameRecorder recorder;
-  var nextTimestamp = 1000000;
+  var key = 0, timestamp = 1000000, monotonic = 0;
+  FrameRecorder make({
+    bool enabled = true,
+    int maxRawFrames = 60000,
+    int maxFramesPerCase = 12000,
+  }) {
+    final value = FrameRecorder(
+      enabled: enabled,
+      currentFrameNumber: () => key,
+      monotonicMicros: () => monotonic,
+      maxRawFrames: maxRawFrames,
+      maxFramesPerCase: maxFramesPerCase,
+    );
+    value.setRenderConditions(
+      starfield: true,
+      renderer: 'Impeller',
+      rendererBackend: 'vulkan',
+      rendererVerified: true,
+      theme: 'dark',
+      viewportWidth: 390,
+      viewportHeight: 844,
+      devicePixelRatio: 3,
+      textScale: 1,
+    );
+    value.setRefreshRateHz(120);
+    return value;
+  }
 
-  int frame() {
-    final timestamp = nextTimestamp;
-    nextTimestamp += 100000;
+  void boundary() {
+    key++;
+    timestamp += 100000;
     binding.handleBeginFrame(Duration(microseconds: timestamp));
     binding.handleDrawFrame();
-    return timestamp;
   }
 
-  int frameNumber() =>
-      binding.currentSystemFrameTimeStamp.inMicroseconds ~/ 10000;
-
-  FrameTiming timing(
-    int startUs,
-    int buildUs,
-    int rasterUs, {
-    int? frameNumber,
-  }) => FrameTiming(
-    vsyncStart: startUs - 100,
-    buildStart: startUs,
-    buildFinish: startUs + buildUs,
-    rasterStart: startUs + buildUs,
-    rasterFinish: startUs + buildUs + rasterUs,
-    rasterFinishWallTime: startUs + buildUs + rasterUs,
-    frameNumber: frameNumber ?? startUs ~/ 10000,
-  );
-
-  void report(List<FrameTiming> timings) {
-    binding.platformDispatcher.onReportTimings!(timings);
-  }
-
+  FrameTiming timing(int number, int start, int raster, {int build = 1000}) =>
+      FrameTiming(
+        frameNumber: number,
+        vsyncStart: start,
+        buildStart: start + 100,
+        buildFinish: start + 100 + build,
+        rasterStart: start + 100 + build,
+        rasterFinish: start + 100 + build + raster,
+        rasterFinishWallTime: start + 100 + build + raster,
+      );
+  void report(List<FrameTiming> timings) =>
+      binding.platformDispatcher.onReportTimings!(timings);
   Map total() => recorder.snapshot()['total'] as Map;
-
-  void conditions({
-    bool glass = true,
-    bool scrollCardGlass = false,
-    bool stars = true,
-    String quality = 'high',
-    String phase = 'stable',
-    bool frost = true,
-    String renderer = 'Impeller',
-    String backend = 'vulkan',
-    String theme = 'dark',
-    double budget = 1000 / 60,
-    double baseBlur = 1.2,
-    double baseSaturation = 1.15,
-    SfFixedGlassPolicy? fixedPolicy,
-    bool isPlanContext = true,
-    String fixedConfig = 'baseline',
-    bool prewarmEnabled = false,
-    String prewarmStatus = 'disabled',
-    double? prewarmDurationMs,
-  }) => recorder.setRenderConditions(
-    glassEnabled: glass,
-    scrollCardGlassEnabled: scrollCardGlass,
-    starfield: stars,
-    glassQuality: quality,
-    glassPhase: phase,
-    glassFrost: frost,
-    renderer: renderer,
-    rendererBackend: backend,
-    adaptiveTargetFrameMs: budget,
-    theme: theme,
-    viewportWidth: 412,
-    viewportHeight: 915,
-    devicePixelRatio: 2.625,
-    textScale: 1,
-    fixedGlassPolicy: fixedPolicy,
-    fixedGlassPlanContext: fixedPolicy == null ? null : isPlanContext,
-    fixedGlassPresentRoles: const {
-      SfFixedGlassRole.input,
-      SfFixedGlassRole.suggestions,
-    },
-    fixedGlassConfigurationId: fixedConfig,
-    prewarmEnabled: prewarmEnabled,
-    prewarmStatus: prewarmStatus,
-    prewarmDurationMs: prewarmDurationMs,
-    fixedGlassBaseBlur: baseBlur,
-    fixedGlassBaseSaturation: baseSaturation,
-  );
-
-  Map measureFixedChat({
-    required String configId,
-    required SfFixedGlassPolicy policy,
-    String theme = 'light',
-  }) {
+  Map cell(String id) => recorder.caseSnapshot(id)!;
+  void startEntry() {
+    recorder.setPage('action_library');
     recorder.start();
-    recorder.setRefreshRateHz(120);
-    conditions(
-      fixedPolicy: policy,
-      isPlanContext: false,
-      fixedConfig: configId,
-      theme: theme,
-      budget: 1000 / 120,
-      baseBlur: theme == 'light' ? 1.5 : 1.2,
-      baseSaturation: theme == 'light' ? 1.1 : 1.15,
-    );
     expect(
-      recorder.beginFixedGlassEntry(
-        configId: configId,
-        targetPage: 'performance_chat',
-      ),
+      recorder.beginCase(theme: 'dark', scenario: FrameScenario.pageEntry),
       isTrue,
     );
-    recorder.setPage('performance_chat');
-    final entry = frame();
-    report([timing(entry, 1000, 19000)]);
-    expect(
-      recorder.beginFixedGlassCase(
-        configId: configId,
-        scenario: FrameScenario.longChatScroll,
-        fixtureId: 'long_chat_72_v1',
-        messageCount: 72,
-      ),
-      isTrue,
-    );
-    final first = frame();
-    nextTimestamp += 31000000;
-    final last = frame();
-    report([timing(first, 1000, 7000), timing(last, 1000, 4000)]);
-    recorder.endCase();
-    return (recorder.snapshot()['fixedGlassCases']
-            as Map)['${configId}__longChatScroll']
-        as Map;
+    boundary();
   }
-
-  bool beginCase({
-    String variant = 'glass_on_stars_on',
-    FrameScenario scenario = FrameScenario.longChatScroll,
-    String fixtureId = 'chat_fixture_v1',
-    int messageCount = 64,
-  }) => recorder.beginCase(
-    variant: variant,
-    scenario: scenario,
-    fixtureId: fixtureId,
-    messageCount: messageCount,
-  );
-
-  Map currentCase() =>
-      (recorder.snapshot()['cases'] as Map)[recorder.currentCaseId] as Map;
-
-  int count(Map caseStats, String window) =>
-      (caseStats[window] as Map)['frameCount'] as int;
 
   setUp(() {
+    key = 0;
+    timestamp = 1000000;
+    monotonic = 0;
     binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
-    recorder = FrameRecorder(enabled: true, currentFrameNumber: frameNumber);
+    recorder = make();
   });
-
   tearDown(() {
     recorder.stop();
     binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
-    frame();
   });
 
-  test(
-    'production default is off and disabled recorder registers nothing',
-    () {
-      expect(FrameRecorder.buildEnabled, isFalse);
-      recorder = FrameRecorder(enabled: false);
-      final initialCallbacks = binding.transientCallbackCount;
-      recorder.setPage('action_library');
-      recorder.beginScenario(FrameScenario.actionListScroll);
-      recorder.setRefreshRateHz(120);
-      recorder.setMetadata({'deviceModel': 'Phone'});
-      conditions();
-      expect(beginCase(), isFalse);
-      recorder.endCase();
-      recorder.start();
-      recorder.reset();
-      expect(recorder.isRunning, isFalse);
-      expect(recorder.isCollecting, isFalse);
-      expect(binding.transientCallbackCount, initialCallbacks);
-      report([timing(nextTimestamp - 100000, 20000, 40000)]);
-      final snapshot = recorder.snapshot();
-      expect(snapshot['receivedFrameCount'], 0);
-      expect(snapshot['metadata'], isEmpty);
-      expect(snapshot['currentRefreshRateHz'], 60);
-      expect(snapshot['cases'], isEmpty);
-      expect(snapshot['currentCaseId'], isNull);
-      expect(
-        (snapshot['currentRenderConditions'] as Map)['glassEnabled'],
-        isNull,
-      );
-    },
-    skip: FrameRecorder.buildEnabled,
-  );
-
-  test(
-    'averages, histogram quantiles and worst frames have stated precision',
-    () {
-      recorder.setPage('action_library');
-      recorder.start();
-      final start = frame();
-      report([
-        for (var i = 1; i <= 100; i++) timing(start + i, i * 1000, i * 2000),
-      ]);
-      final stats = total();
-      final ui = stats['uiBuild'] as Map;
-      final raster = stats['raster'] as Map;
-      expect(stats['frameCount'], 100);
-      expect(ui['averageMs'], 50.5);
-      expect(raster['averageMs'], 101);
-      expect(ui['worstMs'], 100);
-      expect(raster['worstMs'], 200);
-      expect(ui['p90Ms'], inInclusiveRange(90, 90 * 1.0625 + .001));
-      expect(ui['p99Ms'], inInclusiveRange(99, 99 * 1.0625 + .001));
-      expect(raster['p90Ms'], inInclusiveRange(180, 180 * 1.0625 + .001));
-      expect(raster['p99Ms'], inInclusiveRange(198, 198 * 1.0625 + .001));
-      expect(ui['overBudgetFrames'], 84);
-      expect(raster['overBudgetFrames'], 92);
-      expect(stats['eitherThreadOverBudgetFrames'], 92);
-      final expectedMissed = List.generate(
-        100,
-        (i) => math.max(0, ((i + 1) * 2000 / (1000000 / 60)).ceil() - 1),
-      ).reduce((a, b) => a + b);
-      expect(stats['estimatedMissedVsyncs'], expectedMissed);
-    },
-  );
-
-  test(
-    '120 Hz strict budget, union and missed-vsync estimate do not double count',
-    () {
-      recorder.setRefreshRateHz(120);
-      recorder.start();
-      final start = frame();
-      report([
-        timing(start, 8333, 8333),
-        timing(start + 1, 8334, 1000),
-        timing(start + 2, 1000, 9000),
-        timing(start + 3, 17000, 25000),
-      ]);
-      final stats = total();
-      expect((stats['uiBuild'] as Map)['overBudgetFrames'], 2);
-      expect((stats['raster'] as Map)['overBudgetFrames'], 2);
-      expect(stats['eitherThreadOverBudgetFrames'], 3);
-      expect(stats['estimatedMissedVsyncs'], 4);
-      expect(stats['refreshRatesHz'], [120]);
-    },
-  );
-
-  test('start and lifecycle resume are idempotent; stop removes callbacks', () {
-    recorder.start();
-    recorder.start();
-    recorder.didChangeAppLifecycleState(AppLifecycleState.resumed);
-    final start = frame();
-    report([timing(start, 20000, 5000)]);
-    expect(total()['frameCount'], 1);
+  test('disabled diagnostics do not record or arm a workload', () {
     recorder.stop();
-    recorder.stop();
-    report([timing(start + 1, 20000, 5000)]);
-    expect(total()['frameCount'], 1);
+    recorder = make(enabled: false);
+    recorder.start();
+    expect(
+      recorder.armCase(theme: 'dark', scenario: FrameScenario.pageEntry),
+      isFalse,
+    );
+    expect(recorder.snapshot()['recordedFrameCount'], 0);
     expect(recorder.isCollecting, isFalse);
-    recorder.start();
-    final restarted = frame();
-    report([timing(restarted, 20000, 5000)]);
-    expect(total()['frameCount'], 2);
   });
-
   test(
-    'batched frames retain page, scenario and refresh rate at frame start',
+    'exact integer nearest-rank and original phase timestamps are retained',
     () {
-      recorder.setPage('action_library');
-      recorder.beginScenario(FrameScenario.actionListScroll);
-      recorder.start();
-      final first = frame();
       recorder.setPage('chat');
-      recorder.beginScenario(FrameScenario.longChatScroll);
-      recorder.setRefreshRateHz(120);
-      final second = frame();
-      recorder.setPage('settings'); // Must not backdate to the previous frame.
+      recorder.start();
+      boundary();
       report([
-        timing(first, 12000, 3000),
-        timing(second - 1, 12000, 3000),
-        timing(second, 12000, 3000),
+        for (var i = 1; i <= 100; i++)
+          timing(key + i, timestamp + i * 1000, i * 100),
       ]);
-      final snapshot = recorder.snapshot();
-      final pages = snapshot['pages'] as Map;
-      expect((pages['action_library'] as Map)['frameCount'], 2);
-      expect((pages['chat'] as Map)['frameCount'], 1);
-      expect(pages.containsKey('settings'), isFalse);
-      final scenarios = snapshot['scenarios'] as Map;
-      expect((scenarios['actionListScroll'] as Map)['frameCount'], 2);
-      expect((scenarios['longChatScroll'] as Map)['frameCount'], 1);
-      expect(total()['eitherThreadOverBudgetFrames'], 1);
-      recorder.endScenario(FrameScenario.actionListScroll);
-      expect(recorder.snapshot()['currentScenario'], 'longChatScroll');
-      recorder.endScenario(FrameScenario.longChatScroll);
-      final third = frame();
-      report([timing(third, 1000, 1000)]);
-      expect(total()['frameCount'], 4);
-      expect((recorder.snapshot()['scenarios'] as Map).length, 2);
+      final raster = total()['raster'] as Map;
+      expect(raster['p50Us'], 5000);
+      expect(raster['p90Us'], 9000);
+      expect(raster['p99Us'], 9900);
+      expect(raster['maxUs'], 10000);
+      expect(raster['over8_33msCount'], 17);
+      final raw = (recorder.snapshot()['rawFrames'] as List).first as Map;
+      expect((raw['phasesUs'] as Map)['vsyncStart'], timestamp + 1000);
+      expect(raw['rasterUs'], 100);
+      expect(jsonEncode(recorder.snapshot()), isNot(contains('histogram')));
     },
   );
-
-  test('reset rejects old batches and preserves safe measurement context', () {
-    recorder.setPage('training');
-    recorder.beginScenario(FrameScenario.trainingActionSwitch);
-    recorder.setRefreshRateHz(120);
-    recorder.setMetadata({'appVersion': '0.1.0', 'appBuild': 15});
-    recorder.start();
-    final old = frame();
-    report([timing(old, 1000, 1000)]);
-    recorder.reset();
-    final current = frame();
-    report([timing(old, 90000, 90000), timing(current, 9000, 1000)]);
-    final snapshot = recorder.snapshot();
-    expect(snapshot['recordedFrameCount'], 1);
-    expect(snapshot['ignoredBeforeSessionFrameCount'], 1);
-    expect(snapshot['currentPage'], 'training');
-    expect(snapshot['currentScenario'], 'trainingActionSwitch');
-    expect(snapshot['currentRefreshRateHz'], 120);
-    expect(snapshot['metadata'], {'appVersion': '0.1.0', 'appBuild': 15});
-    expect((total()['uiBuild'] as Map)['worstMs'], 9);
-  });
-
-  test('settings frames do not contaminate a manually selected scenario', () {
-    recorder.setPage('action_library');
-    recorder.beginScenario(FrameScenario.actionListScroll);
-    expect(recorder.currentPage, 'action_library');
-    expect(recorder.currentScenario, FrameScenario.actionListScroll);
-    recorder.start();
-    final library = frame();
-    recorder.setPage('settings');
-    final settings = frame();
-    recorder.setPage('performance_settings');
-    final performanceSettings = frame();
-    recorder.setPage('action_library');
-    final returnedLibrary = frame();
-    report([
-      timing(library, 1000, 2000),
-      timing(settings, 90000, 90000),
-      timing(performanceSettings, 80000, 80000),
-      timing(returnedLibrary, 3000, 4000),
-    ]);
-    final snapshot = recorder.snapshot();
-    final scenarios = snapshot['scenarios'] as Map;
-    final scenario = scenarios['actionListScroll'] as Map;
-    expect(scenario['frameCount'], 2);
-    expect((scenario['uiBuild'] as Map)['averageMs'], 2);
-    expect((scenario['uiBuild'] as Map)['worstMs'], 3);
-    expect(total()['frameCount'], 4);
-    expect((total()['uiBuild'] as Map)['worstMs'], 90);
-    final pages = snapshot['pages'] as Map;
-    expect((pages['settings'] as Map)['frameCount'], 1);
-    expect((pages['performance_settings'] as Map)['frameCount'], 1);
-    expect(recorder.currentScenario, FrameScenario.actionListScroll);
-    recorder.endScenario();
-    expect(recorder.currentScenario, isNull);
-  });
-
-  test('frame keys win over vsync and presentation timestamp offsets', () {
-    recorder.setPage('action_library');
-    recorder.start();
-    final old = frame();
-    final oldNumber = frameNumber();
-    recorder.setPage('chat');
-    final current = frame();
-    final currentNumber = frameNumber();
-    report([
-      // The old frame may build late, after the next presentation timestamp.
-      timing(current + 500000, 1000, 2000, frameNumber: oldNumber),
-      // The new frame may build before its future presentation target.
-      timing(old - 500000, 3000, 4000, frameNumber: currentNumber),
-    ]);
-    final pages = recorder.snapshot()['pages'] as Map;
-    expect(
-      ((pages['action_library'] as Map)['uiBuild'] as Map)['averageMs'],
-      1,
-    );
-    expect(((pages['chat'] as Map)['uiBuild'] as Map)['averageMs'], 3);
-    expect(recorder.snapshot()['recordedFrameCount'], 2);
-  });
-
-  test('missing engine frame keys are explicit rather than guessed', () {
-    recorder = FrameRecorder(enabled: true, currentFrameNumber: () => -1);
-    recorder.start();
-    final start = frame();
-    report([
-      timing(start, 1000, 1000, frameNumber: -1),
-      timing(start + 1, 1000, 1000),
-    ]);
-    final snapshot = recorder.snapshot();
-    expect(snapshot['recordedFrameCount'], 0);
-    expect(snapshot['unattributedFrameCount'], 2);
-    expect(snapshot['unavailableFrameKeyBoundaryCount'], 1);
-  });
-
-  test(
-    'inactive frames are excluded even when returned in a resumed batch',
-    () {
-      recorder.start();
-      final active = frame();
-      recorder.didChangeAppLifecycleState(AppLifecycleState.inactive);
-      expect(recorder.isCollecting, isFalse);
-      recorder.didChangeAppLifecycleState(AppLifecycleState.hidden);
-      recorder.didChangeAppLifecycleState(AppLifecycleState.paused);
-      recorder.didChangeAppLifecycleState(AppLifecycleState.resumed);
-      final resumed = frame();
-      report([
-        timing(active, 1000, 1000),
-        timing(active + 10000, 90000, 90000),
-        timing(resumed, 2000, 2000),
-      ]);
-      expect(total()['frameCount'], 2);
-      expect(recorder.snapshot()['ignoredInactiveFrameCount'], 1);
-    },
-  );
-
-  test(
-    'history eviction and page cardinality stay bounded without guessing',
-    () {
-      recorder = FrameRecorder(
-        enabled: true,
-        maxPages: 3,
-        maxLabelTransitions: 4,
-        currentFrameNumber: frameNumber,
-      );
-      recorder.start();
-      final old = frame();
-      for (var i = 0; i < 30; i++) {
-        recorder.setPage('page_$i');
-        final start = frame();
-        report([timing(start, 1000, 2000)]);
-      }
-      report([timing(old, 90000, 90000)]);
-      final snapshot = recorder.snapshot();
-      expect((snapshot['pages'] as Map).length, 3);
-      expect((snapshot['otherPages'] as Map)['frameCount'], 27);
-      expect(snapshot['recordedFrameCount'], 30);
-      expect(snapshot['unattributedFrameCount'], 1);
-      final retention = snapshot['retention'] as Map;
-      expect(retention['retainedLabelTransitions'], 4);
-      expect(retention['evictedLabelTransitions'], 27);
-      expect(retention['perFrameSamplesStored'], 0);
-      expect((total()['uiBuild'] as Map)['worstMs'], 1);
-    },
-  );
-
-  test('histogram memory stays fixed across large batches and long frames', () {
-    recorder.start();
-    final start = frame();
-    report([
-      for (var i = 0; i < 20000; i++) timing(start + i, i % 16, 1000),
-      timing(start + 20000, 15000000, 1000000),
-    ]);
-    final snapshot = recorder.snapshot();
-    expect(snapshot['recordedFrameCount'], 20001);
-    expect((total()['uiBuild'] as Map)['worstMs'], 15000);
-    expect((total()['uiBuild'] as Map)['p99Ms'], 15 / 1000);
-    expect((snapshot['retention'] as Map)['histogramBucketsPerThread'], 1024);
-    expect((snapshot['retention'] as Map)['perFrameSamplesStored'], 0);
-    expect(jsonEncode(snapshot).length, lessThan(10000));
-  });
-
-  test(
-    'empty, zero durations and invalid timing do not fabricate statistics',
-    () {
-      expect((total()['uiBuild'] as Map)['averageMs'], isNull);
-      expect((total()['raster'] as Map)['p99Ms'], isNull);
-      recorder.start();
-      // The callback has not established its first scheduler boundary yet.
-      report([timing(nextTimestamp, 1000, 1000)]);
-      final start = frame();
-      report([timing(start, 0, 0), timing(start + 1, -1, 0)]);
-      final snapshot = recorder.snapshot();
-      expect(snapshot['unattributedFrameCount'], 1);
-      expect(snapshot['invalidTimingFrameCount'], 1);
-      expect(snapshot['recordedFrameCount'], 1);
-      expect((total()['uiBuild'] as Map)['p99Ms'], 0);
-      expect((total()['raster'] as Map)['worstMs'], 0);
-      expect(total()['estimatedMissedVsyncs'], 0);
-    },
-  );
-
-  test('report only accepts fixed labels and allowlisted bounded metadata', () {
-    recorder.setPage('private chat message');
-    recorder.setRefreshRateHz(double.nan);
-    recorder.setRefreshRateHz(0);
-    recorder.setMetadata({
-      'deviceModel': 'Pixel 9 Pro',
-      'systemVersion': 'Android 15',
-      'isEmulator': false,
-      'secret': 'PRIVATE_KEY',
-      'chat': 'PRIVATE_KEY',
-      'platform': 'https://PRIVATE_KEY',
-      'deviceManufacturer': 'x' * 129,
-      'appBuild': double.infinity,
-    });
-    final snapshot = recorder.snapshot();
-    expect(snapshot['currentPage'], 'unknown');
-    expect(snapshot['invalidPageLabelCount'], 1);
-    expect(snapshot['currentRefreshRateHz'], 60);
-    expect(snapshot['metadata'], {
-      'deviceModel': 'Pixel 9 Pro',
-      'systemVersion': 'Android 15',
-      'isEmulator': false,
-    });
-    expect(jsonEncode(snapshot), isNot(contains('PRIVATE_KEY')));
-  });
-
-  test('fixed-glass matrix keeps entry and steady scroll independently', () {
-    recorder.start();
-    conditions(fixedPolicy: SfFixedGlassPolicy.baseline);
-    expect(
-      recorder.beginFixedGlassEntry(
-        configId: 'baseline',
-        targetPage: 'performance_plan_cards',
-      ),
-      isTrue,
-    );
-    recorder.setPage('performance_plan_cards');
-    final entry = frame();
-    report([timing(entry, 1000, 19000)]);
-    expect(
-      recorder.beginFixedGlassCase(
-        configId: 'baseline',
-        scenario: FrameScenario.planCardScroll,
-        fixtureId: 'plan_cards_72_v1',
-        messageCount: 72,
-      ),
-      isTrue,
-    );
-    final start = frame();
-    nextTimestamp += 31000000;
-    final end = frame();
-    report([timing(start, 1000, 7000), timing(end, 1000, 4000)]);
-    recorder.endCase();
-    final snapshot = recorder.snapshot();
-    final cell =
-        (snapshot['fixedGlassCases'] as Map)['baseline__planCardScroll'] as Map;
-    expect(snapshot['cases'], isEmpty);
-    expect(cell['comparisonReady'], isTrue);
-    expect(cell['comparisonIssues'], isEmpty);
-    expect(cell['targetPreviouslyEntered'], isFalse);
-    expect(cell['entryOrdinal'], 1);
-    expect(cell['entryConditionGroupCount'], 1);
-    expect(
-      ((cell['entryFirst2Seconds'] as Map)['raster'] as Map)['worstMs'],
-      19,
-    );
-    expect(((cell['steadyState'] as Map)['raster'] as Map)['worstMs'], 4);
-    final fixed =
-        ((cell['conditions'] as List).single as Map)['condition'] as Map;
-    final state = fixed['fixedGlass'] as Map;
-    expect(state['roleStates'], {
-      'topBar': null,
-      'bottomBar': null,
-      'input': true,
-      'suggestions': true,
-    });
-    expect((state['roleMaterials'] as Map)['input'], {
-      'trueGlass': true,
-      'blur': 1.2,
-      'saturation': 1.15,
-    });
-    recorder.setPage('performance_settings');
-    recorder.beginFixedGlassEntry(
-      configId: 'baseline',
-      targetPage: 'performance_plan_cards',
-    );
-    final stale =
-        (recorder.snapshot()['fixedGlassCases']
-                as Map)['baseline__planCardScroll']
-            as Map;
-    expect(stale['comparisonReady'], isFalse);
-    expect(stale['invalidationReason'], 'new_entry_attempt_started');
-    final pending =
-        (recorder.snapshot()['fixedGlassEntries'] as Map)['baseline'] as Map;
-    expect(pending['scriptStarted'], isFalse);
-    expect((pending['entryFirst2Seconds'] as Map)['frameCount'], 0);
-    // Export/reset cannot turn a previously visited page into a cold page.
-    recorder.reset();
-    recorder.setPage('performance_settings');
-    recorder.beginFixedGlassEntry(
-      configId: 'baseline',
-      targetPage: 'performance_plan_cards',
-    );
-    recorder.setPage('performance_plan_cards');
-    final revisit = frame();
-    report([timing(revisit, 1000, 1000)]);
-    recorder.beginFixedGlassCase(
-      configId: 'baseline',
-      scenario: FrameScenario.planCardScroll,
-      fixtureId: 'plan_cards_72_v1',
-      messageCount: 72,
-    );
-    final second =
-        (recorder.snapshot()['fixedGlassCases']
-                as Map)['baseline__planCardScroll']
-            as Map;
-    expect(second['targetPreviouslyEntered'], isTrue);
-    expect(second['entryOrdinal'], 2);
-  });
-
-  test(
-    'fixed-glass material changes in delayed batches never mix silently',
-    () {
-      recorder.start();
-      recorder.setPage('performance_plan_cards');
-      conditions(fixedPolicy: SfFixedGlassPolicy.baseline);
-      recorder.beginFixedGlassEntry(
-        configId: 'baseline',
-        targetPage: 'performance_plan_cards',
-      );
-      recorder.beginFixedGlassCase(
-        configId: 'baseline',
-        scenario: FrameScenario.planCardScroll,
-        fixtureId: 'plan_cards_72_v1',
-        messageCount: 72,
-      );
-      final first = frame();
-      conditions(
-        fixedPolicy: SfFixedGlassPolicy.baseline.copyWith(
-          saturationEnabled: false,
-          blurScale: .5,
-        ),
-      );
-      final second = frame();
-      report([timing(first, 1000, 8000), timing(second, 1000, 3000)]);
+  for (final value in [8329, 8330, 8331]) {
+    test('strict 120Hz P99 boundary at $value us', () {
+      startEntry();
+      report([timing(key, timestamp, value)]);
+      monotonic = 3000000;
       recorder.endCase();
-      final cell =
-          (recorder.snapshot()['fixedGlassCases']
-                  as Map)['baseline__planCardScroll']
-              as Map;
-      expect(
-        cell['comparisonIssues'],
-        containsAll([
-          'mixed_render_conditions',
-          'fixed_glass_actual_policy_mismatch',
-        ]),
-      );
-      expect(cell['entryConditionGroupCount'], 2);
-      final groups = cell['conditions'] as List;
-      expect(
-        (((groups[1] as Map)['condition'] as Map)['fixedGlass']
-            as Map)['roleMaterials'],
-        {
-          'topBar': null,
-          'bottomBar': null,
-          'input': {'trueGlass': true, 'blur': .6, 'saturation': 1.0},
-          'suggestions': {'trueGlass': true, 'blur': .6, 'saturation': 1.0},
-        },
-      );
-    },
-  );
-
-  test(
-    'prewarm failures remain explicit and N/A roles cannot be fake cells',
-    () {
-      expect(
-        recorder.beginFixedGlassCase(
-          configId: 'top_bar_static',
-          scenario: FrameScenario.planCardScroll,
-          fixtureId: 'plan_cards_72_v1',
-          messageCount: 72,
-        ),
-        isFalse,
-      );
-      expect(
-        recorder.beginFixedGlassCase(
-          configId: 'chat_baseline',
-          scenario: FrameScenario.planCardScroll,
-          fixtureId: 'plan_cards_72_v1',
-          messageCount: 72,
-        ),
-        isFalse,
-      );
-      recorder.start();
-      recorder.setPage('performance_plan_cards');
-      conditions(
-        fixedPolicy: SfFixedGlassPolicy.baseline,
-        fixedConfig: 'baseline_prewarmed',
-        prewarmEnabled: true,
-        prewarmStatus: 'unsupported',
-        prewarmDurationMs: 4,
-      );
-      recorder.beginFixedGlassCase(
-        configId: 'baseline_prewarmed',
-        scenario: FrameScenario.planCardScroll,
-        fixtureId: 'plan_cards_72_v1',
-        messageCount: 72,
-      );
-      final first = frame();
-      report([timing(first, 1000, 4000)]);
-      recorder.endCase();
-      final cell =
-          (recorder.snapshot()['fixedGlassCases']
-                  as Map)['baseline_prewarmed__planCardScroll']
-              as Map;
-      expect(
-        cell['comparisonIssues'],
-        contains('fixed_glass_prewarm_not_succeeded'),
-      );
-      expect(recorder.snapshot()['invalidCaseRequestCount'], 2);
-      expect(
-        (recorder.snapshot()['retention'] as Map)['maxFixedGlassCases'],
-        13,
-      );
-    },
-  );
-
-  for (final theme in ['light', 'dark']) {
-    test('static chat default records actual $theme materials and entry', () {
-      final cell = measureFixedChat(
-        configId: 'chat_suggestions_static',
-        policy: SfFixedGlassPolicy.chat,
-        theme: theme,
-      );
-      expect(cell['comparisonReady'], isTrue);
-      expect(cell['comparisonIssues'], isEmpty);
-      expect(cell['fixtureId'], 'long_chat_72_v1');
-      final actual =
-          ((cell['conditions'] as List).single as Map)['condition'] as Map;
-      final fixed = actual['fixedGlass'] as Map;
-      expect(actual['theme'], theme);
-      expect(actual['starfield'], isTrue);
-      expect(actual['scrollCardGlassEnabled'], isFalse);
-      expect(fixed['context'], 'chat');
-      expect(fixed['presentRoles'], ['input', 'suggestions']);
-      expect(fixed['roleStates'], {
-        'topBar': null,
-        'bottomBar': null,
-        'input': true,
-        'suggestions': false,
-      });
-      expect(fixed['roleMaterials'], {
-        'topBar': null,
-        'bottomBar': null,
-        'input': {
-          'trueGlass': true,
-          'blur': theme == 'light' ? 1.5 : 1.2,
-          'saturation': theme == 'light' ? 1.1 : 1.15,
-        },
-        'suggestions': {'trueGlass': false, 'blur': 0.0, 'saturation': 1.0},
-      });
-      expect((fixed['policy'] as Map).containsKey('inputBlur'), isFalse);
-      expect(fixed['prewarmEnabled'], isFalse);
-      expect(fixed['prewarmStatus'], 'disabled');
-      expect(fixed['prewarmDurationMs'], isNull);
-      expect(fixed['prewarmLogicalWidth'], isNull);
-      expect(fixed['prewarmLogicalHeight'], isNull);
-      expect(fixed['prewarmPixelRatio'], isNull);
-      expect(cell['entryCondition'], actual);
-      expect(cell['entryWindowComplete'], isTrue);
-      expect(
-        ((cell['entryFirst2Seconds'] as Map)['raster'] as Map)['worstMs'],
-        19,
-      );
-      expect(((cell['steadyState'] as Map)['raster'] as Map)['worstMs'], 4);
-      expect(recorder.snapshot()['cases'], isEmpty);
-      expect(
-        (recorder.snapshot()['retention'] as Map)['maxFixedGlassCases'],
-        13,
-      );
+      boundary();
+      final data = cell('dark__pageEntry');
+      expect(data['comparisonReady'], isTrue);
+      final full = recorder.snapshot();
+      final compactCell = (full['cases'] as Map)['dark__pageEntry'] as Map;
+      expect(compactCell.containsKey('rawFrames'), isFalse);
+      final rawIndex = (compactCell['rawFrameIndices'] as List).single as int;
+      expect(((full['rawFrames'] as List)[rawIndex] as Map)['rasterUs'], value);
+      expect(data['rasterP99Pass'], value < 8330);
+      final raster = (data['allFrames'] as Map)['raster'] as Map;
+      expect(raster['over8_33msCount'], value > 8330 ? 1 : 0);
+      expect(raster['overExact120HzPeriodCount'], 0);
     });
   }
-
-  test('input-only comparison reports the absolute 1.2 sigma', () {
-    const configId = 'chat_suggestions_static_input_blur_1_2';
-    final cell = measureFixedChat(
-      configId: configId,
-      policy: SfFixedGlassPolicy.chat.copyWith(inputBlur: 1.2),
-    );
-    expect(cell['comparisonReady'], isTrue);
-    expect(cell['comparisonIssues'], isEmpty);
-    final actual =
-        ((cell['conditions'] as List).single as Map)['condition'] as Map;
-    final fixed = actual['fixedGlass'] as Map;
-    expect(fixed['baseBlur'], 1.5);
-    expect((fixed['policy'] as Map)['inputBlur'], 1.2);
-    expect((fixed['roleMaterials'] as Map)['input'], {
-      'trueGlass': true,
-      'blur': 1.2,
-      'saturation': 1.1,
-    });
-    expect((fixed['roleMaterials'] as Map)['suggestions'], {
-      'trueGlass': false,
-      'blur': 0.0,
-      'saturation': 1.0,
-    });
-    expect(fixed['prewarmEnabled'], isFalse);
-    expect(fixed['prewarmStatus'], 'disabled');
-    expect(cell['entryCondition'], actual);
-  });
-
-  test('input-only comparison cannot become valid under the dark theme', () {
-    final cell = measureFixedChat(
-      configId: 'chat_suggestions_static_input_blur_1_2',
-      policy: SfFixedGlassPolicy.chat.copyWith(inputBlur: 1.2),
-      theme: 'dark',
-    );
-    expect(cell['completed'], isTrue);
-    expect(cell['comparisonReady'], isFalse);
-    expect(cell['comparisonIssues'], [
-      'input_blur_control_requires_light_theme',
-    ]);
-    expect(count(cell, 'steadyState'), 1);
-  });
-
-  test('legacy chat baseline remains a separate true-glass control', () {
-    final cell = measureFixedChat(
-      configId: 'chat_baseline',
-      policy: SfFixedGlassPolicy.baseline,
-    );
-    expect(cell['comparisonReady'], isTrue);
-    expect(cell['comparisonIssues'], isEmpty);
-    final actual =
-        ((cell['conditions'] as List).single as Map)['condition'] as Map;
-    final fixed = actual['fixedGlass'] as Map;
-    expect((fixed['roleStates'] as Map)['suggestions'], isTrue);
-    expect((fixed['roleMaterials'] as Map)['suggestions'], {
-      'trueGlass': true,
-      'blur': 1.5,
-      'saturation': 1.1,
-    });
-  });
-
-  test('missing input sigma cannot impersonate the input-only comparison', () {
-    final cell = measureFixedChat(
-      configId: 'chat_suggestions_static_input_blur_1_2',
-      policy: SfFixedGlassPolicy.chat,
-    );
-    expect(cell['comparisonReady'], isFalse);
-    expect(cell['comparisonIssues'], ['fixed_glass_actual_policy_mismatch']);
-  });
-
-  test('new chat comparisons retain thirteen bounded replacement slots', () {
-    expect(SfFixedGlassPolicy.experimentIds, hasLength(13));
-    for (var pass = 0; pass < 2; pass++) {
-      for (final id in SfFixedGlassPolicy.experimentIds) {
-        expect(
-          recorder.beginFixedGlassCase(
-            configId: id,
-            scenario: SfFixedGlassPolicy.isChatConfiguration(id)
-                ? FrameScenario.longChatScroll
-                : FrameScenario.planCardScroll,
-            fixtureId: 'bounded_fixture_v1',
-            messageCount: 72,
-          ),
-          isTrue,
-        );
-        recorder.endCase(completed: false);
-      }
-    }
-    for (var i = 0; i < 20; i++) {
-      expect(
-        recorder.beginFixedGlassCase(
-          configId: 'unbounded_chat_$i',
-          scenario: FrameScenario.longChatScroll,
-          fixtureId: 'bounded_fixture_v1',
-          messageCount: 72,
-        ),
-        isFalse,
-      );
-    }
-    expect(recorder.snapshot()['fixedGlassCases'], hasLength(13));
-    expect(recorder.snapshot()['cases'], isEmpty);
-    expect(recorder.snapshot()['invalidCaseRequestCount'], 20);
-  });
-
-  test('measurement metadata retains fixed app and device context fields', () {
-    final metadata = <String, Object?>{
-      'sdkRef': 'f684e02f38e652633c23fa8946a53d02b6aa3ea2',
-      'appSource': 'performance_baseline',
-      'appBuildNumber': 15,
-      'measurementKind': 'baseline_profile',
-      'appearance': 'dark',
-      'starfield': true,
-      'glassQuality': 'medium',
-      'deviceApiLevel': 35,
-      'metadataStatus': 'available',
-      'contentActionCount': 120,
-      'chatMessageCount': 250,
-      'theme': 'dark',
-      'appBaseCommit': 'abcdef012345',
-    };
-    recorder.setMetadata(metadata);
-    final snapshot = recorder.snapshot();
-    expect(snapshot['metadata'], metadata);
-    final definitions = snapshot['definitions'] as Map;
-    expect(definitions['coverage'], contains('WebView'));
-    expect(definitions['coverage'], contains('no screen-present FPS'));
-  });
-
   test(
-    'condition changes are visible without counting initial device metadata',
+    '60Hz keeps the literal 8.33ms P99 gate and identifies its actual period separately',
     () {
-      recorder.setMetadata({'theme': 'dark', 'starfield': true});
-      recorder.setMetadata({
-        'theme': 'light',
-      }); // Before capture: no change count.
-      recorder.start();
-      frame();
-      recorder.setRefreshRateHz(120); // First explicit rate: no change count.
-      recorder.setMetadata({
-        'glassQuality': 'medium',
-        'deviceModel': 'Pixel 9 Pro',
-        'metadataStatus': 'available',
-      });
-      expect(recorder.snapshot()['conditionChangesDuringCapture'], 0);
-      recorder.setMetadata({'theme': 'dark', 'starfield': false});
-      recorder.setMetadata({'glassQuality': 'low', 'metadataStatus': 'ready'});
       recorder.setRefreshRateHz(60);
-      recorder.setRefreshRateHz(60); // Repeated assignment is not a change.
-      recorder.setMetadata({'theme': 'dark'});
-      expect(recorder.snapshot()['conditionChangesDuringCapture'], 4);
-      recorder.reset();
-      expect(recorder.snapshot()['conditionChangesDuringCapture'], 0);
-      recorder.setMetadata({'theme': 'light'});
-      expect(recorder.snapshot()['conditionChangesDuringCapture'], 1);
-      recorder.stop();
-      recorder.setMetadata({'theme': 'dark'});
-      recorder.setRefreshRateHz(120);
-      expect(recorder.snapshot()['conditionChangesDuringCapture'], 1);
-    },
-  );
-
-  test('actual conditions retain frame attribution across delayed batches', () {
-    recorder.setPage('chat');
-    conditions();
-    expect(beginCase(), isTrue);
-    recorder.start();
-    final first = frame();
-    conditions(
-      stars: false,
-      quality: 'low',
-      phase: 'motion',
-      frost: false,
-      renderer: 'Skia',
-      backend: 'opengl',
-      budget: 1000 / 120,
-    );
-    recorder.setRefreshRateHz(120);
-    final second = frame();
-    // This assignment has not reached its scheduled boundary: it must never
-    // overwrite either frame's actual conditions in a delayed engine batch.
-    conditions(quality: 'medium');
-    report([timing(first, 1000, 7000), timing(second, 2000, 12000)]);
-    final measurement = currentCase();
-    final groups = measurement['conditions'] as List;
-    expect(groups.length, 2);
-    final original = groups[0] as Map;
-    final changed = groups[1] as Map;
-    expect(original['condition'], {
-      'glassEnabled': true,
-      'scrollCardGlassEnabled': false,
-      'starfield': true,
-      'glassQuality': 'high',
-      'glassPhase': 'stable',
-      'glassFrost': true,
-      'renderer': 'Impeller',
-      'rendererBackend': 'vulkan',
-      'refreshRateHz': 60.0,
-      'frameBudgetMs': 1000 / 60,
-      'adaptiveTargetFrameMs': 1000 / 60,
-      'theme': 'dark',
-      'viewportWidth': 412.0,
-      'viewportHeight': 915.0,
-      'devicePixelRatio': 2.625,
-      'textScale': 1.0,
-    });
-    final changedCondition = changed['condition'] as Map;
-    expect(changedCondition['starfield'], false);
-    expect(changedCondition['glassQuality'], 'low');
-    expect(changedCondition['glassPhase'], 'motion');
-    expect(changedCondition['glassFrost'], false);
-    expect(changedCondition['renderer'], 'Skia');
-    expect(changedCondition['rendererBackend'], 'opengl');
-    expect(changedCondition['refreshRateHz'], 120);
-    expect(count(original, 'allFrames'), 1);
-    expect(count(changed, 'allFrames'), 1);
-    expect(
-      measurement['comparisonIssues'],
-      containsAll([
-        'mixed_render_conditions',
-        'variant_switches_do_not_match_actual_conditions',
-      ]),
-    );
-    final perScenario = recorder.snapshot()['scenarioConditions'] as Map;
-    expect((perScenario['longChatScroll'] as Map)['groups'], hasLength(2));
-  });
-
-  test(
-    'scroll-card rendering changes retain actual mode and invalidate a case',
-    () {
-      recorder.setPage('chat');
-      conditions();
-      beginCase();
-      recorder.start();
-      final first = frame();
-      conditions(scrollCardGlass: true);
-      final second = frame();
-      report([timing(first, 1000, 3000), timing(second, 1000, 12000)]);
-      final measurement = currentCase();
-      final groups = measurement['conditions'] as List;
-      expect(groups, hasLength(2));
-      expect(
-        ((groups.first as Map)['condition'] as Map)['scrollCardGlassEnabled'],
-        false,
-      );
-      expect(
-        ((groups.last as Map)['condition'] as Map)['scrollCardGlassEnabled'],
-        true,
-      );
-      expect(
-        measurement['comparisonIssues'],
-        contains('mixed_render_conditions'),
-      );
-      expect(recorder.snapshot()['conditionChangesDuringCapture'], 1);
-    },
-  );
-
-  test('case warmup uses real vsync and exact two second boundary', () {
-    recorder.setPage('chat');
-    recorder.setRefreshRateHz(120);
-    conditions(stars: false, budget: 1000 / 120);
-    beginCase(variant: 'glass_on_stars_off');
-    recorder.start();
-    frame();
-    final key = frameNumber();
-    // Scheduler time differs by many seconds; only the actual engine vsync
-    // clock determines both warmup and observed case duration.
-    report([
-      timing(100000000, 1000, 40000, frameNumber: key),
-      timing(101999999, 1000, 20000, frameNumber: key),
-      timing(102000000, 1000, 7000, frameNumber: key),
-      timing(132000000, 1000, 8000, frameNumber: key),
-    ]);
-    final id = recorder.currentCaseId;
-    recorder.endCase();
-    final measurement = (recorder.snapshot()['cases'] as Map)[id] as Map;
-    expect(recorder.snapshot()['schema'], 2);
-    expect(count(measurement, 'allFrames'), 4);
-    expect(count(measurement, 'warmupFirst2Seconds'), 2);
-    expect(count(measurement, 'steadyState'), 2);
-    expect(count(measurement, 'firstPageEntryFirst2Seconds'), 2);
-    expect(measurement['observedDurationSeconds'], 32);
-    expect(measurement['comparisonReady'], true);
-    expect(measurement['comparisonIssues'], isEmpty);
-    final steady = measurement['steadyState'] as Map;
-    expect((steady['raster'] as Map)['averageMs'], 7.5);
-    expect((steady['raster'] as Map)['worstMs'], 8);
-    expect((steady['raster'] as Map)['overBudgetRatio'], 0);
-    final warmup = measurement['warmupFirst2Seconds'] as Map;
-    expect((warmup['raster'] as Map)['overBudgetRatio'], 1);
-    final group = (measurement['conditions'] as List).single as Map;
-    expect(count(group, 'warmupFirst2Seconds'), 2);
-    expect(count(group, 'steadyState'), 2);
-  });
-
-  test('page first entry is independent of case warmup and page reentry', () {
-    recorder.setPage('chat');
-    conditions();
-    recorder.start();
-    frame();
-    report([timing(10000000, 1000, 30000, frameNumber: frameNumber())]);
-    beginCase();
-    frame();
-    report([timing(15000000, 1000, 5000, frameNumber: frameNumber())]);
-    final measurement = currentCase();
-    expect(count(measurement, 'warmupFirst2Seconds'), 1);
-    expect(count(measurement, 'firstPageEntryFirst2Seconds'), 0);
-    final entries = recorder.snapshot()['pageEntries'] as Map;
-    final chatEntry = entries['chat'] as Map;
-    expect((chatEntry['first2Seconds'] as Map)['frameCount'], 1);
-    expect(
-      ((chatEntry['first2Seconds'] as Map)['raster'] as Map)['worstMs'],
-      30,
-    );
-    recorder.endCase();
-    recorder.setPage('plan');
-    frame();
-    report([timing(20000000, 1000, 5000, frameNumber: frameNumber())]);
-    recorder.setPage('chat');
-    beginCase(variant: 'glass_on_stars_off');
-    frame();
-    report([timing(25000000, 1000, 5000, frameNumber: frameNumber())]);
-    expect(count(currentCase(), 'firstPageEntryFirst2Seconds'), 0);
-  });
-
-  test('ending, changing and resampling cells never mixes delayed frames', () {
-    recorder.setPage('chat');
-    conditions();
-    beginCase();
-    final firstId = recorder.currentCaseId;
-    recorder.start();
-    final first = frame();
-    recorder.endCase();
-    conditions(stars: false);
-    beginCase(variant: 'glass_on_stars_off');
-    final secondId = recorder.currentCaseId;
-    final second = frame();
-    report([timing(first, 1000, 5000), timing(second, 1000, 9000)]);
-    var measurements = recorder.snapshot()['cases'] as Map;
-    expect(count(measurements[firstId] as Map, 'allFrames'), 1);
-    expect((measurements[firstId] as Map)['completed'], true);
-    expect(count(measurements[secondId] as Map, 'allFrames'), 1);
-    expect((measurements[secondId] as Map)['completed'], false);
-    recorder.endCase();
-    conditions();
-    beginCase();
-    final resample = frame();
-    // A still-pending frame from the old object cannot enter the new same-key
-    // cell. Other matrix cells retain their earlier results.
-    report([timing(first + 1, 1000, 90000), timing(resample, 1000, 3000)]);
-    measurements = recorder.snapshot()['cases'] as Map;
-    expect(measurements, hasLength(2));
-    expect(count(measurements[firstId] as Map, 'allFrames'), 1);
-    expect(
-      (((measurements[firstId] as Map)['allFrames'] as Map)['raster']
-          as Map)['worstMs'],
-      3,
-    );
-    expect(count(measurements[secondId] as Map, 'allFrames'), 1);
-  });
-
-  test('settings and no-case frames never leak into comparison cells', () {
-    recorder.setPage('chat');
-    conditions();
-    beginCase();
-    final id = recorder.currentCaseId;
-    recorder.start();
-    final first = frame();
-    recorder.setPage('performance_settings');
-    final settings = frame();
-    recorder.endCase();
-    recorder.setPage('chat');
-    final after = frame();
-    report([
-      timing(first, 1000, 3000),
-      timing(settings, 90000, 90000),
-      timing(after, 90000, 90000),
-    ]);
-    final measurement = (recorder.snapshot()['cases'] as Map)[id] as Map;
-    expect(count(measurement, 'allFrames'), 1);
-    expect(total()['frameCount'], 3);
-  });
-
-  test(
-    'invalid requests retain active cell and short or unknown data is gated',
-    () {
-      recorder.setPage('chat');
-      recorder.start();
-      beginCase(messageCount: 17);
-      final originalId = recorder.currentCaseId;
-      expect(beginCase(variant: 'arbitrary_name'), isFalse);
-      expect(beginCase(scenario: FrameScenario.planExpand), isFalse);
-      expect(beginCase(fixtureId: 'private chat text'), isFalse);
-      expect(beginCase(messageCount: -1), isFalse);
-      expect(beginCase(messageCount: 10001), isFalse);
-      expect(recorder.currentCaseId, originalId);
-      final first = frame();
-      report([timing(first, 1000, 40000)]);
-      final measurement = currentCase();
-      expect(measurement['comparisonReady'], false);
-      expect(
-        measurement['comparisonIssues'],
-        containsAll([
-          'incomplete',
-          'observed_span_less_than_30_seconds',
-          'no_steady_state_frames',
-          'renderer_unknown',
-          'actual_render_condition_unknown',
-          'long_chat_has_fewer_than_60_messages',
-        ]),
-      );
-      expect(recorder.snapshot()['invalidCaseRequestCount'], 5);
-      recorder.endCase(completed: false);
-      expect(recorder.currentCaseId, isNull);
-    },
-  );
-
-  test('actual conditions reject placeholders and invalid budgets', () {
-    conditions(
-      quality: 'adaptive_initial',
-      phase: 'private message',
-      renderer: 'requested_impeller',
-      backend: 'https://private',
-      budget: double.nan,
-    );
-    final actual = recorder.snapshot()['currentRenderConditions'] as Map;
-    expect(actual['glassQuality'], 'unknown');
-    expect(actual['glassPhase'], 'unknown');
-    expect(actual['renderer'], 'unknown');
-    expect(actual['rendererBackend'], 'unknown');
-    expect(actual['adaptiveTargetFrameMs'], isNull);
-    expect(jsonEncode(actual), isNot(contains('private')));
-    recorder.setPage('chat');
-    conditions(budget: 16);
-    beginCase();
-    recorder.setRefreshRateHz(120);
-    recorder.start();
-    final first = frame();
-    report([timing(first, 1000, 40000)]);
-    expect(
-      currentCase()['comparisonIssues'],
-      contains('adaptive_budget_does_not_match_refresh_rate'),
-    );
-  });
-
-  test('all eight fixed cells and resets keep bounded storage', () {
-    const variants = [
-      'glass_on_stars_on',
-      'glass_on_stars_off',
-      'glass_off_stars_on',
-      'glass_off_stars_off',
-    ];
-    const scenarios = [
-      FrameScenario.longChatScroll,
-      FrameScenario.planCardScroll,
-    ];
-    recorder = FrameRecorder(
-      enabled: true,
-      maxConditionGroupsPerCase: 2,
-      currentFrameNumber: frameNumber,
-    );
-    recorder.setPage('chat');
-    recorder.start();
-    for (final variant in variants) {
-      for (final scenario in scenarios) {
-        conditions(
-          glass: variant.startsWith('glass_on_'),
-          stars: variant.endsWith('_stars_on'),
-        );
-        beginCase(variant: variant, scenario: scenario);
-        for (final quality in ['high', 'medium', 'low', 'low']) {
-          conditions(
-            glass: variant.startsWith('glass_on_'),
-            stars: variant.endsWith('_stars_on'),
-            quality: quality,
-          );
-          final timestamp = frame();
-          report([timing(timestamp, 1000, 10000)]);
-        }
-        recorder.endCase();
-      }
-    }
-    final snapshot = recorder.snapshot();
-    final measurements = snapshot['cases'] as Map;
-    expect(measurements, hasLength(8));
-    for (final measurement in measurements.values.cast<Map>()) {
-      expect(measurement['conditions'], hasLength(2));
-      expect(count(measurement, 'allFrames'), 4);
-      expect(measurement['overflowConditionFrameCount'], 2);
-      expect(
-        measurement['comparisonIssues'],
-        contains('condition_groups_overflow'),
-      );
-    }
-    final manual = snapshot['scenarioConditions'] as Map;
-    for (final value in manual.values.cast<Map>()) {
-      expect(value['groups'], hasLength(2));
-      expect(value['overflowFrameCount'], greaterThan(0));
-    }
-    final retention = snapshot['retention'] as Map;
-    expect(retention['maxCases'], 8);
-    expect(retention['maxConditionGroupsPerCase'], 2);
-    expect(retention['perFrameSamplesStored'], 0);
-    recorder.reset();
-    expect(recorder.snapshot()['cases'], isEmpty);
-    expect(recorder.snapshot()['scenarioConditions'], isEmpty);
-    expect(recorder.currentCaseId, isNull);
-    expect(recorder.snapshot()['invalidCaseRequestCount'], 0);
-  });
-
-  test('non-monotonic vsync times explicitly invalidate window comparison', () {
-    recorder.setPage('chat');
-    conditions();
-    beginCase();
-    recorder.start();
-    frame();
-    final key = frameNumber();
-    report([
-      timing(100000000, 1000, 5000, frameNumber: key),
-      timing(132000000, 1000, 5000, frameNumber: key),
-      timing(99999999, 1000, 5000, frameNumber: key),
-    ]);
-    expect(
-      currentCase()['comparisonIssues'],
-      contains('out_of_order_vsync_timestamps'),
-    );
-    expect(count(currentCase(), 'allFrames'), 3);
-    expect(count(currentCase(), 'warmupFirst2Seconds'), 1);
-    expect(count(currentCase(), 'steadyState'), 1);
-  });
-
-  test(
-    'pausing an active cell cannot turn a sparse sample into a full run',
-    () {
-      recorder.setPage('chat');
-      conditions();
-      beginCase();
-      recorder.start();
-      frame();
-      report([timing(100000000, 1000, 5000, frameNumber: frameNumber())]);
-      recorder.didChangeAppLifecycleState(AppLifecycleState.inactive);
-      recorder.didChangeAppLifecycleState(AppLifecycleState.resumed);
-      frame();
-      report([timing(132000000, 1000, 5000, frameNumber: frameNumber())]);
-      expect(
-        currentCase()['comparisonIssues'],
-        contains('lifecycle_interrupted'),
-      );
-      expect(currentCase()['comparisonReady'], false);
-    },
-  );
-
-  test(
-    'interrupted tail invalidates an ended cell while preserving late frames',
-    () {
-      recorder.setPage('chat');
-      conditions();
-      beginCase();
-      final firstId = recorder.currentCaseId!;
-      recorder.start();
-      frame();
-      final firstKey = frameNumber();
-      report([
-        timing(100000000, 1000, 5000, frameNumber: firstKey),
-        timing(132000000, 1000, 6000, frameNumber: firstKey),
-      ]);
+      startEntry();
+      report([timing(key, timestamp, 12000)]);
+      monotonic = 3000000;
       recorder.endCase();
-      var first = (recorder.snapshot()['cases'] as Map)[firstId] as Map;
-      expect(first['completed'], true);
-      expect(first['comparisonReady'], true);
-      recorder.invalidateCase(firstId);
-      // Invalidation must not reactivate the ended case or relabel its tail.
-      expect(recorder.currentCaseId, isNull);
-      expect(recorder.currentScenario, isNull);
-      conditions(stars: false);
-      beginCase(variant: 'glass_on_stars_off');
-      final secondId = recorder.currentCaseId!;
-      frame();
-      final secondKey = frameNumber();
+      boundary();
+      final data = cell('dark__pageEntry');
+      expect(data['rasterP99Pass'], isFalse);
+      expect(data['is120HzDeviceSample'], isFalse);
+      expect(data['acceptanceBudgetUs'], 8330);
+      final raster = (data['allFrames'] as Map)['raster'] as Map;
+      expect(raster['overBudgetFrames'], 0);
+      expect(raster['over8_33msCount'], 1);
+    },
+  );
+  test(
+    'delayed batches keep the page label at their exact engine frame number',
+    () {
+      recorder.setPage('chat');
+      recorder.start();
+      boundary();
+      final a = timing(key, timestamp, 1000);
+      recorder.setPage('action_library');
+      boundary();
+      final b = timing(key, timestamp, 2000);
+      report([a, b]);
+      final pages = recorder.snapshot()['pages'] as Map;
+      expect((pages['chat'] as Map)['frameCount'], 1);
+      expect((pages['action_library'] as Map)['frameCount'], 1);
+    },
+  );
+  test('reset rejects delayed timings from the previous round', () {
+    recorder.start();
+    boundary();
+    final before = timing(key, timestamp, 1000);
+    recorder.reset();
+    boundary();
+    report([before, timing(key, timestamp, 2000)]);
+    expect(total()['frameCount'], 1);
+    expect(recorder.snapshot()['beforeSessionFrameCount'], 1);
+  });
+  test('raw retention overflow never becomes an approximate percentile', () {
+    recorder.stop();
+    recorder = make(maxRawFrames: 2);
+    recorder.start();
+    boundary();
+    report([
+      timing(key, timestamp, 1000),
+      timing(key + 1, timestamp + 1000, 2000),
+      timing(key + 2, timestamp + 2000, 3000),
+    ]);
+    expect(total()['rawSampleOverflowFrameCount'], 1);
+    expect((total()['raster'] as Map)['p99Us'], isNull);
+    expect(recorder.snapshot()['rawFramesTruncated'], isTrue);
+  });
+  test(
+    'mixed render conditions invalidate an otherwise complete real entry',
+    () {
+      startEntry();
+      report([timing(key, timestamp, 1000)]);
+      recorder.setRenderConditions(
+        starfield: false,
+        renderer: 'impeller',
+        rendererBackend: 'vulkan',
+        rendererVerified: true,
+        theme: 'dark',
+        viewportWidth: 390,
+        viewportHeight: 844,
+        devicePixelRatio: 3,
+        textScale: 1,
+      );
+      boundary();
+      report([timing(key, timestamp, 1000)]);
+      monotonic = 3000000;
+      recorder.endCase();
+      boundary();
+      expect(
+        cell('dark__pageEntry')['comparisonIssues'],
+        contains('mixed_or_missing_render_conditions'),
+      );
+      expect(cell('dark__pageEntry')['rasterP99Pass'], isFalse);
+    },
+  );
+  test(
+    'case raw overflow and duplicate engine frame keys are explicit failures',
+    () {
+      recorder.stop();
+      recorder = make(maxFramesPerCase: 2);
+      startEntry();
       report([
-        timing(132000001, 1000, 7000, frameNumber: firstKey),
-        timing(140000000, 1000, 9000, frameNumber: secondKey),
+        timing(key, timestamp, 1000),
+        timing(key, timestamp + 1000, 1000),
+        timing(key + 1, timestamp + 2000, 1000),
       ]);
-      final measurements = recorder.snapshot()['cases'] as Map;
-      first = measurements[firstId] as Map;
-      expect(count(first, 'allFrames'), 3);
-      expect(first['completed'], false);
-      expect(first['comparisonReady'], false);
-      expect(first['invalidationReason'], 'interrupted_tail_delivery');
+      monotonic = 3000000;
+      recorder.endCase();
+      boundary();
+      final issues = cell('dark__pageEntry')['comparisonIssues'] as List;
+      expect(issues, contains('raw_frame_limit_reached'));
+      expect(issues, contains('duplicate_frame_numbers'));
+      expect(cell('dark__pageEntry')['rasterP99Pass'], isFalse);
+    },
+  );
+  test('an interrupted lifecycle cannot pass a case', () {
+    startEntry();
+    report([timing(key, timestamp, 1000)]);
+    recorder.didChangeAppLifecycleState(AppLifecycleState.paused);
+    recorder.didChangeAppLifecycleState(AppLifecycleState.resumed);
+    boundary();
+    monotonic = 3000000;
+    recorder.endCase();
+    boundary();
+    expect(
+      cell('dark__pageEntry')['comparisonIssues'],
+      contains('lifecycle_interrupted'),
+    );
+  });
+  test(
+    'ten IDs are theme times real workload, without runtime material variants',
+    () {
+      for (final theme in ['light', 'dark']) {
+        for (final scenario in FrameRecorder.acceptanceScenarios) {
+          expect(recorder.beginCase(theme: theme, scenario: scenario), isTrue);
+          recorder.endCase();
+        }
+      }
+      final data = recorder.snapshot();
+      expect((data['cases'] as Map).length, 10);
+      expect(data['material'], 'solid');
+      expect(data['schema'], 3);
+      expect((data['cases'] as Map).keys, contains('light__bottomBarSwitch'));
+      expect(jsonEncode(data), isNot(contains('prewarm')));
+    },
+  );
+  test(
+    'armed entry begins on the real target route, and can be cancelled safely',
+    () {
+      recorder.setPage('chat');
       expect(
-        first['comparisonIssues'],
-        containsAll(['case_invalidated', 'interrupted_tail_delivery']),
+        recorder.armCase(theme: 'dark', scenario: FrameScenario.pageEntry),
+        isTrue,
       );
-      final second = measurements[secondId] as Map;
-      expect(count(second, 'allFrames'), 1);
-      expect(second['invalidationReason'], isNull);
-      recorder.invalidateCase('unknown_cell', reason: 'private message');
-      expect(recorder.snapshot()['cases'] as Map, hasLength(2));
-      recorder.invalidateCase(firstId, reason: 'private message');
-      first = (recorder.snapshot()['cases'] as Map)[firstId] as Map;
-      expect(first['invalidationReason'], 'invalidated');
+      expect(recorder.currentCaseId, isNull);
+      recorder.setPage('action_library');
+      expect(recorder.currentCaseId, 'dark__pageEntry');
+      recorder.endCase(completed: false);
+      recorder.armCase(theme: 'dark', scenario: FrameScenario.trainingPlayback);
+      recorder.cancelArmedCase();
+      recorder.setPage('training');
+      expect(recorder.currentCaseId, isNull);
+    },
+  );
+  test(
+    'bottom-bar workload requires actual chat and library route traffic',
+    () {
+      recorder.setPage('chat');
+      recorder.start();
+      recorder.beginCase(
+        theme: 'dark',
+        scenario: FrameScenario.bottomBarSwitch,
+      );
+      boundary();
+      report([timing(key, timestamp, 1000)]);
+      monotonic = 20000000;
+      recorder.endCase();
+      boundary();
       expect(
-        jsonEncode(recorder.snapshot()),
-        isNot(contains('private message')),
+        cell('dark__bottomBarSwitch')['comparisonIssues'],
+        contains('real_bottom_bar_flow_not_observed'),
       );
+    },
+  );
+  test(
+    'safe metadata allowlist excludes content and endpoint-shaped values',
+    () {
+      recorder.setMetadata({
+        'appSource': 'a' * 40,
+        'token': 'secret',
+        'chat': 'private',
+        'deviceModel': 'ws://127.0.0.1/private',
+        'material': 'solid',
+      });
+      final metadata = recorder.snapshot()['metadata'] as Map;
+      expect(metadata['material'], 'solid');
+      expect(metadata['appSource'], 'a' * 40);
+      expect(metadata.containsKey('token'), isFalse);
+      expect(metadata.containsKey('chat'), isFalse);
+      expect(metadata.containsKey('deviceModel'), isFalse);
     },
   );
 }

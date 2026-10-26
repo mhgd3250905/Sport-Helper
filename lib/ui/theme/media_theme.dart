@@ -25,7 +25,7 @@ String? sfVariant(Exercise e) => sfUsesLight(e) ? 'light' : null;
 
 /// Chroma-keyed figures (Pose-Hub green-screen masters → alpha WebP, see
 /// tools/media/build_cutouts.py) for the moves whose figure stands straight
-/// on the glass plan card, with no stage box. Only these two so far.
+/// on the plan card, with no stage box. Only these two so far.
 abstract final class SfCutouts {
   /// Animated cutouts play; off in the test harness (an endless animated
   /// image never lets the frame scheduler settle) and under reduced motion.

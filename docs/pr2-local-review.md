@@ -44,7 +44,7 @@
 | 重新安全确认回答“是” | 显示相应停止/咨询建议；从抽屉点已存计划的开始仍留在对话，没有新增训练历史 |
 | 错误与限制 | 控制台 0 error，运行时错误列表为空。尽管内置常用字字体，仍观察到 `fonts.gstatic.com` 回退请求，Web 预览不能宣称完全离线 |
 
-本机截图：[小屏卡片](screenshots/pr2-local-card-small.png)、[小屏浅色暂停](screenshots/pr2-local-player-light-small.png)。截图展示的是 Web 海报，不代表原生视频验收。
+本机截图：[小屏卡片](../../deliveries/flat-release-20261026/retired-evidence/manifest.json)、[小屏浅色暂停](../../deliveries/flat-release-20261026/retired-evidence/manifest.json)。截图展示的是 Web 海报，不代表原生视频验收。
 
 ## 合并判定与边界
 

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import 'tokens.dart';
@@ -53,24 +55,103 @@ class SfSolidSurface extends StatelessWidget {
   }
 }
 
+OverlayEntry? _solidToastEntry;
+
 void showSfSolidToast(
   BuildContext context,
   String text, {
   required Widget icon,
+  double bottom = 112,
 }) {
-  final messenger = ScaffoldMessenger.of(context);
-  messenger.hideCurrentSnackBar();
-  messenger.showSnackBar(
-    SnackBar(
-      backgroundColor: SfColors.surfaceHigh,
-      margin: const EdgeInsets.fromLTRB(24, 0, 24, 112),
-      content: Row(
-        children: [
-          icon,
-          const SizedBox(width: 8),
-          Expanded(child: Text(text, style: SfType.callout)),
-        ],
-      ),
+  _solidToastEntry?.remove();
+  _solidToastEntry = null;
+  final overlay = Overlay.maybeOf(context, rootOverlay: true);
+  if (overlay == null) return;
+  late final OverlayEntry entry;
+  entry = OverlayEntry(
+    builder: (_) => _SolidToastHost(
+      text: text,
+      icon: icon,
+      bottom: bottom,
+      onDone: () {
+        if (_solidToastEntry == entry) {
+          _solidToastEntry = null;
+          entry.remove();
+        }
+      },
+      onDisposed: () {
+        if (_solidToastEntry == entry) _solidToastEntry = null;
+      },
     ),
   );
+  _solidToastEntry = entry;
+  overlay.insert(entry);
+}
+
+class _SolidToastHost extends StatefulWidget {
+  const _SolidToastHost({
+    required this.text,
+    required this.icon,
+    required this.bottom,
+    required this.onDone,
+    required this.onDisposed,
+  });
+
+  final String text;
+  final Widget icon;
+  final double bottom;
+  final VoidCallback onDone, onDisposed;
+
+  @override
+  State<_SolidToastHost> createState() => _SolidToastHostState();
+}
+
+class _SolidToastHostState extends State<_SolidToastHost> {
+  Timer? _hold;
+
+  @override
+  void initState() {
+    super.initState();
+    _hold = Timer(const Duration(seconds: 2), widget.onDone);
+  }
+
+  @override
+  void dispose() {
+    _hold?.cancel();
+    widget.onDisposed();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final inset =
+        MediaQuery.viewPaddingOf(context).bottom +
+        MediaQuery.viewInsetsOf(context).bottom;
+    return Positioned(
+      left: 24,
+      right: 24,
+      bottom: widget.bottom + inset,
+      // Informational feedback must not swallow a tap on the plan's start
+      // button or another control underneath it.
+      child: IgnorePointer(
+        child: Semantics(
+          liveRegion: true,
+          child: Material(
+            type: MaterialType.transparency,
+            child: SfSolidSurface(
+              level: SfSurfaceLevel.raised,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Row(
+                children: [
+                  widget.icon,
+                  const SizedBox(width: 8),
+                  Expanded(child: Text(widget.text, style: SfType.callout)),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }

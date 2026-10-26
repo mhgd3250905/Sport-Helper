@@ -35,7 +35,7 @@ class _BlockedStorage implements LocalStateStorage {
 }
 
 SessionResult _completedWorkout() => SessionResult(
-  sessionId: 'glass-integration-workout',
+  sessionId: 'flat-integration-workout',
   planId: 'core-plan',
   planTitle: '核心训练',
   startedAt: DateTime.utc(2026, 10, 21, 1),
@@ -65,7 +65,7 @@ class _PendingAgent implements ManagedChatEngine, ProgressChatEngine {
   int resets = 0;
 
   @override
-  String get id => 'glass-integration-agent';
+  String get id => 'flat-integration-agent';
   @override
   Stream<coach.AgentEvent> get events => eventBus.stream;
   @override
@@ -85,36 +85,35 @@ class _PendingAgent implements ManagedChatEngine, ProgressChatEngine {
 }
 
 void main() {
-  for (final glassFirst in [true, false]) {
-    test('${glassFirst ? 'glass' : 'trainer'} write in flight preserves '
-        'trainer result, memory setting and silent quality changes', () async {
+  for (final settingsFirst in [true, false]) {
+    test('${settingsFirst ? 'settings' : 'trainer'} write in flight preserves '
+        'trainer result, memory setting and appearance changes', () async {
       final storage = _BlockedStorage();
       final store = AppStore(storage);
       addTearDown(store.dispose);
       int notifications = 0;
       store.addListener(() => notifications++);
       final result = _completedWorkout();
-      final first = glassFirst
-          ? store.setGlassQuality('premium')
+      final first = settingsFirst
+          ? store.setAppearance('light')
           : store.saveSession(result);
       await storage.firstStarted.future;
-      // Adaptive quality must not rebuild the app from its frame callback.
-      expect(notifications, 0);
+      expect(notifications, settingsFirst ? 1 : 0);
       expect(store.sessionResults, isEmpty);
-      final second = glassFirst
+      final second = settingsFirst
           ? store.saveSession(result)
-          : store.setGlassQuality('premium');
+          : store.setAppearance('light');
       final memory = store.setAiMemoryEnabled(false);
-      final settledQuality = store.setGlassQuality('standard');
-      expect(notifications, 1); // Only the memory preference notified.
+      final settledAppearance = store.setAppearance('dark');
+      expect(notifications, 3);
 
       storage.releaseFirst.complete();
-      await Future.wait([first, second, memory, settledQuality]);
-      expect(notifications, 2); // One durable trainer commit, no glass event.
+      await Future.wait([first, second, memory, settledAppearance]);
+      expect(notifications, 4);
       final restored = AppStore(storage);
       addTearDown(restored.dispose);
       await restored.load();
-      expect(restored.glassQuality, 'standard');
+      expect(restored.appearance, 'dark');
       expect(restored.aiMemoryEnabled, isFalse);
       expect(restored.sessionResults.single.toJson(), result.toJson());
       expect(restored.history.single.sessionId, result.sessionId);
@@ -123,7 +122,7 @@ void main() {
   }
 
   testWidgets(
-    'phone keyboard leaves glass dock, Agent progress, cancel and new chat reachable',
+    'phone keyboard leaves input dock, Agent progress, cancel and new chat reachable',
     (tester) async {
       tester.view
         ..physicalSize = const Size(390, 844)

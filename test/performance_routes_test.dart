@@ -36,15 +36,15 @@ void main() {
     navigator.currentState!.pop();
     await tester.pumpAndSettle();
     expect(recorder.currentPage, 'chat');
-    navigator.currentState!.pushNamed('fixed_glass_lab');
+    navigator.currentState!.pushNamed('performance_lab');
     await tester.pumpAndSettle();
-    expect(recorder.currentPage, 'fixed_glass_lab');
+    expect(recorder.currentPage, 'performance_lab');
     navigator.currentState!.pushNamed('performance_plan_cards');
     await tester.pumpAndSettle();
     expect(recorder.currentPage, 'performance_plan_cards');
     navigator.currentState!.pop();
     await tester.pumpAndSettle();
-    expect(recorder.currentPage, 'fixed_glass_lab');
+    expect(recorder.currentPage, 'performance_lab');
     navigator.currentState!.pop();
     await tester.pumpAndSettle();
     expect(recorder.currentPage, 'chat');

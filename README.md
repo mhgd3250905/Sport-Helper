@@ -1,5 +1,18 @@
 # 智能健身助手 SmartFit
 
+## 当前扁平候选（2026-10-26，待真机验收）
+
+- App 候选为 `0.1.0+32`，分支 `feat/solid-surfaces-20261026`；扁平视觉基线为 `353f146b42a434d999e83912fe3e1147422a787e`。
+- 正式依赖：`ugk_trainer-v0.3.1` 与 `ugk_coach_ui-v0.2.1`，均指向 `c6e261e75dc8647ccc2767bc253af664957c516b`；coach 保持 `ugk_coach-v0.5.0`。
+- 保留页面结构、功能、星尘、A2 青绿以及透明人物出框；卡片、顶栏、底栏、输入、建议、弹层使用三档不透明实色表面。
+- `packed_alpha.frag` 及其透明视频合成路径是播放功能，必须保留；本轮不接入或替换 219 素材。
+- 本轮不改 App `main` 或 `release/1.0`；原有聊天、保存计划、训练记录、设备身份及其他用户数据不清空。
+- 全库 `flutter analyze --no-pub` 为 0 问题；截图测试通过，已生成[首页/对话浅深预览与底部细节](../deliveries/flat-release-20261026/screenshots-v2)。这些图来自实际 Flutter widget 渲染，不是真机截图，不证明安装、性能或设备验收已完成。
+- 当前指定红米不可连接；安装、真机 Raster P99 与持续训练待实际采集。包体及对照变化见构建后的 `deliveries/flat-release-20261026/release-apk.json`，旧 APK 的历史数字不代表本候选。
+- 最终按 120Hz 的 8.33ms 预算检验计划卡滚动、长聊天、进页、底部切换与训练播放，浅深分别采集；逐帧原始整数微秒计算 P99，并报告超预算帧数。
+
+退役的实验文档、报告和旧图已按原字节移出候选，原文与 SHA-256 见 [历史证据归档清单](../deliveries/flat-release-20261026/retired-evidence/manifest.json)。下方历史记录只描述各自时点，不代表本候选重新通过了那些检查。
+
 2026-10-25 播放按钮动画待验：训练页改用 SDK 独立 `UgkPlayPauseButton`，保留原尺寸和配色，加入可中断图标形变、中心色波、按压弹回和减少动态分支。内测 `0.1.0+26`，固定新 `ugk_trainer-v0.2.7`，与切换闪烁和首帧对齐修复一起真机复测。见[本轮记录](docs/play-pause-button-2026-10-25.md)。
 
 2026-10-25 首帧衔接待验：训练待播图改用同主题、同一视频解码出的第 0 帧，消除另选关键姿势图与视频起播的跳变；聊天与列表封面保留。内测 `0.1.0+25`，SDK 保持 `ugk_trainer-v0.2.6`。仅验证相关改动，不跑全量；见[首帧修复说明](docs/playback-first-frame-2026-10-25.md)。
@@ -25,15 +38,15 @@
 
 ## 版本与验收入口
 
-2026-10-23 流畅度审核分支 `feat/performance-baseline` 已生成 **`0.1.0+16` 内测性能基线**（运行源码 `4319e1e`，arm64 release 49,515,967B）：仅增加内存帧统计、场景分组和系统分享，不先修改业务/视觉或 SDK。334 项测试、分析、三 ABI JNI 和生产版裁剪通过；按开哥提醒已停止模拟器，仅保留三个已导出场景。开哥导出手机基线后，再据实测决定修复与对比；本轮尚未合并推送。[基线采集与产物核验](docs/performance-baseline-2026-10-23.md)、[App 与 SDK 静态审核](docs/performance-static-audit-2026-10-23.md)。
+2026-10-23 流畅度审核分支 `feat/performance-baseline` 已生成 **`0.1.0+16` 内测性能基线**（运行源码 `4319e1e`，arm64 release 49,515,967B）：仅增加内存帧统计、场景分组和系统分享，不先修改业务/视觉或 SDK。334 项测试、分析、三 ABI JNI 和生产版裁剪通过；按开哥提醒已停止模拟器，仅保留三个已导出场景。开哥导出手机基线后，再据实测决定修复与对比；本轮尚未合并推送。[基线采集与产物核验](../deliveries/flat-release-20261026/retired-evidence/manifest.json)、[App 与 SDK 静态审核](../deliveries/flat-release-20261026/retired-evidence/manifest.json)。
 
 2026-10-23 当前保存版本为 **`0.1.0+15` internal**，运行源码 `15079e6`，本地注释标签 `smartfit-v0.1.0+15-internal-verified`。开哥确认本次测试通过；arm64 release 为 **49,384,327B / 49.38MB**，包含已选 AAC-LC、内测运行日志与 Android 存储 JNI 修复。App 两项 SDK 依赖固定 `f684e02`（coach 0.3.3 / trainer 0.1.6）。当前仅保存版本及对齐文档，尚未合并或推送；连续 >20 分钟训练和 iOS 专项单独待验。入口：[验收记录](docs/acceptance.md)、[当前台账](docs/version-management.md)、[修复详情](docs/android-storage-jni-fix-2026-10-23.md)。下方为历史阶段。
 
-2026-10-22 已按开哥授权修复、通过审核并合并 [PR #5](https://github.com/mhgd3250905/Sport-Helper/pull/5)，合并提交 `172366c6527d999b7817d97fe386e442f70f0e20`。计划卡展开后大图过渡到首行动作缩略图，标题与收起按钮适配大字体，隐藏卡片退出键盘焦点。253 项测试、分析 0 issue、Web/Android debug 构建及浏览器交互通过；SDK 0.3.3 与顶部栏改动保留。本轮未交付或安装新 APK，[审核、截图与边界](docs/pr5-local-review.md)。
+2026-10-22 已按开哥授权修复、通过审核并合并 [PR #5](https://github.com/mhgd3250905/Sport-Helper/pull/5)，合并提交 `172366c6527d999b7817d97fe386e442f70f0e20`。计划卡展开后大图过渡到首行动作缩略图，标题与收起按钮适配大字体，隐藏卡片退出键盘焦点。253 项测试、分析 0 issue、Web/Android debug 构建及浏览器交互通过；SDK 0.3.3 与顶部栏改动保留。本轮未交付或安装新 APK，[审核、截图与边界](../deliveries/flat-release-20261026/retired-evidence/manifest.json)。
 
 SDK 0.3.3 已于 2026-10-21 经开哥批准，以 `f80db2804d6cb9791817463cd1cd5250b32a0e84` 合入并推送 App main，合并树与验收分支 `feat/coach-033-speed@3388bd1` 一致。两项 git ref 固定为 SDK main `fc5e456c44d76b872eb812597ffb5f67bc66bce3`，按要求使用 `0.1.0+9`，包含顶部栏移除。完整 237 项测试与分析 0 问题；六条真实 Worker 记录已核对为相同运行代码并复用，共 180.430 秒、74,130 token，均无回落。[可转发的六条记录](docs/coach-033-smoke-2026-10-21.md)。
 
-此前 Liquid Glass UI 于 2026-10-21 经开哥授权审核、修复并合并 [PR #4](https://github.com/mhgd3250905/Sport-Helper/pull/4)，合并提交 `561ea8cc69efa38d07c03169c257e8fa4116bc72`。当时 237 项测试、分析 0 issue、Web 与 Android debug 构建通过，实际浏览器验证深浅色计划卡及共享训练流程；保留 CoachAgent 0.3.2 和 SDK 门禁，修复大字体溢出。截图、包身份和未测设备性能边界见 [PR #4 审核记录](docs/pr4-local-review.md)。以下 `+8` 数据描述之前的 SDK 接入验收，不替代当前版本。
+此前 该阶段界面 于 2026-10-21 经开哥授权审核、修复并合并 [PR #4](https://github.com/mhgd3250905/Sport-Helper/pull/4)，合并提交 `561ea8cc69efa38d07c03169c257e8fa4116bc72`。当时 237 项测试、分析 0 issue、Web 与 Android debug 构建通过，实际浏览器验证深浅色计划卡及共享训练流程；保留 CoachAgent 0.3.2 和 SDK 门禁，修复大字体溢出。截图、包身份和未测设备性能边界见 [PR #4 审核记录](../deliveries/flat-release-20261026/retired-evidence/manifest.json)。以下 `+8` 数据描述之前的 SDK 接入验收，不替代当前版本。
 
 ### SDK 0.3.2 接入阶段（0.1.0+8，历史）
 

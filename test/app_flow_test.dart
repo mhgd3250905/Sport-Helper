@@ -69,6 +69,29 @@ void tall(WidgetTester tester) {
   addTearDown(tester.view.reset);
 }
 
+// Paused Morph Pulse breathing intentionally keeps scheduling frames behind
+// the modal. Wait for the finite route animation, not for the whole app to idle.
+Future<void> _openDiscomfort(WidgetTester tester) async {
+  await tester.tap(find.byKey(const ValueKey('discomfort')));
+  await tester.pump();
+  final sheet = find.byType(BottomSheet);
+  expect(sheet, findsOneWidget);
+  final animation = ModalRoute.of(tester.element(sheet))!.animation!;
+  for (var frame = 0; frame < 90 && !animation.isCompleted; frame++) {
+    await tester.pump(const Duration(milliseconds: 16));
+  }
+  expect(animation.status, AnimationStatus.completed);
+  expect(find.text('跳过这个动作').hitTestable(), findsOneWidget);
+}
+
+Future<void> _closeDiscomfort(WidgetTester tester) async {
+  for (var frame = 0; frame < 90; frame++) {
+    await tester.pump(const Duration(milliseconds: 16));
+    if (find.byType(BottomSheet).evaluate().isEmpty) return;
+  }
+  fail('Discomfort sheet did not finish its finite closing transition.');
+}
+
 void main() {
   testWidgets('skipping the last exercise while paused still records the result', (tester) async {
     final s = services();
@@ -84,8 +107,7 @@ void main() {
     await tester.pump();
     await tester.tap(find.byKey(const ValueKey('pause')));
     await tester.pump();
-    await tester.tap(find.byKey(const ValueKey('discomfort')));
-    await tester.pumpAndSettle();
+    await _openDiscomfort(tester);
     await tester.tap(find.text('跳过这个动作'));
     await tester.pumpAndSettle();
     expect(find.text('今天先到这里'), findsOneWidget);
@@ -141,8 +163,7 @@ void main() {
     await showPlayer(tester, s);
     await tester.tap(find.byKey(const ValueKey('pause')));
     await tester.pump();
-    await tester.tap(find.byKey(const ValueKey('discomfort')));
-    await tester.pumpAndSettle();
+    await _openDiscomfort(tester);
     await tester.tap(find.text('结束今天的训练'));
     await tester.pumpAndSettle();
     expect(find.text('今天先到这里'), findsOneWidget);
@@ -159,10 +180,9 @@ void main() {
     await showPlayer(tester, services());
     await tester.tap(find.byKey(const ValueKey('pause')));
     await tester.pump();
-    await tester.tap(find.byKey(const ValueKey('discomfort')));
-    await tester.pumpAndSettle();
+    await _openDiscomfort(tester);
     await tester.tap(find.text('跳过这个动作'));
-    await tester.pumpAndSettle();
+    await _closeDiscomfort(tester);
     expect(tester.widget<ExerciseVideo>(find.byType(ExerciseVideo)).paused, isTrue);
     await tester.pumpWidget(const SizedBox());
   });
@@ -217,8 +237,10 @@ void main() {
     await tester.pumpAndSettle();
     expect(s.store.savedPlans.single.plan.id, plan.id);
     expect(find.text('已保存'), findsOneWidget);
+    expect(find.textContaining('已保存为「'), findsOneWidget);
 
     // Training opens at stable full-screen bounds, hiding the old chat.
+    // The visible informational toast must let this tap reach the start button.
     final screen = tester.getRect(find.byType(ChatHomePage));
     await tester.tap(find.byKey(ValueKey('plan-start-${plan.id}')));
     await tester.pump();

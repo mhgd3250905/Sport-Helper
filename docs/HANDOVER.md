@@ -1,10 +1,23 @@
 # 智能健身助手（SmartFit）交接说明
 
-## 当前主线接入（2026-10-24，已批准合入并推送）
+## 当前扁平候选（2026-10-26，待真机验收）
+
+- App 候选为 `0.1.0+32`，分支 `feat/solid-surfaces-20261026`；扁平视觉基线为 `353f146b42a434d999e83912fe3e1147422a787e`。
+- 正式依赖：`ugk_trainer-v0.3.1` 与 `ugk_coach_ui-v0.2.1`，均指向 `c6e261e75dc8647ccc2767bc253af664957c516b`；coach 保持 `ugk_coach-v0.5.0`。
+- 保留页面结构、功能、星尘、A2 青绿以及透明人物出框；卡片、顶栏、底栏、输入、建议、弹层使用三档不透明实色表面。
+- `packed_alpha.frag` 及其透明视频合成路径是播放功能，必须保留；本轮不接入或替换 219 素材。
+- 本轮不改 App `main` 或 `release/1.0`；原有聊天、保存计划、训练记录、设备身份及其他用户数据不清空。
+- 全库 `flutter analyze --no-pub` 为 0 问题；截图测试通过，已生成[首页/对话浅深预览与底部细节](../../deliveries/flat-release-20261026/screenshots-v2)。这些图来自实际 Flutter widget 渲染，不是真机截图，不证明安装、性能或设备验收已完成。
+- 当前指定红米不可连接；安装、真机 Raster P99 与持续训练待实际采集。包体及对照变化以 `deliveries/flat-release-20261026/release-apk.json` 构建回执为准，旧 APK 的历史数字不代表本候选。
+- 最终按 120Hz 的 8.33ms 预算检验计划卡滚动、长聊天、进页、底部切换与训练播放，浅深分别采集；逐帧原始整数微秒计算 P99，并报告超预算帧数。
+
+退役的实验文档、报告和旧图已按原字节移出候选，原文与 SHA-256 见 [历史证据归档清单](../../deliveries/flat-release-20261026/retired-evidence/manifest.json)。下方历史记录只描述各自时点，不代表本候选重新通过了那些检查。
+
+## 历史主线接入（2026-10-24，已批准合入并推送）
 
 开哥已批准功能源码 `7f3458dabbf8db4d5c65297d72bccc77eeed8c86` 合入并推送 main：coach 0.4.1 / trainer 0.2.1 正式 tag、询问气泡与 `ugk_coach_ui 0.1.0` 迁移完成。先发布 SDK 两个 tag（均固定 `f0ea064`），再从正式 GitHub 远端以全新 Git 缓存验证 App 严格锁文件，最后合入 App。后续只改发布状态文档。`release/1.0` 保持 `6c786c0`；App 版本不变，未安装或上传新包。接口与验证见[本轮记录](coach-ui-integration-2026-10-24.md)。以下为历史交付快照。
 
-## 当前交接入口（2026-10-23，+15 用户确认通过并保存）
+## 历史交接入口（2026-10-23，+15 用户确认通过并保存）
 
 开哥已反馈本次 +15 测试通过，并要求先保存版本、对齐文档和台账。运行源码固定 `15079e6fc57be7c1e0d5b6c5f876784f183ce63e`；保存标签为本地 `smartfit-v0.1.0+15-internal-verified`，分支 `feat/voice-aac-comparison`。internal arm64 APK 49,384,327B，SHA-256 `6ecdc72d0fb48c8b179e288009cfe8279a50be4bef1391ee7dfdedebf48249fb`；本次核对文件身份，沿用该源码的 298 测试、3 项 Python 测试及三 ABI JNI 门禁结果，不重建用户已测包。详见[本轮验收](acceptance.md)、[版本台账](version-management.md)及[版本保存记录](reports/version-save-0.1.0+15-2026-10-23.json)。
 
@@ -16,15 +29,15 @@
 
 ## PR #5 交接记录（2026-10-22，历史，已修复审核并合 main）
 
-计划卡展开精简与共享元素动画已合 main：最终已测 head `f92cbc936a123b77bc43d2a23987d928596eaefd`，合并提交 `172366c6527d999b7817d97fe386e442f70f0e20`，两者文件树完全一致。标题按收起按钮实际宽度让位，隐藏卡片隔离键盘焦点；253 项测试、分析 0 issue、严格锁文件、Web release / Android debug 构建及正式浏览器交互通过。GitHub review 为 APPROVED。保持 SDK 0.3.3 与无顶部栏界面，没有新交付 APK、设备安装或 Worker 请求；先前交付包不包含本次计划卡优化。下一步等待开哥安排，证据见 [PR #5 审核记录](pr5-local-review.md)。
+计划卡展开精简与共享元素动画已合 main：最终已测 head `f92cbc936a123b77bc43d2a23987d928596eaefd`，合并提交 `172366c6527d999b7817d97fe386e442f70f0e20`，两者文件树完全一致。标题按收起按钮实际宽度让位，隐藏卡片隔离键盘焦点；253 项测试、分析 0 issue、严格锁文件、Web release / Android debug 构建及正式浏览器交互通过。GitHub review 为 APPROVED。保持 SDK 0.3.3 与无顶部栏界面，没有新交付 APK、设备安装或 Worker 请求；先前交付包不包含本次计划卡优化。下一步等待开哥安排，证据见 [PR #5 审核记录](../../deliveries/flat-release-20261026/retired-evidence/manifest.json)。
 
 ## SDK 0.3.3 接入（2026-10-21，历史交付）
 
 `feat/coach-033-speed@3388bd1` 已经开哥批准，以 `f80db2804d6cb9791817463cd1cd5250b32a0e84` 合入并推送 App main，合并树与验收分支相同。SDK ref 固定 main `fc5e456c44d76b872eb812597ffb5f67bc66bce3`，版本按新任务为 `0.1.0+9`，包含无顶部栏界面。运行源码 `158f4ac0d2cf7bfed0ac37d63ec6bd66eb0e5537`；完整 237 项测试、分析 0 问题。SDK 已在 SmartFit 实际 AI 链路完成的完整六条经源码和原始哈希核验后复用，180.430 秒、74,130 token、无回落。逐条记录、源码适用边界与日志见 [0.3.3 报告](coach-033-smoke-2026-10-21.md)。合并后仅同步文档，不重复冒烟或构建；本次未将真机已装的 `+10` 降级。
 
-## Liquid Glass 主线（2026-10-21，0.1.0+9，历史交付）
+## PR #4 界面主线（2026-10-21，0.1.0+9，历史交付）
 
-[PR #4](https://github.com/mhgd3250905/Sport-Helper/pull/4) 已按开哥授权审核、修复并以 `561ea8cc69efa38d07c03169c257e8fa4116bc72` 合入 main；合并树与最终 PR head `67d1a731281ea5b865e6d5fd2fb2253e0a464795` 完全一致。已测运行源码 `829381ffa19b737a6c146c8c73b33394937665b1`，237 测试、分析 0 issue、Web/Android 构建及浏览器深浅色交互通过，APK 为 `0.1.0+9`。保留 SDK 0.3.2 门禁、取消/进度、记忆存储和 `TrainerPlayer`，旧本地播放器原型未搬回。大字体溢出已修复，设备帧率/热量未新增实测。包身份及截图见 [审核记录](pr4-local-review.md)；后续可安装 +9 APK 体验。
+[PR #4](https://github.com/mhgd3250905/Sport-Helper/pull/4) 已按开哥授权审核、修复并以 `561ea8cc69efa38d07c03169c257e8fa4116bc72` 合入 main；合并树与最终 PR head `67d1a731281ea5b865e6d5fd2fb2253e0a464795` 完全一致。已测运行源码 `829381ffa19b737a6c146c8c73b33394937665b1`，237 测试、分析 0 issue、Web/Android 构建及浏览器深浅色交互通过，APK 为 `0.1.0+9`。保留 SDK 0.3.2 门禁、取消/进度、记忆存储和 `TrainerPlayer`，旧本地播放器原型未搬回。大字体溢出已修复，设备帧率/热量未新增实测。包身份及截图见 [审核记录](../../deliveries/flat-release-20261026/retired-evidence/manifest.json)；后续可安装 +9 APK 体验。
 
 ## SDK 0.3.2 接入阶段（0.1.0+8，历史）
 
@@ -139,7 +152,7 @@ profile 使用 SDK `09a392b` 的 smartfit，随包 `assets/coach/smartfit.json` 
 - **领域层**：场景描述匹配（规则）→ `TemplatePlanGenerator` → `PlanValidator`（规则见 `docs/plan-schema.md`）→ 会话引擎（绝对时钟，阶段化）
 - **语音**：预生成中文语音 270 条（`assets/voice/zh/` + `manifest.json`），edge-tts 生成
 - **UI**：安全确认 → 首页/场景描述 → 模板 → 训练计划（训练小组）→ 跟练（准备/训练/休息）→ 动作库 → 关于（含 CC BY 署名）
-- 截图：`docs/screenshots/01–10`
+- 截图：[旧图索引](../../deliveries/flat-release-20261026/retired-evidence/manifest.json)
 
 ## 4. 代码地图
 

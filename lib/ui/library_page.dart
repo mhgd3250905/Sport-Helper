@@ -191,7 +191,7 @@ class _ExerciseDetailsState extends State<_ExerciseDetails> {
                       bottom: SfSpace.x3,
                       child: IgnorePointer(
                         child: ExcludeSemantics(
-                          child: SfControlFace(
+                          child: SfSolidControlFace(
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [

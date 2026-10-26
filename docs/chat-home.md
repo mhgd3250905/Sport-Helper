@@ -1,10 +1,23 @@
 # 对话式主界面
 
+## 当前扁平候选（2026-10-26，待真机验收）
+
+- App 候选为 `0.1.0+32`，分支 `feat/solid-surfaces-20261026`；扁平视觉基线为 `353f146b42a434d999e83912fe3e1147422a787e`。
+- 正式依赖：`ugk_trainer-v0.3.1` 与 `ugk_coach_ui-v0.2.1`，均指向 `c6e261e75dc8647ccc2767bc253af664957c516b`；coach 保持 `ugk_coach-v0.5.0`。
+- 保留页面结构、功能、星尘、A2 青绿以及透明人物出框；卡片、顶栏、底栏、输入、建议、弹层使用三档不透明实色表面。
+- `packed_alpha.frag` 及其透明视频合成路径是播放功能，必须保留；本轮不接入或替换 219 素材。
+- 本轮不改 App `main` 或 `release/1.0`；原有聊天、保存计划、训练记录、设备身份及其他用户数据不清空。
+- 全库 `flutter analyze --no-pub` 为 0 问题；截图测试通过，已生成[首页/对话浅深预览与底部细节](../../deliveries/flat-release-20261026/screenshots-v2)。这些图来自实际 Flutter widget 渲染，不是真机截图，不证明安装、性能或设备验收已完成。
+- 当前指定红米不可连接；安装、真机 Raster P99 与持续训练待实际采集。包体及对照变化以 `deliveries/flat-release-20261026/release-apk.json` 构建回执为准，旧 APK 的历史数字不代表本候选。
+- 最终按 120Hz 的 8.33ms 预算检验计划卡滚动、长聊天、进页、底部切换与训练播放，浅深分别采集；逐帧原始整数微秒计算 P99，并报告超预算帧数。
+
+退役的实验文档、报告和旧图已按原字节移出候选，原文与 SHA-256 见 [历史证据归档清单](../../deliveries/flat-release-20261026/retired-evidence/manifest.json)。下方历史记录只描述各自时点，不代表本候选重新通过了那些检查。
+
 当前保存版本为 `feat/voice-aac-comparison` / `0.1.0+15`，运行源码 `15079e6`，本地标签 `smartfit-v0.1.0+15-internal-verified`。开哥于 2026-10-23 确认本次测试通过；App 固定 SDK `f684e02`（coach 0.3.3 / trainer 0.1.6），保留无顶部栏与已合入的 PR #5 计划卡优化，增加内测日志及 Android 发布包存储修复。当前本地主线仍为 +12，本次仅保存版本；包身份与验收范围以[台账](version-management.md)和[验收记录](acceptance.md)为准。
 
 历史 +10 分支 `fix/chat-without-top-bar` 按真机反馈移除顶部「新对话」栏，聊天直接使用系统状态栏以下的空间；「新对话」移到左下角计划抽屉，仍可取消当前请求并 reset。底部输入与建议栏保持原有布局。
 
-历史 +9 通过 [PR #4](pr4-local-review.md) 合入 Liquid Glass：输入栏与建议浮动在对话上方，紧凑计划卡原地展开，展开后保存；开始训练仍交给共享 SDK。当时 237 项测试与实际浏览器深浅色交互通过。新对话、取消/进度、门禁动作/计划卡和 AI 记忆保留。下面 `+8` 的说明和旧截图属于 SDK 接入阶段；PR #4 截图记录基础样式，计划卡细节另见 [PR #5](pr5-local-review.md)。
+历史 +9 通过 [PR #4](../../deliveries/flat-release-20261026/retired-evidence/manifest.json) 完成当时的界面整合：输入栏与建议浮动在对话上方，紧凑计划卡原地展开，展开后保存；开始训练仍交给共享 SDK。当时 237 项测试与实际浏览器深浅色交互通过。新对话、取消/进度、门禁动作/计划卡和 AI 记忆保留。下面 `+8` 的说明和旧截图属于 SDK 接入阶段；PR #4 截图记录基础样式，计划卡细节另见 [PR #5](../../deliveries/flat-release-20261026/retired-evidence/manifest.json)。
 
 主界面只有一段对话：漂在无边的空间里（默认跟随系统，可切换深空或浅色「白色无边空间」，保留已有外观选择），没有标题栏和边框。视觉规范见 [design-language.md](design-language.md)。助手可回复文字、动作卡或计划卡：动作卡点开详情，计划卡可开练或保存。SDK 接入阶段的 `0.1.0+8` 使用 SDK 0.3.2，2026-10-21 经开哥授权合入 `ebb0840`，已推送 origin/main 并核对远端一致。旧 `+7` 功能随本次进入主线，旧证据不替代本轮独立验证。AI 最终失败使用「预设方案」。
 
@@ -12,7 +25,7 @@
 
 | 开场对话 | 安全确认 | 追问 | 计划卡片 | 已存计划抽屉 |
 |---|---|---|---|---|
-| ![](screenshots/chat-opening.png) | ![](screenshots/chat-safety.png) | ![](screenshots/chat-ask.png) | ![](screenshots/chat-card.png) | ![](screenshots/chat-drawer.png) |
+| [历史图像索引](../../deliveries/flat-release-20261026/retired-evidence/manifest.json) | [历史图像索引](../../deliveries/flat-release-20261026/retired-evidence/manifest.json) | [历史图像索引](../../deliveries/flat-release-20261026/retired-evidence/manifest.json) | [历史图像索引](../../deliveries/flat-release-20261026/retired-evidence/manifest.json) | [历史图像索引](../../deliveries/flat-release-20261026/retired-evidence/manifest.json) |
 
 ## 结构
 
@@ -86,15 +99,15 @@ App 生命周期内长期持有一个 `CoachSession`，关闭 AI 界面不清空
 
 | 跟练 · 准备 | 跟练 · 训练中 | 跟练 · 休息 | 浅色 · 卡片 | 浅色 · 跟练 |
 |---|---|---|---|---|
-| ![](screenshots/chat-player-prep.png) | ![](screenshots/chat-player-work.png) | ![](screenshots/chat-player-rest.png) | ![](screenshots/chat-card-light.png) | ![](screenshots/chat-player-work-light.png) |
+| [历史图像索引](../../deliveries/flat-release-20261026/retired-evidence/manifest.json) | [历史图像索引](../../deliveries/flat-release-20261026/retired-evidence/manifest.json) | [历史图像索引](../../deliveries/flat-release-20261026/retired-evidence/manifest.json) | [历史图像索引](../../deliveries/flat-release-20261026/retired-evidence/manifest.json) | [历史图像索引](../../deliveries/flat-release-20261026/retired-evidence/manifest.json) |
 
 - 计划卡片封面上的「开始」圆盘、抽屉里已存计划的 ▶：`CardExpandRoute`（`lib/ui/chat/expand_route.dart`）做容器变换——卡片 500 ms 内放大到全屏（`fastOutSlowIn`），先铺天空底色，跟练页按全屏尺寸布局后随卡片宽度缩放并淡入（中途不重排），背后的对话只变暗不缩放。返回 420 ms 收回卡片当前位置；从抽屉开始的（抽屉已关）收回到对话中间。系统「减少动画 / 移除动画」时只淡入淡出。路由展开后不透明，对话页（含星尘）停止绘制。
-- 跟练页（`PlayerPage`）结构参照 HipLab 训练页：顶栏关闭 · 区块名 + 进度条 · n/N；视频直接放在与渲染底一致的舞台上（不加模糊、不加色、不再套玻璃框），左上「已暂停 / 换左侧」、右上「不舒服」标签；动作名、组次与剂量、计时环（训练中强调色，准备/休息中性色）、要领；训练中下方显示「下一个」；底部上一个 / 暂停（全页唯一强调色圆盘）/ 跳过。完成页、不舒服面板、结束确认框同一套 token。计时、语音时序、视频播放与左右镜像、中断恢复、记录逻辑都没改。
+- 跟练页（`PlayerPage`）结构参照 HipLab 训练页：顶栏关闭 · 区块名 + 进度条 · n/N；视频直接放在与渲染底一致的舞台上（保持媒体原色与原构图），左上「已暂停 / 换左侧」、右上「不舒服」标签；动作名、组次与剂量、计时环（训练中强调色，准备/休息中性色）、要领；训练中下方显示「下一个」；底部上一个 / 暂停（全页唯一强调色圆盘）/ 跳过。完成页、不舒服面板、结束确认框同一套 token。计时、语音时序、视频播放与左右镜像、中断恢复、记录逻辑都没改。
 
 ## 视觉与性能
 
 - 背景：两色天空渐变 + 一团极淡冷光 + 48 颗微尘缓慢上漂（CustomPainter，独立图层，≤30 fps）。App 进入后台、被其他页面覆盖（跟练中）、系统「减少动画」、或「关于与设置 → 星尘动效」关闭时停止。
-- 气泡与卡片：色调分层，不再使用 `BackdropFilter`（上一版每个气泡一次背景模糊），绘制更省。
+- 气泡与卡片：使用集中 token 的不透明实色表面；滚动内容不采样页面背景。
 - 字体：内置 Noto Sans SC 可变字重子集（4.1 MB，OFL），真机与截图字重一致。
 
 ## 本轮核心验证

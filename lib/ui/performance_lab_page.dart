@@ -1,19 +1,13 @@
 import 'dart:async';
 import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
-
 import '../app/services.dart';
 import '../diagnostics/frame_recorder.dart';
 import '../diagnostics/performance_fixture.dart';
-import '../diagnostics/performance_lab.dart';
 import '../diagnostics/performance_report.dart';
 import 'chat/chat_home_page.dart';
 import 'theme.dart';
-import 'theme/fixed_glass_policy.dart';
 
-/// Fixed workload shared by all eight cells: 800 logical pixels/second,
-/// reversing every four seconds over the same 3,200-pixel range.
 abstract final class PerformanceScrollProtocol {
   static const sampleDuration = Duration(seconds: 32);
   static const legDuration = Duration(seconds: 4);
@@ -22,22 +16,19 @@ abstract final class PerformanceScrollProtocol {
   static const curve = Curves.linear;
 }
 
-const _variants = <String, String>{
-  'glass_on_stars_on': '玻璃开 · 星尘开',
-  'glass_on_stars_off': '玻璃开 · 星尘关',
-  'glass_off_stars_on': '玻璃关 · 星尘开',
-  'glass_off_stars_off': '玻璃关 · 星尘关',
-};
-const _scenarios = <FrameScenario, String>{
-  FrameScenario.longChatScroll: '聊天滑动',
-  FrameScenario.planCardScroll: '计划卡滑动',
+const performanceScenarios = <FrameScenario, String>{
+  FrameScenario.planCardScroll: '计划卡滚动',
+  FrameScenario.longChatScroll: '长聊天滚动',
+  FrameScenario.pageEntry: '进入动作库页面',
+  FrameScenario.bottomBarSwitch: '底栏入口 → 抽屉 → 动作库 → 返回',
+  FrameScenario.trainingPlayback: '真实训练播放页',
 };
 
-/// Internal-only entry point; the production settings omit this route.
+/// Ten real-workload cells. Appearance and the user's starfield preference
+/// remain controlled by the normal App settings.
 class PerformanceLabPage extends StatefulWidget {
   const PerformanceLabPage({super.key, this.service});
   final PerformanceReportService? service;
-
   @override
   State<PerformanceLabPage> createState() => _PerformanceLabPageState();
 }
@@ -48,36 +39,12 @@ class _PerformanceLabPageState extends State<PerformanceLabPage> {
   FrameRecorder get _recorder => _service.recorder;
   bool _busy = false;
   String? _message;
-  late final bool _previousFreeze;
 
-  @override
-  void initState() {
-    super.initState();
-    _previousFreeze = PerformanceLab.instance.freezeAdaptation;
-    // The adaptive scope is an ancestor of this route. Notify it after this
-    // build, rather than trying to mark an ancestor dirty during initState.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted && _recorder.enabled) {
-        PerformanceLab.instance.setFreezeAdaptation(true);
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    // Navigator finalization locks the widget tree during route disposal.
-    scheduleMicrotask(() {
-      PerformanceLab.instance.setFreezeAdaptation(_previousFreeze);
-    });
-    super.dispose();
-  }
-
-  Future<void> _sample(String variant, FrameScenario scenario) async {
-    if (MediaQuery.disableAnimationsOf(context)) {
-      setState(() => _message = '系统“移除动画”已开启，不能用于星尘开关对照。请关闭后重新采样。');
+  Future<void> _sample(String theme, FrameScenario scenario) async {
+    if (Theme.of(context).brightness.name != theme) {
+      setState(() => _message = '请先在设置中切到对应主题，再采这一格。');
       return;
     }
-    final previousOverrides = PerformanceLab.instance.snapshotOverrides();
     setState(() {
       _busy = true;
       _message = null;
@@ -86,11 +53,18 @@ class _PerformanceLabPageState extends State<PerformanceLabPage> {
       await _service.initialize();
       await _service.refreshDeviceInfo();
       if (!mounted) return;
-      final metadata = _recorder.snapshot()['metadata'] as Map;
-      final renderer = '${metadata['renderer']}'.toLowerCase();
-      if ((renderer != 'impeller' && renderer != 'skia') ||
-          metadata['rendererVerified'] != true) {
-        setState(() => _message = '尚未确认实际 renderer，未开始采样。请刷新设备信息后重试。');
+      if (!_service.rendererVerified) {
+        setState(() => _message = '实际 renderer 尚未验证，未开始采样。');
+        return;
+      }
+      _recorder.start();
+      if (scenario != FrameScenario.longChatScroll &&
+          scenario != FrameScenario.planCardScroll) {
+        if (!_recorder.armCase(theme: theme, scenario: scenario)) {
+          setState(() => _message = '未能准备采样，请先结束当前格。');
+          return;
+        }
+        Navigator.of(context).popUntil((route) => route.isFirst);
         return;
       }
       final original = AppServices.of(context);
@@ -100,7 +74,6 @@ class _PerformanceLabPageState extends State<PerformanceLabPage> {
         starfield: original.store.starfield,
         appearance: original.store.appearance,
       );
-      PerformanceLab.instance.setVariant(variant);
       final completed = await Navigator.of(context).push<bool>(
         MaterialPageRoute<bool>(
           settings: RouteSettings(
@@ -112,7 +85,7 @@ class _PerformanceLabPageState extends State<PerformanceLabPage> {
             fixture: fixture,
             source: original,
             recorder: _recorder,
-            variant: variant,
+            theme: theme,
             scenario: scenario,
           ),
         ),
@@ -120,39 +93,12 @@ class _PerformanceLabPageState extends State<PerformanceLabPage> {
       if (mounted) {
         setState(
           () => _message = completed == true
-              ? '本格采样结束。有效性以每格状态为准；完成八格后导出同一份 JSON。'
-              : '本格未完成，已保留为无效采样。其他格保持原样。',
+              ? '已保留本格原始帧；以导出后的有效性和精确分位为准。'
+              : '采样未完成，原始结果已保留。',
         );
       }
-    } on Object catch (error) {
-      if (mounted) setState(() => _message = '未完成采样：$error');
-    } finally {
-      PerformanceLab.instance.restoreOverrides(previousOverrides);
-      if (mounted) setState(() => _busy = false);
-    }
-  }
-
-  Future<void> _refresh() async {
-    setState(() => _busy = true);
-    await _service.initialize();
-    await _service.refreshDeviceInfo();
-    if (!mounted) return;
-    final metadata = _recorder.snapshot()['metadata'] as Map;
-    setState(() {
-      _busy = false;
-      _message = '实际 renderer：${metadata['renderer'] ?? 'unknown'}。';
-    });
-  }
-
-  Future<void> _share() async {
-    setState(() => _busy = true);
-    try {
-      await _service.share();
-      if (mounted) setState(() => _message = '系统分享已打开，请保存或发送报告。');
-    } on NoPerformanceFrames {
-      if (mounted) setState(() => _message = '还没有收到帧，请先完成至少一格采样。');
     } on Object {
-      if (mounted) setState(() => _message = '导出失败，请稍后重试。');
+      if (mounted) setState(() => _message = '未能完成采样，请检查场景素材和设备状态。');
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -161,125 +107,53 @@ class _PerformanceLabPageState extends State<PerformanceLabPage> {
   @override
   Widget build(BuildContext context) {
     if (!_recorder.enabled) return const SizedBox.shrink();
-    final cases = _recorder.snapshot()['cases'] as Map? ?? const {};
+    final recorded = (_recorder.status()['caseIds'] as List).cast<String>();
     return Scaffold(
-      appBar: const SfTopBar(title: 'Raster 对照采样'),
+      appBar: const SfTopBar(title: '实色界面性能采样'),
       body: ListView(
         padding: const EdgeInsets.all(SfSpace.x4),
         children: [
           Text(
-            '固定 72 条测试消息，使用正式聊天和计划卡组件，不读取或改写你的对话。'
-            '每格自动滑动 32 秒，前 2 秒与稳态分开统计，再等待尾帧交付。'
-            '这八格保留固定控件原材质用于全局开关对照；当前默认的验收请使用“固定玻璃拆分”里的两格复测。'
-            '请保持同一主题、屏幕方向、字体大小和设备状态。采样时不用手滑。',
+            '材质固定 solid；浅深主题各五个真实场景。保留原星尘设置、字体和缓存。'
+            '120Hz Raster P99 必须低于8.33ms；无真机样本不显示通过。',
             style: SfType.body,
           ),
           const SizedBox(height: SfSpace.x3),
-          ListenableBuilder(
-            listenable: PerformanceLab.instance,
-            builder: (context, _) => Text(
-              '列表卡片：${PerformanceLab.instance.scrollingGlassEnabled ? '真玻璃对照' : '静态仿玻璃（默认）'}。'
-              '下方玻璃开/关指全局开关；卡片模式另记入每格条件。'
-              '更换卡片模式后请开始新一轮，避免混合两种模式。',
-              key: const ValueKey('performance-scroll-card-mode'),
-              style: SfType.caption,
-            ),
-          ),
           Text(
-            '点击任意一格即生成独立测试会话；重新采样只替换本格。'
-            '矩阵采样固定进入时的玻璃档位，离开此页后恢复自适应。'
-            '每格结束后恢复进入前的玻璃和星尘设置。中途退出、后台或尺寸变化会使本格无效。',
+            '两个滚动格使用正式聊天和计划卡组件、72条隔离测试消息、32秒自动往返，'
+            '不会写入你的对话。进页格：返回后点动作库，进入后记录3秒。'
+            '底栏格：返回后用既有底栏入口打开抽屉、进入动作库并返回，持续20秒；这不是Tab导航。'
+            '播放格：返回后按正常安全门禁进入真实训练页，记录22秒；不要在统计时完成或保存测试训练。',
             style: SfType.caption,
           ),
-          for (final variant in _variants.entries) ...[
-            SfSectionTitle(variant.value),
-            for (final scenario in _scenarios.entries)
-              Padding(
-                padding: const EdgeInsets.only(bottom: SfSpace.x2),
-                child: SfPanel(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Text(scenario.value, style: SfType.title),
-                      const SizedBox(height: SfSpace.x2),
-                      Text(
-                        _result(cases['${variant.key}__${scenario.key.name}']),
-                        style: SfType.caption,
-                      ),
-                      const SizedBox(height: SfSpace.x2),
-                      SfPrimaryButton(
-                        key: ValueKey(
-                          'performance-case-${variant.key}-${scenario.key.name}',
-                        ),
-                        label:
-                            cases.containsKey(
-                              '${variant.key}__${scenario.key.name}',
-                            )
-                            ? '重新生成测试会话并采样'
-                            : '生成测试会话并采样',
-                        onPressed: _busy
-                            ? null
-                            : () => _sample(variant.key, scenario.key),
-                      ),
-                    ],
-                  ),
-                ),
+          for (final theme in const ['light', 'dark']) ...[
+            const SizedBox(height: SfSpace.x4),
+            SfSectionTitle(theme == 'light' ? '浅色' : '深色'),
+            for (final item in performanceScenarios.entries) ...[
+              Text(item.value, style: SfType.callout),
+              Text(
+                recorded.contains('${theme}__${item.key.name}')
+                    ? '已有一格；重新采样只替换这一格。'
+                    : '尚未采集。',
+                style: SfType.caption,
               ),
+              SfPrimaryButton(
+                key: ValueKey('performance-case-$theme-${item.key.name}'),
+                label: '采集${item.value}',
+                onPressed: _busy ? null : () => _sample(theme, item.key),
+              ),
+              const SizedBox(height: SfSpace.x3),
+            ],
           ],
-          const SfSectionTitle('本轮报告'),
-          SfPrimaryButton(
-            key: const ValueKey('performance-lab-export'),
-            label: '导出八格性能报告 JSON',
-            onPressed: _busy ? null : _share,
-          ),
-          TextButton(
-            onPressed: _busy ? null : _refresh,
-            child: const Text('刷新设备信息 / renderer'),
-          ),
-          TextButton(
-            key: const ValueKey('performance-lab-reset'),
-            onPressed: _busy
-                ? null
-                : () => setState(() {
-                    _recorder.endScenario();
-                    _recorder.reset();
-                    _recorder.start();
-                    _message = '已清空本轮全部统计和八格结果。';
-                  }),
-            child: const Text('开始新一轮（清空全部八格和本轮统计）'),
-          ),
-          if (_message case final message?)
-            Text(message, style: SfType.caption),
+          SfTextAction(label: '取消待开始的场景', onPressed: _recorder.cancelArmedCase),
+          if (_message != null)
+            Semantics(
+              liveRegion: true,
+              child: Text(_message!, style: SfType.body),
+            ),
         ],
       ),
     );
-  }
-
-  String _result(Object? value) {
-    if (value is! Map) return '未采样';
-    final ready = value['comparisonReady'] == true;
-    final steady = value['steadyState'];
-    final raster = steady is Map ? steady['raster'] : null;
-    final issues = value['comparisonIssues'];
-    final reason = issues is List ? issues.join('、') : '条件未满足';
-    final status = ready ? '可用于同场景对照' : '暂不可对照：$reason';
-    if (raster is! Map) return status;
-    String ms(String key) =>
-        raster[key] is num ? (raster[key] as num).toStringAsFixed(2) : '—';
-    final ratio = raster['overBudgetRatio'];
-    final percent = ratio is num ? (ratio * 100).toStringAsFixed(2) : '—';
-    final groups = value['conditions'];
-    final actual = groups is List && groups.length == 1 && groups.single is Map
-        ? (groups.single as Map)['condition']
-        : null;
-    final cards = actual is Map ? actual['scrollCardGlassEnabled'] : null;
-    final cardMode = switch (cards) {
-      true => '真玻璃',
-      false => '静态仿玻璃',
-      _ => '未记录',
-    };
-    return '$status · 卡片：$cardMode\nRaster 均值 ${ms('averageMs')} ms · '
-        'P90 ${ms('p90Ms')} ms · P99 ${ms('p99Ms')} ms · 超预算 $percent%';
   }
 }
 
@@ -291,23 +165,17 @@ class PerformanceCaseRunner extends StatefulWidget {
     required this.fixture,
     required this.source,
     required this.recorder,
-    required this.variant,
+    required this.theme,
     required this.scenario,
     this.sampleDuration = PerformanceScrollProtocol.sampleDuration,
     this.tailDelay = PerformanceScrollProtocol.tailDeliveryDelay,
-    this.fixedGlassConfigurationId,
-    this.fixedGlassPolicy = SfFixedGlassPolicy.baseline,
-    this.variantLabel,
   });
 
   final PerformanceFixture fixture;
   final AppServices source;
   final FrameRecorder recorder;
-  final String variant;
+  final String theme;
   final FrameScenario scenario;
-  final String? fixedGlassConfigurationId;
-  final SfFixedGlassPolicy fixedGlassPolicy;
-  final String? variantLabel;
 
   /// Short durations are useful in widget tests; they cannot produce a valid
   /// 30-second steady-state comparison in the recorder.
@@ -402,26 +270,17 @@ class _PerformanceCaseRunnerState extends State<PerformanceCaseRunner>
     }
     _initialSize = MediaQuery.sizeOf(context);
     widget.recorder.start();
-    final fixedConfiguration = widget.fixedGlassConfigurationId;
-    _caseStarted = fixedConfiguration == null
-        ? widget.recorder.beginCase(
-            variant: widget.variant,
-            scenario: widget.scenario,
-            fixtureId: widget.fixture.id,
-            messageCount: widget.fixture.controller.messages.length,
-          )
-        : widget.recorder.beginFixedGlassCase(
-            configId: fixedConfiguration,
-            scenario: widget.scenario,
-            fixtureId: widget.fixture.id,
-            messageCount: widget.fixture.controller.messages.length,
-          );
+    _caseStarted = widget.recorder.beginCase(
+      theme: widget.theme,
+      scenario: widget.scenario,
+      fixtureId: widget.fixture.id,
+      messageCount: widget.fixture.controller.messages.length,
+    );
     if (!_caseStarted) {
       _abort('记录器未能开始采样，请返回重试。');
       return;
     }
-    _startedCaseId =
-        '${fixedConfiguration ?? widget.variant}__${widget.scenario.name}';
+    _startedCaseId = '${widget.theme}__${widget.scenario.name}';
     final stopwatch = Stopwatch()..start();
     _status.value = '正在采样 · 0 / ${widget.sampleDuration.inSeconds} 秒';
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
@@ -527,11 +386,11 @@ class _PerformanceCaseRunnerState extends State<PerformanceCaseRunner>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              '测试会话 · ${_scenarios[widget.scenario]} · 72 条',
+                              '测试会话 · ${performanceScenarios[widget.scenario]} · 72 条',
                               style: SfType.caption,
                             ),
                             Text(
-                              widget.variantLabel ?? _variants[widget.variant]!,
+                              '${widget.theme} · ${performanceScenarios[widget.scenario]}',
                               style: SfType.caption,
                             ),
                             ValueListenableBuilder<String>(
@@ -561,21 +420,8 @@ class _PerformanceCaseRunnerState extends State<PerformanceCaseRunner>
     ),
   );
 
-  Widget _conversation() {
-    final page = ChatHomePage(
-      controller: widget.fixture.controller,
-      scrollController: _scroll,
-    );
-    // These two acceptance cells exercise the actual page default, without a
-    // material override that could conceal a missing production integration.
-    if (widget.fixedGlassConfigurationId == 'suggestions_static' ||
-        widget.fixedGlassConfigurationId == 'chat_suggestions_static') {
-      return page;
-    }
-    return SfFixedGlassScope(
-      isPlanContext: widget.scenario == FrameScenario.planCardScroll,
-      policy: widget.fixedGlassPolicy,
-      child: page,
-    );
-  }
+  Widget _conversation() => ChatHomePage(
+    controller: widget.fixture.controller,
+    scrollController: _scroll,
+  );
 }

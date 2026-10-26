@@ -1,36 +1,19 @@
-# Raster 同场景对照工具
+# 实色界面原始帧十格工具
 
-读取新版内测包导出的 schema 2 JSON，逐格输出 4 档 × 聊天/计划卡 8 行稳态 Raster 表，并分别列出 case 前 2 秒、case 与首次进页窗口交集、全局首次进页前 2 秒和最差帧。
+仅接受 schema 3、material=solid。浅深主题各采计划卡滚动、长聊天、进入动作库页面、底栏入口→抽屉→动作库→返回、真实训练播放页。底栏流程使用既有入口，不是导航Tab。旧材质实验实现和对应schema工具已移除。
 
-```powershell
-python tools/performance/raster_matrix.py 'F:/test-logs/SmartFit-performance-NEW.json' -o 'F:/test-logs/SmartFit-raster-matrix.md'
-python -m unittest discover -s tools/performance -p test_raster_matrix.py -v
-```
+采样入口为内测设置“性能报告”→“浅深主题×五场景”。两滚动场景保留72条隔离离线会话、32秒、每4秒3200逻辑像素往返；进页3秒、底栏20秒、播放22秒，后两项前2秒另列。切换主题使用原设置，保持同一星尘偏好、字号、缓存与实际刷新率。
 
-多份输入只接受同一 `startedAt`、同一具体 `appSource`、同一设备/App/SDK/renderer/主题来源的互补格。重复格直接报错，不能用后一个文件静默覆盖。旧 schema 1 基线无法补成八格；缺格、未完成、跨度不足 30 秒、条件混合、未验证 renderer 或数据无效均显示 `—`。
+    python tools/performance/raster_matrix.py <原始报告.json> -o <新矩阵.md> --json-output <新矩阵.json>
+    python tools/performance/raster_matrix.py <浅色单格.json> <其他九格.json> -o <新矩阵.md>
+    python -m unittest discover -s tools/performance -p test_raster_matrix.py -v
 
-每个差值只关闭一个开关，且保持场景、测试数据和消息数一致；同时核对每帧实际 renderer/backend、刷新率、主题、窗口尺寸、像素比和文字缩放。两边玻璃都开启的星尘对照，还要求实际玻璃 quality/phase/frost 一致。未记录实际尺寸的格需重新采样。全局首次进页窗口不绑定某个档位，不能用来做四档归因。
+工具重新计算原始整数微秒的exact nearest-rank，不采信预先填写的分位。120Hz Raster P99严格<8330us；>8330us与duration*120>1000000分别计数。P99门槛始终固定8330us，不因60Hz放宽；实际周期另列，非120Hz样本不足以代表120Hz设备验收。没有样本、缺格、原始帧溢出、条件混合、源码或设备不同均不能得到十格P99通过结论。超预算数量和比例需单独审阅，不自动宣告总体验收通过。旧4.607ms仅作另一构建的历史参考，不合并百分位或计算因果收益。
 
-`raster_controls_v3` 继续使用 schema 2，并逐帧显式记录 `scrollCardGlassEnabled`。`glass_on/off` 仍表示总玻璃开关；列表卡片默认静态仿玻璃，内测“列表卡片真玻璃”可单独开启旧效果用于对照。工具逐格列出实际卡片模式，拒绝把不同卡片模式当成同条件的星尘或全局玻璃差值。切换卡片模式后应清空并另导出一轮报告。旧 `raster_controls_v2` 报告仍可单独读取，明确标为当时的卡片路径，不能与新版静态卡片混为一组。
+完整报告使用一个rawFrames表；每格rawFrameIndices引用同一表，不复制原始时间。VM逐格导出则在该格内保留rawFrames，工具两者都识别。分位因原始帧容量不足变为null，不回退到直方图估计。App和Android内测分享上限一致为64MiB，以UTF-8字节数计，JSON紧凑编码；超过上限保留原统计，改用本地逐格导出。
 
-工具不合并百分位，不推断根因或着色器编译。P90/P99 是记录器导出的直方图估计；超预算比例不是屏幕实际掉帧率。输出文件和 stdout 均使用 LF。
+构建必须传真实SMARTFIT_BUILD_SOURCE与SMARTFIT_SOURCE_FINGERPRINT。指纹算法及保留数据的构建/采集步骤在工作区deliveries/flat-release-20261026。指纹覆盖公共Android构建输入，不读取私密defines或签名密钥。
 
-## Android renderer 解析器验证
+VM扩展仅在internal profile注册：status为轻量状态，armCase在真实目标路由准备采样，case按固定caseId导出单格，endCase/cancelCase结束或取消，snapshot/reset/scenario/endScenario保留通用能力。正式release只有设置导出路径；生产构建没有内测诊断。
 
-这 16 条检查只使用合成引擎行，直接编译应用实际的 `InternalRendererEvidenceParser`，不需要 Android 设备、模拟器、Gradle 构建或新增依赖。
-
-以下命令在项目根目录运行，使用本机已有 Android Studio JBR 和 Gradle 自带的 Kotlin 编译器；输出只写入独立临时目录：
-
-```powershell
-$rendererCompilerLib = 'E:/DevCaches/gradle/wrapper/dists/gradle-9.3.1-all/9ot9r568e8zfvvd4mn8rbu1j0/gradle-9.3.1/lib'
-$rendererCheckDirectory = 'E:/DevCaches/tmp/smartfit-performance-native'
-New-Item -ItemType Directory -Force -Path $rendererCheckDirectory | Out-Null
-& 'E:/Android/Android Studio/jbr/bin/java.exe' -Xmx256m -cp "$rendererCompilerLib/*" org.jetbrains.kotlin.cli.jvm.K2JVMCompiler -no-stdlib -no-reflect -classpath "$rendererCompilerLib/kotlin-stdlib-2.2.21.jar" -d "$rendererCheckDirectory/renderer-evidence-check.jar" android/app/src/internal/kotlin/com/ugk/smartfit/InternalRendererEvidence.kt tools/performance/test_renderer_evidence.kt
-if ($LASTEXITCODE -ne 0) { throw 'Renderer test compilation failed' }
-& 'E:/Android/Android Studio/jbr/bin/java.exe' -Xmx64m -cp "$rendererCheckDirectory/renderer-evidence-check.jar;$rendererCompilerLib/kotlin-stdlib-2.2.21.jar" com.ugk.smartfit.Test_renderer_evidenceKt
-if ($LASTEXITCODE -ne 0) { throw 'Renderer parser checks failed' }
-```
-
-实际 renderer 证据限定为自身 PID、当前 Activity 创建之后、`flutter` 标签及固定引擎源路径的精确启动行，后台限量读取，不导出日志原文。Vulkan 探测后只有捕到最终 OpenGLES 行才确认回退结果。证据不足保持 `unverified`，不能拿默认配置或缺少 Impeller 日志推断 Skia。
-
-识别文本已核对本机 Flutter 3.44.7 的 arm64 release 引擎及同版本官方源码：[Impeller OpenGLES](https://github.com/flutter/flutter/blob/69c8c61792f04cc809dfef0c910414fb9afc06cd/engine/src/flutter/shell/platform/android/android_context_gl_impeller.cc)、[Impeller Vulkan](https://github.com/flutter/flutter/blob/69c8c61792f04cc809dfef0c910414fb9afc06cd/engine/src/flutter/shell/platform/android/android_context_vk_impeller.cc)、[动态回退](https://github.com/flutter/flutter/blob/69c8c61792f04cc809dfef0c910414fb9afc06cd/engine/src/flutter/shell/platform/android/android_context_dynamic_impeller.cc)。该版 [Skia 初始化](https://github.com/flutter/flutter/blob/69c8c61792f04cc809dfef0c910414fb9afc06cd/engine/src/flutter/shell/platform/android/android_context_gl_skia.cc)没有同等成功启动声明，因此目前 Skia 路径会保留为未验证。
+这些数据不证明硬件呈现FPS、屏幕掉帧率或GPU完成时间。原生renderer解析器Kotlin验证保留，使用tools/performance/test_renderer_evidence.kt；保持同一实际renderer/backend后比较。

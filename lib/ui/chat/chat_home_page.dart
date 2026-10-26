@@ -263,27 +263,33 @@ class _ChatHomePageState extends State<ChatHomePage> {
                           setState(() => _dockHeight = s.height);
                         }
                       },
-                      child: ColoredBox(
-                        color: SfColors.surfaceLow,
-                        child: SafeArea(
-                          top: false,
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              SuggestionStrip(
-                                items: _chat.typing
-                                    ? const []
-                                    : _chat.suggestions,
-                                onTap: _send,
-                              ),
-                              ChatInputBar(
-                                focusNode: _input,
-                                onSend: _send,
-                                enabled: !_chat.typing,
-                                onPlans: () =>
-                                    _scaffold.currentState?.openDrawer(),
-                              ),
-                            ],
+                      child: RepaintBoundary(
+                        key: const ValueKey('chat-composer-dock-boundary'),
+                        child: DecoratedBox(
+                          key: const ValueKey('chat-composer-dock'),
+                          decoration: BoxDecoration(
+                            gradient: SfComposerTokens.dockGradient,
+                          ),
+                          child: SafeArea(
+                            top: false,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                SuggestionStrip(
+                                  items: _chat.typing
+                                      ? const []
+                                      : _chat.suggestions,
+                                  onTap: _send,
+                                ),
+                                ChatInputBar(
+                                  focusNode: _input,
+                                  onSend: _send,
+                                  enabled: !_chat.typing,
+                                  onPlans: () =>
+                                      _scaffold.currentState?.openDrawer(),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -327,7 +333,6 @@ class _ChatHomePageState extends State<ChatHomePage> {
         // initial safe clearance belongs to the scrollable content instead.
         topInset: MediaQuery.paddingOf(context).top,
         fadeTop: false,
-        topColor: SfColors.skyTop,
         timeMarkBuilder: (at, now) => TimeMark(at, now: now),
         typing: _chat.typing
             ? TypingBubble(

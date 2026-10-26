@@ -280,7 +280,22 @@ void main() {
           find.byType(trainer.TrainerPlayer),
         );
         expect(player.theme.brightness, palette.brightness);
+        expect(player.theme.background, palette.background);
+        expect(player.theme.surface, palette.surface);
+        expect(player.theme.surfaceHigh, palette.surfaceHigh);
+        expect(player.theme.border, palette.line);
+        expect(player.theme.shadow, palette.shadow);
+        expect(
+          player.theme.track,
+          Color.alphaBlend(palette.track, palette.surfaceHigh),
+        );
+        expect(player.theme.track.a, 1);
+        expect(
+          player.theme.ringKnob,
+          palette.isDark ? palette.text : palette.surface,
+        );
         expect(player.theme.accent, palette.accent);
+        expect(player.theme.accentSubtle, palette.accentSoft);
         expect(player.theme.pausedColor, palette.emphasis);
         expect(player.theme.onPaused, palette.onEmphasis);
         expect(player.theme.fontFamily, sfFontFamily);

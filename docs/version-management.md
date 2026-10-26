@@ -1,5 +1,18 @@
 # 版本管理与台账
 
+## 当前扁平候选（2026-10-26，待真机验收）
+
+- App 候选为 `0.1.0+32`，分支 `feat/solid-surfaces-20261026`；扁平视觉基线为 `353f146b42a434d999e83912fe3e1147422a787e`。
+- 正式依赖：`ugk_trainer-v0.3.1` 与 `ugk_coach_ui-v0.2.1`，均指向 `c6e261e75dc8647ccc2767bc253af664957c516b`；coach 保持 `ugk_coach-v0.5.0`。
+- 保留页面结构、功能、星尘、A2 青绿以及透明人物出框；卡片、顶栏、底栏、输入、建议、弹层使用三档不透明实色表面。
+- `packed_alpha.frag` 及其透明视频合成路径是播放功能，必须保留；本轮不接入或替换 219 素材。
+- 本轮不改 App `main` 或 `release/1.0`；原有聊天、保存计划、训练记录、设备身份及其他用户数据不清空。
+- 全库 `flutter analyze --no-pub` 为 0 问题；截图测试通过，已生成[首页/对话浅深预览与底部细节](../../deliveries/flat-release-20261026/screenshots-v2)。这些图来自实际 Flutter widget 渲染，不是真机截图，不证明安装、性能或设备验收已完成。
+- 当前指定红米不可连接；安装、真机 Raster P99 与持续训练待实际采集。包体及对照变化以 `deliveries/flat-release-20261026/release-apk.json` 构建回执为准，旧 APK 的历史数字不代表本候选。
+- 最终按 120Hz 的 8.33ms 预算检验计划卡滚动、长聊天、进页、底部切换与训练播放，浅深分别采集；逐帧原始整数微秒计算 P99，并报告超预算帧数。
+
+退役的实验文档、报告和旧图已按原字节移出候选，原文与 SHA-256 见 [历史证据归档清单](../../deliveries/flat-release-20261026/retired-evidence/manifest.json)。下方历史记录只描述各自时点，不代表本候选重新通过了那些检查。
+
 ## 共享聊天 UI 0.1.1 补丁（2026-10-24，已批准合入并推送）
 
 功能源码 `9d2ff7db6f598fe6cf629de02ed3c56ade660f9e` 已合入并推送 main，基于 `5b65cd7` 保留既有 iOS 提交，App 版本仍为 `0.1.0+22`。SDK 三个正式 tag：coach_ui 0.1.1、coach 0.4.2、trainer 0.2.2，均固定 `3302d6235a39e2c2b4b51fa196cc32b37c31b54c`。按批准先发布 SDK，再用隔离 Flutter 3.44.7 从正式 GitHub 严格解析且锁文件不变后合入 App；全局 3.47.8 引入的另外 5 项依赖变化未纳入本轮。本任务未写 `release/1.0`，后续提交仅发布状态文档。详见[补丁回执](coach-ui-011-2026-10-24.md)。
@@ -12,9 +25,9 @@
 
 ## 流畅度基线候选（2026-10-23，+16 待手机采集）
 
-`feat/performance-baseline` 基于已验收的 +15 保存节点 `c350680`，版本 `0.1.0+16`。仅增加 internal 帧统计、页面/场景标签、设备元数据和 JSON 系统分享；SDK 两项 ref 保持 `f684e02`，未作性能修复或视觉改动。手机基线、修复后同场景对比和开哥同意后才合并推送。使用方法与最终产物核验见[性能基线报告](performance-baseline-2026-10-23.md)，候选原因和 SDK 边界见[静态审核](performance-static-audit-2026-10-23.md)。以下 +15 仍是最近一次用户明确验收通过的版本。
+`feat/performance-baseline` 基于已验收的 +15 保存节点 `c350680`，版本 `0.1.0+16`。仅增加 internal 帧统计、页面/场景标签、设备元数据和 JSON 系统分享；SDK 两项 ref 保持 `f684e02`，未作性能修复或视觉改动。手机基线、修复后同场景对比和开哥同意后才合并推送。使用方法与最终产物核验见[性能基线报告](../../deliveries/flat-release-20261026/retired-evidence/manifest.json)，候选原因和 SDK 边界见[静态审核](../../deliveries/flat-release-20261026/retired-evidence/manifest.json)。以下 +15 仍是最近一次用户明确验收通过的版本。
 
-## 当前保存版本（2026-10-23，+15 用户确认通过）
+## 历史保存版本（2026-10-23，+15 用户确认通过）
 
 开哥确认最近交付的 +15 测试通过，本次按要求先作本地版本保存并对齐台账。确认原话和证据范围见[验收记录](acceptance.md)，机器可读记录见[版本存档](reports/version-save-0.1.0+15-2026-10-23.json)。
 
@@ -56,7 +69,7 @@
 | 关于页版本 | `0.1.0+9 (MVP)`；独立常量见 [about_page.dart](../lib/ui/about_page.dart) |
 | 资源版本 | 93 个动作包为 `1.1.0`；公共包 `_common` 为 `1.0.0`；格式版本仍为 `1`，见 [小包规范](drill-pack-spec.md) 与 [索引](../assets/packs/index.json) |
 | 交付状态 | PR #5 仅编译验证，未交付或安装新 APK。此前 SDK 0.3.3 / +9 debug APK 仍为 208,043,503 bytes，不含 PR #5；未将真机已装的 UI +10 降级 |
-| 验收状态 | PR #5 全量 253 测试、分析 0 issue、严格锁文件、Web/Android debug 构建及浏览器交互通过，见 [审核记录](pr5-local-review.md)。AI 链路未改；此前六条 Worker 的身份与复用边界仍见 [0.3.3 报告](coach-033-smoke-2026-10-21.md) |
+| 验收状态 | PR #5 全量 253 测试、分析 0 issue、严格锁文件、Web/Android debug 构建及浏览器交互通过，见 [审核记录](../../deliveries/flat-release-20261026/retired-evidence/manifest.json)。AI 链路未改；此前六条 Worker 的身份与复用边界仍见 [0.3.3 报告](coach-033-smoke-2026-10-21.md) |
 
 Git 标签、App 包版本与资源版本分别管理。`m7` 不代表 Android versionCode 为 7；该历史阶段依次为 `+1` M7、`+2` 训练接入、`+3` 目录节奏修复、`+4/+5` JSON 信封、`+6` 工具会话、`+7` 首次 Skill Agent 分支、`+8` SDK 0.3.2、`+9` UI 主线；当时尚无可交付 release 包。后续 +12/+13/+14/+15 release 以顶部当前台账及各阶段报告为准。
 
@@ -76,15 +89,15 @@ APK `.buildlog/install/SmartFit-ui-no-top-bar-0.1.0+10-debug.apk`，208,029,103 
 
 2026-10-21 已在连接的真机从 `+9` 覆盖升级，未清空数据；前台启动正常，截图确认顶部栏已消失、原聊天保留。新对话的取消/reset 及键盘可达性由现有回归测试覆盖。日志 `.buildlog/no-top-bar-tests.log`、`no-top-bar-analyze.log`、`no-top-bar-build.log`；真机截图仅保留在本机 `.buildlog/no-top-bar-device.png`。
 
-## Liquid Glass（0.1.0+9，PR #4 已审核合并）
+## PR #4 界面阶段（0.1.0+9，PR #4 已审核合并）
 
 | 项目 | 当前 +9 debug 包身份 |
 | --- | --- |
 | 源码 / 合并 | 已测 `829381ffa19b737a6c146c8c73b33394937665b1`；最终 PR head `67d1a73`；GitHub 合并 `561ea8c`，整树一致 |
-| APK | `.buildlog/install/SmartFit-liquid-glass-0.1.0+9-debug.apk`，主项目本机忽略目录保留 |
+| APK | [旧包身份原始记录](../../deliveries/flat-release-20261026/retired-evidence/manifest.json) |
 | 字节数 / SHA-256 | 208,025,947 bytes；`46f5ffc77b64774ef7cb2ee2634d0ab3a819a4367521becca0168cba9875de16` |
 | Android 身份 | `com.ugk.smartfit`，versionName `0.1.0`、versionCode `9`，minSdk `24`、targetSdk `36`，debug |
-| 日志 / 审核 | 隔离副本 `.buildlog/pr4-tests-final.log`、`pr4-analyze-final.log`、`pr4-web-build.log`、`pr4-android-debug-build.log`；[审核与截图](pr4-local-review.md) |
+| 日志 / 审核 | 隔离副本 `.buildlog/pr4-tests-final.log`、`pr4-analyze-final.log`、`pr4-web-build.log`、`pr4-android-debug-build.log`；[审核与截图](../../deliveries/flat-release-20261026/retired-evidence/manifest.json) |
 | 边界 | 大字体溢出已修复，AI/门禁和共享播放器保留；没有新增真实 Worker 或 Android 真机性能结论，旧 +8 的六条数据不改写 |
 
 ## SDK 0.3.2 接入（0.1.0+8，历史，已合入并推送 main）

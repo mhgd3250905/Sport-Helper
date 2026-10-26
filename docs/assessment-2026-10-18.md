@@ -45,7 +45,7 @@
 
 ### 2.1 定位与技术栈
 - 定位：FlareLab（托马斯训练助手）与 HipLab（开胯训练助手）共用的**动作库与渲染工厂**，2026-10-17 从 3D-Body 迁出。动作规格、人物模型、渲染工具、成片清单的唯一来源；App 只按发布版本取成片。
-- 技术栈：Node（three 0.170.0、lucide、vite 7.3.6）+ Python 3（numpy/scipy/Pillow 渲染合成，媒体脚本仅标准库）+ ffmpeg(libx264) + Playwright/Chromium 无头渲染（GPU：Windows ANGLE D3D11；无 GPU 用 SwiftShader）。
+- 技术栈：Node（three 0.170.0、lucide、vite 7.3.6）+ Python 3（numpy/scipy/Pillow 渲染合成，媒体脚本仅标准库）+ ffmpeg(libx264) + Playwright/Chromium 无头渲染（GPU：Windows ANGLE D3D11；无 GPU 时使用 CPU 软件渲染后端）。
 - 渲染方式：每个动作一个 JS spec（程序化关键帧 + IK 求解 + 肌群高亮 + 相机/阴影/QA 约束）→ 浏览器 three.js 场景逐帧渲染 → 合成绿幕/透明母帧 → 派生深色 H.264 成片和封面。
 - 人物模型：`training-human-v2@2.0.1`（Snow 派生卡通人物 + 灰色人台头，13 个固定源 SHA-256），新动作必须用该 profile。
 

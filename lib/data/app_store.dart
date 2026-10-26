@@ -54,6 +54,7 @@ class AppStore extends ChangeNotifier {
   AppStore(this._storage, {this.actionIssueEnabled = actionIssueBuildEnabled});
 
   static const key = 'smartfit.state.v1';
+  static const _retiredVisualKey = 'glassQuality';
   final LocalStateStorage _storage;
   final bool actionIssueEnabled;
 
@@ -106,11 +107,6 @@ class AppStore extends ChangeNotifier {
   );
   static const appearances = ['dark', 'light', 'system'];
 
-  /// The liquid-glass quality the adaptive scope settled on last run
-  /// ('premium' | 'standard' | 'minimal'), so the next launch starts there
-  /// instead of re-benchmarking from standard. Null until measured.
-  String? glassQuality;
-
   /// How many chat messages are kept on the device.
   static const chatLogLimit = 60;
 
@@ -125,6 +121,18 @@ class AppStore extends ChangeNotifier {
         return;
       }
       final j = jsonDecode(raw) as Map<String, dynamic>;
+      if (j.containsKey(_retiredVisualKey)) {
+        j.remove(_retiredVisualKey);
+        try {
+          // Persist the original map so unrelated keys and long histories survive.
+          await _enqueueWrite(() => _storage.write(key, jsonEncode(j)));
+        } on Object catch (error) {
+          RuntimeLog.instance.record(
+            'state.retired_preference_cleanup_deferred',
+            fields: RuntimeLog.errorFields(error),
+          );
+        }
+      }
       safetyAccepted = j['safetyAccepted'] == true;
       safetyBlocked = j['safetyBlocked'] == true;
       if (j['voice'] is Map) {
@@ -138,9 +146,6 @@ class AppStore extends ChangeNotifier {
         );
       }
       starfield = j['starfield'] != false;
-      if (j['glassQuality'] is String) {
-        glassQuality = j['glassQuality'] as String;
-      }
       aiMemoryEnabled = j['aiMemoryEnabled'] != false;
       mediaWifiOnly = j['mediaWifiOnly'] != false;
       if (appearances.contains(j['appearance'])) {
@@ -205,7 +210,6 @@ class AppStore extends ChangeNotifier {
     'aiMemoryEnabled': aiMemoryEnabled,
     'mediaWifiOnly': mediaWifiOnly,
     'appearance': appearance,
-    'glassQuality': ?glassQuality,
     'savedPlans': [for (final p in savedPlans) p.toJson()],
     'chat': chatLog.length > chatLogLimit
         ? chatLog.sublist(chatLog.length - chatLogLimit)
@@ -292,14 +296,6 @@ class AppStore extends ChangeNotifier {
     aiMemoryEnabled = enabled;
     notifyListeners();
     return _enqueueWrite(() => _storage.write(key, _encodeState()));
-  }
-
-  /// Silent because adaptive quality can settle during a frame. Keep writes
-  /// in the same queue as settings and completed trainer sessions.
-  Future<void> setGlassQuality(String quality) {
-    if (quality == glassQuality) return Future.value();
-    glassQuality = quality;
-    return _save(notify: false);
   }
 
   Future<void> setAppearance(String a) {

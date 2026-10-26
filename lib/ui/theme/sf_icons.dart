@@ -124,11 +124,6 @@ class SfIconPainter extends CustomPainter {
   late Paint _stroke;
   late Paint _fill;
 
-  /// Paints over what is already in the layer with transparency (knockouts
-  /// in filled glyphs: the play triangle cut out of a solid disc, etc.).
-  late Paint _cutStroke;
-  late Paint _cutFill;
-
   @override
   void paint(Canvas canvas, Size size) {
     final k = size.shortestSide / 24;
@@ -148,16 +143,7 @@ class SfIconPainter extends CustomPainter {
       ..style = PaintingStyle.fill
       ..color = color
       ..isAntiAlias = true;
-    _cutStroke = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = sw
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round
-      ..blendMode = BlendMode.dstOut;
-    _cutFill = Paint()..blendMode = BlendMode.dstOut;
-    canvas.saveLayer(const Rect.fromLTWH(-2, -2, 28, 28), Paint());
     _draw(canvas);
-    canvas.restore();
     canvas.restore();
   }
 
@@ -221,8 +207,17 @@ class SfIconPainter extends CustomPainter {
           Offset(16.2, 9.4),
         ]);
         if (filled) {
-          c.drawCircle(const Offset(12, 12), 9.6, _fill);
-          c.drawPath(check, _cutStroke);
+          _paintHoled(
+            c,
+            Path()..addOval(
+              Rect.fromCircle(center: const Offset(12, 12), radius: 9.6),
+            ),
+            _strokeHole(const [
+              Offset(8, 12.4),
+              Offset(10.9, 15.2),
+              Offset(16.2, 9.4),
+            ]),
+          );
         } else {
           c.drawCircle(const Offset(12, 12), 9, _stroke);
           c.drawPath(check, _stroke);
@@ -300,9 +295,7 @@ class SfIconPainter extends CustomPainter {
           ..arcToPoint(const Offset(14, 16.2), radius: const Radius.circular(2))
           ..lineTo(14, 19.9);
         if (filled) {
-          c.drawPath(house, _fill);
-          c.drawPath(house, _stroke);
-          c.drawPath(door..close(), _cutFill);
+          _paintHoled(c, house, door..close(), stroke: true);
         } else {
           c.drawPath(
             Path()
@@ -349,9 +342,7 @@ class SfIconPainter extends CustomPainter {
           ..cubicTo(13.9, 17.7, 13.1, 18.6, 12, 18.6)
           ..close();
         if (filled) {
-          c.drawPath(outer, _fill);
-          c.drawPath(outer, _stroke);
-          c.drawPath(inner, _cutFill);
+          _paintHoled(c, outer, inner, stroke: true);
         } else {
           c.drawPath(outer, _stroke);
           c.drawPath(inner, _stroke);
@@ -363,9 +354,13 @@ class SfIconPainter extends CustomPainter {
           Offset(15.9, 12),
         ], 1.4);
         if (filled) {
-          c.drawCircle(const Offset(12, 12), 9.6, _fill);
-          c.drawPath(tri, _cutFill);
-          c.drawPath(tri, _cutStroke..strokeWidth = 1);
+          _paintHoled(
+            c,
+            Path()..addOval(
+              Rect.fromCircle(center: const Offset(12, 12), radius: 9.6),
+            ),
+            tri,
+          );
         } else {
           c.drawCircle(const Offset(12, 12), 9, _stroke);
           c.drawPath(tri, _fill);
@@ -385,8 +380,18 @@ class SfIconPainter extends CustomPainter {
           Offset(17, 12.4),
         ]);
         if (filled) {
-          c.drawRRect(box.inflate(.6), _fill);
-          c.drawPath(pulse, _cutStroke);
+          _paintHoled(
+            c,
+            Path()..addRRect(box.inflate(.6)),
+            _strokeHole(const [
+              Offset(7, 12.4),
+              Offset(9.2, 12.4),
+              Offset(10.7, 9.2),
+              Offset(13.2, 15.6),
+              Offset(14.7, 12.4),
+              Offset(17, 12.4),
+            ]),
+          );
         } else {
           c.drawRRect(box, _stroke);
           c.drawPath(pulse, _stroke);
@@ -483,10 +488,11 @@ class SfIconPainter extends CustomPainter {
           (const Offset(11.6, 14.8), const Offset(17, 14.8)),
         ];
         if (filled) {
-          c.drawRRect(box.inflate(.6), _fill);
+          final holes = Path();
           for (final (a, b) in lines) {
-            c.drawLine(a, b, _cutStroke);
+            holes.addPath(_strokeHole([a, b]), Offset.zero);
           }
+          _paintHoled(c, Path()..addRRect(box.inflate(.6)), holes);
         } else {
           c.drawRRect(box, _stroke);
           for (final (a, b) in lines) {
@@ -495,15 +501,27 @@ class SfIconPainter extends CustomPainter {
         }
       case SfGlyph.info:
         if (filled) {
-          c.drawCircle(const Offset(12, 12), 9.6, _fill);
-          c.drawLine(const Offset(12, 11), const Offset(12, 16.4), _cutStroke);
-          c.drawCircle(const Offset(12, 7.9), 1.15, _cutFill);
+          _paintHoled(
+            c,
+            Path()..addOval(
+              Rect.fromCircle(center: const Offset(12, 12), radius: 9.6),
+            ),
+            _strokeHole(const [Offset(12, 11), Offset(12, 16.4)])..addOval(
+              Rect.fromCircle(center: const Offset(12, 7.9), radius: 1.15),
+            ),
+          );
         } else {
           c.drawCircle(const Offset(12, 12), 9, _stroke);
           c.drawLine(const Offset(12, 11), const Offset(12, 16.4), _stroke);
           c.drawCircle(const Offset(12, 7.9), 1.15, _fill);
         }
       case SfGlyph.copy:
+        final front = RRect.fromRectAndRadius(
+          const Rect.fromLTWH(8, 7, 12.5, 14),
+          const Radius.circular(2.5),
+        );
+        c.save();
+        _clipHoles(c, Path()..addRRect(front.inflate(1)));
         c.drawRRect(
           RRect.fromRectAndRadius(
             const Rect.fromLTWH(3.5, 3, 12.5, 15),
@@ -511,11 +529,7 @@ class SfIconPainter extends CustomPainter {
           ),
           _stroke,
         );
-        final front = RRect.fromRectAndRadius(
-          const Rect.fromLTWH(8, 7, 12.5, 14),
-          const Radius.circular(2.5),
-        );
-        c.drawRRect(front.inflate(1), _cutFill);
+        c.restore();
         c.drawRRect(front, filled ? _fill : _stroke);
       case SfGlyph.clipboard:
         final board = RRect.fromRectAndRadius(
@@ -527,22 +541,19 @@ class SfIconPainter extends CustomPainter {
           const Radius.circular(1.5),
         );
         if (filled) {
-          c.drawRRect(board.inflate(.6), _fill);
-          c.drawLine(
-            const Offset(12, 10.6),
-            const Offset(12, 16.4),
-            _cutStroke,
-          );
-          c.drawLine(
-            const Offset(9.1, 13.5),
-            const Offset(14.9, 13.5),
-            _cutStroke,
-          );
-          c.drawRRect(tab.inflate(1.2), _cutFill);
+          final holes = _strokeHole(const [Offset(12, 10.6), Offset(12, 16.4)])
+            ..addPath(
+              _strokeHole(const [Offset(9.1, 13.5), Offset(14.9, 13.5)]),
+              Offset.zero,
+            )
+            ..addRRect(tab.inflate(1.2));
+          _paintHoled(c, Path()..addRRect(board.inflate(.6)), holes);
           c.drawRRect(tab, _fill);
         } else {
+          c.save();
+          _clipHoles(c, Path()..addRRect(tab.inflate(1)));
           c.drawRRect(board, _stroke);
-          c.drawRRect(tab.inflate(1.0), _cutFill);
+          c.restore();
           c.drawRRect(tab, _stroke);
           c.drawLine(const Offset(12, 10.6), const Offset(12, 16.4), _stroke);
           c.drawLine(
@@ -566,9 +577,16 @@ class SfIconPainter extends CustomPainter {
           Offset(15.2, 10.1),
         ]);
         if (filled) {
-          c.drawPath(shield, _fill);
-          c.drawPath(shield, _stroke);
-          c.drawPath(check, _cutStroke);
+          _paintHoled(
+            c,
+            shield,
+            _strokeHole(const [
+              Offset(9, 12.1),
+              Offset(11.2, 14.3),
+              Offset(15.2, 10.1),
+            ]),
+            stroke: true,
+          );
         } else {
           c.drawPath(shield, _stroke);
           c.drawPath(check, _stroke);
@@ -641,9 +659,12 @@ class SfIconPainter extends CustomPainter {
                     9.4,
         ], 1.4);
         if (filled) {
-          c.drawPath(oct, _fill);
-          c.drawPath(oct, _stroke);
-          c.drawLine(const Offset(8.4, 12), const Offset(15.6, 12), _cutStroke);
+          _paintHoled(
+            c,
+            oct,
+            _strokeHole(const [Offset(8.4, 12), Offset(15.6, 12)]),
+            stroke: true,
+          );
         } else {
           c.drawPath(oct, _stroke);
           c.drawLine(const Offset(8.4, 12), const Offset(15.6, 12), _stroke);
@@ -701,13 +722,15 @@ class SfIconPainter extends CustomPainter {
           const Radius.circular(4),
         );
         if (filled) {
-          c.drawRRect(band, _fill);
-          c.drawRRect(
-            RRect.fromRectAndRadius(
-              Rect.fromCenter(center: Offset.zero, width: 5.6, height: 5),
-              const Radius.circular(1.5),
+          _paintHoled(
+            c,
+            Path()..addRRect(band),
+            Path()..addRRect(
+              RRect.fromRectAndRadius(
+                Rect.fromCenter(center: Offset.zero, width: 5.6, height: 5),
+                const Radius.circular(1.5),
+              ),
             ),
-            _cutFill,
           );
         } else {
           c.drawRRect(band, _stroke);
@@ -761,29 +784,60 @@ class SfIconPainter extends CustomPainter {
           c.drawCircle(Offset(x, 12), 1.6, _fill);
         }
       case SfGlyph.grid:
-        for (final o in const [Offset(4, 4), Offset(13, 4), Offset(4, 13), Offset(13, 13)]) {
-          final r = RRect.fromRectAndRadius(o & const Size(7, 7), const Radius.circular(2));
+        for (final o in const [
+          Offset(4, 4),
+          Offset(13, 4),
+          Offset(4, 13),
+          Offset(13, 13),
+        ]) {
+          final r = RRect.fromRectAndRadius(
+            o & const Size(7, 7),
+            const Radius.circular(2),
+          );
           if (filled) c.drawRRect(r, _fill);
           c.drawRRect(r, _stroke);
         }
       case SfGlyph.sliders:
         for (final (y, x) in const [(7.0, 15.0), (17.0, 9.0)]) {
+          c.save();
+          _clipHoles(
+            c,
+            Path()..addOval(Rect.fromCircle(center: Offset(x, y), radius: 3.2)),
+          );
           c.drawLine(Offset(4, y), Offset(20, y), _stroke);
-          c.drawCircle(Offset(x, y), 3.2, _cutFill);
+          c.restore();
           c.drawCircle(Offset(x, y), 2.6, filled ? _fill : _stroke);
         }
       case SfGlyph.swap:
         c.drawLine(const Offset(5, 8.5), const Offset(18, 8.5), _stroke);
-        c.drawPath(_poly(const [Offset(14.5, 5), Offset(18, 8.5), Offset(14.5, 12)]), _stroke);
+        c.drawPath(
+          _poly(const [Offset(14.5, 5), Offset(18, 8.5), Offset(14.5, 12)]),
+          _stroke,
+        );
         c.drawLine(const Offset(19, 15.5), const Offset(6, 15.5), _stroke);
-        c.drawPath(_poly(const [Offset(9.5, 12), Offset(6, 15.5), Offset(9.5, 19)]), _stroke);
+        c.drawPath(
+          _poly(const [Offset(9.5, 12), Offset(6, 15.5), Offset(9.5, 19)]),
+          _stroke,
+        );
       case SfGlyph.clock:
         if (filled) {
-          c.drawCircle(const Offset(12, 12), 9.6, _fill);
-          c.drawPath(_poly(const [Offset(12, 7.4), Offset(12, 12), Offset(15.2, 14)]), _cutStroke);
+          _paintHoled(
+            c,
+            Path()..addOval(
+              Rect.fromCircle(center: const Offset(12, 12), radius: 9.6),
+            ),
+            _strokeHole(const [
+              Offset(12, 7.4),
+              Offset(12, 12),
+              Offset(15.2, 14),
+            ]),
+          );
         } else {
           c.drawCircle(const Offset(12, 12), 9, _stroke);
-          c.drawPath(_poly(const [Offset(12, 7.4), Offset(12, 12), Offset(15.2, 14)]), _stroke);
+          c.drawPath(
+            _poly(const [Offset(12, 7.4), Offset(12, 12), Offset(15.2, 14)]),
+            _stroke,
+          );
         }
       case SfGlyph.sparkle:
         final p = Path()
@@ -796,6 +850,47 @@ class SfIconPainter extends CustomPainter {
         c.drawPath(p, _fill);
         c.drawPath(p, _stroke);
     }
+  }
+
+  /// Omit the holes before drawing ink, so the actual background stays visible.
+  void _paintHoled(Canvas canvas, Path ink, Path holes, {bool stroke = false}) {
+    canvas.save();
+    _clipHoles(
+      canvas,
+      holes,
+      bounds: ink.getBounds().inflate(_stroke.strokeWidth + 1),
+    );
+    canvas.drawPath(ink, _fill);
+    if (stroke) canvas.drawPath(ink, _stroke);
+    canvas.restore();
+  }
+
+  void _clipHoles(Canvas canvas, Path holes, {Rect? bounds}) {
+    canvas.clipPath(
+      Path.combine(
+        PathOperation.difference,
+        Path()..addRect(bounds ?? const Rect.fromLTWH(-2, -2, 28, 28)),
+        holes,
+      ),
+    );
+  }
+
+  /// Round-capped straight segments, expressed as one filled path for clipping.
+  Path _strokeHole(List<Offset> points) {
+    final path = Path();
+    final radius = _stroke.strokeWidth / 2;
+    for (final point in points) {
+      path.addOval(Rect.fromCircle(center: point, radius: radius));
+    }
+    for (var i = 1; i < points.length; i++) {
+      final a = points[i - 1];
+      final b = points[i];
+      final delta = b - a;
+      if (delta.distance == 0) continue;
+      final normal = Offset(-delta.dy, delta.dx) * (radius / delta.distance);
+      path.addPolygon([a + normal, a - normal, b - normal, b + normal], true);
+    }
+    return path;
   }
 
   static Path _poly(List<Offset> pts) => Path()..addPolygon(pts, false);

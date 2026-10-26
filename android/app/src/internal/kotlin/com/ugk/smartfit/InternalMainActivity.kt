@@ -244,6 +244,7 @@ class InternalMainActivity : MainActivity() {
     }
 
     companion object {
-        private const val MAX_REPORT_BYTES = 8 * 1024 * 1024
+        // Ten light/dark scenarios retain raw frame phases for reproducible percentiles.
+        private const val MAX_REPORT_BYTES = 64 * 1024 * 1024
     }
 }

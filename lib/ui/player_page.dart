@@ -11,7 +11,6 @@ import 'action_issue_actions.dart';
 import 'alpha_artwork.dart';
 import 'exercise_video.dart';
 import 'theme/celebration.dart';
-import 'theme/glass.dart';
 import 'theme/tokens.dart';
 
 /// App styling, assets and storage injected into the shared training player.
@@ -82,18 +81,21 @@ class _PlayerPageState extends State<PlayerPage> {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          const SfGlassField(player: true),
           TrainerPlayer(
             plan: trainerPlan(plan),
             rhythms: trainerRhythms(s.library),
             strings: TrainerStrings.zh(),
             theme: TrainerTheme(
               brightness: p.brightness,
-              background: Colors.transparent,
+              background: p.background,
               surface: p.surface,
               surfaceHigh: p.surfaceHigh,
-              track: p.track,
+              border: p.line,
+              shadow: p.shadow,
+              track: Color.alphaBlend(p.track, p.surfaceHigh),
+              ringKnob: p.isDark ? p.text : p.surface,
               accent: p.accent,
+              accentSubtle: p.accentSoft,
               accentText: p.accentText,
               onAccent: p.onAccent,
               pausedColor: p.emphasis,
@@ -104,7 +106,6 @@ class _PlayerPageState extends State<PlayerPage> {
               caution: p.caution,
               danger: p.danger,
               mediaStage: p.mediaStage,
-              scrim: p.scrim,
               fontFamily: sfFontFamily,
             ),
             drillOf: (id) {

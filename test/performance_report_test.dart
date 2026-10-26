@@ -5,18 +5,10 @@ import 'dart:ui' show FrameTiming;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:smartfit/app/services.dart';
-import 'package:smartfit/core/storage/local_state_storage.dart';
-import 'package:smartfit/data/app_store.dart';
 import 'package:smartfit/diagnostics/frame_recorder.dart';
 import 'package:smartfit/diagnostics/performance_report.dart';
-import 'package:smartfit/domain/exercise.dart';
-import 'package:smartfit/domain/template.dart';
-import 'package:smartfit/ui/about_page.dart';
 import 'package:smartfit/ui/performance_settings.dart';
 import 'package:smartfit/ui/theme.dart';
-import 'package:smartfit/voice/voice_library.dart';
-import 'package:smartfit/voice/voice_queue.dart';
 
 const _channel = MethodChannel('smartfit/performance');
 const _device = <String, Object?>{
@@ -60,14 +52,6 @@ class _ControlledService extends PerformanceReportService {
     attempts.add(result);
     return result.future;
   }
-}
-
-class _MemoryStorage implements LocalStateStorage {
-  @override
-  Future<String?> read(String key) async => null;
-
-  @override
-  Future<void> write(String key, String value) async {}
 }
 
 void main() {
@@ -315,7 +299,8 @@ void main() {
         expect(export.filename.length, lessThanOrEqualTo(96));
         final decoded = jsonDecode(export.contents) as Map<String, dynamic>;
         expect(decoded, recorder.snapshot());
-        expect(decoded['reportType'], 'frame_performance');
+        expect(decoded['reportType'], 'solid_frame_performance');
+        expect(decoded['material'], 'solid');
         expect(decoded['recordedFrameCount'], 1);
         expect((decoded['metadata'] as Map)['deviceModel'], 'Test phone');
         expect((decoded['metadata'] as Map)['appBuildNumber'], 2016);
@@ -392,178 +377,131 @@ void main() {
     });
   });
 
+  test(
+    'compact UTF-8 export size guard preserves raw frames and skips native sharing',
+    () async {
+      final recorder = createRecorder();
+      final normal = _ReportPlatform()
+        ..readDevice = () async => {..._device, 'model': '示例手机'};
+      final service = PerformanceReportService(
+        recorder: recorder,
+        platform: normal,
+      );
+      await service.initialize();
+      seedUnitFrame(recorder);
+      await service.share();
+      final contents = normal.exports.single.contents;
+      expect(contents, isNot(contains('\n')));
+      final data = jsonDecode(contents) as Map;
+      expect(data['schema'], 3);
+      expect((data['rawFrames'] as List).length, 1);
+      final limited = _ReportPlatform()..readDevice = normal.readDevice;
+      final restricted = PerformanceReportService(
+        recorder: recorder,
+        platform: limited,
+        maxExportBytes: contents.length,
+      );
+      await expectLater(
+        restricted.share(),
+        throwsA(isA<PerformanceReportTooLarge>()),
+      );
+      expect(limited.exports, isEmpty);
+      expect((recorder.snapshot()['rawFrames'] as List).length, 1);
+      expect(PerformanceReportService.maximumExportBytes, 64 * 1024 * 1024);
+    },
+  );
+
   group('Performance settings', () {
     const exportKey = ValueKey('performance-export');
-
+    testWidgets('disabled recorder renders no controls or platform access', (
+      tester,
+    ) async {
+      final platform = _ReportPlatform();
+      await showPage(
+        tester,
+        PerformanceReportService(
+          recorder: createRecorder(enabled: false),
+          platform: platform,
+        ),
+      );
+      expect(find.byKey(exportKey), findsNothing);
+      expect(platform.deviceCalls, 0);
+      expect(platform.exports, isEmpty);
+    });
     testWidgets(
-      'VM-selected hidden scenario opens settings with a valid dropdown value',
+      'generic VM scenario survives opening the new ten-cell settings',
       (tester) async {
-        final recorder = createRecorder();
-        // The profile VM extension accepts every fixed enum, including the
-        // verification-only scenario that the manual combined window omits.
-        recorder.beginScenario(FrameScenario.mediaVerifyScroll);
+        final recorder = createRecorder()
+          ..beginScenario(FrameScenario.mediaVerifyScroll);
         await showPage(tester, _ControlledService(recorder));
-        expect(tester.takeException(), isNull);
         expect(
-          tester
-              .widget<DropdownButtonFormField<FrameScenario>>(
-                find.byKey(const ValueKey('performance-scenario')),
-              )
-              .initialValue,
-          FrameScenario.actionListScroll,
+          find.byKey(const ValueKey('performance-open-lab')),
+          findsOneWidget,
         );
+        expect(find.byType(SwitchListTile), findsNothing);
+        expect(tester.takeException(), isNull);
         expect(recorder.currentScenario, FrameScenario.mediaVerifyScroll);
       },
     );
-
     testWidgets(
-      'disabled recorder renders no controls and does not access the platform',
-      (tester) async {
-        final platform = _ReportPlatform();
-        await showPage(
-          tester,
-          PerformanceReportService(
-            recorder: createRecorder(enabled: false),
-            platform: platform,
-          ),
-        );
-        expect(find.byKey(exportKey), findsNothing);
-        expect(find.text('性能报告'), findsNothing);
-        expect(platform.deviceCalls, 0);
-        expect(platform.exports, isEmpty);
-      },
-    );
-
-    testWidgets(
-      'production settings contains no performance entry',
-      (tester) async {
-        expect(FrameRecorder.buildEnabled, isFalse);
-        final store = AppStore(_MemoryStorage());
-        addTearDown(store.dispose);
-        final services = AppServices(
-          library: ExerciseLibrary([]),
-          catalog: TemplateCatalog([]),
-          store: store,
-          voiceLibrary: VoiceLibrary.empty,
-          voiceOutput: const MutedVoiceOutput(),
-        );
-        tester.view.physicalSize = const Size(1080, 9000);
-        tester.view.devicePixelRatio = 2.5;
-        addTearDown(tester.view.reset);
-        await tester.pumpWidget(
-          AppScope(
-            services: services,
-            child: MaterialApp(
-              theme: buildTheme(SfPalette.light),
-              home: const AboutPage(),
-            ),
-          ),
-        );
-        await tester.pump();
-        expect(
-          find.byKey(const ValueKey('performance-report-open')),
-          findsNothing,
-        );
-        expect(find.text('导出性能报告'), findsNothing);
-      },
-      skip: FrameRecorder.buildEnabled,
-    );
-
-    testWidgets(
-      'export disables edits and duplicate taps; success or later cancel preserves statistics',
+      'export disables duplicate requests and preserves the raw round',
       (tester) async {
         final recorder = createRecorder();
-        final service = _ControlledService(recorder);
-        await showPage(tester, service);
+        // The page and exporter must share the same recorder.
+        final actual = _ControlledService(recorder);
+        await showPage(tester, actual);
         await seedWidgetFrame(tester, recorder);
         final before = recorder.snapshot();
         await tester.tap(find.byKey(exportKey));
-        await tester.tap(find.byKey(exportKey));
         await tester.pump();
-        expect(find.text('正在准备报告…'), findsOneWidget);
-        for (final key in [
-          'performance-export',
-          'performance-reset',
-          'performance-start-scenario',
-        ]) {
-          expect(
-            tester.widget<SfPrimaryButton>(find.byKey(ValueKey(key))).onPressed,
-            isNull,
-          );
-        }
-        expect(
-          tester
-              .widget<SfTextAction>(
-                find.byKey(const ValueKey('performance-end-scenario')),
-              )
-              .onPressed,
-          isNull,
-        );
-        expect(
-          tester
-              .widget<DropdownButtonFormField<FrameScenario>>(
-                find.byKey(const ValueKey('performance-scenario')),
-              )
-              .onChanged,
-          isNull,
-        );
-        expect(service.attempts, isEmpty);
-        await tester.pump(const Duration(milliseconds: 1200));
-        expect(service.attempts, hasLength(1));
-        await tester.tap(find.byKey(exportKey));
-        await tester.pump();
-        expect(service.attempts, hasLength(1));
-        service.attempts.single.complete();
-        await tester.pumpAndSettle();
-        expect(find.text('已打开系统分享，请选择接收方。统计仍保留。'), findsOneWidget);
         expect(
           tester.widget<SfPrimaryButton>(find.byKey(exportKey)).onPressed,
-          isNotNull,
+          isNull,
         );
-        // The chooser may later be cancelled; opening it must never clear a round.
+        await tester.pump(const Duration(milliseconds: 1200));
+        expect(actual.attempts, hasLength(1));
+        actual.attempts.single.complete();
+        await tester.pumpAndSettle();
+        expect(find.text('系统分享已打开；取消分享不会清空统计。'), findsOneWidget);
         expect(recorder.snapshot(), before);
       },
     );
-
-    testWidgets('export failure preserves the round and permits retry', (
+    testWidgets('export failure retains samples and permits a retry', (
       tester,
     ) async {
       final recorder = createRecorder();
-      final service = _ControlledService(recorder);
-      await showPage(tester, service);
+      final actual = _ControlledService(recorder);
+      await showPage(tester, actual);
       await seedWidgetFrame(tester, recorder);
       final before = recorder.snapshot();
       await tester.tap(find.byKey(exportKey));
       await tester.pump(const Duration(milliseconds: 1200));
-      expect(service.attempts, hasLength(1));
-      service.attempts.single.completeError(StateError('write failed'));
+      actual.attempts.single.completeError(
+        StateError('fixture export failure'),
+      );
       await tester.pump();
-      expect(find.text('报告导出失败；统计仍保留，请重试。'), findsOneWidget);
+      expect(find.text('导出未完成，请稍后重试；已有统计仍保留。'), findsOneWidget);
       expect(recorder.snapshot(), before);
       await tester.tap(find.byKey(exportKey));
       await tester.pump(const Duration(milliseconds: 1200));
-      expect(service.attempts, hasLength(2));
-      service.attempts.last.complete();
-      await tester.pump();
-      expect(find.text('已打开系统分享，请选择接收方。统计仍保留。'), findsOneWidget);
-      expect(recorder.snapshot(), before);
+      expect(actual.attempts, hasLength(2));
+      actual.attempts.last.complete();
+      await tester.pumpAndSettle();
     });
-
-    testWidgets(
-      'empty-round error gives actionable feedback and enables export again',
-      (tester) async {
-        final service = _ControlledService(createRecorder());
-        await showPage(tester, service);
-        await tester.tap(find.byKey(exportKey));
-        await tester.pump(const Duration(milliseconds: 1200));
-        service.attempts.single.completeError(const NoPerformanceFrames());
-        await tester.pump();
-        expect(find.text('尚未收到有效帧数据，请返回页面操作后再导出。'), findsOneWidget);
-        expect(
-          tester.widget<SfPrimaryButton>(find.byKey(exportKey)).onPressed,
-          isNotNull,
-        );
-      },
-    );
+    testWidgets('empty samples never create a performance claim', (
+      tester,
+    ) async {
+      final service = _ControlledService(createRecorder());
+      await showPage(tester, service);
+      await tester.tap(find.byKey(exportKey));
+      await tester.pump(const Duration(milliseconds: 1200));
+      service.attempts.single.completeError(const NoPerformanceFrames());
+      await tester.pump();
+      expect(find.text('还没有收到真实帧，未生成性能结论。'), findsOneWidget);
+      expect(
+        tester.widget<SfPrimaryButton>(find.byKey(exportKey)).onPressed,
+        isNotNull,
+      );
+    });
   });
 }

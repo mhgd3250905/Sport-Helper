@@ -246,6 +246,86 @@ abstract final class SfColors {
   static BorderSide get cardEdge => BorderSide(color: palette.line);
 }
 
+/// The chat composer has one quiet input plane over the existing sky.
+/// Its material stays local to the dock; the page palettes are unchanged.
+abstract final class SfComposerTokens {
+  static const outerPadding = EdgeInsets.fromLTRB(16, 0, 16, 12);
+  static const inputInnerPadding = EdgeInsets.symmetric(horizontal: 4);
+  static const inputTextPadding = EdgeInsets.symmetric(vertical: 15);
+  static const inputHeight = 54.0;
+  static const inputRadius = 22.0;
+  static const inputTextSize = 16.0;
+  static const inputTextHeight = 1.5;
+  static const edgeWidth = 1.0;
+  static const actionWidth = 44.0;
+  static const bookmarkSize = 21.0;
+  static const sendSize = 34.0;
+  static const sendIconSize = 18.0;
+  static const sendStrokeWidth = 2.0;
+  static const inputInsetWithoutLeading = 12.0;
+  static const pressScale = .97;
+  static const suggestionStripHeight = 52.0;
+  static const suggestionStripPadding = EdgeInsets.fromLTRB(16, 4, 16, 4);
+  static const suggestionGap = 8.0;
+  static const suggestionFaceHeight = 32.0;
+  static const suggestionRadius = 16.0;
+  static const suggestionPadding = EdgeInsets.symmetric(horizontal: 12);
+  static const suggestionTextSize = 14.0;
+  static const suggestionTextHeight = 1.2;
+  static const suggestionTextWeight = FontWeight.w400;
+  static const suggestionIconSize = 14.0;
+  static const suggestionIconGap = 6.0;
+  static const suggestionEdgeWidth = .75;
+
+  static LinearGradient get dockGradient => LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [
+      SfColors.skyBottom.withValues(alpha: 0),
+      SfColors.skyBottom.withValues(alpha: .86),
+      SfColors.skyBottom,
+    ],
+    stops: const [0, .5, 1],
+  );
+
+  static LinearGradient get inputGradient => LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: SfColors.isDark
+        ? const [Color(0xFF1D2225), Color(0xFF171C1F)]
+        : const [Color(0xFFFFFFFF), Color(0xFFF7F9F7)],
+  );
+
+  static Color get inputEdge =>
+      SfColors.isDark ? const Color(0xFF3A4246) : const Color(0xFFD2DCD5);
+  static Color get hint =>
+      SfColors.isDark ? const Color(0xFF899596) : const Color(0xFF818E86);
+  static Color get bookmark =>
+      SfColors.isDark ? const Color(0xFFB1BDBE) : const Color(0xFF63736B);
+  static Color get inactiveSendFill =>
+      SfColors.isDark ? const Color(0xFF262F33) : const Color(0xFFECF0ED);
+  static Color get inactiveSendInk =>
+      SfColors.isDark ? const Color(0xFF748285) : const Color(0xFF9BA9A1);
+  static List<BoxShadow> get inputShadow => [
+    BoxShadow(
+      color: SfColors.isDark
+          ? const Color(0x28000000)
+          : const Color(0x0B203B2B),
+      blurRadius: 6,
+      offset: const Offset(0, 2),
+    ),
+  ];
+
+  static Color get suggestionFill =>
+      SfColors.isDark ? const Color(0xFF181F22) : const Color(0xFFF0F4F1);
+  static Color get suggestionEdge =>
+      SfColors.isDark ? const Color(0xFF303A3E) : const Color(0xFFDDE5DF);
+  static Color get suggestionInk =>
+      SfColors.isDark ? const Color(0xFFBAC5C5) : const Color(0xFF4C5E54);
+  static Color get suggestionIcon =>
+      SfColors.isDark ? const Color(0xFF8FB7B2) : const Color(0xFF598477);
+}
+
 /// Type scale. Six steps; weight and colour carry the rest of the
 /// hierarchy. Heights are tuned for CJK (1.5–1.6 for running text).
 abstract final class SfType {

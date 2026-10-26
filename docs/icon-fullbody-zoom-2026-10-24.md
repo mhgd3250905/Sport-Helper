@@ -4,13 +4,13 @@
 
 ## 图像与构图
 
-[A2 1024 原图](../assets/brand/source/smartfit-icon-v3-fullbody-zoom.png) 基于原 `smartfit-icon-v3.png` 用内置 image_gen 编辑，提示词目标约 15% 放大。独立目测为一成多；抬起手臂、双腿、两只鞋以及机器人和天线均完整，鞋底下仍有约 50px 留白。不是精确像素变换承诺。没有改页面布局、颜色 token、SDK 或任何玻璃/星尘/列表渲染代码；额外仅同步 App/报告版本元数据到+22。
+[A2 1024 原图](../assets/brand/source/smartfit-icon-v3-fullbody-zoom.png) 基于原 `smartfit-icon-v3.png` 用内置 image_gen 编辑，提示词目标约 15% 放大。独立目测为一成多；抬起手臂、双腿、两只鞋以及机器人和天线均完整，鞋底下仍有约 50px 留白。不是精确像素变换承诺。没有改页面布局、颜色 token、SDK 或星尘、列表或其他页面渲染代码；额外仅同步 App/报告版本元数据到+22。
 
 工具输出 1254×1254 RGB，经统一等比缩到所需 1024×1024，没有裁切或追加缩放构图。完整 prompt、参考图和输出 hash 见 [来源记录](../tools/branding/fullbody-zoom-provenance.json)。原 A/B 源图、78 份候选资源及原内测 APK 留存。
 
 按开哥追加要求，原始全身底图、半身候选、A2 的1024源图均保留在 `assets/brand/source/`；A2 的1254原始生成文件也按原字节归档至 `tools/branding/archive/smartfit-icon-v3-fullbody-zoom-generated-1254.png`。归档不作为 App 打包资源，后续可从底图重新调整构图。
 
-新 [三行遮罩对照](screenshots/icon-fullbody-zoom/icon-mask-preview.png) 依次为原全身 A、裁切 B、放大全身 A2；A2 的双脚在圆形及圆角遮罩下均完整。Android 前景仍为整图 46dp，含四角的对角线约 65.05dp，完整落在 66dp 安全圆内；放大来自画面内构图，未放大图层突破安全区。
+新 [三行遮罩对照](../../deliveries/flat-release-20261026/retired-evidence/manifest.json) 依次为原全身 A、裁切 B、放大全身 A2；A2 的双脚在圆形及圆角遮罩下均完整。Android 前景仍为整图 46dp，含四角的对角线约 65.05dp，完整落在 66dp 安全圆内；放大来自画面内构图，未放大图层突破安全区。
 
 ## 包与真机
 

@@ -261,10 +261,6 @@ void main() {
           .widget<ExerciseVideo>(find.byType(ExerciseVideo))
           .playbackHandle;
       expect(handle, isNotNull);
-      expect(
-        find.descendant(of: marker, matching: find.byType(BackdropFilter)),
-        findsNothing,
-      );
       await tester.tap(marker);
       await tester.pumpAndSettle();
       expect(find.text('动作：test-a'), findsOneWidget);

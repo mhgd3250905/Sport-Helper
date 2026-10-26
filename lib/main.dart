@@ -5,7 +5,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
 
 import 'app/services.dart';
@@ -25,11 +24,8 @@ import 'diagnostics/performance_report.dart';
 import 'diagnostics/performance_routes.dart';
 import 'diagnostics/performance_vm.dart';
 import 'diagnostics/performance_conditions.dart';
-import 'diagnostics/performance_lab.dart';
 import 'ui/chat/chat_home_page.dart';
 import 'ui/theme/app_theme.dart';
-import 'ui/theme/glass.dart';
-import 'ui/theme/adaptive_glass.dart';
 import 'ui/theme/tokens.dart';
 import 'voice/just_audio_output.dart';
 
@@ -83,9 +79,6 @@ Future<void> main() async {
     };
   }
   registerFontLicense();
-  // Pre-warm the glass shaders before the first frame (no white flash).
-  await LiquidGlassWidgets.initialize();
-  log.record('app.shaders_ready');
   final media = await TrainingMediaRepository.create(
     manifestAsset: TrainingMediaConfig.manifestAsset,
     baseUrls: TrainingMediaConfig.baseUrls,
@@ -176,26 +169,9 @@ Future<void> main() async {
     unawaited(PerformanceReportService.instance.initialize());
   }
   runApp(
-    LiquidGlassWidgets.wrap(
-      // Material theme mode drives the glass brightness.
-      brightnessResolver: Theme.maybeBrightnessOf,
-      // One App-owned monitor uses the exact display budget in every build.
-      // The package's integer 16 ms default must not run alongside it.
-      adaptiveQuality: false,
-      child: SfAdaptiveGlass(
-        initialQuality: SfGlass.initialQuality(store.glassQuality),
-        onQualityChanged: (_, to) => store.setGlassQuality(to.name),
-        freezeListenable: FrameRecorder.buildEnabled
-            ? PerformanceLab.instance
-            : null,
-        freezeAdaptation: FrameRecorder.buildEnabled
-            ? () => PerformanceLab.instance.freezeAdaptation
-            : null,
-        child: TrainingMediaScope(
-          repository: media,
-          child: SmartFitApp(services: services),
-        ),
-      ),
+    TrainingMediaScope(
+      repository: media,
+      child: SmartFitApp(services: services),
     ),
   );
 }
@@ -267,7 +243,7 @@ class _SmartFitAppState extends State<SmartFitApp> with WidgetsBindingObserver {
         supportedLocales: const [Locale('zh', 'CN'), Locale('en')],
         localizationsDelegates: GlobalMaterialLocalizations.delegates,
         navigatorObservers: [?_performanceRoutes],
-        // Glass widgets render text outside a Scaffold (toasts, overlays):
+        // Overlays render text outside a Scaffold:
         // a transparent Material gives them Material text and ink.
         builder: (context, child) {
           if (FrameRecorder.buildEnabled) {

@@ -22,7 +22,7 @@ Rect? rectOf(BuildContext? context) {
 }
 
 /// Container transform: the tapped card grows into a full-screen page
-/// (rounded glass rect → screen, sky fill first, page fading in on top),
+/// (rounded card → screen, sky fill first, page fading in on top),
 /// and shrinks back into the card on the way out. Without an origin it
 /// grows from a card-sized rect in the middle. With the system's reduced
 /// motion it is a plain cross-fade.
@@ -60,8 +60,11 @@ class CardExpandRoute<T> extends PageRoute<T> {
   }
 
   @override
-  Widget buildPage(BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation) =>
-      builder(context);
+  Widget buildPage(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+  ) => builder(context);
 
   @override
   Widget buildTransitions(
@@ -76,7 +79,9 @@ class CardExpandRoute<T> extends PageRoute<T> {
     return _ExpandTransition(
       animation: animation,
       // Closing: fold back to where the card is now (it may have moved).
-      origin: () => animation.status == AnimationStatus.reverse ? origin?.call() : _openedFrom,
+      origin: () => animation.status == AnimationStatus.reverse
+          ? origin?.call()
+          : _openedFrom,
       radius: radius,
       child: child,
     );
@@ -100,10 +105,16 @@ class _ExpandTransition extends StatelessWidget {
   // container curve; the chat underneath only dims, never scales.
   static final _grow = CurveTween(curve: SfMotion.container);
   // The sky fills the card's face first, so the card reads as lifting.
-  static final _fill = CurveTween(curve: const Interval(0, .3, curve: Curves.easeOut));
+  static final _fill = CurveTween(
+    curve: const Interval(0, .3, curve: Curves.easeOut),
+  );
   // The page fades in over the second half of the growth, scaled with it.
-  static final _content = CurveTween(curve: const Interval(.3, .8, curve: Curves.easeOut));
-  static final _scrim = CurveTween(curve: const Interval(0, .6, curve: Curves.easeOut));
+  static final _content = CurveTween(
+    curve: const Interval(.3, .8, curve: Curves.easeOut),
+  );
+  static final _scrim = CurveTween(
+    curve: const Interval(0, .6, curve: Curves.easeOut),
+  );
 
   @override
   Widget build(BuildContext context) => LayoutBuilder(
@@ -127,7 +138,9 @@ class _ExpandTransition extends StatelessWidget {
               Positioned.fill(
                 child: IgnorePointer(
                   child: ColoredBox(
-                    color: Colors.black.withValues(alpha: (palette.isDark ? .45 : .14) * _scrim.transform(v)),
+                    color: Colors.black.withValues(
+                      alpha: (palette.isDark ? .45 : .14) * _scrim.transform(v),
+                    ),
                   ),
                 ),
               ),
@@ -138,7 +151,10 @@ class _ExpandTransition extends StatelessWidget {
                   child: Stack(
                     fit: StackFit.expand,
                     children: [
-                      Opacity(opacity: _fill.transform(v), child: SkyFill(palette: palette)),
+                      Opacity(
+                        opacity: _fill.transform(v),
+                        child: SkyFill(palette: palette),
+                      ),
                       // The page is laid out at full size and scaled with
                       // the card's width, so nothing reflows mid-move.
                       Opacity(
@@ -152,7 +168,10 @@ class _ExpandTransition extends StatelessWidget {
                           child: Transform.scale(
                             scale: scale,
                             alignment: Alignment.topLeft,
-                            child: SizedBox.fromSize(size: full.size, child: page),
+                            child: SizedBox.fromSize(
+                              size: full.size,
+                              child: page,
+                            ),
                           ),
                         ),
                       ),

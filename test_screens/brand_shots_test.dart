@@ -2,8 +2,7 @@
 // the normal unit suite, after applying the brand tokens:
 //   flutter test --no-pub test_screens/brand_shots_test.dart --update-goldens
 // SF_SCREENSHOT_DIR selects the output folder. No emulator or user storage.
-// flutter_test_config.dart selects shader-free SfGlass.minimal: these are
-// colour / layout review images, not screenshots of device glass rendering.
+// These are component colour/layout images, not device performance evidence.
 import 'dart:io';
 
 import 'package:flutter/material.dart';

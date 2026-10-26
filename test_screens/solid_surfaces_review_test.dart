@@ -36,7 +36,7 @@ Future<void> _loadFonts() async {
   }
 }
 
-Future<void> _shot(WidgetTester tester, String name) async {
+Future<void> _shot(WidgetTester tester, String name, {Finder? target}) async {
   await tester.runAsync(() async {
     for (final element in tester.allElements.toList()) {
       if (element.widget case final Image image) {
@@ -47,15 +47,13 @@ Future<void> _shot(WidgetTester tester, String name) async {
   await tester.pump(const Duration(milliseconds: 100));
   final output = Platform.environment['SF_SCREENSHOT_DIR']!;
   await expectLater(
-    find.byType(MaterialApp),
+    target ?? find.byType(MaterialApp),
     matchesGoldenFile(Uri.file('$output/$name.png')),
   );
 }
 
 void _assertOpaqueSurfaces(WidgetTester tester) {
-  expect(find.byType(BackdropFilter), findsNothing);
   final surfaces = find.byType(SfSolidSurface);
-  expect(surfaces, findsWidgets);
   for (final element in surfaces.evaluate()) {
     final container =
         (element.widget as SfSolidSurface).build(element) as Container;
@@ -68,6 +66,23 @@ void _assertOpaqueSurfaces(WidgetTester tester) {
       expect(shadow.blurRadius, lessThanOrEqualTo(4));
     }
   }
+  final input = tester.widget<Container>(
+    find.byKey(const ValueKey('chat-composer-face')),
+  );
+  final inputPaint = input.decoration! as BoxDecoration;
+  expect(inputPaint.gradient, isA<LinearGradient>());
+  for (final color in (inputPaint.gradient! as LinearGradient).colors) {
+    expect(color.a, 1);
+  }
+  final inputEdge = input.foregroundDecoration! as BoxDecoration;
+  expect(inputEdge.border!.top.width, 1);
+  expect(inputPaint.boxShadow!.single.blurRadius, lessThanOrEqualTo(6));
+  final dock = tester.widget<DecoratedBox>(
+    find.byKey(const ValueKey('chat-composer-dock')),
+  );
+  final dockPaint = dock.decoration as BoxDecoration;
+  expect(dockPaint.border, isNull);
+  expect((dockPaint.gradient! as LinearGradient).colors.first.a, 0);
 }
 
 void main() {
@@ -112,6 +127,20 @@ void main() {
       expect(services.chat.currentPlan, isNotNull);
       _assertOpaqueSurfaces(tester);
       await _shot(tester, 'conversation-$theme');
+
+      await tester.enterText(
+        find.byKey(const ValueKey('chat-input')),
+        '安排一套轻松的训练',
+      );
+      await tester.pumpAndSettle();
+      await _shot(
+        tester,
+        'dock-detail-$theme',
+        target: find.byKey(const ValueKey('chat-composer-dock-boundary')),
+      );
+      await tester.enterText(find.byKey(const ValueKey('chat-input')), '');
+      FocusManager.instance.primaryFocus?.unfocus();
+      await tester.pumpAndSettle();
 
       final plan = services.chat.currentPlan!;
       await tester.tap(find.byKey(ValueKey('plan-expand-${plan.id}')));

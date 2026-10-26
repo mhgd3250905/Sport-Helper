@@ -262,6 +262,15 @@ void main() {
           ),
         );
         await pump(tester, card(), enabled: false, palette: palette);
+        final colors = smartfitCoachUiStyle().colors;
+        expect(colors.background, palette.background);
+        expect(colors.surface, palette.surface);
+        expect(colors.surfaceRaised, palette.surfaceHigh);
+        expect(colors.outline, palette.line);
+        expect(colors.shadow, palette.shadow);
+        expect(colors.mediaLabelSurface, palette.surfaceHigh);
+        expect(colors.surfaceRaised.a, 1);
+        expect(colors.mediaLabelSurface.a, 1);
         final start = find.byKey(const ValueKey('plan-start-alpha-static'));
         final expand = find.byKey(const ValueKey('plan-expand-alpha-static'));
         final oldStart = tester.getRect(start);

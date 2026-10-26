@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'glass.dart';
+import 'solid_surface.dart';
 import 'sf_icons.dart';
 import 'tokens.dart';
 import 'widgets.dart';
@@ -13,7 +13,13 @@ import 'widgets.dart';
 /// The top bar of a plain page: a tonal back disc (our chevron), the
 /// title, an optional caption and trailing action. Replaces [AppBar].
 class SfTopBar extends StatelessWidget implements PreferredSizeWidget {
-  const SfTopBar({super.key, required this.title, this.caption, this.trailing, this.onBack});
+  const SfTopBar({
+    super.key,
+    required this.title,
+    this.caption,
+    this.trailing,
+    this.onBack,
+  });
   final String title;
   final String? caption;
   final Widget? trailing;
@@ -27,44 +33,54 @@ class SfTopBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final canPop = onBack != null || (ModalRoute.of(context)?.canPop ?? false);
-    return SafeArea(
-      bottom: false,
-      child: SizedBox(
-        height: 64,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(SfSpace.x3, 0, SfSpace.x4, 0),
-          child: Row(
-            children: [
-              if (canPop) ...[
-                SfCircleButton(
-                  key: const ValueKey('back'),
-                  icon: SfGlyph.back,
-                  size: 40,
-                  tooltip: '返回',
-                  fill: Colors.transparent,
-                  onPressed: onBack ?? () => Navigator.of(context).maybePop(),
+    return ColoredBox(
+      color: SfColors.surfaceLow,
+      child: SafeArea(
+        bottom: false,
+        child: SizedBox(
+          height: 64,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(SfSpace.x3, 0, SfSpace.x4, 0),
+            child: Row(
+              children: [
+                if (canPop) ...[
+                  SfCircleButton(
+                    key: const ValueKey('back'),
+                    icon: SfGlyph.back,
+                    size: 40,
+                    tooltip: '返回',
+                    fill: Colors.transparent,
+                    onPressed: onBack ?? () => Navigator.of(context).maybePop(),
+                  ),
+                  const SizedBox(width: SfSpace.x1),
+                ] else
+                  const SizedBox(width: SfSpace.x2),
+                Expanded(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: SfType.title.copyWith(
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      if (caption != null)
+                        Text(
+                          caption!,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: SfType.caption.copyWith(color: SfColors.muted),
+                        ),
+                    ],
+                  ),
                 ),
-                const SizedBox(width: SfSpace.x1),
-              ] else
-                const SizedBox(width: SfSpace.x2),
-              Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: SfType.title.copyWith(fontWeight: FontWeight.w800),
-                    ),
-                    if (caption != null)
-                      Text(caption!, maxLines: 1, overflow: TextOverflow.ellipsis, style: SfType.caption.copyWith(color: SfColors.muted)),
-                  ],
-                ),
-              ),
-              ?trailing,
-            ],
+                ?trailing,
+              ],
+            ),
           ),
         ),
       ),
@@ -114,14 +130,20 @@ class SfChoiceChip extends StatelessWidget {
         decoration: ShapeDecoration(
           color: bg,
           shape: StadiumBorder(
-            side: SfColors.isDark || selected ? BorderSide.none : BorderSide(color: SfColors.line),
+            side: SfColors.isDark || selected
+                ? BorderSide.none
+                : BorderSide(color: SfColors.line),
           ),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             if (icon != null) ...[
-              SfIcon(icon!, size: 16, color: selected ? SfColors.accentText : SfColors.muted),
+              SfIcon(
+                icon!,
+                size: 16,
+                color: selected ? SfColors.accentText : SfColors.muted,
+              ),
               const SizedBox(width: 6),
             ],
             Text(
@@ -143,7 +165,13 @@ class SfChoiceChip extends StatelessWidget {
 /// A settings row with a switch: the whole row toggles; title callout,
 /// explanation label.
 class SfSwitchRow extends StatelessWidget {
-  const SfSwitchRow({super.key, required this.title, this.subtitle, required this.value, required this.onChanged});
+  const SfSwitchRow({
+    super.key,
+    required this.title,
+    this.subtitle,
+    required this.value,
+    required this.onChanged,
+  });
   final String title;
   final String? subtitle;
   final bool value;
@@ -160,7 +188,10 @@ class SfSwitchRow extends StatelessWidget {
     child: ConstrainedBox(
       constraints: const BoxConstraints(minHeight: 56),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: SfSpace.x1, vertical: SfSpace.x2),
+        padding: const EdgeInsets.symmetric(
+          horizontal: SfSpace.x1,
+          vertical: SfSpace.x2,
+        ),
         child: Row(
           children: [
             Expanded(
@@ -171,7 +202,10 @@ class SfSwitchRow extends StatelessWidget {
                   Text(title, style: SfType.callout),
                   if (subtitle != null) ...[
                     const SizedBox(height: 2),
-                    Text(subtitle!, style: SfType.label.copyWith(fontSize: 12.5)),
+                    Text(
+                      subtitle!,
+                      style: SfType.label.copyWith(fontSize: 12.5),
+                    ),
                   ],
                 ],
               ),
@@ -190,7 +224,14 @@ class SfSwitchRow extends StatelessWidget {
 /// A tappable list row: optional leading glyph, title, optional detail,
 /// chevron.
 class SfListRow extends StatelessWidget {
-  const SfListRow({super.key, required this.title, this.detail, this.icon, required this.onTap, this.color});
+  const SfListRow({
+    super.key,
+    required this.title,
+    this.detail,
+    this.icon,
+    required this.onTap,
+    this.color,
+  });
   final String title;
   final String? detail;
   final SfGlyph? icon;
@@ -205,7 +246,10 @@ class SfListRow extends StatelessWidget {
     child: ConstrainedBox(
       constraints: const BoxConstraints(minHeight: 52),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: SfSpace.x1, vertical: SfSpace.x2),
+        padding: const EdgeInsets.symmetric(
+          horizontal: SfSpace.x1,
+          vertical: SfSpace.x2,
+        ),
         child: Row(
           children: [
             if (icon != null) ...[
@@ -218,11 +262,17 @@ class SfListRow extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(title, style: SfType.callout.copyWith(color: color)),
-                  if (detail != null) Text(detail!, style: SfType.label.copyWith(fontSize: 12.5)),
+                  if (detail != null)
+                    Text(detail!, style: SfType.label.copyWith(fontSize: 12.5)),
                 ],
               ),
             ),
-            SfIcon(SfGlyph.chevronRight, size: 16, color: SfColors.faint, strokeWidth: 2),
+            SfIcon(
+              SfGlyph.chevronRight,
+              size: 16,
+              color: SfColors.faint,
+              strokeWidth: 2,
+            ),
           ],
         ),
       ),
@@ -230,9 +280,8 @@ class SfListRow extends StatelessWidget {
   );
 }
 
-/// A segmented choice whose thumb really slides along the track (HipLab
-/// R1: the one neutral raised part of the app), with a soft spring and a
-/// selection tick. Reduced motion: the thumb jumps.
+/// A segmented choice with a solid sliding thumb and a selection tick.
+/// Reduced motion keeps the same layout and moves the thumb immediately.
 class SfSegmented<T> extends StatelessWidget {
   const SfSegmented({
     super.key,
@@ -252,7 +301,9 @@ class SfSegmented<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final index = items.indexWhere((e) => e.$1 == value).clamp(0, items.length - 1);
+    final index = items
+        .indexWhere((e) => e.$1 == value)
+        .clamp(0, items.length - 1);
     final still = SfMotion.reduced(context);
     const pad = 3.0;
     final r = (height - pad * 2) / 2;
@@ -275,11 +326,15 @@ class SfSegmented<T> extends StatelessWidget {
                 top: 0,
                 bottom: 0,
                 width: w,
-                child: SfTactile(
+                child: DecoratedBox(
                   key: const ValueKey('segment-thumb'),
-                  style: SfTactileStyle.neutral(),
-                  pressed: false,
-                  radius: r,
+                  decoration: ShapeDecoration(
+                    color: SfColors.thumb,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(r),
+                      side: SfColors.cardEdge,
+                    ),
+                  ),
                 ),
               ),
               Row(
@@ -287,7 +342,9 @@ class SfSegmented<T> extends StatelessWidget {
                   for (final (v, label) in items)
                     Expanded(
                       child: SfPressable(
-                        key: keyPrefix == null ? null : ValueKey('$keyPrefix$v'),
+                        key: keyPrefix == null
+                            ? null
+                            : ValueKey('$keyPrefix$v'),
                         semanticLabel: label,
                         onTap: v == value ? () {} : () => onChanged(v),
                         haptic: v == value ? SfHaptic.none : SfHaptic.selection,
@@ -299,8 +356,12 @@ class SfSegmented<T> extends StatelessWidget {
                               fontFamily: sfFontFamily,
                               fontSize: 14,
                               height: 1.2,
-                              fontWeight: v == value ? FontWeight.w600 : FontWeight.w400,
-                              color: v == value ? SfColors.text : SfColors.muted,
+                              fontWeight: v == value
+                                  ? FontWeight.w600
+                                  : FontWeight.w400,
+                              color: v == value
+                                  ? SfColors.text
+                                  : SfColors.muted,
                             ),
                             child: Text(label),
                           ),
@@ -336,7 +397,10 @@ class SfEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.symmetric(horizontal: SfSpace.x6, vertical: SfSpace.x8),
+    padding: const EdgeInsets.symmetric(
+      horizontal: SfSpace.x6,
+      vertical: SfSpace.x8,
+    ),
     child: Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -355,22 +419,38 @@ class SfEmptyState extends StatelessWidget {
         Text(title, textAlign: TextAlign.center, style: SfType.headline),
         if (body != null) ...[
           const SizedBox(height: SfSpace.x2),
-          Text(body!, textAlign: TextAlign.center, style: SfType.label.copyWith(height: 1.6)),
+          Text(
+            body!,
+            textAlign: TextAlign.center,
+            style: SfType.label.copyWith(height: 1.6),
+          ),
         ],
         if (action != null && onAction != null) ...[
           const SizedBox(height: SfSpace.x3),
-          SfTextAction(label: action!, onPressed: onAction, color: SfColors.accentText),
+          SfTextAction(
+            label: action!,
+            onPressed: onAction,
+            color: SfColors.accentText,
+          ),
         ],
       ],
     ),
   );
 }
 
-/// The one toast: a liquid-glass capsule with the accent check, floating
-/// above the input (M18: in with an 8 px rise, out fast; reduced motion:
-/// the fade only). Replaces default snack bars.
-void showSfToast(BuildContext context, String text, {SfGlyph icon = SfGlyph.checkCircle, double bottom = 96}) {
-  showSfGlassToast(context, text, bottom: bottom, icon: SfIcon(icon, size: 18, color: SfColors.accentText, filled: true));
+/// The shared opaque notification, positioned clear of the page controls.
+void showSfToast(
+  BuildContext context,
+  String text, {
+  SfGlyph icon = SfGlyph.checkCircle,
+  double bottom = 96,
+}) {
+  showSfSolidToast(
+    context,
+    text,
+    bottom: bottom,
+    icon: SfIcon(icon, size: 18, color: SfColors.accentText, filled: true),
+  );
 }
 
 /// Pass-through for children that cross-fade on change (names, labels,
@@ -396,17 +476,18 @@ class SfFadeSwitcher extends StatelessWidget {
       duration: duration,
       switchInCurve: SfMotion.standard,
       switchOutCurve: Curves.easeIn,
-      layoutBuilder: (current, previous) => Stack(
-        alignment: alignment,
-        children: [...previous, ?current],
-      ),
+      layoutBuilder: (current, previous) =>
+          Stack(alignment: alignment, children: [...previous, ?current]),
       transitionBuilder: (child, a) {
         final fade = FadeTransition(opacity: a, child: child);
         if (still || rise == 0) return fade;
         return AnimatedBuilder(
           animation: a,
           child: fade,
-          builder: (_, c) => Transform.translate(offset: Offset(0, rise * (1 - a.value)), child: c),
+          builder: (_, c) => Transform.translate(
+            offset: Offset(0, rise * (1 - a.value)),
+            child: c,
+          ),
         );
       },
       child: child,

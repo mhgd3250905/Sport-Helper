@@ -1,5 +1,18 @@
 # 本机验收记录
 
+## 当前扁平候选（2026-10-26，待真机验收）
+
+- App 候选为 `0.1.0+32`，分支 `feat/solid-surfaces-20261026`；扁平视觉基线为 `353f146b42a434d999e83912fe3e1147422a787e`。
+- 正式依赖：`ugk_trainer-v0.3.1` 与 `ugk_coach_ui-v0.2.1`，均指向 `c6e261e75dc8647ccc2767bc253af664957c516b`；coach 保持 `ugk_coach-v0.5.0`。
+- 保留页面结构、功能、星尘、A2 青绿以及透明人物出框；卡片、顶栏、底栏、输入、建议、弹层使用三档不透明实色表面。
+- `packed_alpha.frag` 及其透明视频合成路径是播放功能，必须保留；本轮不接入或替换 219 素材。
+- 本轮不改 App `main` 或 `release/1.0`；原有聊天、保存计划、训练记录、设备身份及其他用户数据不清空。
+- 全库 `flutter analyze --no-pub` 为 0 问题；截图测试通过，已生成[首页/对话浅深预览与底部细节](../../deliveries/flat-release-20261026/screenshots-v2)。这些图来自实际 Flutter widget 渲染，不是真机截图，不证明安装、性能或设备验收已完成。
+- 当前指定红米不可连接；安装、真机 Raster P99 与持续训练待实际采集。包体及对照变化以 `deliveries/flat-release-20261026/release-apk.json` 构建回执为准，旧 APK 的历史数字不代表本候选。
+- 最终按 120Hz 的 8.33ms 预算检验计划卡滚动、长聊天、进页、底部切换与训练播放，浅深分别采集；逐帧原始整数微秒计算 P99，并报告超预算帧数。
+
+退役的实验文档、报告和旧图已按原字节移出候选，原文与 SHA-256 见 [历史证据归档清单](../../deliveries/flat-release-20261026/retired-evidence/manifest.json)。下方历史记录只描述各自时点，不代表本候选重新通过了那些检查。
+
 ## SDK 与共享聊天 UI（2026-10-24，已批准合入并推送）
 
 SmartFit 功能源码 `7f3458dabbf8db4d5c65297d72bccc77eeed8c86` 已批准合入并推送 main：coach 0.4.1、多轮询问、独立 coach_ui 0.1.0 呈现及 trainer 0.2.1 tag 适配完成。SDK 两个新 tag 均已发布为 `f0ea064`，随后以全新 Git 缓存从正式 GitHub 远端严格解析成功，App 锁文件无变化。全套 452 通过 / 13 条件跳过，分析无问题；深浅色原 main golden 逐像素一致，Web release / Android internal debug 编译通过。SDK UI 8 测试、trainer 207 测试通过。后续只更新发布状态文档；未安装包或声称真机验收。完整证据、接口和发布回执见[本轮接入记录](coach-ui-integration-2026-10-24.md)。以下保留历史验收快照。
@@ -38,7 +51,7 @@ App `feat/on-demand-media` 运行源码 `ee73bb112b9cf3cdaae7803628d0d9703b73ff2
 
 开哥授权本机修复、通过审核后合并。已测运行源码 / PR 最终 head `f92cbc936a123b77bc43d2a23987d928596eaefd`，目标 main `d4b3e76bf10474ae6c49d8b9f376fa842e16840b`。两项 P2（标题与收起按钮重叠、隐藏详情按钮仍能 Tab/Enter 激活）已关闭；保留原展开/收起节奏和共享元素过渡。全量 253 项测试通过，新增 16 项覆盖窄屏、随包字体、三档字号、深浅色、减少动效及键盘反向操作；分析 0 issue、严格锁文件、Web release 与 Android debug 编译通过。
 
-正式 Web 入口以独立本地 origin 和模板生成计划，已验证展开、保存、详情、切深色、进入共享 SDK 播放器、暂停/提前结束并返回；控制台 0 errors / 0 warnings。GitHub 已提交 [APPROVED review](https://github.com/mhgd3250905/Sport-Helper/pull/5#pullrequestreview-5602560196)，合并提交 `172366c6527d999b7817d97fe386e442f70f0e20` 的整个文件树与已测 head 一致，本地主线已快进同步。SDK 0.3.3 固定依赖、顶部栏移除和 AI 链路保留；没有新增 Worker 请求、真机体验或性能结论，也没有交付/安装新 APK。完整证据与截图见 [PR #5 审核记录](pr5-local-review.md)。
+正式 Web 入口以独立本地 origin 和模板生成计划，已验证展开、保存、详情、切深色、进入共享 SDK 播放器、暂停/提前结束并返回；控制台 0 errors / 0 warnings。GitHub 已提交 [APPROVED review](https://github.com/mhgd3250905/Sport-Helper/pull/5#pullrequestreview-5602560196)，合并提交 `172366c6527d999b7817d97fe386e442f70f0e20` 的整个文件树与已测 head 一致，本地主线已快进同步。SDK 0.3.3 固定依赖、顶部栏移除和 AI 链路保留；没有新增 Worker 请求、真机体验或性能结论，也没有交付/安装新 APK。完整证据与截图见 [PR #5 审核记录](../../deliveries/flat-release-20261026/retired-evidence/manifest.json)。
 
 ## SDK 0.3.3 提速接入（0.1.0+9，已合 main 并推送，2026-10-21）
 
@@ -50,11 +63,11 @@ App `feat/on-demand-media` 运行源码 `ee73bb112b9cf3cdaae7803628d0d9703b73ff2
 
 `fix/chat-without-top-bar` / 运行源码 `89ffa8f` 去掉顶部动作栏，新对话移至左下角抽屉；237 项测试、分析 0 issue 与 Android debug 构建通过。真机已覆盖安装 `+10`，前台截图确认顶部栏消失、原聊天保留；未清空数据。当前 main 仍为 `+9`，包身份与证据见 [版本台账](version-management.md)。
 
-## Liquid Glass（0.1.0+9，PR #4 已审核合并，2026-10-21）
+## PR #4 界面阶段（0.1.0+9，PR #4 已审核合并，2026-10-21）
 
 审核原 head `d92f89a`、目标 main `530686e`；解决六处冲突并修复 320px / 大字体单动作卡溢出后，运行源码为 `829381ffa19b737a6c146c8c73b33394937665b1`。最终 PR head `67d1a731281ea5b865e6d5fd2fb2253e0a464795` 仅再加审核文档与截图。已获授权由 GitHub 以 `561ea8cc69efa38d07c03169c257e8fa4116bc72` 合并，整树一致。
 
-237 项测试、静态分析 0 issue、严格锁文件、Web 与 Android debug 构建通过。真实浏览器正式着色器下检查深浅色计划生成、展开、保存、新对话、SDK 播放器暂停/提前结束返回，控制台 0 errors / warnings。新增队列交错写入和键盘下取消/新对话回归；包与截图见 [完整审核记录](pr4-local-review.md)。本轮没有新增真机帧率或真实 Worker 请求，不改写下方 `+8` 的独立证据。
+237 项测试、静态分析 0 issue、严格锁文件、Web 与 Android debug 构建通过。真实浏览器正式着色器下检查深浅色计划生成、展开、保存、新对话、SDK 播放器暂停/提前结束返回，控制台 0 errors / warnings。新增队列交错写入和键盘下取消/新对话回归；包与截图见 [完整审核记录](../../deliveries/flat-release-20261026/retired-evidence/manifest.json)。本轮没有新增真机帧率或真实 Worker 请求，不改写下方 `+8` 的独立证据。
 
 ## SDK 0.3.2 接入（0.1.0+8，核心已验，已合入并推送 main，2026-10-21）
 
@@ -292,7 +305,7 @@ Widget 测试使用替代音频输出，不能证明 Android 解码、扬声器�
 
 **Web 限制：** 当前视频明确使用 `media_view_stub.dart`，只有海报，没有 Web 视频播放器，不能用 Web 判断 Android 视频解码与同步是否通过。虽然构建时把 CanvasKit 放到本地，运行中仍观察到 `fonts.gstatic.com` 的中文字体请求，因此没有宣称 Web 预览完全离线。Android 的媒体、来电、锁屏和 release APK 验收仍待执行。
 
-浏览器实拍：[暂停画面](screenshots/web-player-paused.png)、[无器械替换拦截](screenshots/web-swap-guard.png)、[横屏详情滚动到底部](screenshots/web-landscape-detail.png)。临时浏览器日志与检查脚本留在本机 `output/playwright/`，不提交仓库。
+浏览器实拍：[暂停画面](../../deliveries/flat-release-20261026/retired-evidence/manifest.json)、[无器械替换拦截](../../deliveries/flat-release-20261026/retired-evidence/manifest.json)、[横屏详情滚动到底部](../../deliveries/flat-release-20261026/retired-evidence/manifest.json)。临时浏览器日志与检查脚本留在本机 `output/playwright/`，不提交仓库。
 
 ## Android 完整设备验收清单（M7 仍待执行）
 

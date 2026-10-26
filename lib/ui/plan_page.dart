@@ -396,8 +396,9 @@ class _PlanPageState extends State<PlanPage> with WidgetsBindingObserver {
                                 '${active ? '暂停' : '播放'}${exercise.name}示范',
                             icon: active ? SfGlyph.pause : SfGlyph.play,
                             size: 60,
-                            fill: (light ? Colors.white : Colors.black)
-                                .withValues(alpha: .76),
+                            fill: light
+                                ? SfPalette.light.surfaceHigh
+                                : SfPalette.dark.surfaceHigh,
                             iconColor: light
                                 ? SfPalette.light.text
                                 : SfPalette.dark.text,
