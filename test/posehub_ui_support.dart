@@ -140,8 +140,9 @@ class PoseHubUiRepository implements PoseHubMediaRepository {
 
 AppServices poseHubUiServices({
   required coach.PoseHubAppTestCatalog catalog,
-  required PoseHubMediaRepository media,
+  required PoseHubMediaRepository? media,
   ExerciseLibrary? library,
+  Future<void>? imagesReady,
 }) => AppServices(
   library: library ?? ExerciseLibrary([]),
   catalog: TemplateCatalog([]),
@@ -150,6 +151,7 @@ AppServices poseHubUiServices({
   voiceOutput: const MutedVoiceOutput(),
   poseHubCatalog: catalog,
   poseHubMedia: media,
+  poseHubImagesReady: imagesReady,
 );
 
 Widget poseHubUiApp({

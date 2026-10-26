@@ -25,6 +25,7 @@ import 'training_media_config.dart';
 import 'app_test_pack.dart';
 import 'app_test_catalog.dart';
 import 'posehub_media_repository.dart';
+import 'posehub_media_preparer.dart';
 
 /// Everything pages need, created once at start-up.
 class AppServices {
@@ -44,6 +45,7 @@ class AppServices {
     this.testCatalog,
     this.poseHubCatalog,
     this.poseHubMedia,
+    this.poseHubImagesReady,
   }) : templates = TemplatePlanGenerator(
          lib: library,
          catalog: catalog,
@@ -78,6 +80,11 @@ class AppServices {
   final AppTestCatalog? testCatalog;
   final coach.PoseHubAppTestCatalog? poseHubCatalog;
   final PoseHubMediaRepository? poseHubMedia;
+  final Future<void>? poseHubImagesReady;
+  late final SmartFitPoseHubMediaPreparer? poseHubPreparer =
+      poseHubCatalog == null
+      ? null
+      : SmartFitPoseHubMediaPreparer(poseHubMedia);
   final TemplateCatalog catalog;
   final AppStore store;
   final VoiceSource voiceLibrary;

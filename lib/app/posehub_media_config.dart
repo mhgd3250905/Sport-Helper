@@ -4,7 +4,7 @@ abstract final class PoseHubMediaConfig {
       bool.fromEnvironment('SMARTFIT_POSEHUB_PACK');
 
   /// Override the public file host without changing catalog identities/hashes.
-  static const mediaBaseUrl = String.fromEnvironment(
-    'SMARTFIT_POSEHUB_MEDIA_BASE_URL',
+  static const mediaBaseUrls = String.fromEnvironment(
+    'SMARTFIT_POSEHUB_MEDIA_BASE_URLS',
   );
 }

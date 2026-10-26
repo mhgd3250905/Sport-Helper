@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smartfit/ui/exercise_video.dart';
 import 'package:smartfit/ui/library_page.dart';
-import 'package:smartfit/ui/posehub_download_status.dart';
 import 'package:smartfit/ui/posehub_library_page.dart';
 import 'package:smartfit/ui/theme.dart';
 import 'package:smartfit/ui/theme/trainer_theme.dart';
@@ -114,8 +113,7 @@ void main() {
     },
   );
 
-  // SDK 0.4.1 navigation/control regression only. Its provider hook is pending;
-  // these interactions do not claim that SDK pages initiate Repo downloads.
+  // Real SDK navigation and practice receive the host's stable provider.
   for (final palette in [SfPalette.light, SfPalette.dark]) {
     testWidgets(
       'SDK browse/search/pending/manual practice, ${palette.brightness.name}',
@@ -259,7 +257,7 @@ void main() {
         ),
       );
       await tester.pumpWidget(show());
-      expect(find.byType(PoseHubDownloadStatus), findsOneWidget);
+      expect(find.byType(PoseHubMediaPreparationPanel), findsOneWidget);
       expect(find.byType(DrillMediaView), findsNothing);
       var snapshot = await handle.capture();
       expect(snapshot!.mediaId, action.id);

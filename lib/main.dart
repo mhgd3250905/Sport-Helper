@@ -87,6 +87,7 @@ Future<void> main() async {
       ? await PoseHubActionLibrary.load()
       : null;
   PoseHubMediaRepository? poseHubMedia;
+  Future<void>? poseHubImagesReady;
   if (poseHubCatalog != null) {
     PoseHubBundledImages? images;
     try {
@@ -103,7 +104,7 @@ Future<void> main() async {
     try {
       delivery = await PoseHubMediaDelivery.load(
         catalogRevision: PoseHubActionLibrary.catalogSha256,
-        mediaBaseUrl: PoseHubMediaConfig.mediaBaseUrl,
+        mediaBaseUrls: PoseHubMediaConfig.mediaBaseUrls,
       );
     } on Object catch (error) {
       log.record(
@@ -115,10 +116,29 @@ Future<void> main() async {
       poseHubMedia = await PoseHubMediaRepository.create(
         catalog: poseHubCatalog,
         catalogRevision: PoseHubActionLibrary.catalogSha256,
-        mediaBaseUrl: delivery.mediaBaseUrl,
+        packVersion: delivery.packVersion,
+        mediaBaseUrls: delivery.mediaBaseUrls,
         bundledFileLoader: images?.loadFile,
-        downloadUrlResolver: delivery.urlFor,
       );
+      if (images != null) {
+        // Small bundled covers are copied in the background. No video is
+        // requested, and the first SDK library mount waits for local images.
+        poseHubImagesReady =
+            Future.wait<Uri>([
+              for (final action in poseHubCatalog.allActions)
+                for (final entry in action.files.entries)
+                  if (entry.key != 'video')
+                    poseHubMedia.ensureFile(entry.value),
+            ]).then<void>(
+              (_) {},
+              onError: (Object error, StackTrace _) {
+                log.record(
+                  'posehub.image_cache_incomplete',
+                  fields: RuntimeLog.errorFields(error),
+                );
+              },
+            );
+      }
     } on Object catch (error) {
       log.record(
         'posehub.cache_unavailable',
@@ -193,6 +213,7 @@ Future<void> main() async {
     testCatalog: testContent?.catalog,
     poseHubCatalog: poseHubCatalog,
     poseHubMedia: poseHubMedia,
+    poseHubImagesReady: poseHubImagesReady,
     coachProfile: coachProfile,
     deviceId: deviceId,
     media: media,

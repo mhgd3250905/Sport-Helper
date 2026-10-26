@@ -11,15 +11,15 @@ import 'posehub_media_repository_types.dart';
 
 Future<PoseHubMediaFileStore> createPoseHubMediaStore({
   required String revision,
+  required String packVersion,
   required String? rootDirectory,
   required List<coach.PoseHubPackFile> files,
-  required Uri? mediaBaseUrl,
-  required List<String>? legacyDirectories,
+  required List<Uri> mediaBaseUrls,
   required bool allowInsecureLocalhost,
   required Duration timeout,
   required int maxRedirects,
 }) async {
-  if (mediaBaseUrl != null) {
+  for (final mediaBaseUrl in mediaBaseUrls) {
     _checkUrl(mediaBaseUrl, allowInsecureLocalhost);
     if (!mediaBaseUrl.path.endsWith('/')) {
       throw const FormatException('Media base URL must be a directory.');
@@ -42,7 +42,13 @@ Future<PoseHubMediaFileStore> createPoseHubMediaStore({
     throw const FormatException('Media cache parent is a link.');
   }
   await parent.create();
-  final root = Directory('$supportPath/posehub-media/$revision');
+  final version = Directory('${parent.path}/$packVersion');
+  if (await FileSystemEntity.type(version.path, followLinks: false) ==
+      FileSystemEntityType.link) {
+    throw const FormatException('Media cache version is a link.');
+  }
+  await version.create();
+  final root = Directory('${version.path}/$revision');
   if (await FileSystemEntity.type(root.path, followLinks: false) ==
       FileSystemEntityType.link) {
     throw const FormatException('Media cache revision is a link.');
@@ -55,12 +61,6 @@ Future<PoseHubMediaFileStore> createPoseHubMediaStore({
   return _FileStore(
     canonical,
     files,
-    legacyDirectories ??
-        [
-          '$supportPath/posehub/app-test-pack-r1-v2',
-          '$supportPath/posehub/app-test-pack-r1',
-          '$supportPath/posehub/app-test-pack-r1-v1',
-        ],
     allowInsecureLocalhost,
     timeout,
     maxRedirects,
@@ -110,7 +110,6 @@ class _FileStore implements PoseHubMediaFileStore {
   _FileStore(
     this.root,
     this.files,
-    this.legacyDirectories,
     this.allowLocal,
     this.timeout,
     this.maxRedirects,
@@ -118,7 +117,6 @@ class _FileStore implements PoseHubMediaFileStore {
 
   final Directory root;
   final List<coach.PoseHubPackFile> files;
-  final List<String> legacyDirectories;
   final bool allowLocal;
   final Duration timeout;
   final int maxRedirects;
@@ -205,19 +203,6 @@ class _FileStore implements PoseHubMediaFileStore {
     for (final alias in aliases) {
       final target = await _target(alias.path);
       if (await _verified(target, file)) return target.uri;
-    }
-    for (final legacy in legacyDirectories) {
-      final directory = Directory(legacy);
-      if (!await directory.exists()) continue;
-      final legacyRoot = await directory.resolveSymbolicLinks();
-      for (final alias in aliases) {
-        final old = File.fromUri(Directory(legacyRoot).uri.resolve(alias.path));
-        if (!await old.exists()) continue;
-        final resolved = await old.resolveSymbolicLinks();
-        if (_within(resolved, legacyRoot) && await _verified(old, file)) {
-          return old.uri;
-        }
-      }
     }
     return null;
   }

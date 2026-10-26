@@ -5,6 +5,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
 import 'package:ugk_trainer/ugk_trainer.dart';
 
+const _v3CatalogSha =
+    '75881cf91621c967f80732f0219f23e85b35e8bde5d1a51ee75dec5f7c5edd36';
+
 const _pendingIds = {
   'h-bilateral-farmer-hold-native',
   'h-db-shrug',
@@ -27,7 +30,17 @@ void main() {
   late Map<String, Object?> canonical;
 
   setUpAll(() async {
-    // Use the App's real asset bundle, including the SDK's pinned checksum gate.
+    // Check this release receipt in the App contract. The SDK deliberately
+    // accepts other self-consistent catalogs instead of pinning this hash.
+    final raw = await rootBundle.load(
+      '${PoseHubActionLibrary.assetRoot}catalog.json',
+    );
+    expect(
+      coach.sha256Hex(
+        raw.buffer.asUint8List(raw.offsetInBytes, raw.lengthInBytes),
+      ),
+      _v3CatalogSha,
+    );
     pack = await PoseHubActionLibrary.load();
     ai = pack.toAiCatalog();
     canonical = _json(
@@ -37,33 +50,58 @@ void main() {
     );
   });
 
-  test('real SDK bundle keeps 219 identities and exactly 211 AI actions', () {
-    expect(pack.allActions, hasLength(219));
-    expect(pack.allActions.map((action) => action.id).toSet(), hasLength(219));
-    expect(pack.semanticCompleteActions, hasLength(211));
-    expect(pack.pendingActions.map((action) => action.id).toSet(), _pendingIds);
-    expect(ai.length, 211);
-    expect(ai.problems, isEmpty);
-    expect(ai.ids, pack.semanticCompleteActions.map((action) => action.id));
+  test(
+    'official v3 bundle keeps 219 identities and exactly 211 AI actions',
+    () {
+      expect(pack.allActions, hasLength(219));
+      expect(
+        pack.allActions.map((action) => action.id).toSet(),
+        hasLength(219),
+      );
+      expect(pack.semanticCompleteActions, hasLength(211));
+      expect(
+        pack.pendingActions.map((action) => action.id).toSet(),
+        _pendingIds,
+      );
+      expect(ai.length, 211);
+      expect(ai.problems, isEmpty);
+      expect(ai.ids, pack.semanticCompleteActions.map((action) => action.id));
 
-    final files = [
-      for (final action in pack.allActions) ...action.files.values,
-    ];
-    expect(files, hasLength(657));
-    expect(files.map((file) => file.path).toSet(), hasLength(657));
-    for (final action in pack.pendingActions) {
-      expect(ai.contains(action.id), isFalse, reason: action.id);
-      expect(action.trainingStatusLabel, '训练说明待补');
-    }
-    // Semantic approval does not promote the original media review flags.
-    expect(pack.raw['reviewed'], isFalse);
-    expect(pack.raw['releaseEligible'], isFalse);
-    for (final action in pack.allActions) {
-      expect(action.raw['reviewed'], isFalse, reason: action.id);
-      expect(action.raw['releaseEligible'], isFalse, reason: action.id);
-      expect(action.rawTrainingSemantics['videoLoopIsTrainingDose'], isFalse);
-    }
-  });
+      final files = [
+        for (final action in pack.allActions) ...action.files.values,
+      ];
+      expect(files, hasLength(657));
+      expect(files.map((file) => file.path).toSet(), hasLength(657));
+      expect(files.fold(0, (sum, file) => sum + file.bytes), 163351529);
+      expect(
+        [
+          for (final action in pack.allActions) ...[
+            action.cover,
+            action.thumbnail,
+          ],
+        ].fold(0, (sum, file) => sum + file.bytes),
+        6513102,
+      );
+      for (final file in files) {
+        expect(
+          file.downloadUri.toString(),
+          'https://media.uuugk.win/pack/r1-v3/${file.path}',
+        );
+      }
+      for (final action in pack.pendingActions) {
+        expect(ai.contains(action.id), isFalse, reason: action.id);
+        expect(action.trainingStatusLabel, '训练说明待补');
+      }
+      // Semantic approval does not promote the original media review flags.
+      expect(pack.raw['reviewed'], isFalse);
+      expect(pack.raw['releaseEligible'], isFalse);
+      for (final action in pack.allActions) {
+        expect(action.raw['reviewed'], isFalse, reason: action.id);
+        expect(action.raw['releaseEligible'], isFalse, reason: action.id);
+        expect(action.rawTrainingSemantics['videoLoopIsTrainingDose'], isFalse);
+      }
+    },
+  );
 
   test(
     '142 canonical definitions and 69 authored doses survive projection',
@@ -138,7 +176,7 @@ void main() {
   );
 
   test(
-    'missing doses stay unknown and unbound or altered semantics fail closed',
+    'unknown doses stay null; self-contained catalogs work and invalid doses reject',
     () {
       final pending = pack.tryGet('h-towel-isometric-curl')!;
       final dose =
@@ -149,10 +187,11 @@ void main() {
         expect(dose[field], isNull, reason: field);
       }
       expect(() => dose['seconds'] = 30, throwsUnsupportedError);
-      expect(
-        coach.PoseHubAppTestCatalog.fromJson(pack.raw).toAiCatalog,
-        throwsStateError,
-      );
+      final selfContained = coach.PoseHubAppTestCatalog.fromJson(
+        pack.raw,
+      ).toAiCatalog();
+      expect(selfContained.ids, ai.ids);
+      expect(selfContained.problems, isEmpty);
 
       final altered = _json(jsonEncode(pack.raw));
       final action = (altered['actions']! as List<Object?>)

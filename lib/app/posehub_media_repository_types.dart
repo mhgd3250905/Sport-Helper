@@ -33,7 +33,6 @@ class PoseHubDownloadState {
 /// Receives the original path and expected SHA. Videos never use this loader.
 typedef PoseHubBundledFileLoader =
     Future<Uint8List?> Function(coach.PoseHubPackFile file);
-typedef PoseHubDownloadUrlResolver = Uri? Function(coach.PoseHubPackFile file);
 
 /// Messages deliberately contain no request URI, redirect signature or headers.
 class PoseHubMediaException implements Exception {

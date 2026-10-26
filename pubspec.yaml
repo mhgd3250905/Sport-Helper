@@ -12,16 +12,16 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   ugk_trainer:
-    version: 0.4.1
+    version: 0.4.2
     git:
       url: https://github.com/mhgd3250905/ugk-3d-pose-sdk.git
       path: packages/ugk_trainer
-      ref: ugk_trainer-v0.4.1
+      ref: ugk_trainer-v0.4.2
   ugk_coach:
-    version: 0.6.1
+    version: 0.6.2
     git:
       url: https://github.com/mhgd3250905/ugk-3d-pose-sdk.git
-      ref: ugk_coach-v0.6.1
+      ref: ugk_coach-v0.6.2
   ugk_coach_ui:
     version: 0.2.1
     git:
@@ -265,7 +265,7 @@ flutter:
     - path: assets/posehub/media-delivery.json
       flavors:
         - internal
-    - path: assets/posehub/images/a1655e5c64055c14af35850b5468390d9d11161e53a87a0cbe7780ec7ed25dc0/
+    - path: assets/posehub/images/75881cf91621c967f80732f0219f23e85b35e8bde5d1a51ee75dec5f7c5edd36/
       flavors:
         - internal
     - assets/media_player/

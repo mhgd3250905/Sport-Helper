@@ -341,7 +341,9 @@ void main() {
     repo.failAction(action.id);
     await tester.pumpAndSettle();
     expect(find.byType(DrillMediaView), findsNothing);
-    await tester.tap(find.byKey(const ValueKey('posehub-download-retry')));
+    await tester.tap(
+      find.byKey(const ValueKey('posehub-media-preparation-retry')),
+    );
     await tester.pump();
     expect(repo.actionRequests, [action.id, action.id]);
     repo.completeAction(action.id);

@@ -150,21 +150,22 @@ void main() {
 
   Future<PoseHubMediaRepository> create({
     PoseHubBundledFileLoader? bundled,
-    PoseHubDownloadUrlResolver? resolver,
+    List<Uri>? mediaBases,
     bool offline = false,
     Duration timeout = const Duration(seconds: 3),
     Duration progressInterval = const Duration(milliseconds: 25),
     int concurrent = 3,
     int redirects = 5,
     String? revision,
+    String packVersion = 'r1-v3',
   }) async {
     final result = await PoseHubMediaRepository.forTesting(
       catalog: fixture.catalog,
       catalogRevision: revision ?? fixture.revision,
-      mediaBaseUrl: offline ? null : base,
+      mediaBaseUrls: offline ? [] : (mediaBases ?? [base]),
+      packVersion: packVersion,
       rootDirectory: support.path,
       bundledFileLoader: bundled,
-      downloadUrlResolver: resolver,
       allowInsecureLocalhost: true,
       timeout: timeout,
       progressInterval: progressInterval,
@@ -190,7 +191,10 @@ void main() {
     () async {
       final repo = await create();
       expect(repo.mediaBaseUri.scheme, 'file');
-      expect(repo.mediaBaseUri.path.endsWith('/${fixture.revision}/'), isTrue);
+      expect(
+        repo.mediaBaseUri.path.endsWith('/r1-v3/${fixture.revision}/'),
+        isTrue,
+      );
       expect(await Directory.fromUri(repo.mediaBaseUri).exists(), isTrue);
       expect(await Directory.fromUri(repo.mediaBaseUri).list().isEmpty, isTrue);
       expect(requested, isEmpty);
@@ -270,25 +274,46 @@ void main() {
   );
 
   test(
-    'legacy v2 is checked by requested path and SHA without moving user data',
+    'v2 native and previous cache roots are never reused even for identical SHA',
     () async {
       final file = fixture.first.video;
-      final legacy = Directory('${support.path}/posehub/app-test-pack-r1-v2');
-      final old = File.fromUri(legacy.uri.resolve(file.path));
-      await old.parent.create(recursive: true);
-      await old.writeAsBytes(fixture.bodies[file.path]!);
+      final previousRoots = [
+        Directory('${support.path}/posehub/app-test-pack-r1-v2'),
+        Directory('${support.path}/posehub-media/${fixture.revision}'),
+        Directory('${support.path}/posehub-media/r1-v2/${fixture.revision}'),
+      ];
+      final oldFiles = <File>[];
+      for (final root in previousRoots) {
+        final old = File.fromUri(root.uri.resolve(file.path));
+        await old.parent.create(recursive: true);
+        await old.writeAsBytes(fixture.bodies[file.path]!);
+        oldFiles.add(old);
+      }
       final userData = File('${support.path}/keep-user-data')
         ..writeAsStringSync('preserved');
       final repo = await create(offline: true);
-      final uri = await repo.ensureFile(file);
-      expect(uri, file.resolve(repo.mediaBaseUri));
-      expect(await old.readAsBytes(), fixture.bodies[file.path]);
+      await expectLater(
+        repo.ensureFile(file),
+        throwsA(
+          isA<PoseHubMediaException>().having(
+            (e) => e.code,
+            'code',
+            'not_configured',
+          ),
+        ),
+      );
+      expect(
+        await File.fromUri(file.resolve(repo.mediaBaseUri)).exists(),
+        isFalse,
+      );
+      for (final old in oldFiles) {
+        expect(await old.readAsBytes(), fixture.bodies[file.path]);
+      }
       expect(await userData.readAsString(), 'preserved');
       expect(requested, isEmpty);
-      final targetFiles = await Directory.fromUri(
-        repo.mediaBaseUri,
-      ).list(recursive: true).where((e) => e is File).toList();
-      expect(targetFiles.length, 1);
+      final online = await create();
+      await online.ensureFile(file);
+      expect(requested, ['/${file.path}']);
     },
   );
 
@@ -620,21 +645,19 @@ void main() {
   );
 
   test(
-    'download URL resolver maps a file to an actual flat asset name',
+    'base URL resolves the original nested catalog path without flat mapping',
     () async {
       final file = fixture.first.video;
       handler = (request) async {
-        expect(request.uri.path, '/flat-${file.sha256}.mp4');
+        expect(request.uri.path, '/pack/r1-v3/${file.path}');
         final bytes = fixture.bodies[file.path]!;
         request.response.contentLength = bytes.length;
         request.response.add(bytes);
         await request.response.close();
       };
-      final repo = await create(
-        resolver: (f) => base.resolve('flat-${f.sha256}.mp4'),
-      );
+      final repo = await create(mediaBases: [base.resolve('pack/r1-v3/')]);
       await repo.ensureFile(file);
-      expect(requested, ['/flat-${file.sha256}.mp4']);
+      expect(requested, ['/pack/r1-v3/${file.path}']);
     },
   );
 
@@ -666,7 +689,7 @@ void main() {
           PoseHubMediaRepository.create(
             catalog: fixture.catalog,
             catalogRevision: fixture.revision,
-            mediaBaseUrl: url,
+            mediaBaseUrls: [url],
             rootDirectory: support.path,
           ),
           throwsA(anything),
@@ -755,9 +778,9 @@ void main() {
   );
 
   test(
-    'explicit mapping miss fails closed without guessing a base URL',
+    'empty media bases fail closed without any guessed download URL',
     () async {
-      final repo = await create(resolver: (_) => null);
+      final repo = await create(mediaBases: []);
       await expectLater(
         repo.ensureFile(fixture.first.video),
         throwsA(
@@ -770,6 +793,142 @@ void main() {
       );
       expect(requested, isEmpty);
       await noParts(repo);
+    },
+  );
+
+  for (final failure in ['http', 'bytes', 'sha256', 'truncated', 'timeout']) {
+    test(
+      'ordered mirror fallback after $failure cleans partial output',
+      () async {
+        final file = fixture.first.video;
+        final bytes = fixture.bodies[file.path]!;
+        final release = Completer<void>();
+        late PoseHubMediaRepository repo;
+        handler = (request) async {
+          if (request.uri.path.startsWith('/primary/')) {
+            expect(request.uri.path, '/primary/${file.path}');
+            if (failure == 'http') {
+              request.response.statusCode = 503;
+            } else if (failure == 'bytes') {
+              request.response.contentLength = 0;
+            } else if (failure == 'sha256') {
+              request.response.contentLength = bytes.length;
+              request.response.add(Uint8List(bytes.length));
+            } else if (failure == 'truncated') {
+              request.response.contentLength = bytes.length;
+              final socket = await request.response.detachSocket();
+              socket.add(bytes.sublist(0, bytes.length ~/ 2));
+              await socket.flush();
+              socket.destroy();
+              return;
+            } else {
+              request.response.bufferOutput = false;
+              request.response.contentLength = bytes.length;
+              request.response.add(bytes.sublist(0, 1));
+              await request.response.flush();
+              await release.future;
+            }
+            await request.response.close();
+            return;
+          }
+          expect(request.uri.path, '/backup/${file.path}');
+          await noParts(repo);
+          expect(
+            await File.fromUri(file.resolve(repo.mediaBaseUri)).exists(),
+            isFalse,
+          );
+          request.response.contentLength = bytes.length;
+          request.response.add(bytes);
+          await request.response.close();
+        };
+        repo = await create(
+          mediaBases: [base.resolve('primary/'), base.resolve('backup/')],
+          timeout: const Duration(milliseconds: 150),
+        );
+        try {
+          final uri = await repo.ensureFile(file);
+          expect(await File.fromUri(uri).readAsBytes(), bytes);
+          expect(requested, ['/primary/${file.path}', '/backup/${file.path}']);
+          expect(repo.watchFile(file).value.phase, PoseHubDownloadPhase.ready);
+          expect(repo.watchFile(file).value.error, isNull);
+          await noParts(repo);
+        } finally {
+          release.complete();
+        }
+      },
+    );
+  }
+
+  test(
+    'a failed primary connection automatically tries the next base',
+    () async {
+      final unavailable = await HttpServer.bind(
+        InternetAddress.loopbackIPv4,
+        0,
+      );
+      final deadBase = Uri.parse('http://127.0.0.1:${unavailable.port}/');
+      await unavailable.close(force: true);
+      final repo = await create(mediaBases: [deadBase, base]);
+      final file = fixture.first.video;
+      final uri = await repo.ensureFile(file);
+      expect(await File.fromUri(uri).readAsBytes(), fixture.bodies[file.path]);
+      expect(requested, ['/${file.path}']);
+      await noParts(repo);
+    },
+  );
+
+  test('all failed mirrors leave no published file or partial data', () async {
+    handler = (request) async {
+      request.response.contentLength = fixture.first.video.bytes;
+      request.response.add(Uint8List(fixture.first.video.bytes));
+      await request.response.close();
+    };
+    final repo = await create(
+      mediaBases: [base.resolve('first/'), base.resolve('second/')],
+    );
+    final file = fixture.first.video;
+    await expectLater(
+      repo.ensureFile(file),
+      throwsA(
+        isA<PoseHubMediaException>().having((e) => e.code, 'code', 'sha256'),
+      ),
+    );
+    expect(requested, ['/first/${file.path}', '/second/${file.path}']);
+    expect(
+      await File.fromUri(file.resolve(repo.mediaBaseUri)).exists(),
+      isFalse,
+    );
+    expect(repo.watchFile(file).value.phase, PoseHubDownloadPhase.failed);
+    await noParts(repo);
+  });
+
+  test(
+    'pack versions isolate the same catalog SHA and never share cache files',
+    () async {
+      final older = await create(packVersion: 'r1-v2');
+      final file = fixture.first.video;
+      await older.ensureFile(file);
+      final current = await create(offline: true);
+      expect(current.mediaBaseUri, isNot(older.mediaBaseUri));
+      expect(
+        current.mediaBaseUri.path.endsWith('/r1-v3/${fixture.revision}/'),
+        isTrue,
+      );
+      await expectLater(
+        current.ensureFile(file),
+        throwsA(
+          isA<PoseHubMediaException>().having(
+            (e) => e.code,
+            'code',
+            'not_configured',
+          ),
+        ),
+      );
+      expect(
+        await File.fromUri(file.resolve(older.mediaBaseUri)).readAsBytes(),
+        fixture.bodies[file.path],
+      );
+      expect(requested.length, 1);
     },
   );
 

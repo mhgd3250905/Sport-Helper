@@ -11,7 +11,6 @@ import 'posehub_media_repository_types.dart';
 export 'posehub_media_repository_types.dart'
     show
         PoseHubBundledFileLoader,
-        PoseHubDownloadUrlResolver,
         PoseHubDownloadPhase,
         PoseHubDownloadState,
         PoseHubMediaException;
@@ -20,28 +19,27 @@ abstract interface class PoseHubMediaRepository {
   static Future<PoseHubMediaRepository> create({
     required coach.PoseHubAppTestCatalog catalog,
     required String catalogRevision,
-    required Uri? mediaBaseUrl,
+    required List<Uri> mediaBaseUrls,
+    String packVersion = 'r1-v3',
     String? rootDirectory,
     PoseHubBundledFileLoader? bundledFileLoader,
-    PoseHubDownloadUrlResolver? downloadUrlResolver,
   }) => _create(
     catalog: catalog,
     catalogRevision: catalogRevision,
-    mediaBaseUrl: mediaBaseUrl,
+    mediaBaseUrls: mediaBaseUrls,
+    packVersion: packVersion,
     rootDirectory: rootDirectory,
     bundledFileLoader: bundledFileLoader,
-    downloadUrlResolver: downloadUrlResolver,
   );
 
   @visibleForTesting
   static Future<PoseHubMediaRepository> forTesting({
     required coach.PoseHubAppTestCatalog catalog,
     required String catalogRevision,
-    required Uri? mediaBaseUrl,
+    required List<Uri> mediaBaseUrls,
+    String packVersion = 'r1-v3',
     required String rootDirectory,
     PoseHubBundledFileLoader? bundledFileLoader,
-    PoseHubDownloadUrlResolver? downloadUrlResolver,
-    List<String>? legacyDirectories,
     bool allowInsecureLocalhost = false,
     Duration timeout = const Duration(seconds: 15),
     Duration progressInterval = const Duration(milliseconds: 100),
@@ -50,11 +48,10 @@ abstract interface class PoseHubMediaRepository {
   }) => _create(
     catalog: catalog,
     catalogRevision: catalogRevision,
-    mediaBaseUrl: mediaBaseUrl,
+    mediaBaseUrls: mediaBaseUrls,
+    packVersion: packVersion,
     rootDirectory: rootDirectory,
     bundledFileLoader: bundledFileLoader,
-    downloadUrlResolver: downloadUrlResolver,
-    legacyDirectories: legacyDirectories,
     allowInsecureLocalhost: allowInsecureLocalhost,
     timeout: timeout,
     progressInterval: progressInterval,
@@ -74,11 +71,10 @@ abstract interface class PoseHubMediaRepository {
 Future<PoseHubMediaRepository> _create({
   required coach.PoseHubAppTestCatalog catalog,
   required String catalogRevision,
-  required Uri? mediaBaseUrl,
+  required List<Uri> mediaBaseUrls,
+  required String packVersion,
   String? rootDirectory,
   PoseHubBundledFileLoader? bundledFileLoader,
-  PoseHubDownloadUrlResolver? downloadUrlResolver,
-  List<String>? legacyDirectories,
   bool allowInsecureLocalhost = false,
   Duration timeout = const Duration(seconds: 15),
   Duration progressInterval = const Duration(milliseconds: 100),
@@ -86,6 +82,8 @@ Future<PoseHubMediaRepository> _create({
   int maxRedirects = 5,
 }) async {
   if (!RegExp(r'^[a-f0-9]{64}$').hasMatch(catalogRevision) ||
+      !RegExp(r'^[a-z0-9]+(?:-[a-z0-9]+)*$').hasMatch(packVersion) ||
+      packVersion.length > 64 ||
       timeout <= Duration.zero ||
       progressInterval < Duration.zero ||
       maxConcurrent < 1 ||
@@ -98,12 +96,13 @@ Future<PoseHubMediaRepository> _create({
     for (final action in catalog.allActions)
       for (final file in action.files.values) file.path: file,
   };
+  final bases = List<Uri>.unmodifiable(mediaBaseUrls);
   final store = await platform.createPoseHubMediaStore(
     revision: catalogRevision,
+    packVersion: packVersion,
     rootDirectory: rootDirectory,
     files: files.values.toList(),
-    mediaBaseUrl: mediaBaseUrl,
-    legacyDirectories: legacyDirectories,
+    mediaBaseUrls: bases,
     allowInsecureLocalhost: allowInsecureLocalhost,
     timeout: timeout,
     maxRedirects: maxRedirects,
@@ -112,9 +111,8 @@ Future<PoseHubMediaRepository> _create({
     catalog,
     files,
     store,
-    mediaBaseUrl,
+    bases,
     bundledFileLoader,
-    downloadUrlResolver,
     timeout,
     progressInterval,
     maxConcurrent,
@@ -126,9 +124,8 @@ class _Repository implements PoseHubMediaRepository {
     this.catalog,
     this.files,
     this.store,
-    this.base,
+    this.bases,
     this.loadBundle,
-    this.resolveDownload,
     this.timeout,
     this.progressInterval,
     this.maxConcurrent,
@@ -146,9 +143,8 @@ class _Repository implements PoseHubMediaRepository {
   final coach.PoseHubAppTestCatalog catalog;
   final Map<String, coach.PoseHubPackFile> files;
   final PoseHubMediaFileStore store;
-  final Uri? base;
+  final List<Uri> bases;
   final PoseHubBundledFileLoader? loadBundle;
-  final PoseHubDownloadUrlResolver? resolveDownload;
   final Duration timeout, progressInterval;
   final int maxConcurrent;
   final _fileJobs = <String, Future<Uri>>{};
@@ -264,6 +260,7 @@ class _Repository implements PoseHubMediaRepository {
     final now = DateTime.now();
     if (phase == PoseHubDownloadPhase.downloading &&
         notifier.value.phase == phase &&
+        received >= notifier.value.receivedBytes &&
         received < file.bytes) {
       final previous = _lastProgress[file.path];
       if (previous != null && now.difference(previous) < progressInterval) {
@@ -395,18 +392,31 @@ class _Repository implements PoseHubMediaRepository {
           return await store.bundled(file, bytes, progress, verifying);
         }
       }
-      // An explicit release mapping is authoritative. A missing entry must not
-      // turn into a guessed URL underneath a different delivery layout.
-      final resolver = resolveDownload;
-      final url = resolver == null ? base?.resolve(file.path) : resolver(file);
-      if (url == null) {
+      if (bases.isEmpty) {
         throw const PoseHubMediaException(
           'not_configured',
           'Media download is not configured yet.',
         );
       }
-      _contentState(file, PoseHubDownloadPhase.downloading);
-      return await store.download(file, url, progress, verifying);
+      Object? failure;
+      for (final base in bases) {
+        _check();
+        _contentState(file, PoseHubDownloadPhase.downloading);
+        try {
+          return await store.download(
+            file,
+            base.resolve(file.path),
+            progress,
+            verifying,
+          );
+        } catch (error) {
+          // A disposed consumer does not start a new mirror request. Each
+          // failed transport has already closed and removed its own temp file.
+          _check();
+          failure = error;
+        }
+      }
+      throw _safeError(failure!);
     } finally {
       _release();
     }

@@ -206,18 +206,22 @@ void main() {
     'external current delivery matches declared training completeness',
     () async {
       final root = Directory(realPack!);
-      final text = await File('${root.path}/catalog.json').readAsString();
-      final delivery = jsonDecode(text) as Map<String, dynamic>;
-      final result = await AppTestCatalog.load(
-        deliveryCatalogJson: text,
-        readSemanticCatalog: (path) => File('${root.path}/$path').readAsBytes(),
+      final bytes = await File('${root.path}/catalog.json').readAsBytes();
+      expect(
+        coach.sha256Hex(bytes),
+        PoseHubActionLibrary.catalogSha256,
+        reason: 'The external smoke must use the current official SDK catalog.',
       );
-      final rows = delivery['actions'] as List;
+      // Current packs are self-contained. Do not send them through the legacy
+      // fixture decoder or require an independently installed canonical file.
+      final sdk = coach.PoseHubAppTestCatalog.fromBytes(bytes);
+      final result = AppTestCatalog.fromSdk(sdk);
+      final rows = sdk.allActions;
       expect(result.entries.length, rows.length);
-      final declared = [
-        for (final raw in rows)
-          if ((raw as Map)['trainingDefinitionComplete'] == true) raw['id'],
-      ];
+      expect(result.entries.keys, rows.map((action) => action.id));
+      final declared = sdk.semanticCompleteActions
+          .map((action) => action.id)
+          .toList();
       expect(
         result.trainingEligibleIds,
         unorderedEquals(declared),
@@ -228,7 +232,9 @@ void main() {
         }.toString(),
       );
       expect(result.semanticStatus, AppTestSemanticStatus.verified);
+      expect(result.isSdkBound, isTrue);
       expect(result.toCoachCatalog()!.length, declared.length);
+      expect(result.toCoachCatalog()!.ids, sdk.toAiCatalog().ids);
       // ignore: avoid_print
       print(
         'Current delivery: ${rows.length} library rows; ${declared.length} AI-ready; ${rows.length - declared.length} pending.',

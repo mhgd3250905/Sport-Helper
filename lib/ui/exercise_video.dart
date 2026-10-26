@@ -80,6 +80,7 @@ class _ExerciseVideoState extends State<ExerciseVideo> {
       return _PoseHubExerciseVideo(
         action: action,
         repo: services?.poseHubMedia,
+        preparer: services?.poseHubPreparer,
         playing: widget.playing,
         paused: widget.paused,
         mirrored: widget.mirrored,
@@ -123,6 +124,7 @@ class _PoseHubExerciseVideo extends StatefulWidget {
   const _PoseHubExerciseVideo({
     required this.action,
     required this.repo,
+    required this.preparer,
     required this.playing,
     required this.paused,
     required this.mirrored,
@@ -132,6 +134,7 @@ class _PoseHubExerciseVideo extends StatefulWidget {
 
   final coach.PoseHubPackAction action;
   final PoseHubMediaRepository? repo;
+  final PoseHubMediaPreparer? preparer;
   final bool playing, paused, mirrored;
   final double radius;
   final DrillMediaPlaybackHandle? playbackHandle;
@@ -143,6 +146,7 @@ class _PoseHubExerciseVideo extends StatefulWidget {
 class _PoseHubExerciseVideoState extends State<_PoseHubExerciseVideo>
     with WidgetsBindingObserver {
   Future<Uri>? _ready;
+  final _preparation = PoseHubMediaPreparationController();
   bool _backgrounded = false;
 
   @override
@@ -151,7 +155,8 @@ class _PoseHubExerciseVideoState extends State<_PoseHubExerciseVideo>
     WidgetsBinding.instance.addObserver(this);
     final lifecycle = WidgetsBinding.instance.lifecycleState;
     _backgrounded = lifecycle != null && lifecycle != AppLifecycleState.resumed;
-    _ready = _prepare();
+    _preparation.addListener(_preparationChanged);
+    _prepare();
     _bindIdentity();
   }
 
@@ -161,11 +166,21 @@ class _PoseHubExerciseVideoState extends State<_PoseHubExerciseVideo>
     controller: null,
   );
 
-  Future<Uri>? _prepare() {
+  void _preparationChanged() {
+    if (mounted) setState(() {});
+  }
+
+  void _prepare() {
+    _preparation.cancel();
     final repo = widget.repo;
-    if (repo == null) return null;
-    if (widget.playing) return repo.ensureAction(widget.action.id);
-    return repo.ensureFile(widget.action.cover).then((_) => repo.mediaBaseUri);
+    if (widget.playing && widget.preparer != null) {
+      _ready = null;
+      _preparation.start(widget.preparer!, widget.action);
+    } else {
+      _ready = repo
+          ?.ensureFile(widget.action.cover)
+          .then((_) => repo.mediaBaseUri);
+    }
   }
 
   @override
@@ -176,7 +191,7 @@ class _PoseHubExerciseVideoState extends State<_PoseHubExerciseVideo>
         oldWidget.action.cover.sha256 != widget.action.cover.sha256 ||
         oldWidget.action.video.sha256 != widget.action.video.sha256 ||
         oldWidget.playing != widget.playing) {
-      _ready = _prepare();
+      _prepare();
     }
     if (!identical(oldWidget.playbackHandle, widget.playbackHandle)) {
       oldWidget.playbackHandle?.unbind(this);
@@ -193,22 +208,60 @@ class _PoseHubExerciseVideoState extends State<_PoseHubExerciseVideo>
   }
 
   void _retry() {
-    final ready = _prepare();
-    setState(() {
-      _ready = ready;
-    });
+    _prepare();
+    setState(() {});
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     widget.playbackHandle?.unbind(this);
+    _preparation.removeListener(_preparationChanged);
+    _preparation.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = SmartFitTrainerTheme.of(context);
+    Widget media(Uri base) => Transform.flip(
+      flipX: widget.mirrored,
+      child: PoseHubPackMedia(
+        key: ValueKey('posehub-exercise-media-${widget.action.id}'),
+        action: widget.action,
+        baseUri: base,
+        playing:
+            widget.playing &&
+            !_backgrounded &&
+            TickerMode.valuesOf(context).enabled,
+        paused: widget.paused || _backgrounded,
+        theme: theme,
+      ),
+    );
+    if (widget.playing && widget.preparer != null) {
+      final state = _preparation.state;
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(widget.radius),
+        child: state.status == PoseHubMediaPreparationStatus.ready
+            ? media(state.mediaBaseUri!)
+            : AspectRatio(
+                aspectRatio: 1,
+                child: ColoredBox(
+                  color: theme.mediaStage,
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(SfSpace.x4),
+                      child: PoseHubMediaPreparationPanel(
+                        state: state,
+                        theme: theme,
+                        onRetry: _retry,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+      );
+    }
     return ClipRRect(
       borderRadius: BorderRadius.circular(widget.radius),
       child: FutureBuilder<Uri>(
@@ -216,20 +269,7 @@ class _PoseHubExerciseVideoState extends State<_PoseHubExerciseVideo>
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done &&
               snapshot.hasData) {
-            return Transform.flip(
-              flipX: widget.mirrored,
-              child: PoseHubPackMedia(
-                key: ValueKey('posehub-exercise-media-${widget.action.id}'),
-                action: widget.action,
-                baseUri: snapshot.data!,
-                playing:
-                    widget.playing &&
-                    !_backgrounded &&
-                    TickerMode.valuesOf(context).enabled,
-                paused: widget.paused || _backgrounded,
-                theme: theme,
-              ),
-            );
+            return media(snapshot.data!);
           }
           return AspectRatio(
             aspectRatio: 1,

@@ -11,6 +11,7 @@ import 'package:smartfit/domain/scenario.dart';
 import 'package:smartfit/domain/session.dart';
 import 'package:smartfit/domain/template.dart';
 import 'package:smartfit/packs/drill_pack.dart';
+import 'package:ugk_coach/ugk_coach.dart' as coach;
 import 'package:ugk_trainer/engine.dart' as trainer;
 import 'package:ugk_trainer/ugk_trainer.dart' show PoseHubActionLibrary;
 
@@ -290,13 +291,14 @@ void main() {
     'current complete definitions retain every historical pack ID',
     () async {
       final source = Directory(realPack!);
-      final catalog = await AppTestCatalog.load(
-        deliveryCatalogJson: await File(
-          '${source.path}/catalog.json',
-        ).readAsString(),
-        readSemanticCatalog: (path) =>
-            File('${source.path}/$path').readAsBytes(),
+      final bytes = await File('${source.path}/catalog.json').readAsBytes();
+      expect(
+        coach.sha256Hex(bytes),
+        PoseHubActionLibrary.catalogSha256,
+        reason: 'The external smoke must use the current official SDK catalog.',
       );
+      final sdk = coach.PoseHubAppTestCatalog.fromBytes(bytes);
+      final catalog = AppTestCatalog.fromSdk(sdk);
       final packs = await PackSet.load((path) => File(path).readAsString());
       final legacy = ExerciseLibrary.fromPacks(packs);
       final result = AppTestContent.build(
@@ -304,6 +306,8 @@ void main() {
         legacyLibrary: legacy,
       );
       expect(result.library.length, catalog.trainingEligibleIds.length);
+      expect(catalog.isSdkBound, isTrue);
+      expect(result.coachCatalog.ids, sdk.toAiCatalog().ids);
       expect(result.coachCatalog.length, result.library.length);
       expect([
         for (final e in legacy.all)

@@ -4,10 +4,10 @@ import 'posehub_media_repository_types.dart';
 
 Future<PoseHubMediaFileStore> createPoseHubMediaStore({
   required String revision,
+  required String packVersion,
   required String? rootDirectory,
   required List<coach.PoseHubPackFile> files,
-  required Uri? mediaBaseUrl,
-  required List<String>? legacyDirectories,
+  required List<Uri> mediaBaseUrls,
   required bool allowInsecureLocalhost,
   required Duration timeout,
   required int maxRedirects,
