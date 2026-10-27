@@ -313,9 +313,10 @@ class AiChatEngine
       _slotsFor(input, state, edit: edit),
       operation,
       usesCurrentPlan: edit != null,
-      restoredParameters: edit == null
-          ? _restoredParameters(input, state)
-          : null,
+      currentGoal: _saidSlots(input).goal,
+      previousParameters: state.plan == null
+          ? state.pending ?? state.coachContext
+          : Slots.fromRequest(state.request ?? requestForPlan(state.plan!)),
     );
     _pending = turn;
     RuntimeLog.instance.record(
@@ -395,17 +396,10 @@ class AiChatEngine
               : null);
       if (result == null) return empty();
       if (turn.timedOut) {
-        final fallback = await _localFallback(turn);
-        if (_disposed || _pending != turn) return empty();
-        final plan = fallback.messages
-            .where((m) => m.plan != null)
-            .firstOrNull
-            ?.plan;
         lastResult = coach.CoachTurnResult(
           turnId: result.turnId,
-          status: coach.TurnStatus.fallback,
-          text: fallback.messages.map((m) => m.text).join('\n'),
-          plan: plan == null ? null : restorePlan(plan, fallback.state.request),
+          status: coach.TurnStatus.error,
+          isPlanningFailure: true,
           fallbackReason: coach.FallbackReason.timeout,
           error: const coach.AgentRequestFailed(
             coach.AgentFailureKind.turnTimeout,
@@ -417,7 +411,6 @@ class AiChatEngine
           reads: result.reads,
           submissions: result.submissions,
         );
-        turn.fallbackReply = fallback;
       } else {
         lastResult = result;
       }
@@ -472,8 +465,23 @@ class AiChatEngine
             inputAccepted: false,
           );
         case coach.TurnStatus.error:
+          final failure = conversation.state.messages
+              .where(
+                (message) =>
+                    !message.isUser && message.turnId == accepted.turnId,
+              )
+              .lastOrNull;
           return ChatReply(
-            messages: const [BotMessage('预设方案暂时也无法生成，请调整条件或点「自己选条件」。')],
+            aiTurn: true,
+            messages: accepted.isPlanningFailure
+                ? [
+                    BotMessage(
+                      '',
+                      isPlanningFailure: true,
+                      conversationMessageId: failure?.id,
+                    ),
+                  ]
+                : const [BotMessage('网络不太稳，请稍后重试。')],
             state: state,
           );
         default:
@@ -491,7 +499,14 @@ class AiChatEngine
                   admitted.plan.copyWith(
                     id: 'ai-${DateTime.now().microsecondsSinceEpoch}-${_random.nextInt(0x100000000).toRadixString(16)}',
                   ),
-                  turn.context,
+                  coach.CoachContext(
+                    scene: admitted.plan.scene,
+                    equipment: admitted.plan.equipment.toSet(),
+                    minutes: admitted.plan.targetMinutes,
+                    level: admitted.plan.level,
+                    goal: admitted.plan.goal,
+                    avoid: turn.slots.avoid,
+                  ),
                 )
           : admitted;
       final plan = validated == null
@@ -499,20 +514,12 @@ class AiChatEngine
           : TrainingPlan.fromJson(validated.plan.toJson());
       final request = plan == null
           ? null
-          : requestForPlan(
-              plan,
-            ).copyWith(description: input, equipment: turn.slots.equipment);
+          : requestForPlan(plan).copyWith(description: input);
       final fallback = accepted.status == coach.TurnStatus.fallback;
       final output = conversation.state.messages
           .where((m) => !m.isUser && m.turnId == accepted.turnId)
           .lastOrNull;
-      final text = [
-        if (fallback) _fallbackNotice(accepted),
-        if ((output?.text ?? accepted.text).isNotEmpty)
-          output?.text ?? accepted.text,
-        if (fallback && turn.fallbackReply?.state.plan != null && plan == null)
-          '当前模板未通过安全检查，请调整条件或自己选条件。',
-      ].join('\n');
+      final text = output?.text ?? accepted.text;
       return ChatReply(
         aiTurn: true,
         messages: [
@@ -523,6 +530,8 @@ class AiChatEngine
             actions: accepted.actions,
             question: accepted.question,
             conversationMessageId: output?.id,
+            answeredForm: output?.answeredForm ?? const {},
+            isPlanningFailure: output?.isPlanningFailure ?? false,
             request: request,
             options: fallback && plan == null
                 ? turn.fallbackReply?.messages
@@ -565,7 +574,8 @@ class AiChatEngine
           ? coach.FallbackReason.timeout
           : coach.FallbackReason.server;
       return ChatReply(
-        messages: const [BotMessage('预设方案暂时也无法生成，请调整条件或点「自己选条件」。')],
+        aiTurn: true,
+        messages: const [BotMessage('', isPlanningFailure: true)],
         state: state,
       );
     } finally {
@@ -573,29 +583,6 @@ class AiChatEngine
       unawaited(progress.cancel());
       if (_pending == turn) _pending = null;
     }
-  }
-
-  String _fallbackNotice(coach.CoachTurnResult result) {
-    final error = result.error;
-    if (error is coach.AgentRequestFailed) {
-      return switch (error.kind) {
-        coach.AgentFailureKind.retriesExhausted =>
-          error.errorClass == coach.RequestErrorClass.rateLimited
-              ? '预设方案 · AI 请求较多，重试后仍未成功，请稍后再试。'
-              : '预设方案 · AI 重试后仍未成功，先用本地模板继续。',
-        coach.AgentFailureKind.nonRetryable => '预设方案 · AI 暂时无法处理这条请求，先用本地模板继续。',
-        coach.AgentFailureKind.turnTimeout => '预设方案 · AI 思考超时，先用本地模板继续。',
-      };
-    }
-    if (error is coach.AgentStalled) {
-      return '预设方案 · AI 暂时没能继续完成，先用本地模板继续。';
-    }
-    if (error is coach.AgentStepLimitExceeded) {
-      return '预设方案 · AI 暂时没能完成这次请求，先用本地模板继续。';
-    }
-    return result.fallbackReason == coach.FallbackReason.rateLimited
-        ? '预设方案 · AI 请求较多，请稍后再试。'
-        : '预设方案 · AI 暂时不可用，先用本地模板继续。';
   }
 
   ChatReply _admitLocalCards(ChatReply reply) => ChatReply(
@@ -755,47 +742,6 @@ class AiChatEngine
         : said.copyWith(minutes: int.parse(minutes[1]!).clamp(3, 60));
   }
 
-  Slots _restoredParameters(String input, ChatState state) {
-    // A live SDK session understands corrections, negation, and form answers
-    // better than the App's local fallback parser. Let it infer those fields
-    // from its own history and the current message.
-    if (agent.history.any((message) => message.role == coach.LlmRole.user)) {
-      return const Slots();
-    }
-    // Restored display history is not restored into the SDK agent. Recover only
-    // unambiguous user statements; otherwise asking again is safer than turning
-    // an outdated or negated condition into a fact.
-    final texts = <String>{
-      for (final message in state.recentMessages)
-        if (message.isUser && message.aiVisible && message.text != input)
-          message.text,
-      for (final message in conversation.state.messages)
-        if (message.isUser && message.text != input) message.text,
-    };
-    String? scene;
-    int? minutes;
-    for (final text in texts) {
-      final said = _saidSlots(text);
-      if (said.scene != null) {
-        scene = RegExp(r'不|没|无|别|除|以外|之外').hasMatch(text) ? null : said.scene;
-      }
-      if (said.minutes != null) {
-        minutes = RegExp(r'不|没|无|别|除|以外|之外').hasMatch(text)
-            ? null
-            : said.minutes;
-      }
-    }
-    // The local parser does not cover the SDK's full equipment vocabulary.
-    // Only recover a standalone barehand answer, never a partial gear list.
-    final barehand =
-        texts.length == 1 && RegExp(r'^\s*(徒手|空手)\s*$').hasMatch(texts.single);
-    return Slots(
-      scene: scene,
-      minutes: minutes,
-      equipment: barehand ? const {} : null,
-    );
-  }
-
   Slots _slotsFor(String input, ChatState state, {PlanEdit? edit}) {
     // Aggregated state may contain defaults from a generated/restored card.
     // Only the live conversation's original user text establishes facts.
@@ -865,14 +811,16 @@ class _Turn {
     this.slots,
     this.operation, {
     this.usesCurrentPlan = false,
-    this.restoredParameters,
+    this.currentGoal,
+    this.previousParameters,
   });
   final String input;
   final ChatState state;
   final Slots slots;
   final String operation;
   final bool usesCurrentPlan;
-  final Slots? restoredParameters;
+  final String? currentGoal;
+  final Slots? previousParameters;
   final watch = Stopwatch()..start();
   int step = 0;
   int attempts = 0;
@@ -880,15 +828,17 @@ class _Turn {
   bool timedOut = false;
   ChatReply? fallbackReply;
   coach.CoachContext get context => coach.CoachContext(
-    scene: usesCurrentPlan ? slots.scene : restoredParameters?.scene,
+    // r2 treats supplied conditions as previous selections for a new task;
+    // the user's current text and confirmed form supply the actual facts.
+    scene: usesCurrentPlan ? slots.scene : previousParameters?.scene,
     equipment:
-        (usesCurrentPlan ? slots.equipment : restoredParameters?.equipment)
+        (usesCurrentPlan ? slots.equipment : previousParameters?.equipment)
             ?.map((e) => e.name)
             .toSet(),
     avoid: slots.avoid,
     level: slots.level,
-    minutes: usesCurrentPlan ? slots.minutes : restoredParameters?.minutes,
-    goal: slots.goal,
+    minutes: usesCurrentPlan ? slots.minutes : previousParameters?.minutes,
+    goal: usesCurrentPlan ? slots.goal : currentGoal,
     notes: [
       if (usesCurrentPlan && state.plan != null)
         '用户当前明确采用的训练计划，调整请以此为基础：${jsonEncode(state.plan!.toJson())}',

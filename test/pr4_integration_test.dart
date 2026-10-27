@@ -187,10 +187,12 @@ void main() {
         const coach.AgentEvent('reset-turn', coach.AgentEventKind.slow),
       );
       await tester.pumpAndSettle();
-      expect(find.text('还在想…').hitTestable(), findsOneWidget);
+      expect(find.text('正在理解需求').hitTestable(), findsOneWidget);
       final newChat = find.byKey(const ValueKey('chat-new-conversation'));
       expect(newChat, findsNothing);
-      await tester.tap(find.byKey(const ValueKey('open-plans')));
+      await tester.tap(find.byKey(const ValueKey('chat-panel-toggle')));
+      // The platform removes its keyboard inset after the panel toggle.
+      tester.view.viewInsets = FakeViewPadding.zero;
       await tester.pumpAndSettle();
       expect(newChat.hitTestable(), findsOneWidget);
       await tester.tap(newChat);
@@ -199,7 +201,7 @@ void main() {
       expect(chat.typing, isFalse);
       expect(chat.messages.single.greeting, isTrue);
       expect(tester.widget<ChatInputBar>(input).enabled, isTrue);
-      expect(tester.getRect(input).bottom, lessThanOrEqualTo(524));
+      expect(tester.getRect(input).bottom, lessThanOrEqualTo(844));
 
       for (var i = 0; i < engine.replies.length; i++) {
         engine.replies[i].complete(

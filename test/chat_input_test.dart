@@ -126,7 +126,7 @@ void main() {
             ),
           ),
         );
-        final leading = find.byKey(const ValueKey('open-plans'));
+        final leading = find.byKey(const ValueKey('chat-panel-toggle'));
         final sending = find.byKey(const ValueKey('chat-send'));
         for (final action in [leading, sending]) {
           final size = tester.getSize(action);
@@ -137,9 +137,7 @@ void main() {
           find.descendant(of: leading, matching: find.byType(Container)),
           findsNothing,
         );
-        final bookmark = find.byWidgetPredicate(
-          (widget) => widget is SfIcon && widget.glyph == SfGlyph.bookmark,
-        );
+        final bookmark = find.byIcon(Icons.add_rounded);
         final sendIcon = find.byWidgetPredicate(
           (widget) => widget is SfIcon && widget.glyph == SfGlyph.arrowUp,
         );

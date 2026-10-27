@@ -59,6 +59,8 @@ class ChatMessage {
     this.conversationMessageId,
     this.questionAnswered = false,
     this.answeredChoices = const [],
+    this.answeredForm = const {},
+    this.isPlanningFailure = false,
     this.plan,
     this.validatedPlan,
     this.actions,
@@ -83,6 +85,8 @@ class ChatMessage {
   final String? conversationMessageId;
   final bool questionAnswered;
   final List<String> answeredChoices;
+  final Map<String, List<String>> answeredForm;
+  final bool isPlanningFailure;
 
   /// A plan card (assistant only) and the request it was made for.
   final TrainingPlan? plan;
@@ -106,6 +110,7 @@ class ChatMessage {
     bool? aiVisible,
     bool? questionAnswered,
     List<String>? answeredChoices,
+    Map<String, List<String>>? answeredForm,
   }) => ChatMessage(
     id: id,
     role: role,
@@ -117,6 +122,8 @@ class ChatMessage {
     conversationMessageId: conversationMessageId,
     questionAnswered: questionAnswered ?? this.questionAnswered,
     answeredChoices: answeredChoices ?? this.answeredChoices,
+    answeredForm: answeredForm ?? this.answeredForm,
+    isPlanningFailure: isPlanningFailure,
     plan: plan,
     validatedPlan: validatedPlan,
     actions: actions,
@@ -136,6 +143,8 @@ class ChatMessage {
     'conversationMessageId': ?conversationMessageId,
     if (questionAnswered) 'questionAnswered': true,
     if (answeredChoices.isNotEmpty) 'answeredChoices': answeredChoices,
+    if (answeredForm.isNotEmpty) 'answeredForm': answeredForm,
+    if (isPlanningFailure) 'isPlanningFailure': true,
     'plan': ?plan?.toJson(),
     if (validatedPlan != null || plan?.source == 'ai') 'isAiPlan': true,
     if (actions != null)
@@ -165,6 +174,20 @@ class ChatMessage {
     final actions = actionIds is List && actionIds.every((id) => id is String)
         ? restoreWith?.restoreActions(actionIds.cast<String>())
         : null;
+    final question = j['question'] is Map
+        ? _restoreQuestion(j['question'] as Map)
+        : null;
+    final answer = _stringLists(j['answeredForm']) ?? const {};
+    final fieldsByKey = {
+      for (final field in question?.fields ?? <coach.AskUserField>[])
+        field.key: field,
+    };
+    final validAnswer = answer.entries.every((entry) {
+      final field = fieldsByKey[entry.key];
+      return field != null &&
+          (field.multiple || entry.value.length <= 1) &&
+          entry.value.every(field.options.contains);
+    });
     return ChatMessage(
       id: j['id'] as String,
       role: j['role'] == 'user' ? ChatRole.user : ChatRole.assistant,
@@ -176,14 +199,14 @@ class ChatMessage {
       ],
       chosen: (j['chosen'] as num?)?.toInt(),
       conversationMessageId: j['conversationMessageId'] as String?,
-      question: j['question'] is Map
-          ? coach.AskUserGate.check(jsonEncode(j['question'])).question
-          : null,
+      question: question,
       questionAnswered: j['questionAnswered'] == true,
       answeredChoices: [
         for (final value in j['answeredChoices'] as List? ?? const [])
           if (value is String) value,
       ],
+      answeredForm: validAnswer ? answer : const {},
+      isPlanningFailure: j['isPlanningFailure'] == true,
       greeting: j['greeting'] == true,
       aiVisible: j['aiVisible'] == true,
       plan: plan,
@@ -191,6 +214,144 @@ class ChatMessage {
       actions: actions,
       request: request,
     );
+  }
+}
+
+// Stored history is untrusted. Confirmation cards have SDK-only fields which
+// are intentionally rejected by the public model-output AskUserGate.
+Map<String, List<String>>? _stringLists(Object? value) {
+  if (value == null) return const {};
+  if (value is! Map || value.length > 32) return null;
+  final result = <String, List<String>>{};
+  for (final entry in value.entries) {
+    if (entry.key is! String ||
+        (entry.key as String).length > 80 ||
+        entry.value is! List) {
+      return null;
+    }
+    final raw = entry.value as List;
+    if (raw.length > 100 || raw.any((v) => v is! String || v.length > 120)) {
+      return null;
+    }
+    result[entry.key as String] = List<String>.from(raw);
+  }
+  return result;
+}
+
+coach.AskUserQuestion? _restoreQuestion(Map raw) {
+  if (raw['isConfirmation'] != true) {
+    return coach.AskUserGate.check(jsonEncode(raw)).question;
+  }
+  try {
+    const keys = {
+      'question',
+      'mode',
+      'fields',
+      'skipLabel',
+      'isConfirmation',
+      'focus',
+      'defaultSelections',
+    };
+    if (raw.keys.any((key) => key is! String || !keys.contains(key)) ||
+        raw['mode'] != 'form' ||
+        raw['skipLabel'] != '按默认来' ||
+        raw['question'] is! String ||
+        (raw['question'] as String).length > 300 ||
+        (raw['focus'] != null &&
+            (raw['focus'] is! String ||
+                (raw['focus'] as String).length > 100)) ||
+        raw['fields'] is! List ||
+        (raw['fields'] as List).length != 3) {
+      return null;
+    }
+    final defaults = _stringLists(raw['defaultSelections']);
+    if (defaults == null ||
+        defaults.keys.any(
+          (key) => !const {'scene', 'equipment', 'minutes'}.contains(key),
+        )) {
+      return null;
+    }
+    final fields = <coach.AskUserField>[];
+    for (final item in raw['fields'] as List) {
+      if (item is! Map ||
+          item.keys.any(
+            (key) =>
+                key is! String ||
+                !const {
+                  'key',
+                  'label',
+                  'options',
+                  'multiple',
+                  'preselected',
+                  'previousSelections',
+                  'optionsByScene',
+                }.contains(key),
+          )) {
+        return null;
+      }
+      final key = item['key'];
+      final label = item['label'];
+      final options = item['options'];
+      final multiple = item['multiple'];
+      if (key is! String ||
+          label is! String ||
+          label.isEmpty ||
+          label.length > 80 ||
+          options is! List ||
+          options.isEmpty ||
+          options.length > 100 ||
+          options.any((v) => v is! String || v.isEmpty || v.length > 120) ||
+          (multiple != null && multiple is! bool)) {
+        return null;
+      }
+      final choices = List<String>.from(options);
+      if (choices.toSet().length != choices.length) return null;
+      List<String>? list(Object? value) {
+        if (value == null) return const [];
+        if (value is! List ||
+            value.length > choices.length ||
+            value.any((v) => v is! String || !choices.contains(v))) {
+          return null;
+        }
+        return List<String>.from(value);
+      }
+
+      final selected = list(item['preselected']);
+      final previous = list(item['previousSelections']);
+      final byScene = _stringLists(item['optionsByScene']);
+      if (selected == null ||
+          previous == null ||
+          byScene == null ||
+          byScene.values.any(
+            (values) => values.any((v) => !choices.contains(v)),
+          ) ||
+          (defaults[key] ?? const []).any((v) => !choices.contains(v)) ||
+          (key != 'equipment' &&
+              (multiple == true ||
+                  selected.length > 1 ||
+                  (defaults[key]?.length ?? 0) > 1))) {
+        return null;
+      }
+      fields.add(
+        coach.AskUserField(
+          key: key,
+          label: label,
+          options: choices,
+          multiple: multiple == true,
+          preselected: selected,
+          previousSelections: previous,
+          optionsByScene: byScene,
+        ),
+      );
+    }
+    return coach.AskUserQuestion.confirmation(
+      question: raw['question'] as String,
+      fields: fields,
+      focus: raw['focus'] as String?,
+      defaultSelections: defaults,
+    );
+  } on Object {
+    return null;
   }
 }
 
@@ -425,6 +586,8 @@ class BotMessage {
     this.options = const [],
     this.question,
     this.conversationMessageId,
+    this.answeredForm = const {},
+    this.isPlanningFailure = false,
     this.plan,
     this.validatedPlan,
     this.actions,
@@ -436,6 +599,8 @@ class BotMessage {
   final List<ChatOption> options;
   final coach.AskUserQuestion? question;
   final String? conversationMessageId;
+  final Map<String, List<String>> answeredForm;
+  final bool isPlanningFailure;
   final TrainingPlan? plan;
   final coach.ValidatedPlan? validatedPlan;
   final coach.ValidatedActions? actions;

@@ -23,9 +23,9 @@ void main() {
     final messages = s.chat.messages.length;
     await tester.pumpWidget(SmartFitApp(services: s));
     await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const ValueKey('open-plans')));
+    await tester.tap(find.byKey(const ValueKey('chat-panel-toggle')));
     await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const ValueKey('drawer-about')));
+    await tester.tap(find.byKey(const ValueKey('panel-settings')));
     await tester.pumpAndSettle();
     for (final mode in ['light', 'system', 'dark']) {
       await tester.tap(find.byKey(ValueKey('appearance-$mode')));

@@ -93,12 +93,12 @@ class TimeMark extends StatelessWidget {
 }
 
 class TypingBubble extends StatelessWidget {
-  const TypingBubble({super.key, this.onCancel, this.progressLabel});
+  const TypingBubble({super.key, this.onCancel, this.events});
   final VoidCallback? onCancel;
-  final String? progressLabel;
+  final Stream<CoachTypingEvent>? events;
   @override
   Widget build(BuildContext context) => withSmartfitCoachUi(
     context,
-    CoachTypingBubble(onCancel: onCancel, progressLabel: progressLabel),
+    CoachTypingBubble(onCancel: onCancel, events: events),
   );
 }

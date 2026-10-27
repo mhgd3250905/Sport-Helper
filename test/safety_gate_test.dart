@@ -72,7 +72,9 @@ void main() {
       expect(find.byType(PlayerPage), findsNothing);
       expect(s.store.lastPlan, isNull);
 
-      await tester.tap(find.byKey(const ValueKey('open-plans')));
+      await tester.tap(find.byKey(const ValueKey('chat-panel-toggle')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('panel-plans')));
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(ValueKey('saved-start-${saved.id}')));
       await tester.pumpAndSettle();

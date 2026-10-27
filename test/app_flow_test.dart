@@ -44,7 +44,8 @@ AppServices services({VoiceOutput output = const MutedVoiceOutput()}) {
   );
 }
 
-class InterruptibleTestOutput extends MutedVoiceOutput implements InterruptibleVoiceOutput {
+class InterruptibleTestOutput extends MutedVoiceOutput
+    implements InterruptibleVoiceOutput {
   final events = StreamController<AudioInterruption>.broadcast(sync: true);
   @override
   Stream<AudioInterruption> get interruptions => events.stream;
@@ -52,13 +53,21 @@ class InterruptibleTestOutput extends MutedVoiceOutput implements InterruptibleV
   Future<void> reactivate() async {}
 }
 
-Future<void> showPlayer(WidgetTester tester, AppServices s, {TrainingPlan? plan}) async {
+Future<void> showPlayer(
+  WidgetTester tester,
+  AppServices s, {
+  TrainingPlan? plan,
+}) async {
   tall(tester);
-  final generated = await s.generator.generate(const ScenarioRequest(templateId: 'office-relax'));
-  await tester.pumpWidget(AppScope(
-    services: s,
-    child: MaterialApp(home: PlayerPage(plan: plan ?? generated.plan!)),
-  ));
+  final generated = await s.generator.generate(
+    const ScenarioRequest(templateId: 'office-relax'),
+  );
+  await tester.pumpWidget(
+    AppScope(
+      services: s,
+      child: MaterialApp(home: PlayerPage(plan: plan ?? generated.plan!)),
+    ),
+  );
   await tester.pump();
 }
 
@@ -93,97 +102,141 @@ Future<void> _closeDiscomfort(WidgetTester tester) async {
 }
 
 void main() {
-  testWidgets('skipping the last exercise while paused still records the result', (tester) async {
-    final s = services();
-    const plan = TrainingPlan(
-      id: 'single', source: 'template', title: '单动作', summary: '', goal: 'relax', scene: 'home',
-      equipment: [], level: 1, targetMinutes: 1,
-      blocks: [PlanBlock(id: 'main', name: '主训练', type: BlockType.main, rounds: 1, restBetweenRoundsSeconds: 0, items: [
-        PlanItem(exerciseId: 'h-squat', mode: DoseMode.reps, sets: 1, reps: 10, perSide: false, restSeconds: 10),
-      ])],
-    );
-    await showPlayer(tester, s, plan: plan);
-    await tester.tap(find.byKey(const ValueKey('skip')));
-    await tester.pump();
-    await tester.tap(find.byKey(const ValueKey('pause')));
-    await tester.pump();
-    await _openDiscomfort(tester);
-    await tester.tap(find.text('跳过这个动作'));
-    await tester.pumpAndSettle();
-    expect(find.text('今天先到这里'), findsOneWidget);
-    expect(s.store.history, hasLength(1));
-    // ugk_trainer records only completed work, never skipped exercises.
-    expect(s.store.history.single.completed, 0);
-    expect(s.store.history.single.total, 1);
-    await tester.pumpWidget(const SizedBox());
-  });
+  testWidgets(
+    'skipping the last exercise while paused still records the result',
+    (tester) async {
+      final s = services();
+      const plan = TrainingPlan(
+        id: 'single',
+        source: 'template',
+        title: '单动作',
+        summary: '',
+        goal: 'relax',
+        scene: 'home',
+        equipment: [],
+        level: 1,
+        targetMinutes: 1,
+        blocks: [
+          PlanBlock(
+            id: 'main',
+            name: '主训练',
+            type: BlockType.main,
+            rounds: 1,
+            restBetweenRoundsSeconds: 0,
+            items: [
+              PlanItem(
+                exerciseId: 'h-squat',
+                mode: DoseMode.reps,
+                sets: 1,
+                reps: 10,
+                perSide: false,
+                restSeconds: 10,
+              ),
+            ],
+          ),
+        ],
+      );
+      await showPlayer(tester, s, plan: plan);
+      await tester.tap(find.byKey(const ValueKey('skip')));
+      await tester.pump();
+      await tester.tap(find.byKey(const ValueKey('pause')));
+      await tester.pump();
+      await _openDiscomfort(tester);
+      await tester.tap(find.text('跳过这个动作'));
+      await tester.pumpAndSettle();
+      expect(find.text('今天先到这里'), findsOneWidget);
+      expect(s.store.history, hasLength(1));
+      // ugk_trainer records only completed work, never skipped exercises.
+      expect(s.store.history.single.completed, 0);
+      expect(s.store.history.single.total, 1);
+      await tester.pumpWidget(const SizedBox());
+    },
+  );
 
-  testWidgets('pause and audio interruption freeze the demonstration until resumed', (tester) async {
-    final output = InterruptibleTestOutput();
-    final s = services(output: output);
-    await showPlayer(tester, s);
-    bool paused() => tester.widget<ExerciseVideo>(find.byType(ExerciseVideo)).paused;
-    expect(paused(), isFalse);
-    await tester.tap(find.byKey(const ValueKey('pause')));
-    await tester.pump();
-    expect(paused(), isTrue);
-    await tester.tap(find.byKey(const ValueKey('pause')));
-    await tester.pump();
-    expect(paused(), isFalse);
-    output.events.add(AudioInterruption.began);
-    await tester.pump();
-    expect(paused(), isTrue);
-    output.events.add(AudioInterruption.ended);
-    await tester.pump();
-    expect(paused(), isTrue);
-    await tester.tap(find.byKey(const ValueKey('pause')));
-    await tester.pump();
-    expect(paused(), isFalse);
-    await tester.pumpWidget(const SizedBox());
-    await output.events.close();
-  });
+  testWidgets(
+    'pause and audio interruption freeze the demonstration until resumed',
+    (tester) async {
+      final output = InterruptibleTestOutput();
+      final s = services(output: output);
+      await showPlayer(tester, s);
+      bool paused() =>
+          tester.widget<ExerciseVideo>(find.byType(ExerciseVideo)).paused;
+      expect(paused(), isFalse);
+      await tester.tap(find.byKey(const ValueKey('pause')));
+      await tester.pump();
+      expect(paused(), isTrue);
+      await tester.tap(find.byKey(const ValueKey('pause')));
+      await tester.pump();
+      expect(paused(), isFalse);
+      output.events.add(AudioInterruption.began);
+      await tester.pump();
+      expect(paused(), isTrue);
+      output.events.add(AudioInterruption.ended);
+      await tester.pump();
+      expect(paused(), isTrue);
+      await tester.tap(find.byKey(const ValueKey('pause')));
+      await tester.pump();
+      expect(paused(), isFalse);
+      await tester.pumpWidget(const SizedBox());
+      await output.events.close();
+    },
+  );
 
-  testWidgets('the player keeps its sky still and shows pause through the resume control', (tester) async {
-    final s = services();
-    s.store.starfield = true; // even with star dust on, the workout keeps it still
-    await showPlayer(tester, s);
-    final sky = tester.widget<CosmosBackground>(find.byType(CosmosBackground));
-    expect(sky.animate, isFalse);
-    expect(find.text('已暂停'), findsNothing);
-    await tester.tap(find.byKey(const ValueKey('pause')));
-    await tester.pump();
-    expect(find.text('已暂停'), findsNothing);
-    expect(find.byTooltip('继续训练'), findsOneWidget);
-    expect(find.byKey(const ValueKey('counter')), findsOneWidget);
-    await tester.pumpWidget(const SizedBox());
-  });
+  testWidgets(
+    'the player keeps its sky still and shows pause through the resume control',
+    (tester) async {
+      final s = services();
+      s.store.starfield =
+          true; // even with star dust on, the workout keeps it still
+      await showPlayer(tester, s);
+      final sky = tester.widget<CosmosBackground>(
+        find.byType(CosmosBackground),
+      );
+      expect(sky.animate, isFalse);
+      expect(find.text('已暂停'), findsNothing);
+      await tester.tap(find.byKey(const ValueKey('pause')));
+      await tester.pump();
+      expect(find.text('已暂停'), findsNothing);
+      expect(find.byTooltip('继续训练'), findsOneWidget);
+      expect(find.byKey(const ValueKey('counter')), findsOneWidget);
+      await tester.pumpWidget(const SizedBox());
+    },
+  );
 
-  testWidgets('ending from discomfort while paused records an incomplete workout once', (tester) async {
-    final s = services();
-    await showPlayer(tester, s);
-    await tester.tap(find.byKey(const ValueKey('pause')));
-    await tester.pump();
-    await _openDiscomfort(tester);
-    await tester.tap(find.text('结束今天的训练'));
-    await tester.pumpAndSettle();
-    expect(find.text('今天先到这里'), findsOneWidget);
-    expect(find.text('训练完成！'), findsNothing);
-    expect(s.store.history, hasLength(1));
-    expect(s.store.history.single.completed, 0);
-    expect(s.store.history.single.total, greaterThan(0));
-    await tester.pump(const Duration(seconds: 2));
-    expect(s.store.history, hasLength(1));
-    await tester.pumpWidget(const SizedBox());
-  });
+  testWidgets(
+    'ending from discomfort while paused records an incomplete workout once',
+    (tester) async {
+      final s = services();
+      await showPlayer(tester, s);
+      await tester.tap(find.byKey(const ValueKey('pause')));
+      await tester.pump();
+      await _openDiscomfort(tester);
+      await tester.tap(find.text('结束今天的训练'));
+      await tester.pumpAndSettle();
+      expect(find.text('今天先到这里'), findsOneWidget);
+      expect(find.text('训练完成！'), findsNothing);
+      expect(s.store.history, hasLength(1));
+      expect(s.store.history.single.completed, 0);
+      expect(s.store.history.single.total, greaterThan(0));
+      await tester.pump(const Duration(seconds: 2));
+      expect(s.store.history, hasLength(1));
+      await tester.pumpWidget(const SizedBox());
+    },
+  );
 
-  testWidgets('skipping from discomfort preserves an existing pause', (tester) async {
+  testWidgets('skipping from discomfort preserves an existing pause', (
+    tester,
+  ) async {
     await showPlayer(tester, services());
     await tester.tap(find.byKey(const ValueKey('pause')));
     await tester.pump();
     await _openDiscomfort(tester);
     await tester.tap(find.text('跳过这个动作'));
     await _closeDiscomfort(tester);
-    expect(tester.widget<ExerciseVideo>(find.byType(ExerciseVideo)).paused, isTrue);
+    expect(
+      tester.widget<ExerciseVideo>(find.byType(ExerciseVideo)).paused,
+      isTrue,
+    );
     await tester.pumpWidget(const SizedBox());
   });
 
@@ -210,7 +263,9 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  testWidgets('safety talk → describe → plan card → player → back in the chat', (tester) async {
+  testWidgets('safety talk → describe → plan card → player → back in the chat', (
+    tester,
+  ) async {
     tall(tester);
     final s = services();
     await tester.pumpWidget(SmartFitApp(services: s));
@@ -267,7 +322,9 @@ void main() {
     expect(s.chat.messages.last.isPlan, isFalse); // a word after the workout
   });
 
-  testWidgets('reduced motion: the player opens directly at full screen', (tester) async {
+  testWidgets('reduced motion: the player opens directly at full screen', (
+    tester,
+  ) async {
     tall(tester);
     tester.platformDispatcher.accessibilityFeaturesTestValue =
         const FakeAccessibilityFeatures(disableAnimations: true);
@@ -284,7 +341,10 @@ void main() {
     await tester.pump(const Duration(milliseconds: 60));
     expect(tester.getRect(find.byType(PlayerPage)), screen);
     expect(
-      find.ancestor(of: find.byType(PlayerPage), matching: find.byType(FadeTransition)),
+      find.ancestor(
+        of: find.byType(PlayerPage),
+        matching: find.byType(FadeTransition),
+      ),
       findsNothing,
     );
     await tester.pump(const Duration(milliseconds: 500));
@@ -295,51 +355,63 @@ void main() {
     expect(find.byType(PlayerPage), findsNothing);
   });
 
-  testWidgets('drawer ▶ starts a saved plan in the player and comes back to the chat', (tester) async {
-    tall(tester);
-    final s = services();
-    await s.store.acceptSafety(blocked: false);
-    await tester.pumpWidget(SmartFitApp(services: s));
-    await tester.pumpAndSettle();
-    await say(tester, '在家 15 分钟练核心，徒手');
-    await tester.tap(find.byKey(ValueKey('plan-expand-${s.chat.currentPlan!.id}')));
-    await tester.pumpAndSettle();
-    await tester.tap(find.byKey(ValueKey('plan-save-${s.chat.currentPlan!.id}')));
-    await tester.pumpAndSettle();
-    final saved = s.store.savedPlans.single;
-    await tester.tap(find.byKey(const ValueKey('open-plans')));
-    await tester.pumpAndSettle();
-    await tester.tap(find.byKey(ValueKey('saved-start-${saved.id}')));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 600));
-    expect(find.byType(PlayerPage), findsOneWidget);
-    await tester.tap(find.byKey(const ValueKey('close')));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('结束'));
-    await tester.pumpAndSettle();
-    expect(find.byType(PlayerPage), findsNothing);
-    expect(find.byType(ChatHomePage), findsOneWidget);
-    expect(s.store.history, hasLength(1));
-  });
+  testWidgets(
+    'drawer ▶ starts a saved plan in the player and comes back to the chat',
+    (tester) async {
+      tall(tester);
+      final s = services();
+      await s.store.acceptSafety(blocked: false);
+      await tester.pumpWidget(SmartFitApp(services: s));
+      await tester.pumpAndSettle();
+      await say(tester, '在家 15 分钟练核心，徒手');
+      await tester.tap(
+        find.byKey(ValueKey('plan-expand-${s.chat.currentPlan!.id}')),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.byKey(ValueKey('plan-save-${s.chat.currentPlan!.id}')),
+      );
+      await tester.pumpAndSettle();
+      final saved = s.store.savedPlans.single;
+      await tester.tap(find.byKey(const ValueKey('chat-panel-toggle')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('panel-plans')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(ValueKey('saved-start-${saved.id}')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 600));
+      expect(find.byType(PlayerPage), findsOneWidget);
+      await tester.tap(find.byKey(const ValueKey('close')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('结束'));
+      await tester.pumpAndSettle();
+      expect(find.byType(PlayerPage), findsNothing);
+      expect(find.byType(ChatHomePage), findsOneWidget);
+      expect(s.store.history, hasLength(1));
+    },
+  );
 
-  testWidgets('a "是" in the safety talk → advice, no plans, library still open', (tester) async {
-    tall(tester);
-    final s = services();
-    await tester.pumpWidget(SmartFitApp(services: s));
-    await tester.pumpAndSettle();
-    await answerSafety(tester, ['否', '是']);
-    expect(s.store.safetyAccepted, isTrue);
-    expect(s.store.safetyBlocked, isTrue);
-    expect(find.textContaining('医生的康复安排'), findsOneWidget);
+  testWidgets(
+    'a "是" in the safety talk → advice, no plans, library still open',
+    (tester) async {
+      tall(tester);
+      final s = services();
+      await tester.pumpWidget(SmartFitApp(services: s));
+      await tester.pumpAndSettle();
+      await answerSafety(tester, ['否', '是']);
+      expect(s.store.safetyAccepted, isTrue);
+      expect(s.store.safetyBlocked, isTrue);
+      expect(find.textContaining('医生的康复安排'), findsOneWidget);
 
-    await say(tester, '在家 10 分钟拉伸');
-    expect(find.byType(PlanCard), findsNothing);
-    expect(find.textContaining('先不生成训练计划'), findsWidgets);
+      await say(tester, '在家 10 分钟拉伸');
+      expect(find.byType(PlanCard), findsNothing);
+      expect(find.textContaining('先不生成训练计划'), findsWidgets);
 
-    await tester.tap(openOption('浏览动作库').first);
-    await tester.pumpAndSettle();
-    expect(find.byType(LibraryPage), findsOneWidget);
-  });
+      await tester.tap(openOption('浏览动作库').first);
+      await tester.pumpAndSettle();
+      expect(find.byType(LibraryPage), findsOneWidget);
+    },
+  );
 
   testWidgets('typing during the safety talk waits for it', (tester) async {
     tall(tester);
@@ -352,7 +424,9 @@ void main() {
     expect(s.store.safetyAccepted, isFalse);
   });
 
-  testWidgets('drawer: saved plans, show one in the chat, app entries', (tester) async {
+  testWidgets('drawer: saved plans, show one in the chat, app entries', (
+    tester,
+  ) async {
     tall(tester);
     final s = services();
     await s.store.acceptSafety(blocked: false);
@@ -367,22 +441,24 @@ void main() {
     await tester.pumpAndSettle();
     await say(tester, '讲个笑话');
 
-    await tester.tap(find.byKey(const ValueKey('open-plans')));
+    await tester.tap(find.byKey(const ValueKey('chat-panel-toggle')));
     await tester.pumpAndSettle();
     expect(find.text('我的计划'), findsWidgets);
+    await tester.tap(find.byKey(const ValueKey('panel-plans')));
+    await tester.pumpAndSettle();
     final saved = s.store.savedPlans.single;
     await tester.tap(find.byKey(ValueKey('saved-${saved.id}')));
     await tester.pumpAndSettle();
     expect(s.chat.messages.last.plan?.id, plan.id); // shown again as a card
 
     // New conversation is in the drawer; the form opens from the chat.
-    await tester.tap(find.byKey(const ValueKey('open-plans')));
+    await tester.tap(find.byKey(const ValueKey('chat-panel-toggle')));
     await tester.pumpAndSettle();
-    expect(find.byKey(const ValueKey('drawer-library')), findsOneWidget);
-    expect(find.byKey(const ValueKey('drawer-about')), findsOneWidget);
+    expect(find.byKey(const ValueKey('panel-library')), findsOneWidget);
+    expect(find.byKey(const ValueKey('panel-settings')), findsOneWidget);
     expect(find.byKey(const ValueKey('chat-new-conversation')), findsOneWidget);
     expect(find.byKey(const ValueKey('drawer-custom')), findsNothing);
-    await tester.tap(find.byKey(const ValueKey('drawer-library')));
+    await tester.tap(find.byKey(const ValueKey('panel-library')));
     await tester.pumpAndSettle();
     expect(find.byType(LibraryPage), findsOneWidget);
     await tester.tap(find.byTooltip('返回').first);
@@ -391,13 +467,23 @@ void main() {
     expect(find.byType(CustomPlanPage), findsOneWidget);
   });
 
-  testWidgets('the custom form (opened from the chat) still generates plans', (tester) async {
+  testWidgets('the custom form (opened from the chat) still generates plans', (
+    tester,
+  ) async {
     tall(tester);
     final s = services();
     await s.store.acceptSafety(blocked: false);
-    await tester.pumpWidget(AppScope(services: s, child: const MaterialApp(home: CustomPlanPage())));
+    await tester.pumpWidget(
+      AppScope(
+        services: s,
+        child: const MaterialApp(home: CustomPlanPage()),
+      ),
+    );
     await tester.pumpAndSettle();
-    await tester.enterText(find.byKey(const ValueKey('prompt')), '在办公室午休 10 分钟，肩颈很僵');
+    await tester.enterText(
+      find.byKey(const ValueKey('prompt')),
+      '在办公室午休 10 分钟，肩颈很僵',
+    );
     await tester.ensureVisible(find.byKey(const ValueKey('generate')));
     await tester.tap(find.byKey(const ValueKey('generate')));
     await tester.pumpAndSettle();

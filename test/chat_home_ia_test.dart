@@ -32,37 +32,56 @@ void main() {
     expect(greetingFor(DateTime(2026, 10, 20, 1)), '夜深了');
   });
 
-  testWidgets('opening: a large greeting (no bubble) and first-visit discovery chips', (tester) async {
-    tall(tester);
-    final s = services();
-    await s.store.acceptSafety(blocked: false);
-    await tester.pumpWidget(SmartFitApp(services: s));
-    await tester.pumpAndSettle();
-    final g = s.chat.messages.single;
-    expect(g.greeting, isTrue);
-    expect(find.byType(GreetingBlock), findsOneWidget);
-    expect(find.byType(MessageBubble), findsNothing);
-    expect(find.text(greetingFor(DateTime.now())), findsOneWidget);
-    expect(find.text('说说今天想怎么练？'), findsOneWidget);
-    // First visit: plan examples, then 你能做什么 with its glyph.
-    expect(s.chat.suggestions.last, '你能做什么');
-    await tester.dragUntilVisible(
-      find.text('你能做什么'),
-      find.descendant(of: find.byType(SuggestionStrip), matching: find.byType(Scrollable)),
-      const Offset(-120, 0),
-    );
-    await tester.pumpAndSettle();
-    final help = find.ancestor(of: find.text('你能做什么'), matching: find.byType(Row)).first;
-    expect(find.descendant(of: help, matching: find.byType(SfIcon)), findsOneWidget);
-    // The greeting survives a restart as a greeting.
-    expect(g.toJson()['greeting'], isTrue);
-  });
+  testWidgets(
+    'opening: a large greeting (no bubble) and first-visit discovery chips',
+    (tester) async {
+      tall(tester);
+      final s = services();
+      await s.store.acceptSafety(blocked: false);
+      await tester.pumpWidget(SmartFitApp(services: s));
+      await tester.pumpAndSettle();
+      final g = s.chat.messages.single;
+      expect(g.greeting, isTrue);
+      expect(find.byType(GreetingBlock), findsOneWidget);
+      expect(find.byType(MessageBubble), findsNothing);
+      expect(find.text(greetingFor(DateTime.now())), findsOneWidget);
+      expect(find.text('说说今天想怎么练？'), findsOneWidget);
+      // First visit: plan examples, then 你能做什么 with its glyph.
+      expect(s.chat.suggestions.last, '你能做什么');
+      await tester.dragUntilVisible(
+        find.text('你能做什么'),
+        find.descendant(
+          of: find.byType(SuggestionStrip),
+          matching: find.byType(Scrollable),
+        ),
+        const Offset(-120, 0),
+      );
+      await tester.pumpAndSettle();
+      final help = find
+          .ancestor(of: find.text('你能做什么'), matching: find.byType(Row))
+          .first;
+      expect(
+        find.descendant(of: help, matching: find.byType(SfIcon)),
+        findsOneWidget,
+      );
+      // The greeting survives a restart as a greeting.
+      expect(g.toJson()['greeting'], isTrue);
+    },
+  );
 
   testWidgets('returning: 上次那个 / 上次练了什么 lead the chips', (tester) async {
     tall(tester);
     final s = services();
     await s.store.acceptSafety(blocked: false);
-    await s.store.addHistory(HistoryEntry(title: '核心激活', at: DateTime.now(), minutes: 15, completed: 8, total: 8));
+    await s.store.addHistory(
+      HistoryEntry(
+        title: '核心激活',
+        at: DateTime.now(),
+        minutes: 15,
+        completed: 8,
+        total: 8,
+      ),
+    );
     s.chat.start();
     await s.chat.send('在家 15 分钟练核心，徒手');
     await s.chat.started(s.chat.currentPlan!);
@@ -73,7 +92,9 @@ void main() {
     expect(s.chat.messages.last.options.single.label, '再来一次');
   });
 
-  testWidgets('the conversation switches appearance and voice itself', (tester) async {
+  testWidgets('the conversation switches appearance and voice itself', (
+    tester,
+  ) async {
     tall(tester);
     final s = services();
     await s.store.acceptSafety(blocked: false);
@@ -93,43 +114,60 @@ void main() {
     expect(s.store.voice.voice, isTrue);
   });
 
-  testWidgets('有哪些拉伸动作 opens the library on 拉伸; 设置 opens settings', (tester) async {
+  testWidgets('有哪些拉伸动作 opens the library on 拉伸; 设置 opens settings', (
+    tester,
+  ) async {
     tall(tester);
     final s = services();
     await s.store.acceptSafety(blocked: false);
     await tester.pumpWidget(SmartFitApp(services: s));
     await tester.pumpAndSettle();
     await say(tester, '有哪些拉伸动作');
-    expect(tester.widget<LibraryPage>(find.byType(LibraryPage)).initial, ExerciseCategory.stretch);
+    expect(
+      tester.widget<LibraryPage>(find.byType(LibraryPage)).initial,
+      ExerciseCategory.stretch,
+    );
     await tester.tap(find.byTooltip('返回').first);
     await tester.pumpAndSettle();
     await say(tester, '设置');
     expect(find.byType(AboutPage), findsOneWidget);
   });
 
-  testWidgets('drawer: empty state 去排一套 closes it and focuses the input', (tester) async {
+  testWidgets('drawer: empty state 去排一套 closes it and focuses the input', (
+    tester,
+  ) async {
     tall(tester);
     final s = services();
     await s.store.acceptSafety(blocked: false);
     await tester.pumpWidget(SmartFitApp(services: s));
     await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const ValueKey('open-plans')));
+    await tester.tap(find.byKey(const ValueKey('chat-panel-toggle')));
     await tester.pumpAndSettle();
     expect(find.text('设置'), findsOneWidget);
     expect(find.text('自定义计划'), findsNothing);
+    await tester.tap(find.byKey(const ValueKey('panel-plans')));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('去排一套'));
     await tester.pumpAndSettle();
     expect(find.byType(Drawer), findsNothing);
-    final field = tester.widget<TextField>(find.byKey(const ValueKey('chat-input')));
+    final field = tester.widget<TextField>(
+      find.byKey(const ValueKey('chat-input')),
+    );
     expect(field.focusNode!.hasFocus, isTrue);
   });
 
-  testWidgets('safety talk: each question carries its step as a caption', (tester) async {
+  testWidgets('safety talk: each question carries its step as a caption', (
+    tester,
+  ) async {
     tall(tester);
     final s = services();
     await tester.pumpWidget(SmartFitApp(services: s));
     await tester.pumpAndSettle();
-    await tester.tap(find.byWidgetPredicate((w) => w is OptionPill && w.label == '我已了解' && w.enabled));
+    await tester.tap(
+      find.byWidgetPredicate(
+        (w) => w is OptionPill && w.label == '我已了解' && w.enabled,
+      ),
+    );
     await tester.pumpAndSettle();
     expect(find.text('安全确认 1/4'), findsOneWidget);
     expect(find.textContaining('1/4\u3000'), findsNothing);

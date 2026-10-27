@@ -12,23 +12,23 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   ugk_trainer:
-    version: 0.5.1
+    version: 0.6.0
     git:
-      url: https://github.com/mhgd3250905/ugk-3d-pose-sdk.git
+      url: file:///E:/AII-3D/3D-Pose-SDK-worktrees/smartfit-feedback-r2
       path: packages/ugk_trainer
-      # Temporary voice fast-switch validation; replace with the SDK tag before merging main.
-      ref: 5ad8440e799dfcd524a52daf85090087d2e16818
+      # Local r2 candidate; replace with the approved SDK tag before merging main.
+      ref: e4590a771ad80e207b90852f5efa068a93eb9c9b
   ugk_coach:
-    version: 0.7.0
+    version: 0.8.0
     git:
-      url: https://github.com/mhgd3250905/ugk-3d-pose-sdk.git
-      ref: ugk_coach-v0.7.0
+      url: file:///E:/AII-3D/3D-Pose-SDK-worktrees/smartfit-feedback-r2
+      ref: e4590a771ad80e207b90852f5efa068a93eb9c9b
   ugk_coach_ui:
-    version: 0.3.1
+    version: 0.4.0
     git:
-      url: https://github.com/mhgd3250905/ugk-3d-pose-sdk.git
+      url: file:///E:/AII-3D/3D-Pose-SDK-worktrees/smartfit-feedback-r2
       path: packages/ugk_coach_ui
-      ref: ugk_coach_ui-v0.3.1
+      ref: e4590a771ad80e207b90852f5efa068a93eb9c9b
   shared_preferences: 2.5.6
   webview_flutter: 4.14.1
   webview_flutter_android: 4.14.1

@@ -22,17 +22,18 @@ import '../theme/measure_size.dart';
 import '../theme/solid_surface.dart';
 import '../theme/sf_icons.dart';
 import '../theme/tokens.dart';
+import '../theme/widgets.dart';
 import '../training_route.dart';
 import 'action_card.dart';
 import 'chat_widgets.dart';
 import 'coach_ui_adapter.dart';
 import 'cosmos.dart';
 import 'plan_card.dart';
-import 'saved_plans_drawer.dart';
+import 'saved_plans_page.dart';
 import 'validated_plan_card.dart';
 
 /// The home screen: one conversation floating in an endless sky. No app
-/// bar, no borders; the plans drawer opens from the input's left icon.
+/// bar, no borders; the input's left icon opens the feature panel.
 class ChatHomePage extends StatefulWidget {
   const ChatHomePage({super.key, this.controller, this.scrollController});
 
@@ -50,6 +51,7 @@ class ChatHomePage extends StatefulWidget {
 class _ChatHomePageState extends State<ChatHomePage>
     with WidgetsBindingObserver {
   late ChatController _chat;
+  late Stream<CoachTypingEvent> _typingEvents;
   StreamSubscription<String>? _actions;
   late final _scroll = widget.scrollController ?? ScrollController();
 
@@ -57,8 +59,11 @@ class _ChatHomePageState extends State<ChatHomePage>
   /// safe area); the conversation reserves it as bottom padding so the
   /// newest message can always scroll clear of the controls.
   double _dockHeight = 112;
-  final _scaffold = GlobalKey<ScaffoldState>();
   final _input = FocusNode();
+  bool _panelOpen = false;
+  bool _switchingToKeyboard = false;
+  Timer? _keyboardHeightTimer;
+  Timer? _keyboardTransitionTimer;
 
   /// Messages already on screen when the page opened don't animate in.
   final _seen = <String>{};
@@ -74,9 +79,64 @@ class _ChatHomePageState extends State<ChatHomePage>
     unawaited(SystemChannels.textInput.invokeMethod<void>('TextInput.hide'));
   }
 
-  void _openDrawer() {
+  void _togglePanel() {
+    if (_panelOpen) {
+      _closePanel();
+      return;
+    }
+    _keyboardTransitionTimer?.cancel();
+    setState(() {
+      _panelOpen = true;
+      _switchingToKeyboard = false;
+    });
     _dismissInput();
-    _scaffold.currentState?.openDrawer();
+  }
+
+  void _closePanel() {
+    _keyboardTransitionTimer?.cancel();
+    if (!_panelOpen && !_switchingToKeyboard) return;
+    setState(() {
+      _panelOpen = false;
+      _switchingToKeyboard = false;
+    });
+  }
+
+  void _inputTapped() {
+    if (!_panelOpen) return;
+    setState(() {
+      _panelOpen = false;
+      _switchingToKeyboard = true;
+    });
+    _keyboardTransitionTimer?.cancel();
+    _keyboardTransitionTimer = Timer(const Duration(milliseconds: 700), () {
+      if (mounted && _switchingToKeyboard) {
+        setState(() => _switchingToKeyboard = false);
+      }
+    });
+  }
+
+  @override
+  void didChangeMetrics() {
+    if (!mounted || _actions == null) return;
+    final view = View.of(context);
+    final height = view.viewInsets.bottom / view.devicePixelRatio;
+    if (_switchingToKeyboard &&
+        height >= AppServices.of(context).store.lastKeyboardHeight - 20) {
+      _keyboardTransitionTimer?.cancel();
+      setState(() => _switchingToKeyboard = false);
+    }
+    _keyboardHeightTimer?.cancel();
+    if (height >= 160 && height <= 650 && !_panelOpen) {
+      _keyboardHeightTimer = Timer(const Duration(milliseconds: 300), () {
+        if (!mounted || _panelOpen) return;
+        final current = view.viewInsets.bottom / view.devicePixelRatio;
+        if ((current - height).abs() < 1) {
+          unawaited(
+            AppServices.of(context).store.setLastKeyboardHeight(height),
+          );
+        }
+      });
+    }
   }
 
   @override
@@ -94,6 +154,9 @@ class _ChatHomePageState extends State<ChatHomePage>
     if (_actions != null) return;
     final s = AppServices.of(context);
     _chat = widget.controller ?? s.chat;
+    _typingEvents = _chat.progressEvents.map(
+      (event) => CoachTypingEvent(event.kind.name, path: event.path),
+    );
     _chat.start();
     _seen.addAll(_chat.messages.map((m) => m.id));
     _actions = _chat.actions.listen(_onAction);
@@ -103,6 +166,8 @@ class _ChatHomePageState extends State<ChatHomePage>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _actions?.cancel();
+    _keyboardHeightTimer?.cancel();
+    _keyboardTransitionTimer?.cancel();
     if (widget.scrollController == null) _scroll.dispose();
     _input.dispose();
     super.dispose();
@@ -120,11 +185,12 @@ class _ChatHomePageState extends State<ChatHomePage>
       case '@custom':
         _push(const CustomPlanPage());
       case '@drawer':
-        _openDrawer();
+        _openPlans();
     }
   }
 
   Future<void> _push(Widget page) async {
+    _closePanel();
     _dismissInput();
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
@@ -133,6 +199,7 @@ class _ChatHomePageState extends State<ChatHomePage>
             LibraryPage() => 'library',
             AboutPage() => 'settings',
             CustomPlanPage() => 'custom_plan',
+            SavedPlansPage() => 'saved_plans',
             _ => 'other',
           },
         ),
@@ -142,11 +209,30 @@ class _ChatHomePageState extends State<ChatHomePage>
     if (mounted) _dismissInput();
   }
 
-  /// Close the drawer first so the chat (or the player) is what you see.
-  void _fromDrawer(Future<void> Function() then) {
-    _dismissInput();
-    _scaffold.currentState?.closeDrawer();
-    unawaited(then());
+  void _openPlans() {
+    final s = AppServices.of(context);
+    unawaited(
+      _push(
+        SavedPlansPage(
+          store: s.store,
+          library: s.library,
+          onShow: (p) {
+            Navigator.of(context).pop();
+            unawaited(_chat.showSaved(p));
+          },
+          onStart: (p, _) {
+            Navigator.of(context).pop();
+            unawaited(_start(p.plan));
+          },
+          onCompose: () {
+            Navigator.of(context).pop();
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) _input.requestFocus();
+            });
+          },
+        ),
+      ),
+    );
   }
 
   /// Open the stable video stage directly; the summary follows back in chat.
@@ -234,103 +320,181 @@ class _ChatHomePageState extends State<ChatHomePage>
   @override
   Widget build(BuildContext context) {
     final s = AppServices.of(context);
+    final media = MediaQuery.of(context);
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: sfOverlay,
-      child: Scaffold(
-        key: _scaffold,
-        backgroundColor: SfColors.skyBottom,
-        resizeToAvoidBottomInset: true,
-        drawerScrimColor: SfColors.isDark
-            ? const Color(0x99000000)
-            : const Color(0x4D121614),
-        drawer: SavedPlansDrawer(
-          store: s.store,
-          library: s.library,
-          onShow: (p) => _fromDrawer(() => _chat.showSaved(p)),
-          onStart: (p, _) => _fromDrawer(() => _start(p.plan)),
-          // Nothing saved yet: close the drawer and put the cursor in the chat.
-          onCompose: () => _fromDrawer(() async => _input.requestFocus()),
-          // Session and App actions stay in the drawer; the conversation has
-          // no persistent header. The form opens from 「自己选条件」.
-          footer: [
-            DrawerEntry(
-              key: const ValueKey('chat-new-conversation'),
-              icon: SfGlyph.sparkle,
-              label: '新对话',
-              onTap: () => _fromDrawer(_chat.newConversation),
-            ),
-            DrawerEntry(
-              key: const ValueKey('drawer-library'),
-              icon: SfGlyph.grid,
-              label: '动作库',
-              onTap: () => _fromDrawer(() => _push(const LibraryPage())),
-            ),
-            DrawerEntry(
-              key: const ValueKey('drawer-about'),
-              icon: SfGlyph.sliders,
-              label: '设置',
-              onTap: () => _fromDrawer(() => _push(const AboutPage())),
-            ),
-          ],
-        ),
-        body: ListenableBuilder(
-          listenable: PerformanceLab.buildEnabled
-              ? Listenable.merge([s.store, PerformanceLab.instance])
-              : s.store,
-          builder: (context, _) => CosmosBackground(
-            showStars: PerformanceLab.buildEnabled
-                ? PerformanceLab.instance.starsVisible
-                : true,
-            animate: PerformanceLab.buildEnabled
-                ? PerformanceLab.instance.starfieldFor(s.store.starfield)
-                : s.store.starfield,
-            child: ListenableBuilder(
-              listenable: _chat,
-              builder: (context, _) => Stack(
-                fit: StackFit.expand,
-                children: [
-                  Positioned.fill(child: _messages()),
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    child: SfMeasureSize(
-                      onSize: (s) {
-                        if (mounted && (s.height - _dockHeight).abs() > .5) {
-                          setState(() => _dockHeight = s.height);
-                        }
-                      },
-                      child: RepaintBoundary(
-                        key: const ValueKey('chat-composer-dock-boundary'),
-                        child: DecoratedBox(
-                          key: const ValueKey('chat-composer-dock'),
-                          decoration: BoxDecoration(
-                            gradient: SfComposerTokens.dockGradient,
-                          ),
-                          child: SafeArea(
-                            top: false,
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                SuggestionStrip(
-                                  items: _chat.typing
-                                      ? const []
-                                      : _chat.suggestions,
-                                  onTap: _send,
-                                ),
-                                ChatInputBar(
-                                  focusNode: _input,
-                                  onSend: _send,
-                                  enabled: !_chat.typing,
-                                  onPlans: _openDrawer,
-                                ),
-                              ],
+      child: PopScope(
+        canPop: !_panelOpen,
+        onPopInvokedWithResult: (didPop, _) {
+          if (!didPop && _panelOpen) _closePanel();
+        },
+        child: Scaffold(
+          backgroundColor: SfColors.skyBottom,
+          resizeToAvoidBottomInset: true,
+          body: ListenableBuilder(
+            listenable: PerformanceLab.buildEnabled
+                ? Listenable.merge([s.store, PerformanceLab.instance])
+                : s.store,
+            builder: (context, _) => CosmosBackground(
+              showStars: PerformanceLab.buildEnabled
+                  ? PerformanceLab.instance.starsVisible
+                  : true,
+              animate: PerformanceLab.buildEnabled
+                  ? PerformanceLab.instance.starfieldFor(s.store.starfield)
+                  : s.store.starfield,
+              child: ListenableBuilder(
+                listenable: _chat,
+                builder: (context, _) => Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Positioned.fill(
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.translucent,
+                        onTap: _panelOpen ? _closePanel : null,
+                        child: _messages(),
+                      ),
+                    ),
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      child: SfMeasureSize(
+                        onSize: (s) {
+                          if (mounted && (s.height - _dockHeight).abs() > .5) {
+                            setState(() => _dockHeight = s.height);
+                          }
+                        },
+                        child: RepaintBoundary(
+                          key: const ValueKey('chat-composer-dock-boundary'),
+                          child: DecoratedBox(
+                            key: const ValueKey('chat-composer-dock'),
+                            decoration: BoxDecoration(
+                              gradient: SfComposerTokens.dockGradient,
+                            ),
+                            child: SafeArea(
+                              top: false,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  SuggestionStrip(
+                                    items: _chat.typing
+                                        ? const []
+                                        : _chat.suggestions,
+                                    onTap: _send,
+                                  ),
+                                  ChatInputBar(
+                                    focusNode: _input,
+                                    onSend: _send,
+                                    enabled: !_chat.typing,
+                                    onPlans: _togglePanel,
+                                    panelOpen: _panelOpen,
+                                    onTextTap: _inputTapped,
+                                  ),
+                                  if (_panelOpen || _switchingToKeyboard)
+                                    _featurePanel(s, media),
+                                ],
+                              ),
                             ),
                           ),
                         ),
                       ),
                     ),
-                  ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _featurePanel(AppServices services, MediaQueryData media) {
+    // The system inset and this panel share one footprint while the keyboard
+    // is moving, preventing the input from jumping by a full keyboard height.
+    final target =
+        (services.store.lastKeyboardHeight - media.viewPadding.bottom).clamp(
+          0.0,
+          media.size.height * .65,
+        );
+    final visible = (target - media.viewInsets.bottom).clamp(0.0, target);
+    final entries =
+        <({String key, String label, SfGlyph icon, VoidCallback tap})>[
+          (
+            key: 'panel-plans',
+            label: '我的计划',
+            icon: SfGlyph.bookmark,
+            tap: _openPlans,
+          ),
+          (
+            key: 'chat-new-conversation',
+            label: '新对话',
+            icon: SfGlyph.sparkle,
+            tap: () {
+              _closePanel();
+              unawaited(_chat.newConversation());
+            },
+          ),
+          (
+            key: 'panel-library',
+            label: '动作库',
+            icon: SfGlyph.grid,
+            tap: () => unawaited(_push(const LibraryPage())),
+          ),
+          (
+            key: 'panel-settings',
+            label: '设置',
+            icon: SfGlyph.sliders,
+            tap: () => unawaited(_push(const AboutPage())),
+          ),
+        ];
+    return SizedBox(
+      key: const ValueKey('chat-feature-panel'),
+      height: visible,
+      width: double.infinity,
+      child: ClipRect(
+        child: OverflowBox(
+          alignment: Alignment.topCenter,
+          minHeight: target,
+          maxHeight: target,
+          child: IgnorePointer(
+            ignoring: !_panelOpen,
+            child: ColoredBox(
+              color: SfColors.surface,
+              child: GridView.count(
+                padding: const EdgeInsets.fromLTRB(16, 20, 16, 12),
+                crossAxisCount: 4,
+                childAspectRatio: .8,
+                children: [
+                  for (final entry in entries)
+                    SfPressable(
+                      key: ValueKey(entry.key),
+                      semanticLabel: entry.label,
+                      onTap: entry.tap,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 56,
+                            height: 56,
+                            decoration: BoxDecoration(
+                              color: SfColors.surfaceHigh,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: SfColors.line),
+                            ),
+                            child: Center(
+                              child: SfIcon(
+                                entry.icon,
+                                size: 24,
+                                color: SfColors.text,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(entry.label, style: SfType.label),
+                        ],
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -371,10 +535,7 @@ class _ChatHomePageState extends State<ChatHomePage>
         fadeTop: false,
         timeMarkBuilder: (at, now) => TimeMark(at, now: now),
         typing: _chat.typing
-            ? TypingBubble(
-                onCancel: _chat.cancelRequest,
-                progressLabel: _chat.progressLabel,
-              )
+            ? TypingBubble(onCancel: _chat.cancelRequest, events: _typingEvents)
             : null,
       ),
     );
@@ -388,6 +549,12 @@ class _ChatHomePageState extends State<ChatHomePage>
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: [
+        if (m.isPlanningFailure)
+          CoachFailureBubble(
+            key: ValueKey('coach-planning-failure-${m.id}'),
+            enabled: !_chat.typing,
+            onRetry: () => _chat.send('重试'),
+          ),
         if (m.question case final question?)
           CoachQuestionBubble(
             key: ValueKey('coach-question-${m.id}'),
@@ -400,8 +567,10 @@ class _ChatHomePageState extends State<ChatHomePage>
                 : _chat.answerQuestion(m, answer),
             onChoiceAnswer: (choices) => _chat.answerChoices(m, choices),
             onFormAnswer: (answers) => _chat.answerForm(m, answers),
+            onSkip: () => _chat.skipQuestion(m),
           ),
-        if (hasText &&
+        if (!m.isPlanningFailure &&
+            hasText &&
             (m.question == null ||
                 (m.text.isNotEmpty && m.text != m.question!.question)))
           MessageBubble(

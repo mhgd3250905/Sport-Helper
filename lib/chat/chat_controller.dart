@@ -40,8 +40,23 @@ class ChatController extends ChangeNotifier {
   final List<ChatMessage> messages = [];
   List<String> suggestions = discoverySuggestions(returning: false);
   bool typing = false;
-  String? progressLabel;
   StreamSubscription<coach.AgentEvent>? _progressSubscription;
+  final _progressEvents = StreamController<coach.AgentEvent>.broadcast();
+  final _progressHistory = <coach.AgentEvent>[];
+
+  /// Accepted events for the active turn, including events emitted before the
+  /// typing widget has mounted. A cancelled or finished turn is never replayed.
+  late final Stream<coach.AgentEvent> progressEvents = Stream.multi((listener) {
+    final subscription = _progressEvents.stream.listen(
+      listener.add,
+      onError: listener.addError,
+      onDone: listener.close,
+    );
+    for (final event in _progressHistory) {
+      listener.add(event);
+    }
+    listener.onCancel = subscription.cancel;
+  }, isBroadcast: true);
   String? _progressTurnId;
   final Set<String> _finishedProgressTurns = {};
   bool _progressEnded = true;
@@ -69,6 +84,7 @@ class ChatController extends ChangeNotifier {
       messages[i] = m.copyWith(
         questionAnswered: snapshot?.questionAnswered ?? true,
         answeredChoices: snapshot?.answeredChoices ?? m.answeredChoices,
+        answeredForm: snapshot?.answeredForm ?? m.answeredForm,
       );
     }
   }
@@ -86,24 +102,12 @@ class ChatController extends ChangeNotifier {
       operation: _diagnosticOperation,
       fields: {'kind': event.kind.name, 'step': event.step},
     );
+    _progressHistory.add(event);
+    if (_progressHistory.length > 64) _progressHistory.removeAt(0);
+    _progressEvents.add(event);
     if (event.kind == coach.AgentEventKind.done) {
       _endProgress();
-    } else {
-      progressLabel = switch (event.kind) {
-        coach.AgentEventKind.reading ||
-        coach.AgentEventKind.listing => '正在查动作库',
-        coach.AgentEventKind.checking => '正在核对计划',
-        coach.AgentEventKind.memory => '正在整理训练偏好',
-        coach.AgentEventKind.retrying =>
-          event.reason == coach.RequestErrorClass.contextTooLong
-              ? '正在整理上下文，继续思考…'
-              : '网络不稳，正在重试（${event.attempt}/${event.maxAttempts}）…',
-        coach.AgentEventKind.slow => '还在想…',
-        coach.AgentEventKind.thinking => progressLabel ?? '正在思考回复',
-        coach.AgentEventKind.askUser || coach.AgentEventKind.done => null,
-      };
     }
-    notifyListeners();
   }
 
   void _endProgress() {
@@ -117,7 +121,7 @@ class ChatController extends ChangeNotifier {
     }
     _progressTurnId = null;
     _progressEnded = true;
-    progressLabel = null;
+    _progressHistory.clear();
   }
 
   /// Index into [safetyQuestions] while the safety talk runs (-1 = waiting
@@ -192,6 +196,8 @@ class ChatController extends ChangeNotifier {
           question: m.question,
           questionAnswered: m.questionAnswered,
           answeredChoices: m.answeredChoices,
+          answeredForm: m.answeredForm,
+          isPlanningFailure: m.isPlanningFailure,
           plan: m.validatedPlan,
           actions: m.actions,
         ),
@@ -734,6 +740,8 @@ class ChatController extends ChangeNotifier {
         options: m.options,
         question: m.question,
         conversationMessageId: m.conversationMessageId,
+        answeredForm: m.answeredForm,
+        isPlanningFailure: m.isPlanningFailure,
         plan: plan,
         validatedPlan: validatedPlan,
         actions: m.actions,
@@ -789,6 +797,7 @@ class ChatController extends ChangeNotifier {
     typing = false;
     _endProgress();
     unawaited(_progressSubscription?.cancel());
+    unawaited(_progressEvents.close());
     if (engine case final ManagedChatEngine managed) managed.cancelPending();
     _actions.close();
     super.dispose();

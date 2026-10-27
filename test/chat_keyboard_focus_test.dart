@@ -19,9 +19,9 @@ void main() {
     await tester.pump();
     expect(tester.widget<TextField>(input).focusNode!.hasFocus, isTrue);
     expect(tester.testTextInput.isVisible, isTrue);
-    await tester.tap(find.byKey(const ValueKey('open-plans')));
+    await tester.tap(find.byKey(const ValueKey('chat-panel-toggle')));
     await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const ValueKey('drawer-library')));
+    await tester.tap(find.byKey(const ValueKey('panel-library')));
     await tester.pumpAndSettle();
     expect(find.byType(LibraryPage), findsOneWidget);
     await tester.tap(find.byTooltip('返回').first);
@@ -55,7 +55,9 @@ void main() {
       await tester.pumpAndSettle();
       expect(tester.widget<TextField>(input).focusNode!.hasFocus, isFalse);
       expect(tester.testTextInput.isVisible, isFalse);
-      await tester.tap(find.byKey(const ValueKey('open-plans')));
+      await tester.tap(find.byKey(const ValueKey('chat-panel-toggle')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('panel-plans')));
       await tester.pumpAndSettle();
       await tester.tap(find.text('去排一套'));
       await tester.pumpAndSettle();

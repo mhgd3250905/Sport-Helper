@@ -10,108 +10,81 @@ import '../theme/tokens.dart';
 import '../theme/widgets.dart';
 import 'expand_route.dart';
 
-/// Drawer from the input's left icon: the saved plans (tap = show it in
-/// the chat, ▶ = start now, ⋯ = rename / delete), then app entries.
-class SavedPlansDrawer extends StatelessWidget {
-  const SavedPlansDrawer({
+/// Saved plans as a normal page; selecting a plan returns it to chat.
+class SavedPlansPage extends StatelessWidget {
+  const SavedPlansPage({
     super.key,
     required this.store,
     required this.library,
     required this.onShow,
     required this.onStart,
-    this.footer = const [],
     this.onCompose,
   });
-
-  /// The empty state's 「去排一套」: close the drawer, focus the chat input.
-  final VoidCallback? onCompose;
 
   final AppStore store;
   final ExerciseLibrary library;
   final void Function(SavedPlan) onShow;
-
-  /// ▶; [from] is the tile, which the player grows out of.
   final void Function(SavedPlan, OriginRect from) onStart;
-
-  /// Entries under the list (动作库, 关于与设置…).
-  final List<Widget> footer;
+  final VoidCallback? onCompose;
 
   @override
-  Widget build(BuildContext context) {
-    final width = (MediaQuery.sizeOf(context).width * .84).clamp(280.0, 360.0);
-    return Drawer(
-      width: width,
-      backgroundColor: SfColors.isDark ? SfColors.surface : SfColors.background,
+  Widget build(BuildContext context) => Scaffold(
+    backgroundColor: SfColors.background,
+    appBar: AppBar(
+      title: const Text('我的计划'),
+      backgroundColor: SfColors.background,
       surfaceTintColor: Colors.transparent,
-      elevation: 0,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.horizontal(right: Radius.circular(SfRadius.xl)),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: SafeArea(
-        child: ListenableBuilder(
-          listenable: store,
-          builder: (context, _) => Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Expanded(
-                // The heading and empty state also scroll when landscape or
-                // a keyboard leaves little room above the footer entries.
-                child: CustomScrollView(
-                  slivers: [
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(SfSpace.x6, SfSpace.x6, SfSpace.x6, SfSpace.x1),
-                        child: Text('我的计划', style: SfType.title.copyWith(fontSize: 24)),
-                      ),
-                    ),
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(SfSpace.x6, 0, SfSpace.x6, SfSpace.x4),
-                        child: Text(
-                          store.savedPlans.isEmpty
-                              ? '保存的计划会出现在这里'
-                              : '${store.savedPlans.length} 套 · 点一下在对话里调出',
-                          style: SfType.label,
-                        ),
-                      ),
-                    ),
-                    if (store.savedPlans.isEmpty)
-                      SliverToBoxAdapter(child: _Empty(onCompose: onCompose))
-                    else
-                      SliverPadding(
-                        padding: const EdgeInsets.fromLTRB(SfSpace.x4, 0, SfSpace.x4, SfSpace.x4),
-                        sliver: SliverList.separated(
-                          itemCount: store.savedPlans.length,
-                          separatorBuilder: (_, _) => const SizedBox(height: SfSpace.x2),
-                          itemBuilder: (context, i) => _SavedTile(
-                            plan: store.savedPlans[i],
-                            library: library,
-                            onShow: onShow,
-                            onStart: onStart,
-                            onRename: (p) => _rename(context, p),
-                            onDelete: (p) => _delete(context, p),
-                          ),
-                        ),
-                      ),
-                  ],
+    ),
+    body: SafeArea(
+      child: ListenableBuilder(
+        listenable: store,
+        builder: (context, _) => CustomScrollView(
+          slivers: [
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  SfSpace.x6,
+                  SfSpace.x3,
+                  SfSpace.x6,
+                  SfSpace.x4,
+                ),
+                child: Text(
+                  store.savedPlans.isEmpty
+                      ? '保存的计划会出现在这里'
+                      : '${store.savedPlans.length} 套 · 点一下在对话里调出',
+                  style: SfType.label,
                 ),
               ),
-              if (footer.isNotEmpty) ...[
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: SfSpace.x6),
-                  child: Divider(color: SfColors.isDark ? SfColors.surfaceHigh : SfColors.line),
+            ),
+            if (store.savedPlans.isEmpty)
+              SliverToBoxAdapter(child: _Empty(onCompose: onCompose))
+            else
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(
+                  SfSpace.x4,
+                  0,
+                  SfSpace.x4,
+                  SfSpace.x4,
                 ),
-                const SizedBox(height: SfSpace.x2),
-                ...footer,
-                const SizedBox(height: SfSpace.x3),
-              ],
-            ],
-          ),
+                sliver: SliverList.separated(
+                  itemCount: store.savedPlans.length,
+                  separatorBuilder: (_, _) =>
+                      const SizedBox(height: SfSpace.x2),
+                  itemBuilder: (context, i) => _SavedTile(
+                    plan: store.savedPlans[i],
+                    library: library,
+                    onShow: onShow,
+                    onStart: onStart,
+                    onRename: (p) => _rename(context, p),
+                    onDelete: (p) => _delete(context, p),
+                  ),
+                ),
+              ),
+          ],
         ),
       ),
-    );
-  }
+    ),
+  );
 
   Future<void> _rename(BuildContext context, SavedPlan p) async {
     final text = TextEditingController(text: p.name);
@@ -141,7 +114,9 @@ class SavedPlansDrawer extends StatelessWidget {
       ),
     );
     text.dispose();
-    if (name != null && name.trim().isNotEmpty) await store.renamePlan(p.id, name);
+    if (name != null && name.trim().isNotEmpty) {
+      await store.renamePlan(p.id, name);
+    }
   }
 
   Future<void> _delete(BuildContext context, SavedPlan p) async {
@@ -200,7 +175,10 @@ class _SavedTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = plan.plan;
-    final first = p.items.map((i) => library.tryGet(i.exerciseId)).whereType<Exercise>().firstOrNull;
+    final first = p.items
+        .map((i) => library.tryGet(i.exerciseId))
+        .whereType<Exercise>()
+        .firstOrNull;
     final secs = SessionBuilder(library).planSeconds(p);
     final used = plan.lastUsedAt == null ? '' : '${_ago(plan.lastUsedAt!)}练过';
     return SfPressable(
@@ -216,7 +194,12 @@ class _SavedTile extends StatelessWidget {
           boxShadow: SfColors.cardShadow,
         ),
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(SfSpace.x2, SfSpace.x2, 0, SfSpace.x2),
+          padding: const EdgeInsets.fromLTRB(
+            SfSpace.x2,
+            SfSpace.x2,
+            0,
+            SfSpace.x2,
+          ),
           child: Row(
             children: [
               ClipRRect(
@@ -227,8 +210,11 @@ class _SavedTile extends StatelessWidget {
                     color: sfStageFor(first).mediaStage,
                     child: first == null
                         ? null
-                        : Image.asset(sfPoster(first), fit: BoxFit.cover,
-                            errorBuilder: (_, _, _) => const SizedBox.shrink()),
+                        : Image.asset(
+                            sfPoster(first),
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                          ),
                   ),
                 ),
               ),
@@ -241,7 +227,9 @@ class _SavedTile extends StatelessWidget {
                       plan.name,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: SfType.callout.copyWith(fontWeight: FontWeight.w600),
+                      style: SfType.callout.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                     const SizedBox(height: 2),
                     Text(
@@ -265,7 +253,7 @@ class _SavedTile extends StatelessWidget {
                 iconColor: SfColors.accentText,
                 haptic: SfHaptic.medium,
                 onPressed: () {
-                  // Where the tile is now; once the drawer is gone the
+                  // Where the tile is now; once this page is gone the
                   // player folds back into the middle of the chat.
                   final at = rectOf(context);
                   var first = true;
@@ -282,10 +270,14 @@ class _SavedTile extends StatelessWidget {
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(minWidth: 120),
                 icon: SfIcon(SfGlyph.more, color: SfColors.muted, size: 20),
-                onSelected: (v) => v == 'rename' ? onRename(plan) : onDelete(plan),
+                onSelected: (v) =>
+                    v == 'rename' ? onRename(plan) : onDelete(plan),
                 itemBuilder: (_) => [
                   const PopupMenuItem(value: 'rename', child: Text('重命名')),
-                  PopupMenuItem(value: 'delete', child: Text('删除', style: TextStyle(color: SfColors.danger))),
+                  PopupMenuItem(
+                    value: 'delete',
+                    child: Text('删除', style: TextStyle(color: SfColors.danger)),
+                  ),
                 ],
               ),
             ],
@@ -301,39 +293,4 @@ class _SavedTile extends StatelessWidget {
     if (d.inHours >= 1) return '${d.inHours} 小时前';
     return '刚刚';
   }
-}
-
-/// A quiet row at the bottom of the drawer (动作库, 关于与设置…).
-class DrawerEntry extends StatelessWidget {
-  const DrawerEntry({super.key, required this.icon, required this.label, this.hint, required this.onTap});
-  final SfGlyph icon;
-  final String label;
-  final String? hint;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) => SfPressable(
-    semanticLabel: label,
-    onTap: onTap,
-    scale: .985,
-    child: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: SfSpace.x6, vertical: 12),
-      child: Row(
-        children: [
-          SfIcon(icon, size: 20, color: SfColors.muted),
-          const SizedBox(width: SfSpace.x4),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(label, style: SfType.callout.copyWith(fontWeight: FontWeight.w400)),
-                if (hint != null)
-                  Text(hint!, maxLines: 1, overflow: TextOverflow.ellipsis, style: SfType.caption),
-              ],
-            ),
-          ),
-        ],
-      ),
-    ),
-  );
 }

@@ -5,7 +5,6 @@ import 'package:ugk_coach_ui/ugk_coach_ui.dart';
 import '../../chat/chat_models.dart' show ChatMessage;
 import '../../domain/exercise.dart';
 import '../../domain/plan.dart';
-import '../../domain/session.dart';
 import '../../app/posehub_asset_bundle.dart';
 import '../alpha_artwork.dart';
 import '../theme.dart' show levelZh;
@@ -42,6 +41,10 @@ CoachQuestionData toCoachQuestionData(ChatMessage message) {
     multiple: question.multiple,
     answered: message.questionAnswered,
     answeredChoices: message.answeredChoices,
+    answeredForm: message.answeredForm,
+    isConfirmation: question.isConfirmation,
+    focus: question.focus,
+    defaultSelections: question.defaultSelections,
     fields: [
       for (final field in question.fields)
         CoachQuestionField(
@@ -49,6 +52,9 @@ CoachQuestionData toCoachQuestionData(ChatMessage message) {
           label: field.label,
           options: field.options,
           multiple: field.multiple,
+          initialSelections: field.preselected,
+          previousSelections: field.previousSelections,
+          optionsByScene: field.optionsByScene,
         ),
     ],
     skipLabel: question.skipLabel,
@@ -105,10 +111,19 @@ CoachUiStyle smartfitCoachUiStyle() {
       timeLabel: _timeLabel,
     ),
     builders: CoachUiBuilders(
-      media: (context, request) =>
-          SfAlphaCards.enabledOf(context) &&
-              (request.asset.startsWith('assets/app_test_pack/') ||
-                  PoseHubAssetBundle.handles(request.asset))
+      media: (context, request) => _isTrainerStandingAsset(request.asset)
+          ? Image.asset(
+              request.asset,
+              fit: request.fit,
+              alignment: request.alignment,
+              semanticLabel: request.semanticLabel,
+              excludeFromSemantics: request.semanticLabel == null,
+              gaplessPlayback: true,
+              errorBuilder: (_, _, _) => const SizedBox.shrink(),
+            )
+          : SfAlphaCards.enabledOf(context) &&
+                (request.asset.startsWith('assets/app_test_pack/') ||
+                    PoseHubAssetBundle.handles(request.asset))
           ? SfAlphaAsset(
               asset: request.asset,
               fit: request.cutout ? request.fit : BoxFit.contain,
@@ -215,6 +230,24 @@ String _timeLabel(DateTime at, DateTime now) {
   };
 }
 
+const _trainerStandingPrefix =
+    'packages/ugk_trainer/assets/pose_hub/app-test-pack-r1/standing/';
+
+bool _isTrainerStandingAsset(String asset) => RegExp(
+  r'^packages/ugk_trainer/assets/pose_hub/app-test-pack-r1/standing/[A-Za-z0-9_-]+\.webp$',
+).hasMatch(asset);
+
+String? _trainerStandingFor(Exercise exercise) {
+  if (!RegExp(r'^[A-Za-z0-9_-]+$').hasMatch(exercise.id)) return null;
+  // This is the catalog-bound image key created by AppTestContent, not an
+  // arbitrary user-supplied asset path. Other exercise sources keep their own
+  // existing still images.
+  final cover =
+      '${PoseHubAssetBundle.prefix}${Uri.encodeComponent(exercise.id)}/cover';
+  if (exercise.media.alphaCover != cover) return null;
+  return '$_trainerStandingPrefix${exercise.id}.webp';
+}
+
 CoachExercise toCoachExercise(
   Exercise e, {
   bool alphaCards = SfAlphaCards.enabled,
@@ -224,8 +257,7 @@ CoachExercise toCoachExercise(
   return CoachExercise(
     id: e.id,
     name: e.name,
-    // The SDK's hero uses cutout; its strip, rows and flying destinations
-    // share poster. Their two alpha stills depict the same selected pose.
+    // The SDK chooses its own thumbnail/cutout treatment for each card state.
     poster: alpha ? e.media.alphaThumbnail ?? e.media.alphaCover! : sfPoster(e),
     stage: alpha
         ? CoachMediaPalette(
@@ -237,12 +269,12 @@ CoachExercise toCoachExercise(
     categoryLabel: e.category.zh,
     cues: e.cues,
     cutout: alpha
-        ? e.media.alphaCover
+        ? _trainerStandingFor(e) ?? e.media.alphaCover
         : SfCutouts.has(e)
         ? SfCutouts.asset(e)
         : null,
     stillCutout: alpha
-        ? e.media.alphaCover
+        ? _trainerStandingFor(e) ?? e.media.alphaCover
         : SfCutouts.has(e)
         ? SfCutouts.asset(e, still: true)
         : null,
@@ -250,17 +282,11 @@ CoachExercise toCoachExercise(
 }
 
 CoachRoutine toCoachRoutine(TrainingPlan p, ExerciseLibrary library) {
-  final moves = [
-    for (final id in p.exerciseIds) library.tryGet(id),
-  ].whereType<Exercise>();
-  const furniture = {'none', 'mat', 'chair', 'wall', 'block'};
-  final gear = {
-    for (final e in moves)
-      ...e.effectiveEquipmentIds.where((id) => !furniture.contains(id)),
-  };
+  // The admitted plan carries equipment for the exercises it actually uses.
+  // Do not hide furniture that the user must prepare for those exercises.
+  final gear = p.equipment.where((id) => id != 'none' && id.isNotEmpty).toSet();
   final gearText = gear.isEmpty ? '徒手' : gear.map(equipmentLabel).join('、');
-  final minutes = (SessionBuilder(library).planSeconds(p) / 60).round();
-  final duration = minutes < 1 ? '不到 1 分钟' : '$minutes 分钟';
+  final duration = '${p.targetMinutes} 分钟';
   final items = [
     for (final b in p.blocks)
       for (final i in b.items)

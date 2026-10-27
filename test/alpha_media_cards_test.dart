@@ -92,6 +92,9 @@ Iterable<String> _images(WidgetTester tester) => tester
     .whereType<AssetImage>()
     .map((asset) => asset.assetName);
 
+String _standing(String id) =>
+    'packages/ugk_trainer/assets/pose_hub/app-test-pack-r1/standing/$id.webp';
+
 Future<List<int>> _fixtureImage() async {
   final recorder = ui.PictureRecorder();
   ui.Canvas(recorder).drawRect(
@@ -211,8 +214,8 @@ void main() {
 
     final enabled = toCoachExercise(e, alphaCards: true);
     expect(enabled.poster, e.media.alphaThumbnail);
-    expect(enabled.cutout, e.media.alphaCover);
-    expect(enabled.stillCutout, e.media.alphaCover);
+    expect(enabled.cutout, _standing(e.id));
+    expect(enabled.stillCutout, _standing(e.id));
     expect(enabled.stage.mediaStage, Colors.transparent);
     final old = plain['h-catcow-quad'];
     final retained = toCoachExercise(old, alphaCards: true);
@@ -220,6 +223,35 @@ void main() {
     expect(retained.cutout, isNull);
     expect(retained.stage.mediaStage, SfPalette.light.mediaStage);
   });
+
+  test(
+    'routine metadata displays admitted equipment and confirmed duration',
+    () {
+      final data = _plan().toJson()
+        ..['equipment'] = ['chair', 'wall', 'mat']
+        ..['targetMinutes'] = 10;
+      final routine = toCoachRoutine(TrainingPlan.fromJson(data), library);
+      expect(routine.gearLabel, '椅子、墙、瑜伽垫');
+      expect(routine.durationLabel, '10 分钟');
+      expect(routine.metaLabel, contains('10 分钟'));
+      expect(routine.metaLabel, contains('椅子、墙、瑜伽垫'));
+
+      final bodyweight = toCoachRoutine(_plan(), library);
+      expect(bodyweight.gearLabel, '徒手');
+    },
+  );
+
+  test(
+    'SDK-bound plan stills resolve bundled transparent first frames',
+    () async {
+      for (final exercise in library.all) {
+        final key = toCoachExercise(exercise, alphaCards: true).stillCutout;
+        expect(key, _standing(exercise.id), reason: exercise.id);
+        final bytes = await rootBundle.load(key!);
+        expect(bytes.lengthInBytes, greaterThan(0), reason: exercise.id);
+      }
+    },
+  );
 
   for (final palette in [SfPalette.light, SfPalette.dark]) {
     testWidgets(
@@ -294,11 +326,8 @@ void main() {
         expect(alphaExpand.top - body.top, oldExpand.top - oldBody.top);
         expect(alphaExpand.right, oldExpand.right);
         expect(alphaExpand.height, oldExpand.height);
-        expect(_images(tester), contains(library['h-squat'].media.alphaCover));
-        expect(
-          _images(tester),
-          contains(library['w-bird-dog'].media.alphaThumbnail),
-        );
+        expect(_images(tester), contains(_standing('h-squat')));
+        expect(_images(tester), contains(_standing('w-bird-dog')));
         final face = tester.getRect(
           find.byKey(const ValueKey('alpha-card-face')),
         );

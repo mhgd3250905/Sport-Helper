@@ -740,7 +740,7 @@ void main() {
         '动作慢一点，保持自然呼吸。',
       ], latency: Duration.zero);
       final ai = engine(client);
-      final reply = await ai.reply('训练时怎么呼吸更舒服？', const ChatState());
+      final reply = await ai.reply('请讲解训练时的呼吸要领', const ChatState());
       expect(texts(reply), '动作慢一点，保持自然呼吸。');
       expect(reply.aiTurn, isTrue);
       expect(replyPlan(reply), isNull);
@@ -852,7 +852,8 @@ void main() {
         isTrue,
       );
       expect(reply.messages, hasLength(1));
-      expect(texts(reply), '按条件排好了，可以开始。');
+      expect(texts(reply), contains('10分钟'));
+      expect(texts(reply), contains('徒手'));
       expect(texts(reply), isNot(contains(hidden)));
       expect(replyPlan(reply)!.exerciseIds, {'h-side-leg-raise'});
       expect(events.map((e) => e.kind), [
@@ -928,30 +929,29 @@ void main() {
     },
   );
 
-  test('repeated tool steps stall with a labelled local fallback', () async {
-    final client = coach.FakeLlmClient([
-      for (var i = 0; i < 4; i++)
-        tool('read', {'path': 'action-library/SKILL.md'}, text: 'STEP-PRIVATE'),
-    ], latency: Duration.zero);
-    final ai = engine(client);
-    final reply = await ai.reply('在家 10 分钟练全身，徒手', const ChatState());
-    expect(ai.agent.maxSteps, 100);
-    expect(client.requests, hasLength(4));
-    expect(ai.lastResult!.steps, 4);
-    expect(ai.lastResult!.error, isA<coach.AgentStalled>());
-    expect(ai.lastOutcome, coach.TurnOutcome.fallback);
-    expect(ai.lastResult!.records, hasLength(4));
-    expect(texts(reply), startsWith('预设方案 · AI 暂时没能继续完成，先用本地模板继续。'));
-    expect(texts(reply), isNot(contains('重试后')));
-    expect(texts(reply), isNot(contains('STEP-PRIVATE')));
-    expect(replyPlan(reply), isNotNull);
-    expect(
-      replyPlan(reply)!.items
-          .expand((item) => library[item.exerciseId].effectiveEquipmentIds)
-          .where((id) => id != 'none'),
-      isEmpty,
-    );
-  });
+  test(
+    'repeated tool steps fail without silently selecting a preset',
+    () async {
+      final client = coach.FakeLlmClient([
+        for (var i = 0; i < 4; i++)
+          tool('read', {
+            'path': 'action-library/SKILL.md',
+          }, text: 'STEP-PRIVATE'),
+      ], latency: Duration.zero);
+      final ai = engine(client);
+      final reply = await ai.reply('在家 10 分钟练全身，徒手', const ChatState());
+      expect(ai.agent.maxSteps, 100);
+      expect(client.requests, hasLength(4));
+      expect(ai.lastResult!.steps, 4);
+      expect(ai.lastResult!.error, isA<coach.AgentStalled>());
+      expect(ai.lastOutcome, coach.TurnOutcome.error);
+      expect(ai.lastResult!.records, hasLength(4));
+      expect(reply.messages.single.isPlanningFailure, isTrue);
+      expect(texts(reply), isNot(contains('预设方案')));
+      expect(texts(reply), isNot(contains('STEP-PRIVATE')));
+      expect(replyPlan(reply), isNull);
+    },
+  );
 
   test(
     'App deadline leaves the SDK total timeout and retry defaults intact',
@@ -993,7 +993,7 @@ void main() {
       ]);
       expect(ai.lastOutcome, coach.TurnOutcome.model);
       expect(ai.lastResult!.steps, 3);
-      final planned = await ai.reply('在家 10 分钟练全身', remembered.state);
+      final planned = await ai.reply('在家 10 分钟徒手练全身', remembered.state);
       expect(replyPlan(planned), isNotNull);
       final system = client.requests.last.messages.first.content;
       expect(system, contains('用户是新手'));
@@ -1025,7 +1025,7 @@ void main() {
         '好的，按本次条件来。',
       ], latency: Duration.zero);
       final ai = engine(client, memoryStore: memory, enableUserMemory: false);
-      final reply = await ai.reply('给我一点训练建议', const ChatState());
+      final reply = await ai.reply('请讲解训练时的呼吸要领', const ChatState());
       expect(texts(reply), '好的，按本次条件来。');
       for (final request in client.requests) {
         expect(requestText(request), isNot(contains(privateFact)));
@@ -1060,14 +1060,14 @@ void main() {
         '已经清除了。',
       ], latency: Duration.zero);
       final ai = engine(client, memoryStore: memory);
-      await ai.reply('先聊训练', const ChatState());
+      await ai.reply('先讲解训练时的呼吸要领', const ChatState());
       expect(
         client.requests.first.messages.first.content,
         contains(privateFact),
       );
       await ai.clearMemory();
       expect(memory.entries, isEmpty);
-      await ai.reply('再聊训练', const ChatState());
+      await ai.reply('再讲解训练时的呼吸要领', const ChatState());
       expect(
         client.requests.last.messages.first.content,
         isNot(contains(privateFact)),
@@ -1094,7 +1094,7 @@ void main() {
         '欢迎继续训练。',
       ], latency: Duration.zero);
       final ai = engine(client, memoryStore: memory);
-      await ai.reply('聊一聊训练', const ChatState());
+      await ai.reply('讲解训练时的呼吸要领', const ChatState());
       expect(ai.enableUserMemory, isTrue);
       expect(
         client.requests.first.messages.first.content,
@@ -1120,7 +1120,7 @@ void main() {
 
       ai.enableUserMemory = true;
       ai.reset();
-      await ai.reply('聊一聊训练', const ChatState());
+      await ai.reply('讲解训练时的呼吸要领', const ChatState());
       expect(
         client.requests.last.messages.first.content,
         contains(privateFact),
@@ -1191,7 +1191,7 @@ void main() {
         '新对话正常回复。',
       ], latency: Duration.zero);
       final ai = engine(client, memoryStore: memory);
-      final pending = ai.reply('记下$fact', const ChatState());
+      final pending = ai.reply('记下$fact，顺便讲解一下', const ChatState());
       await started.future;
       expect(memory.entries.map((e) => e.text), [fact]);
       ai.reset();
@@ -1202,7 +1202,7 @@ void main() {
       expect(memory.entries.map((e) => e.text), [fact]);
       late.complete('旧对话迟到回复');
       await Future<void>.delayed(Duration.zero);
-      final next = await ai.reply('聊一聊训练', const ChatState());
+      final next = await ai.reply('讲解训练时的呼吸要领', const ChatState());
       expect(texts(next), '新对话正常回复。');
       expect(client.requests.last.messages.first.content, contains(fact));
       expect(requestText(client.requests.last), isNot(contains('旧对话迟到回复')));
@@ -1226,7 +1226,7 @@ void main() {
         },
       ], latency: Duration.zero);
       final ai = engine(client, memoryStore: memory);
-      final reply = await ai.reply('请记下$fact', const ChatState());
+      final reply = await ai.reply('请记下$fact，顺便讲解一下', const ChatState());
       expect(ai.lastResult!.status, coach.TurnStatus.ok);
       expect(client.requests, hasLength(2));
       expect(memory.saves, 1);
@@ -1351,7 +1351,7 @@ void main() {
   );
 
   test(
-    'offline and request timeout exhaust SDK step retries before one local fallback',
+    'offline and request timeout exhaust SDK retries and produce a planning failure',
     () async {
       for (final pair in [
         (coach.LlmErrorKind.network, coach.FallbackReason.offline),
@@ -1366,7 +1366,7 @@ void main() {
             ),
         ], latency: Duration.zero);
         final ai = engine(client);
-        final reply = await ai.reply('在家练全身', const ChatState());
+        final reply = await ai.reply('在家徒手 10 分钟练全身', const ChatState());
         expect(client.requests, hasLength(5));
         expect(ai.lastResult!.steps, 1);
         expect(ai.lastResult!.error, isA<coach.AgentRequestFailed>());
@@ -1375,12 +1375,10 @@ void main() {
         expect(failure.attempts, 5);
         expect(ai.lastResult!.records.map((r) => r.retry), [0, 1, 2, 3, 4]);
         expect(ai.lastFallbackReason, pair.$2);
-        expect(texts(reply), startsWith('预设方案 · AI 重试后仍未成功，先用本地模板继续。'));
+        expect(reply.messages.single.isPlanningFailure, isTrue);
+        expect(replyPlan(reply), isNull);
+        expect(texts(reply), isNot(contains('预设方案')));
         expect(texts(reply), isNot(contains('test-unavailable')));
-        expectLocalPreserved(
-          reply,
-          await local().reply('在家练全身', const ChatState()),
-        );
       }
     },
   );
@@ -1428,7 +1426,7 @@ void main() {
   );
 
   test(
-    'nonretryable HTTP failure falls back once with a distinct user message',
+    'nonretryable HTTP failure emits a planning failure without private text',
     () async {
       final gateway = await _Gateway.start(
         [],
@@ -1437,22 +1435,19 @@ void main() {
       );
       addTearDown(gateway.close);
       final ai = engine(gateway.client());
-      final reply = await ai.reply('在家练全身', const ChatState());
+      final reply = await ai.reply('在家徒手 10 分钟练全身', const ChatState());
       expect(gateway.bodies, hasLength(1));
       final failure = ai.lastResult!.error! as coach.AgentRequestFailed;
       expect(failure.kind, coach.AgentFailureKind.nonRetryable);
       expect(failure.errorClass, coach.RequestErrorClass.badRequest);
       expect(failure.attempts, 1);
       expect(ai.lastResult!.records.map((r) => r.retry), [0]);
-      expect(texts(reply), startsWith('预设方案 · AI 暂时无法处理这条请求，先用本地模板继续。'));
-      expect(texts(reply), isNot(contains('重试后')));
+      expect(reply.messages.single.isPlanningFailure, isTrue);
+      expect(replyPlan(reply), isNull);
+      expect(texts(reply), isNot(contains('预设方案')));
       expect(
         texts(reply),
         isNot(contains('provider-private-validation-error')),
-      );
-      expectLocalPreserved(
-        reply,
-        await local().reply('在家练全身', const ChatState()),
       );
     },
   );
@@ -1473,7 +1468,7 @@ void main() {
         }
       });
       addTearDown(subscription.cancel);
-      final pending = ai.reply('解释一下训练节奏', const ChatState());
+      final pending = ai.reply('请讲解训练节奏', const ChatState());
       await retryStarted.future;
       ai.cancelPending();
       final cancelled = await pending.timeout(const Duration(seconds: 1));
@@ -1714,7 +1709,7 @@ void main() {
   });
 
   test(
-    'App total guard aborts actual HTTP and renders the typed turn-timeout fallback',
+    'App total guard aborts actual HTTP and renders a planning failure',
     () async {
       final gateway = await _Gateway.start([], hold: true);
       addTearDown(gateway.close);
@@ -1728,10 +1723,10 @@ void main() {
       final failure = ai.lastResult!.error! as coach.AgentRequestFailed;
       expect(failure.kind, coach.AgentFailureKind.turnTimeout);
       expect(failure.errorClass, coach.RequestErrorClass.timeout);
-      expect(texts(reply), startsWith('预设方案 · AI 思考超时，先用本地模板继续。'));
-      expect(texts(reply), isNot(contains('重试后')));
-      expect(replyPlan(reply), isNotNull);
-      // This App fallback has no controller result; it must not borrow a
+      expect(reply.messages.single.isPlanningFailure, isTrue);
+      expect(texts(reply), isNot(contains('预设方案')));
+      expect(replyPlan(reply), isNull);
+      // This App guard has no controller result; it must not borrow a
       // previous question/user message identity from SDK presentation history.
       expect(
         reply.messages.map((m) => m.conversationMessageId),
@@ -2278,18 +2273,19 @@ void main() {
         );
         addTearDown(gateway.close);
         final ai = engine(gateway.client());
-        final reply = await ai.reply('在家练全身', const ChatState());
-        expect(texts(reply), startsWith('预设方案'));
+        final reply = await ai.reply('在家徒手 10 分钟练全身', const ChatState());
+        expect(reply.messages.single.isPlanningFailure, isTrue);
+        expect(texts(reply), isNot(contains('预设方案')));
         final requestError = fields(events('ai.request.error').single);
         expect(requestError['httpStatus'], HttpStatus.forbidden);
         expect(requestError['kind'], 'auth');
         expect(requestError['errorType'], 'LlmException');
         expect(requestError['elapsedMs'], isNonNegative);
         final end = fields(events('ai.turn.end').single);
-        expect(end['route'], 'fallback');
-        expect(end['status'], 'fallback');
+        expect(end['route'], 'sdk');
+        expect(end['status'], 'error');
         expect(end['reason'], ai.lastFallbackReason!.name);
-        expect(events('ai.fallback.begin'), hasLength(1));
+        expect(events('ai.fallback.begin'), isEmpty);
         expect(log.exportJson(), isNot(contains('private-app-key-secret')));
         expect(log.exportJson(), isNot(contains('provider-body')));
         expect(log.exportJson(), isNot(contains('127.0.0.1')));
@@ -2374,7 +2370,8 @@ void main() {
         final client = _LateClient();
         final ai = engine(client, deadline: const Duration(milliseconds: 10));
         final reply = await ai.reply('在家 10 分钟练全身，徒手', const ChatState());
-        expect(texts(reply), startsWith('预设方案'));
+        expect(reply.messages.single.isPlanningFailure, isTrue);
+        expect(texts(reply), isNot(contains('预设方案')));
         expect(events('ai.turn.timeout'), hasLength(1));
         expect(events('ai.request.cancel'), hasLength(1));
         expect(fields(events('ai.turn.end').single)['reason'], 'timeout');

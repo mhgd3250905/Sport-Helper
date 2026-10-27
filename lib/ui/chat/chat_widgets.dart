@@ -110,6 +110,8 @@ class ChatInputBar extends StatefulWidget {
     this.onPlans,
     this.enabled = true,
     this.focusNode,
+    this.panelOpen = false,
+    this.onTextTap,
   });
 
   /// Lets the page put the cursor here (the drawer's 「去排一套」).
@@ -117,6 +119,8 @@ class ChatInputBar extends StatefulWidget {
   final void Function(String) onSend;
   final VoidCallback? onPlans;
   final bool enabled;
+  final bool panelOpen;
+  final VoidCallback? onTextTap;
 
   @override
   State<ChatInputBar> createState() => _ChatInputBarState();
@@ -177,13 +181,15 @@ class _ChatInputBarState extends State<ChatInputBar> {
                       width: SfComposerTokens.actionWidth,
                       height: SfComposerTokens.inputHeight,
                       child: SfPressable(
-                        key: const ValueKey('open-plans'),
-                        tooltip: '我的计划',
-                        semanticLabel: '我的计划',
+                        key: const ValueKey('chat-panel-toggle'),
+                        tooltip: widget.panelOpen ? '收起面板' : '打开功能面板',
+                        semanticLabel: widget.panelOpen ? '收起面板' : '打开功能面板',
                         onTap: widget.onPlans,
                         child: Center(
-                          child: SfIcon(
-                            SfGlyph.bookmark,
+                          child: Icon(
+                            widget.panelOpen
+                                ? Icons.keyboard_outlined
+                                : Icons.add_rounded,
                             size: SfComposerTokens.bookmarkSize,
                             color: SfComposerTokens.bookmark,
                           ),
@@ -199,6 +205,7 @@ class _ChatInputBarState extends State<ChatInputBar> {
                       key: const ValueKey('chat-input'),
                       controller: _text,
                       focusNode: _focus,
+                      onTap: widget.onTextTap,
                       minLines: 1,
                       maxLines: 4,
                       textInputAction: TextInputAction.send,
