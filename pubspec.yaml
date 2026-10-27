@@ -16,7 +16,8 @@ dependencies:
     git:
       url: https://github.com/mhgd3250905/ugk-3d-pose-sdk.git
       path: packages/ugk_trainer
-      ref: ugk_trainer-v0.5.1
+      # Temporary voice fast-switch validation; replace with the SDK tag before merging main.
+      ref: 5ad8440e799dfcd524a52daf85090087d2e16818
   ugk_coach:
     version: 0.7.0
     git:

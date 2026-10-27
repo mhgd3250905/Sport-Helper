@@ -19,3 +19,7 @@ SDK 的长期记忆中 scene 和 equipment 会作为模型的参考资料进入�
 ## 验证边界
 
 自动化覆盖真实 App controller、SDK 追问门禁、UI 表单选择及跳过；固定响应测试不等同于真实服务或真机测试。实际服务结果、APK 构建和设备验收以交付回报为准。
+
+## 临时语音快切验收依赖
+
++37 验收包的 `ugk_trainer` 临时固定到 SDK main 提交 `5ad8440e799dfcd524a52daf85090087d2e16818`，供真机验证语音快切。`ugk_coach` 保持 `ugk_coach-v0.7.0`，`ugk_coach_ui` 保持 `ugk_coach_ui-v0.3.1`。该提交固定不是正式发布 tag：SDK 出新 tag 后，合入 main 前必须切回该 tag 并重新锁定和验证。
