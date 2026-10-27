@@ -227,6 +227,7 @@ void main() {
       (tester) async {
         var starts = 0;
         var saves = 0;
+        var opens = 0;
         Widget card() => Scaffold(
           body: SingleChildScrollView(
             child: Padding(
@@ -237,7 +238,7 @@ void main() {
                 saved: false,
                 onStart: (_) => starts++,
                 onSave: () => saves++,
-                onOpen: () {},
+                onOpen: () => opens++,
               ),
             ),
           ),
@@ -257,19 +258,27 @@ void main() {
         final oldStart = tester.getRect(start);
         final oldExpand = tester.getRect(expand);
         final oldCard = tester.getRect(find.byType(PlanCard));
+        final oldBody = tester.getRect(find.byType(CoachCardSurface));
         expect(oldCard.height, CoachPlanCard.setHeight);
         // The SDK cover is shared by both treatments; alpha mode changes the
         // painted face and cutout layout, not the identity of its image source.
         expect(find.byKey(const ValueKey('alpha-card-face')), findsNothing);
 
         await pump(tester, card(), palette: palette);
-        // SDK 0.3.0 deliberately gives the multi-action cutout hero more room.
-        // The App adopts that public folded-height contract; the 14dp painted
-        // face offset must still leave the button's size and bottom anchor alone.
+        // SDK 0.3.1 reserves 58dp above its 300dp upright-cutout card body.
+        // Keep that published outer-layout contract separate from the App's
+        // 14dp painted-face offset, which must not alter the body or controls.
+        const uprightOverhang = 58.0;
         expect(find.byType(CoachPlanCard), findsOneWidget);
         final cardRect = tester.getRect(find.byType(PlanCard));
+        final body = tester.getRect(find.byType(CoachCardSurface));
         expect(cardRect.width, oldCard.width);
-        expect(cardRect.height, CoachPlanCard.cutoutSetHeight);
+        expect(
+          cardRect.height,
+          CoachPlanCard.cutoutSetHeight + uprightOverhang,
+        );
+        expect(body.height, CoachPlanCard.cutoutSetHeight);
+        expect(body.top - cardRect.top, uprightOverhang);
         final alphaStart = tester.getRect(start);
         expect(alphaStart.size, oldStart.size);
         expect(alphaStart.right, oldStart.right);
@@ -279,10 +288,10 @@ void main() {
         );
         expect(alphaStart.width, greaterThanOrEqualTo(48));
         expect(alphaStart.height, greaterThanOrEqualTo(48));
-        // The SDK's established cutout style chooses a different dark face;
-        // its top/right anchor and touch height stay fixed.
+        // Controls retain their anchors within the body, which now sits below
+        // the SDK-owned overhang reservation.
         final alphaExpand = tester.getRect(expand);
-        expect(alphaExpand.top, oldExpand.top);
+        expect(alphaExpand.top - body.top, oldExpand.top - oldBody.top);
         expect(alphaExpand.right, oldExpand.right);
         expect(alphaExpand.height, oldExpand.height);
         expect(_images(tester), contains(library['h-squat'].media.alphaCover));
@@ -294,9 +303,14 @@ void main() {
           find.byKey(const ValueKey('alpha-card-face')),
         );
         expect(SfAlphaCards.rise, 14);
-        expect(face.top - cardRect.top, SfAlphaCards.rise);
+        expect(face.top - body.top, SfAlphaCards.rise);
         expect(tester.takeException(), isNull);
 
+        await tester.tap(
+          find.byKey(const ValueKey('plan-cutout-overhang-hit')),
+        );
+        expect(opens, 1);
+        expect(starts, 0);
         await tester.tap(start);
         expect(starts, 1);
         await tester.tap(expand);
@@ -305,6 +319,16 @@ void main() {
         expect(find.byKey(const ValueKey('fly-hero')), findsOneWidget);
         expect(tester.takeException(), isNull);
         await tester.pumpAndSettle();
+        final expandedFace = tester.getRect(
+          find.byKey(const ValueKey('alpha-card-face')),
+        );
+        final title = tester.getRect(
+          find.byKey(const ValueKey('plan-header-title')),
+        );
+        // The SDK's default surfaceTopInset already accounts for this host's
+        // visible 14dp face; no duplicate App inset is needed.
+        expect(title.top - expandedFace.top, 23);
+        expect(title.left - expandedFace.left, 23);
         await tester.tap(find.byKey(const ValueKey('plan-save-alpha-static')));
         expect(saves, 1);
         expect(tester.takeException(), isNull);

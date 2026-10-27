@@ -114,7 +114,7 @@ void main() {
         expect(icon.height, 56);
         expect(
           find.text(
-            '版本 0.1.0 (35)${TrainingMediaConfig.isInternal ? ' · 内测' : ''}',
+            '版本 0.1.0 (36)${TrainingMediaConfig.isInternal ? ' · 内测' : ''}',
           ),
           findsOneWidget,
         );
