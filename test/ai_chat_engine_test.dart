@@ -705,13 +705,22 @@ void main() {
         final ai = engine(client);
         final first = await ai.reply(
           '帮我讲解训练动作',
-          const ChatState(
-            coachContext: Slots(
+          ChatState(
+            coachContext: const Slots(
               scene: 'home',
               minutes: 10,
               level: 1,
               avoid: {'wrist'},
             ),
+            recentMessages: [
+              ChatMessage(
+                id: 'explicit-home-time',
+                role: ChatRole.user,
+                at: DateTime(2026, 10, 27),
+                text: '在家 10 分钟',
+                aiVisible: true,
+              ),
+            ],
           ),
         );
         expect(first.messages.single.question, isNotNull);
@@ -1794,7 +1803,20 @@ void main() {
             ),
         ], latency: Duration.zero),
       );
-      final rejected = await limited.reply('10 分钟全身', confirmed.state);
+      final rejected = await limited.reply(
+        '10 分钟全身',
+        confirmed.state.copyWith(
+          recentMessages: [
+            ChatMessage(
+              id: 'explicit-office-no-gear',
+              role: ChatRole.user,
+              at: DateTime(2026, 10, 27),
+              text: '办公室，徒手，保护膝',
+              aiVisible: true,
+            ),
+          ],
+        ),
+      );
       expect(limited.lastResult!.status, coach.TurnStatus.fallback);
       expect(limited.lastResult!.plan, isNull);
       expect(replyPlan(rejected), isNull);

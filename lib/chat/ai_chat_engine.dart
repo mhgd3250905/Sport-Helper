@@ -303,7 +303,20 @@ class AiChatEngine
       );
       return local.reply(input, state);
     }
-    final turn = _Turn(input, state, _slotsFor(input, state), operation);
+    final edit =
+        questionId == null && conversation.state.pendingQuestion == null
+        ? _editFor(input, state)
+        : null;
+    final turn = _Turn(
+      input,
+      state,
+      _slotsFor(input, state, edit: edit),
+      operation,
+      usesCurrentPlan: edit != null,
+      restoredParameters: edit == null
+          ? _restoredParameters(input, state)
+          : null,
+    );
     _pending = turn;
     RuntimeLog.instance.record(
       'chat.route',
@@ -721,26 +734,97 @@ class AiChatEngine
     );
   }
 
-  Slots _slotsFor(String input, ChatState state) {
-    final request = state.request;
-    var slots =
-        state.coachContext ??
-        state.pending ??
-        (request == null ? const Slots() : Slots.fromRequest(request));
-    if (state.coachContext == null) {
-      final lastPlan = state.recentMessages.lastIndexWhere(
-        (m) => m.plan != null,
-      );
-      for (final message
-          in state.recentMessages
-              .skip(lastPlan + 1)
-              .where((m) => m.isUser && m.aiVisible)) {
-        slots = slots.merge(local.parser.parse(message.text));
+  PlanEdit? _editFor(String input, ChatState state) {
+    final plan = state.plan;
+    if (plan == null) return null;
+    // A fresh request for an easy workout is not "make this card easier".
+    if (RegExp(r'安排|生成|制定|一组训练|新的训练').hasMatch(input) &&
+        !RegExp(r'这套|当前|刚才|原来|上面').hasMatch(input)) {
+      return null;
+    }
+    return local.parser.parseEdit(input, [
+      for (final item in plan.items) ?local.lib.tryGet(item.exerciseId)?.name,
+    ]);
+  }
+
+  Slots _saidSlots(String text, {String? asked}) {
+    final said = local.parser.parse(text, asked: asked);
+    final minutes = RegExp(r'(\d+)\s*(分钟|min|分)').firstMatch(text);
+    return minutes == null
+        ? said
+        : said.copyWith(minutes: int.parse(minutes[1]!).clamp(3, 60));
+  }
+
+  Slots _restoredParameters(String input, ChatState state) {
+    // A live SDK session understands corrections, negation, and form answers
+    // better than the App's local fallback parser. Let it infer those fields
+    // from its own history and the current message.
+    if (agent.history.any((message) => message.role == coach.LlmRole.user)) {
+      return const Slots();
+    }
+    // Restored display history is not restored into the SDK agent. Recover only
+    // unambiguous user statements; otherwise asking again is safer than turning
+    // an outdated or negated condition into a fact.
+    final texts = <String>{
+      for (final message in state.recentMessages)
+        if (message.isUser && message.aiVisible && message.text != input)
+          message.text,
+      for (final message in conversation.state.messages)
+        if (message.isUser && message.text != input) message.text,
+    };
+    String? scene;
+    int? minutes;
+    for (final text in texts) {
+      final said = _saidSlots(text);
+      if (said.scene != null) {
+        scene = RegExp(r'不|没|无|别|除|以外|之外').hasMatch(text) ? null : said.scene;
+      }
+      if (said.minutes != null) {
+        minutes = RegExp(r'不|没|无|别|除|以外|之外').hasMatch(text)
+            ? null
+            : said.minutes;
       }
     }
-    slots = slots.merge(
-      local.parser.parse(input, asked: state.asked.lastOrNull),
+    // The local parser does not cover the SDK's full equipment vocabulary.
+    // Only recover a standalone barehand answer, never a partial gear list.
+    final barehand =
+        texts.length == 1 && RegExp(r'^\s*(徒手|空手)\s*$').hasMatch(texts.single);
+    return Slots(
+      scene: scene,
+      minutes: minutes,
+      equipment: barehand ? const {} : null,
     );
+  }
+
+  Slots _slotsFor(String input, ChatState state, {PlanEdit? edit}) {
+    // Aggregated state may contain defaults from a generated/restored card.
+    // Only the live conversation's original user text establishes facts.
+    // The SDK conversation also retains normalized explicit form answers.
+    final rawMessages = conversation.state.messages;
+    final userTexts = [
+      for (final message in state.recentMessages)
+        if (message.isUser && message.aiVisible) message.text,
+      for (final message in rawMessages)
+        if (message.isUser) message.text,
+    ];
+    var slots = Slots(
+      avoid: {
+        ...?state.coachContext?.avoid,
+        ...?state.pending?.avoid,
+        ...?state.request?.avoid,
+        ...?state.plan?.avoid,
+      },
+    );
+    for (final text in userTexts) {
+      slots = slots.merge(_saidSlots(text));
+    }
+    if (edit != null) {
+      // Explicit edits may reuse the selected card, including its defaults.
+      slots = slots.merge(
+        Slots.fromRequest(state.request ?? requestForPlan(state.plan!)),
+      );
+    }
+    slots = slots.merge(_saidSlots(input, asked: state.asked.lastOrNull));
     var minutes = slots.minutes;
     var level = slots.level;
     final explicitMinutes = RegExp(r'(\d+)\s*(分钟|min|分)').firstMatch(input);
@@ -748,9 +832,6 @@ class AiChatEngine
       minutes = int.parse(explicitMinutes[1]!).clamp(3, 60);
     }
     if (state.plan case final plan?) {
-      final edit = local.parser.parseEdit(input, [
-        for (final item in plan.items) ?local.lib.tryGet(item.exerciseId)?.name,
-      ]);
       switch (edit?.kind) {
         case EditKind.shorter:
           minutes = (plan.targetMinutes * .7).round().clamp(3, 60);
@@ -778,11 +859,20 @@ class AiChatEngine
 }
 
 class _Turn {
-  _Turn(this.input, this.state, this.slots, this.operation);
+  _Turn(
+    this.input,
+    this.state,
+    this.slots,
+    this.operation, {
+    this.usesCurrentPlan = false,
+    this.restoredParameters,
+  });
   final String input;
   final ChatState state;
   final Slots slots;
   final String operation;
+  final bool usesCurrentPlan;
+  final Slots? restoredParameters;
   final watch = Stopwatch()..start();
   int step = 0;
   int attempts = 0;
@@ -790,15 +880,18 @@ class _Turn {
   bool timedOut = false;
   ChatReply? fallbackReply;
   coach.CoachContext get context => coach.CoachContext(
-    scene: slots.scene,
-    equipment: slots.equipment?.map((e) => e.name).toSet(),
+    scene: usesCurrentPlan ? slots.scene : restoredParameters?.scene,
+    equipment:
+        (usesCurrentPlan ? slots.equipment : restoredParameters?.equipment)
+            ?.map((e) => e.name)
+            .toSet(),
     avoid: slots.avoid,
     level: slots.level,
-    minutes: slots.minutes,
+    minutes: usesCurrentPlan ? slots.minutes : restoredParameters?.minutes,
     goal: slots.goal,
     notes: [
-      if (state.plan case final plan?)
-        '用户当前明确采用的训练计划，调整请以此为基础：${jsonEncode(plan.toJson())}',
+      if (usesCurrentPlan && state.plan != null)
+        '用户当前明确采用的训练计划，调整请以此为基础：${jsonEncode(state.plan!.toJson())}',
     ],
   );
 }
