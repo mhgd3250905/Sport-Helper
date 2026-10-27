@@ -63,6 +63,7 @@ class ChatMessage {
     this.isPlanningFailure = false,
     this.plan,
     this.validatedPlan,
+    this.planState,
     this.actions,
     this.request,
     this.greeting = false,
@@ -91,6 +92,9 @@ class ChatMessage {
   /// A plan card (assistant only) and the request it was made for.
   final TrainingPlan? plan;
   final coach.ValidatedPlan? validatedPlan;
+
+  /// SDK task conditions captured for this exact admitted card.
+  final coach.CoachPlanState? planState;
   final coach.ValidatedActions? actions;
   final ScenarioRequest? request;
 
@@ -126,6 +130,7 @@ class ChatMessage {
     isPlanningFailure: isPlanningFailure,
     plan: plan,
     validatedPlan: validatedPlan,
+    planState: planState,
     actions: actions,
     request: request,
     greeting: greeting,
@@ -146,6 +151,8 @@ class ChatMessage {
     if (answeredForm.isNotEmpty) 'answeredForm': answeredForm,
     if (isPlanningFailure) 'isPlanningFailure': true,
     'plan': ?plan?.toJson(),
+    if (validatedPlan != null && planState?.planId == validatedPlan!.plan.id)
+      'planState': planState!.toJson(),
     if (validatedPlan != null || plan?.source == 'ai') 'isAiPlan': true,
     if (actions != null)
       'actionIds': [for (final item in actions!.items) item.id],
@@ -169,6 +176,18 @@ class ChatMessage {
       validatedPlan = restoreWith?.restorePlan(plan, request);
       // Stored AI data is untrusted until the current SDK admits it again.
       if (validatedPlan == null) plan = null;
+    }
+    coach.CoachPlanState? planState;
+    if (validatedPlan != null && j['planState'] is Map) {
+      try {
+        final restored = coach.CoachPlanState.fromJson(
+          Map<String, dynamic>.from(j['planState'] as Map),
+        );
+        if (restored.planId == validatedPlan.plan.id) planState = restored;
+      } on Object {
+        // An unreadable snapshot must not discard a safely re-admitted card.
+        // The SDK will infer legacy conditions from the plan instead.
+      }
     }
     final actionIds = j['actionIds'];
     final actions = actionIds is List && actionIds.every((id) => id is String)
@@ -211,6 +230,7 @@ class ChatMessage {
       aiVisible: j['aiVisible'] == true,
       plan: plan,
       validatedPlan: validatedPlan,
+      planState: planState,
       actions: actions,
       request: request,
     );
@@ -590,6 +610,7 @@ class BotMessage {
     this.isPlanningFailure = false,
     this.plan,
     this.validatedPlan,
+    this.planState,
     this.actions,
     this.request,
     this.greeting = false,
@@ -603,6 +624,7 @@ class BotMessage {
   final bool isPlanningFailure;
   final TrainingPlan? plan;
   final coach.ValidatedPlan? validatedPlan;
+  final coach.CoachPlanState? planState;
   final coach.ValidatedActions? actions;
   final ScenarioRequest? request;
 }

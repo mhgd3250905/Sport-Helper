@@ -314,9 +314,7 @@ class AiChatEngine
       operation,
       usesCurrentPlan: edit != null,
       currentGoal: _saidSlots(input).goal,
-      previousParameters: state.plan == null
-          ? state.pending ?? state.coachContext
-          : Slots.fromRequest(state.request ?? requestForPlan(state.plan!)),
+      previousParameters: _previousParameters(state),
     );
     _pending = turn;
     RuntimeLog.instance.record(
@@ -519,6 +517,15 @@ class AiChatEngine
       final output = conversation.state.messages
           .where((m) => !m.isUser && m.turnId == accepted.turnId)
           .lastOrNull;
+      // The App assigns a unique ID to every admitted plan. Bind the SDK's
+      // matching task snapshot to the re-admitted card's new ID as well.
+      final sdkPlanState = output?.planState;
+      final planState =
+          validated != null &&
+              admitted != null &&
+              sdkPlanState?.planId == admitted.plan.id
+          ? session.planStateFor(validated)
+          : null;
       final text = output?.text ?? accepted.text;
       return ChatReply(
         aiTurn: true,
@@ -527,6 +534,7 @@ class AiChatEngine
             text,
             plan: plan,
             validatedPlan: validated,
+            planState: planState,
             actions: accepted.actions,
             question: accepted.question,
             conversationMessageId: output?.id,
@@ -740,6 +748,82 @@ class AiChatEngine
     return minutes == null
         ? said
         : said.copyWith(minutes: int.parse(minutes[1]!).clamp(3, 60));
+  }
+
+  Slots? _previousParameters(ChatState state) {
+    final plan = state.plan;
+    final card = plan == null
+        ? null
+        : state.recentMessages
+              .where((message) => message.plan?.id == plan.id)
+              .lastOrNull;
+    final snapshot = card?.planState?.planId == plan?.id
+        ? card?.planState
+        : null;
+    final storedEquipment = snapshot?.context.equipment;
+    final previous = snapshot != null
+        ? Slots(
+            scene: snapshot.context.scene,
+            minutes: snapshot.context.minutes,
+            equipment:
+                storedEquipment == null ||
+                    storedEquipment.any(
+                      (name) =>
+                          !Equipment.values.any((item) => item.name == name),
+                    )
+                ? null
+                : {
+                    for (final item in Equipment.values)
+                      if (storedEquipment.contains(item.name)) item,
+                  },
+          )
+        : plan == null
+        ? state.pending ?? state.coachContext
+        : Slots.fromRequest(state.request ?? requestForPlan(plan));
+    if (agent.history.any((message) => message.role == coach.LlmRole.user)) {
+      return previous;
+    }
+    // The SDK restores visible history but not its inference history. If the
+    // user corrected conditions after the last card, prefer those as optional
+    // suggestions rather than silently prefilling the older card's values.
+    final messages = state.recentMessages;
+    final lastCard = messages.lastIndexWhere((message) => message.plan != null);
+    var scene = previous?.scene;
+    var minutes = previous?.minutes;
+    var equipment = previous?.equipment;
+    for (final message in messages.skip(lastCard + 1)) {
+      if (!message.isUser || !message.aiVisible) continue;
+      final text = message.text;
+      final said = _saidSlots(text);
+      if (said.scene != null || text.contains('健身房')) {
+        scene = RegExp(r'不在|不去|不是|没在|以外|之外').hasMatch(text)
+            ? null
+            : text.contains('健身房')
+            ? 'gym'
+            : said.scene;
+      }
+      if (said.minutes != null) {
+        minutes = RegExp(r'不|没|无|别|除|以外|之外').hasMatch(text)
+            ? null
+            : said.minutes;
+      }
+      if (RegExp(r'徒手|空手|器械|椅|凳|墙|垫|弹力带|拉力带|阻力带|哑铃|杠铃').hasMatch(text)) {
+        // The local parser covers only part of the SDK equipment vocabulary.
+        // Avoid retaining a stale gear suggestion after an ambiguous update.
+        equipment =
+            RegExp(r'徒手|空手').hasMatch(text) &&
+                !RegExp(r'不|没|无|别|除|椅|凳|墙|垫|弹力带|拉力带|阻力带|哑铃|杠铃').hasMatch(text)
+            ? <Equipment>{}
+            : null;
+      }
+    }
+    if (previous == null &&
+        scene == null &&
+        minutes == null &&
+        equipment == null) {
+      return null;
+    }
+    return Slots(scene: scene, equipment: equipment, minutes: minutes);
   }
 
   Slots _slotsFor(String input, ChatState state, {PlanEdit? edit}) {

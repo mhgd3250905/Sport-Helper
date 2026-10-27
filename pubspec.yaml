@@ -1,7 +1,7 @@
 name: smartfit
 description: "智能健身助手 — 描述训练场景，按模板生成训练计划，预渲染动作跟练。"
 publish_to: 'none'
-version: 0.1.0+37
+version: 0.1.0+38
 
 environment:
   sdk: ^3.12.0
@@ -17,18 +17,18 @@ dependencies:
       url: file:///E:/AII-3D/3D-Pose-SDK-worktrees/smartfit-feedback-r2
       path: packages/ugk_trainer
       # Local r2 candidate; replace with the approved SDK tag before merging main.
-      ref: e4590a771ad80e207b90852f5efa068a93eb9c9b
+      ref: cc03d4a962e7167bf3b008832f85018daa410014
   ugk_coach:
     version: 0.8.0
     git:
       url: file:///E:/AII-3D/3D-Pose-SDK-worktrees/smartfit-feedback-r2
-      ref: e4590a771ad80e207b90852f5efa068a93eb9c9b
+      ref: cc03d4a962e7167bf3b008832f85018daa410014
   ugk_coach_ui:
     version: 0.4.0
     git:
       url: file:///E:/AII-3D/3D-Pose-SDK-worktrees/smartfit-feedback-r2
       path: packages/ugk_coach_ui
-      ref: e4590a771ad80e207b90852f5efa068a93eb9c9b
+      ref: cc03d4a962e7167bf3b008832f85018daa410014
   shared_preferences: 2.5.6
   webview_flutter: 4.14.1
   webview_flutter_android: 4.14.1

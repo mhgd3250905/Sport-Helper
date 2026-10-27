@@ -590,8 +590,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: e4590a771ad80e207b90852f5efa068a93eb9c9b
-      resolved-ref: e4590a771ad80e207b90852f5efa068a93eb9c9b
+      ref: cc03d4a962e7167bf3b008832f85018daa410014
+      resolved-ref: cc03d4a962e7167bf3b008832f85018daa410014
       url: "file:///E:/AII-3D/3D-Pose-SDK-worktrees/smartfit-feedback-r2"
     source: git
     version: "0.8.0"
@@ -599,8 +599,8 @@ packages:
     dependency: "direct main"
     description:
       path: "packages/ugk_coach_ui"
-      ref: e4590a771ad80e207b90852f5efa068a93eb9c9b
-      resolved-ref: e4590a771ad80e207b90852f5efa068a93eb9c9b
+      ref: cc03d4a962e7167bf3b008832f85018daa410014
+      resolved-ref: cc03d4a962e7167bf3b008832f85018daa410014
       url: "file:///E:/AII-3D/3D-Pose-SDK-worktrees/smartfit-feedback-r2"
     source: git
     version: "0.4.0"
@@ -608,8 +608,8 @@ packages:
     dependency: "direct main"
     description:
       path: "packages/ugk_trainer"
-      ref: e4590a771ad80e207b90852f5efa068a93eb9c9b
-      resolved-ref: e4590a771ad80e207b90852f5efa068a93eb9c9b
+      ref: cc03d4a962e7167bf3b008832f85018daa410014
+      resolved-ref: cc03d4a962e7167bf3b008832f85018daa410014
       url: "file:///E:/AII-3D/3D-Pose-SDK-worktrees/smartfit-feedback-r2"
     source: git
     version: "0.6.0"

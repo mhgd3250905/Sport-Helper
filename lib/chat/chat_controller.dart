@@ -199,6 +199,7 @@ class ChatController extends ChangeNotifier {
           answeredForm: m.answeredForm,
           isPlanningFailure: m.isPlanningFailure,
           plan: m.validatedPlan,
+          planState: m.planState,
           actions: m.actions,
         ),
     ]);
@@ -744,6 +745,7 @@ class ChatController extends ChangeNotifier {
         isPlanningFailure: m.isPlanningFailure,
         plan: plan,
         validatedPlan: validatedPlan,
+        planState: validatedPlan == null ? null : m.planState,
         actions: m.actions,
         request: m.request,
         greeting: m.greeting,
