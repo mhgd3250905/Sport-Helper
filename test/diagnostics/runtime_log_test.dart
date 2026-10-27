@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/services.dart';
 import 'package:smartfit/core/storage/local_state_storage.dart';
@@ -9,10 +10,15 @@ import 'package:smartfit/diagnostics/runtime_log.dart';
 class _Storage implements LocalStateStorage {
   String? value;
   bool fail = false;
+  int reads = 0;
   int writes = 0;
   Completer<void>? gate;
   @override
-  Future<String?> read(String key) async => value;
+  Future<String?> read(String key) async {
+    reads++;
+    return value;
+  }
+
   @override
   Future<void> write(String key, String value) async {
     writes++;
@@ -26,19 +32,36 @@ List<dynamic> _events(RuntimeLog log) =>
     (jsonDecode(log.exportJson()) as Map)['events'] as List;
 
 void main() {
-  test(
-    'production default is off and disabled log never accesses storage',
-    () async {
-      expect(RuntimeLog.buildEnabled, isFalse);
-      final storage = _Storage()..fail = true;
-      final log = RuntimeLog(enabled: false, storage: storage);
-      await log.initialize();
-      log.record('app.start');
-      await log.flush();
-      expect(storage.writes, 0);
-      expect(log.entryCount, 0);
-    },
-  );
+  test('build default follows flavor and explicit debug opt-in', () {
+    const internal = String.fromEnvironment('FLUTTER_APP_FLAVOR') == 'internal';
+    const debugOptIn = bool.fromEnvironment('SMARTFIT_RUNTIME_LOGS');
+    if (internal) {
+      expect(
+        RuntimeLog.buildEnabled,
+        isTrue,
+        reason: 'Internal diagnostics on.',
+      );
+    } else if (kDebugMode && debugOptIn) {
+      expect(RuntimeLog.buildEnabled, isTrue, reason: 'Explicit debug opt-in.');
+    } else {
+      expect(
+        RuntimeLog.buildEnabled,
+        isFalse,
+        reason: 'Production defaults off and release ignores debug opt-in.',
+      );
+    }
+  });
+
+  test('explicitly disabled log never reads or writes storage', () async {
+    final storage = _Storage()..fail = true;
+    final log = RuntimeLog(enabled: false, storage: storage);
+    await log.initialize();
+    log.record('app.start');
+    await log.flush();
+    expect(storage.reads, 0);
+    expect(storage.writes, 0);
+    expect(log.entryCount, 0);
+  });
 
   test(
     'persist, restart and export retain safe correlated metadata only',

@@ -1,4 +1,5 @@
-import 'package:ugk_trainer/ugk_trainer.dart' show TrainerRingPainter;
+import 'package:ugk_trainer/ugk_trainer.dart'
+    show TrainerRingPainter, UgkPlayPauseButton;
 // The motion list of docs/design-audit-2026-10-19.md §5 as assertions:
 // the countdown ring repaints on its own, the last seconds breathe (not
 // under reduced motion), plain pages push sideways (cross-fade under
@@ -97,29 +98,37 @@ void main() {
     final s = services();
     await tester.pumpWidget(AppScope(services: s, child: MaterialApp(theme: buildTheme(), home: const PlayerPage(plan: _hold))));
     await tester.pump();
-    // Trainer 0.2 uses the same live painter around its pause button,
-    // with separate countdown digits instead of TrainerCountdownRing.
+    // The shared play/pause control owns the live painter. Its public progress
+    // notifier advances without rebuilding the transport widget.
     final ring = find.byKey(const ValueKey('ring'));
+    final pause = find.byKey(const ValueKey('pause'));
+    final transport = tester.widget<UgkPlayPauseButton>(pause);
     TrainerRingPainter painter() =>
         tester.widget<CustomPaint>(ring).painter! as TrainerRingPainter;
     final progress = painter().progress;
+    expect(transport.isPlaying, isTrue);
+    expect(transport.progress, same(progress));
     final before = progress.value;
     await tester.pump(const Duration(milliseconds: 300));
     // Same notifier, advanced: the painter listens, the page need not.
+    expect(tester.widget<UgkPlayPauseButton>(pause), same(transport));
     expect(painter().progress, same(progress));
     expect(progress.value, greaterThan(before));
     // Pausing dims the ring.
-    await tester.tap(find.byKey(const ValueKey('pause')));
+    await tester.tap(pause);
     await tester.pump();
-    expect(
-      tester.widget<AnimatedOpacity>(find.ancestor(
-        of: ring,
-        matching: find.byType(AnimatedOpacity),
-      ).first).opacity,
-      .45,
-    );
+    expect(tester.widget<UgkPlayPauseButton>(pause).isPlaying, isFalse);
     final paused = progress.value;
     await tester.pump(const Duration(milliseconds: 300));
+    expect(
+      tester.widget<Opacity>(find.ancestor(
+        of: ring,
+        matching: find.byType(Opacity),
+      ).first).opacity,
+      .5,
+    );
+    expect(painter().glowOpacity, 0);
+    expect(painter().progress, same(progress));
     expect(progress.value, paused);
     await tester.pumpWidget(const SizedBox());
   });

@@ -223,7 +223,7 @@ void main() {
 
   for (final palette in [SfPalette.light, SfPalette.dark]) {
     testWidgets(
-      'alpha plan uses a lower face and unchanged controls in ${palette.brightness.name}',
+      'alpha plan keeps SDK height and anchored controls in ${palette.brightness.name}',
       (tester) async {
         var starts = 0;
         var saves = 0;
@@ -256,14 +256,29 @@ void main() {
         final expand = find.byKey(const ValueKey('plan-expand-alpha-static'));
         final oldStart = tester.getRect(start);
         final oldExpand = tester.getRect(expand);
-        final oldSize = tester.getSize(find.byType(PlanCard));
+        final oldCard = tester.getRect(find.byType(PlanCard));
+        expect(oldCard.height, CoachPlanCard.setHeight);
         // The SDK cover is shared by both treatments; alpha mode changes the
         // painted face and cutout layout, not the identity of its image source.
         expect(find.byKey(const ValueKey('alpha-card-face')), findsNothing);
 
         await pump(tester, card(), palette: palette);
-        expect(tester.getSize(find.byType(PlanCard)), oldSize);
-        expect(tester.getRect(start), oldStart);
+        // SDK 0.3.0 deliberately gives the multi-action cutout hero more room.
+        // The App adopts that public folded-height contract; the 14dp painted
+        // face offset must still leave the button's size and bottom anchor alone.
+        expect(find.byType(CoachPlanCard), findsOneWidget);
+        final cardRect = tester.getRect(find.byType(PlanCard));
+        expect(cardRect.width, oldCard.width);
+        expect(cardRect.height, CoachPlanCard.cutoutSetHeight);
+        final alphaStart = tester.getRect(start);
+        expect(alphaStart.size, oldStart.size);
+        expect(alphaStart.right, oldStart.right);
+        expect(
+          alphaStart.bottom - cardRect.bottom,
+          oldStart.bottom - oldCard.bottom,
+        );
+        expect(alphaStart.width, greaterThanOrEqualTo(48));
+        expect(alphaStart.height, greaterThanOrEqualTo(48));
         // The SDK's established cutout style chooses a different dark face;
         // its top/right anchor and touch height stay fixed.
         final alphaExpand = tester.getRect(expand);
@@ -278,7 +293,7 @@ void main() {
         final face = tester.getRect(
           find.byKey(const ValueKey('alpha-card-face')),
         );
-        final cardRect = tester.getRect(find.byType(PlanCard));
+        expect(SfAlphaCards.rise, 14);
         expect(face.top - cardRect.top, SfAlphaCards.rise);
         expect(tester.takeException(), isNull);
 
