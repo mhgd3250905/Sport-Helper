@@ -1,8 +1,37 @@
 # 智能健身助手（SmartFit）交接说明
 
-> 2026-10-26 最新状态：+32 扁平 main（06ea39d）保持不动；独立分支 +34 已接通 SDK v3 与按动作下载，内测出包及边界见[当前记录](posehub-on-demand-v3-2026-10-26.md)。下方为 +32 阶段及更早历史。
+> 2026-10-28 最新状态：当前分支 `codex/coach-v2`，+40 运行源码 `428c5f3db4a90907889a2fa3e0eb9633b38a48b0`。开发者日志与 SDK 场景澄清修复已接通，本机验证及内测 APK 已交付；开哥认可基础功能已调通。main / release/1.0 保持不动、未推送；本轮未装机。当前事实见[版本台账](version-management.md)、[本轮阶段说明](coach-v2-plus40-2026-10-28.md)、[验收记录](acceptance.md)与[开发者日志说明](developer-logging-2026-10-28.md)。
 
-## 当前扁平候选（2026-10-26，待真机验收）
+## 当前交接：+40（2026-10-28）
+
++39 基线为 `43f8ff17faa5098a0ff00107040f7ca56e38d5f2`；本阶段日志提交为 `5a1e25405f799bc8835a2d54fc9225dde6d45dfc`，+40 / SDK 接入提交为 `428c5f3db4a90907889a2fa3e0eb9633b38a48b0`。三包 `ugk_coach`、`ugk_coach_ui`、`ugk_trainer` 统一固定 SDK commit `1532f0825b93777139be0e92e715ebec144a73b9`，当前仍是候选 commit 依赖。
+
+本阶段开发者日志读取真实版本与构建号，工具记录沿用 SDK 事件名并带参数和结果摘要；`set_params` 完整保留 `name/value/source/quote`。每轮保存用户原话，点“新对话”前另存 `exportSession` 快照，最近 5 份轮转。以上只写开发者日志，API Key 和请求头不写入，具体见[开发者日志说明](developer-logging-2026-10-28.md)。
+
+| 验证 / 交付 | 本会话已确认事实 |
+| --- | --- |
+| 自动化 | 全量 571 项通过、0 跳过；静态分析 0 问题；严格锁文件检查通过 |
+| APK | `SmartFit-coach-v2-0.1.0+40-428c5f3-internal-arm64-v8a-release.apk`；143,468,166 B（136.82 MiB），internal arm64 release |
+| SHA-256 | `6b634f1292363ce798738667aa9a7dcd1a08e3854c2f6bfa8a032e2bf308d74c` |
+| 版本 / 包检查 | 实际 APK aapt：`0.1.0` / `2040`；签名同 +39，16KB 对齐、native ELF 与存储 JNI 检查通过 |
+| 真实模型 | 首轮显示“想在哪拉伸臀部？家里、办公室还是健身房？”，5,808 ms / 2 次调用；回答“在家”后推荐，4,885 ms / 3 次调用；合计 10,693 ms / 5 次调用，无错；scene 为 `home/user/在家` |
+
+上述执行结果沿用本会话先前记录，本次文档收尾未重跑、未重读原始日志、APK 或密钥。本机模型测试版本来自 `apk_aapt`，不是设备日志。本轮无可用 ADB 设备，未执行保留数据覆盖安装，未新增浅深 Raster P99、长时间训练或 iOS 验证。
+
+开哥最新反馈“很好我觉得基础版本功能可用了 算是调通了”，记为基础功能认可；不扩大为真机性能通过或合并、推送、上架授权。main 保持 `7344df22744feb2550f8d989bebd154c6d1ec9c5`，release/1.0 保持 `6c786c08450d5a988db32af025ef0a1f8f5ae331`；后续继续等开哥安排。
+
+## 当前角色与约束
+
+- 本机维护主线，负责 Android 开发、版本决策与交付；合并、推送和发布仍以用户本次明确授权为准。云端 Hark 只在明确指派时辅助，走 feature 分支与 PR，不直接推 main。
+- 参考仓库 `mhgd3250905/3D-Pose-Hub`、`mhgd3250905/HipLab` 只读，禁止写入、push 或开 PR / issue；本阶段不修改 SDK。
+- 保留 Blender Studio Snow（CC BY 4.0）素材署名。公开仓库不提交密钥、token、keystore、`local.properties`、APK / build 产物。
+- 当前明确指定的 `codex/coach-v2` 及 main / release/1.0 冻结约束，优先于下方旧交接中的 `feat/*`、每里程碑打 tag 等一般规则；这些旧规则不构成本次合并、推送或打 tag 授权。
+
+## +34 下载接入记录（2026-10-26，历史）
+
+2026-10-26 的阶段状态：+32 扁平 main（06ea39d）保持不动；独立分支 +34 已接通 SDK v3 与按动作下载，内测出包及边界见[当时记录](posehub-on-demand-v3-2026-10-26.md)。以下为 +32 阶段及更早历史，状态和数字只适用于各自时点；持续有效的角色、署名和敏感物约束以顶部说明为准。
+
+## 历史扁平候选（2026-10-26，当时待真机验收）
 
 - App 候选为 `0.1.0+32`，分支 `feat/solid-surfaces-20261026`；扁平视觉基线为 `353f146b42a434d999e83912fe3e1147422a787e`。
 - 正式依赖：`ugk_trainer-v0.3.1` 与 `ugk_coach_ui-v0.2.1`，均指向 `c6e261e75dc8647ccc2767bc253af664957c516b`；coach 保持 `ugk_coach-v0.5.0`。

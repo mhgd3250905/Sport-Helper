@@ -1,8 +1,32 @@
 # 版本管理与台账
 
-> 2026-10-27 最新状态：+34 已确认并进入 main（7344df2）；`codex/feedback-r1-part1` 的 +35 候选完成 SDK / 训练接入和 B / D 设置页，211 项定向测试、静态分析通过，出包及真机结果另记；开哥确认前 main 和 release/1.0 不动。见[当前记录](feedback-r1-part1-2026-10-27.md)。下方为历史。
+> 2026-10-28 当前版本：`codex/coach-v2` 的 `0.1.0+40` 已出内部 release APK；开哥确认“基础版本功能可用了”“算是调通了”。确认范围仅为基础功能可用，本次未通过 ADB 覆盖安装、未新增真机量化验收，未合入或推送 main，`release/1.0` 不动。详见[本轮交付记录](coach-v2-plus40-2026-10-28.md)与[当前验收记录](acceptance.md)。
 
-## 当前扁平候选（2026-10-26，待真机验收）
+## 当前 +40 内测交付（2026-10-28）
+
+| 项目 | 当前事实与边界 |
+| --- | --- |
+| App 版本 / 分支 | `0.1.0+40` / `codex/coach-v2`；前一交付 +39 功能源为 `43f8ff17faa5098a0ff00107040f7ca56e38d5f2` |
+| 功能源码 | `428c5f3db4a90907889a2fa3e0eb9633b38a48b0`；本轮日志改动提交 `5a1e25405f799bc8835a2d54fc9225dde6d45dfc`，随后升级场景澄清修复并递增为 +40；文档收束提交不替代已打包功能源码 |
+| SDK 固定依赖 | `ugk_coach 0.8.0`、`ugk_coach_ui 0.4.0`、`ugk_trainer 0.6.0` 三包均以完整 commit 固定 `1532f0825b93777139be0e92e715ebec144a73b9`，锁文件一致；这是 App 依赖记录，不据此声称 SDK 当前 HEAD 或正式 tag |
+| 本地主线 / 发布分支 | `main` 与本地跟踪的 `origin/main` 均为 `7344df22744feb2550f8d989bebd154c6d1ec9c5`；`release/1.0` 为 `6c786c08450d5a988db32af025ef0a1f8f5ae331`；本轮均未合并或推送 |
+| APK 文件 | `SmartFit-coach-v2-0.1.0+40-428c5f3-internal-arm64-v8a-release.apk` |
+| 包身份 | `com.ugk.smartfit.internal`，versionName `0.1.0`、实际 versionCode `2040`，internal / arm64-v8a / release；pubspec 构建后缀为 `40`，不与 ABI 偏移后的原生构建号混写 |
+| 字节数 / SHA-256 | 143,468,166B / 136.82MiB；`6b634f1292363ce798738667aa9a7dcd1a08e3854c2f6bfa8a032e2bf308d74c`；比 +39 增加 131,072B |
+| 包检查 | 签名与 +39 一致；16KB 对齐与存储 JNI 门禁通过，不代表生产发布签名或真机安装完成 |
+| 既有验证回执 | 本轮功能源码全量 571 项通过、0 跳过，静态分析 0 问题，严格锁文件校验通过；构建环境及详细回执见[本轮交付记录](coach-v2-plus40-2026-10-28.md)；本次文档收束不冒充重新测试或构建 |
+| 真实模型回执 | 先询问地点：5,808ms / 2 次调用；回答“在家”后推荐：4,885ms / 3 次调用；合计 10,693ms / 5 次调用，无报错；日志中的 `scene` 为 `value=home`、`source=user`、`quote=在家` |
+| 用户确认 / 待验 | 2026-10-28 开哥确认“基础版本功能可用了”“算是调通了”；仅记录基础功能确认。本轮未通过 ADB 保留数据覆盖安装，未新增真机截图、Raster P99 或完整训练量化结果；不能由本次确认推断这些项目通过，也不扩大为主线合并、推送或发布授权 |
+
+更新日期：2026-10-28（Asia/Shanghai）。当前交付以本节及[验收记录](acceptance.md)为准，交接入口见 [HANDOVER.md](HANDOVER.md)。
+
+以下至“后续版本维护规则”前均为历史记录；其中“当前”“本轮”“待验”等措辞只属于各节标注的时点，不替代上方 +40 状态。
+
+## 历史：反馈 r1 +35 候选（2026-10-27）
+
+当时 +34 已确认并进入 main（`7344df2`）；`codex/feedback-r1-part1` 的 +35 候选完成 SDK / 训练接入和 B / D 设置页，211 项定向测试、静态分析通过，出包及真机结果另记；当时开哥确认前 main 和 release/1.0 不动。见[阶段记录](feedback-r1-part1-2026-10-27.md)。
+
+## 历史：扁平 +32 候选（2026-10-26，当时待真机验收）
 
 - App 候选为 `0.1.0+32`，分支 `feat/solid-surfaces-20261026`；扁平视觉基线为 `353f146b42a434d999e83912fe3e1147422a787e`。
 - 正式依赖：`ugk_trainer-v0.3.1` 与 `ugk_coach_ui-v0.2.1`，均指向 `c6e261e75dc8647ccc2767bc253af664957c516b`；coach 保持 `ugk_coach-v0.5.0`。
@@ -23,7 +47,7 @@
 
 功能源码 `7f3458dabbf8db4d5c65297d72bccc77eeed8c86` 已合入并推送 main，App 版本仍为 `0.1.0+22`。固定 `ugk_coach-v0.4.1`、`ugk_trainer-v0.2.1`、`ugk_coach_ui-v0.1.0`；后两个 tag 已发布且均指向 SDK `f0ea0647586913b205fc6dbb75fc9f97cedc55ce`。trainer 只改依赖声明，运行代码不变。正式远端全新 Git 缓存解析及严格锁文件验证通过，后续提交仅对齐发布状态文档。未安装或上架新 App，`release/1.0` 保持原状。详见[本轮记录](coach-ui-integration-2026-10-24.md)。
 
-更新日期：2026-10-24（Asia/Shanghai）。本文件区分当前保存版本、本地主线与历史交付；验收证据以 [acceptance.md](acceptance.md) 为准，交接入口见 [HANDOVER.md](HANDOVER.md)。
+历史条目原更新日期：2026-10-24（Asia/Shanghai）。以下保留当时版本、主线与交付记录，不代表当前 +40 的验收结果。
 
 ## 流畅度基线候选（2026-10-23，+16 待手机采集）
 
@@ -271,12 +295,12 @@ PR #3 合并提交与已测源的树均为 `029a952876a816ffa72f28def688cd62ba34
 
 1. 本机维护主线、审核合并与打包；云端仅在明确指派时使用 `feat/*` + PR。3D-Pose-Hub、HipLab 保持只读。
 2. 新功能里程碑使用独立 commit + `mN-xxx` 标签；已有标签不移动。文档对齐不自动新增里程碑、公开发布或标记验收通过。
-3. 后续新交付包递增 Android versionCode；在 `pubspec.yaml` 维护默认 `versionName+versionCode`，若通过 `--build-name` / `--build-number` 覆盖，必须在包台账记实际值和命令。关于页独立版本常量需同步核对。
+3. 后续新交付包递增 Android versionCode；在 `pubspec.yaml` 维护默认 `versionName+构建后缀`，若通过 `--build-name` / `--build-number` 覆盖，必须在包台账记实际值和命令。split APK 的实际 versionCode 含 ABI 偏移，应以原生包身份为准。关于页、运行日志头及启动日志统一通过 `AppBuildInfo` / `PackageInfo` 读取实际 versionName 和 buildNumber，不维护独立版本常量；读取失败记 `unknown`。
 4. 每次交付记录源码 SHA、构建命令及环境、包名、版本、类型、ABI、大小、SHA-256、签名类型、交付方式和待验边界；记录的是实际产物，不以分支名、标签或文件名推断包身份。
 5. 覆盖安装前核对包名、签名和版本兼容性，保留用户数据。正式 keystore 仅在本机管理，切换证书须另行安排迁移，不能把现有 debug 证书记为正式签名。
 6. 动作包版本按 [小包规范 §6](drill-pack-spec.md#6-版本规则) 更新；生成内容通过 `tools/` 重建并校验，不手改生成的文件清单与索引。
 7. 新验证结果先写验收记录，再更新本台账的状态和交接入口。APK、build 产物、密钥、keystore、`local.properties` 不入 Git；Snow CC BY 4.0 署名保留。
-8. 用户明确要求保存版本时可创建本地注释标签。本次 `smartfit-v0.1.0+15-internal-verified` 记录内测交付与用户确认，不代替生产发布、专项验收或主线合并；推送另按当次授权执行。
+8. 用户明确要求保存版本时可创建本地注释标签。既有 `smartfit-v0.1.0+15-internal-verified` 仅记录 +15 的历史内测交付与用户确认，不代替生产发布、专项验收或主线合并；本轮 +40 文档收束不新增标签，推送另按当次授权执行。
 
 查询当前主线、里程碑和本台账最近提交：
 

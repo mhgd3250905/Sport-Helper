@@ -1,6 +1,6 @@
 # 开发者日志：版本、工具与会话快照
 
-本检查点位于 `codex/coach-v2`，继承 +39 的 SDK `32d2839a4edb6d47e5ffe362215ec1a94b208824`。只补开发者取证能力，不把参数、工具或快照显示在聊天界面；不修改 SDK。后续 SDK 场景修复与 +40 单独验证、出包。
+日志能力检查点为 `5a1e25405f799bc8835a2d54fc9225dde6d45dfc`，位于 `codex/coach-v2`，当时继承 +39 的 SDK `32d2839a4edb6d47e5ffe362215ec1a94b208824`。该能力已随 +40 `428c5f3db4a90907889a2fa3e0eb9633b38a48b0` 出包，SDK 三包现统一为 `1532f0825b93777139be0e92e715ebec144a73b9`；版本与验收见[台账](version-management.md)及[+40 记录](coach-v2-plus40-2026-10-28.md)。下列日志契约继续适用，仅用于开发者日志，不把参数、工具或快照显示在聊天界面。
 
 ## 版本与事件
 
@@ -24,7 +24,7 @@
 
 开始“新对话”时，先取得当前 `controller.exportSession().toJson()`，在取消/清空前形成归档内容；归档写入完成后才清空 SDK 会话。归档期间的新输入等候这次重置完成，多次点击合并为一次。保存失败只记错误类型，不弹窗、不阻断新对话。
 
-原生路径为 App 私有 Application Support 下的 `diagnostics/session-snapshots/`，文件名 `SmartFit-session-<UTC>-<序号>-<随机后缀>.json`。先写临时文件并 flush，再同目录原子重命名；仅轮换本服务文件，保留最近 5 份，不清除其他数据。Web 开发测试使用相同接口的内存归档，不新增下载或 UI。
+原生路径为 App 私有 Application Support 下的 `diagnostics/session-snapshots/`，文件名 `SmartFit-session-<UTC>-<序号>-<随机后缀>.json`。先在该归档目录的临时子目录写文件并 flush，再在同一文件系统内原子重命名到归档目录；仅轮换本服务文件，保留最近 5 份，不清除其他数据。Web 开发测试使用相同接口的内存归档，不新增下载或 UI。
 
 运行日志沿用最近 7 天、1500 条、512 KiB 的有界保留策略，与会话快照的 5 份保留相互独立。正式 flavor 关闭；内测或显式开启的 debug 才采集详细内容。
 

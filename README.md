@@ -1,5 +1,65 @@
 # 智能健身助手 SmartFit
 
+## 当前基础版本（2026-10-28）
+
+当前内测版本为 **0.1.0+40**，分支 `codex/coach-v2`，打包源码 `428c5f3db4a90907889a2fa3e0eb9633b38a48b0`；开发者日志来自 `5a1e25405f799bc8835a2d54fc9225dde6d45dfc`。开哥已确认“基础版本功能可用了”“算是调通了”，本次保存为基础功能可用检查点。
+
+三个 SDK Git 依赖与 coach override 统一固定 `1532f0825b93777139be0e92e715ebec144a73b9`：coach 0.8.0、coach_ui 0.4.0、trainer 0.6.0。使用完整提交锁定的当前候选，尚未换正式 tag。App `main` 仍为 +34 `7344df22744feb2550f8d989bebd154c6d1ec9c5`，`release/1.0` 为 `6c786c08450d5a988db32af025ef0a1f8f5ae331`；本阶段只在功能分支保存，不合并、不推送、不新建 tag。
+
+| 事实源 | 范围 |
+| --- | --- |
+| [版本管理与台账](docs/version-management.md) | 当前 App / SDK、打包源码、包身份、主线及发布边界的统一入口 |
+| [验收记录](docs/acceptance.md) | 测试、构建、真实模型与用户确认；区分本机和设备证据 |
+| [阶段交接](docs/HANDOVER.md) | 当前接手信息、角色约束和后续边界 |
+| [对话主界面](docs/chat-home.md) | 当前 SDK 会话、卡片、底部面板和训练入口 |
+| [+40 接入明细](docs/coach-v2-plus40-2026-10-28.md) | 本轮 SDK 场景修复、APK 与单段真实模型结果 |
+| [开发者日志](docs/developer-logging-2026-10-28.md) | 实际版本、用户原话、工具参数/回执摘要、最近 5 份会话快照 |
+
+## 当前功能与数据
+
+用户输入经 App 传给 SDK `CoachAgent`，追问、条件来源、任务节点、推荐及计划版本由 SDK 的会话账本决定。App 负责安全确认、存储、传输、页面导航和已保存计划。等待气泡映射真实节点事件，完成后折叠；询问、推荐、计划与失败使用 SDK 组件。手动选条件的本地模板功能继续保留。
+
+会话保存 SDK 完整快照和显示消息；重开调用 `restoreSession`，无快照的旧档调用 `restoreHistory`，恢复回落只记日志。新对话先归档当前快照再清空会话，保留聊天以外的计划、训练记录、记忆和设置。
+
+输入栏的宫格/键盘按钮切换自适应底部面板，入口为“我的计划、新对话、动作库、设置”；“我的计划”是独立页面，保留打开和删除。返回主页不会自动弹键盘。动作库、单动作训练和跟练页面使用 SDK，媒体由 App 按动作下载、SHA 校验和版本目录缓存，再交给 SDK 播放；保留星尘、浅深主题和 A2 青绿实色风格。
+
+## 当前验证与交付
+
+固定 Flutter 3.44.7。+40 源码全量 **571 项通过、0 跳过**，静态分析及严格锁文件通过。真实模型“拉伸一下臀部”先问地点；回答“在家”后交付推荐卡，共 **10,693 ms / 5 次调用**，无报错，日志中 `scene=home / source=user / quote=在家`。
+
+internal arm64 release 为 **143,468,166 B / 136.82 MiB**，比 +39 增加 128 KiB，签名与 +39 一致，16KB 对齐和存储 JNI 检查通过。实际 Android 身份为 `com.ugk.smartfit.internal`、versionName `0.1.0`、versionCode `2040`。源码、APK、哈希和证据绑定见版本台账；文档收束提交不改变此打包源码与已有 APK。
+
+本轮未连接设备、未覆盖安装；本机模型日志的版本依据为实际 APK 的 aapt 元数据，标记 `nativeDevice=false`。本次用户确认记录基础功能可用，真机量化性能、连续训练和 iOS 专项仍保留各自验收边界。
+
+## 构建与配置
+
+当前 App 配置为 `https://ai.uuugk.win/v1`、`deepseek-flash`、Bearer；地址、模型、鉴权和 Key 均支持 `SMARTFIT_AI_*` dart-define 注入。Key 由仓库外环境在执行时提供；开发者日志、请求摘要和 Git 不保存 Key 或请求头。当前客户端 `maxRetries=0`，SDK 的重试、请求超时和上下文阈值使用默认，App 外保护 390 秒。
+
+以下为 internal 构建示例，先选择 Flutter 3.44.7，再由本机环境提供 `SMARTFIT_AI_TOKEN`：
+
+```powershell
+if ([string]::IsNullOrWhiteSpace($env:SMARTFIT_AI_TOKEN)) { throw '请先在本机提供 AI Key' }
+$aiDefines = @(
+  '--dart-define=SMARTFIT_AI_BASE_URL=https://ai.uuugk.win/v1',
+  '--dart-define=SMARTFIT_AI_MODEL=deepseek-flash',
+  '--dart-define=SMARTFIT_AI_AUTH=bearer',
+  "--dart-define=SMARTFIT_AI_TOKEN=$env:SMARTFIT_AI_TOKEN"
+)
+flutter pub get --enforce-lockfile
+flutter analyze --no-pub
+flutter test --no-pub --flavor internal --concurrency=1
+flutter build apk --release --no-pub --flavor internal --split-per-abi --target-platform android-arm64 @aiDefines
+```
+
+完整回归还显式开启官方目录和匿名 HTTPS 素材验证；实际 +40 构建另记录源码/素材标志，详见验收记录。此包仅供开哥本人手机，正式发布、主线合并和推送按后续明确安排执行。
+
+## 历史快照
+
+<details>
+<summary>+36 及更早的原阶段记录、旧配置与旧构建示例</summary>
+
+以下保持各自时点的说明；其中“当前”“最新”只指对应历史日期，当前事实以上方统一入口为准。
+
 > 2026-10-26 最新状态：+32 扁平 main（06ea39d）保持不动；独立分支 +34 已接通 SDK v3 与按动作下载，内测出包及边界见[当前记录](docs/posehub-on-demand-v3-2026-10-26.md)。下方为 +32 阶段及更早历史。
 
 ## 当前扁平候选（2026-10-26，待真机验收）
@@ -152,3 +212,5 @@ python3 tools/packs/validate_packs.py --decode
 动作视频来自 Pose-Hub（mhgd3250905/3D-Pose-Hub）：46 条为 v0.2.0 深色成片（经 HipLab 冻结版本），47 条为 Pose-Hub 云盘归档的绿幕母版，本仓库抠像到同色背景。
 人物派生自 Blender Studio Snow（CC BY 4.0，署名见 `assets/licenses/Drill-media-ATTRIBUTION.md`，App「关于」页展示）。
 3D-Pose-Hub 与 HipLab 只作参考与素材来源，本仓库不向它们写入任何内容。
+
+</details>
