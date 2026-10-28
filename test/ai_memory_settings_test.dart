@@ -92,7 +92,7 @@ void main() {
     expect(find.byKey(const ValueKey('ai-memory-clear')), findsNothing);
     expect(find.text('AI 记忆'), findsNothing);
     expect(find.text('隐私与 AI'), findsNothing);
-    expect(find.textContaining('api.uuugk.win'), findsNothing);
+    expect(find.textContaining('ai.uuugk.win'), findsNothing);
     expect(find.text('隐私'), findsOneWidget);
     await tester.pumpWidget(const SizedBox());
   });

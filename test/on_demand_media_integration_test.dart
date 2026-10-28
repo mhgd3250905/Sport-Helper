@@ -518,7 +518,7 @@ void main() {
     final content = (await tester.runAsync(
       () => AppServices.loadContent(media: media),
     ))!;
-    final holdAfter = probes + 2; // Refresh for the reply, then hold prefetch.
+    final holdAfter = probes + 1; // Hold the explicit plan's first prefetch.
     holdFromProbe = holdAfter;
     final output = _Output();
     final services = AppServices(
@@ -534,7 +534,19 @@ void main() {
     await services.store.acceptSafety(blocked: false);
     services.chat.start();
     await tester.runAsync(() async {
-      await services.chat.send('在家 5 分钟练灵活，徒手，新手');
+      final manualPlan = TrainingPlan(
+        id: 'manual-pending-media',
+        source: 'template',
+        title: '灵活练习',
+        summary: '',
+        goal: 'mobility',
+        scene: 'home',
+        equipment: const [],
+        level: 1,
+        targetMinutes: 5,
+        blocks: _template('n-pelvis-circle').blocks,
+      );
+      expect(await services.chat.started(manualPlan), isTrue);
       for (var i = 0; i < 100 && probes < holdAfter; i++) {
         await Future<void>.delayed(const Duration(milliseconds: 5));
       }
@@ -567,10 +579,13 @@ void main() {
     final posterFinder = find.byKey(
       const ValueKey('drill-poster-$waitingPosterPath'),
     );
-    final legacyIndex = jsonDecode(
-      File('${TrainingMediaConfig.assetRoot}/assets-index.json')
-          .readAsStringSync(),
-    ) as Map<String, dynamic>;
+    final legacyIndex =
+        jsonDecode(
+              File(
+                '${TrainingMediaConfig.assetRoot}/assets-index.json',
+              ).readAsStringSync(),
+            )
+            as Map<String, dynamic>;
     final darkMedia =
         ((legacyIndex['actions'] as Map)['n-pelvis-circle'] as Map)['dark']
             as Map;
@@ -587,10 +602,12 @@ void main() {
     ))!;
     expect(posterBytes.lengthInBytes, posterReceipt['bytes']);
     expect(
-      coach.sha256Hex(posterBytes.buffer.asUint8List(
-        posterBytes.offsetInBytes,
-        posterBytes.lengthInBytes,
-      )),
+      coach.sha256Hex(
+        posterBytes.buffer.asUint8List(
+          posterBytes.offsetInBytes,
+          posterBytes.lengthInBytes,
+        ),
+      ),
       posterReceipt['sha256'],
     );
     final image = tester.widget<Image>(posterFinder);
@@ -609,6 +626,7 @@ void main() {
       expect(pixels, findsOneWidget);
       expect(tester.widget<RawImage>(pixels).image, isNotNull);
     }
+
     expectCorrectWaitingImage();
     final initialCounter = tester
         .widget<trainer.TrainerCountdownDigits>(

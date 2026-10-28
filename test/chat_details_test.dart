@@ -7,7 +7,7 @@ import 'package:smartfit/ui/plan_page.dart';
 import 'package:smartfit/ui/player_page.dart';
 import 'package:smartfit/ui/exercise_video.dart';
 
-import 'app_flow_test.dart' show services, tall;
+import 'app_flow_test.dart' show services, tall, showManualChatCard;
 
 void main() {
   testWidgets('appearance changes keep a pushed route and conversation state', (
@@ -17,7 +17,7 @@ void main() {
     final s = services();
     await s.store.acceptSafety(blocked: false);
     s.chat.start();
-    await s.chat.send('在家 15 分钟练核心，徒手');
+    await showManualChatCard(s);
     final plan = s.chat.currentPlan!;
     await s.chat.save(plan);
     final messages = s.chat.messages.length;
@@ -46,7 +46,7 @@ void main() {
       final s = services();
       await s.store.acceptSafety(blocked: false);
       s.chat.start();
-      await s.chat.send('在办公室午休 10 分钟，肩颈很僵');
+      await showManualChatCard(s, template: 'office-relax');
       final plan = s.chat.currentPlan!;
       await tester.pumpWidget(SmartFitApp(services: s));
       await tester.pumpAndSettle();

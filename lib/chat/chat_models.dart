@@ -63,7 +63,7 @@ class ChatMessage {
     this.isPlanningFailure = false,
     this.plan,
     this.validatedPlan,
-    this.planState,
+    this.coachTask,
     this.actions,
     this.request,
     this.greeting = false,
@@ -93,8 +93,8 @@ class ChatMessage {
   final TrainingPlan? plan;
   final coach.ValidatedPlan? validatedPlan;
 
-  /// SDK task conditions captured for this exact admitted card.
-  final coach.CoachPlanState? planState;
+  /// SDK task event snapshot, used only to render the completed checklist.
+  final coach.CoachTaskState? coachTask;
   final coach.ValidatedActions? actions;
   final ScenarioRequest? request;
 
@@ -130,7 +130,7 @@ class ChatMessage {
     isPlanningFailure: isPlanningFailure,
     plan: plan,
     validatedPlan: validatedPlan,
-    planState: planState,
+    coachTask: coachTask,
     actions: actions,
     request: request,
     greeting: greeting,
@@ -151,8 +151,7 @@ class ChatMessage {
     if (answeredForm.isNotEmpty) 'answeredForm': answeredForm,
     if (isPlanningFailure) 'isPlanningFailure': true,
     'plan': ?plan?.toJson(),
-    if (validatedPlan != null && planState?.planId == validatedPlan!.plan.id)
-      'planState': planState!.toJson(),
+    'coachTask': ?coachTask?.toJson(),
     if (validatedPlan != null || plan?.source == 'ai') 'isAiPlan': true,
     if (actions != null)
       'actionIds': [for (final item in actions!.items) item.id],
@@ -177,16 +176,14 @@ class ChatMessage {
       // Stored AI data is untrusted until the current SDK admits it again.
       if (validatedPlan == null) plan = null;
     }
-    coach.CoachPlanState? planState;
-    if (validatedPlan != null && j['planState'] is Map) {
+    coach.CoachTaskState? coachTask;
+    if (j['coachTask'] is Map) {
       try {
-        final restored = coach.CoachPlanState.fromJson(
-          Map<String, dynamic>.from(j['planState'] as Map),
+        coachTask = coach.CoachTaskState.fromJson(
+          Map<String, Object?>.from(j['coachTask'] as Map),
         );
-        if (restored.planId == validatedPlan.plan.id) planState = restored;
       } on Object {
-        // An unreadable snapshot must not discard a safely re-admitted card.
-        // The SDK will infer legacy conditions from the plan instead.
+        // A damaged presentation snapshot cannot discard the conversation.
       }
     }
     final actionIds = j['actionIds'];
@@ -230,7 +227,7 @@ class ChatMessage {
       aiVisible: j['aiVisible'] == true,
       plan: plan,
       validatedPlan: validatedPlan,
-      planState: planState,
+      coachTask: coachTask,
       actions: actions,
       request: request,
     );
@@ -412,112 +409,11 @@ ScenarioRequest requestForPlan(TrainingPlan p) => ScenarioRequest(
   templateId: p.templateId,
 );
 
-/// What the user has told us so far for one plan request. Null = not said.
-class Slots {
-  const Slots({
-    this.goal,
-    this.scene,
-    this.minutes,
-    this.equipment,
-    this.level,
-    this.avoid = const {},
-    this.focus = const {},
-    this.description = '',
-  });
-
-  final String? goal;
-  final String? scene;
-  final int? minutes;
-
-  /// Extra gear: {} = "徒手" said explicitly, null = not mentioned.
-  final Set<Equipment>? equipment;
-  final int? level;
-  final Set<String> avoid;
-
-  /// Body parts the user wants to train (肩颈, 核心, 臀腿…).
-  final Set<String> focus;
-  final String description;
-
-  factory Slots.fromRequest(ScenarioRequest request) => Slots(
-    goal: request.goal,
-    scene: request.scene,
-    minutes: request.minutes,
-    equipment: request.equipment,
-    level: request.level,
-    avoid: request.avoid,
-    description: request.description,
-  );
-
-  bool get isEmpty =>
-      goal == null &&
-      scene == null &&
-      minutes == null &&
-      equipment == null &&
-      level == null &&
-      avoid.isEmpty &&
-      focus.isEmpty;
-
-  /// [o] is newer: its said values win, sets add up.
-  Slots merge(Slots o) => Slots(
-    goal: o.goal ?? goal,
-    scene: o.scene ?? scene,
-    minutes: o.minutes ?? minutes,
-    equipment: o.equipment == null
-        ? equipment
-        : (o.equipment!.isEmpty
-              ? <Equipment>{}
-              : {...?equipment, ...o.equipment!}),
-    level: o.level ?? level,
-    avoid: {...avoid, ...o.avoid},
-    focus: {...focus, ...o.focus},
-    description: [
-      description,
-      o.description,
-    ].where((d) => d.isNotEmpty).join('，'),
-  );
-
-  Slots copyWith({String? goal, int? minutes, Set<Equipment>? equipment}) =>
-      Slots(
-        goal: goal ?? this.goal,
-        scene: scene,
-        minutes: minutes ?? this.minutes,
-        equipment: equipment ?? this.equipment,
-        level: level,
-        avoid: avoid,
-        focus: focus,
-        description: description,
-      );
-
-  ScenarioRequest toRequest({String? fallbackGoal}) => ScenarioRequest(
-    description: description,
-    goal: goal ?? fallbackGoal,
-    scene: scene ?? 'home',
-    equipment: equipment ?? const {},
-    minutes:
-        minutes ??
-        switch (goal) {
-          'warmup' => 6,
-          'cooldown' => 8,
-          _ => 10,
-        },
-    level: level ?? 1,
-    avoid: avoid,
-  );
-
-  @override
-  String toString() =>
-      'Slots(goal: $goal, scene: $scene, min: $minutes, eq: ${equipment?.map((e) => e.name)}, '
-      'L$level, avoid: $avoid, focus: $focus)';
-}
-
 /// The engine's memory of the conversation, owned by the controller and
 /// handed back with every reply.
 class ChatState {
   const ChatState({
-    this.pending,
-    this.coachContext,
     this.recentMessages = const [],
-    this.asked = const [],
     this.plan,
     this.request,
     this.safetyBlocked = false,
@@ -529,15 +425,8 @@ class ChatState {
     this.now,
   });
 
-  /// A plan request still waiting for an answer to a follow-up question.
-  final Slots? pending;
-
-  /// Explicit constraints and recent chat for the SDK; workout logs stay local.
-  final Slots? coachContext;
+  /// Display-only recent messages; the SDK owns all conversation conditions.
   final List<ChatMessage> recentMessages;
-
-  /// Slots already asked about for [pending] ('goal', 'minutes', 'equipment').
-  final List<String> asked;
 
   /// The plan on the latest card and its request: what edits apply to.
   final TrainingPlan? plan;
@@ -567,11 +456,7 @@ class ChatState {
   final DateTime? now;
 
   ChatState copyWith({
-    Slots? pending,
-    Slots? coachContext,
     List<ChatMessage>? recentMessages,
-    bool clearPending = false,
-    List<String>? asked,
     TrainingPlan? plan,
     ScenarioRequest? request,
     bool? safetyBlocked,
@@ -582,10 +467,7 @@ class ChatState {
     bool? systemLight,
     DateTime? now,
   }) => ChatState(
-    pending: clearPending ? null : (pending ?? this.pending),
-    coachContext: coachContext ?? this.coachContext,
     recentMessages: recentMessages ?? this.recentMessages,
-    asked: clearPending ? const [] : (asked ?? this.asked),
     plan: plan ?? this.plan,
     request: request ?? this.request,
     safetyBlocked: safetyBlocked ?? this.safetyBlocked,
@@ -610,7 +492,7 @@ class BotMessage {
     this.isPlanningFailure = false,
     this.plan,
     this.validatedPlan,
-    this.planState,
+    this.coachTask,
     this.actions,
     this.request,
     this.greeting = false,
@@ -624,7 +506,7 @@ class BotMessage {
   final bool isPlanningFailure;
   final TrainingPlan? plan;
   final coach.ValidatedPlan? validatedPlan;
-  final coach.CoachPlanState? planState;
+  final coach.CoachTaskState? coachTask;
   final coach.ValidatedActions? actions;
   final ScenarioRequest? request;
 }
@@ -654,9 +536,7 @@ class ChatReply {
   final bool inputAccepted;
 }
 
-/// Turns what the user typed into assistant replies. [RuleChatEngine] is
-/// the offline implementation; a model-backed engine (with the same plan
-/// validation) plugs in here later.
+/// Presentation boundary for SDK replies and explicit local App commands.
 abstract interface class ChatEngine {
   String get id;
   Future<ChatReply> reply(String text, ChatState state);

@@ -137,12 +137,12 @@ void main() {
           find.descendant(of: leading, matching: find.byType(Container)),
           findsNothing,
         );
-        final bookmark = find.byIcon(Icons.add_rounded);
+        final menuIcon = find.byIcon(Icons.grid_view_rounded);
         final sendIcon = find.byWidgetPredicate(
           (widget) => widget is SfIcon && widget.glyph == SfGlyph.arrowUp,
         );
         expect(
-          tester.getCenter(bookmark).dy,
+          tester.getCenter(menuIcon).dy,
           closeTo(tester.getCenter(sendIcon).dy, .1),
         );
         expect(

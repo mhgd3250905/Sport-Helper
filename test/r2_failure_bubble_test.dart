@@ -7,7 +7,7 @@ import 'package:smartfit/app/services.dart';
 import 'package:smartfit/chat/ai_chat_engine.dart';
 import 'package:smartfit/chat/chat_controller.dart';
 import 'package:smartfit/chat/chat_models.dart';
-import 'package:smartfit/chat/rule_chat_engine.dart';
+import 'package:smartfit/chat/app_chat_actions.dart';
 import 'package:smartfit/ui/chat/chat_home_page.dart';
 import 'package:smartfit/ui/theme/app_theme.dart';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
@@ -107,7 +107,7 @@ void main() {
         ),
       ], latency: Duration.zero);
       final engine = AiChatEngine(
-        local: RuleChatEngine(lib: app.library, templates: app.templates),
+        local: const AppChatActions(),
         catalog: (await PoseHubActionLibrary.load()).toAiCatalog(),
         profile: coach.CoachProfile.fromJson(
           jsonDecode(File('assets/coach/smartfit.json').readAsStringSync()),

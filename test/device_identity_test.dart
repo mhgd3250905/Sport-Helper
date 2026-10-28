@@ -105,25 +105,22 @@ void main() {
   });
 
   test(
-    'proxy config uses app and device headers without Authorization',
+    'proxy config uses only Bearer authentication with the approved model',
     () async {
       final client = const AiCoachConfig(
         token: ' fixture-app-key ',
       ).createClient(deviceId: 'ea2c6891-654f-431b-a1f4-11a9a3e03bea');
       addTearDown(client.close);
-      expect(client.config.baseUrl, 'https://api.uuugk.win/v1');
-      expect(client.model, 'deepseek-v4-flash-0731');
+      expect(client.config.baseUrl, 'https://ai.uuugk.win/v1');
+      expect(client.model, 'deepseek-flash');
       expect(client.config.maxRetries, 0);
       expect(client.config.timeout, const Duration(seconds: 120));
       expect(client.config.maxTokens, 6000);
       final headers = await client.auth.headers();
-      expect(headers, {
-        'X-App-Key': 'fixture-app-key',
-        'X-Device-Id': 'ea2c6891-654f-431b-a1f4-11a9a3e03bea',
-      });
+      expect(headers, {'Authorization': 'Bearer fixture-app-key'});
       expect(
         headers.keys.map((k) => k.toLowerCase()),
-        isNot(contains('authorization')),
+        isNot(anyOf(contains('x-app-key'), contains('x-device-id'))),
       );
     },
   );

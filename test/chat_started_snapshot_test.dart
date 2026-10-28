@@ -134,8 +134,8 @@ void main() {
         store: store,
         replyDelay: Duration.zero,
       )..start();
-      await c.send('在家 15 分钟练核心，徒手');
-      final original = c.currentPlan!;
+      const original = _original;
+      expect(await c.started(original), isTrue);
       await c.save(original);
       final modified = original.copyWith(
         id: '${original.id}~detail-edit',

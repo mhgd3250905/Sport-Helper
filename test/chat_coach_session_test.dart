@@ -14,6 +14,7 @@ import 'package:smartfit/domain/scenario.dart';
 import 'package:smartfit/ui/chat/action_card.dart';
 import 'package:smartfit/ui/chat/chat_home_page.dart';
 import 'package:smartfit/ui/chat/chat_widgets.dart';
+import 'package:smartfit/ui/chat/coach_task_bubble.dart';
 import 'package:smartfit/ui/chat/plan_card.dart';
 import 'package:smartfit/ui/chat/validated_plan_card.dart';
 import 'package:smartfit/ui/theme/app_theme.dart';
@@ -84,8 +85,8 @@ void main() {
   TrainingPlan aiPlan() => const TrainingPlan(
     id: 'validated-test-plan',
     source: 'ai',
-    title: '轻松提踵',
-    summary: '用提踵唤醒小腿。',
+    title: '轻松早安式',
+    summary: '用徒手早安式活动髋部。',
     goal: 'fullbody',
     scene: 'home',
     equipment: [],
@@ -100,7 +101,7 @@ void main() {
         restBetweenRoundsSeconds: 0,
         items: [
           PlanItem(
-            exerciseId: 'h-calf-raise',
+            exerciseId: 'h-good-morning',
             mode: DoseMode.reps,
             sets: 1,
             reps: 10,
@@ -140,8 +141,30 @@ void main() {
     ),
   );
 
+  coach.CoachTaskState taskSnapshot({
+    required String current,
+    required String stamp,
+  }) => coach.CoachTaskState(
+    type: 'plan',
+    reused: false,
+    nodes: [
+      const coach.CoachNodeState(
+        id: 'understand',
+        status: 'done',
+        stamp: '已确认训练目标',
+        doneAtTurn: 1,
+      ),
+      coach.CoachNodeState(id: current, status: 'current', stamp: stamp),
+    ],
+  );
+
+  Finder cancelButton() => find.descendant(
+    of: find.byType(CoachTaskBubble),
+    matching: find.widgetWithText(TextButton, '取消'),
+  );
+
   testWidgets(
-    'real agent events drive phase copy and cancellation filters late events',
+    'SDK node snapshots render before mount and cancellation filters late events',
     (tester) async {
       tall(tester);
       final (chat, engine, app) = await setup();
@@ -149,26 +172,39 @@ void main() {
       final pending = chat.send('给我排计划');
       // The first event arrives before the bubble mounts; it must be replayed.
       engine.eventBus.add(
-        const coach.AgentEvent(
+        coach.AgentEvent(
           'turn',
-          coach.AgentEventKind.reading,
+          coach.AgentEventKind.node,
           step: 1,
-          path: 'action-library/index/scene/home.md',
+          task: taskSnapshot(current: 'actions', stamp: '候选动作来自 SDK'),
         ),
       );
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 250));
-      expect(find.text('正在查动作库'), findsOneWidget);
+      expect(find.text('候选动作来自 SDK'), findsOneWidget);
+      expect(find.text('已确认训练目标'), findsOneWidget);
+      expect(find.byIcon(Icons.check_circle_rounded), findsOneWidget);
       engine.eventBus.add(
-        const coach.AgentEvent('turn', coach.AgentEventKind.checking, step: 2),
+        coach.AgentEvent(
+          'turn',
+          coach.AgentEventKind.node,
+          step: 2,
+          task: taskSnapshot(current: 'review', stamp: 'SDK 正在核对动作编排'),
+        ),
       );
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 250));
-      expect(find.text('正在核对计划'), findsOneWidget);
-      await tester.tap(find.byKey(const ValueKey('chat-cancel')));
+      expect(find.text('SDK 正在核对动作编排'), findsOneWidget);
+      expect(find.text('候选动作来自 SDK'), findsNothing);
+      await tester.tap(cancelButton());
       await tester.pump();
       engine.eventBus.add(
-        const coach.AgentEvent('turn', coach.AgentEventKind.reading, step: 3),
+        coach.AgentEvent(
+          'turn',
+          coach.AgentEventKind.node,
+          step: 3,
+          task: taskSnapshot(current: 'output', stamp: '取消后的旧节点'),
+        ),
       );
       engine.pending.single.complete(
         ChatReply(
@@ -179,12 +215,13 @@ void main() {
       await pending;
       await tester.pumpAndSettle();
       expect(find.text('迟到'), findsNothing);
-      expect(find.byType(TypingBubble), findsNothing);
+      expect(find.byType(CoachTaskBubble), findsNothing);
+      expect(find.text('取消后的旧节点'), findsNothing);
     },
   );
 
   testWidgets(
-    'retries do not replace SDK phase copy and done ignores late events',
+    'retries do not replace SDK task nodes and done ignores late events',
     (tester) async {
       tall(tester);
       final (chat, engine, app) = await setup();
@@ -192,11 +229,15 @@ void main() {
       final pending = chat.send('给我排计划');
       await tester.pump();
       engine.eventBus.add(
-        const coach.AgentEvent('retry-turn', coach.AgentEventKind.checking),
+        coach.AgentEvent(
+          'retry-turn',
+          coach.AgentEventKind.node,
+          task: taskSnapshot(current: 'review', stamp: 'SDK 核对中的任务'),
+        ),
       );
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 250));
-      expect(find.text('正在核对计划'), findsOneWidget);
+      expect(find.text('SDK 核对中的任务'), findsOneWidget);
       engine.eventBus.add(
         const coach.AgentEvent(
           'retry-turn',
@@ -207,7 +248,7 @@ void main() {
       );
       await tester.pump();
       expect(find.text('网络不稳，正在重试（1/4）…'), findsNothing);
-      expect(find.text('正在核对计划'), findsOneWidget);
+      expect(find.text('SDK 核对中的任务'), findsOneWidget);
       expect(
         tester.widget<ChatInputBar>(find.byType(ChatInputBar)).enabled,
         isFalse,
@@ -220,14 +261,15 @@ void main() {
         ),
       );
       engine.eventBus.add(
-        const coach.AgentEvent(
+        coach.AgentEvent(
           'retry-turn',
-          coach.AgentEventKind.reading,
-          path: 'action-library/index.md',
+          coach.AgentEventKind.node,
+          task: taskSnapshot(current: 'actions', stamp: '结束后的迟到节点'),
         ),
       );
       await tester.pump();
-      expect(find.text('正在查动作库'), findsNothing);
+      expect(find.text('结束后的迟到节点'), findsNothing);
+      expect(find.text('SDK 核对中的任务'), findsOneWidget);
       engine.pending.single.complete(
         ChatReply(
           messages: const [BotMessage('计划准备好了')],
@@ -236,7 +278,7 @@ void main() {
       );
       await pending;
       await tester.pumpAndSettle();
-      expect(find.byType(TypingBubble), findsNothing);
+      expect(find.byType(CoachTaskBubble), findsNothing);
       expect(find.text('计划准备好了'), findsOneWidget);
     },
   );
@@ -252,23 +294,27 @@ void main() {
       const coach.AgentEvent('cancelled-turn', coach.AgentEventKind.thinking),
     );
     await tester.pump();
-    await tester.tap(find.byKey(const ValueKey('chat-cancel')));
+    await tester.tap(cancelButton());
     await tester.pump();
     final current = chat.send('新的请求');
     engine.eventBus.add(
-      const coach.AgentEvent('cancelled-turn', coach.AgentEventKind.checking),
+      coach.AgentEvent(
+        'cancelled-turn',
+        coach.AgentEventKind.node,
+        task: taskSnapshot(current: 'review', stamp: '已取消轮次的任务节点'),
+      ),
     );
     engine.eventBus.add(
-      const coach.AgentEvent(
+      coach.AgentEvent(
         'current-turn',
-        coach.AgentEventKind.reading,
-        path: 'action-library/index.md',
+        coach.AgentEventKind.node,
+        task: taskSnapshot(current: 'actions', stamp: '当前轮次的动作节点'),
       ),
     );
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 250));
-    expect(find.text('正在查动作库'), findsOneWidget);
-    expect(find.text('正在核对计划'), findsNothing);
+    expect(find.text('当前轮次的动作节点'), findsOneWidget);
+    expect(find.text('已取消轮次的任务节点'), findsNothing);
     engine.pending[1].complete(
       ChatReply(messages: const [BotMessage('当前回复')], state: engine.states[1]),
     );
@@ -376,6 +422,14 @@ void main() {
   test('AI snapshots and edited training plans must pass the gate', () async {
     final (chat, engine, app) = await setup();
     final valid = aiPlan();
+    expect(
+      coach.PlanValidator(catalog: catalog, profile: profile)
+          .validate(const coach.PlanCodec().decode(valid.toJson()))
+          .errors
+          .map((issue) => issue.message),
+      isEmpty,
+      reason: 'The rendering fixture must itself pass the current SDK gate.',
+    );
     final invalid = valid.copyWith(
       blocks: [
         valid.blocks.single.copyWith(
@@ -430,42 +484,43 @@ void main() {
     },
   );
 
-  testWidgets(
-    'waiting shows the initial phase, blocks send and offers cancel',
-    (tester) async {
-      tall(tester);
-      final (chat, engine, app) = await setup();
-      await showChat(tester, chat, app);
-      await tester.pumpAndSettle();
-      final pending = chat.send('排个计划');
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 450));
-      expect(find.text('正在理解需求'), findsOneWidget);
-      expect(
-        tester.widget<ChatInputBar>(find.byType(ChatInputBar)).enabled,
-        isFalse,
-      );
-      await tester.enterText(find.byKey(const ValueKey('chat-input')), '稍后再发');
-      await tester.tap(find.byKey(const ValueKey('chat-send')));
-      expect(engine.pending, hasLength(1));
-      await tester.tap(find.byKey(const ValueKey('chat-cancel')));
-      await tester.pump();
-      expect(find.byType(TypingBubble), findsNothing);
-      expect(
-        tester.widget<ChatInputBar>(find.byType(ChatInputBar)).enabled,
-        isTrue,
-      );
-      engine.pending.single.complete(
-        ChatReply(
-          messages: const [BotMessage('取消后不能显示')],
-          state: engine.states.single,
-        ),
-      );
-      await pending;
-      await tester.pumpAndSettle();
-      expect(find.text('取消后不能显示'), findsNothing);
-    },
-  );
+  testWidgets('waiting before SDK task nodes blocks send and offers cancel', (
+    tester,
+  ) async {
+    tall(tester);
+    final (chat, engine, app) = await setup();
+    await showChat(tester, chat, app);
+    await tester.pumpAndSettle();
+    final pending = chat.send('排个计划');
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 450));
+    expect(find.byType(CoachTaskBubble), findsOneWidget);
+    expect(find.text('教练待办'), findsOneWidget);
+    expect(find.byKey(const ValueKey('coach-node-understand')), findsNothing);
+    expect(
+      tester.widget<ChatInputBar>(find.byType(ChatInputBar)).enabled,
+      isFalse,
+    );
+    await tester.enterText(find.byKey(const ValueKey('chat-input')), '稍后再发');
+    await tester.tap(find.byKey(const ValueKey('chat-send')));
+    expect(engine.pending, hasLength(1));
+    await tester.tap(cancelButton());
+    await tester.pump();
+    expect(find.byType(CoachTaskBubble), findsNothing);
+    expect(
+      tester.widget<ChatInputBar>(find.byType(ChatInputBar)).enabled,
+      isTrue,
+    );
+    engine.pending.single.complete(
+      ChatReply(
+        messages: const [BotMessage('取消后不能显示')],
+        state: engine.states.single,
+      ),
+    );
+    await pending;
+    await tester.pumpAndSettle();
+    expect(find.text('取消后不能显示'), findsNothing);
+  });
 
   testWidgets(
     'closing the page keeps conversation; new conversation clears it',

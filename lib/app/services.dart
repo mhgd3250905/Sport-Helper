@@ -10,7 +10,7 @@ import '../chat/chat_controller.dart';
 import '../chat/ai_chat_engine.dart';
 import '../chat/ai_coach_config.dart';
 import '../chat/chat_models.dart';
-import '../chat/rule_chat_engine.dart';
+import '../chat/app_chat_actions.dart';
 import '../data/app_store.dart';
 import '../diagnostics/runtime_log.dart';
 import '../diagnostics/training_media_log.dart';
@@ -194,7 +194,7 @@ class AppServices {
   late final ChatEngine chatEngine = _createChatEngine();
 
   ChatEngine _createChatEngine() {
-    final local = RuleChatEngine(lib: library, templates: templates);
+    const local = AppChatActions();
     final catalog = coachCatalog;
     final profile = coachProfile;
     final id = deviceId;

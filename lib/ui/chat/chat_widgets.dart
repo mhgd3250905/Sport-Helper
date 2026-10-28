@@ -114,7 +114,7 @@ class ChatInputBar extends StatefulWidget {
     this.onTextTap,
   });
 
-  /// Lets the page put the cursor here (the drawer's 「去排一套」).
+  /// Lets an explicit compose action put the cursor here.
   final FocusNode? focusNode;
   final void Function(String) onSend;
   final VoidCallback? onPlans;
@@ -189,7 +189,7 @@ class _ChatInputBarState extends State<ChatInputBar> {
                           child: Icon(
                             widget.panelOpen
                                 ? Icons.keyboard_outlined
-                                : Icons.add_rounded,
+                                : Icons.grid_view_rounded,
                             size: SfComposerTokens.bookmarkSize,
                             color: SfComposerTokens.bookmark,
                           ),
@@ -274,6 +274,107 @@ class _ChatInputBarState extends State<ChatInputBar> {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class ChatPanelAction {
+  const ChatPanelAction({
+    required this.key,
+    required this.label,
+    required this.icon,
+    required this.onTap,
+  });
+
+  final Key key;
+  final String label;
+  final SfGlyph icon;
+  final VoidCallback onTap;
+}
+
+/// A content-sized tools grid. Narrow screens and large text add rows instead
+/// of keeping the old keyboard-sized empty space.
+class ChatFeaturePanel extends StatelessWidget {
+  const ChatFeaturePanel({super.key, required this.actions});
+
+  final List<ChatPanelAction> actions;
+
+  @override
+  Widget build(BuildContext context) {
+    final media = MediaQuery.of(context);
+    final labelStyle = SfType.label;
+    final labelSize = labelStyle.fontSize!;
+    final textScale = media.textScaler.scale(labelSize) / labelSize;
+    return ColoredBox(
+      color: SfFeaturePanelTokens.background,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final contentWidth =
+              constraints.maxWidth - SfFeaturePanelTokens.padding.horizontal;
+          final columns =
+              (contentWidth / (SfFeaturePanelTokens.minTileWidth * textScale))
+                  .floor()
+                  .clamp(1, SfFeaturePanelTokens.maxColumns);
+          return ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight:
+                  media.size.height * SfFeaturePanelTokens.maxHeightFraction,
+            ),
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: SfFeaturePanelTokens.padding,
+                child: Wrap(
+                  runSpacing: SfFeaturePanelTokens.rowGap,
+                  children: [
+                    for (final action in actions)
+                      SizedBox(
+                        width: contentWidth / columns,
+                        child: SfPressable(
+                          key: action.key,
+                          semanticLabel: action.label,
+                          onTap: action.onTap,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: SfFeaturePanelTokens.tileSize,
+                                height: SfFeaturePanelTokens.tileSize,
+                                decoration: BoxDecoration(
+                                  color: SfFeaturePanelTokens.tileFill,
+                                  borderRadius: BorderRadius.circular(
+                                    SfFeaturePanelTokens.tileRadius,
+                                  ),
+                                  border: Border.all(
+                                    color: SfFeaturePanelTokens.tileEdge,
+                                  ),
+                                ),
+                                child: Center(
+                                  child: SfIcon(
+                                    action.icon,
+                                    size: SfFeaturePanelTokens.iconSize,
+                                    color: SfColors.text,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(
+                                height: SfFeaturePanelTokens.labelGap,
+                              ),
+                              Text(
+                                action.label,
+                                style: labelStyle,
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }

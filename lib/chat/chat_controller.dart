@@ -8,7 +8,7 @@ import '../diagnostics/runtime_log.dart';
 import '../domain/plan.dart';
 import '../domain/saved_plan.dart';
 import 'chat_models.dart';
-import 'rule_chat_engine.dart' show discoverySuggestions;
+import 'app_chat_actions.dart' show discoverySuggestions;
 import 'safety_script.dart';
 
 /// Owns the chat home's conversation: the message list, the engine's state,
@@ -57,6 +57,8 @@ class ChatController extends ChangeNotifier {
     }
     listener.onCancel = subscription.cancel;
   }, isBroadcast: true);
+  coach.CoachTaskState? _latestTask;
+  coach.CoachTaskState? get activeTask => _latestTask;
   String? _progressTurnId;
   final Set<String> _finishedProgressTurns = {};
   bool _progressEnded = true;
@@ -102,6 +104,10 @@ class ChatController extends ChangeNotifier {
       operation: _diagnosticOperation,
       fields: {'kind': event.kind.name, 'step': event.step},
     );
+    if (event.kind == coach.AgentEventKind.node && event.task != null) {
+      _latestTask = event.task;
+      notifyListeners();
+    }
     _progressHistory.add(event);
     if (_progressHistory.length > 64) _progressHistory.removeAt(0);
     _progressEvents.add(event);
@@ -199,7 +205,7 @@ class ChatController extends ChangeNotifier {
           answeredForm: m.answeredForm,
           isPlanningFailure: m.isPlanningFailure,
           plan: m.validatedPlan,
-          planState: m.planState,
+          planState: _legacyPlanState(m),
           actions: m.actions,
         ),
     ]);
@@ -222,6 +228,23 @@ class ChatController extends ChangeNotifier {
     }
     suggestions = _defaults();
     notifyListeners();
+  }
+
+  // Read-only migration for pre-v2 saves. New saves own no per-card state.
+  coach.CoachPlanState? _legacyPlanState(ChatMessage message) {
+    if (message.validatedPlan == null) return null;
+    final raw = store.chatLog
+        .where((row) => row['id'] == message.id)
+        .firstOrNull;
+    if (raw?['planState'] is! Map) return null;
+    try {
+      final stored = coach.CoachPlanState.fromJson(
+        Map<String, dynamic>.from(raw!['planState'] as Map),
+      );
+      return stored.planId == message.validatedPlan!.plan.id ? stored : null;
+    } on Object {
+      return null;
+    }
   }
 
   static final _none = ChatMessage(
@@ -256,6 +279,7 @@ class ChatController extends ChangeNotifier {
       managed.reset();
     }
     _state = const ChatState();
+    _latestTask = null;
     _safetyStep = null;
     _safetyMessageId = null;
     messages.clear();
@@ -323,6 +347,7 @@ class ChatController extends ChangeNotifier {
       fields: {'inputChars': t.length},
     );
     typing = true;
+    _latestTask = null;
     _endProgress();
     _progressEnded = false;
     notifyListeners();
@@ -578,14 +603,7 @@ class ChatController extends ChangeNotifier {
     if (saved != null) await store.touchPlan(saved.id);
     await store.rememberPlan(p);
     if (!store.trainingAllowed) return false;
-    _state = _state.copyWith(
-      clearPending: true,
-      plan: p,
-      request: request,
-      coachContext: Slots.fromRequest(
-        request,
-      ).merge(Slots(avoid: _state.coachContext?.avoid ?? const {})),
-    );
+    _state = _state.copyWith(plan: p, request: request);
     // A plan edited in its detail page is a distinct version. Keep that
     // exact snapshot so the post-workout save offer survives a restart.
     if (card == null) _bot(BotMessage('', plan: p, request: request));
@@ -745,7 +763,7 @@ class ChatController extends ChangeNotifier {
         isPlanningFailure: m.isPlanningFailure,
         plan: plan,
         validatedPlan: validatedPlan,
-        planState: validatedPlan == null ? null : m.planState,
+        coachTask: aiVisible ? _latestTask : m.coachTask,
         actions: m.actions,
         request: m.request,
         greeting: m.greeting,

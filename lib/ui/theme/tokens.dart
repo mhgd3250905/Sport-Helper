@@ -153,7 +153,7 @@ class SfPalette {
     emphasisText: Color(0xFFF38F7F),
     onEmphasis: Color(0xFF30120E),
     text: Color(0xFFF2F3F5),
-    muted: Color(0xFF8D9199),
+    muted: Color(0xFFA0A4AC),
     faint: Color(0xFF5C6068),
     caution: Color(0xFFF3A443),
     danger: Color(0xFFEF6A6A),
@@ -178,7 +178,7 @@ class SfPalette {
     surface: Color(0xFFFFFFFF),
     surfaceHigh: Color(0xFFEBF2EE),
     line: Color(0xFFD7E3DC),
-    accent: Color(0xFF0F7976),
+    accent: Color(0xFF0E7673),
     accentText: Color(0xFF0A6C69),
     onAccent: Color(0xFFFFFFFF),
     emphasis: SfBrand.coral,
@@ -324,6 +324,22 @@ abstract final class SfComposerTokens {
       SfColors.isDark ? const Color(0xFFBAC5C5) : const Color(0xFF4C5E54);
   static Color get suggestionIcon =>
       SfColors.isDark ? const Color(0xFF8FB7B2) : const Color(0xFF598477);
+}
+
+/// Compact chat tools share the sky colour and grow only when a row is added.
+abstract final class SfFeaturePanelTokens {
+  static const padding = EdgeInsets.fromLTRB(16, 16, 16, 16);
+  static const minTileWidth = 80.0;
+  static const maxColumns = 4;
+  static const rowGap = 16.0;
+  static const tileSize = 56.0;
+  static const tileRadius = 16.0;
+  static const iconSize = 24.0;
+  static const labelGap = 8.0;
+  static const maxHeightFraction = .45;
+  static Color get background => SfColors.skyBottom;
+  static Color get tileFill => SfColors.surfaceHigh;
+  static Color get tileEdge => SfColors.line;
 }
 
 /// Type scale. Six steps; weight and colour carry the rest of the

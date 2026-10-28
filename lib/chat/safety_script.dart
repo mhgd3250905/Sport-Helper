@@ -21,7 +21,8 @@ const safetyDisclaimer = '开始之前，先花 10 秒确认安全。\n\n$discla
 
 const safetyLead = '再确认 4 件事，符合的话点「是」。';
 
-String safetyQuestionText(int i) => '${i + 1}/${safetyQuestions.length}　${safetyQuestions[i]}？';
+String safetyQuestionText(int i) =>
+    '${i + 1}/${safetyQuestions.length}　${safetyQuestions[i]}？';
 
 const safetyAllClear = '好，都没问题。\n现在说说：想练什么、在哪儿、有多少时间？';
 

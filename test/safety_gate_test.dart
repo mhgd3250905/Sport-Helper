@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:smartfit/app/services.dart';
 import 'package:smartfit/chat/chat_controller.dart';
 import 'package:smartfit/chat/chat_models.dart';
-import 'package:smartfit/chat/rule_chat_engine.dart';
+import 'package:smartfit/chat/app_chat_actions.dart';
 import 'package:smartfit/data/app_store.dart';
 import 'package:smartfit/domain/scenario.dart';
 import 'package:smartfit/main.dart';
@@ -57,9 +57,12 @@ void main() {
       await s.store.acceptSafety(blocked: false);
       await tester.pumpWidget(SmartFitApp(services: s));
       await tester.pumpAndSettle();
-      await s.chat.send('在办公室午休 10 分钟，肩颈很僵');
-      final p = s.chat.currentPlan!;
+      final generated = await s.generator.generate(
+        const ScenarioRequest(templateId: 'office-relax'),
+      );
+      final p = generated.plan!;
       final saved = await s.chat.save(p);
+      await s.chat.showSaved(saved);
       s.chat.startSafetyCheck();
       await tester.pumpAndSettle();
       expect(s.store.safetyBlocked, isFalse);
@@ -114,12 +117,16 @@ void main() {
       final store = AppStore(mem);
       await store.acceptSafety(blocked: false);
       final c = ChatController(
-        engine: RuleChatEngine(lib: s.library, templates: s.templates),
+        engine: const AppChatActions(),
         store: store,
         replyDelay: Duration.zero,
       )..start();
-      await c.send('在办公室午休 10 分钟，肩颈很僵');
-      final p = c.currentPlan!;
+      final generated = await s.generator.generate(
+        const ScenarioRequest(templateId: 'office-relax'),
+      );
+      final p = generated.plan!;
+      final saved = await c.save(p);
+      await c.showSaved(saved);
       c.startSafetyCheck();
       expect(await c.started(p), isFalse);
       expect(store.lastPlan, isNull);

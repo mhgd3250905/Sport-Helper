@@ -13,7 +13,7 @@ import 'package:smartfit/main.dart';
 import 'package:smartfit/ui/chat/plan_card.dart';
 import 'package:smartfit/ui/plan_page.dart';
 
-import 'app_flow_test.dart' show services, tall;
+import 'app_flow_test.dart' show services, showManualChatCard, tall;
 
 const _single = TrainingPlan(
   id: 'single-move',
@@ -106,8 +106,7 @@ void main() {
     final s = services();
     await s.store.acceptSafety(blocked: false);
     s.chat.start();
-    await s.chat.send('在家 15 分钟练核心，徒手');
-    final plan = s.chat.currentPlan!;
+    final plan = await showManualChatCard(s);
     expect(plan.items.length, greaterThan(1));
     await tester.pumpWidget(SmartFitApp(services: s));
     await tester.pumpAndSettle();
@@ -257,12 +256,24 @@ void main() {
     }
     expect((heroRects.last.center - row0.center).distance, lessThan(4));
     expect(heroRects.last.width, closeTo(40, 2));
-    // Header + rows only: no hero, no gap (r8 was > 240 + 48 per row).
+    // SDK measures row text at the available width. Wrapped labels may add
+    // height; the compact card still contains only header, rows and footer.
     final n = plan.items.length;
+    final headerHeight = tester
+        .getSize(find.byKey(const ValueKey('plan-header')))
+        .height;
+    var rowsHeight = 0.0;
+    for (var i = 0; i < n; i++) {
+      final rowHeight = tester
+          .getSize(find.byKey(ValueKey('plan-row-$i')))
+          .height;
+      expect(rowHeight, inInclusiveRange(48.0, 84.0));
+      rowsHeight += rowHeight;
+    }
     final openH = tester.getSize(card).height;
-    expect(openH, lessThan(PlanCard.setHeight + 48.0 * n));
-    expect(openH, greaterThanOrEqualTo(12 + 56 + 48.0 * n + 70));
-    expect(openH, lessThanOrEqualTo(12 + 56 + 48.0 * n + 110));
+    expect(openH, lessThan(PlanCard.setHeight + rowsHeight));
+    expect(openH, greaterThanOrEqualTo(12 + headerHeight + rowsHeight + 70));
+    expect(openH, lessThanOrEqualTo(12 + headerHeight + rowsHeight + 110));
     // The header carries the title (once) at the card's top.
     final title = find.descendant(of: card, matching: find.text(plan.title));
     expect(title, findsOneWidget);
@@ -383,8 +394,7 @@ void main() {
     final s = services();
     await s.store.acceptSafety(blocked: false);
     s.chat.start();
-    await s.chat.send('在家 15 分钟练核心，徒手');
-    final plan = s.chat.currentPlan!;
+    final plan = await showManualChatCard(s);
     await tester.pumpWidget(SmartFitApp(services: s));
     await tester.pumpAndSettle();
     final card = find.byType(PlanCard);

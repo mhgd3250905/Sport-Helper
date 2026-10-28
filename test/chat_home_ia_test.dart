@@ -1,22 +1,27 @@
-// Chat home after the IA pass (docs/design-audit-2026-10-19.md §2.1, §4):
-// a large greeting instead of a bubble, discovery chips with icons, the
-// conversation switching appearance / voice itself, opening the library by
-// category and settings, and the drawer's empty state putting the cursor
-// in the chat.
+// Chat home discovery, explicit navigation/settings and SDK-owned text.
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smartfit/chat/chat_controller.dart';
+import 'package:smartfit/chat/ai_chat_engine.dart';
+import 'package:smartfit/chat/app_chat_actions.dart';
+import 'package:smartfit/app/services.dart';
 import 'package:smartfit/data/app_store.dart';
-import 'package:smartfit/domain/exercise.dart';
 import 'package:smartfit/main.dart';
 import 'package:smartfit/ui/about_page.dart';
 import 'package:smartfit/ui/chat/chat_widgets.dart';
+import 'package:smartfit/ui/chat/chat_home_page.dart';
 import 'package:smartfit/ui/library_page.dart';
 import 'package:smartfit/ui/theme.dart';
 
-import 'app_flow_test.dart' show services, tall;
+import 'package:ugk_coach/ugk_coach.dart' as coach;
+
+import 'app_flow_test.dart' show services, tall, showManualChatCard;
+import 'support/coach_v2_fixtures.dart';
 
 void main() {
+  late CoachV2Fixtures fixture;
+  setUpAll(() async => fixture = await CoachV2Fixtures.load());
+
   Future<void> say(WidgetTester tester, String text) async {
     await tester.enterText(find.byKey(const ValueKey('chat-input')), text);
     await tester.pump();
@@ -69,30 +74,39 @@ void main() {
     },
   );
 
-  testWidgets('returning: 上次那个 / 上次练了什么 lead the chips', (tester) async {
-    tall(tester);
-    final s = services();
-    await s.store.acceptSafety(blocked: false);
-    await s.store.addHistory(
-      HistoryEntry(
-        title: '核心激活',
-        at: DateTime.now(),
-        minutes: 15,
-        completed: 8,
-        total: 8,
-      ),
-    );
-    s.chat.start();
-    await s.chat.send('在家 15 分钟练核心，徒手');
-    await s.chat.started(s.chat.currentPlan!);
-    s.chat.finished(s.chat.currentPlan!, completed: 8, total: 8);
-    expect(s.chat.suggestions.take(2), ['上次那个', '上次练了什么']);
-    await s.chat.send('上次练了什么');
-    expect(s.chat.messages.last.text, contains('今天的「核心激活」'));
-    expect(s.chat.messages.last.options.single.label, '再来一次');
-  });
+  testWidgets(
+    'returning users retain training history and use the plan panel',
+    (tester) async {
+      tall(tester);
+      final s = services();
+      await s.store.acceptSafety(blocked: false);
+      await s.store.addHistory(
+        HistoryEntry(
+          title: '核心激活',
+          at: DateTime.now(),
+          minutes: 15,
+          completed: 8,
+          total: 8,
+        ),
+      );
+      s.chat.start();
+      final plan = await showManualChatCard(s);
+      final saved = await s.chat.save(plan);
+      s.chat.finished(plan, completed: 8, total: 8);
+      expect(s.chat.suggestions, contains('在家 20 分钟练核心'));
+      expect(s.chat.suggestions, isNot(contains('上次那个')));
+      expect(s.store.history.single.title, '核心激活');
+      await tester.pumpWidget(SmartFitApp(services: s));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('chat-panel-toggle')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('panel-plans')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(ValueKey('saved-${saved.id}')), findsOneWidget);
+    },
+  );
 
-  testWidgets('the conversation switches appearance and voice itself', (
+  testWidgets('settings controls switch appearance and voice explicitly', (
     tester,
   ) async {
     tall(tester);
@@ -100,21 +114,84 @@ void main() {
     await s.store.acceptSafety(blocked: false);
     await tester.pumpWidget(SmartFitApp(services: s));
     await tester.pumpAndSettle();
-    await say(tester, '换浅色');
+    await tester.tap(find.byKey(const ValueKey('chat-panel-toggle')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('panel-settings')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('appearance-light')));
+    await tester.pumpAndSettle();
     expect(s.store.appearance, 'light');
     expect(SfColors.isDark, isFalse);
-    await say(tester, '换深色');
+    await tester.tap(find.byKey(const ValueKey('appearance-dark')));
+    await tester.pumpAndSettle();
     expect(s.store.appearance, 'dark');
-    await say(tester, '关掉语音');
+    await tester.ensureVisible(find.byKey(const ValueKey('voice-switch')));
+    await tester.tap(find.byKey(const ValueKey('voice-switch')));
+    await tester.pumpAndSettle();
     expect(s.store.voice.voice, isFalse);
     expect(s.store.voice.chimes, isTrue);
-    await say(tester, '静音');
+    await tester.tap(find.byKey(const ValueKey('chime-switch')));
+    await tester.pumpAndSettle();
     expect(s.store.voice.chimes, isFalse);
-    await say(tester, '打开语音');
+    await tester.tap(find.byKey(const ValueKey('voice-switch')));
+    await tester.pumpAndSettle();
     expect(s.store.voice.voice, isTrue);
   });
 
-  testWidgets('有哪些拉伸动作 opens the library on 拉伸; 设置 opens settings', (
+  testWidgets(
+    'free text reaches SDK and cannot change App settings or navigate',
+    (tester) async {
+      tall(tester);
+      final s = services();
+      await s.store.acceptSafety(blocked: false);
+      final client = coach.FakeLlmClient(
+        List.filled(4, 'SDK 已收到。'),
+        latency: Duration.zero,
+      );
+      final engine = AiChatEngine(
+        local: const AppChatActions(),
+        catalog: fixture.catalog,
+        profile: fixture.profile,
+        client: client,
+        enableUserMemory: false,
+      );
+      final chat = ChatController(
+        engine: engine,
+        store: s.store,
+        replyDelay: Duration.zero,
+      );
+      addTearDown(chat.dispose);
+      addTearDown(engine.dispose);
+      await tester.pumpWidget(
+        AppScope(
+          services: s,
+          child: MaterialApp(
+            theme: buildTheme(),
+            home: ChatHomePage(controller: chat),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final appearance = s.store.appearance;
+      final voice = s.store.voice;
+      for (final text in ['换浅色', '关掉语音', '有哪些拉伸动作', '设置']) {
+        await say(tester, text);
+        expect(s.store.appearance, appearance);
+        expect(s.store.voice, same(voice));
+        expect(find.byType(LibraryPage), findsNothing);
+        expect(find.byType(AboutPage), findsNothing);
+      }
+      expect(client.requests, hasLength(4));
+      expect(engine.agent.sessionState.userTurns.map((turn) => turn.text), [
+        '换浅色',
+        '关掉语音',
+        '有哪些拉伸动作',
+        '设置',
+      ]);
+    },
+  );
+
+  testWidgets('panel navigation opens the library with filters and settings', (
     tester,
   ) async {
     tall(tester);
@@ -122,14 +199,26 @@ void main() {
     await s.store.acceptSafety(blocked: false);
     await tester.pumpWidget(SmartFitApp(services: s));
     await tester.pumpAndSettle();
-    await say(tester, '有哪些拉伸动作');
+    await tester.tap(find.byKey(const ValueKey('chat-panel-toggle')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('panel-library')));
+    await tester.pumpAndSettle();
+    expect(find.byType(LibraryPage), findsOneWidget);
+    await tester.ensureVisible(find.byKey(const ValueKey('cat-stretch')));
+    await tester.tap(find.byKey(const ValueKey('cat-stretch')));
+    await tester.pumpAndSettle();
     expect(
-      tester.widget<LibraryPage>(find.byType(LibraryPage)).initial,
-      ExerciseCategory.stretch,
+      tester
+          .widget<SfChoiceChip>(find.byKey(const ValueKey('cat-stretch')))
+          .selected,
+      isTrue,
     );
     await tester.tap(find.byTooltip('返回').first);
     await tester.pumpAndSettle();
-    await say(tester, '设置');
+    await tester.tap(find.byKey(const ValueKey('chat-panel-toggle')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('panel-settings')));
+    await tester.pumpAndSettle();
     expect(find.byType(AboutPage), findsOneWidget);
   });
 

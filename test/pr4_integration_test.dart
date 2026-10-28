@@ -9,6 +9,7 @@ import 'package:smartfit/core/storage/local_state_storage.dart';
 import 'package:smartfit/data/app_store.dart';
 import 'package:smartfit/ui/chat/chat_home_page.dart';
 import 'package:smartfit/ui/chat/chat_widgets.dart';
+import 'package:smartfit/ui/chat/coach_task_bubble.dart';
 import 'package:smartfit/ui/theme/app_theme.dart';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
 import 'package:ugk_trainer/ugk_trainer.dart';
@@ -165,11 +166,28 @@ void main() {
 
       final pending = chat.send('在家练核心十五分钟');
       engine.eventBus.add(
-        const coach.AgentEvent('phone-turn', coach.AgentEventKind.checking),
+        coach.AgentEvent(
+          'phone-turn',
+          coach.AgentEventKind.node,
+          task: coach.CoachTaskState(
+            type: 'plan',
+            reused: false,
+            nodes: const [
+              coach.CoachNodeState(
+                id: 'review',
+                status: 'current',
+                stamp: 'SDK 正在核对方案',
+              ),
+            ],
+          ),
+        ),
       );
       await tester.pumpAndSettle();
-      final progress = find.text('正在核对计划');
-      final cancel = find.byKey(const ValueKey('chat-cancel'));
+      final progress = find.text('SDK 正在核对方案');
+      final cancel = find.descendant(
+        of: find.byType(CoachTaskBubble),
+        matching: find.widgetWithText(TextButton, '取消'),
+      );
       expect(progress.hitTestable(), findsOneWidget);
       expect(cancel.hitTestable(), findsOneWidget);
       expect(
@@ -187,7 +205,7 @@ void main() {
         const coach.AgentEvent('reset-turn', coach.AgentEventKind.slow),
       );
       await tester.pumpAndSettle();
-      expect(find.text('正在理解需求').hitTestable(), findsOneWidget);
+      expect(find.text('教练待办').hitTestable(), findsOneWidget);
       final newChat = find.byKey(const ValueKey('chat-new-conversation'));
       expect(newChat, findsNothing);
       await tester.tap(find.byKey(const ValueKey('chat-panel-toggle')));

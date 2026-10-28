@@ -22,12 +22,12 @@ import '../theme/measure_size.dart';
 import '../theme/solid_surface.dart';
 import '../theme/sf_icons.dart';
 import '../theme/tokens.dart';
-import '../theme/widgets.dart';
 import '../training_route.dart';
 import 'action_card.dart';
 import 'chat_widgets.dart';
 import 'coach_ui_adapter.dart';
 import 'cosmos.dart';
+import 'coach_task_bubble.dart';
 import 'plan_card.dart';
 import 'saved_plans_page.dart';
 import 'validated_plan_card.dart';
@@ -51,7 +51,6 @@ class ChatHomePage extends StatefulWidget {
 class _ChatHomePageState extends State<ChatHomePage>
     with WidgetsBindingObserver {
   late ChatController _chat;
-  late Stream<CoachTypingEvent> _typingEvents;
   StreamSubscription<String>? _actions;
   late final _scroll = widget.scrollController ?? ScrollController();
 
@@ -61,9 +60,6 @@ class _ChatHomePageState extends State<ChatHomePage>
   double _dockHeight = 112;
   final _input = FocusNode();
   bool _panelOpen = false;
-  bool _switchingToKeyboard = false;
-  Timer? _keyboardHeightTimer;
-  Timer? _keyboardTransitionTimer;
 
   /// Messages already on screen when the page opened don't animate in.
   final _seen = <String>{};
@@ -84,59 +80,17 @@ class _ChatHomePageState extends State<ChatHomePage>
       _closePanel();
       return;
     }
-    _keyboardTransitionTimer?.cancel();
-    setState(() {
-      _panelOpen = true;
-      _switchingToKeyboard = false;
-    });
+    setState(() => _panelOpen = true);
     _dismissInput();
   }
 
   void _closePanel() {
-    _keyboardTransitionTimer?.cancel();
-    if (!_panelOpen && !_switchingToKeyboard) return;
-    setState(() {
-      _panelOpen = false;
-      _switchingToKeyboard = false;
-    });
+    if (!_panelOpen) return;
+    setState(() => _panelOpen = false);
   }
 
   void _inputTapped() {
-    if (!_panelOpen) return;
-    setState(() {
-      _panelOpen = false;
-      _switchingToKeyboard = true;
-    });
-    _keyboardTransitionTimer?.cancel();
-    _keyboardTransitionTimer = Timer(const Duration(milliseconds: 700), () {
-      if (mounted && _switchingToKeyboard) {
-        setState(() => _switchingToKeyboard = false);
-      }
-    });
-  }
-
-  @override
-  void didChangeMetrics() {
-    if (!mounted || _actions == null) return;
-    final view = View.of(context);
-    final height = view.viewInsets.bottom / view.devicePixelRatio;
-    if (_switchingToKeyboard &&
-        height >= AppServices.of(context).store.lastKeyboardHeight - 20) {
-      _keyboardTransitionTimer?.cancel();
-      setState(() => _switchingToKeyboard = false);
-    }
-    _keyboardHeightTimer?.cancel();
-    if (height >= 160 && height <= 650 && !_panelOpen) {
-      _keyboardHeightTimer = Timer(const Duration(milliseconds: 300), () {
-        if (!mounted || _panelOpen) return;
-        final current = view.viewInsets.bottom / view.devicePixelRatio;
-        if ((current - height).abs() < 1) {
-          unawaited(
-            AppServices.of(context).store.setLastKeyboardHeight(height),
-          );
-        }
-      });
-    }
+    _closePanel();
   }
 
   @override
@@ -154,9 +108,6 @@ class _ChatHomePageState extends State<ChatHomePage>
     if (_actions != null) return;
     final s = AppServices.of(context);
     _chat = widget.controller ?? s.chat;
-    _typingEvents = _chat.progressEvents.map(
-      (event) => CoachTypingEvent(event.kind.name, path: event.path),
-    );
     _chat.start();
     _seen.addAll(_chat.messages.map((m) => m.id));
     _actions = _chat.actions.listen(_onAction);
@@ -166,8 +117,6 @@ class _ChatHomePageState extends State<ChatHomePage>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _actions?.cancel();
-    _keyboardHeightTimer?.cancel();
-    _keyboardTransitionTimer?.cancel();
     if (widget.scrollController == null) _scroll.dispose();
     _input.dispose();
     super.dispose();
@@ -320,7 +269,6 @@ class _ChatHomePageState extends State<ChatHomePage>
   @override
   Widget build(BuildContext context) {
     final s = AppServices.of(context);
-    final media = MediaQuery.of(context);
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: sfOverlay,
       child: PopScope(
@@ -390,8 +338,7 @@ class _ChatHomePageState extends State<ChatHomePage>
                                     panelOpen: _panelOpen,
                                     onTextTap: _inputTapped,
                                   ),
-                                  if (_panelOpen || _switchingToKeyboard)
-                                    _featurePanel(s, media),
+                                  _panelSlot(context),
                                 ],
                               ),
                             ),
@@ -409,15 +356,21 @@ class _ChatHomePageState extends State<ChatHomePage>
     );
   }
 
-  Widget _featurePanel(AppServices services, MediaQueryData media) {
-    // The system inset and this panel share one footprint while the keyboard
-    // is moving, preventing the input from jumping by a full keyboard height.
-    final target =
-        (services.store.lastKeyboardHeight - media.viewPadding.bottom).clamp(
-          0.0,
-          media.size.height * .65,
-        );
-    final visible = (target - media.viewInsets.bottom).clamp(0.0, target);
+  Widget _panelSlot(BuildContext context) {
+    final panel = _panelOpen
+        ? _featurePanel()
+        : const SizedBox(width: double.infinity);
+    if (MediaQuery.disableAnimationsOf(context)) return panel;
+    return AnimatedSize(
+      key: const ValueKey('chat-panel-transition'),
+      duration: SfMotion.medium,
+      curve: SfMotion.standard,
+      alignment: Alignment.topCenter,
+      child: panel,
+    );
+  }
+
+  Widget _featurePanel() {
     final entries =
         <({String key, String label, SfGlyph icon, VoidCallback tap})>[
           (
@@ -448,59 +401,17 @@ class _ChatHomePageState extends State<ChatHomePage>
             tap: () => unawaited(_push(const AboutPage())),
           ),
         ];
-    return SizedBox(
+    return ChatFeaturePanel(
       key: const ValueKey('chat-feature-panel'),
-      height: visible,
-      width: double.infinity,
-      child: ClipRect(
-        child: OverflowBox(
-          alignment: Alignment.topCenter,
-          minHeight: target,
-          maxHeight: target,
-          child: IgnorePointer(
-            ignoring: !_panelOpen,
-            child: ColoredBox(
-              color: SfColors.surface,
-              child: GridView.count(
-                padding: const EdgeInsets.fromLTRB(16, 20, 16, 12),
-                crossAxisCount: 4,
-                childAspectRatio: .8,
-                children: [
-                  for (final entry in entries)
-                    SfPressable(
-                      key: ValueKey(entry.key),
-                      semanticLabel: entry.label,
-                      onTap: entry.tap,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            width: 56,
-                            height: 56,
-                            decoration: BoxDecoration(
-                              color: SfColors.surfaceHigh,
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: SfColors.line),
-                            ),
-                            child: Center(
-                              child: SfIcon(
-                                entry.icon,
-                                size: 24,
-                                color: SfColors.text,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(entry.label, style: SfType.label),
-                        ],
-                      ),
-                    ),
-                ],
-              ),
-            ),
+      actions: [
+        for (final entry in entries)
+          ChatPanelAction(
+            key: ValueKey(entry.key),
+            label: entry.label,
+            icon: entry.icon,
+            onTap: entry.tap,
           ),
-        ),
-      ),
+      ],
     );
   }
 
@@ -535,7 +446,11 @@ class _ChatHomePageState extends State<ChatHomePage>
         fadeTop: false,
         timeMarkBuilder: (at, now) => TimeMark(at, now: now),
         typing: _chat.typing
-            ? TypingBubble(onCancel: _chat.cancelRequest, events: _typingEvents)
+            ? CoachTaskBubble(
+                task: _chat.activeTask,
+                waiting: true,
+                onCancel: _chat.cancelRequest,
+              )
             : null,
       ),
     );

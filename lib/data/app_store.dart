@@ -71,9 +71,6 @@ class AppStore extends ChangeNotifier {
   bool aiMemoryEnabled = true;
   bool mediaWifiOnly = true;
 
-  /// Last observed keyboard height in logical pixels, used by the chat panel.
-  double lastKeyboardHeight = 280;
-
   bool safetyAccepted = false;
 
   /// A safety question was answered "是": browse only, no generated plans.
@@ -151,13 +148,6 @@ class AppStore extends ChangeNotifier {
       starfield = j['starfield'] != false;
       aiMemoryEnabled = j['aiMemoryEnabled'] != false;
       mediaWifiOnly = j['mediaWifiOnly'] != false;
-      final keyboardHeight = j['lastKeyboardHeight'];
-      if (keyboardHeight is num &&
-          keyboardHeight.isFinite &&
-          keyboardHeight >= 160 &&
-          keyboardHeight <= 650) {
-        lastKeyboardHeight = keyboardHeight.toDouble();
-      }
       if (appearances.contains(j['appearance'])) {
         appearance = j['appearance'] as String;
       }
@@ -219,7 +209,6 @@ class AppStore extends ChangeNotifier {
     'starfield': starfield,
     'aiMemoryEnabled': aiMemoryEnabled,
     'mediaWifiOnly': mediaWifiOnly,
-    'lastKeyboardHeight': lastKeyboardHeight,
     'appearance': appearance,
     'savedPlans': [for (final p in savedPlans) p.toJson()],
     'chat': chatLog.length > chatLogLimit
@@ -318,17 +307,6 @@ class AppStore extends ChangeNotifier {
   Future<void> setMediaWifiOnly(bool value) {
     mediaWifiOnly = value;
     return _save();
-  }
-
-  Future<void> setLastKeyboardHeight(double value) {
-    if (!value.isFinite ||
-        value < 160 ||
-        value > 650 ||
-        (lastKeyboardHeight - value).abs() < 1) {
-      return Future.value();
-    }
-    lastKeyboardHeight = value;
-    return _save(notify: false);
   }
 
   SavedPlan? savedFor(TrainingPlan p) =>

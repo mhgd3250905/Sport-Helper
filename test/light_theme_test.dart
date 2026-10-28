@@ -1,17 +1,15 @@
 // Pose-Hub's baked light/dark media follows the App theme without runtime keying.
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:smartfit/chat/chat_models.dart';
-import 'package:smartfit/chat/rule_chat_engine.dart';
 import 'package:smartfit/data/app_store.dart';
 import 'package:smartfit/domain/exercise.dart';
-import 'package:smartfit/domain/plan_generator.dart';
 import 'package:smartfit/main.dart';
 import 'package:smartfit/ui/exercise_video.dart';
 import 'package:smartfit/ui/theme.dart';
 import 'package:ugk_trainer/ugk_trainer.dart' as trainer;
 
-import 'app_flow_test.dart' show MemoryStorage, services, tall;
+import 'app_flow_test.dart'
+    show MemoryStorage, services, tall, showManualChatCard;
 import 'support.dart';
 
 double _lum(Color c) => c.computeLuminance();
@@ -270,42 +268,6 @@ void main() {
   });
 
   group('switching', () {
-    test(
-      '「你能做什么」 offers the opposite of the look in effect, follow-system included',
-      () async {
-        final lib = loadLibrary();
-        final engine = RuleChatEngine(
-          lib: lib,
-          templates: TemplatePlanGenerator(lib: lib, catalog: loadCatalog()),
-        );
-        Future<List<String>> labels(ChatState s) async => [
-          for (final o in (await engine.reply(
-            '你能做什么',
-            s,
-          )).messages.first.options)
-            o.label,
-        ];
-        expect(
-          await labels(
-            const ChatState(appearance: 'system', systemLight: true),
-          ),
-          contains('换深色'),
-        );
-        expect(
-          await labels(const ChatState(appearance: 'system')),
-          contains('换浅色'),
-        );
-        expect(
-          await labels(const ChatState(appearance: 'light')),
-          contains('换深色'),
-        );
-        expect(
-          await labels(const ChatState(appearance: 'dark', systemLight: true)),
-          contains('换浅色'),
-        );
-      },
-    );
-
     test('a new install follows the system; a stored choice is kept', () async {
       final fresh = AppStore(MemoryStorage());
       await fresh.load();
@@ -326,7 +288,7 @@ void main() {
         final s = services();
         await s.store.acceptSafety(blocked: false);
         s.chat.start();
-        await s.chat.send('在家 15 分钟练核心，徒手');
+        await showManualChatCard(s);
         // Hero and strip previews switch to each theme's bundled stills.
         final items = s.chat.currentPlan!.items.toList();
         final hero = s.library[items.first.exerciseId];
@@ -352,25 +314,20 @@ void main() {
         expect(_assetsIn(tester), contains(first.media.lightPoster));
         expect(_assetsIn(tester), contains(hero.media.lightPoster));
 
-        // 「换深色」 in the conversation overrides the system.
-        await tester.enterText(find.byKey(const ValueKey('chat-input')), '换深色');
-        await tester.pump();
-        await tester.tap(find.byKey(const ValueKey('chat-send')));
+        // Settings changes override the system without a prose command.
+        await s.store.setAppearance('dark');
         await tester.pumpAndSettle();
         expect(s.store.appearance, 'dark');
         expect(SfColors.isDark, isTrue);
         expect(_assetsIn(tester), contains(first.media.poster));
 
-        // 「换浅色」 back keeps the chat and updates its cover artwork.
         final messages = s.chat.messages.length;
-        await tester.enterText(find.byKey(const ValueKey('chat-input')), '换浅色');
-        await tester.pump();
-        await tester.tap(find.byKey(const ValueKey('chat-send')));
+        await s.store.setAppearance('light');
         await tester.pumpAndSettle();
         expect(s.store.appearance, 'light');
         expect(SfColors.isDark, isFalse);
         expect(_assetsIn(tester), contains(first.media.lightPoster));
-        expect(s.chat.messages.length, greaterThan(messages));
+        expect(s.chat.messages.length, messages);
         await tester.pumpWidget(const SizedBox());
       },
     );

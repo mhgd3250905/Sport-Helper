@@ -78,6 +78,20 @@ void tall(WidgetTester tester) {
   addTearDown(tester.view.reset);
 }
 
+// Product navigation tests use an explicit manually composed plan fixture;
+// natural-language plan generation is exercised by the SDK integration tests.
+Future<TrainingPlan> showManualChatCard(
+  AppServices services, {
+  String template = 'core',
+}) async {
+  final result = await services.generator.generate(
+    ScenarioRequest(templateId: template),
+  );
+  final plan = result.plan!;
+  await services.chat.started(plan);
+  return plan;
+}
+
 // Paused Morph Pulse breathing intentionally keeps scheduling frames behind
 // the modal. Wait for the finite route animation, not for the whole app to idle.
 Future<void> _openDiscomfort(WidgetTester tester) async {
@@ -263,7 +277,7 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  testWidgets('safety talk → describe → plan card → player → back in the chat', (
+  testWidgets('safety talk → manual plan card → player → back in the chat', (
     tester,
   ) async {
     tall(tester);
@@ -278,8 +292,9 @@ void main() {
     expect(s.store.safetyBlocked, isFalse);
     expect(find.textContaining('都没问题'), findsOneWidget);
 
-    // Describe → the card.
-    await say(tester, '在办公室午休 10 分钟，肩颈很僵');
+    // An explicit manual-plan fixture supplies the card.
+    await showManualChatCard(s, template: 'office-relax');
+    await tester.pumpAndSettle();
     expect(find.byType(PlanCard), findsOneWidget);
     expect(find.text('工位肩颈腰放松'), findsOneWidget);
     final plan = s.chat.currentPlan!;
@@ -333,7 +348,8 @@ void main() {
     await s.store.acceptSafety(blocked: false);
     await tester.pumpWidget(SmartFitApp(services: s));
     await tester.pumpAndSettle();
-    await say(tester, '在家 15 分钟练核心，徒手');
+    await showManualChatCard(s);
+    await tester.pumpAndSettle();
     final plan = s.chat.currentPlan!;
     final screen = tester.getRect(find.byType(ChatHomePage));
     await tester.tap(find.byKey(ValueKey('plan-start-${plan.id}')));
@@ -363,7 +379,8 @@ void main() {
       await s.store.acceptSafety(blocked: false);
       await tester.pumpWidget(SmartFitApp(services: s));
       await tester.pumpAndSettle();
-      await say(tester, '在家 15 分钟练核心，徒手');
+      await showManualChatCard(s);
+      await tester.pumpAndSettle();
       await tester.tap(
         find.byKey(ValueKey('plan-expand-${s.chat.currentPlan!.id}')),
       );
@@ -433,7 +450,8 @@ void main() {
     await tester.pumpWidget(SmartFitApp(services: s));
     await tester.pumpAndSettle();
 
-    await say(tester, '在家 15 分钟练核心，徒手');
+    await showManualChatCard(s);
+    await tester.pumpAndSettle();
     final plan = s.chat.currentPlan!;
     await tester.tap(find.byKey(ValueKey('plan-expand-${plan.id}')));
     await tester.pumpAndSettle();
@@ -463,7 +481,8 @@ void main() {
     expect(find.byType(LibraryPage), findsOneWidget);
     await tester.tap(find.byTooltip('返回').first);
     await tester.pumpAndSettle();
-    await say(tester, '自己选条件');
+    s.chat.command('@custom');
+    await tester.pumpAndSettle();
     expect(find.byType(CustomPlanPage), findsOneWidget);
   });
 

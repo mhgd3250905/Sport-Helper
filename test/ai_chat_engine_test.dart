@@ -1,56 +1,23 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:smartfit/app/app_test_catalog.dart';
-import 'package:smartfit/app/app_test_content.dart';
 import 'package:smartfit/chat/ai_chat_engine.dart';
-import 'package:smartfit/chat/chat_controller.dart';
+import 'package:smartfit/chat/ai_coach_config.dart';
+import 'package:smartfit/chat/app_chat_actions.dart';
 import 'package:smartfit/chat/chat_models.dart';
-import 'package:smartfit/chat/rule_chat_engine.dart';
-import 'package:smartfit/core/storage/local_state_storage.dart';
-import 'package:smartfit/data/app_store.dart';
-import 'package:smartfit/diagnostics/runtime_log.dart';
-import 'package:smartfit/domain/exercise.dart';
 import 'package:smartfit/domain/plan.dart';
-import 'package:smartfit/domain/plan_generator.dart';
-import 'package:smartfit/domain/plan_validator.dart';
-import 'package:smartfit/domain/saved_plan.dart';
-import 'package:smartfit/domain/session.dart';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
-import 'package:ugk_trainer/ugk_trainer.dart' show PoseHubActionLibrary;
 
-import 'support.dart';
+import 'support/coach_v2_fixtures.dart';
 
-class _Storage implements LocalStateStorage {
-  final values = <String, String>{};
-  @override
-  Future<String?> read(String key) async => values[key];
-  @override
-  Future<void> write(String key, String value) async => values[key] = value;
-}
-
-class _FailingMemoryStore extends coach.InMemoryUserMemoryStore {
-  bool fail = true;
-  int saves = 0;
-
-  @override
-  Future<void> save(List<coach.MemoryEntry> entries) async {
-    saves++;
-    if (fail) throw StateError('disk-full-private-detail');
-    await super.save(entries);
-  }
-}
-
-/// A queued provider response may arrive after cancellation.
 class _LateClient implements coach.LlmClient {
   final started = Completer<void>();
   final late = Completer<coach.LlmResponse>();
   final requests = <coach.LlmRequest>[];
   coach.CancelToken? token;
   @override
-  String get model => 'late-test-model';
+  String get model => 'late-test';
   @override
   coach.Pricing? get pricing => null;
   @override
@@ -68,2126 +35,563 @@ class _LateClient implements coach.LlmClient {
   }
 }
 
-/// Exercises the SDK OpenAI tool-call wire parser and HTTP cancellation.
-class _Gateway {
-  _Gateway(this.server);
-  final HttpServer server;
-  final bodies = <Map<String, dynamic>>[];
-  final sockets = <Socket>[];
-  final requestStarted = Completer<void>();
-  final aborted = Completer<void>();
-
-  static Future<_Gateway> start(
-    List<coach.LlmResponse> responses, {
-    bool hold = false,
-    int status = HttpStatus.ok,
-    String errorMessage = 'test quota exceeded',
-  }) async {
-    final gateway = _Gateway(
-      await HttpServer.bind(InternetAddress.loopbackIPv4, 0),
-    );
-    gateway.server.listen((request) async {
-      final body =
-          jsonDecode(await utf8.decoder.bind(request).join())
-              as Map<String, dynamic>;
-      gateway.bodies.add(body);
-      if (!gateway.requestStarted.isCompleted) {
-        gateway.requestStarted.complete();
-      }
-      if (status != HttpStatus.ok) {
-        request.response.statusCode = status;
-        request.response.headers.contentType = ContentType.json;
-        request.response.headers.set(HttpHeaders.retryAfterHeader, '0');
-        request.response.write(
-          jsonEncode({
-            'error': {'message': errorMessage},
-          }),
-        );
-        await request.response.close();
-        return;
-      }
-      if (hold) {
-        final socket = await request.response.detachSocket(writeHeaders: false);
-        gateway.sockets.add(socket);
-        socket.listen(
-          (_) {},
-          onDone: () {
-            if (!gateway.aborted.isCompleted) gateway.aborted.complete();
-          },
-          onError: (Object _) {
-            if (!gateway.aborted.isCompleted) gateway.aborted.complete();
-          },
-        );
-        return;
-      }
-      final response = responses[gateway.bodies.length - 1];
-      request.response.headers.contentType = ContentType.json;
-      request.response.write(
-        jsonEncode({
-          'model': 'loopback-test',
-          'choices': [
-            {
-              'message': {
-                'content': response.content,
-                if (response.toolCalls.isNotEmpty)
-                  'tool_calls': [
-                    for (final call in response.toolCalls) call.toJson(),
-                  ],
-                'reasoning_content': '仅供模型内部推理，不能显示',
-              },
-              'finish_reason': response.toolCalls.isEmpty
-                  ? 'stop'
-                  : 'tool_calls',
-            },
-          ],
-          'usage': {'prompt_tokens': 100, 'completion_tokens': 20},
-        }),
-      );
-      await request.response.close();
-    });
-    return gateway;
-  }
-
-  coach.OpenAiCompatibleClient client() => coach.OpenAiCompatibleClient(
-    config: coach.LlmConfig(
-      baseUrl: 'http://127.0.0.1:${server.port}/v1',
-      model: 'loopback-test',
-      timeout: const Duration(seconds: 2),
-      maxRetries: 0,
-    ),
-  );
-
-  Future<void> close() async {
-    for (final socket in sockets) {
-      socket.destroy();
-    }
-    await server.close(force: true);
-  }
+class _FailingMemory extends coach.InMemoryUserMemoryStore {
+  @override
+  Future<void> save(List<coach.MemoryEntry> entries) async =>
+      throw StateError('private-disk-error');
 }
 
+String _text(ChatReply reply) => reply.messages.map((m) => m.text).join('\n');
+String _wire(coach.LlmRequest request) =>
+    jsonEncode(request.messages.map((m) => m.toJson()).toList());
+
 void main() {
-  late ExerciseLibrary library;
-  late coach.Catalog catalog;
-  late coach.CoachProfile profile;
-
+  late CoachV2Fixtures fixture;
   setUpAll(() async {
-    // Read official SDK assets directly: initializing a widget binding here
-    // would replace HttpClient and invalidate the loopback wire tests below.
-    final config = File('.dart_tool/package_config.json');
-    final packages =
-        (jsonDecode(config.readAsStringSync()) as Map)['packages'] as List;
-    final trainer = packages.cast<Map>().singleWhere(
-      (p) => p['name'] == 'ugk_trainer',
-    );
-    final root = config.absolute.uri.resolve("${trainer['rootUri']}/");
-    final bytes = await File.fromUri(
-      root.resolve(
-        '${PoseHubActionLibrary.assetRoot.replaceFirst('packages/ugk_trainer/', '')}catalog.json',
-      ),
-    ).readAsBytes();
-    expect(coach.sha256Hex(bytes), PoseHubActionLibrary.catalogSha256);
-    final sdk = coach.PoseHubAppTestCatalog.fromBytes(bytes);
-    final content = AppTestContent.build(
-      catalog: AppTestCatalog.fromSdk(sdk),
-      legacyLibrary: loadLibrary(),
-    );
-    library = content.library;
-    catalog = content.coachCatalog;
-    profile = coach.CoachProfile.fromJson(
-      jsonDecode(File('assets/coach/smartfit.json').readAsStringSync()),
-    );
+    fixture = await CoachV2Fixtures.load();
   });
-
-  RuleChatEngine local() => RuleChatEngine(
-    lib: library,
-    templates: TemplatePlanGenerator(lib: library, catalog: loadCatalog()),
-  );
-
   AiChatEngine engine(
     coach.LlmClient client, {
-    Duration? deadline,
+    Duration deadline = const Duration(seconds: 390),
     coach.UserMemoryStore? memoryStore,
-    bool enableUserMemory = true,
+    bool enableUserMemory = false,
   }) {
-    final result = AiChatEngine(
-      local: local(),
-      catalog: catalog,
-      profile: profile,
+    final value = AiChatEngine(
+      local: const AppChatActions(),
+      catalog: fixture.catalog,
+      profile: fixture.profile,
       client: client,
-      turnTimeout: deadline ?? const Duration(seconds: 390),
+      turnTimeout: deadline,
       memoryStore: memoryStore,
       enableUserMemory: enableUserMemory,
     );
-    addTearDown(result.dispose);
-    return result;
+    addTearDown(value.dispose);
+    return value;
   }
 
-  TrainingPlan plan({
-    String id = 'model-plan-one',
-    List<String> ids = const ['h-side-leg-raise'],
-    String scene = 'home',
-    int minutes = 10,
-    int level = 1,
-    Set<String> avoid = const {},
-  }) {
-    // Realistic fixture doses: SDK 0.7 validates elapsed time as well as the
-    // targetMinutes label. Multiple rounds cover long-duration boundary cases.
-    final rounds = (minutes / 12).ceil().clamp(1, 6);
-    final perItem =
-        (minutes * 60 -
-            10 -
-            (rounds - 1) * 15 -
-            rounds * (ids.length - 1) * 15) /
-        (rounds * ids.length);
-    PlanItem item(String id) {
-      final exercise = library.tryGet(id);
-      final timed = exercise?.dose.mode == DoseMode.time;
-      final sides = exercise?.unilateral == true ? 2 : 1;
-      const sets = 6;
-      final repSeconds = catalog[id] == null
-          ? 3.0
-          : const coach.PlanDuration().repSeconds(catalog[id]!);
-      final work = ((perItem / sets - (sides == 2 ? 5 : 0)) / sides);
-      final seconds = work.floor().clamp(10, 120);
-      final reps = (work / repSeconds).floor().clamp(1, 30);
-      final actualWork = timed ? seconds.toDouble() : reps * repSeconds;
-      final rest =
-          ((perItem - sets * (actualWork * sides + (sides == 2 ? 5 : 0))) /
-                  (sets - 1))
-              .round()
-              .clamp(0, 180);
-      return PlanItem(
-        exerciseId: id,
-        mode: timed ? DoseMode.time : DoseMode.reps,
-        sets: sets,
-        reps: timed ? null : reps,
-        workSeconds: timed ? seconds : null,
-        perSide: sides == 2,
-        restSeconds: rest,
+  group('SDK owns text and task decisions', () {
+    for (final input in ['帮我安排一组训练', '我的计划', '换浅色', '看看动作库', '@library']) {
+      test(
+        'free text "$input" reaches SDK without App intent routing',
+        () async {
+          final client = coach.FakeLlmClient(['SDK回答'], latency: Duration.zero);
+          final ai = engine(client);
+          final reply = await ai.reply(input, const ChatState());
+          expect(_text(reply), 'SDK回答');
+          expect(reply.action, isNull);
+          expect(client.requests, hasLength(1));
+          expect(ai.agent.sessionState.userTurns.single.text, input);
+          expect(
+            ai.conversation.state.messages.where((m) => m.isUser).single.text,
+            input,
+          );
+        },
       );
     }
-
-    return TrainingPlan(
-      id: id,
-      source: 'ai',
-      title: 'AI 徒手训练',
-      summary: '按已确认条件编排。',
-      goal: 'fullbody',
-      scene: scene,
-      equipment: const [],
-      level: level,
-      targetMinutes: minutes,
-      avoid: avoid,
-      blocks: [
-        PlanBlock(
-          id: 'main',
-          name: '主训练',
-          type: BlockType.main,
-          rounds: rounds,
-          restBetweenRoundsSeconds: 15,
-          items: [for (final id in ids) item(id)],
-        ),
-      ],
-    );
-  }
-
-  coach.LlmResponse tool(
-    String name,
-    Map<String, Object?> arguments, {
-    String text = '按你的条件排好了。',
-  }) => coach.LlmResponse(
-    content: text,
-    toolCalls: [
-      coach.LlmToolCall(
-        id: 'call-test',
-        name: name,
-        arguments: jsonEncode(arguments),
-      ),
-    ],
-  );
-
-  coach.LlmResponse planResponse({TrainingPlan? value, String? text}) => tool(
-    coach.CoachTools.showPlan,
-    (value ?? plan()).toJson(),
-    text: text ?? '按你的条件排好了。',
-  );
-
-  coach.LlmResponse actionsResponse({
-    List<String> ids = const ['h-calf-raise'],
-    String text = '先看看这些动作的做法。',
-  }) => tool(coach.CoachTools.showActions, {
-    'items': [
-      for (final id in ids) {'actionId': id, 'note': '保持自然呼吸。'},
-    ],
-  }, text: text);
-
-  String texts(ChatReply reply) => reply.messages.map((m) => m.text).join('\n');
-  TrainingPlan? replyPlan(ChatReply reply) =>
-      reply.messages.map((m) => m.plan).whereType<TrainingPlan>().firstOrNull;
-  String requestText(coach.LlmRequest request) =>
-      request.messages.map((m) => jsonEncode(m.toJson())).join('\n');
-
-  void expectLocalPreserved(ChatReply actual, ChatReply expected) {
-    expect(actual.state.pending.toString(), expected.state.pending.toString());
-    expect(actual.state.asked, expected.state.asked);
-    expect(actual.state.safetyBlocked, expected.state.safetyBlocked);
-    expect(actual.suggestions, expected.suggestions);
-    expect(actual.action, expected.action);
-    for (final message in expected.messages) {
-      expect(texts(actual), contains(message.text));
-      expect(
-        actual.messages.expand((m) => m.options).map((o) => o.toJson()),
-        containsAll(message.options.map((o) => o.toJson())),
-      );
-    }
-  }
-
-  ChatController controllerFor(
-    AiChatEngine ai, {
-    AppStore? store,
-    Duration replyDelay = Duration.zero,
-  }) {
-    final controller = ChatController(
-      engine: ai,
-      store: store ?? (AppStore(_Storage())..safetyAccepted = true),
-      replyDelay: replyDelay,
-    )..start();
-    addTearDown(controller.dispose);
-    return controller;
-  }
-
-  // r2 creates one local three-field confirmation before a model call.
-  // The older model-authored text/choice questions are no longer a planning
-  // protocol; persistence/legacy mapping is covered by coach_ui_question_flow.
-  group('SDK r2 planning confirmation', () {
-    coach.LlmClient refusingClient() => coach.FakeLlmClient([
-      const coach.LlmException(
-        coach.LlmErrorKind.http,
-        'private-error',
-        statusCode: 401,
-      ),
-    ], latency: Duration.zero);
-
     test(
-      'invalid and duplicate selections cannot submit; valid grouped answer closes question',
-      () async {
-        final client = refusingClient() as coach.FakeLlmClient;
-        final ai = engine(client);
-        final controller = controllerFor(ai);
-        await controller.send('在家想安排一套训练');
-        final message = controller.messages.last;
-        expect(message.question!.isConfirmation, isTrue);
-        expect(message.question!.fields.map((f) => f.key), [
-          'scene',
-          'equipment',
-          'minutes',
-        ]);
-        expect(client.requests, isEmpty);
-        expect(controller.canAnswerQuestion(message), isTrue);
-        await controller.answerForm(message, {
-          'scene': ['家里'],
-          'equipment': ['非法器械'],
-          'minutes': ['10 分钟'],
-        });
-        expect(client.requests, isEmpty);
-        expect(controller.canAnswerQuestion(message), isTrue);
-        final answer = {
-          'scene': ['家里'],
-          'equipment': ['徒手'],
-          'minutes': ['10 分钟'],
-        };
-        await Future.wait([
-          controller.answerForm(message, answer),
-          controller.answerForm(message, answer),
-        ]);
-        expect(client.requests, hasLength(1));
-        final updated = controller.messages.firstWhere(
-          (m) => m.id == message.id,
-        );
-        expect(updated.questionAnswered, isTrue);
-        expect(updated.answeredForm, answer);
-        expect(controller.canAnswerQuestion(updated), isFalse);
-        await controller.answerForm(message, answer);
-        expect(client.requests, hasLength(1));
-        expect(controller.messages.last.isPlanningFailure, isTrue);
-        expect(controller.messages.last.plan, isNull);
-      },
-    );
-
-    test(
-      'default action records default selections without automatic preset',
-      () async {
-        final client = refusingClient() as coach.FakeLlmClient;
-        final controller = controllerFor(engine(client));
-        await controller.send('帮我安排一组训练');
-        final question = controller.messages.last;
-        expect(question.question!.skipLabel, '按默认来');
-        final defaults = question.question!.defaultSelections;
-        await controller.skipQuestion(question);
-        final answered = controller.messages.firstWhere(
-          (m) => m.id == question.id,
-        );
-        expect(answered.answeredForm, defaults);
-        expect(answered.questionAnswered, isTrue);
-        expect(client.requests, hasLength(1));
-        expect(controller.messages.last.isPlanningFailure, isTrue);
-        expect(controller.messages.last.plan, isNull);
-      },
-    );
-
-    test(
-      'stored confirmation is read-only and new conversation invalidates it',
+      'explicit App command bypasses model without interpreting prose',
       () async {
         final client = coach.FakeLlmClient([], latency: Duration.zero);
-        final ai = engine(client);
-        final store = AppStore(_Storage())..safetyAccepted = true;
-        final controller = controllerFor(ai, store: store);
-        await controller.send('帮我安排一组训练');
-        final question = controller.messages.last;
-        final restored = ChatMessage.fromJson(
-          question.toJson().cast<String, dynamic>(),
-        );
-        expect(restored.question!.toJson(), question.question!.toJson());
-        expect(
-          ChatMessage.fromJson({
-            ...question.toJson(),
-            'question': {'question': 'bad'},
-          }).question,
-          isNull,
-        );
-        await Future<void>.delayed(Duration.zero);
-        final fresh = controllerFor(
-          engine(coach.FakeLlmClient([], latency: Duration.zero)),
-          store: store,
-        );
-        final historical = fresh.messages.firstWhere((m) => m.question != null);
-        expect(fresh.canAnswerQuestion(historical), isFalse);
-        await controller.newConversation();
-        expect(controller.canAnswerQuestion(question), isFalse);
-        await controller.skipQuestion(question);
+        final reply = await engine(
+          client,
+        ).replyAppCommand('@library', const ChatState());
+        expect(reply.action, '@library');
         expect(client.requests, isEmpty);
-        expect(ai.agent.history, isEmpty);
       },
     );
-
     test(
-      'local navigation closes a pending confirmation without model request',
+      'stale App plan/request/history never become host parameters',
       () async {
-        final client = coach.FakeLlmClient([], latency: Duration.zero);
-        final store = AppStore(_Storage())..safetyAccepted = true;
-        final saved = await store.savePlan(
-          plan(id: 'saved-during-clarification'),
+        const old = TrainingPlan(
+          id: 'old-private-card',
+          source: 'ai',
+          title: '旧方案私有标记',
+          summary: '',
+          goal: 'core',
+          scene: 'gym',
+          equipment: ['dumbbell'],
+          level: 3,
+          targetMinutes: 45,
+          blocks: [],
         );
-        final controller = controllerFor(engine(client), store: store);
-        await controller.send('帮我安排一组训练');
-        final question = controller.messages.last;
-        await controller.showSaved(saved);
-        expect(client.requests, isEmpty);
-        expect(controller.messages.last.plan!.id, saved.plan.id);
-        expect(controller.canAnswerQuestion(question), isFalse);
-        await controller.send('静音');
-        expect(client.requests, isEmpty);
-        expect(store.voice.voice, isFalse);
-      },
-    );
-
-    test('confirmed form preserves safety in the actual SDK request', () async {
-      final client = refusingClient() as coach.FakeLlmClient;
-      final ai = engine(client);
-      final first = await ai.reply(
-        '帮我安排一组训练',
-        const ChatState(coachContext: Slots(avoid: {'wrist'})),
-      );
-      final question = first.messages.single;
-      expect(question.question!.isConfirmation, isTrue);
-      await ai.replyAnswer(
-        question.conversationMessageId!,
-        '确认',
-        first.state,
-        formAnswers: {
-          'scene': ['家里'],
-          'equipment': ['徒手'],
-          'minutes': ['10 分钟'],
-        },
-      );
-      expect(client.requests, hasLength(1));
-      expect(requestText(client.requests.single), contains('wrist'));
-      expect(ai.lastResult!.isPlanningFailure, isTrue);
-    });
-  });
-
-  test(
-    'plain SDK text reaches bubbles without inventing cards or App commands',
-    () async {
-      final client = coach.FakeLlmClient([
-        '动作慢一点，保持自然呼吸。',
-      ], latency: Duration.zero);
-      final ai = engine(client);
-      final reply = await ai.reply('请讲解训练时的呼吸要领', const ChatState());
-      expect(texts(reply), '动作慢一点，保持自然呼吸。');
-      expect(reply.aiTurn, isTrue);
-      expect(replyPlan(reply), isNull);
-      expect(reply.messages.every((m) => m.actions == null), isTrue);
-      expect(reply.action, isNull);
-      expect(ai.lastResult?.status, coach.TurnStatus.ok);
-      expect(ai.lastOutcome, coach.TurnOutcome.model);
-      expect(ai.session.turnCount, 1);
-    },
-  );
-
-  test('wire show_actions and show_plan accept only SDK gate values', () async {
-    final gateway = await _Gateway.start([actionsResponse(), planResponse()]);
-    addTearDown(gateway.close);
-    final ai = engine(gateway.client());
-    final first = await ai.reply('给我看提踵动作', const ChatState());
-    final actions = first.messages.map((m) => m.actions).nonNulls.single;
-    expect(actions, isA<coach.ValidatedActions>());
-    expect(identical(actions, ai.lastResult!.actions), isTrue);
-    expect(actions.items.single.id, 'h-calf-raise');
-    expect(actions.items.single.note, '保持自然呼吸。');
-    expect(replyPlan(first), isNull);
-
-    final second = await ai.reply('在家 10 分钟练全身，徒手', first.state);
-    final selected = replyPlan(second)!;
-    expect(ai.lastResult!.plan, isA<coach.ValidatedPlan>());
-    expect(selected.exerciseIds, ai.lastResult!.plan!.plan.exerciseIds);
-    expect(selected.source, 'ai');
-    expect(
-      PlanValidator(library).validate(selected, second.state.request),
-      isEmpty,
-    );
-    expect(texts(first) + texts(second), isNot(contains('仅供模型内部推理')));
-    expect(texts(second), isNot(contains('"tool_calls"')));
-    expect(gateway.bodies, hasLength(2));
-    for (final body in gateway.bodies) {
-      expect(body['tool_choice'], 'auto');
-      expect(body.containsKey('response_format'), isFalse);
-      expect(
-        (body['tools'] as List).map((t) => (t as Map)['function']['name']),
-        containsAll(['show_actions', 'show_plan']),
-      );
-      expect(
-        (body['tools'] as List).map((t) => (t as Map)['function']['name']),
-        isNot(contains('check_plan')),
-      );
-    }
-    final history = gateway.bodies.last['messages'] as List;
-    expect(history.where((m) => m['role'] == 'tool'), isNotEmpty);
-    final shown =
-        history.where((m) => m['role'] == 'tool').single['content'] as String;
-    expect(jsonDecode(shown), {'ok': true, 'shown': true});
-
-    final phases = SessionBuilder(library).phases(selected);
-    final session = SessionEngine(phases);
-    session.update(phases.fold<double>(0, (n, p) => n + p.seconds) + 1);
-    expect(session.done, isTrue);
-    expect(session.completedExercises, selected.items.length);
-    final storage = _Storage();
-    await AppStore(storage).savePlan(selected);
-    final reloaded = AppStore(storage);
-    await reloaded.load();
-    expect(reloaded.savedPlans.single.plan.toJson(), selected.toJson());
-  });
-
-  test(
-    'wire agent reads skills, checks a plan and delivers one typed card with per-step usage',
-    () async {
-      const hidden = 'INTERMEDIATE-SKILL-NOTES-MUST-NOT-RENDER';
-      final gateway = await _Gateway.start([
-        tool('read', {'path': 'action-library/SKILL.md'}, text: hidden),
-        tool('check_plan', plan().toJson(), text: hidden),
-        planResponse(text: '按条件排好了，可以开始。'),
-        const coach.LlmResponse(content: '下一轮正常回复。'),
-      ]);
-      addTearDown(gateway.close);
-      final ai = engine(gateway.client());
-      final events = <coach.AgentEvent>[];
-      final subscription = ai.agent.events.listen(events.add);
-      addTearDown(subscription.cancel);
-
-      final reply = await ai.reply('先检查再排：在家 10 分钟练全身，徒手', const ChatState());
-      final result = ai.lastResult!;
-      expect(result.status, coach.TurnStatus.ok);
-      expect(result.plan, isA<coach.ValidatedPlan>());
-      expect(result.steps, 3);
-      expect(result.reads, ['action-library/SKILL.md']);
-      expect(result.submissions, 1);
-      expect(result.resubmits, 0);
-      expect(ai.lastOutcome, coach.TurnOutcome.model);
-      expect(result.records.map((r) => r.outcome), [
-        coach.CallOutcome.toolStep,
-        coach.CallOutcome.toolStep,
-        coach.CallOutcome.passed,
-      ]);
-      expect(result.records.map((r) => r.turnOutcome).toSet(), {
-        coach.TurnOutcome.model,
-      });
-      expect(result.usage.promptTokens, 300);
-      expect(result.usage.completionTokens, 60);
-      expect(
-        ai.usage.records.map((r) => r.id),
-        result.records.map((r) => r.id),
-      );
-      expect(
-        result.records.every(
-          (r) => r.promptVersion == ai.agent.prompts.version(profile),
-        ),
-        isTrue,
-      );
-      expect(reply.messages, hasLength(1));
-      expect(texts(reply), contains('10分钟'));
-      expect(texts(reply), contains('徒手'));
-      expect(texts(reply), isNot(contains(hidden)));
-      expect(replyPlan(reply)!.exerciseIds, {'h-side-leg-raise'});
-      expect(events.map((e) => e.kind), [
-        coach.AgentEventKind.thinking,
-        coach.AgentEventKind.reading,
-        coach.AgentEventKind.thinking,
-        coach.AgentEventKind.checking,
-        coach.AgentEventKind.thinking,
-        coach.AgentEventKind.done,
-      ]);
-      expect(events.last.status, coach.TurnStatus.ok);
-      expect(events.map((e) => e.turnId).toSet(), {result.turnId});
-
-      final secondRequest = gateway.bodies[1];
-      expect(
-        (secondRequest['messages'] as List).last['content'],
-        contains('action-library'),
-      );
-      final checkResult =
-          jsonDecode(
-                (gateway.bodies[2]['messages'] as List).last['content']
-                    as String,
-              )
-              as Map;
-      expect(checkResult['ok'], isTrue);
-      expect(checkResult['estimatedMinutes'], isA<num>());
-      expect(checkResult['targetMinutes'], 10);
-      expect(
-        (gateway.bodies.first['tools'] as List).map(
-          (t) => (t as Map)['function']['name'],
-        ),
-        containsAll(['read', 'ls', 'check_plan', 'show_actions', 'show_plan']),
-      );
-
-      final history = jsonEncode(
-        ai.agent.history.map((m) => m.toJson()).toList(),
-      );
-      expect(history, contains('show_plan'));
-      expect(history, isNot(contains(hidden)));
-      expect(history, isNot(contains('action-library/SKILL.md')));
-      expect(history, isNot(contains('check_plan')));
-      await ai.reply('下一轮的问题', reply.state);
-      final nextPrompt = jsonEncode(gateway.bodies.last['messages']);
-      // r2 records its validated plan summary, not the model's unchecked text.
-      expect(nextPrompt, contains('10分钟'));
-      expect(nextPrompt, contains('徒手'));
-      expect(nextPrompt, isNot(contains('按条件排好了，可以开始')));
-      expect(nextPrompt, isNot(contains(hidden)));
-      expect(gateway.bodies, hasLength(4));
-    },
-  );
-
-  test(
-    'check_plan errors are private tool feedback and do not count as a rejected delivery',
-    () async {
-      final invalid = plan(ids: ['unknown-drill']);
-      final client = coach.FakeLlmClient([
-        tool('check_plan', invalid.toJson(), text: 'CHECK-FAILED-PRIVATE'),
-        tool('read', {'path': 'action-library/index/scene/home.md'}),
-        tool('check_plan', plan().toJson()),
-        planResponse(),
-      ], latency: Duration.zero);
-      final ai = engine(client);
-      final reply = await ai.reply('先检查再排：在家 10 分钟练全身，徒手', const ChatState());
-      expect(ai.lastResult!.status, coach.TurnStatus.ok);
-      expect(ai.lastResult!.steps, 4);
-      expect(ai.lastResult!.submissions, 1);
-      expect(ai.lastOutcome, coach.TurnOutcome.model);
-      final feedback =
-          jsonDecode(client.requests[1].messages.last.content) as Map;
-      expect(feedback['ok'], isFalse);
-      expect(jsonEncode(feedback['errors']), contains('unknown_exercise'));
-      expect(replyPlan(reply)!.exerciseIds, {'h-side-leg-raise'});
-      expect(texts(reply), isNot(contains('CHECK-FAILED-PRIVATE')));
-      expect(texts(reply), isNot(contains('unknown-drill')));
-    },
-  );
-
-  test(
-    'repeated tool steps fail without silently selecting a preset',
-    () async {
-      final client = coach.FakeLlmClient([
-        for (var i = 0; i < 4; i++)
-          tool('read', {
-            'path': 'action-library/SKILL.md',
-          }, text: 'STEP-PRIVATE'),
-      ], latency: Duration.zero);
-      final ai = engine(client);
-      final reply = await ai.reply('在家 10 分钟练全身，徒手', const ChatState());
-      expect(ai.agent.maxSteps, 100);
-      expect(client.requests, hasLength(4));
-      expect(ai.lastResult!.steps, 4);
-      expect(ai.lastResult!.error, isA<coach.AgentStalled>());
-      expect(ai.lastOutcome, coach.TurnOutcome.error);
-      expect(ai.lastResult!.records, hasLength(4));
-      expect(reply.messages.single.isPlanningFailure, isTrue);
-      expect(texts(reply), isNot(contains('预设方案')));
-      expect(texts(reply), isNot(contains('STEP-PRIVATE')));
-      expect(replyPlan(reply), isNull);
-    },
-  );
-
-  test(
-    'App deadline leaves the SDK total timeout and retry defaults intact',
-    () {
-      final ai = AiChatEngine(
-        local: local(),
-        catalog: catalog,
-        profile: profile,
-        client: coach.FakeLlmClient([], latency: Duration.zero),
-      );
-      addTearDown(ai.dispose);
-      expect(ai.agent.maxSteps, 100);
-      expect(ai.agent.turnTimeout, const Duration(seconds: 360));
-      expect(ai.agent.requestTimeout, const Duration(seconds: 60));
-      expect(ai.agent.maxRequestRetries, 4);
-      expect(ai.agent.retryBaseDelay, const Duration(seconds: 1));
-      expect(ai.agent.retryMaxDelay, const Duration(seconds: 15));
-      expect(ai.turnTimeout, greaterThan(ai.agent.turnTimeout));
-    },
-  );
-
-  test(
-    'enabled memory is saved before tool success and enters the next plan request',
-    () async {
-      final memory = coach.InMemoryUserMemoryStore();
-      final client = coach.FakeLlmClient([
-        tool('remember', {'kind': 'level', 'text': '用户是新手'}),
-        tool('remember', {'kind': 'equipment', 'text': '家里有哑铃'}),
-        '记下了：新手，家里有哑铃。',
-        planResponse(),
-      ], latency: Duration.zero);
-      final ai = engine(client, memoryStore: memory);
-      final remembered = await ai.reply('我是新手，家里有哑铃', const ChatState());
-      await Future<void>.delayed(Duration.zero);
-      expect(texts(remembered), contains('记下了'));
-      expect(memory.entries.map((m) => m.kind), [
-        coach.MemoryKind.level,
-        coach.MemoryKind.equipment,
-      ]);
-      expect(ai.lastOutcome, coach.TurnOutcome.model);
-      expect(ai.lastResult!.steps, 3);
-      final planned = await ai.reply('在家 10 分钟徒手练全身', remembered.state);
-      expect(replyPlan(planned), isNotNull);
-      final system = client.requests.last.messages.first.content;
-      expect(system, contains('用户是新手'));
-      expect(system, contains('家里有哑铃'));
-      expect(
-        client.requests.last.tools.map((t) => t.name),
-        containsAll(['remember', 'forget']),
-      );
-      final history = jsonEncode(
-        ai.agent.history.map((m) => m.toJson()).toList(),
-      );
-      expect(history, isNot(contains('"name":"remember"')));
-    },
-  );
-
-  test(
-    'memory disabled from startup omits stored facts, skills and memory tools',
-    () async {
-      const privateFact = 'STORED-ONLY-MEMORY-SENTINEL';
-      final memory = coach.InMemoryUserMemoryStore([
-        coach.MemoryEntry(
-          coach.MemoryKind.preference,
-          privateFact,
-          at: DateTime.utc(2026),
-        ),
-      ]);
-      final client = coach.FakeLlmClient([
-        tool('remember', {'kind': 'goal', 'text': '不应被保存的目标'}),
-        '好的，按本次条件来。',
-      ], latency: Duration.zero);
-      final ai = engine(client, memoryStore: memory, enableUserMemory: false);
-      final reply = await ai.reply('请讲解训练时的呼吸要领', const ChatState());
-      expect(texts(reply), '好的，按本次条件来。');
-      for (final request in client.requests) {
-        expect(requestText(request), isNot(contains(privateFact)));
-        expect(
-          request.messages.first.content,
-          isNot(contains('user-memory/SKILL.md')),
-        );
-        expect(
-          request.tools.map((t) => t.name),
-          isNot(anyOf(contains('remember'), contains('forget'))),
-        );
-      }
-      expect(client.requests.last.messages.last.content, contains('没有工具'));
-      await Future<void>.delayed(Duration.zero);
-      expect(memory.entries.map((m) => m.text), [privateFact]);
-    },
-  );
-
-  test(
-    'clearMemory removes durable facts and the next system summary',
-    () async {
-      const privateFact = 'CLEAR-MEMORY-SENTINEL';
-      final memory = coach.InMemoryUserMemoryStore([
-        coach.MemoryEntry(
-          coach.MemoryKind.preference,
-          privateFact,
-          at: DateTime.utc(2026),
-        ),
-      ]);
-      final client = coach.FakeLlmClient([
-        '先聊一下。',
-        '已经清除了。',
-      ], latency: Duration.zero);
-      final ai = engine(client, memoryStore: memory);
-      await ai.reply('先讲解训练时的呼吸要领', const ChatState());
-      expect(
-        client.requests.first.messages.first.content,
-        contains(privateFact),
-      );
-      await ai.clearMemory();
-      expect(memory.entries, isEmpty);
-      await ai.reply('再讲解训练时的呼吸要领', const ChatState());
-      expect(
-        client.requests.last.messages.first.content,
-        isNot(contains(privateFact)),
-      );
-      expect(await ai.agent.memory(), isEmpty);
-    },
-  );
-
-  test(
-    'runtime memory toggle keeps the conversation and suppresses stored facts in subsequent requests',
-    () async {
-      const privateFact = 'RUNTIME-STORED-ONLY-MEMORY-SENTINEL';
-      final memory = coach.InMemoryUserMemoryStore([
-        coach.MemoryEntry(
-          coach.MemoryKind.preference,
-          privateFact,
-          at: DateTime.utc(2026),
-        ),
-      ]);
-      final client = coach.FakeLlmClient([
-        '请告诉我本次训练条件。',
-        planResponse(),
-        planResponse(),
-        '欢迎继续训练。',
-      ], latency: Duration.zero);
-      final ai = engine(client, memoryStore: memory);
-      await ai.reply('讲解训练时的呼吸要领', const ChatState());
-      expect(ai.enableUserMemory, isTrue);
-      expect(
-        client.requests.first.messages.first.content,
-        contains(privateFact),
-      );
-
-      ai.enableUserMemory = false;
-      expect(ai.enableUserMemory, isFalse);
-      expect(ai.agent.history, isNotEmpty);
-      await ai.reply('在家 10 分钟练全身，徒手', const ChatState());
-      expect(requestText(client.requests[1]), contains('请告诉我本次训练条件'));
-      expect(requestText(client.requests[1]), isNot(contains(privateFact)));
-      expect(
-        client.requests[1].tools.map((t) => t.name),
-        isNot(anyOf(contains('remember'), contains('forget'))),
-      );
-
-      ai.reset();
-      await ai.reply('在家 10 分钟练全身，徒手', const ChatState());
-      expect(requestText(client.requests[2]), isNot(contains(privateFact)));
-      expect(requestText(client.requests[2]), isNot(contains('请告诉我本次训练条件')));
-      expect(memory.entries.map((e) => e.text), [privateFact]);
-
-      ai.enableUserMemory = true;
-      ai.reset();
-      await ai.reply('讲解训练时的呼吸要领', const ChatState());
-      expect(
-        client.requests.last.messages.first.content,
-        contains(privateFact),
-      );
-      expect(
-        client.requests.last.tools.map((t) => t.name),
-        containsAll(['remember', 'forget']),
-      );
-    },
-  );
-
-  test(
-    'cancelling after confirmed memory suppresses late output and retains the saved fact',
-    () async {
-      const stagedFact = '家里有两只8公斤哑铃';
-      final memory = coach.InMemoryUserMemoryStore();
-      final started = Completer<void>();
-      final late = Completer<Object>();
-      final client = coach.FakeLlmClient([
-        tool('remember', {'kind': 'equipment', 'text': stagedFact}),
-        (coach.LlmRequest _) {
-          started.complete();
-          return late.future;
-        },
-        '新轮正常回复。',
-      ], latency: Duration.zero);
-      final ai = engine(client, memoryStore: memory);
-      final events = <coach.AgentEvent>[];
-      final subscription = ai.agent.events.listen(events.add);
-      addTearDown(subscription.cancel);
-      final pending = ai.reply('记下$stagedFact', const ChatState());
-      await started.future;
-      expect(memory.entries.map((e) => e.text), [stagedFact]);
-      ai.cancelPending();
-      final reply = await pending.timeout(const Duration(seconds: 1));
-      final eventCount = events.length;
-      expect(reply.messages, isEmpty);
-      expect(ai.agent.turnCount, 0);
-      expect(ai.agent.history, isEmpty);
-      expect(ai.lastOutcome, coach.TurnOutcome.cancelled);
-      expect(memory.entries.map((e) => e.text), [stagedFact]);
-      late.complete('迟到的记忆确认不得保存');
-      await Future<void>.delayed(Duration.zero);
-      expect(events, hasLength(eventCount));
-      expect(events.where((e) => e.kind == coach.AgentEventKind.done), isEmpty);
-      expect(memory.entries.map((e) => e.text), [stagedFact]);
-      final next = await ai.reply('再来一轮', const ChatState());
-      expect(texts(next), '新轮正常回复。');
-      expect(requestText(client.requests.last), isNot(contains('迟到的记忆确认')));
-      expect(client.requests.last.messages.first.content, contains(stagedFact));
-      expect(client.requests.last.messages.first.content, contains('# 用户记忆（'));
-    },
-  );
-
-  test(
-    'reset retains a memory tool already confirmed by durable save',
-    () async {
-      const fact = '惯常每周二和周五居家训练';
-      final memory = coach.InMemoryUserMemoryStore();
-      final started = Completer<void>();
-      final late = Completer<Object>();
-      final client = coach.FakeLlmClient([
-        tool('remember', {'kind': 'schedule', 'text': fact}),
-        (coach.LlmRequest _) {
-          started.complete();
-          return late.future;
-        },
-        '新对话正常回复。',
-      ], latency: Duration.zero);
-      final ai = engine(client, memoryStore: memory);
-      final pending = ai.reply('记下$fact，顺便讲解一下', const ChatState());
-      await started.future;
-      expect(memory.entries.map((e) => e.text), [fact]);
-      ai.reset();
-      final cancelled = await pending.timeout(const Duration(seconds: 1));
-      expect(cancelled.messages, isEmpty);
-      expect(ai.agent.history, isEmpty);
-      expect(ai.agent.turnCount, 0);
-      expect(memory.entries.map((e) => e.text), [fact]);
-      late.complete('旧对话迟到回复');
-      await Future<void>.delayed(Duration.zero);
-      final next = await ai.reply('讲解训练时的呼吸要领', const ChatState());
-      expect(texts(next), '新对话正常回复。');
-      expect(client.requests.last.messages.first.content, contains(fact));
-      expect(requestText(client.requests.last), isNot(contains('旧对话迟到回复')));
-    },
-  );
-
-  test(
-    'failed memory save returns a tool error before user confirmation',
-    () async {
-      const fact = '每周六偏好做灵活性训练';
-      final memory = _FailingMemoryStore();
-      final client = coach.FakeLlmClient([
-        tool('remember', {'kind': 'preference', 'text': fact}),
-        (coach.LlmRequest request) {
-          final feedback = jsonDecode(request.messages.last.content) as Map;
-          expect(feedback['ok'], isFalse);
-          expect(feedback['error'], 'memory_save_failed');
-          expect(feedback['message'], contains('不要向用户确认已记下'));
-          expect(memory.entries, isEmpty);
-          return '这次没能记住，你可以稍后再试。';
-        },
-      ], latency: Duration.zero);
-      final ai = engine(client, memoryStore: memory);
-      final reply = await ai.reply('请记下$fact，顺便讲解一下', const ChatState());
-      expect(ai.lastResult!.status, coach.TurnStatus.ok);
-      expect(client.requests, hasLength(2));
-      expect(memory.saves, 1);
-      expect(memory.entries, isEmpty);
-      expect(await ai.agent.memory(), isEmpty);
-      expect(texts(reply), '这次没能记住，你可以稍后再试。');
-      expect(texts(reply), isNot(contains('disk-full-private-detail')));
-      expect(texts(reply), isNot(contains('memory_save_failed')));
-      expect(replyPlan(reply), isNull);
-    },
-  );
-
-  test(
-    'natural action-demo requests reach show_actions while the explicit library command stays local',
-    () async {
-      final client = coach.FakeLlmClient([
-        actionsResponse(),
-        actionsResponse(),
-        actionsResponse(),
-      ], latency: Duration.zero);
-      final ai = engine(client);
-      for (final input in ['看看动作', '有哪些拉伸动作', '动作示范']) {
-        final reply = await ai.reply(input, const ChatState());
-        expect(reply.action, isNull);
-        expect(
-          reply.messages.map((m) => m.actions).nonNulls.single,
-          isA<coach.ValidatedActions>(),
-        );
-      }
-      expect(client.requests, hasLength(3));
-      final library = await ai.reply('看看动作库', const ChatState());
-      expect(library.action, '@library');
-      expect(client.requests, hasLength(3));
-    },
-  );
-
-  test(
-    'all gate errors return as tool feedback before a valid resubmission',
-    () async {
-      final invalid = plan(ids: ['unknown-drill', 'h-db-row', 'h-squat']);
-      final client = coach.FakeLlmClient([
-        planResponse(value: invalid, text: '不合格原始文字不可显示'),
-        planResponse(),
-      ], latency: Duration.zero);
-      final ai = engine(client);
-      final reply = await ai.reply('在家 10 分钟练全身，徒手，保护膝', const ChatState());
-      expect(ai.lastOutcome, coach.TurnOutcome.rewritten);
-      expect(ai.lastResult!.resubmits, 1);
-      expect(client.requests, hasLength(2));
-      final feedback = client.requests.last.messages.last;
-      expect(feedback.role, coach.LlmRole.tool);
-      final errors = (jsonDecode(feedback.content) as Map)['errors'] as List;
-      expect(
-        errors.map((e) => e['code']),
-        containsAll(['unknown_exercise', 'equipment', 'avoid']),
-      );
-      for (final error in errors.cast<Map>()) {
-        expect(
-          error.keys,
-          containsAll(['path', 'code', 'expected', 'actual', 'fix']),
-        );
-      }
-      expect(feedback.content, contains('unknown-drill'));
-      expect(feedback.content, contains('h-db-row'));
-      expect(feedback.content, contains('h-squat'));
-      expect(replyPlan(reply)!.exerciseIds, {'h-side-leg-raise'});
-      expect(replyPlan(reply)!.avoid, contains('膝'));
-      expect(texts(reply), isNot(contains('不合格原始文字')));
-    },
-  );
-
-  test(
-    'three rejected plan submissions show failure without leaking model output',
-    () async {
-      final invalid = actionsResponse(
-        ids: ['unknown-drill'],
-        text: 'SECRET-REJECTED-TEXT',
-      );
-      final gateway = await _Gateway.start([invalid, invalid, invalid]);
-      addTearDown(gateway.close);
-      final ai = engine(gateway.client());
-      final reply = await ai.reply('在家徒手10分钟练全身', const ChatState());
-      expect(gateway.bodies, hasLength(3));
-      expect(ai.lastResult!.status, coach.TurnStatus.error);
-      expect(ai.lastResult!.submissions, 3);
-      expect(reply.messages.single.isPlanningFailure, isTrue);
-      expect(replyPlan(reply), isNull);
-      expect(texts(reply), isNot(contains('SECRET-REJECTED-TEXT')));
-      expect(texts(reply), isNot(contains('unknown-drill')));
-      expect(reply.messages.every((m) => m.actions == null), isTrue);
-      expect(
-        jsonEncode(ai.session.history.map((m) => m.toJson()).toList()),
-        isNot(contains('SECRET-REJECTED-TEXT')),
-      );
-    },
-  );
-
-  test('prompt canary aborts planning without exposing private text', () async {
-    final response = tool(coach.CoachTools.showActions, {
-      'items': [
-        {'actionId': 'h-calf-raise', 'note': coach.defaultPromptCanary},
-      ],
-    }, text: '这句和整轮一起丢弃');
-    final client = coach.FakeLlmClient([response], latency: Duration.zero);
-    final ai = engine(client);
-    final reply = await ai.reply('在家徒手10分钟练全身', const ChatState());
-    expect(client.requests, hasLength(1));
-    expect(ai.lastResult!.leaked, isTrue);
-    expect(ai.lastResult!.status, coach.TurnStatus.error);
-    expect(reply.messages.single.isPlanningFailure, isTrue);
-    expect(texts(reply), isNot(contains(coach.defaultPromptCanary)));
-    expect(texts(reply), isNot(contains('这句和整轮一起丢弃')));
-    expect(reply.messages.every((m) => m.actions == null), isTrue);
-  });
-
-  test(
-    'offline and request timeout exhaust SDK retries and produce a planning failure',
-    () async {
-      for (final pair in [
-        (coach.LlmErrorKind.network, coach.FallbackReason.offline),
-        (coach.LlmErrorKind.timeout, coach.FallbackReason.timeout),
-      ]) {
-        final client = coach.FakeLlmClient([
-          for (var i = 0; i < 5; i++)
-            coach.LlmException(
-              pair.$1,
-              'test-unavailable',
-              retryAfter: Duration.zero,
-            ),
-        ], latency: Duration.zero);
-        final ai = engine(client);
-        final reply = await ai.reply('在家徒手 10 分钟练全身', const ChatState());
-        expect(client.requests, hasLength(5));
-        expect(ai.lastResult!.steps, 1);
-        expect(ai.lastResult!.error, isA<coach.AgentRequestFailed>());
-        final failure = ai.lastResult!.error! as coach.AgentRequestFailed;
-        expect(failure.kind, coach.AgentFailureKind.retriesExhausted);
-        expect(failure.attempts, 5);
-        expect(ai.lastResult!.records.map((r) => r.retry), [0, 1, 2, 3, 4]);
-        expect(ai.lastFallbackReason, pair.$2);
-        expect(reply.messages.single.isPlanningFailure, isTrue);
-        expect(replyPlan(reply), isNull);
-        expect(texts(reply), isNot(contains('预设方案')));
-        expect(texts(reply), isNot(contains('test-unavailable')));
-      }
-    },
-  );
-
-  test(
-    'a transient request retry can deliver a typed card without fallback',
-    () async {
-      final client = coach.FakeLlmClient([
-        const coach.LlmException(
-          coach.LlmErrorKind.network,
-          'transport-private-error',
-          retryAfter: Duration.zero,
-        ),
-        actionsResponse(),
-      ], latency: Duration.zero);
-      final ai = engine(client);
-      final events = <coach.AgentEvent>[];
-      final subscription = ai.events.listen(events.add);
-      addTearDown(subscription.cancel);
-      final reply = await ai.reply('给我看提踵怎么做', const ChatState());
-      expect(client.requests, hasLength(2));
-      expect(ai.lastResult!.status, coach.TurnStatus.ok);
-      expect(ai.lastResult!.steps, 1);
-      expect(ai.lastOutcome, coach.TurnOutcome.model);
-      expect(ai.lastFallbackReason, isNull);
-      expect(ai.lastResult!.records.map((r) => r.retry), [0, 1]);
-      expect(ai.lastResult!.records.map((r) => r.outcome), [
-        coach.CallOutcome.error,
-        coach.CallOutcome.passed,
-      ]);
-      final retry = events.singleWhere(
-        (e) => e.kind == coach.AgentEventKind.retrying,
-      );
-      expect(retry.attempt, 1);
-      expect(retry.maxAttempts, 4);
-      expect(retry.reason, coach.RequestErrorClass.network);
-      expect(retry.delay, Duration.zero);
-      expect(
-        reply.messages.map((m) => m.actions).nonNulls.single,
-        isA<coach.ValidatedActions>(),
-      );
-      expect(texts(reply), isNot(contains('预设方案')));
-      expect(texts(reply), isNot(contains('transport-private-error')));
-    },
-  );
-
-  test(
-    'nonretryable HTTP failure emits a planning failure without private text',
-    () async {
-      final gateway = await _Gateway.start(
-        [],
-        status: HttpStatus.badRequest,
-        errorMessage: 'provider-private-validation-error',
-      );
-      addTearDown(gateway.close);
-      final ai = engine(gateway.client());
-      final reply = await ai.reply('在家徒手 10 分钟练全身', const ChatState());
-      expect(gateway.bodies, hasLength(1));
-      final failure = ai.lastResult!.error! as coach.AgentRequestFailed;
-      expect(failure.kind, coach.AgentFailureKind.nonRetryable);
-      expect(failure.errorClass, coach.RequestErrorClass.badRequest);
-      expect(failure.attempts, 1);
-      expect(ai.lastResult!.records.map((r) => r.retry), [0]);
-      expect(reply.messages.single.isPlanningFailure, isTrue);
-      expect(replyPlan(reply), isNull);
-      expect(texts(reply), isNot(contains('预设方案')));
-      expect(
-        texts(reply),
-        isNot(contains('provider-private-validation-error')),
-      );
-    },
-  );
-
-  test(
-    'cancelling SDK backoff never renders a fallback or sends its retry',
-    () async {
-      final client = coach.FakeLlmClient([
-        const coach.LlmException(coach.LlmErrorKind.network, 'offline'),
-        '新的请求正常回复。',
-      ], latency: Duration.zero);
-      final ai = engine(client);
-      final retryStarted = Completer<void>();
-      final subscription = ai.events.listen((event) {
-        if (event.kind == coach.AgentEventKind.retrying &&
-            !retryStarted.isCompleted) {
-          retryStarted.complete();
-        }
-      });
-      addTearDown(subscription.cancel);
-      final pending = ai.reply('请讲解训练节奏', const ChatState());
-      await retryStarted.future;
-      ai.cancelPending();
-      final cancelled = await pending.timeout(const Duration(seconds: 1));
-      expect(cancelled.messages, isEmpty);
-      expect(ai.lastOutcome, coach.TurnOutcome.cancelled);
-      expect(ai.lastFallbackReason, isNull);
-      expect(client.requests, hasLength(1));
-      expect(ai.agent.history, isEmpty);
-      expect(ai.agent.turnCount, 0);
-      final next = await ai.reply('再解释一下', const ChatState());
-      expect(texts(next), '新的请求正常回复。');
-      expect(client.requests, hasLength(2));
-    },
-  );
-
-  test('offline planning never automatically admits a fallback plan', () async {
-    final client = coach.FakeLlmClient([
-      for (var i = 0; i < 5; i++)
-        const coach.LlmException(
-          coach.LlmErrorKind.network,
-          'offline',
-          retryAfter: Duration.zero,
-        ),
-    ], latency: Duration.zero);
-    final ai = engine(client);
-    final reply = await ai.reply('在家10分钟练全身，徒手，保护膝', const ChatState());
-    expect(ai.lastResult!.status, coach.TurnStatus.error);
-    expect(ai.lastResult!.plan, isNull);
-    expect(replyPlan(reply), isNull);
-    expect(reply.messages.single.isPlanningFailure, isTrue);
-    expect(texts(reply), isNot(contains('预设方案')));
-  });
-
-  test(
-    'App commands, recalled plans, workout records and safety stay local',
-    () async {
-      final client = coach.FakeLlmClient([], latency: Duration.zero);
-      final ai = engine(client);
-      final savedPlan = plan();
-      final state = ChatState(
-        lastPlan: savedPlan,
-        saved: [
-          SavedPlan(
-            id: 'saved-one',
-            name: '我的训练',
-            plan: savedPlan,
-            savedAt: DateTime(2026, 10, 20),
-          ),
-        ],
-        history: [
-          WorkoutLog(
-            title: '昨天训练',
-            at: DateTime(2026, 10, 19),
-            minutes: 10,
-            completed: 1,
-            total: 1,
-          ),
-        ],
-      );
-      for (final input in [
-        '看看动作库',
-        '@saved:saved-one',
-        '我的计划',
-        '上次练了什么',
-        '上次那个',
-        '换浅色',
-        '胸口疼',
-      ]) {
-        expectLocalPreserved(
-          await ai.reply(input, state),
-          await local().reply(input, state),
-        );
-        expect(client.requests, isEmpty, reason: 'App-owned input: $input');
-      }
-      final blocked = state.copyWith(safetyBlocked: true);
-      expectLocalPreserved(
-        await ai.reply('在家 10 分钟练全身，徒手', blocked),
-        await local().reply('在家 10 分钟练全身，徒手', blocked),
-      );
-      expect(ai.session.history, isEmpty);
-      expect(client.requests, isEmpty);
-    },
-  );
-
-  test(
-    'persistent SDK history retains admitted actions and tool turn',
-    () async {
-      final client = coach.FakeLlmClient([
-        actionsResponse(),
-        const coach.LlmResponse(content: '动作时保持自然呼吸。'),
-      ], latency: Duration.zero);
-      final ai = engine(client);
-      final first = await ai.reply('给我看提踵怎么做', const ChatState());
-      expect(first.messages.single.actions, isNotNull);
-      final second = await ai.reply('请讲解训练时的呼吸要领', first.state);
-      expect(texts(second), '动作时保持自然呼吸。');
-      expect(client.requests, hasLength(2));
-      final history = client.requests.last.messages;
-      expect(
-        history
-            .where((m) => m.role == coach.LlmRole.assistant)
-            .expand((m) => m.toolCalls)
-            .map((t) => t.name),
-        contains('show_actions'),
-      );
-      expect(
-        history.any(
-          (m) => m.role == coach.LlmRole.tool && m.content.contains('shown'),
-        ),
-        isTrue,
-      );
-    },
-  );
-
-  test(
-    'level and duration conflicts are resubmitted rather than repaired',
-    () async {
-      final client = coach.FakeLlmClient([
-        planResponse(value: plan(level: 1, minutes: 20)),
-        planResponse(value: plan(level: 3, minutes: 10)),
-      ], latency: Duration.zero);
-      final ai = engine(client);
-      final reply = await ai.reply('进阶，在家 10 分钟练全身，徒手', const ChatState());
-      expect(ai.lastResult!.resubmits, 1);
-      final feedback = client.requests.last.messages.last.content;
-      final errors = (jsonDecode(feedback) as Map)['errors'] as List;
-      expect(
-        errors
-            .where((e) => e['code'] == 'context_conflict')
-            .map((e) => e['path']),
-        containsAll(['level', 'targetMinutes']),
-      );
-      expect(replyPlan(reply)!.level, 3);
-      expect(replyPlan(reply)!.targetMinutes, 10);
-    },
-  );
-
-  test(
-    'duplicate send is busy and does not cancel the active turn or call the model',
-    () async {
-      final client = _LateClient();
-      final ai = engine(client);
-      final first = ai.reply('请讲解训练时的呼吸要领', const ChatState());
-      await client.started.future;
-      final busy = await ai.reply('重复发送', const ChatState());
-      expect(ai.lastResult!.status, coach.TurnStatus.busy);
-      expect(busy.messages, isEmpty);
-      expect(client.requests, hasLength(1));
-      expect(client.token!.isCancelled, isFalse);
-      client.late.complete(const coach.LlmResponse(content: '第一轮正常完成'));
-      expect(texts(await first), '第一轮正常完成');
-      expect(ai.session.turnCount, 1);
-    },
-  );
-
-  test(
-    'cancelPending returns promptly and late plans never reach history or rendering',
-    () async {
-      final client = _LateClient();
-      final ai = engine(client);
-      final pending = ai.reply('在家 10 分钟练全身，徒手', const ChatState());
-      await client.started.future;
-      ai.cancelPending();
-      final cancelled = await pending.timeout(const Duration(seconds: 1));
-      expect(client.token?.isCancelled, isTrue);
-      expect(cancelled.messages, isEmpty);
-      expect(ai.lastOutcome, coach.TurnOutcome.cancelled);
-      expect(ai.session.turnCount, 0);
-      expect(ai.session.history, isEmpty);
-      client.late.complete(planResponse(text: '晚到取消训练，不应进入任何历史'));
-      await Future<void>.delayed(Duration.zero);
-      final next = await ai.reply('有什么建议？', cancelled.state);
-      expect(replyPlan(next), isNull);
-      expect(requestText(client.requests.last), isNot(contains('晚到取消训练')));
-      expect(texts(next), '新的回复');
-      expect(ai.session.turnCount, 1);
-    },
-  );
-
-  test(
-    'reset clears the SDK conversation and invalidates a pending old turn',
-    () async {
-      final client = _LateClient();
-      final ai = engine(client);
-      final pending = ai.reply('旧会话问题', const ChatState());
-      await client.started.future;
-      ai.reset();
-      final cancelled = await pending.timeout(const Duration(seconds: 1));
-      expect(cancelled.messages, isEmpty);
-      expect(ai.session.history, isEmpty);
-      expect(ai.session.turnCount, 0);
-      client.late.complete(planResponse(text: '旧会话迟到计划'));
-      final next = await ai.reply('新会话问题', const ChatState());
-      expect(texts(next), '新的回复');
-      expect(requestText(client.requests.last), isNot(contains('旧会话问题')));
-      expect(requestText(client.requests.last), isNot(contains('旧会话迟到计划')));
-    },
-  );
-
-  test('reset clears completed tool turns before a new conversation', () async {
-    final client = coach.FakeLlmClient([
-      actionsResponse(),
-      '全新会话',
-    ], latency: Duration.zero);
-    final ai = engine(client);
-    await ai.reply('旧动作问题', const ChatState());
-    expect(ai.session.history, isNotEmpty);
-    ai.reset();
-    expect(ai.session.history, isEmpty);
-    expect(ai.session.turnCount, 0);
-    await ai.reply('新问题', const ChatState());
-    expect(requestText(client.requests.last), isNot(contains('旧动作问题')));
-    expect(client.requests.last.messages, hasLength(2));
-  });
-
-  test(
-    'App total guard aborts actual HTTP and renders a planning failure',
-    () async {
-      final gateway = await _Gateway.start([], hold: true);
-      addTearDown(gateway.close);
-      final ai = engine(
-        gateway.client(),
-        deadline: const Duration(milliseconds: 40),
-      );
-      final reply = await ai.reply('在家 10 分钟练全身，徒手', const ChatState());
-      await gateway.aborted.future.timeout(const Duration(seconds: 2));
-      expect(ai.lastFallbackReason, coach.FallbackReason.timeout);
-      final failure = ai.lastResult!.error! as coach.AgentRequestFailed;
-      expect(failure.kind, coach.AgentFailureKind.turnTimeout);
-      expect(failure.errorClass, coach.RequestErrorClass.timeout);
-      expect(reply.messages.single.isPlanningFailure, isTrue);
-      expect(texts(reply), isNot(contains('预设方案')));
-      expect(replyPlan(reply), isNull);
-      // This App guard has no controller result; it must not borrow a
-      // previous question/user message identity from SDK presentation history.
-      expect(
-        reply.messages.map((m) => m.conversationMessageId),
-        everyElement(isNull),
-      );
-      expect(gateway.bodies, hasLength(1));
-    },
-  );
-
-  test(
-    'offline new task retains safety but never creates an automatic plan',
-    () async {
-      final client = coach.FakeLlmClient([
-        for (var i = 0; i < 5; i++)
-          const coach.LlmException(
-            coach.LlmErrorKind.network,
-            'test offline',
-            retryAfter: Duration.zero,
-          ),
-      ], latency: Duration.zero);
-      final ai = engine(client);
-      final reply = await ai.reply('办公室徒手10分钟肩颈放松，保护膝', const ChatState());
-      expect(client.requests, hasLength(5));
-      expect(ai.lastResult!.status, coach.TurnStatus.error);
-      expect(reply.messages.single.isPlanningFailure, isTrue);
-      expect(replyPlan(reply), isNull);
-      expect(requestText(client.requests.first), contains('膝'));
-      expect(texts(reply), isNot(contains('预设方案')));
-    },
-  );
-
-  test(
-    'adopting an office saved plan retains protections in the following CoachContext',
-    () async {
-      final office = plan(
-        id: 'office-saved',
-        ids: ['o-stand-sidebend'],
-        scene: 'office',
-        avoid: {'肩'},
-      );
-      for (final input in ['@saved:office', '上次那个']) {
-        final client = coach.FakeLlmClient([
-          '按办公室条件继续调整。',
-        ], latency: Duration.zero);
-        final ai = engine(client);
-        final previous = ChatState(
-          plan: plan(),
-          request: requestForPlan(plan()),
-          coachContext: const Slots(
-            scene: 'home',
-            equipment: {},
-            avoid: {'膝'},
-            minutes: 10,
-          ),
-          lastPlan: office,
-          saved: [
-            SavedPlan(
-              id: 'office',
-              name: '工位训练',
-              plan: office,
-              savedAt: DateTime(2026, 10, 20),
+        final state = ChatState(
+          plan: old,
+          request: requestForPlan(old),
+          recentMessages: [
+            ChatMessage(
+              id: 'old-user',
+              role: ChatRole.user,
+              at: DateTime(2026),
+              text: 'OLD-PRIVATE-GYM-CONTEXT',
+              aiVisible: true,
             ),
           ],
         );
-        final adopted = await ai.reply(input, previous);
-        expect(client.requests, isEmpty);
-        expect(adopted.state.plan!.scene, 'office');
-        final edited = await ai.reply('再短一点', adopted.state);
-        expect(edited.state.coachContext!.scene, 'office');
-        expect(edited.state.coachContext!.avoid, containsAll(['肩', '膝']));
+        final client = coach.FakeLlmClient([
+          '请说说本次需求。',
+        ], latency: Duration.zero);
+        final ai = engine(client);
+        await ai.reply('现在想活动一下', state);
+        expect(ai.agent.sessionState.params, isEmpty);
+        expect(ai.agent.sessionState.hostValues, isEmpty);
+        expect(ai.agent.sessionState.userTurns.map((m) => m.text), ['现在想活动一下']);
         expect(
-          client.requests.single.messages.last.content,
-          contains('办公室（office）'),
+          _wire(client.requests.single),
+          isNot(contains('OLD-PRIVATE-GYM-CONTEXT')),
         );
-        expect(client.requests.single.messages.last.content, contains('肩'));
-        expect(client.requests.single.messages.last.content, contains('膝'));
-      }
-    },
-  );
-
-  test(
-    'controller keeps records and safety answers out of persistent SDK prompts',
-    () async {
+        expect(_wire(client.requests.single), isNot(contains('旧方案私有标记')));
+      },
+    );
+    test('plain JSON or prose never creates an admitted App plan', () async {
       final client = coach.FakeLlmClient([
-        'AI 轮次一：保持稳定节奏。',
-        'AI 轮次二：再逐步增加强度。',
+        '{"title":"model prose","targetMinutes":10,"blocks":[]}',
       ], latency: Duration.zero);
       final ai = engine(client);
-      final store = AppStore(_Storage());
-      store.history.add(
-        HistoryEntry(
-          title: '仅留本机的敏感训练记录',
-          at: DateTime(2026, 10, 20),
-          minutes: 10,
-          completed: 1,
-          total: 1,
-        ),
-      );
-      final controller = ChatController(
-        engine: ai,
-        store: store,
-        replyDelay: Duration.zero,
-      );
-      addTearDown(controller.dispose);
-      controller.start();
-      var question = controller.messages.lastWhere((m) => m.options.isNotEmpty);
-      await controller.choose(
-        question,
-        question.options.indexWhere((o) => o.value == '@safety:ack'),
-      );
-      while (controller.inSafetyCheck) {
-        question = controller.messages.lastWhere((m) => m.options.isNotEmpty);
-        await controller.choose(
-          question,
-          question.options.indexWhere((o) => o.value == '@safety:no'),
-        );
-      }
-      final safetyMessages = List<ChatMessage>.of(controller.messages);
-      await controller.send('上次练了什么');
-      expect(controller.messages.last.text, contains('仅留本机的敏感训练记录'));
-      await controller.send('请讲解训练时的呼吸要领');
-      await controller.send('呼吸的节奏是什么？');
-      expect(client.requests, hasLength(2));
-      final prompt = requestText(client.requests.last);
-      expect(prompt, contains('AI 轮次一：保持稳定节奏。'));
-      expect(prompt, contains('请讲解训练时的呼吸要领'));
-      expect(prompt, isNot(contains('上次练了什么')));
-      expect(prompt, isNot(contains('仅留本机的敏感训练记录')));
-      expect(prompt, isNot(contains('我已了解')));
-      expect(safetyMessages.every((m) => !m.aiVisible), isTrue);
-      expect(controller.messages.last.aiVisible, isTrue);
+      final reply = await ai.reply('描述这个例子', const ChatState());
       expect(
-        ChatMessage.fromJson(controller.messages.last.toJson()).aiVisible,
+        reply.messages.every((m) => m.plan == null && m.validatedPlan == null),
         isTrue,
       );
-    },
-  );
-
-  test(
-    'explicit 100 and 120 minute requests cannot silently admit a 60-minute plan',
-    () async {
-      for (final minutes in [100, 120]) {
-        final client = coach.FakeLlmClient([
-          for (var attempt = 0; attempt < 3; attempt++)
-            planResponse(value: plan(minutes: 60)),
-        ], latency: Duration.zero);
-        final ai = engine(client);
-        final reply = await ai.reply('在家 $minutes 分钟练全身，徒手', const ChatState());
-        expect(ai.lastResult!.status, coach.TurnStatus.error);
-        expect(ai.lastResult!.submissions, 3);
-        expect(reply.messages.single.isPlanningFailure, isTrue);
-        expect(replyPlan(reply), isNull);
-        expect(client.requests, hasLength(3));
-        final feedback =
-            jsonDecode(client.requests[1].messages.last.content) as Map;
-        expect(
-          (feedback['errors'] as List).cast<Map>(),
-          contains(
-            predicate<Map>(
-              (issue) =>
-                  issue['code'] == 'context_conflict' &&
-                  issue['path'] == 'targetMinutes' &&
-                  issue['expected'].toString().contains('$minutes'),
-            ),
-          ),
-        );
-      }
-    },
-  );
-
-  test(
-    'HTTP 429 produces a failure without silently choosing a preset',
-    () async {
-      final gateway = await _Gateway.start(
-        [],
-        status: HttpStatus.tooManyRequests,
-      );
-      addTearDown(gateway.close);
-      final ai = engine(gateway.client());
-      final reply = await ai.reply('在家徒手10分钟练全身', const ChatState());
-      expect(gateway.bodies, hasLength(5));
-      expect(ai.lastFallbackReason, coach.FallbackReason.rateLimited);
-      final failure = ai.lastResult!.error! as coach.AgentRequestFailed;
-      expect(failure.kind, coach.AgentFailureKind.retriesExhausted);
-      expect(failure.errorClass, coach.RequestErrorClass.rateLimited);
-      expect(failure.attempts, 5);
-      expect(ai.lastResult!.records.map((r) => r.retry), [0, 1, 2, 3, 4]);
-      expect(reply.messages.single.isPlanningFailure, isTrue);
-      expect(replyPlan(reply), isNull);
-      expect(texts(reply), isNot(contains('预设方案')));
-    },
-  );
-
-  test(
-    'restart offers latest explicit office choices as preselection and retains safety',
-    () async {
-      final old = plan(avoid: {'腰'});
-      final oldPlan = TrainingPlan.fromJson({
-        ...old.toJson(),
-        'source': 'template',
-      });
-      final at = DateTime(2026, 10, 20);
-      final messages = [
-        ChatMessage(
-          id: 'old-user',
-          role: ChatRole.user,
-          at: at,
-          text: '在家10分钟练全身，徒手，保护腰',
-          aiVisible: true,
-        ),
-        ChatMessage(
-          id: 'old-plan',
-          role: ChatRole.assistant,
-          at: at,
-          text: '居家计划。',
-          plan: oldPlan,
-          request: requestForPlan(oldPlan),
-          aiVisible: true,
-        ),
-        ChatMessage(
-          id: 'new-user',
-          role: ChatRole.user,
-          at: at,
-          text: '现在改在办公室，徒手，保护膝',
-          aiVisible: true,
-        ),
-        ChatMessage(
-          id: 'new-question',
-          role: ChatRole.assistant,
-          at: at,
-          text: '这次有几分钟？',
-          aiVisible: true,
-        ),
-      ];
-      final storage = _Storage();
-      final initial = AppStore(storage);
-      await initial.acceptSafety(blocked: false);
-      await initial.setChatLog(messages.map((m) => m.toJson()).toList());
-      final store = AppStore(storage);
-      await store.load();
+      expect(ai.agent.sessionState.plans, isEmpty);
+    });
+    test('SDK ask_user is answerable only after send has completed', () async {
       final client = coach.FakeLlmClient([
-        const coach.LlmException(
-          coach.LlmErrorKind.http,
-          'offline-private',
-          statusCode: 401,
-        ),
+        CoachV2Fixtures.batch([
+          CoachV2Fixtures.call('question', 'ask_user', {
+            'question': '想重点练哪里？',
+            'mode': 'choice',
+            'options': ['核心', '下肢'],
+          }),
+        ]),
       ], latency: Duration.zero);
       final ai = engine(client);
-      final controller = controllerFor(ai, store: store);
-      expect(controller.currentPlan!.scene, 'home');
-      await controller.send('帮我安排一组训练');
-      final message = controller.messages.last;
-      expect(message.question!.isConfirmation, isTrue);
-      expect(message.question!.fields.map((f) => f.key), [
-        'scene',
-        'equipment',
-        'minutes',
-      ]);
-      expect(message.question!.fields.first.previousSelections, ['办公室']);
-      expect(client.requests, isEmpty);
-      await controller.answerForm(message, {
-        'scene': ['办公室'],
-        'equipment': ['徒手'],
-        'minutes': ['10 分钟'],
-      });
-      expect(client.requests, hasLength(1));
-      final prompt = requestText(client.requests.single);
-      expect(prompt, contains('腰'));
-      expect(prompt, contains('膝'));
-      expect(controller.messages.last.isPlanningFailure, isTrue);
-    },
-  );
-
-  test(
-    'offline shortening never silently presents a preset and preserves safety',
-    () async {
-      // The SDK restores only a re-admitted card, not an arbitrary ChatState.
-      // Keep this legacy fixture's duration and doses within the real catalog.
-      final old = TrainingPlan(
-        id: 'saved-offline-plan',
-        source: 'ai',
-        title: '全身训练',
-        summary: '居家训练。',
-        goal: 'fullbody',
-        scene: 'home',
-        equipment: const [],
-        level: 1,
-        targetMinutes: 10,
-        blocks: const [
-          PlanBlock(
-            id: 'main',
-            name: '训练',
-            type: BlockType.main,
-            rounds: 2,
-            restBetweenRoundsSeconds: 0,
-            items: [
-              PlanItem(
-                exerciseId: 'h-step-jack',
-                mode: DoseMode.time,
-                sets: 3,
-                workSeconds: 80,
-                perSide: false,
-                restSeconds: 30,
-              ),
-            ],
-          ),
-        ],
-      );
-      for (final scenario in [
-        ('再短一点，保护膝', 'home', const {'膝'}),
-        ('再短一点，改在办公室，徒手', 'office', const <String>{}),
-      ]) {
-        final storage = _Storage();
-        final initial = AppStore(storage);
-        await initial.acceptSafety(blocked: false);
-        await initial.setChatLog([
-          ChatMessage(
-            id: 'saved-user',
-            role: ChatRole.user,
-            at: DateTime(2026, 10, 27),
-            text: '在家徒手10分钟做全身训练',
-            aiVisible: true,
-          ).toJson(),
-          ChatMessage(
-            id: 'saved-card',
-            role: ChatRole.assistant,
-            at: DateTime(2026, 10, 27),
-            plan: old,
-            request: requestForPlan(old),
-            aiVisible: true,
-          ).toJson(),
-        ]);
-        final restoredStore = AppStore(storage);
-        await restoredStore.load();
-        final client = coach.FakeLlmClient([
-          for (var i = 0; i < 5; i++)
-            const coach.LlmException(
-              coach.LlmErrorKind.network,
-              'offline',
-              retryAfter: Duration.zero,
-            ),
-        ], latency: Duration.zero);
-        final ai = engine(client);
-        final controller = controllerFor(ai, store: restoredStore);
-        expect(controller.currentPlan?.id, old.id);
-        final sdkCard = ai.conversation.state.messages.singleWhere(
-          (message) => message.plan != null,
-        );
-        expect(sdkCard.plan!.plan.id, old.id);
-        await controller.send(scenario.$1);
-        expect(ai.lastFallbackReason, coach.FallbackReason.offline);
-        expect(
-          controller.messages.last.isPlanningFailure,
-          isTrue,
-          reason:
-              'Editing a restored plan remains a planning task while offline.',
-        );
-        // The previously saved card may remain on screen; no new card is made.
-        expect(
-          controller.messages.where((message) => message.isPlan),
-          hasLength(1),
-        );
-        expect(controller.currentPlan?.id, old.id);
-        expect(controller.messages.last.text, isNot(contains('预设方案')));
-        expect(client.requests, hasLength(5));
-        final prompt = requestText(client.requests.first);
-        expect(prompt, contains(scenario.$2));
-        for (final area in scenario.$3) {
-          expect(prompt, contains(area), reason: 'Safety must reach the SDK.');
-        }
-      }
-    },
-  );
-
-  TrainingPlan r2AdmittedPlan(String exercise) => TrainingPlan(
-    id: 'model-reused-id',
-    source: 'ai',
-    title: '训练',
-    summary: '按条件安排。',
-    goal: 'fullbody',
-    scene: 'home',
-    equipment: const [],
-    level: 1,
-    targetMinutes: 10,
-    blocks: [
-      PlanBlock(
-        id: 'main',
-        name: '训练',
-        type: BlockType.main,
-        rounds: 2,
-        restBetweenRoundsSeconds: 0,
-        items: [
-          exercise == 'h-squat'
-              ? const PlanItem(
-                  exerciseId: 'h-squat',
-                  mode: DoseMode.reps,
-                  sets: 3,
-                  reps: 18,
-                  restSeconds: 60,
-                  perSide: false,
-                )
-              : const PlanItem(
-                  exerciseId: 'h-step-jack',
-                  mode: DoseMode.time,
-                  sets: 3,
-                  workSeconds: 80,
-                  restSeconds: 30,
-                  perSide: false,
-                ),
-        ],
-      ),
-    ],
-  );
-
-  test(
-    'distinct admitted plans with a reused model id save independently',
-    () async {
-      final client = coach.FakeLlmClient([
-        planResponse(value: r2AdmittedPlan('h-step-jack')),
-        planResponse(value: r2AdmittedPlan('h-squat')),
-      ], latency: Duration.zero);
-      final ai = engine(client);
-      final firstReply = await ai.reply('在家10分钟练全身，徒手', const ChatState());
-      final secondReply = await ai.reply('重新安排在家徒手10分钟全身训练', firstReply.state);
-      final first = replyPlan(firstReply)!;
+      final reply = await ai.reply('帮我练一下', const ChatState());
+      expect(reply.messages.single.question?.options, ['核心', '下肢']);
+      expect(reply.messages.single.plan, isNull);
       expect(
-        replyPlan(secondReply),
-        isNotNull,
-        reason:
-            'SDK status=${ai.lastResult?.status}, issues=${ai.lastResult?.issues.map((i) => i.toJson()).toList()}, '
-            'last feedback=${client.requests.last.messages.last.content}',
+        ai.conversation.canAnswer(reply.messages.single.conversationMessageId!),
+        isTrue,
       );
-      final second = replyPlan(secondReply)!;
-      expect(first.id, isNot('model-reused-id'));
-      expect(second.id, isNot('model-reused-id'));
-      expect(first.id, isNot(second.id));
-      expect(first.exerciseIds, {'h-step-jack'});
-      expect(second.exerciseIds, {'h-squat'});
-      final storage = _Storage();
-      final store = AppStore(storage);
-      await store.savePlan(first);
-      await store.savePlan(second);
-      final reloaded = AppStore(storage);
-      await reloaded.load();
-      expect(reloaded.savedPlans, hasLength(2));
-      expect(reloaded.savedPlans.map((p) => p.plan.id).toSet(), {
-        first.id,
-        second.id,
-      });
-    },
-  );
-
-  for (final phrase in ['换一套', '换个别的', '再来一套']) {
-    test(
-      'suggested $phrase generates a different plan for the adopted conditions',
-      () async {
-        final client = coach.FakeLlmClient([
-          planResponse(value: r2AdmittedPlan('h-step-jack')),
-          planResponse(value: r2AdmittedPlan('h-squat')),
-        ], latency: Duration.zero);
-        final ai = engine(client);
-        final first = await ai.reply('在家10分钟练全身，徒手', const ChatState());
-        expect(replyPlan(first), isNotNull);
-        final replacement = await ai.reply(phrase, first.state);
-        expect(
-          replyPlan(replacement),
-          isNotNull,
-          reason:
-              'The App suggestion must reach the SDK as a plan replacement.',
-        );
-        expect(replyPlan(replacement)!.exerciseIds, {'h-squat'});
-        expect(replyPlan(replacement)!.targetMinutes, 10);
-        expect(replyPlan(replacement)!.scene, 'home');
-        expect(replacement.messages.where((m) => m.question != null), isEmpty);
-        final previousIds = replyPlan(first)!.exerciseIds;
-        final replacementIds = replyPlan(replacement)!.exerciseIds;
-        expect(
-          replacementIds.difference(previousIds).length * 2,
-          greaterThanOrEqualTo(replacementIds.length),
-        );
-      },
-    );
-  }
-
-  test('换一套 rejects a plan whose exercises are unchanged', () async {
-    final unchanged = r2AdmittedPlan('h-step-jack');
-    final client = coach.FakeLlmClient([
-      planResponse(value: unchanged),
-      for (var i = 0; i < 3; i++) planResponse(value: unchanged),
-    ], latency: Duration.zero);
-    final ai = engine(client);
-    final first = await ai.reply('在家10分钟练全身，徒手', const ChatState());
-    expect(replyPlan(first), isNotNull);
-    final replacement = await ai.reply('换一套', first.state);
-    expect(replyPlan(replacement), isNull);
-    expect(ai.lastResult!.status, coach.TurnStatus.error);
-    expect(
-      ai.lastResult!.issues.map((issue) => issue.code),
-      contains('plan_too_similar'),
-    );
-    expect(replacement.messages.single.isPlanningFailure, isTrue);
-    expect(client.requests, hasLength(4));
+      expect(
+        client.requests,
+        hasLength(1),
+        reason: 'The fake model chose to ask; no App preflight question.',
+      );
+    });
   });
 
-  group('runtime diagnostics', () {
-    late RuntimeLog previousLog;
-    late RuntimeLog log;
-
-    setUp(() {
-      previousLog = RuntimeLog.instance;
-      log = RuntimeLog(enabled: true);
-      RuntimeLog.instance = log;
-    });
-
-    tearDown(() => RuntimeLog.instance = previousLog);
-
-    List<Map<String, dynamic>> events([String? name]) => [
-      for (final event
-          in (jsonDecode(log.exportJson()) as Map<String, dynamic>)['events']
-              as List)
-        if (name == null || (event as Map)['event'] == name)
-          Map<String, dynamic>.from(event as Map),
-    ];
-
-    Map<String, dynamic> fields(Map<String, dynamic> event) =>
-        Map<String, dynamic>.from(event['fields'] as Map);
-
+  group('v2 typed cards and ledger', () {
     test(
-      'adopted AI plan and later local command have distinct provenance',
+      'batched plan tools produce exact SDK plan identity and payload',
       () async {
-        final result = planResponse(text: 'private-provider-body');
+        final client = coach.FakeLlmClient(
+          fixture.planTurn(),
+          latency: Duration.zero,
+        );
+        final ai = engine(client);
+        final events = <coach.AgentEvent>[];
+        final sub = ai.events.listen(events.add);
+        addTearDown(sub.cancel);
+        final reply = await ai.reply('在家徒手10分钟做拉伸', const ChatState());
+        expect(
+          ai.lastResult?.plan,
+          isNotNull,
+          reason: '${ai.lastResult?.issues} ${ai.lastResult?.error}',
+        );
+        final card = reply.messages.single;
+        expect(identical(card.validatedPlan, ai.lastResult!.plan), isTrue);
+        expect(card.plan!.id, ai.lastResult!.plan!.plan.id);
+        expect(card.plan!.toJson(), ai.lastResult!.plan!.plan.toJson());
+        expect(card.plan!.targetMinutes, 10);
+        expect(client.requests, hasLength(2));
+        expect(ai.agent.sessionState.params['minutes']!.source, 'user');
+        expect(ai.agent.sessionState.params['equipment']!.value, isEmpty);
+        expect(
+          events
+              .where(
+                (e) =>
+                    e.kind == coach.AgentEventKind.node &&
+                    e.node?.status == 'done',
+              )
+              .map((e) => e.node!.id),
+          [
+            'understand',
+            'parameters',
+            'actions',
+            'planning',
+            'review',
+            'output',
+          ],
+        );
+      },
+    );
+    test('SDK recommendation is typed actions and never a text plan', () async {
+      final client = coach.FakeLlmClient(
+        fixture.recommendationTurn(),
+        latency: Duration.zero,
+      );
+      final ai = engine(client);
+      final reply = await ai.reply('推荐几个拉伸动作', const ChatState());
+      expect(
+        reply.messages.single.actions,
+        isNotNull,
+        reason: '${ai.lastResult?.issues} ${ai.lastResult?.error}',
+      );
+      expect(
+        reply.messages.single.actions!.items.map((a) => a.id),
+        CoachV2Fixtures.stretching,
+      );
+      expect(reply.messages.single.plan, isNull);
+      expect(ai.agent.sessionState.task!.type, 'recommend');
+      expect(ai.agent.sessionState.task!.nodes.last.status, 'done');
+      expect(client.requests, hasLength(1));
+    });
+    test('recommendation becomes a plan through SDK default reuse', () async {
+      final client = coach.FakeLlmClient([
+        ...fixture.recommendationTurn(),
+        ...fixture.planTurn(prefix: 'from-recommend', goalQuote: null),
+      ], latency: Duration.zero);
+      final ai = engine(client);
+      final first = await ai.reply('推荐几个拉伸动作', const ChatState());
+      expect(first.messages.single.actions, isNotNull);
+      final reply = await ai.reply('在家徒手10分钟，把这些排成计划', first.state);
+      expect(
+        reply.messages.single.validatedPlan,
+        isNotNull,
+        reason: '${ai.lastResult?.issues}',
+      );
+      expect(ai.agent.sessionState.task!.reused, isTrue);
+      expect(reply.messages.single.question, isNull);
+    });
+    test(
+      'same-plan edit preserves SDK identity and advances version',
+      () async {
         final client = coach.FakeLlmClient([
-          coach.LlmResponse(
-            content: result.content,
-            toolCalls: result.toolCalls,
-            reasoning: 'private-reasoning-body',
-            usage: const coach.TokenUsage(
-              promptTokens: 200,
-              completionTokens: 100,
-              reasoningTokens: 60,
-            ),
+          ...fixture.planTurn(),
+          ...fixture.planTurn(
+            prefix: 'edited',
+            reuse: true,
+            sceneQuote: null,
+            equipmentQuote: null,
+            goalQuote: null,
+            minutes: 7,
+            minutesQuote: '7分钟',
+            operation: 'edit',
+            operationQuote: '缩短',
           ),
         ], latency: Duration.zero);
         final ai = engine(client);
-        final store = AppStore(_Storage())..safetyAccepted = true;
-        final controller = ChatController(
-          engine: ai,
-          store: store,
-          replyDelay: Duration.zero,
+        final first = await ai.reply('在家徒手10分钟做拉伸', const ChatState());
+        final previous = first.messages.single.plan!;
+        final next = await ai.reply('缩短到7分钟', first.state);
+        expect(
+          next.messages.single.plan,
+          isNotNull,
+          reason: '${ai.lastResult?.issues}',
         );
-        addTearDown(controller.dispose);
-        controller.start();
-        const input = '在家 10 分钟练全身，徒手 private-user-prompt';
-        await controller.send(input);
-        expect(ai.lastResult?.status, coach.TurnStatus.ok);
-        final adopted = fields(events('ai.turn.end').single);
-        expect(adopted, containsPair('route', 'ai'));
-        expect(adopted, containsPair('hasPlan', true));
-        expect(adopted, containsPair('reasoningTokens', 60));
-        expect(adopted, containsPair('submissions', 1));
-        final aiOperation = events('chat.send').single['operation'];
-        for (final event in events().where(
-          (event) => event['operation'] != null,
-        )) {
-          expect(event['operation'], aiOperation);
-        }
-        expect(fields(events('chat.reply.rendered').single)['hasPlan'], isTrue);
-        await controller.send('设置');
-        expect(client.requests, hasLength(1));
-        expect(ai.lastResult, isNull);
-        expect(ai.lastOutcome, isNull);
-        expect(ai.lastFallbackReason, isNull);
-        final localRoute = events('chat.route').last;
-        expect(fields(localRoute), {
-          'route': 'local',
-          'reason': 'local_shortcut',
-        });
-        expect(localRoute['operation'], isNot(aiOperation));
-        final serialized = log.exportJson();
-        for (final private in [
-          input,
-          'private-user-prompt',
-          'private-provider-body',
-          'private-reasoning-body',
-          'AI 徒手训练',
-          'action-library/SKILL.md',
-        ]) {
-          expect(serialized, isNot(contains(private)));
-        }
+        expect(next.messages.single.plan!.id, previous.id);
+        expect(next.messages.single.plan!.targetMinutes, 7);
+        expect(
+          ai.agent.sessionState.plans[previous.id]!.map((v) => v.version),
+          [1, 2],
+        );
+        expect(next.messages.single.question, isNull);
       },
     );
-
-    test(
-      'HTTP auth failure records status and fallback without private server text',
-      () async {
-        final gateway = await _Gateway.start(
-          [],
-          status: HttpStatus.forbidden,
-          errorMessage:
-              'private-app-key-secret provider-body should not export',
-        );
-        addTearDown(gateway.close);
-        final ai = engine(gateway.client());
-        final reply = await ai.reply('在家徒手 10 分钟练全身', const ChatState());
-        expect(reply.messages.single.isPlanningFailure, isTrue);
-        expect(texts(reply), isNot(contains('预设方案')));
-        final requestError = fields(events('ai.request.error').single);
-        expect(requestError['httpStatus'], HttpStatus.forbidden);
-        expect(requestError['kind'], 'auth');
-        expect(requestError['errorType'], 'LlmException');
-        expect(requestError['elapsedMs'], isNonNegative);
-        final end = fields(events('ai.turn.end').single);
-        expect(end['route'], 'sdk');
-        expect(end['status'], 'error');
-        expect(end['reason'], ai.lastFallbackReason!.name);
-        expect(events('ai.fallback.begin'), isEmpty);
-        expect(log.exportJson(), isNot(contains('private-app-key-secret')));
-        expect(log.exportJson(), isNot(contains('provider-body')));
-        expect(log.exportJson(), isNot(contains('127.0.0.1')));
-      },
-    );
-
-    test('retry and tool progress retain only known event metadata', () async {
-      final ai = engine(
-        coach.FakeLlmClient([
-          const coach.LlmException(
-            coach.LlmErrorKind.network,
-            'private-network-error',
-            retryAfter: Duration.zero,
-          ),
-          tool('read', {'path': 'action-library/SKILL.md'}),
-          tool('check_plan', plan().toJson()),
-          planResponse(),
-        ], latency: Duration.zero),
+    for (final phrase in ['换一套', '换个别的', '再来一套']) {
+      test(
+        '"$phrase" keeps SDK conditions and changes at least half main actions',
+        () async {
+          final client = coach.FakeLlmClient([
+            ...fixture.planTurn(),
+            ...fixture.planTurn(
+              prefix: 'replacement',
+              reuse: true,
+              sceneQuote: null,
+              equipmentQuote: null,
+              goalQuote: null,
+              minutes: null,
+              operation: 'replace_all',
+              operationQuote: phrase,
+              ids: CoachV2Fixtures.alternativeStretching,
+            ),
+          ], latency: Duration.zero);
+          final ai = engine(client);
+          final first = await ai.reply('在家徒手10分钟做拉伸', const ChatState());
+          final next = await ai.reply(phrase, first.state);
+          final plan = next.messages.single.plan;
+          expect(
+            plan,
+            isNotNull,
+            reason: '${ai.lastResult?.issues} ${ai.lastResult?.error}',
+          );
+          expect(plan!.id, first.messages.single.plan!.id);
+          expect(plan.targetMinutes, 10);
+          expect(next.messages.single.question, isNull);
+          final oldIds = first.messages.single.plan!.items
+              .map((m) => m.exerciseId)
+              .toSet();
+          final ids = plan.items.map((m) => m.exerciseId).toSet();
+          expect(
+            ids.difference(oldIds).length / ids.length,
+            greaterThanOrEqualTo(.5),
+            reason:
+                'old=$oldIds new=$ids; ledger=${jsonEncode(ai.agent.sessionState.toJson())}',
+          );
+        },
       );
-      await ai.reply('先检查再排：在家 10 分钟练全身，徒手', const ChatState());
-      expect(ai.lastResult!.status, coach.TurnStatus.ok);
-      expect(events('ai.request.begin'), hasLength(4));
-      expect(events('ai.request.end'), hasLength(3));
-      expect(events('ai.request.error'), hasLength(1));
-      final retry = events(
-        'ai.progress',
-      ).singleWhere((event) => fields(event)['kind'] == 'retrying');
-      expect(fields(retry), containsPair('reason', 'network'));
-      expect(fields(retry), containsPair('attempt', 1));
+    }
+    test('unsearched recommendation cannot become an App card', () async {
+      final client = coach.FakeLlmClient([
+        CoachV2Fixtures.batch([
+          CoachV2Fixtures.call('start', 'start_task', {'type': 'recommend'}),
+          CoachV2Fixtures.call('params', 'set_params', {
+            'fields': {
+              'goal': CoachV2Fixtures.sourced(['purpose.stretch'], '拉伸'),
+            },
+          }),
+          CoachV2Fixtures.call('invalid', 'show_actions', {
+            'ids': ['fabricated-action'],
+            'note': '慢慢来。',
+          }),
+        ]),
+        '暂时无法提供这个动作。',
+      ], latency: Duration.zero);
+      final ai = engine(client);
+      final reply = await ai.reply('推荐拉伸动作', const ChatState());
       expect(
-        events('ai.progress').map((event) => fields(event)['kind']),
-        containsAll(['reading', 'checking', 'done']),
+        reply.messages.every(
+          (m) => m.actions == null && m.validatedPlan == null,
+        ),
+        isTrue,
       );
-      expect(fields(events('ai.turn.end').single)['reads'], 1);
-      expect(log.exportJson(), isNot(contains('action-library/SKILL.md')));
-      expect(log.exportJson(), isNot(contains('private-network-error')));
+      expect(ai.agent.sessionState.lastDeliveredPlanId, isNull);
     });
+  });
 
+  group('lifecycle and failures', () {
     test(
-      'cancelled late transport completion stays attached to the old operation',
+      'upstream error makes only a failure bubble without a preset',
+      () async {
+        final client = coach.FakeLlmClient([
+          const coach.LlmException(
+            coach.LlmErrorKind.http,
+            'PRIVATE-UPSTREAM-ERROR',
+            statusCode: 401,
+          ),
+        ], latency: Duration.zero);
+        final ai = engine(client);
+        final reply = await ai.reply('在家徒手10分钟做拉伸', const ChatState());
+        expect(reply.messages.single.isPlanningFailure, isTrue);
+        expect(reply.messages.single.plan, isNull);
+        expect(reply.messages.single.actions, isNull);
+        expect(_text(reply), isNot(contains('PRIVATE-UPSTREAM-ERROR')));
+        expect(_text(reply), isNot(contains('预设方案')));
+        expect(ai.lastOutcome, coach.TurnOutcome.error);
+        expect(client.requests, hasLength(1));
+      },
+    );
+    test('cancel defeats late custom transport and next turn works', () async {
+      final client = _LateClient();
+      final ai = engine(client);
+      final pending = ai.reply('第一条', const ChatState());
+      await client.started.future;
+      ai.cancelPending();
+      final cancelled = await pending;
+      expect(cancelled.messages, isEmpty);
+      expect(cancelled.inputAccepted, isFalse);
+      expect(client.token!.isCancelled, isTrue);
+      client.late.complete(
+        const coach.LlmResponse(content: 'LATE-PRIVATE-ANSWER'),
+      );
+      await Future<void>.delayed(Duration.zero);
+      final next = await ai.reply('第二条', const ChatState());
+      expect(_text(next), '新的回复');
+      expect(
+        ai.conversation.state.messages.map((m) => m.text).join(),
+        isNot(contains('LATE-PRIVATE-ANSWER')),
+      );
+    });
+    test(
+      'reset clears ledger and completed history using the same Agent',
+      () async {
+        final client = coach.FakeLlmClient([
+          '第一条回答',
+          '第二条回答',
+        ], latency: Duration.zero);
+        final ai = engine(client);
+        await ai.reply('PREVIOUS-PRIVATE-TURN', const ChatState());
+        final original = ai.agent;
+        ai.reset();
+        expect(identical(ai.agent, original), isTrue);
+        expect(ai.agent.sessionState.userTurns, isEmpty);
+        await ai.reply('新的对话', const ChatState());
+        expect(
+          _wire(client.requests.last),
+          isNot(contains('PREVIOUS-PRIVATE-TURN')),
+        );
+        expect(
+          ai.conversation.state.messages
+              .where((m) => m.isUser)
+              .map((m) => m.text),
+          ['新的对话'],
+        );
+      },
+    );
+    test(
+      'dispose ignores late completion and refuses subsequent sends',
       () async {
         final client = _LateClient();
         final ai = engine(client);
-        final store = AppStore(_Storage())..safetyAccepted = true;
-        final controller = ChatController(
-          engine: ai,
-          store: store,
-          replyDelay: Duration.zero,
-        );
-        addTearDown(controller.dispose);
-        controller.start();
-        final pending = controller.send('在家 10 分钟练全身，徒手');
+        final pending = ai.reply('等待中的请求', const ChatState());
         await client.started.future;
-        final oldOperation = events('chat.send').single['operation'];
-        controller.cancelRequest();
-        await pending;
-        await controller.send('有什么建议？');
-        final newOperation = events('chat.send').last['operation'];
-        expect(newOperation, isNot(oldOperation));
-        client.late.complete(planResponse(text: 'private-late-plan'));
-        await Future<void>.delayed(Duration.zero);
-        final oldEnd = events(
-          'ai.request.end',
-        ).singleWhere((event) => event['operation'] == oldOperation);
-        expect(fields(oldEnd)['available'], isFalse);
-        expect(fields(events('ai.turn.end').single)['route'], 'ai');
-        expect(events('ai.turn.end').single['operation'], newOperation);
-        expect(events('ai.turn.cancel').single['operation'], oldOperation);
-        expect(
-          events('chat.reply.discarded').single['operation'],
-          oldOperation,
+        ai.dispose();
+        client.late.complete(
+          const coach.LlmResponse(content: 'late after disposal'),
         );
-        expect(events('chat.reply.rendered'), hasLength(1));
-        expect(log.exportJson(), isNot(contains('private-late-plan')));
-        expect(controller.messages.last.text, '新的回复');
+        expect((await pending).messages, isEmpty);
+        expect((await ai.reply('不要再发送', const ChatState())).messages, isEmpty);
+        expect(client.requests, hasLength(1));
       },
     );
-
+    test('duplicate send during a request is not accepted or sent', () async {
+      final client = _LateClient();
+      final ai = engine(client);
+      final first = ai.reply('原始消息', const ChatState());
+      await client.started.future;
+      final duplicate = await ai.reply('重复消息', const ChatState());
+      expect(duplicate.inputAccepted, isFalse);
+      expect(client.requests, hasLength(1));
+      ai.cancelPending();
+      await first;
+      client.late.complete(const coach.LlmResponse(content: 'ignored'));
+    });
     test(
-      'outer turn timeout is logged separately from request cancellation',
+      'overlong SDK input is rejected without consuming a model call',
+      () async {
+        final client = coach.FakeLlmClient(['有效回复'], latency: Duration.zero);
+        final ai = engine(client);
+        final long = await ai.reply(
+          '长' * (ai.agent.maxInputChars + 1),
+          const ChatState(),
+        );
+        expect(long.inputAccepted, isFalse);
+        expect(client.requests, isEmpty);
+        expect(_text(await ai.reply('正常提问', const ChatState())), '有效回复');
+      },
+    );
+    test(
+      'outer deadline cancels ignored transport without a stale reply',
       () async {
         final client = _LateClient();
-        final ai = engine(client, deadline: const Duration(milliseconds: 10));
-        final reply = await ai.reply('在家 10 分钟练全身，徒手', const ChatState());
-        expect(reply.messages.single.isPlanningFailure, isTrue);
-        expect(texts(reply), isNot(contains('预设方案')));
-        expect(events('ai.turn.timeout'), hasLength(1));
-        expect(events('ai.request.cancel'), hasLength(1));
-        expect(fields(events('ai.turn.end').single)['reason'], 'timeout');
-        client.late.complete(const coach.LlmResponse(content: 'late response'));
-        await Future<void>.delayed(Duration.zero);
+        final ai = engine(client, deadline: const Duration(milliseconds: 25));
+        final pending = ai.reply('等待', const ChatState());
+        await client.started.future;
+        final result = await pending;
+        expect(result.messages.single.isPlanningFailure, isTrue);
+        expect(result.messages.single.plan, isNull);
+        client.late.complete(
+          const coach.LlmResponse(content: 'late private answer'),
+        );
+      },
+    );
+  });
+
+  group('SDK defaults and memory', () {
+    test(
+      'SDK retry timeout and context thresholds are not overridden',
+      () async {
+        final ai = engine(coach.FakeLlmClient([]));
+        expect(ai.agent.maxSteps, 100);
+        expect(ai.agent.maxRequestRetries, 4);
+        expect(ai.agent.requestTimeout, const Duration(seconds: 60));
+        expect(ai.agent.turnTimeout, const Duration(seconds: 360));
+        expect(ai.agent.contextBudgetTokens, 60000);
+        expect(ai.agent.keepRecentSteps, 3);
+        expect(ai.agent.contextBudgetConfig.toJson(), {
+          'softOffBytes': 40960,
+          'softOnBytes': 51200,
+          'hardBytes': 65536,
+        });
+        expect(ai.agent.extraRules, isEmpty);
+        expect(ai.agent.fallback, isNull);
+        expect(ai.turnTimeout, const Duration(seconds: 390));
+        final transport = const AiCoachConfig(
+          token: 'test-key',
+        ).createClient(deviceId: 'test-device');
+        addTearDown(transport.close);
+        expect(transport.config.maxRetries, 0);
+        expect(
+          transport.config.timeout,
+          greaterThanOrEqualTo(coach.LlmConfig.ugkWorker.timeout),
+        );
+        expect(transport.config.baseUrl, 'https://ai.uuugk.win/v1');
+        expect(transport.config.model, 'deepseek-flash');
+        expect(transport.auth, isA<coach.ApiKeyAuth>());
+        expect(await transport.auth.headers(), {
+          'Authorization': 'Bearer test-key',
+        });
+      },
+    );
+    test('disabled memory omits stored habits and memory tools', () async {
+      final memory = coach.InMemoryUserMemoryStore([
+        coach.MemoryEntry(
+          coach.MemoryKind.preference,
+          'PRIVATE-MEMORY-SENTINEL',
+          at: DateTime(2026),
+        ),
+      ]);
+      final client = coach.FakeLlmClient(['正常回答'], latency: Duration.zero);
+      await engine(
+        client,
+        memoryStore: memory,
+      ).reply('训练呼吸怎么做', const ChatState());
+      expect(
+        _wire(client.requests.single),
+        isNot(contains('PRIVATE-MEMORY-SENTINEL')),
+      );
+      expect(
+        client.requests.single.tools.map((t) => t.name),
+        isNot(contains('remember')),
+      );
+      expect(memory.entries.single.text, 'PRIVATE-MEMORY-SENTINEL');
+    });
+    test(
+      'SDK clearMemory removes durable facts and later prompt summaries',
+      () async {
+        final memory = coach.InMemoryUserMemoryStore([
+          coach.MemoryEntry(
+            coach.MemoryKind.preference,
+            'CLEAR-THIS-HABIT',
+            at: DateTime(2026),
+          ),
+        ]);
+        final client = coach.FakeLlmClient([
+          '第一条',
+          '第二条',
+        ], latency: Duration.zero);
+        final ai = engine(client, memoryStore: memory, enableUserMemory: true);
+        await ai.reply('先介绍呼吸', const ChatState());
+        expect(_wire(client.requests.first), contains('CLEAR-THIS-HABIT'));
+        await ai.clearMemory();
+        expect(memory.entries, isEmpty);
+        await ai.reply('继续介绍', const ChatState());
+        expect(
+          _wire(client.requests.last),
+          isNot(contains('CLEAR-THIS-HABIT')),
+        );
+      },
+    );
+    test(
+      'durable memory failure propagates instead of reporting success',
+      () async {
+        await expectLater(
+          engine(
+            coach.FakeLlmClient([]),
+            memoryStore: _FailingMemory(),
+          ).clearMemory(),
+          throwsStateError,
+        );
       },
     );
   });
