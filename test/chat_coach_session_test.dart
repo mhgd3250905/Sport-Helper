@@ -18,6 +18,8 @@ import 'package:smartfit/ui/chat/coach_task_bubble.dart';
 import 'package:smartfit/ui/chat/plan_card.dart';
 import 'package:smartfit/ui/chat/validated_plan_card.dart';
 import 'package:smartfit/ui/theme/app_theme.dart';
+import 'package:smartfit/ui/theme/polish_card.dart';
+import 'package:smartfit/ui/theme/ui_polish_tokens.dart';
 import 'package:smartfit/ui/theme/widgets.dart';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
 import 'package:ugk_coach_ui/ugk_coach_ui.dart';
@@ -167,6 +169,13 @@ void main() {
     matching: find.widgetWithText(TextButton, '取消'),
   );
 
+  void expectTask(ChatController chat, String current, String stamp) {
+    final nodes = chat.activeTask!.nodes;
+    expect(nodes.map((node) => node.id), ['understand', current]);
+    expect(nodes.map((node) => node.status), ['done', 'current']);
+    expect(nodes.map((node) => node.stamp), ['已确认训练目标', stamp]);
+  }
+
   testWidgets(
     'SDK node snapshots render before mount and cancellation filters late events',
     (tester) async {
@@ -185,9 +194,10 @@ void main() {
       );
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 250));
-      expect(find.text('候选动作来自 SDK'), findsOneWidget);
-      expect(find.text('已确认训练目标'), findsOneWidget);
-      expect(find.byIcon(Icons.check_circle_rounded), findsOneWidget);
+      expectTask(chat, 'actions', '候选动作来自 SDK');
+      expect(find.text('读懂你的需求'), findsOneWidget);
+      expect(find.text('候选动作来自 SDK'), findsNothing);
+      expect(find.text('已确认训练目标'), findsNothing);
       engine.eventBus.add(
         coach.AgentEvent(
           'turn',
@@ -198,8 +208,11 @@ void main() {
       );
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 250));
-      expect(find.text('SDK 正在核对动作编排'), findsOneWidget);
+      expectTask(chat, 'review', 'SDK 正在核对动作编排');
+      expect(find.text('最后检查一遍'), findsOneWidget);
+      expect(find.text('SDK 正在核对动作编排'), findsNothing);
       expect(find.text('候选动作来自 SDK'), findsNothing);
+      final beforeCancel = chat.activeTask;
       await tester.tap(cancelButton());
       await tester.pump();
       engine.eventBus.add(
@@ -218,6 +231,8 @@ void main() {
       );
       await pending;
       await tester.pumpAndSettle();
+      expect(chat.activeTask, same(beforeCancel));
+      expectTask(chat, 'review', 'SDK 正在核对动作编排');
       expect(find.text('迟到'), findsNothing);
       expect(find.byType(CoachTaskBubble), findsNothing);
       expect(find.text('取消后的旧节点'), findsNothing);
@@ -241,7 +256,10 @@ void main() {
       );
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 250));
-      expect(find.text('SDK 核对中的任务'), findsOneWidget);
+      expectTask(chat, 'review', 'SDK 核对中的任务');
+      expect(find.text('最后检查一遍'), findsOneWidget);
+      expect(find.text('SDK 核对中的任务'), findsNothing);
+      final beforeRetry = chat.activeTask;
       engine.eventBus.add(
         const coach.AgentEvent(
           'retry-turn',
@@ -252,7 +270,9 @@ void main() {
       );
       await tester.pump();
       expect(find.text('网络不稳，正在重试（1/4）…'), findsNothing);
-      expect(find.text('SDK 核对中的任务'), findsOneWidget);
+      expect(chat.activeTask, same(beforeRetry));
+      expectTask(chat, 'review', 'SDK 核对中的任务');
+      expect(find.text('最后检查一遍'), findsOneWidget);
       expect(
         tester.widget<ChatInputBar>(find.byType(ChatInputBar)).enabled,
         isFalse,
@@ -272,8 +292,11 @@ void main() {
         ),
       );
       await tester.pump();
+      expect(chat.activeTask, same(beforeRetry));
+      expectTask(chat, 'review', 'SDK 核对中的任务');
       expect(find.text('结束后的迟到节点'), findsNothing);
-      expect(find.text('SDK 核对中的任务'), findsOneWidget);
+      expect(find.text('最后检查一遍'), findsOneWidget);
+      expect(find.text('SDK 核对中的任务'), findsNothing);
       engine.pending.single.complete(
         ChatReply(
           messages: const [BotMessage('计划准备好了')],
@@ -282,7 +305,10 @@ void main() {
       );
       await pending;
       await tester.pumpAndSettle();
-      expect(find.byType(CoachTaskBubble), findsNothing);
+      expect(find.byType(CoachTaskBubble).hitTestable(), findsNothing);
+      for (final bubble in find.byType(CoachTaskBubble).evaluate()) {
+        expect(TickerMode.valuesOf(bubble).enabled, isFalse);
+      }
       expect(find.text('计划准备好了'), findsOneWidget);
     },
   );
@@ -308,6 +334,7 @@ void main() {
         task: taskSnapshot(current: 'review', stamp: '已取消轮次的任务节点'),
       ),
     );
+    expect(chat.activeTask, isNull);
     engine.eventBus.add(
       coach.AgentEvent(
         'current-turn',
@@ -317,7 +344,9 @@ void main() {
     );
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 250));
-    expect(find.text('当前轮次的动作节点'), findsOneWidget);
+    expectTask(chat, 'actions', '当前轮次的动作节点');
+    expect(find.text('读懂你的需求'), findsOneWidget);
+    expect(find.text('当前轮次的动作节点'), findsNothing);
     expect(find.text('已取消轮次的任务节点'), findsNothing);
     engine.pending[1].complete(
       ChatReply(messages: const [BotMessage('当前回复')], state: engine.states[1]),
@@ -331,6 +360,7 @@ void main() {
     );
     await cancelled;
     await tester.pumpAndSettle();
+    expectTask(chat, 'actions', '当前轮次的动作节点');
     expect(find.text('当前回复'), findsOneWidget);
     expect(find.text('迟到的旧回复'), findsNothing);
   });
@@ -499,8 +529,10 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 450));
     expect(find.byType(CoachTaskBubble), findsOneWidget);
-    expect(find.text('教练待办'), findsOneWidget);
-    expect(find.byKey(const ValueKey('coach-node-understand')), findsNothing);
+    expect(chat.activeTask, isNull);
+    expect(find.text('正在想怎么练…'), findsOneWidget);
+    expect(find.text('读懂你的需求'), findsOneWidget);
+    expect(find.byKey(const ValueKey('generation-dots')), findsOneWidget);
     expect(
       tester.widget<ChatInputBar>(find.byType(ChatInputBar)).enabled,
       isFalse,
@@ -578,9 +610,29 @@ void main() {
       expect(card, findsOneWidget);
       expect(find.text(note), findsOneWidget);
       final style = CoachUiTheme.of(tester.element(card));
-      expect(style.builders.surface, isNull);
-      expect(style.builders.controlFace, isNull);
-      expect(style.builders.pressable, isNull);
+      expect(style.builders.surface, isNotNull);
+      expect(style.builders.controlFace, isNotNull);
+      expect(style.builders.pressable, isNotNull);
+      const surfaceRequest = CoachCardSurface(
+        padding: EdgeInsets.all(12),
+        width: 300,
+        child: SizedBox.shrink(),
+      );
+      final surface = style.builders.surface!(
+        tester.element(card),
+        surfaceRequest,
+      );
+      expect(surface, isA<SfPolishCard>());
+      final appSurface = surface as SfPolishCard;
+      expect(appSurface.padding, const EdgeInsets.all(12));
+      expect(appSurface.width, 300);
+      expect(appSurface.child, same(surfaceRequest.child));
+      expect(style.colors.surface, SfCardTokens.fill);
+      expect(style.colors.outline, SfCardTokens.edge);
+      expect(style.typography.callout.fontSize, 15);
+      expect(style.typography.callout.fontWeight, FontWeight.w600);
+      expect(style.typography.callout.height, 1.35);
+      expect(style.typography.caption.fontSize, 12);
       final recommendation = tester.widget<CoachRecommendCard>(card);
       expect(recommendation.library.tryGet('h-wall-angel')!.levelLabel, '入门');
       expect(

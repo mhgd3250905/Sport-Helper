@@ -84,6 +84,11 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
+      final clip = tester.widget<ClipRRect>(
+        find.byKey(const ValueKey('plan-clip-single-move')),
+      );
+      expect(clip.borderRadius, BorderRadius.circular(20));
+      expect(clip.clipBehavior, Clip.antiAlias);
       await tester.tap(find.byKey(const ValueKey('plan-start-single-move')));
       await tester.pumpAndSettle();
       expect(starts, 1);

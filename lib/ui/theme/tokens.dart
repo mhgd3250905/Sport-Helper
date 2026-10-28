@@ -281,11 +281,12 @@ abstract final class SfComposerTokens {
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
     colors: [
-      SfColors.skyBottom.withValues(alpha: 0),
-      SfColors.skyBottom.withValues(alpha: .86),
-      SfColors.skyBottom,
+      SfFeaturePanelTokens.background.withValues(alpha: 0),
+      SfFeaturePanelTokens.background.withValues(alpha: .18),
+      SfFeaturePanelTokens.background.withValues(alpha: .72),
+      SfFeaturePanelTokens.background,
     ],
-    stops: const [0, .5, 1],
+    stops: const [0, .35, .70, 1],
   );
 
   static LinearGradient get inputGradient => LinearGradient(

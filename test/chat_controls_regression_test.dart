@@ -7,6 +7,8 @@ import 'package:smartfit/data/app_store.dart';
 import 'package:smartfit/ui/library_page.dart';
 import 'package:smartfit/ui/chat/saved_plans_page.dart';
 import 'package:smartfit/ui/theme/app_theme.dart';
+import 'package:smartfit/ui/theme/action_tile.dart';
+import 'package:smartfit/ui/theme/ui_polish_tokens.dart';
 import 'package:smartfit/ui/theme/widgets.dart';
 import 'package:smartfit/voice/voice_library.dart';
 import 'package:smartfit/voice/voice_queue.dart';
@@ -157,6 +159,32 @@ void main() {
             ),
           );
           await tester.pumpAndSettle();
+          final tiles = find.byType(SfActionTile);
+          expect(tiles, findsWidgets);
+          final first = tester.getRect(tiles.at(0));
+          final next = tester.getRect(tiles.at(1));
+          expect(first.size, next.size);
+          expect(next.left - first.right, SfCardTokens.gridGap);
+          final firstTexts = find.descendant(
+            of: tiles.at(0),
+            matching: find.byType(Text),
+          );
+          final nextTexts = find.descendant(
+            of: tiles.at(1),
+            matching: find.byType(Text),
+          );
+          expect(
+            tester.getRect(firstTexts.first).height,
+            tester.getRect(nextTexts.first).height,
+          );
+          expect(
+            tester.getRect(firstTexts.last).bottom,
+            tester.getRect(nextTexts.last).bottom,
+          );
+          expect(
+            first.bottom - tester.getRect(firstTexts.last).bottom,
+            SfCardTokens.inset,
+          );
           expect(
             tester.takeException(),
             isNull,

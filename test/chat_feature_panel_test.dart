@@ -246,7 +246,11 @@ void main() {
     }
 
     await openPlans();
-    await tester.tap(find.byKey(ValueKey('saved-${saved.id}')));
+    expect(find.text('1 套'), findsOneWidget);
+    expect(find.textContaining('套 · 点一下'), findsNothing);
+    await tester.tap(find.byKey(ValueKey('saved-menu-${saved.id}')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('点一下在对话里调出'));
     await tester.pumpAndSettle();
     expect(app.chat.messages.last.plan?.id, plan.id);
     await openPlans();

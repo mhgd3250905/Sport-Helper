@@ -60,6 +60,10 @@ class ChatController extends ChangeNotifier {
   }, isBroadcast: true);
   coach.CoachTaskState? _latestTask;
   coach.CoachTaskState? get activeTask => _latestTask;
+
+  /// The SDK ledger supplies parameter sources and selected action IDs to UI.
+  coach.CoachSessionState? get activeSessionState =>
+      _latestTask == null ? null : _conversation?.agent.sessionState;
   String? _progressTurnId;
   final Set<String> _finishedProgressTurns = {};
   bool _progressEnded = true;

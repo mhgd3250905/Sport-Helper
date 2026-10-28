@@ -3,6 +3,7 @@ import 'package:ugk_coach_ui/ugk_coach_ui.dart';
 import '../../domain/exercise.dart';
 import '../../domain/plan.dart';
 import '../alpha_artwork.dart';
+import '../theme/ui_polish_tokens.dart';
 import 'coach_ui_adapter.dart';
 import 'expand_route.dart';
 
@@ -35,21 +36,27 @@ class PlanCard extends StatelessWidget {
     );
     return SfAlphaCardScope(
       active: alphaHero,
-      child: withSmartfitCoachUi(
-        context,
-        CoachPlanCard(
-          cutoutTopInset: alphaHero ? 0 : null,
-          plan: toCoachRoutine(plan, library),
-          library: CoachExerciseLibrary([
-            for (final id in plan.exerciseIds)
-              if (library.tryGet(id) case final e?)
-                toCoachExercise(e, alphaCards: alphaCards),
-          ]),
-          saved: saved,
-          landing: landing,
-          onStart: onStart,
-          onSave: onSave,
-          onOpen: onOpen,
+      child: ClipRRect(
+        key: ValueKey('plan-clip-${plan.id}'),
+        borderRadius: BorderRadius.circular(SfCardTokens.radius),
+        child: withSmartfitCoachUi(
+          context,
+          CoachPlanCard(
+            cutoutTopInset: alphaHero ? 0 : null,
+            // This batch's opaque card surface starts at its own top edge.
+            surfaceTopInset: 0,
+            plan: toCoachRoutine(plan, library),
+            library: CoachExerciseLibrary([
+              for (final id in plan.exerciseIds)
+                if (library.tryGet(id) case final e?)
+                  toCoachExercise(e, alphaCards: alphaCards),
+            ]),
+            saved: saved,
+            landing: landing,
+            onStart: onStart,
+            onSave: onSave,
+            onOpen: onOpen,
+          ),
         ),
       ),
     );

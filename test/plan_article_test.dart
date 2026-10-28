@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:smartfit/app/services.dart';
 import 'package:smartfit/domain/exercise.dart';
 import 'package:smartfit/domain/plan.dart';
+import 'package:smartfit/ui/chat/coach_ui_adapter.dart';
 import 'package:smartfit/ui/exercise_video.dart';
 import 'package:smartfit/ui/plan_page.dart';
 import 'package:smartfit/ui/theme.dart';
@@ -106,6 +107,7 @@ Future<AppServices> _show(
   double height = 844,
   double scale = 1,
   SfPalette palette = SfPalette.dark,
+  TrainingPlan plan = _plan,
   Exercise Function(Exercise)? transform,
 }) async {
   tester.view.physicalSize = Size(width, height);
@@ -137,7 +139,7 @@ Future<AppServices> _show(
             child: child!,
           ),
         ),
-        home: const PlanPage(plan: _plan),
+        home: PlanPage(plan: plan),
       ),
     ),
   );
@@ -165,6 +167,59 @@ ListView _list(WidgetTester tester) =>
 
 void main() {
   tearDown(() => SfColors.palette = SfPalette.dark);
+
+  testWidgets('article hides empty or duplicate arrangement sections', (
+    tester,
+  ) async {
+    for (final summary in ['', '   ', _plan.title, ' ${_plan.title} ']) {
+      final plan = TrainingPlan.fromJson({
+        ..._plan.toJson(),
+        'summary': summary,
+      });
+      await _show(tester, plan: plan);
+      expect(find.text('安排说明'), findsNothing);
+      expect(find.text(_plan.notes.first), findsNothing);
+      expect(find.text(_plan.title), findsOneWidget);
+      await tester.pumpWidget(const SizedBox.shrink());
+    }
+  });
+
+  testWidgets('article localizes protocol sections and uses primary action', (
+    tester,
+  ) async {
+    final plan = TrainingPlan.fromJson({
+      ..._plan.toJson(),
+      'blocks': [
+        for (final block in _plan.blocks)
+          {...block.toJson(), 'name': block.type.name},
+      ],
+    });
+    final s = await _show(tester, plan: plan);
+    expect(find.text('热身'), findsOneWidget);
+    expect(find.text('warmup'), findsNothing);
+    final cardDuration = toCoachRoutine(plan, s.library).durationLabel;
+    expect(find.text(cardDuration), findsOneWidget);
+    expect(cardDuration, isNot('${plan.targetMinutes} 分钟'));
+    expect(
+      tester
+          .widget<SfPrimaryButton>(find.byKey(const ValueKey('start')))
+          .emphasized,
+      isFalse,
+    );
+    await tester.scrollUntilVisible(find.text('主练'), 200);
+    await tester.pumpAndSettle();
+    expect(find.text('main'), findsNothing);
+    await tester.scrollUntilVisible(find.text('放松'), 200);
+    await tester.pumpAndSettle();
+    expect(find.text('cooldown'), findsNothing);
+    final controller = _list(tester).controller!;
+    controller.jumpTo(controller.position.maxScrollExtent);
+    await tester.pumpAndSettle();
+    final action = tester.getRect(find.byKey(const ValueKey('start')));
+    final last = tester.getRect(find.byKey(const ValueKey('plan-move-2:0')));
+    expect(last.bottom, lessThanOrEqualTo(action.top - SfSpace.x6));
+    expect(tester.takeException(), isNull);
+  });
 
   for (final palette in [SfPalette.light, SfPalette.dark]) {
     final theme = palette.isDark ? 'dark' : 'light';

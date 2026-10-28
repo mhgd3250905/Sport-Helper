@@ -7,12 +7,15 @@ import '../../domain/exercise.dart';
 import '../../domain/plan.dart';
 import '../../app/posehub_asset_bundle.dart';
 import '../alpha_artwork.dart';
+import '../plan_presentation.dart';
 import '../theme.dart' show levelZh;
 import '../theme/media_theme.dart';
 import '../theme/sf_icons.dart';
 import '../theme/solid_surface.dart';
 import '../theme/tokens.dart';
 import '../theme/widgets.dart';
+import '../theme/polish_card.dart';
+import '../theme/ui_polish_tokens.dart';
 
 /// Product tokens, trusted media and controls; the SDK owns conversation and
 /// routine rendering. Navigation, storage and credentials remain App concerns.
@@ -24,11 +27,18 @@ Widget withSmartfitCoachUi(BuildContext context, Widget child) =>
 /// Recommendation layout and surfaces stay SDK-owned, with only App colors
 /// and localized fixed labels injected into its own theme scope.
 Widget withSmartfitRecommendUi(BuildContext context, Widget child) {
-  final defaults = CoachUiStyle.fromTheme(Theme.of(context));
+  final style = smartfitCoachUiStyle();
   return CoachUiTheme(
     style: CoachUiStyle(
-      colors: smartfitCoachUiStyle().colors,
-      typography: defaults.typography,
+      colors: style.colors,
+      typography: CoachUiTypography(
+        body: SfType.body,
+        callout: SfCardTokens.title,
+        label: SfType.label,
+        caption: SfCardTokens.metadata,
+        greeting: SfType.greeting,
+      ),
+      builders: style.builders,
       strings: const CoachUiStrings(
         planFromActions: '排成计划',
         actionUnavailable: '动作暂不可用',
@@ -87,9 +97,9 @@ CoachUiStyle smartfitCoachUiStyle() {
       muted: p.muted,
       faint: p.faint,
       background: p.background,
-      surface: p.surface,
+      surface: SfCardTokens.fill,
       surfaceRaised: p.surfaceHigh,
-      outline: p.line,
+      outline: SfCardTokens.edge,
       shadow: p.shadow,
       accent: p.accent,
       accentText: p.accentText,
@@ -148,15 +158,23 @@ CoachUiStyle smartfitCoachUiStyle() {
               semanticLabel: request.semanticLabel,
             )
           : null,
-      pressable: (_, c) => SfPressable(
-        onTap: c.onTap,
-        semanticLabel: c.semanticLabel,
-        tooltip: c.tooltip,
-        scale: c.scale,
-        expanded: c.expanded,
-        haptic: SfHaptic.values[c.haptic.index],
-        child: c.child,
-      ),
+      pressable: (_, c) => c.expanded != null
+          ? SfPlanToggleButton(
+              expanded: c.expanded!,
+              onPressed: c.onTap,
+              semanticLabel: c.semanticLabel,
+              tooltip: c.tooltip,
+              haptic: SfHaptic.values[c.haptic.index],
+            )
+          : SfPressable(
+              onTap: c.onTap,
+              semanticLabel: c.semanticLabel,
+              tooltip: c.tooltip,
+              scale: c.scale,
+              expanded: c.expanded,
+              haptic: SfHaptic.values[c.haptic.index],
+              child: c.child,
+            ),
       controlFace: (_, c) => SfColors.isDark
           ? ConstrainedBox(
               constraints: BoxConstraints(minHeight: c.minHeight),
@@ -177,19 +195,8 @@ CoachUiStyle smartfitCoachUiStyle() {
         color: c.color,
         boxed: false,
       ),
-      surface: (context, c) => SfAlphaCardScope.of(context)
-          ? SfAlphaCardSurface(
-              radius: c.radius,
-              padding: c.padding,
-              width: c.width,
-              child: c.child,
-            )
-          : SfSolidSurface(
-              radius: c.radius,
-              padding: c.padding,
-              width: c.width,
-              child: c.child,
-            ),
+      surface: (_, c) =>
+          SfPolishCard(padding: c.padding, width: c.width, child: c.child),
       icon: (_, c) => SfIcon(
         _glyph(c.glyph),
         size: c.size,
@@ -326,7 +333,7 @@ CoachRoutine toCoachRoutine(TrainingPlan p, ExerciseLibrary library) {
   // Do not hide furniture that the user must prepare for those exercises.
   final gear = p.equipment.where((id) => id != 'none' && id.isNotEmpty).toSet();
   final gearText = gear.isEmpty ? '徒手' : gear.map(equipmentLabel).join('、');
-  final duration = '${p.targetMinutes} 分钟';
+  final duration = planDurationLabel(p, library);
   final items = [
     for (final b in p.blocks)
       for (final i in b.items)

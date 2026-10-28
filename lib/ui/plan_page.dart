@@ -7,8 +7,8 @@ import '../domain/exercise.dart';
 import '../domain/plan.dart';
 import '../domain/plan_validator.dart';
 import '../domain/scenario.dart';
-import '../domain/session.dart';
 import 'exercise_video.dart';
+import 'plan_presentation.dart';
 import 'player_page.dart';
 import 'theme.dart';
 import 'training_route.dart';
@@ -230,7 +230,6 @@ class _PlanPageState extends State<PlanPage> with WidgetsBindingObserver {
           icon: SfGlyph.play,
           label: '前往训练',
           height: buttonHeight,
-          emphasized: true,
           onPressed: () => _startTraining(s),
         ),
       ),
@@ -287,32 +286,30 @@ class _PlanPageState extends State<PlanPage> with WidgetsBindingObserver {
           spacing: SfSpace.x3,
           runSpacing: SfSpace.x1,
           children: [
-            Text(
-              minutesZh(SessionBuilder(lib).planSeconds(_plan)),
-              style: SfType.label,
-            ),
+            Text(planDurationLabel(_plan, lib), style: SfType.label),
             Text('${_plan.items.length} 个动作', style: SfType.label),
             Text(levelZh(_plan.level), style: SfType.label),
             Text(_plan.scene == 'office' ? '办公室' : '居家', style: SfType.label),
           ],
         ),
-        const SizedBox(height: SfSpace.x3),
-        Text(
-          '安排说明',
-          style: SfType.callout.copyWith(fontWeight: FontWeight.w600),
-        ),
-        if (_plan.summary.isNotEmpty) ...[
+        if (_plan.summary.trim().isNotEmpty &&
+            _plan.summary.trim() != _plan.title.trim()) ...[
+          const SizedBox(height: SfSpace.x3),
+          Text(
+            '安排说明',
+            style: SfType.callout.copyWith(fontWeight: FontWeight.w600),
+          ),
           const SizedBox(height: SfSpace.x1),
           Text(
             _plan.summary,
             style: SfType.body.copyWith(color: SfColors.muted, height: 1.5),
           ),
+          for (final note in _plan.notes)
+            Padding(
+              padding: const EdgeInsets.only(top: SfSpace.x2),
+              child: Text(note, style: SfType.label.copyWith(height: 1.5)),
+            ),
         ],
-        for (final note in _plan.notes)
-          Padding(
-            padding: const EdgeInsets.only(top: SfSpace.x2),
-            child: Text(note, style: SfType.label.copyWith(height: 1.5)),
-          ),
       ],
     ),
   );
@@ -321,7 +318,7 @@ class _PlanPageState extends State<PlanPage> with WidgetsBindingObserver {
     final extra = block.type == BlockType.circuit && block.rounds > 1
         ? ' · 循环 ${block.rounds} 轮，轮间休息 ${block.restBetweenRoundsSeconds} 秒'
         : '';
-    return SfSectionTitle('${block.name}$extra');
+    return SfSectionTitle('${planSectionLabel(block)}$extra');
   }
 
   Widget _moveArticle(int bi, int ii, int ordinal, ExerciseLibrary lib) {

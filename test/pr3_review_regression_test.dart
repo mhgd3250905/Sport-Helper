@@ -253,7 +253,7 @@ void main() {
         );
         expect(resume.isPlaying, isFalse);
         expect(resume.strings.resume, '继续训练');
-        expect(resume.theme.pausedColor, SfColors.emphasis);
+        expect(resume.theme.pausedColor, SfColors.accent);
         await tester.pump(const Duration(seconds: 1));
         expect(
           ring(),

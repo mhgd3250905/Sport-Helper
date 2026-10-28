@@ -9,7 +9,9 @@ import 'alpha_artwork.dart';
 import 'exercise_video.dart';
 import 'posehub_library_page.dart';
 import 'theme.dart';
+import 'theme/action_tile.dart';
 import 'theme/trainer_theme.dart';
+import 'theme/ui_polish_tokens.dart';
 
 /// Every move in the library, filterable by category; tap to watch. Opened
 /// from the chat ("看看动作库", "有哪些拉伸动作" → [initial]) or the drawer.
@@ -96,16 +98,8 @@ class _LibraryPageState extends State<LibraryPage> {
   Widget _grid(BuildContext context, List<Exercise> list) => LayoutBuilder(
     key: ValueKey('grid-$_cat'),
     builder: (context, bounds) {
-      final tileWidth = (bounds.maxWidth - SfSpace.x4 * 2 - SfSpace.x3) / 2;
-      final scaler = MediaQuery.textScalerOf(context);
-      final title = SfType.callout;
-      final caption = SfType.caption;
-      // A square image plus two text lines and their spacing. A fixed
-      // aspect ratio leaves too little text room on narrow screens or
-      // with larger system text; round each line up for font metrics.
-      final textHeight =
-          (scaler.scale(title.fontSize!) * title.height!).ceil() +
-          (scaler.scale(caption.fontSize!) * caption.height!).ceil();
+      final tileWidth =
+          (bounds.maxWidth - SfSpace.x4 * 2 - SfCardTokens.gridGap) / 2;
       return GridView.builder(
         padding: const EdgeInsets.fromLTRB(
           SfSpace.x4,
@@ -115,9 +109,9 @@ class _LibraryPageState extends State<LibraryPage> {
         ),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
-          mainAxisSpacing: SfSpace.x4,
-          crossAxisSpacing: SfSpace.x3,
-          mainAxisExtent: tileWidth + SfSpace.x2 + 2 + textHeight,
+          mainAxisSpacing: SfCardTokens.gridGap,
+          crossAxisSpacing: SfCardTokens.gridGap,
+          mainAxisExtent: SfActionTile.heightFor(context, tileWidth),
         ),
         itemCount: list.length,
         itemBuilder: (_, i) =>
@@ -321,8 +315,8 @@ Widget _detailLine(SfGlyph icon, String label, String text, {Color? color}) =>
       ],
     );
 
-/// The cover as the tile's top (concentric corners, no box inside a box),
-/// name and meta below.
+/// The App-owned fallback uses the same card surface and title slots.
+/// The SDK-owned PoseHub browser above retains its own card layout.
 class _Tile extends StatelessWidget {
   const _Tile({required this.exercise, required this.onTap});
   final Exercise exercise;
@@ -331,63 +325,28 @@ class _Tile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final e = exercise;
-    final stage = sfStageFor(e);
+    final alpha = SfAlphaCards.hasCover(
+      e,
+      enabled: SfAlphaCards.enabledOf(context),
+    );
     return SfPressable(
       semanticLabel: e.name,
       onTap: onTap,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (SfAlphaCards.hasCover(
-            e,
-            enabled: SfAlphaCards.enabledOf(context),
-          ))
-            SfAlphaArtwork(exercise: e, thumbnail: true)
-          else
-            DecoratedBox(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(SfRadius.lg),
-                boxShadow: SfColors.cardShadow,
+      child: SfActionTile(
+        title: e.name,
+        metadata:
+            '${e.category.zh} · ${levelZh(e.level)} · ${e.effectiveEquipmentIds.isEmpty ? '徒手' : e.effectiveEquipmentIds.map(equipmentLabel).join('/')}',
+        artwork: alpha
+            ? SfAlphaAsset(
+                asset: e.media.alphaThumbnail ?? e.media.alphaCover!,
+                fit: BoxFit.contain,
+                alignment: Alignment.center,
+              )
+            : Image.asset(
+                sfPoster(e),
+                fit: BoxFit.contain,
+                errorBuilder: (_, _, _) => const SizedBox.shrink(),
               ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(SfRadius.lg),
-                child: AspectRatio(
-                  aspectRatio: 1,
-                  child: ColoredBox(
-                    color: stage.mediaStage,
-                    child: Image.asset(
-                      sfPoster(e),
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, _, _) => const SizedBox.shrink(),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(
-              SfSpace.x1,
-              SfSpace.x2 + 2,
-              SfSpace.x1,
-              0,
-            ),
-            child: Text(
-              e.name,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: SfType.callout.copyWith(fontWeight: FontWeight.w600),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: SfSpace.x1),
-            child: Text(
-              '${e.category.zh} · ${levelZh(e.level)} · ${e.effectiveEquipmentIds.isEmpty ? '徒手' : e.effectiveEquipmentIds.map(equipmentLabel).join('/')}',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: SfType.caption.copyWith(color: SfColors.muted),
-            ),
-          ),
-        ],
       ),
     );
   }

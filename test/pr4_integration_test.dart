@@ -183,7 +183,9 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      final progress = find.text('SDK 正在核对方案');
+      final progress = find.text('最后检查一遍');
+      expect(chat.activeTask!.nodes.single.stamp, 'SDK 正在核对方案');
+      expect(find.text('SDK 正在核对方案'), findsNothing);
       final cancel = find.descendant(
         of: find.byType(CoachTaskBubble),
         matching: find.widgetWithText(TextButton, '取消'),
@@ -205,7 +207,7 @@ void main() {
         const coach.AgentEvent('reset-turn', coach.AgentEventKind.slow),
       );
       await tester.pumpAndSettle();
-      expect(find.text('教练待办').hitTestable(), findsOneWidget);
+      expect(find.text('正在想怎么练…').hitTestable(), findsOneWidget);
       final newChat = find.byKey(const ValueKey('chat-new-conversation'));
       expect(newChat, findsNothing);
       await tester.tap(find.byKey(const ValueKey('chat-panel-toggle')));
@@ -218,6 +220,7 @@ void main() {
       expect(engine.resets, 1);
       expect(chat.typing, isFalse);
       expect(chat.messages.single.greeting, isTrue);
+      expect(find.byType(GreetingBlock), findsOneWidget);
       expect(tester.widget<ChatInputBar>(input).enabled, isTrue);
       expect(tester.getRect(input).bottom, lessThanOrEqualTo(844));
 

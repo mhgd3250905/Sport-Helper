@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import '../../data/app_store.dart';
 import '../../domain/exercise.dart';
 import '../../domain/saved_plan.dart';
-import '../../domain/session.dart';
+import '../plan_presentation.dart';
+import '../theme/polish_card.dart';
 import '../theme/media_theme.dart';
 import '../theme/sf_icons.dart';
 import '../theme/tokens.dart';
+import '../theme/ui_polish_tokens.dart';
 import '../theme/widgets.dart';
 import 'expand_route.dart';
 
@@ -51,7 +53,7 @@ class SavedPlansPage extends StatelessWidget {
                 child: Text(
                   store.savedPlans.isEmpty
                       ? '保存的计划会出现在这里'
-                      : '${store.savedPlans.length} 套 · 点一下在对话里调出',
+                      : '${store.savedPlans.length} 套',
                   style: SfType.label,
                 ),
               ),
@@ -179,109 +181,98 @@ class _SavedTile extends StatelessWidget {
         .map((i) => library.tryGet(i.exerciseId))
         .whereType<Exercise>()
         .firstOrNull;
-    final secs = SessionBuilder(library).planSeconds(p);
     final used = plan.lastUsedAt == null ? '' : '${_ago(plan.lastUsedAt!)}练过';
     return SfPressable(
       key: ValueKey('saved-${plan.id}'),
       semanticLabel: plan.name,
       onTap: () => onShow(plan),
       scale: .985,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: SfColors.isDark ? SfColors.surfaceHigh : SfColors.surface,
-          borderRadius: BorderRadius.circular(SfRadius.lg),
-          border: SfColors.isDark ? null : Border.all(color: SfColors.line),
-          boxShadow: SfColors.cardShadow,
-        ),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(
-            SfSpace.x2,
-            SfSpace.x2,
-            0,
-            SfSpace.x2,
-          ),
-          child: Row(
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(SfRadius.lg - SfSpace.x2),
-                child: SizedBox.square(
-                  dimension: 56,
-                  child: ColoredBox(
-                    color: sfStageFor(first).mediaStage,
-                    child: first == null
-                        ? null
-                        : Image.asset(
-                            sfPoster(first),
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, _, _) => const SizedBox.shrink(),
-                          ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: SfSpace.x3),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      plan.name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: SfType.callout.copyWith(
-                        fontWeight: FontWeight.w600,
+      child: SfPolishCard(
+        child: Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(SfRadius.lg - SfSpace.x2),
+              child: SizedBox.square(
+                dimension: 56,
+                child: first == null
+                    ? null
+                    : Image.asset(
+                        sfPoster(first),
+                        fit: BoxFit.contain,
+                        errorBuilder: (_, _, _) => const SizedBox.shrink(),
                       ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      '${(secs / 60).round().clamp(1, 999)} 分钟 · ${p.items.length} 个动作',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: SfType.label.copyWith(fontSize: 12.5),
-                    ),
-                    if (used.isNotEmpty)
-                      Text(used, maxLines: 1, style: SfType.caption),
-                  ],
-                ),
               ),
-              const SizedBox(width: SfSpace.x2),
-              SfCircleButton(
-                key: ValueKey('saved-start-${plan.id}'),
-                tooltip: '开始训练',
-                size: 40,
-                icon: SfGlyph.play,
-                fill: SfColors.isDark ? SfColors.surface : SfColors.surfaceHigh,
-                iconColor: SfColors.accentText,
-                haptic: SfHaptic.medium,
-                onPressed: () {
-                  // Where the tile is now; once this page is gone the
-                  // player folds back into the middle of the chat.
-                  final at = rectOf(context);
-                  var first = true;
-                  onStart(plan, () {
-                    if (!first) return null;
-                    first = false;
-                    return at;
-                  });
-                },
-              ),
-              PopupMenuButton<String>(
-                key: ValueKey('saved-menu-${plan.id}'),
-                tooltip: '更多',
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(minWidth: 120),
-                icon: SfIcon(SfGlyph.more, color: SfColors.muted, size: 20),
-                onSelected: (v) =>
-                    v == 'rename' ? onRename(plan) : onDelete(plan),
-                itemBuilder: (_) => [
-                  const PopupMenuItem(value: 'rename', child: Text('重命名')),
-                  PopupMenuItem(
-                    value: 'delete',
-                    child: Text('删除', style: TextStyle(color: SfColors.danger)),
+            ),
+            const SizedBox(width: SfSpace.x3),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    plan.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: SfCardTokens.title,
                   ),
+                  const SizedBox(height: 2),
+                  Text(
+                    '${planDurationLabel(p, library)} · ${p.items.length} 个动作',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: SfCardTokens.metadata,
+                  ),
+                  if (used.isNotEmpty)
+                    Text(used, maxLines: 1, style: SfType.caption),
                 ],
               ),
-            ],
-          ),
+            ),
+            const SizedBox(width: SfSpace.x2),
+            SfCircleButton(
+              key: ValueKey('saved-start-${plan.id}'),
+              tooltip: '开始训练',
+              size: 40,
+              icon: SfGlyph.play,
+              fill: SfColors.isDark ? SfColors.surface : SfColors.surfaceHigh,
+              iconColor: SfColors.accentText,
+              haptic: SfHaptic.medium,
+              onPressed: () {
+                // Where the tile is now; once this page is gone the
+                // player folds back into the middle of the chat.
+                final at = rectOf(context);
+                var first = true;
+                onStart(plan, () {
+                  if (!first) return null;
+                  first = false;
+                  return at;
+                });
+              },
+            ),
+            PopupMenuButton<String>(
+              key: ValueKey('saved-menu-${plan.id}'),
+              tooltip: '更多',
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(minWidth: 120),
+              icon: SfIcon(SfGlyph.more, color: SfColors.muted, size: 20),
+              onSelected: (v) {
+                switch (v) {
+                  case 'show':
+                    onShow(plan);
+                  case 'rename':
+                    onRename(plan);
+                  case 'delete':
+                    onDelete(plan);
+                }
+              },
+              itemBuilder: (_) => [
+                const PopupMenuItem(value: 'show', child: Text('点一下在对话里调出')),
+                const PopupMenuItem(value: 'rename', child: Text('重命名')),
+                PopupMenuItem(
+                  value: 'delete',
+                  child: Text('删除', style: TextStyle(color: SfColors.danger)),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );

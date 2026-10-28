@@ -22,11 +22,13 @@ import '../theme/measure_size.dart';
 import '../theme/solid_surface.dart';
 import '../theme/sf_icons.dart';
 import '../theme/tokens.dart';
+import '../theme/ui_polish_tokens.dart';
 import '../training_route.dart';
 import 'chat_widgets.dart';
 import 'coach_ui_adapter.dart';
 import 'cosmos.dart';
 import 'coach_task_bubble.dart';
+import 'coach_delivery_transition.dart';
 import 'plan_card.dart';
 import 'saved_plans_page.dart';
 import 'validated_plan_card.dart';
@@ -57,6 +59,12 @@ class _ChatHomePageState extends State<ChatHomePage>
   /// safe area); the conversation reserves it as bottom padding so the
   /// newest message can always scroll clear of the controls.
   double _dockHeight = 112;
+  double _inputHeight = SfComposerTokens.inputHeight;
+  String? _pendingDeliveryId;
+  String? _pendingUserId;
+  DateTime? _pendingDeliveryAt;
+  Set<String> _replyStartIds = {};
+  final Map<String, String> _deliveryEntryIds = {};
   final _input = FocusNode();
   bool _panelOpen = false;
 
@@ -318,35 +326,7 @@ class _ChatHomePageState extends State<ChatHomePage>
                         },
                         child: RepaintBoundary(
                           key: const ValueKey('chat-composer-dock-boundary'),
-                          child: DecoratedBox(
-                            key: const ValueKey('chat-composer-dock'),
-                            decoration: BoxDecoration(
-                              gradient: SfComposerTokens.dockGradient,
-                            ),
-                            child: SafeArea(
-                              top: false,
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  SuggestionStrip(
-                                    items: _chat.typing
-                                        ? const []
-                                        : _chat.suggestions,
-                                    onTap: _send,
-                                  ),
-                                  ChatInputBar(
-                                    focusNode: _input,
-                                    onSend: _send,
-                                    enabled: !_chat.typing,
-                                    onPlans: _togglePanel,
-                                    panelOpen: _panelOpen,
-                                    onTextTap: _inputTapped,
-                                  ),
-                                  _panelSlot(context),
-                                ],
-                              ),
-                            ),
-                          ),
+                          child: _composerDock(),
                         ),
                       ),
                     ),
@@ -359,6 +339,72 @@ class _ChatHomePageState extends State<ChatHomePage>
       ),
     );
   }
+
+  Widget _composerDock() => Column(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: SfComposerTokens.outerPadding.bottom,
+            height: _inputHeight + SfDockPolishTokens.fadeAboveInput,
+            child: IgnorePointer(
+              child: DecoratedBox(
+                key: const ValueKey('chat-composer-dock'),
+                decoration: BoxDecoration(
+                  gradient: SfDockPolishTokens.gradient,
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            height: SfComposerTokens.outerPadding.bottom,
+            child: ColoredBox(color: SfDockPolishTokens.background),
+          ),
+          SafeArea(
+            top: false,
+            bottom: false,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SuggestionStrip(
+                  items: _chat.typing ? const [] : _chat.suggestions,
+                  onTap: _send,
+                ),
+                SfMeasureSize(
+                  onSize: (size) {
+                    final height =
+                        size.height - SfComposerTokens.outerPadding.vertical;
+                    if (mounted && (height - _inputHeight).abs() > .5) {
+                      setState(() => _inputHeight = height);
+                    }
+                  },
+                  child: ChatInputBar(
+                    focusNode: _input,
+                    onSend: _send,
+                    enabled: !_chat.typing,
+                    onPlans: _togglePanel,
+                    panelOpen: _panelOpen,
+                    onTextTap: _inputTapped,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+      ColoredBox(
+        color: SfDockPolishTokens.background,
+        child: SafeArea(top: false, child: _panelSlot(context)),
+      ),
+    ],
+  );
 
   Widget _panelSlot(BuildContext context) {
     final panel = _panelOpen
@@ -421,17 +467,62 @@ class _ChatHomePageState extends State<ChatHomePage>
 
   Widget _messages() {
     final msgs = _chat.messages;
+    final messageIds = msgs.map((m) => m.id).toSet();
+    _deliveryEntryIds.removeWhere((id, _) => !messageIds.contains(id));
+    if (_pendingDeliveryId != null && !messageIds.contains(_pendingUserId)) {
+      _pendingDeliveryId = null;
+      _pendingUserId = null;
+      _replyStartIds = {};
+    }
+    if (_chat.typing && _pendingDeliveryId == null) {
+      final user = msgs.where((m) => m.isUser).lastOrNull;
+      _pendingUserId = user?.id;
+      _pendingDeliveryId = 'coach-delivery-${user?.id ?? msgs.length}';
+      _pendingDeliveryAt = user?.at ?? msgs.lastOrNull?.at ?? DateTime.now();
+      _replyStartIds = msgs.map((m) => m.id).toSet();
+    } else if (!_chat.typing && _pendingDeliveryId != null) {
+      final replies = msgs.where(
+        (m) => !m.isUser && !m.greeting && !_replyStartIds.contains(m.id),
+      );
+      final delivered =
+          replies.where((m) => m.isPlan || m.actions != null).firstOrNull ??
+          replies.firstOrNull;
+      if (delivered != null) {
+        _deliveryEntryIds[delivered.id] = _pendingDeliveryId!;
+      }
+      _pendingDeliveryId = null;
+      _pendingUserId = null;
+    }
     final rows = [
       for (final m in msgs)
         CoachChatEntry(
-          id: m.id,
+          id: _deliveryEntryIds[m.id] ?? m.id,
           at: m.at,
           isUser: m.isUser,
           isCard: m.isPlan || m.actions != null,
           greeting: m.greeting,
-          child: m.greeting
+          child: _deliveryEntryIds.containsKey(m.id)
+              ? CoachDeliveryTransition(preparing: false, child: _message(m))
+              : m.greeting
               ? GreetingBlock(text: m.text)
               : _message(m, fresh: !_seen.contains(m.id)),
+        ),
+      if (_chat.typing)
+        CoachChatEntry(
+          id: _pendingDeliveryId!,
+          at: _pendingDeliveryAt!,
+          isUser: false,
+          isCard: true,
+          child: CoachDeliveryTransition(
+            preparing: true,
+            child: CoachTaskBubble(
+              task: _chat.activeTask,
+              sessionState: _chat.activeSessionState,
+              library: AppServices.of(context).library,
+              waiting: true,
+              onCancel: _chat.cancelRequest,
+            ),
+          ),
         ),
     ];
     WidgetsBinding.instance.addPostFrameCallback(
@@ -449,13 +540,6 @@ class _ChatHomePageState extends State<ChatHomePage>
         topInset: MediaQuery.paddingOf(context).top,
         fadeTop: false,
         timeMarkBuilder: (at, now) => TimeMark(at, now: now),
-        typing: _chat.typing
-            ? CoachTaskBubble(
-                task: _chat.activeTask,
-                waiting: true,
-                onCancel: _chat.cancelRequest,
-              )
-            : null,
       ),
     );
   }

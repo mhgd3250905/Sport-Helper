@@ -16,7 +16,9 @@ import 'package:smartfit/ui/chat/coach_ui_adapter.dart';
 import 'package:smartfit/ui/chat/plan_card.dart';
 import 'package:smartfit/ui/exercise_video.dart';
 import 'package:smartfit/ui/library_page.dart';
+import 'package:smartfit/ui/plan_presentation.dart';
 import 'package:smartfit/ui/theme.dart';
+import 'package:smartfit/ui/theme/polish_card.dart';
 import 'package:smartfit/voice/voice_library.dart';
 import 'package:smartfit/voice/voice_queue.dart';
 import 'package:ugk_coach_ui/ugk_coach_ui.dart';
@@ -225,15 +227,18 @@ void main() {
   });
 
   test(
-    'routine metadata displays admitted equipment and confirmed duration',
+    'routine metadata displays admitted equipment and executable duration',
     () {
       final data = _plan().toJson()
         ..['equipment'] = ['chair', 'wall', 'mat']
         ..['targetMinutes'] = 10;
       final routine = toCoachRoutine(TrainingPlan.fromJson(data), library);
       expect(routine.gearLabel, '椅子、墙、瑜伽垫');
-      expect(routine.durationLabel, '10 分钟');
-      expect(routine.metaLabel, contains('10 分钟'));
+      // These three 30-second entries and their transitions take about two
+      // minutes. The requested target of ten must not replace the actual dose.
+      expect(routine.durationLabel, '约 2 分钟');
+      expect(routine.metaLabel, contains('约 2 分钟'));
+      expect(planDurationLabel(TrainingPlan.fromJson(data), library), '约 2 分钟');
       expect(routine.metaLabel, contains('椅子、墙、瑜伽垫'));
 
       final bodyweight = toCoachRoutine(_plan(), library);
@@ -278,9 +283,15 @@ void main() {
         await pump(tester, card(), enabled: false, palette: palette);
         final colors = smartfitCoachUiStyle().colors;
         expect(colors.background, palette.background);
-        expect(colors.surface, palette.surface);
+        final expectedFill = palette.isDark
+            ? const Color(0xFF1A2324)
+            : const Color(0xFFFFFFFF);
+        final expectedEdge = palette.isDark
+            ? const Color(0xFFFFFFFF).withValues(alpha: .08)
+            : const Color(0xFFE3E8E6);
+        expect(colors.surface, expectedFill);
         expect(colors.surfaceRaised, palette.surfaceHigh);
-        expect(colors.outline, palette.line);
+        expect(colors.outline, expectedEdge);
         expect(colors.shadow, palette.shadow);
         expect(colors.mediaLabelSurface, palette.surfaceHigh);
         expect(colors.surfaceRaised.a, 1);
@@ -292,14 +303,13 @@ void main() {
         final oldCard = tester.getRect(find.byType(PlanCard));
         final oldBody = tester.getRect(find.byType(CoachCardSurface));
         expect(oldCard.height, CoachPlanCard.setHeight);
-        // The SDK cover is shared by both treatments; alpha mode changes the
-        // painted face and cutout layout, not the identity of its image source.
+        // Only SDK cutout layout changes. Both states use the same approved
+        // card face; there is no separate lowered or elevated image surface.
         expect(find.byKey(const ValueKey('alpha-card-face')), findsNothing);
 
         await pump(tester, card(), palette: palette);
-        // SDK 0.3.1 reserves 58dp above its 300dp upright-cutout card body.
-        // Keep that published outer-layout contract separate from the App's
-        // 14dp painted-face offset, which must not alter the body or controls.
+        // The SDK reserves 58dp above its 300dp upright-cutout card body.
+        // That SDK-owned reservation remains separate from the flat card face.
         const uprightOverhang = 58.0;
         expect(find.byType(CoachPlanCard), findsOneWidget);
         final cardRect = tester.getRect(find.byType(PlanCard));
@@ -328,11 +338,69 @@ void main() {
         expect(alphaExpand.height, oldExpand.height);
         expect(_images(tester), contains(_standing('h-squat')));
         expect(_images(tester), contains(_standing('w-bird-dog')));
-        final face = tester.getRect(
-          find.byKey(const ValueKey('alpha-card-face')),
+        final face = find.byType(SfPolishCard);
+        expect(face, findsOneWidget);
+        expect(tester.getRect(face), body);
+        final faceContainer = tester.widget<Container>(
+          find.descendant(of: face, matching: find.byType(Container)).first,
         );
-        expect(SfAlphaCards.rise, 14);
-        expect(face.top - body.top, SfAlphaCards.rise);
+        final decoration = faceContainer.decoration! as BoxDecoration;
+        expect(decoration.color, expectedFill);
+        expect(decoration.boxShadow, isNull);
+        final edge = faceContainer.foregroundDecoration! as BoxDecoration;
+        expect(edge.borderRadius, BorderRadius.circular(20));
+        expect(edge.border, Border.all(color: expectedEdge, width: 1));
+        final clip = tester.widget<ClipRRect>(
+          find.byKey(const ValueKey('plan-clip-alpha-static')),
+        );
+        expect(clip.borderRadius, BorderRadius.circular(20));
+        expect(clip.clipBehavior, Clip.antiAlias);
+        void expectToggle(bool expanded) {
+          final toggle = find.byType(SfPlanToggleButton);
+          expect(toggle, findsOneWidget);
+          expect(tester.widget<SfPlanToggleButton>(toggle).expanded, expanded);
+          final button = tester.widget<SfPressable>(
+            find.descendant(of: toggle, matching: find.byType(SfPressable)),
+          );
+          expect(button.semanticLabel, expanded ? '收起详情' : '展开详情');
+          expect(button.expanded, expanded);
+          final padding = tester.widget<Padding>(
+            find.descendant(of: toggle, matching: find.byType(Padding)),
+          );
+          expect(padding.padding, const EdgeInsets.symmetric(horizontal: 12));
+          final face = find.descendant(
+            of: toggle,
+            matching: find.byWidgetPredicate(
+              (widget) =>
+                  widget is DecoratedBox &&
+                  widget.decoration is BoxDecoration &&
+                  (widget.decoration as BoxDecoration).color ==
+                      SfColors.surfaceHigh,
+            ),
+          );
+          expect(face, findsOneWidget);
+          // The SDK keeps its 44dp header slot. The colored button face must
+          // still be precisely 32dp in both states, even under that constraint.
+          expect(tester.getSize(face).height, 32);
+          final decoration = tester.widget<DecoratedBox>(face);
+          expect(
+            (decoration.decoration as BoxDecoration).borderRadius,
+            BorderRadius.circular(16),
+          );
+          final label = tester.widget<Text>(
+            find.descendant(of: toggle, matching: find.byType(Text)),
+          );
+          expect(label.style!.fontSize, 13);
+          expect(
+            find.descendant(
+              of: toggle,
+              matching: find.text(expanded ? '收起' : '展开'),
+            ),
+            findsOneWidget,
+          );
+        }
+
+        expectToggle(false);
         expect(tester.takeException(), isNull);
 
         await tester.tap(
@@ -348,16 +416,15 @@ void main() {
         expect(find.byKey(const ValueKey('fly-hero')), findsOneWidget);
         expect(tester.takeException(), isNull);
         await tester.pumpAndSettle();
-        final expandedFace = tester.getRect(
-          find.byKey(const ValueKey('alpha-card-face')),
-        );
+        final expandedFace = tester.getRect(find.byType(SfPolishCard));
         final title = tester.getRect(
           find.byKey(const ValueKey('plan-header-title')),
         );
-        // The SDK's default surfaceTopInset already accounts for this host's
-        // visible 14dp face; no duplicate App inset is needed.
+        // The header is measured from the single card face, with no 14dp
+        // offset retained from the old raised-alpha treatment.
         expect(title.top - expandedFace.top, 23);
         expect(title.left - expandedFace.left, 23);
+        expectToggle(true);
         await tester.tap(find.byKey(const ValueKey('plan-save-alpha-static')));
         expect(saves, 1);
         expect(tester.takeException(), isNull);
@@ -366,7 +433,7 @@ void main() {
   }
 
   testWidgets(
-    'lowering only the painted alpha face leaves hitboxes and flyer measurements fixed',
+    'the unified face ignores the old alpha scope without shifting controls or flyers',
     (tester) async {
       final plan = _plan();
       Widget card(bool lowerFace) => Scaffold(
@@ -398,6 +465,8 @@ void main() {
       final expand = find.byKey(const ValueKey('plan-expand-alpha-static'));
       final start = find.byKey(const ValueKey('plan-start-alpha-static'));
       await pump(tester, card(false), palette: SfPalette.dark);
+      expect(find.byType(SfPolishCard), findsOneWidget);
+      expect(find.byType(SfAlphaCardSurface), findsNothing);
       final startBefore = tester.getRect(start);
       final expandBefore = tester.getRect(expand);
       await tester.tap(expand);
@@ -411,6 +480,8 @@ void main() {
       await tester.pumpAndSettle();
 
       await pump(tester, card(true), palette: SfPalette.dark);
+      expect(find.byType(SfPolishCard), findsOneWidget);
+      expect(find.byType(SfAlphaCardSurface), findsNothing);
       expect(tester.getRect(start), startBefore);
       expect(tester.getRect(expand), expandBefore);
       await tester.tap(expand);
@@ -426,7 +497,7 @@ void main() {
   );
 
   testWidgets(
-    'library thumbnails use alpha while an old tile keeps its stage',
+    'library thumbnails use alpha on one card face with no image-area layer',
     (tester) async {
       final services = makeServices();
       addTearDown(services.dispose);
@@ -444,13 +515,11 @@ void main() {
         _images(tester),
         contains(plain['h-catcow-quad'].media.lightPoster),
       );
-      final image = tester.getRect(
-        find.byKey(const ValueKey('alpha-artwork-image-h-squat')),
-      );
-      final face = tester.getRect(
+      expect(find.byType(SfAlphaArtwork), findsNothing);
+      expect(
         find.byKey(const ValueKey('alpha-artwork-face-h-squat')),
+        findsNothing,
       );
-      expect(face.top - image.top, SfAlphaCards.rise);
       expect(tester.takeException(), isNull);
 
       await pump(
