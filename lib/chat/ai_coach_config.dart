@@ -1,5 +1,7 @@
 import 'package:ugk_coach/ugk_coach.dart' as coach;
 
+import '../diagnostics/runtime_log.dart';
+
 /// Internal API credentials are supplied at build time, never from App storage.
 class AiCoachConfig {
   const AiCoachConfig({
@@ -32,21 +34,23 @@ class AiCoachConfig {
   static const baseUrl = 'https://ai.uuugk.win/v1';
   static const model = 'deepseek-flash';
 
-  coach.OpenAiCompatibleClient createClient({required String deviceId}) =>
-      coach.OpenAiCompatibleClient(
-        // Retry individual steps in CoachAgent, without transport retries.
-        config: coach.LlmConfig.ugkWorker.copyWith(
-          baseUrl: endpoint,
-          model: modelName,
-          maxRetries: 0,
+  coach.OpenAiCompatibleClient createClient({required String deviceId}) {
+    RuntimeLog.instance.protectSecret(token.trim());
+    return coach.OpenAiCompatibleClient(
+      // Retry individual steps in CoachAgent, without transport retries.
+      config: coach.LlmConfig.ugkWorker.copyWith(
+        baseUrl: endpoint,
+        model: modelName,
+        maxRetries: 0,
+      ),
+      auth: switch (authMode) {
+        'bearer' => coach.ApiKeyAuth(token.trim()),
+        'worker' => coach.UgkWorkerAuth(
+          appKey: token.trim(),
+          deviceId: () async => deviceId,
         ),
-        auth: switch (authMode) {
-          'bearer' => coach.ApiKeyAuth(token.trim()),
-          'worker' => coach.UgkWorkerAuth(
-            appKey: token.trim(),
-            deviceId: () async => deviceId,
-          ),
-          _ => throw ArgumentError.value(authMode, 'SMARTFIT_AI_AUTH'),
-        },
-      );
+        _ => throw ArgumentError.value(authMode, 'SMARTFIT_AI_AUTH'),
+      },
+    );
+  }
 }

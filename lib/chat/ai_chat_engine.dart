@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
 
 import '../diagnostics/runtime_log.dart';
+import '../diagnostics/coach_tool_trace.dart';
 import '../domain/plan.dart';
 import '../domain/scenario.dart';
 import 'app_chat_actions.dart';
@@ -210,6 +211,23 @@ class AiChatEngine
         operation: turn.operation,
         fields: {'kind': event.kind.name, 'step': event.step},
       );
+      RuntimeLog.instance.recordDeveloper(
+        'ai.agent.event',
+        operation: turn.operation,
+        fields: {'kind': event.kind.name, 'step': event.step},
+        data: {
+          'turnId': event.turnId,
+          'name': event.kind.name,
+          if (event.path != null) 'path': event.path,
+          if (event.node != null) 'node': event.node!.toJson(),
+          if (event.task != null) 'task': event.task!.toJson(),
+          if (event.kind == coach.AgentEventKind.node)
+            'params': {
+              for (final entry in agent.sessionState.params.entries)
+                entry.key: entry.value.toJson(),
+            },
+        },
+      );
     });
     final timer = Timer(turnTimeout, () {
       turn.timedOut = true;
@@ -250,6 +268,7 @@ class AiChatEngine
               context: context,
               cancel: turn.cancel,
             );
+      turn.result = result;
       if (_disposed || _pending != turn) return empty();
       if (turn.timedOut) return _failure(state);
       if (result == null) return empty();
@@ -332,6 +351,15 @@ class AiChatEngine
       }
       return _failure(state);
     } finally {
+      turn.trace.finish(
+        history: _pending == turn ? agent.history : const [],
+        result: turn.result,
+        status: turn.timedOut
+            ? 'timeout'
+            : turn.cancel.isCancelled
+            ? 'cancelled'
+            : turn.result?.status.name,
+      );
       timer.cancel();
       unawaited(progress.cancel());
       if (_pending == turn) _pending = null;
@@ -349,8 +377,11 @@ class AiChatEngine
 }
 
 class _Turn {
-  _Turn(this.operation);
+  _Turn(this.operation)
+    : trace = CoachToolTrace(RuntimeLog.instance, operation: operation);
   final String operation;
+  final CoachToolTrace trace;
+  coach.CoachTurnResult? result;
   final watch = Stopwatch()..start();
   final cancel = coach.CancelToken();
   int step = 0;
@@ -377,6 +408,7 @@ class _CancellableClient implements coach.LlmClient {
     final operation = turn?.operation;
     final attempt = turn == null ? 0 : ++turn.attempts;
     final step = turn?.step ?? 0;
+    turn?.trace.observeMessages(request.messages);
     final watch = Stopwatch()..start();
     var finished = false;
     void record(String event, Map<String, Object?> fields) =>
@@ -403,22 +435,7 @@ class _CancellableClient implements coach.LlmClient {
           'completionTokens': response.usage.completionTokens,
           'reasoningTokens': response.usage.reasoningTokens,
         });
-        for (final call in response.toolCalls) {
-          // Tool arguments may contain health information, memory or plans.
-          const names = {
-            'read',
-            'ls',
-            'check_plan',
-            'remember',
-            'forget',
-            'ask_user',
-            coach.CoachTools.showPlan,
-            coach.CoachTools.showActions,
-          };
-          record('ai.tool.requested', {
-            'kind': names.contains(call.name) ? call.name : 'unknown',
-          });
-        }
+        turn?.trace.observeResponse(response, step: step, attempt: attempt);
         return response;
       } on Object catch (error) {
         record('ai.request.error', {

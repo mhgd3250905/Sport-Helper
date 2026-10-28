@@ -17,7 +17,7 @@ import 'settings_widgets.dart';
 import 'theme/settings_tokens.dart';
 import 'training_media_settings.dart';
 
-const appVersion = AppBuildInfo.version;
+String get appVersion => AppBuildInfo.version;
 
 const _privacyAi =
     '启用 AI 时，你输入的内容、近期对话、当前计划和训练条件会经 '

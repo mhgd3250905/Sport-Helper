@@ -360,16 +360,34 @@ class ChatController extends ChangeNotifier {
   }
 
   /// Starts a fresh SDK conversation while retaining saved plans and safety.
-  Future<void> newConversation() async {
+  Future<void>? _newConversationPending;
+
+  Future<void> newConversation() {
+    final pending = _newConversationPending;
+    if (pending != null) return pending;
+    final action = _newConversation();
+    _newConversationPending = action;
+    return action.whenComplete(() {
+      if (identical(_newConversationPending, action)) {
+        _newConversationPending = null;
+      }
+    });
+  }
+
+  Future<void> _newConversation() async {
+    final log = RuntimeLog.instance;
+    final snapshot = log.enabled
+        ? _conversation?.exportSession().toJson()
+        : null;
     _cancelDiagnostic('new_conversation');
     RuntimeLog.instance.record('chat.conversation.new');
     _replyEpoch++;
     typing = false;
     _endProgress();
-    if (engine case final ManagedChatEngine managed) {
-      managed.cancelPending();
-      managed.reset();
-    }
+    if (engine case final ManagedChatEngine managed) managed.cancelPending();
+    if (snapshot != null) await log.archiveSession(snapshot);
+    if (_disposed) return;
+    if (engine case final ManagedChatEngine managed) managed.reset();
     _state = const ChatState();
     _latestTask = null;
     _safetyStep = null;
@@ -420,8 +438,22 @@ class ChatController extends ChangeNotifier {
     Map<String, List<String>>? formAnswers,
     bool skipQuestion = false,
   }) async {
+    if (_newConversationPending case final reset?) await reset;
     final t = text.trim();
     if (t.isEmpty || typing) return;
+    final operation = RuntimeLog.instance.newOperation('chat');
+    RuntimeLog.instance.recordDeveloper(
+      'chat.user',
+      operation: operation,
+      fields: {'inputChars': t.length},
+      data: {
+        'text': text,
+        'sentText': t,
+        'displayLabel': ?label,
+        'appCommand': trustedAppCommand,
+        'questionId': ?questionId,
+      },
+    );
     final userMessage = _user(label ?? t);
     if (inSafetyCheck) {
       _bot(const BotMessage('先把上面的安全确认做完，再帮你排计划。'));
@@ -430,7 +462,6 @@ class ChatController extends ChangeNotifier {
       return;
     }
     final epoch = ++_replyEpoch;
-    final operation = RuntimeLog.instance.newOperation('chat');
     final watch = Stopwatch()..start();
     _diagnosticOperation = operation;
     RuntimeLog.instance.record(

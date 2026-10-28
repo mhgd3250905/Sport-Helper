@@ -46,16 +46,20 @@ void registerFontLicense() {
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await configureSystemUi();
+  await AppBuildInfo.initialize();
   final storage = SharedPreferencesLocalStateStorage();
   final log = RuntimeLog.instance = RuntimeLog(
     enabled: RuntimeLog.buildEnabled,
     storage: storage,
+    secrets: [const String.fromEnvironment('SMARTFIT_AI_TOKEN')],
   );
   await log.initialize();
   log.record(
     'app.start',
     fields: {
       'version': AppBuildInfo.version,
+      'versionName': AppBuildInfo.versionName,
+      'buildNumber': AppBuildInfo.buildNumber,
       'flavor': TrainingMediaConfig.isInternal ? 'internal' : 'production',
       'platform': kIsWeb ? 'web' : defaultTargetPlatform.name,
     },

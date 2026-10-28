@@ -5,8 +5,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show PlatformException;
 
 import '../core/storage/local_state_storage.dart';
+import '../app/build_info.dart';
+import 'developer_log_sanitizer.dart';
+import 'session_snapshot_archive.dart';
 
-/// Bounded, opt-in diagnostics. Call sites pass metadata, never payloads.
+/// Bounded developer diagnostics; detailed chat/tool data uses an explicit API.
 /// Production releases cannot enable this with the debug logging define.
 class RuntimeLog {
   RuntimeLog({
@@ -14,8 +17,12 @@ class RuntimeLog {
     this.storage,
     this.maxEntries = 1500,
     this.maxBytes = 512 * 1024,
+    Iterable<String> secrets = const [],
+    SessionSnapshotArchive? snapshotArchive,
     DateTime Function()? clock,
-  }) : _clock = clock ?? DateTime.now;
+  }) : _clock = clock ?? DateTime.now,
+       _sanitizer = DeveloperLogSanitizer(secrets),
+       _snapshotArchive = snapshotArchive ?? createSessionSnapshotArchive();
 
   static const buildEnabled =
       String.fromEnvironment('FLUTTER_APP_FLAVOR') == 'internal' ||
@@ -27,6 +34,8 @@ class RuntimeLog {
   final int maxBytes;
   final LocalStateStorage? storage;
   final DateTime Function() _clock;
+  final DeveloperLogSanitizer _sanitizer;
+  final SessionSnapshotArchive _snapshotArchive;
   final _uptime = Stopwatch()..start();
   final List<Map<String, Object?>> _entries = [];
   late final _session = _clock().toUtc().microsecondsSinceEpoch.toRadixString(
@@ -92,6 +101,8 @@ class RuntimeLog {
     'hasDeviceIdentity',
     'catalogCount',
     'version',
+    'versionName',
+    'buildNumber',
     'flavor',
     'platform',
     'state',
@@ -99,6 +110,13 @@ class RuntimeLog {
   };
   static final _token = RegExp(r'^[A-Za-z0-9_.+\-]{1,96}$');
   static final _event = RegExp(r'^[a-z][a-z0-9_.]{0,63}$');
+  static const _developerEvents = {
+    'chat.user',
+    'ai.tool.requested',
+    'ai.tool.result',
+    'ai.agent.event',
+    'chat.session.archived',
+  };
 
   static String errorType(Object error) {
     final name = error.runtimeType.toString();
@@ -160,6 +178,9 @@ class RuntimeLog {
               'fields': _safeFields(
                 event['fields'] is Map ? event['fields'] : {},
               ),
+              if (_developerEvents.contains(event['event']) &&
+                  event['data'] is Map)
+                'data': _sanitizer.sanitize(event['data']),
             });
           }
         }
@@ -196,6 +217,54 @@ class RuntimeLog {
     unawaited(flush());
   }
 
+  /// This is never shown in the conversation UI and is disabled with the log.
+  void recordDeveloper(
+    String event, {
+    Map<String, Object?> data = const {},
+    Map<String, Object?> fields = const {},
+    String? operation,
+  }) {
+    if (!enabled || !_developerEvents.contains(event)) return;
+    _append({
+      'at': _clock().toUtc().toIso8601String(),
+      'session': _session,
+      'seq': ++_sequence,
+      'sinceStartMs': _uptime.elapsedMilliseconds,
+      'event': event,
+      'operation': ?_safeToken(operation),
+      'fields': _safeFields(fields),
+      'data': _sanitizer.sanitize(data),
+    });
+    _revision++;
+    unawaited(flush());
+  }
+
+  /// Credentials are only used for redaction, never included in output.
+  void protectSecret(String secret) {
+    if (secret.isEmpty) return;
+    _sanitizer.protect(secret);
+    if (enabled) {
+      _revision++;
+      unawaited(flush());
+    }
+  }
+
+  Future<void> archiveSession(Map<String, Object?> snapshot) async {
+    if (!enabled) return;
+    try {
+      final filename = await _snapshotArchive.save(
+        jsonEncode(_sanitizer.sanitize(snapshot)),
+      );
+      recordDeveloper(
+        'chat.session.archived',
+        fields: const {'status': 'ok'},
+        data: {'filename': filename},
+      );
+    } on Object catch (error) {
+      record('chat.session_archive_failed', fields: errorFields(error));
+    }
+  }
+
   void _append(Map<String, Object?> event) {
     final bytes = utf8.encode(jsonEncode(event)).length;
     _entries.add(event);
@@ -215,11 +284,13 @@ class RuntimeLog {
   Map<String, Object?> _snapshot() => {
     'schema': 1,
     'app': 'smartfit',
-    'version': '0.1.0+15',
+    'version': AppBuildInfo.version,
+    'versionName': AppBuildInfo.versionName,
+    'buildNumber': AppBuildInfo.buildNumber,
     'exportedAt': _clock().toUtc().toIso8601String(),
     'persistenceFailed': persistenceFailed,
     'retention': {'maxEntries': maxEntries, 'maxBytes': maxBytes, 'maxDays': 7},
-    'events': List.of(_entries),
+    'events': _sanitizer.sanitize(_entries),
   };
 
   String exportJson() => jsonEncode(_snapshot());
