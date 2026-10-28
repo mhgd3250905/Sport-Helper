@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:smartfit/app/build_info.dart';
 import 'package:smartfit/app/training_media_config.dart';
 import 'package:smartfit/data/app_store.dart';
 import 'package:smartfit/diagnostics/action_issue_store.dart';
@@ -16,6 +18,16 @@ import 'settings_support.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  setUpAll(() async {
+    await AppBuildInfo.initialize(
+      load: () async => PackageInfo(
+        appName: 'SmartFit fixture',
+        packageName: 'settings.fixture',
+        version: '0.9.8',
+        buildNumber: '7042',
+      ),
+    );
+  });
   testWidgets(
     'cold settings restores a persisted disabled recording preference',
     (tester) async {
@@ -114,7 +126,7 @@ void main() {
         expect(icon.height, 56);
         expect(
           find.text(
-            '版本 0.1.0 (38)${TrainingMediaConfig.isInternal ? ' · 内测' : ''}',
+            '版本 0.9.8 (7042)${TrainingMediaConfig.isInternal ? ' · 内测' : ''}',
           ),
           findsOneWidget,
         );
