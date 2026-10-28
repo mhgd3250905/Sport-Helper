@@ -23,7 +23,6 @@ import '../theme/solid_surface.dart';
 import '../theme/sf_icons.dart';
 import '../theme/tokens.dart';
 import '../training_route.dart';
-import 'action_card.dart';
 import 'chat_widgets.dart';
 import 'coach_ui_adapter.dart';
 import 'cosmos.dart';
@@ -95,6 +94,11 @@ class _ChatHomePageState extends State<ChatHomePage>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.paused ||
+        state == AppLifecycleState.detached) {
+      unawaited(_chat.flushPersistence());
+    }
     if ((state == AppLifecycleState.inactive ||
             state == AppLifecycleState.resumed) &&
         (ModalRoute.of(context)?.isCurrent ?? false)) {
@@ -423,7 +427,7 @@ class _ChatHomePageState extends State<ChatHomePage>
           id: m.id,
           at: m.at,
           isUser: m.isUser,
-          isCard: m.isPlan,
+          isCard: m.isPlan || m.actions != null,
           greeting: m.greeting,
           child: m.greeting
               ? GreetingBlock(text: m.text)
@@ -485,6 +489,7 @@ class _ChatHomePageState extends State<ChatHomePage>
             onSkip: () => _chat.skipQuestion(m),
           ),
         if (!m.isPlanningFailure &&
+            m.actions == null &&
             hasText &&
             (m.question == null ||
                 (m.text.isNotEmpty && m.text != m.question!.question)))
@@ -494,11 +499,26 @@ class _ChatHomePageState extends State<ChatHomePage>
             onOption: (i) => _chat.choose(m, i),
           ),
         if (m.actions case final actions?) ...[
-          if (hasText) const SizedBox(height: SfSpace.x3),
-          ActionCard(
-            actions: actions,
-            library: library,
-            onOpen: (exercise) => showExerciseDetails(context, exercise),
+          withSmartfitRecommendUi(
+            context,
+            CoachRecommendCard(
+              key: ValueKey('coach-recommendation-${m.id}'),
+              actionIds: actions.items.map((action) => action.id).toList(),
+              note: m.text,
+              library: CoachExerciseLibrary([
+                for (final action in actions.items)
+                  if (library.tryGet(action.id) case final exercise?)
+                    toCoachRecommendationExercise(exercise),
+              ]),
+              onOpenAction: (id) {
+                if (library.tryGet(id) case final exercise?) {
+                  unawaited(showExerciseDetails(context, exercise));
+                }
+              },
+              onPlanFromActions: _chat.typing
+                  ? null
+                  : (_) => unawaited(_chat.send('请把刚才推荐的动作排成计划。')),
+            ),
           ),
         ],
         if (m.validatedPlan case final validated?) ...[

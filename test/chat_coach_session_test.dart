@@ -11,7 +11,7 @@ import 'package:smartfit/data/app_store.dart';
 import 'package:smartfit/domain/exercise.dart';
 import 'package:smartfit/domain/plan.dart';
 import 'package:smartfit/domain/scenario.dart';
-import 'package:smartfit/ui/chat/action_card.dart';
+import 'package:smartfit/ui/chat/coach_ui_adapter.dart';
 import 'package:smartfit/ui/chat/chat_home_page.dart';
 import 'package:smartfit/ui/chat/chat_widgets.dart';
 import 'package:smartfit/ui/chat/coach_task_bubble.dart';
@@ -20,9 +20,11 @@ import 'package:smartfit/ui/chat/validated_plan_card.dart';
 import 'package:smartfit/ui/theme/app_theme.dart';
 import 'package:smartfit/ui/theme/widgets.dart';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
+import 'package:ugk_coach_ui/ugk_coach_ui.dart';
 
 import 'app_flow_test.dart' show services, tall;
 import 'support.dart';
+import 'support/coach_v2_fixtures.dart';
 
 class _SessionEngine
     implements ManagedChatEngine, RestorableChatEngine, ProgressChatEngine {
@@ -30,6 +32,7 @@ class _SessionEngine
   final coach.ToolGate gate;
   final pending = <Completer<ChatReply>>[];
   final states = <ChatState>[];
+  final inputs = <String>[];
   int cancellations = 0;
   int resets = 0;
   final eventBus = StreamController<coach.AgentEvent>.broadcast(sync: true);
@@ -39,6 +42,7 @@ class _SessionEngine
   String get id => 'test-session';
   @override
   Future<ChatReply> reply(String text, ChatState state) {
+    inputs.add(text);
     states.add(state);
     final result = Completer<ChatReply>();
     pending.add(result);
@@ -553,7 +557,67 @@ void main() {
   );
 
   testWidgets(
-    'validated actions use bundled details and have no training dose',
+    'recommendation uses SDK rendering once and sends the exact plan request',
+    (tester) async {
+      tall(tester);
+      final (chat, engine, app) = await setup();
+      await showChat(tester, chat, app);
+      const note = '慢慢舒展肩部，保持自然呼吸。';
+      final reply = chat.send('推荐一下');
+      engine.pending.single.complete(
+        ChatReply(
+          messages: [
+            BotMessage(note, actions: engine.restoreActions(['h-wall-angel'])),
+          ],
+          state: engine.states.single,
+        ),
+      );
+      await reply;
+      await tester.pumpAndSettle();
+      final card = find.byType(CoachRecommendCard);
+      expect(card, findsOneWidget);
+      expect(find.text(note), findsOneWidget);
+      final style = CoachUiTheme.of(tester.element(card));
+      expect(style.builders.surface, isNull);
+      expect(style.builders.controlFace, isNull);
+      expect(style.builders.pressable, isNull);
+      final recommendation = tester.widget<CoachRecommendCard>(card);
+      expect(recommendation.library.tryGet('h-wall-angel')!.levelLabel, '入门');
+      expect(
+        recommendation.library.tryGet('h-wall-angel')!.equipmentLabel,
+        '墙',
+      );
+      await tester.ensureVisible(
+        find.byKey(const ValueKey('recommend-plan-button')),
+      );
+      await tester.tap(find.byKey(const ValueKey('recommend-plan-button')));
+      await tester.pump();
+      expect(engine.inputs.last, '请把刚才推荐的动作排成计划。');
+      engine.pending.last.complete(
+        ChatReply(messages: const [], state: engine.states.last),
+      );
+      await tester.pumpAndSettle();
+    },
+  );
+
+  test(
+    'PoseHub recommendations reuse the action browser first-frame asset',
+    () async {
+      final fixture = await CoachV2Fixtures.load();
+      final exercise = fixture.library['s-butterfly'];
+      final adapted = toCoachRecommendationExercise(exercise);
+      expect(
+        adapted.stillCutout,
+        'packages/ugk_trainer/assets/pose_hub/app-test-pack-r1/standing/s-butterfly.webp',
+      );
+      expect(adapted.name, exercise.name);
+      expect(adapted.levelLabel, isNotEmpty);
+      expect(adapted.equipmentLabel, isNotEmpty);
+    },
+  );
+
+  testWidgets(
+    'validated recommendations use the SDK card, trusted metadata and callbacks',
     (tester) async {
       String? opened;
       final actions = _SessionEngine(gate).restoreActions(['h-wall-angel'])!;
@@ -561,17 +625,28 @@ void main() {
         MaterialApp(
           theme: buildTheme(),
           home: Scaffold(
-            body: ActionCard(
-              actions: actions,
-              library: library,
-              onOpen: (exercise) => opened = exercise.id,
+            body: Builder(
+              builder: (context) => withSmartfitRecommendUi(
+                context,
+                CoachRecommendCard(
+                  actionIds: actions.items.map((action) => action.id).toList(),
+                  note: '慢慢舒展肩部。',
+                  library: CoachExerciseLibrary([
+                    for (final action in actions.items)
+                      toCoachRecommendationExercise(library[action.id]),
+                  ]),
+                  onOpenAction: (id) => opened = id,
+                ),
+              ),
             ),
           ),
         ),
       );
       expect(find.text(library['h-wall-angel'].name), findsOneWidget);
       expect(find.text('保存'), findsNothing);
-      await tester.tap(find.byKey(const ValueKey('coach-action-h-wall-angel')));
+      await tester.tap(
+        find.byKey(const ValueKey('recommend-action-h-wall-angel')),
+      );
       expect(opened, 'h-wall-angel');
     },
   );

@@ -96,6 +96,10 @@ class AppStore extends ChangeNotifier {
   /// The chat home's recent conversation (ChatMessage JSON, oldest first).
   final List<Map<String, dynamic>> chatLog = [];
 
+  /// Opaque SDK snapshot; the App never edits or derives session facts.
+  String? coachSessionJson;
+  final List<Map<String, dynamic>> coachDisplayMessages = [];
+
   /// Drifting star dust behind the chat (off = static sky).
   bool starfield = true;
 
@@ -163,6 +167,18 @@ class AppStore extends ChangeNotifier {
           for (final m in j['chat'] as List? ?? const [])
             Map<String, dynamic>.from(m as Map),
         ]);
+      final snapshot = j['coachSessionJson'];
+      coachSessionJson = snapshot == null
+          ? null
+          : snapshot is String
+          ? snapshot
+          : jsonEncode(snapshot);
+      coachDisplayMessages
+        ..clear()
+        ..addAll([
+          for (final row in j['coachDisplay'] as List? ?? const [])
+            if (row is Map) Map<String, dynamic>.from(row),
+        ]);
       history
         ..clear()
         ..addAll([
@@ -211,6 +227,8 @@ class AppStore extends ChangeNotifier {
     'mediaWifiOnly': mediaWifiOnly,
     'appearance': appearance,
     'savedPlans': [for (final p in savedPlans) p.toJson()],
+    'coachSessionJson': ?coachSessionJson,
+    if (coachSessionJson != null) 'coachDisplay': coachDisplayMessages,
     'chat': chatLog.length > chatLogLimit
         ? chatLog.sublist(chatLog.length - chatLogLimit)
         : chatLog,
@@ -361,6 +379,19 @@ class AppStore extends ChangeNotifier {
   }
 
   Future<void> setChatLog(List<Map<String, dynamic>> log) {
+    return setConversation(log, sessionJson: null);
+  }
+
+  /// One storage write pairs display messages with their exact SDK snapshot.
+  Future<void> setConversation(
+    List<Map<String, dynamic>> log, {
+    required String? sessionJson,
+    List<Map<String, dynamic>> sdkMessages = const [],
+  }) {
+    coachSessionJson = sessionJson;
+    coachDisplayMessages
+      ..clear()
+      ..addAll(sdkMessages);
     chatLog
       ..clear()
       ..addAll(

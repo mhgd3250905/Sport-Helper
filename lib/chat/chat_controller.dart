@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
@@ -72,26 +73,97 @@ class ChatController extends ChangeNotifier {
 
   void _onConversationChanged() {
     _syncQuestions();
+    _schedulePersistence();
     notifyListeners();
   }
 
-  void _syncQuestions() {
+  void _syncQuestions({bool appendMissing = false}) {
     final conversation = _conversation;
     if (conversation == null) return;
     final snapshots = {for (final m in conversation.state.messages) m.id: m};
+    final existing = <String>{};
     for (var i = 0; i < messages.length; i++) {
       final m = messages[i];
-      if (m.question == null) continue;
-      final snapshot = snapshots[m.conversationMessageId];
+      final sdkId = m.conversationMessageId ?? (m.aiVisible ? m.id : null);
+      final snapshot = snapshots[sdkId];
+      if (snapshot == null) continue;
+      existing.add(snapshot.id);
       messages[i] = m.copyWith(
-        questionAnswered: snapshot?.questionAnswered ?? true,
-        answeredChoices: snapshot?.answeredChoices ?? m.answeredChoices,
-        answeredForm: snapshot?.answeredForm ?? m.answeredForm,
+        text: snapshot.isUser ? null : snapshot.text,
+        question: snapshot.question,
+        conversationMessageId: snapshot.id,
+        questionAnswered: snapshot.questionAnswered,
+        answeredChoices: snapshot.answeredChoices,
+        answeredForm: snapshot.answeredForm,
+        actions: snapshot.actions,
+        clearActions: snapshot.actions == null,
       );
+    }
+    if (appendMissing) {
+      for (final sdk in conversation.state.messages) {
+        // An in-flight user message already exists in the App display log.
+        if (!sdk.isUser && !existing.contains(sdk.id)) {
+          messages.add(_displayMessage(sdk));
+        }
+      }
     }
   }
 
+  ChatMessage _displayMessage(coach.CoachConversationMessage sdk) {
+    final plan = sdk.plan == null
+        ? null
+        : TrainingPlan.fromJson(sdk.plan!.plan.toJson());
+    return ChatMessage(
+      id: sdk.id,
+      conversationMessageId: sdk.id,
+      at: sdk.at,
+      role: sdk.isUser ? ChatRole.user : ChatRole.assistant,
+      text: sdk.text,
+      question: sdk.question,
+      questionAnswered: sdk.questionAnswered,
+      answeredChoices: sdk.answeredChoices,
+      answeredForm: sdk.answeredForm,
+      isPlanningFailure: sdk.isFailure || sdk.isPlanningFailure,
+      plan: plan,
+      validatedPlan: sdk.plan,
+      actions: sdk.actions,
+      request: plan == null ? null : requestForPlan(plan),
+      aiVisible: true,
+    );
+  }
+
+  coach.CoachConversationMessage _sdkDisplay(ChatMessage m) =>
+      coach.CoachConversationMessage(
+        id: m.conversationMessageId ?? m.id,
+        at: m.at,
+        isUser: m.isUser,
+        text: m.text,
+        question: m.question,
+        questionAnswered: m.questionAnswered,
+        answeredChoices: m.answeredChoices,
+        answeredForm: m.answeredForm,
+        isFailure: m.isPlanningFailure,
+        isPlanningFailure: m.isPlanningFailure,
+        plan: m.validatedPlan,
+        actions: m.actions,
+      );
+
+  void _schedulePersistence() {
+    if (!_started || _restoring || _disposed) return;
+    _persistenceTimer?.cancel();
+    _persistenceTimer = Timer(const Duration(milliseconds: 80), () {
+      unawaited(_persist());
+    });
+  }
+
   void _onProgress(coach.AgentEvent event) {
+    if (event.kind == coach.AgentEventKind.snapshotRestoreFallback) {
+      RuntimeLog.instance.record(
+        'chat.snapshot_restore_fallback',
+        fields: {'reason': event.path ?? 'invalid_snapshot'},
+      );
+      return;
+    }
     if (!typing ||
         _progressEnded ||
         _finishedProgressTurns.contains(event.turnId)) {
@@ -106,6 +178,7 @@ class ChatController extends ChangeNotifier {
     );
     if (event.kind == coach.AgentEventKind.node && event.task != null) {
       _latestTask = event.task;
+      _schedulePersistence();
       notifyListeners();
     }
     _progressHistory.add(event);
@@ -143,6 +216,9 @@ class ChatController extends ChangeNotifier {
   int _seq = 0;
   int _replyEpoch = 0;
   bool _started = false;
+  bool _restoring = false;
+  bool _disposed = false;
+  Timer? _persistenceTimer;
 
   /// Runs an app command (`@drawer`, `@library`…) as if a bubble asked.
   void command(String action) {
@@ -192,24 +268,33 @@ class ChatController extends ChangeNotifier {
         // Skip a message an older build wrote differently.
       }
     }
-    _conversation?.restoreHistory([
-      for (final m in messages.where((m) => m.aiVisible))
-        coach.CoachConversationMessage(
-          id: m.conversationMessageId ?? m.id,
-          at: m.at,
-          isUser: m.isUser,
-          text: m.text,
-          question: m.question,
-          questionAnswered: m.questionAnswered,
-          answeredChoices: m.answeredChoices,
-          answeredForm: m.answeredForm,
-          isPlanningFailure: m.isPlanningFailure,
-          plan: m.validatedPlan,
-          planState: _legacyPlanState(m),
-          actions: m.actions,
-        ),
-    ]);
-    _syncQuestions();
+    final conversation = _conversation;
+    if (conversation != null) {
+      final sdkMessages = store.coachDisplayMessages.isEmpty
+          ? messages.where((m) => m.aiVisible).map(_sdkDisplay).toList()
+          : _readSdkDisplay();
+      _restoring = true;
+      try {
+        final encoded = store.coachSessionJson;
+        if (encoded == null) {
+          conversation.restoreHistory(sdkMessages);
+        } else {
+          Object? decoded;
+          try {
+            decoded = jsonDecode(encoded);
+          } on FormatException {
+            decoded = null;
+          }
+          conversation.restoreSession(
+            coach.CoachSessionSnapshot.fromJson(decoded),
+            sdkMessages,
+          );
+        }
+      } finally {
+        _restoring = false;
+      }
+      _syncQuestions(appendMissing: true);
+    }
     final lastCard = messages.lastWhere((m) => m.isPlan, orElse: () => _none);
     if (lastCard != _none) {
       _state = ChatState(
@@ -230,28 +315,35 @@ class ChatController extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Read-only migration for pre-v2 saves. New saves own no per-card state.
-  coach.CoachPlanState? _legacyPlanState(ChatMessage message) {
-    if (message.validatedPlan == null) return null;
-    final raw = store.chatLog
-        .where((row) => row['id'] == message.id)
-        .firstOrNull;
-    if (raw?['planState'] is! Map) return null;
-    try {
-      final stored = coach.CoachPlanState.fromJson(
-        Map<String, dynamic>.from(raw!['planState'] as Map),
-      );
-      return stored.planId == message.validatedPlan!.plan.id ? stored : null;
-    } on Object {
-      return null;
-    }
-  }
-
   static final _none = ChatMessage(
     id: '',
     role: ChatRole.user,
     at: DateTime(2000),
   );
+
+  List<coach.CoachConversationMessage> _readSdkDisplay() {
+    final restored = <coach.CoachConversationMessage>[];
+    for (final row in store.coachDisplayMessages) {
+      try {
+        restored.add(
+          _sdkDisplay(
+            ChatMessage.fromJson(
+              row,
+              restoreWith: engine is RestorableChatEngine
+                  ? engine as RestorableChatEngine
+                  : null,
+            ),
+          ),
+        );
+      } on Object catch (error) {
+        RuntimeLog.instance.record(
+          'chat.display_restore_error',
+          fields: {'errorType': RuntimeLog.errorType(error)},
+        );
+      }
+    }
+    return restored;
+  }
 
   /// Cancels this turn immediately; a late transport response cannot add cards.
   void cancelRequest() {
@@ -784,11 +876,27 @@ class ChatController extends ChangeNotifier {
 
   String _id() => 'm${_clock().microsecondsSinceEpoch}-${_seq++}';
 
+  /// Also used at lifecycle boundaries and by explicit local verification.
+  Future<void> flushPersistence() => _persist();
+
   Future<void> _persist() async {
+    _persistenceTimer?.cancel();
     try {
-      await store.setChatLog([
-        for (final m in messages) m.toJson().cast<String, dynamic>(),
-      ]);
+      final conversation = _conversation;
+      final snapshot = conversation == null
+          ? null
+          : jsonEncode(conversation.exportSession().toJson());
+      final sdkMessages = <Map<String, dynamic>>[
+        for (final m
+            in conversation?.state.messages ??
+                <coach.CoachConversationMessage>[])
+          _displayMessage(m).toJson().cast<String, dynamic>(),
+      ];
+      await store.setConversation(
+        [for (final m in messages) m.toJson().cast<String, dynamic>()],
+        sessionJson: snapshot,
+        sdkMessages: sdkMessages,
+      );
     } on Object catch (error) {
       RuntimeLog.instance.record(
         'chat.persist.error',
@@ -811,6 +919,8 @@ class ChatController extends ChangeNotifier {
 
   @override
   void dispose() {
+    _disposed = true;
+    _persistenceTimer?.cancel();
     _conversation?.removeListener(_onConversationChanged);
     _cancelDiagnostic('dispose');
     _replyEpoch++;
@@ -818,6 +928,7 @@ class ChatController extends ChangeNotifier {
     _endProgress();
     unawaited(_progressSubscription?.cancel());
     unawaited(_progressEvents.close());
+    if (_started) unawaited(_persist());
     if (engine case final ManagedChatEngine managed) managed.cancelPending();
     _actions.close();
     super.dispose();

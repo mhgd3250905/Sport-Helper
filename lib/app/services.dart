@@ -147,6 +147,7 @@ class AppServices {
     final engine = chatEngine;
     if (engine is AiChatEngine) engine.enableUserMemory = enabled;
     await store.setAiMemoryEnabled(enabled);
+    await chat.flushPersistence();
     RuntimeLog.instance.record(
       'settings.ai_memory',
       fields: {'enabled': enabled},
@@ -163,6 +164,7 @@ class AppServices {
         throw StateError('AI memory could not be cleared from local storage');
       }
     }
+    await chat.flushPersistence();
     RuntimeLog.instance.record('settings.ai_memory_cleared');
   }
 

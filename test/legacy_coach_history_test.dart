@@ -45,7 +45,7 @@ void main() {
 
   for (final snapshot in ['valid', 'missing', 'corrupt', 'mismatched']) {
     test(
-      'pre-v2 $snapshot plan state uses SDK legacy restoration safely',
+      'pre-v2 $snapshot history uses SDK recovery without App card state',
       () async {
         final raw = await legacyCard();
         if (snapshot == 'missing') raw.remove('planState');
@@ -78,7 +78,7 @@ void main() {
           restored.toJson().containsKey('planState'),
           isFalse,
           reason:
-              'Legacy per-card conditions are read once, never maintained by App.',
+              'Old planState is not read or maintained by App; SDK restores legacy history.',
         );
       },
     );

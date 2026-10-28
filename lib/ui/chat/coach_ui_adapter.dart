@@ -21,6 +21,23 @@ Widget withSmartfitCoachUi(BuildContext context, Widget child) =>
     ? child
     : CoachUiTheme(style: smartfitCoachUiStyle(), child: child);
 
+/// Recommendation layout and surfaces stay SDK-owned, with only App colors
+/// and localized fixed labels injected into its own theme scope.
+Widget withSmartfitRecommendUi(BuildContext context, Widget child) {
+  final defaults = CoachUiStyle.fromTheme(Theme.of(context));
+  return CoachUiTheme(
+    style: CoachUiStyle(
+      colors: smartfitCoachUiStyle().colors,
+      typography: defaults.typography,
+      strings: const CoachUiStrings(
+        planFromActions: '排成计划',
+        actionUnavailable: '动作暂不可用',
+      ),
+    ),
+    child: child,
+  );
+}
+
 CoachMediaPalette coachMediaPalette(SfPalette p) => CoachMediaPalette(
   mediaStage: p.mediaStage,
   onStage: p.onStage,
@@ -254,6 +271,9 @@ CoachExercise toCoachExercise(
 }) {
   final alpha = SfAlphaCards.hasCover(e, enabled: alphaCards);
   final palette = sfStageFor(e);
+  final gear = e.effectiveEquipmentIds
+      .where((id) => id != 'none' && id.isNotEmpty)
+      .toSet();
   return CoachExercise(
     id: e.id,
     name: e.name,
@@ -267,6 +287,8 @@ CoachExercise toCoachExercise(
           )
         : coachMediaPalette(palette),
     categoryLabel: e.category.zh,
+    levelLabel: levelZh(e.level),
+    equipmentLabel: gear.isEmpty ? '徒手' : gear.map(equipmentLabel).join('、'),
     cues: e.cues,
     cutout: alpha
         ? _trainerStandingFor(e) ?? e.media.alphaCover
@@ -278,6 +300,24 @@ CoachExercise toCoachExercise(
         : SfCutouts.has(e)
         ? SfCutouts.asset(e, still: true)
         : null,
+  );
+}
+
+/// The action browser and recommendations share the SDK's bundled first frame.
+/// Media IDs are resolved from the trusted catalog, never from model text.
+CoachExercise toCoachRecommendationExercise(Exercise exercise) {
+  final adapted = toCoachExercise(exercise);
+  return CoachExercise(
+    id: adapted.id,
+    name: adapted.name,
+    poster: adapted.poster,
+    stage: adapted.stage,
+    categoryLabel: adapted.categoryLabel,
+    levelLabel: adapted.levelLabel,
+    equipmentLabel: adapted.equipmentLabel,
+    cues: adapted.cues,
+    cutout: adapted.cutout,
+    stillCutout: _trainerStandingFor(exercise) ?? adapted.stillCutout,
   );
 }
 

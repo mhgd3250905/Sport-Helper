@@ -124,4 +124,27 @@ void main() {
       );
     },
   );
+
+  test(
+    'explicit build configuration preserves defaults and SDK budgets',
+    () async {
+      const configured = AiCoachConfig(
+        token: 'fixture-token',
+        endpoint: 'https://fixture.invalid/v1',
+        modelName: 'fixture-model',
+        authMode: 'bearer',
+      );
+      final client = configured.createClient(deviceId: 'fixture-device');
+      addTearDown(client.close);
+      expect(client.config.baseUrl, 'https://fixture.invalid/v1');
+      expect(client.config.model, 'fixture-model');
+      expect(await client.auth.headers(), {
+        'Authorization': 'Bearer fixture-token',
+      });
+      expect(client.config.maxRetries, 0);
+      expect(client.config.timeout, const Duration(seconds: 120));
+      expect(const AiCoachConfig().endpoint, AiCoachConfig.baseUrl);
+      expect(const AiCoachConfig().modelName, AiCoachConfig.model);
+    },
+  );
 }
