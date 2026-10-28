@@ -121,6 +121,7 @@ void main() {
     expect(tester.takeException(), isNull);
     await tester.scrollUntilVisible(find.text('还没有保存的计划'), 120);
     await tester.pumpAndSettle();
+    expect(find.text('0 套'), findsOneWidget);
     expect(find.text('还没有保存的计划').hitTestable(), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
@@ -165,6 +166,15 @@ void main() {
           final next = tester.getRect(tiles.at(1));
           expect(first.size, next.size);
           expect(next.left - first.right, SfCardTokens.gridGap);
+          final artwork = tester.getRect(
+            find
+                .descendant(of: tiles.first, matching: find.byType(AspectRatio))
+                .first,
+          );
+          expect(artwork.left - first.left, 12);
+          expect(artwork.top - first.top, 12);
+          expect(artwork.width, first.width - 24);
+          expect(artwork.height, artwork.width);
           final firstTexts = find.descendant(
             of: tiles.at(0),
             matching: find.byType(Text),

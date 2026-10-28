@@ -51,9 +51,7 @@ class SavedPlansPage extends StatelessWidget {
                   SfSpace.x4,
                 ),
                 child: Text(
-                  store.savedPlans.isEmpty
-                      ? '保存的计划会出现在这里'
-                      : '${store.savedPlans.length} 套',
+                  '${store.savedPlans.length} 套',
                   style: SfType.label,
                 ),
               ),

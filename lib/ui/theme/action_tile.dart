@@ -20,7 +20,7 @@ class SfActionTile extends StatelessWidget {
   static double heightFor(BuildContext context, double width) {
     final scaler = MediaQuery.textScalerOf(context);
     return width +
-        SfCardTokens.inset * 2 +
+        SfCardTokens.inset +
         scaler.scale(SfCardTokens.title.fontSize!) *
             SfCardTokens.title.height! *
             SfCardTokens.titleLines +
@@ -36,7 +36,6 @@ class SfActionTile extends StatelessWidget {
         MediaQuery.textScalerOf(context).scale(titleStyle.fontSize!) *
         titleStyle.height!;
     return SfPolishCard(
-      padding: EdgeInsets.zero,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -44,30 +43,28 @@ class SfActionTile extends StatelessWidget {
             aspectRatio: SfCardTokens.imageAspectRatio,
             child: artwork,
           ),
+          const SizedBox(height: SfCardTokens.inset),
           Expanded(
-            child: Padding(
-              padding: SfCardTokens.padding,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    height: lineHeight * SfCardTokens.titleLines,
-                    child: Text(
-                      title,
-                      style: titleStyle,
-                      maxLines: SfCardTokens.titleLines,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  const Spacer(),
-                  Text(
-                    metadata,
-                    style: SfCardTokens.metadata,
-                    maxLines: 1,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  height: lineHeight * SfCardTokens.titleLines,
+                  child: Text(
+                    title,
+                    style: titleStyle,
+                    maxLines: SfCardTokens.titleLines,
                     overflow: TextOverflow.ellipsis,
                   ),
-                ],
-              ),
+                ),
+                const Spacer(),
+                Text(
+                  metadata,
+                  style: SfCardTokens.metadata,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
             ),
           ),
         ],
