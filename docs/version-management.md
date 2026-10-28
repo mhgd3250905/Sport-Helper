@@ -6,6 +6,8 @@
 
 本批软件验证：固定Flutter3.44.7全量586/586、0跳过，静态分析0问题、严格锁文件通过；40张浅深前后软件图及索引已保存。SDK受限的第二、四、五项不因此视为完成。
 
+最终包源 `c6369c44c0a048d3c0ad56f4a2acbbddbc59048a`；APK `SmartFit-ui-polish-1-0.1.0+41-c6369c4-internal-arm64-v8a-release.apk`，143,468,018B / 136.82MiB，SHA256 `ed8bc9987c4cfe33367d4492a7e37edccf8df6444a2069a1fb730a4d862db1c6`。aapt确认 `com.ugk.smartfit.internal / 0.1.0 / 2041`；与+40同签名、ZIP/ELF16KB和存储JNI通过。仅供用户内部真机确认，未自动装机；后续交付文档提交不替代打包源码。
+
 以下为2026-10-28及更早历史；其中“当前”、main冻结与未合并描述仅属于原时点。
 
 > 2026-10-28 当前版本：`codex/coach-v2` 的 `0.1.0+40` 已出内部 release APK；开哥确认“基础版本功能可用了”“算是调通了”。确认范围仅为基础功能可用，本次未通过 ADB 覆盖安装、未新增真机量化验收，未合入或推送 main，`release/1.0` 不动。详见[本轮交付记录](coach-v2-plus40-2026-10-28.md)与[当前验收记录](acceptance.md)。

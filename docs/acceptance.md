@@ -6,6 +6,8 @@
 
 本轮固定 Flutter3.44.7：internal全量586/586、0跳过，flutter analyze零问题，离线严格锁文件通过；before/after截图各2/2场景通过，40张原图大小与SHA256及当前截图入口哈希核对通过。打包后原生身份、签名和16KB/JNI以独立回执为准。
 
+最终 `c6369c4` 源码已出+41：实际APK143,468,018B，aapt身份 `com.ugk.smartfit.internal / 0.1.0 / 2041`；与+40同签名、ZIP/ELF16KB和存储JNI门禁均通过。交付APK实际字节和SHA256已对照 `release-apk.json` 二次核实；未安装、未执行设备操作。SDK受限项不能由测试通过或出包推定完成。
+
 以下保留原日期的历史验收，不覆盖上方当前状态。
 
 > 2026-10-28 最新状态：`codex/coach-v2` 已交付 +40，运行源码 `428c5f3db4a90907889a2fa3e0eb9633b38a48b0`；开发者日志补充和 SDK 场景澄清修复已通过本机验证。开哥认可基础功能已调通；本轮未装机，未新增真机性能、长训练或 iOS 验证，main / release/1.0 保持不动、未推送。见[版本台账](version-management.md)、[本轮阶段说明](coach-v2-plus40-2026-10-28.md)与[开发者日志说明](developer-logging-2026-10-28.md)。

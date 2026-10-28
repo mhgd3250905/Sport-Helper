@@ -34,4 +34,15 @@ SDK 定位依据为已解析的 `ugk_coach_ui/lib/src/plan_card.dart`、`recomme
 
 交付目录 `E:/AII-3D/3D-Sport-AI/deliveries/ui-polish-1-plus41/`。构建脚本仅对干净提交执行，沿用既有私有配置并脱敏；绑定源码指纹、完整 SHA、SDK和素材，校验同签名、ZIP/ELF 16KB、存储JNI及实际APK身份。具体 APK 路径、大小、SHA-256和打包源码取 `release-apk.json`，不以文档提交替换打包源码。
 
+| 最终回执 | 已核实结果 |
+| --- | --- |
+| 打包源码 | `c6369c44c0a048d3c0ad56f4a2acbbddbc59048a`；后续若仅补交付文档，不替换此源码绑定 |
+| APK | `SmartFit-ui-polish-1-0.1.0+41-c6369c4-internal-arm64-v8a-release.apk`，位于上述交付根目录 |
+| 大小 / 对比+40 | 143,468,018 B / 136.82 MiB，比+40减少148 B |
+| SHA-256 | `ed8bc9987c4cfe33367d4492a7e37edccf8df6444a2069a1fb730a4d862db1c6`；已另行核对交付文件实际字节和哈希 |
+| 原生身份 | `com.ugk.smartfit.internal`，aapt实读 `0.1.0 / 2041`，arm64-v8a release |
+| 门禁 | 与+40同签名，ZIP及ELF的16KB检查和存储JNI通过，严格锁文件和SDK/素材指纹通过 |
+| 软件验证 | `validation.json`：全量586/586、0跳过、分析0问题；40原图及入口哈希匹配，最后20张改后重采哈希未变 |
+| 主线 | 已回查远端main仍为 `adc79abef2b7195872e589f6225486e944b66644`；+41自身未合main或推送，release/1.0未操作 |
+
 +41 只供开哥内部真机确认。本轮没有自动安装、真实模型新调用、设备性能、长训练或iOS验收。+41 尚未合 main / 未推送 / 未打 tag，等待开哥确认及安排；+40 已被用户确认并进入 main 的事实与 +41 待验边界分别记录。

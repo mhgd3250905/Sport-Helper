@@ -4,6 +4,8 @@
 
 `codex/ui-polish-1` / `0.1.0+41`，独立工作树 `Sport-Helper-ui-polish-1`，以已推送的 main `adc79ab` 为基线。用户明确确认 +40 真机通过并授权此次 main 合并/推送；+41 的验收与主线准入仍等待用户下一步。`release/1.0` 未操作。先读[本批逐项状态及SDK限制](ui-polish-1-plus41-2026-10-29.md)和[版本台账](version-management.md)。不得把SDK正式动作库或原地展开未完成项当成已通过，也不得把软件截图冒充真机验收。
 
+最终+41打包源码为 `c6369c44c0a048d3c0ad56f4a2acbbddbc59048a`，APK和回执均在 `../deliveries/ui-polish-1-plus41/`（相对App工作树）；全量586、分析0问题，包签名/16KB/JNI通过，40张图齐全。仅补交付记录的后续提交不改变此包的源码绑定。下一步等待开哥真机反馈；SDK第二/四/五项具体待办按本批说明继续处理，未经新指令不修改SDK。
+
 下文保留2026-10-28及更早历史；旧的main冻结/未推送说法仅属于其原日期。
 
 > 2026-10-28 最新状态：当前分支 `codex/coach-v2`，+40 运行源码 `428c5f3db4a90907889a2fa3e0eb9633b38a48b0`。开发者日志与 SDK 场景澄清修复已接通，本机验证及内测 APK 已交付；开哥认可基础功能已调通。main / release/1.0 保持不动、未推送；本轮未装机。当前事实见[版本台账](version-management.md)、[本轮阶段说明](coach-v2-plus40-2026-10-28.md)、[验收记录](acceptance.md)与[开发者日志说明](developer-logging-2026-10-28.md)。
