@@ -1,5 +1,9 @@
 # 本机验收记录
 
+## 当前 +41 两项补齐 / SDK475（2026-10-29）
+
+SDK远端main已核实发布475a5d8，用户授权后三包及coach传递override统一锁定完整SHA。计划列表直接接入公开CoachPlanExpanded，菜单修复沿用826ea92；同一+41/2041的最终源码、测试、APK和截图见[本轮记录](ui-polish-1-plus41-plan-expand-2026-10-29.md)与独立目录 `E:/AII-3D/3D-Sport-AI/deliveries/ui-polish-1-plus41-plan-expand/`。下方826菜单候选、488初包及更早记录均属历史。没有真机/模拟器操作，最终等待用户远程安装确认；App main、release/1.0不动。
+
 ## 当前 +41 菜单补项（2026-10-29）
 
 同一 `codex/ui-polish-1 / +41 / 2041` 继续修复菜单：单240ms控制器、固定面板、键盘共用占位及独立重绘边界。我的计划原地展开仍等待SDK最小公开接口授权，不能记为完成。用户无真机且明确不启动模拟器，由用户远程安装验收；当前软件验证与新APK回执见[本轮记录](ui-polish-1-plus41-menu-supplement-2026-10-29.md)。新交付独立位于 `E:/AII-3D/3D-Sport-AI/deliveries/ui-polish-1-plus41-supplement/`；下方SDK488初包及其他旧验证均保留为历史。

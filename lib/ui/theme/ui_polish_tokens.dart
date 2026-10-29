@@ -82,7 +82,9 @@ abstract final class SfPlanPolishTokens {
   static const togglePadding = EdgeInsets.symmetric(horizontal: 12);
   static const toggleRadius = 16.0;
   static const toggleInset = 12.0;
-  static const expansion = Duration(milliseconds: 280);
+  static const expansion = SfMotion.medium;
+  static const rowFade = SfMotion.fast;
+  static const revealScroll = Duration(milliseconds: 240);
   static const detailActionGap = 24.0;
   static TextStyle get toggle => SfType.label.copyWith(fontSize: 13);
   static TextStyle get details =>
@@ -92,7 +94,7 @@ abstract final class SfPlanPolishTokens {
 abstract final class SfDockPolishTokens {
   static const fadeAboveInput = 72.0;
   static const menuDuration = Duration(milliseconds: 240);
-  static const menuRise = 8.0;
+  static const menuRise = SfSpace.x2;
   static Color get background => SfFeaturePanelTokens.background;
   static LinearGradient get gradient => SfComposerTokens.dockGradient;
 }

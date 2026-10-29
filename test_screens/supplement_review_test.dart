@@ -1,9 +1,13 @@
 // Matched real App entry-point screenshots for the +41 supplement.
 // Before source is d6bd79cd8dc6c5439f67779bd6e894af7981faa3.
 // SF_SCREENSHOT_DIR=<delivery>/screenshots/<before|after>
+// SF_PLAN_EXPAND_CAPTURE=1 adds final SDK475 expansion/details/scroll checks.
+// Archived before images use the original capture harness and same initial
+// three-plan fixture; only the separate scroll scenario adds six more plans.
 // flutter test --no-pub --flavor internal
 //   test_screens/supplement_review_test.dart --update-goldens
 // Software widgets/fonts/assets only; no device/performance acceptance.
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -21,10 +25,12 @@ import 'package:smartfit/domain/plan.dart';
 import 'package:smartfit/ui/alpha_artwork.dart';
 import 'package:smartfit/ui/chat/chat_home_page.dart';
 import 'package:smartfit/ui/chat/saved_plans_page.dart';
+import 'package:smartfit/ui/plan_page.dart';
 import 'package:smartfit/ui/theme.dart';
 import 'package:smartfit/voice/voice_library.dart';
 import 'package:smartfit/voice/voice_queue.dart';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
+import 'package:ugk_coach_ui/ugk_coach_ui.dart' show CoachPlanExpanded;
 import 'package:ugk_trainer/ugk_trainer.dart' show PoseHubActionLibrary;
 
 import '../test/app_flow_test.dart' show MemoryStorage;
@@ -142,6 +148,8 @@ Future<void> _shot(WidgetTester tester, _Images images, String name) async {
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   final output = Platform.environment['SF_SCREENSHOT_DIR'];
+  final captureExpansion =
+      Platform.environment['SF_PLAN_EXPAND_CAPTURE'] == '1';
   late CoachV2Fixtures fixture;
   late coach.PoseHubAppTestCatalog catalog;
   late PoseHubMediaRepository media;
@@ -200,7 +208,7 @@ void main() {
               'id': 'supplement-$id',
               'title': title,
             }),
-          now: DateTime(2026, 10, 29, 9, 0, store.savedPlans.length),
+            now: DateTime(2026, 10, 29, 9, 0, store.savedPlans.length),
           );
         }
         final services = AppServices(
@@ -252,6 +260,100 @@ void main() {
         await tester.pump();
         await tester.pump(const Duration(milliseconds: 800));
         await _shot(tester, images, 'saved-first-tap-$theme');
+        if (captureExpansion) {
+          // The initial four captures retain the original three-plan fixture.
+          // New interactions use the SDK's actual public expanded component.
+          expect(find.byType(SavedPlansPage), findsOneWidget);
+          final first = store.savedPlans.singleWhere((p) => p.name == '晨间舒展');
+          final second = store.savedPlans.singleWhere((p) => p.name == '核心练习');
+          bool expanded(String savedId) => tester
+              .widget<CoachPlanExpanded>(
+                find.byKey(ValueKey('saved-expanded-$savedId')),
+              )
+              .expanded;
+          int expandedCount() => tester
+              .widgetList<CoachPlanExpanded>(find.byType(CoachPlanExpanded))
+              .where((widget) => widget.expanded)
+              .length;
+          expect(expanded(first.id), isTrue);
+          expect(expanded(second.id), isFalse);
+          expect(expandedCount(), 1);
+          expect(find.text('查看详情').hitTestable(), findsOneWidget);
+
+          await tester.tap(
+            find.byKey(ValueKey('saved-${second.id}')).hitTestable(),
+          );
+          await tester.pump();
+          await tester.pump(const Duration(milliseconds: 800));
+          expect(expanded(first.id), isFalse);
+          expect(expanded(second.id), isTrue);
+          expect(expandedCount(), 1);
+          await _shot(tester, images, 'saved-second-exclusive-$theme');
+
+          await tester.tap(
+            find.byKey(ValueKey('plan-expand-${second.plan.id}')),
+          );
+          await tester.pump();
+          await tester.pump(const Duration(milliseconds: 800));
+          expect(expandedCount(), 0);
+          await _shot(tester, images, 'saved-all-collapsed-$theme');
+
+          await tester.tap(
+            find.byKey(ValueKey('saved-${first.id}')).hitTestable(),
+          );
+          await tester.pump();
+          await tester.pump(const Duration(milliseconds: 800));
+          final details = find.byKey(ValueKey('plan-save-${first.plan.id}'));
+          await tester.ensureVisible(details);
+          await tester.tap(details);
+          await tester.pump();
+          await tester.pump(const Duration(milliseconds: 800));
+          expect(find.byType(PlanPage), findsOneWidget);
+          final detailContext = tester.element(find.byType(PlanPage));
+          expect(ModalRoute.of(detailContext)!.settings.name, 'plan');
+          await _shot(tester, images, 'saved-details-top-$theme');
+          final detailPosition = tester
+              .state<ScrollableState>(find.byType(Scrollable).first)
+              .position;
+          for (var layout = 0; layout < 4; layout++) {
+            detailPosition.jumpTo(detailPosition.maxScrollExtent);
+            await tester.pump(const Duration(milliseconds: 100));
+          }
+          await _shot(tester, images, 'saved-details-bottom-$theme');
+          expect(detailPosition.extentAfter, lessThanOrEqualTo(1));
+          Navigator.of(detailContext).pop();
+          await tester.pump();
+          await tester.pump(const Duration(milliseconds: 800));
+          expect(find.byType(SavedPlansPage), findsOneWidget);
+
+          // Only the separate scrolling scenario adds six more saved fixtures;
+          // these are not part of the matched three-plan before/after images.
+          for (var index = 0; index < 6; index++) {
+            await store.savePlan(
+              TrainingPlan.fromJson({
+                ..._plan.toJson(),
+                'id': 'supplement-scroll-$index',
+                'title': '滚动练习 ${index + 1}',
+              }),
+              now: DateTime(2026, 10, 29, 10, 0, store.savedPlans.length),
+            );
+          }
+          await tester.pump();
+          await tester.scrollUntilVisible(
+            find.byKey(ValueKey('saved-entry-${first.id}')),
+            400,
+            scrollable: find.byType(Scrollable).first,
+          );
+          await tester.pump(const Duration(milliseconds: 800));
+          expect(expanded(first.id), isTrue);
+          expect(expandedCount(), 1);
+          await _shot(tester, images, 'saved-scroll-expanded-$theme');
+          await tester.runAsync(
+            () => File('$output/interaction-proof-$theme.json').writeAsString(
+              '${jsonEncode({'schema': 'smartfit-plus41-expanded-plan-widget-proof@1', 'evidence': 'actual App navigation and public SDK expanded widget', 'nativeDevice': false, 'firstExpanded': true, 'secondExpandedWithFirstCollapsed': true, 'collapseLeavesNoExpandedItem': true, 'detailsRoute': 'plan', 'detailsAtActualBottom': true, 'expandedStatePreservedAfterScroll': true, 'savedCountForMatchedViews': 3, 'savedCountForScrollOnly': store.savedPlans.length, 'oneExpandedVisibleAfterScroll': true})}\n',
+            ),
+          );
+        }
         await tester.pumpWidget(const SizedBox.shrink());
         await tester.pump();
       },

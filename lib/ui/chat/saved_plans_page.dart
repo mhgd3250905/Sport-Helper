@@ -1,8 +1,14 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:ugk_coach_ui/ugk_coach_ui.dart';
 
 import '../../data/app_store.dart';
 import '../../domain/exercise.dart';
+import '../../domain/plan.dart';
 import '../../domain/saved_plan.dart';
+import '../alpha_artwork.dart';
+import '../plan_page.dart';
 import '../plan_presentation.dart';
 import '../theme/polish_card.dart';
 import '../theme/media_theme.dart';
@@ -10,10 +16,11 @@ import '../theme/sf_icons.dart';
 import '../theme/tokens.dart';
 import '../theme/ui_polish_tokens.dart';
 import '../theme/widgets.dart';
+import 'coach_ui_adapter.dart';
 import 'expand_route.dart';
 
-/// Saved plans as a normal page; selecting a plan returns it to chat.
-class SavedPlansPage extends StatelessWidget {
+/// One saved plan expands in place through the SDK's shared presentation.
+class SavedPlansPage extends StatefulWidget {
   const SavedPlansPage({
     super.key,
     required this.store,
@@ -30,6 +37,199 @@ class SavedPlansPage extends StatelessWidget {
   final VoidCallback? onCompose;
 
   @override
+  State<SavedPlansPage> createState() => _SavedPlansPageState();
+}
+
+class _SavedPlansPageState extends State<SavedPlansPage> {
+  final _scroll = ScrollController();
+  final _viewport = GlobalKey();
+  final _entryKeys = <String, GlobalKey>{};
+  String? _expandedId;
+  Timer? _revealTimer;
+  int _revealEpoch = 0;
+  bool _autoRevealing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.store.addListener(_storeChanged);
+  }
+
+  @override
+  void didUpdateWidget(SavedPlansPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.store == widget.store) return;
+    oldWidget.store.removeListener(_storeChanged);
+    widget.store.addListener(_storeChanged);
+    _cancelReveal();
+    if (!widget.store.savedPlans.any((plan) => plan.id == _expandedId)) {
+      _expandedId = null;
+    }
+  }
+
+  void _storeChanged() {
+    _cancelReveal();
+    if (!widget.store.savedPlans.any((plan) => plan.id == _expandedId)) {
+      _expandedId = null;
+    }
+    setState(() {});
+  }
+
+  void _cancelReveal() {
+    _revealTimer?.cancel();
+    _revealTimer = null;
+    _revealEpoch++;
+    if (_autoRevealing && _scroll.hasClients) {
+      _scroll.jumpTo(_scroll.offset);
+    }
+    _autoRevealing = false;
+  }
+
+  void _toggle(SavedPlan plan) {
+    _cancelReveal();
+    final expand = _expandedId != plan.id;
+    setState(() => _expandedId = expand ? plan.id : null);
+    if (!expand) return;
+    final epoch = _revealEpoch;
+    final reduced = SfMotion.reduced(context);
+    _revealTimer = Timer(
+      reduced ? Duration.zero : SfPlanPolishTokens.expansion,
+      () {
+        _revealTimer = null;
+        // The SDK has no onEnd. Measure only after its last layout frame.
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted || epoch != _revealEpoch || _expandedId != plan.id) {
+            return;
+          }
+          final entryContext = _entryKeys[plan.id]?.currentContext;
+          final entry = entryContext?.findRenderObject();
+          final viewport = _viewport.currentContext?.findRenderObject();
+          if (entryContext == null ||
+              entry is! RenderBox ||
+              viewport is! RenderBox ||
+              !entry.hasSize ||
+              !viewport.hasSize ||
+              !widget.store.savedPlans.any((saved) => saved.id == plan.id)) {
+            return;
+          }
+          final bottom =
+              entry.localToGlobal(Offset.zero).dy + entry.size.height;
+          final viewportBottom =
+              viewport.localToGlobal(Offset.zero).dy + viewport.size.height;
+          if (bottom <= viewportBottom) return;
+          _autoRevealing = true;
+          unawaited(
+            Scrollable.ensureVisible(
+              entryContext,
+              alignment: 1,
+              alignmentPolicy: ScrollPositionAlignmentPolicy.keepVisibleAtEnd,
+              duration: reduced
+                  ? Duration.zero
+                  : SfPlanPolishTokens.revealScroll,
+              curve: SfMotion.standard,
+            ).whenComplete(() {
+              if (mounted && epoch == _revealEpoch) _autoRevealing = false;
+            }),
+          );
+        });
+        WidgetsBinding.instance.ensureVisualUpdate();
+      },
+    );
+  }
+
+  void _show(SavedPlan plan) {
+    _cancelReveal();
+    widget.onShow(plan);
+  }
+
+  void _start(SavedPlan plan, OriginRect from) {
+    _cancelReveal();
+    widget.onStart(plan, from);
+  }
+
+  void _details(SavedPlan saved) {
+    _cancelReveal();
+    // A saved name is presentation only; the original plan ID/doses are intact.
+    final displayPlan = TrainingPlan.fromJson({
+      ...saved.plan.toJson(),
+      'title': saved.name,
+    });
+    unawaited(
+      Navigator.of(context).push<void>(
+        MaterialPageRoute(
+          settings: const RouteSettings(name: 'plan'),
+          builder: (_) => PlanPage(plan: displayPlan),
+        ),
+      ),
+    );
+  }
+
+  Widget _entry(SavedPlan saved) {
+    final plan = saved.plan;
+    final routine = toCoachRoutine(plan, widget.library);
+    final expanded = _expandedId == saved.id;
+    final alpha = SfAlphaCards.enabledOf(context);
+    return SizedBox(
+      key: ValueKey('saved-entry-${saved.id}'),
+      child: Column(
+        key: _entryKeys.putIfAbsent(saved.id, GlobalKey.new),
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _CollapsedSavedRow(
+            key: ValueKey('saved-collapsed-${saved.id}'),
+            collapsed: !expanded,
+            child: _SavedTile(
+              plan: saved,
+              library: widget.library,
+              onToggle: () => _toggle(saved),
+              onShow: _show,
+              onStart: _start,
+              onRename: (plan) => _rename(context, plan),
+              onDelete: (plan) => _delete(context, plan),
+            ),
+          ),
+          withSmartfitSavedPlanUi(
+            context,
+            CoachPlanExpanded(
+              key: ValueKey('saved-expanded-${saved.id}'),
+              plan: CoachRoutine(
+                id: routine.id,
+                title: saved.name,
+                items: routine.items,
+                durationLabel: routine.durationLabel,
+                gearLabel: routine.gearLabel,
+                levelLabel: routine.levelLabel,
+                metaLabel: routine.metaLabel,
+                adjustmentsLabel: routine.adjustmentsLabel,
+              ),
+              library: CoachExerciseLibrary([
+                for (final id in plan.exerciseIds)
+                  if (widget.library.tryGet(id) case final exercise?)
+                    toCoachExercise(exercise, alphaCards: alpha),
+              ]),
+              expanded: expanded,
+              onCollapse: () => _toggle(saved),
+              actionIcon: CoachGlyph.chevronRight,
+              actionLabel: '查看详情',
+              onAction: () => _details(saved),
+              onStart: (from) => _start(saved, from),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    widget.store.removeListener(_storeChanged);
+    _revealTimer?.cancel();
+    _revealEpoch++;
+    _scroll.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) => Scaffold(
     backgroundColor: SfColors.background,
     appBar: AppBar(
@@ -38,9 +238,11 @@ class SavedPlansPage extends StatelessWidget {
       surfaceTintColor: Colors.transparent,
     ),
     body: SafeArea(
-      child: ListenableBuilder(
-        listenable: store,
-        builder: (context, _) => CustomScrollView(
+      child: SizedBox.expand(
+        key: _viewport,
+        child: CustomScrollView(
+          key: const ValueKey('saved-plans-scroll'),
+          controller: _scroll,
           slivers: [
             SliverToBoxAdapter(
               child: Padding(
@@ -51,13 +253,13 @@ class SavedPlansPage extends StatelessWidget {
                   SfSpace.x4,
                 ),
                 child: Text(
-                  '${store.savedPlans.length} 套',
+                  '${widget.store.savedPlans.length} 套',
                   style: SfType.label,
                 ),
               ),
             ),
-            if (store.savedPlans.isEmpty)
-              SliverToBoxAdapter(child: _Empty(onCompose: onCompose))
+            if (widget.store.savedPlans.isEmpty)
+              SliverToBoxAdapter(child: _Empty(onCompose: widget.onCompose))
             else
               SliverPadding(
                 padding: const EdgeInsets.fromLTRB(
@@ -67,17 +269,11 @@ class SavedPlansPage extends StatelessWidget {
                   SfSpace.x4,
                 ),
                 sliver: SliverList.separated(
-                  itemCount: store.savedPlans.length,
+                  itemCount: widget.store.savedPlans.length,
                   separatorBuilder: (_, _) =>
                       const SizedBox(height: SfSpace.x2),
-                  itemBuilder: (context, i) => _SavedTile(
-                    plan: store.savedPlans[i],
-                    library: library,
-                    onShow: onShow,
-                    onStart: onStart,
-                    onRename: (p) => _rename(context, p),
-                    onDelete: (p) => _delete(context, p),
-                  ),
+                  itemBuilder: (context, i) =>
+                      _entry(widget.store.savedPlans[i]),
                 ),
               ),
           ],
@@ -87,35 +283,12 @@ class SavedPlansPage extends StatelessWidget {
   );
 
   Future<void> _rename(BuildContext context, SavedPlan p) async {
-    final text = TextEditingController(text: p.name);
     final name = await showDialog<String>(
       context: context,
-      builder: (c) => AlertDialog(
-        title: const Text('重命名'),
-        content: TextField(
-          key: const ValueKey('rename-field'),
-          controller: text,
-          autofocus: true,
-          maxLength: 20,
-          decoration: const InputDecoration(hintText: '计划名称'),
-          onSubmitted: (v) => Navigator.pop(c, v),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(c),
-            child: Text('取消', style: TextStyle(color: SfColors.muted)),
-          ),
-          TextButton(
-            key: const ValueKey('rename-ok'),
-            onPressed: () => Navigator.pop(c, text.text),
-            child: const Text('确定'),
-          ),
-        ],
-      ),
+      builder: (_) => _RenameSavedPlanDialog(name: p.name),
     );
-    text.dispose();
-    if (name != null && name.trim().isNotEmpty) {
-      await store.renamePlan(p.id, name);
+    if (mounted && name != null && name.trim().isNotEmpty) {
+      await widget.store.renamePlan(p.id, name);
     }
   }
 
@@ -138,8 +311,130 @@ class SavedPlansPage extends StatelessWidget {
         ],
       ),
     );
-    if (ok == true) await store.deletePlan(p.id);
+    if (ok == true) await widget.store.deletePlan(p.id);
   }
+}
+
+class _RenameSavedPlanDialog extends StatefulWidget {
+  const _RenameSavedPlanDialog({required this.name});
+  final String name;
+
+  @override
+  State<_RenameSavedPlanDialog> createState() => _RenameSavedPlanDialogState();
+}
+
+class _RenameSavedPlanDialogState extends State<_RenameSavedPlanDialog> {
+  late final _text = TextEditingController(text: widget.name);
+
+  @override
+  void dispose() {
+    _text.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => AlertDialog(
+    title: const Text('重命名'),
+    content: TextField(
+      key: const ValueKey('rename-field'),
+      controller: _text,
+      autofocus: true,
+      maxLength: 20,
+      decoration: const InputDecoration(hintText: '计划名称'),
+      onSubmitted: (value) => Navigator.pop(context, value),
+    ),
+    actions: [
+      TextButton(
+        onPressed: () => Navigator.pop(context),
+        child: Text('取消', style: TextStyle(color: SfColors.muted)),
+      ),
+      TextButton(
+        key: const ValueKey('rename-ok'),
+        onPressed: () => Navigator.pop(context, _text.text),
+        child: const Text('确定'),
+      ),
+    ],
+  );
+}
+
+/// Keep the collapsed row mounted while the shared expanded card opens.
+class _CollapsedSavedRow extends StatefulWidget {
+  const _CollapsedSavedRow({
+    super.key,
+    required this.collapsed,
+    required this.child,
+  });
+  final bool collapsed;
+  final Widget child;
+
+  @override
+  State<_CollapsedSavedRow> createState() => _CollapsedSavedRowState();
+}
+
+class _CollapsedSavedRowState extends State<_CollapsedSavedRow>
+    with TickerProviderStateMixin {
+  late final _height = AnimationController(
+    vsync: this,
+    duration: SfPlanPolishTokens.expansion,
+    value: widget.collapsed ? 1 : 0,
+  );
+  late final _fade = AnimationController(
+    vsync: this,
+    duration: SfPlanPolishTokens.rowFade,
+    value: widget.collapsed ? 1 : 0,
+  );
+
+  void _animate() {
+    final target = widget.collapsed ? 1.0 : 0.0;
+    if (SfMotion.reduced(context)) {
+      _height.value = target;
+      _fade.value = target;
+    } else {
+      _height.animateTo(
+        target,
+        duration: SfPlanPolishTokens.expansion,
+        curve: SfMotion.standard,
+      );
+      _fade.animateTo(target, duration: SfPlanPolishTokens.rowFade);
+    }
+  }
+
+  @override
+  void didUpdateWidget(_CollapsedSavedRow oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.collapsed != widget.collapsed) _animate();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (SfMotion.reduced(context)) _animate();
+  }
+
+  @override
+  void dispose() {
+    _height.dispose();
+    _fade.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => ClipRect(
+    child: SizeTransition(
+      alignment: AlignmentDirectional.topStart,
+      sizeFactor: _height,
+      child: ExcludeFocus(
+        excluding: !widget.collapsed,
+        child: IgnorePointer(
+          ignoring: !widget.collapsed,
+          child: ExcludeSemantics(
+            excluding: !widget.collapsed,
+            child: FadeTransition(opacity: _fade, child: widget.child),
+          ),
+        ),
+      ),
+    ),
+  );
 }
 
 class _Empty extends StatelessWidget {
@@ -159,6 +454,7 @@ class _SavedTile extends StatelessWidget {
   const _SavedTile({
     required this.plan,
     required this.library,
+    required this.onToggle,
     required this.onShow,
     required this.onStart,
     required this.onRename,
@@ -167,6 +463,7 @@ class _SavedTile extends StatelessWidget {
 
   final SavedPlan plan;
   final ExerciseLibrary library;
+  final VoidCallback onToggle;
   final void Function(SavedPlan) onShow;
   final void Function(SavedPlan, OriginRect from) onStart;
   final void Function(SavedPlan) onRename;
@@ -183,7 +480,8 @@ class _SavedTile extends StatelessWidget {
     return SfPressable(
       key: ValueKey('saved-${plan.id}'),
       semanticLabel: plan.name,
-      onTap: () => onShow(plan),
+      onTap: onToggle,
+      expanded: false,
       scale: .985,
       child: SfPolishCard(
         child: Row(

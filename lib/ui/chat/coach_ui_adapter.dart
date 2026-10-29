@@ -24,6 +24,14 @@ Widget withSmartfitCoachUi(BuildContext context, Widget child) =>
     ? child
     : CoachUiTheme(style: smartfitCoachUiStyle(), child: child);
 
+/// Saved plans reuse the SDK plan view and its normal App theme. Its left
+/// action opens details instead of saving, using the approved primary ink.
+Widget withSmartfitSavedPlanUi(BuildContext context, Widget child) =>
+    CoachUiTheme(
+      style: smartfitCoachUiStyle(planDetailsAction: true),
+      child: child,
+    );
+
 /// Recommendation layout, controls and card tokens use the SDK defaults.
 /// Only fixed labels are localized; trusted artwork is supplied as model data.
 Widget withSmartfitRecommendUi(BuildContext context, Widget child) {
@@ -81,7 +89,7 @@ CoachQuestionData toCoachQuestionData(ChatMessage message) {
   );
 }
 
-CoachUiStyle smartfitCoachUiStyle() {
+CoachUiStyle smartfitCoachUiStyle({bool planDetailsAction = false}) {
   final p = SfColors.palette;
   return CoachUiStyle(
     colors: CoachUiColors(
@@ -185,7 +193,7 @@ CoachUiStyle smartfitCoachUiStyle() {
         onPressed: c.onPressed,
         icon: c.icon == null ? null : _glyph(c.icon!),
         iconFilled: c.iconFilled,
-        color: c.color,
+        color: planDetailsAction ? SfColors.accent : c.color,
         boxed: false,
       ),
       surface: (_, c) =>

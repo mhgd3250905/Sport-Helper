@@ -1,5 +1,7 @@
 # 我的计划原地展开：所需 SDK 接口
 
+后续状态：用户已授权，SDK侧已实现并发布 `475a5d84b5d0fce839d9d4475da22a6d1ce2df19`，公开名为 `CoachPlanExpanded`。App已统一更新三包锁定，按[两项补齐记录](ui-polish-1-plus41-plan-expand-2026-10-29.md)接入；下文保留为488基线时的接口请求历史，不再表示接口仍缺失。
+
 当前三包固定 `488ce82b9dc7031925ba12c18f252b4e596e7776`，本次只读核对 SDK 本地和远端 main 均为该提交。SDK 仓库、缓存源码和依赖锁定尚未修改。
 
 `packages/ugk_coach_ui/lib/src/plan_card.dart` 的公开 `CoachPlanCard` 没有受控展开、初始展开、展开通知或动画参数。展开状态、切换方法、`_Header`、`_Details` 和 `_MoveRow` 都是私有实现；内部展开/收起时长为550/450ms。公开主题 builders 只提供外观与控件 hook，不提供展开内容。因此不能同时遵守“不改SDK、锁488”“直接复用展开态、禁止另写一份”并实现单条展开及280ms动画。
