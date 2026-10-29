@@ -62,6 +62,7 @@ class _ChatHomePageState extends State<ChatHomePage>
   DateTime? _pendingDeliveryAt;
   Set<String> _replyStartIds = {};
   final Map<String, String> _deliveryEntryIds = {};
+  final Map<String, GlobalKey> _deliveryKeys = {};
   final _input = FocusNode();
   bool _panelOpen = false;
 
@@ -439,6 +440,10 @@ class _ChatHomePageState extends State<ChatHomePage>
       _pendingDeliveryId = null;
       _pendingUserId = null;
     }
+    final liveDeliveries = {..._deliveryEntryIds.values, ?_pendingDeliveryId};
+    _deliveryKeys.removeWhere((id, _) => !liveDeliveries.contains(id));
+    GlobalKey deliveryKey(String id) =>
+        _deliveryKeys.putIfAbsent(id, GlobalKey.new);
     final rows = [
       for (final m in msgs)
         CoachChatEntry(
@@ -448,7 +453,14 @@ class _ChatHomePageState extends State<ChatHomePage>
           isCard: m.isPlan || m.actions != null,
           greeting: m.greeting,
           child: _deliveryEntryIds.containsKey(m.id)
-              ? CoachDeliveryTransition(preparing: false, child: _message(m))
+              ? CoachDeliveryTransition(
+                  key: deliveryKey(_deliveryEntryIds[m.id]!),
+                  preparing: false,
+                  successful:
+                      !m.isPlanningFailure && (m.isPlan || m.actions != null),
+                  interrupted: _chat.typing,
+                  child: _message(m),
+                )
               : m.greeting
               ? GreetingBlock(text: m.text)
               : _message(m, fresh: !_seen.contains(m.id)),
@@ -460,6 +472,7 @@ class _ChatHomePageState extends State<ChatHomePage>
           isUser: false,
           isCard: true,
           child: CoachDeliveryTransition(
+            key: deliveryKey(_pendingDeliveryId!),
             preparing: true,
             child: CoachTaskBubble(
               task: _chat.activeTask,

@@ -27,54 +27,115 @@ abstract final class SfCardTokens {
 }
 
 abstract final class SfGenerationTokens {
-  static const padding = EdgeInsets.all(16);
-  static const animationSize = 56.0;
-  static const arcWidth = 2.0;
-  static const arcSweep = 90.0;
-  static const dotSize = 6.0;
-  static const dotDelay = Duration(milliseconds: 120);
-  static const rotation = Duration(milliseconds: 1200);
-  static const imageHold = Duration(milliseconds: 900);
-  static const imageTransition = Duration(milliseconds: 250);
+  static const cardPadding = EdgeInsets.fromLTRB(16, 14, 16, 16);
+  static const padding = cardPadding;
+  static const cardRadius = 20.0;
+  static const cardEdgeWidth = .5;
+  static const glowRadius = 160.0;
+  static const animationSize = 44.0;
+  static const animationGap = 12.0;
+  static const arcStroke = 1.5;
+  static const arcWidth = arcStroke;
+  static const arcSweep = 300.0;
+  static const arcHeadSize = 1.5;
+  static const rotation = Duration(milliseconds: 1400);
+  static const coreSize = 10.0;
+  static const haloSize = 20.0;
+  static const breath = Duration(milliseconds: 1200);
+  static const breathInitialScale = .8;
+  static const breathInitialOpacity = .6;
+  static const coreCollapse = Duration(milliseconds: 180);
+  static const silhouetteHold = Duration(milliseconds: 900);
+  static const silhouetteFade = Duration(milliseconds: 250);
+  static const imageHold = silhouetteHold;
+  static const imageTransition = silhouetteFade;
+  static const imageInitialScale = .94;
+  static const statusExit = Duration(milliseconds: 160);
+  static const statusDelay = Duration(milliseconds: 60);
   static const statusTransition = Duration(milliseconds: 220);
-  static const statusOffset = 8.0;
+  static const statusOffset = 6.0;
+  static const statusGap = 3.0;
   static const shimmer = Duration(milliseconds: 1600);
   static const progressTransition = Duration(milliseconds: 400);
+  static const progressBand = Duration(milliseconds: 1200);
+  static const progressBandFraction = .4;
+  static const progressTopGap = 14.0;
   static const progressHeight = 3.0;
-  static const progressRadius = 2.0;
+  static const progressRadius = 1.5;
   static const progressGap = 4.0;
   static const progressSegments = 4;
-  static const dotCount = 3;
-  static const dotGap = SfSpace.x1;
-  static const dotLift = SfSpace.x1;
-  static const thumbnailInset = SfSpace.x2;
-  static const chipHeight = 26.0;
-  static const chipPadding = EdgeInsets.symmetric(horizontal: 10);
-  static const chipRadius = 13.0;
+  static const thumbnailInset = 6.0;
+  static const chipsTopGap = 12.0;
+  static const chipGap = 6.0;
+  static const chipHeight = 24.0;
+  static const chipPadding = EdgeInsets.symmetric(horizontal: 9);
+  static const chipRadius = 12.0;
   static const chipTransition = Duration(milliseconds: 200);
   static const chipDelay = Duration(milliseconds: 60);
   static const chipInitialScale = .9;
   static const cancelTouchSize = 44.0;
+  static const completionVisual = Duration(milliseconds: 240);
+  static const completionHold = Duration(milliseconds: 350);
   static const completionTransition = Duration(milliseconds: 300);
+  static const completionFade = Duration(milliseconds: 200);
+  static const completionDetail = Duration(milliseconds: 120);
+  static const checkSize = 20.0;
+  static const checkInitialScale = .6;
   static const maxWidth = 400.0;
 
-  static TextStyle get title =>
-      SfType.callout.copyWith(fontSize: 15, fontWeight: FontWeight.w600);
-  static TextStyle get status =>
-      SfType.body.copyWith(fontSize: 16, fontWeight: FontWeight.w600);
-  static TextStyle get cancel =>
-      SfType.label.copyWith(fontSize: 13, color: SfColors.muted);
+  static Color get cardEdge => (SfColors.isDark ? Colors.white : Colors.black)
+      .withValues(alpha: SfColors.isDark ? .08 : .06);
+  static List<BoxShadow> get cardShadow => SfColors.isDark
+      ? const []
+      : [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: .04),
+            offset: const Offset(0, 1),
+            blurRadius: 2,
+          ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: .06),
+            offset: const Offset(0, 6),
+            blurRadius: 20,
+          ),
+        ];
+  static Color get glow =>
+      SfColors.accent.withValues(alpha: SfColors.isDark ? .10 : .06);
+  static Color get orbFill =>
+      SfColors.accent.withValues(alpha: SfColors.isDark ? .14 : .08);
+  static Color get progressTrack =>
+      (SfColors.isDark ? Colors.white : Colors.black).withValues(
+        alpha: SfColors.isDark ? .10 : .08,
+      );
+  static Color get chipEdge => (SfColors.isDark ? Colors.white : Colors.black)
+      .withValues(alpha: SfColors.isDark ? .12 : .10);
+  static TextStyle get title => SfType.callout.copyWith(
+    fontSize: 15,
+    height: 1.35,
+    fontWeight: FontWeight.w600,
+    color: SfColors.text,
+  );
+  static TextStyle get status => SfType.body.copyWith(
+    fontSize: 13,
+    height: 18 / 13,
+    fontWeight: FontWeight.w500,
+    color: SfColors.muted,
+  );
+  static TextStyle get cancel => SfType.label.copyWith(
+    fontSize: 13,
+    fontWeight: FontWeight.w500,
+    color: SfColors.muted,
+  );
   static TextStyle chipText(bool user) => SfType.caption.copyWith(
     fontSize: 12,
+    fontWeight: FontWeight.w500,
     color: user ? SfColors.accent : SfColors.muted,
   );
-  static Color chipFill(bool user) =>
-      user ? SfColors.accent.withValues(alpha: .12) : Colors.transparent;
-  static Color get highlight => Color.alphaBlend(
-    SfPalette.light.surface.withValues(alpha: .12),
-    SfColors.text,
-  );
-  static const shimmerStops = [0.0, .5, 1.0];
+  static Color chipFill(bool user) => user
+      ? SfColors.accent.withValues(alpha: SfColors.isDark ? .18 : .10)
+      : Colors.transparent;
+  static Color get highlight => SfColors.text;
+  static const shimmerStops = [0.0, .35, .5, .65, 1.0];
 }
 
 abstract final class SfPlanPolishTokens {

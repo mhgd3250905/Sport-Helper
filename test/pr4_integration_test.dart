@@ -207,7 +207,7 @@ void main() {
         const coach.AgentEvent('reset-turn', coach.AgentEventKind.slow),
       );
       await tester.pumpAndSettle();
-      expect(find.text('正在想怎么练…').hitTestable(), findsOneWidget);
+      expect(find.text('正在想怎么练').hitTestable(), findsOneWidget);
       final newChat = find.byKey(const ValueKey('chat-new-conversation'));
       expect(newChat, findsNothing);
       await tester.tap(find.byKey(const ValueKey('chat-panel-toggle')));

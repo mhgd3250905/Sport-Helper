@@ -3,8 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:smartfit/domain/exercise.dart';
 import 'package:smartfit/ui/chat/coach_task_bubble.dart';
 import 'package:smartfit/ui/theme.dart';
-import 'package:smartfit/ui/theme/polish_card.dart';
-import 'package:smartfit/ui/theme/ui_polish_tokens.dart';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
 
 import 'support.dart';
@@ -56,18 +54,25 @@ Future<void> _show(
   bool waiting = true,
   bool reduced = false,
   bool tickers = true,
+  bool visualComplete = false,
+  double width = 390,
+  double textScale = 1,
   VoidCallback? onCancel,
   SfPalette palette = SfPalette.light,
 }) async {
-  tester.view.physicalSize = const Size(390, 844);
+  tester.view.physicalSize = Size(width, 844);
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
   await tester.pumpWidget(
     MaterialApp(
       theme: buildTheme(palette),
+      themeAnimationDuration: Duration.zero,
       builder: (context, child) => SfPaletteScope(
         child: MediaQuery(
-          data: MediaQuery.of(context).copyWith(disableAnimations: reduced),
+          data: MediaQuery.of(context).copyWith(
+            disableAnimations: reduced,
+            textScaler: TextScaler.linear(textScale),
+          ),
           child: child!,
         ),
       ),
@@ -79,6 +84,7 @@ Future<void> _show(
             sessionState: state,
             library: library,
             waiting: waiting,
+            visualComplete: visualComplete,
             onCancel: onCancel,
           ),
         ),
@@ -111,16 +117,43 @@ void main() {
           onCancel: () => cancelled = true,
           palette: palette,
         );
-        expect(find.text('正在为你准备 · 居家拉伸'), findsOneWidget);
+        expect(find.text('为你准备 · 居家拉伸'), findsOneWidget);
         expect(find.text('读懂你的需求'), findsOneWidget);
-        expect(find.byType(SfPolishCard), findsOneWidget);
-        expect(
-          tester.widget<SfPolishCard>(find.byType(SfPolishCard)).padding,
-          const EdgeInsets.all(16),
+        final card = tester.widget<Container>(
+          find.byKey(const ValueKey('generation-card')),
         );
+        expect(card.padding, const EdgeInsets.fromLTRB(16, 14, 16, 16));
+        final decoration = card.decoration! as BoxDecoration;
+        final outline = card.foregroundDecoration! as BoxDecoration;
+        final dark = palette.brightness == Brightness.dark;
+        expect(decoration.color, palette.surface);
+        expect(decoration.borderRadius, BorderRadius.circular(20));
+        expect((outline.border! as Border).top.width, .5);
+        expect(
+          (outline.border! as Border).top.color,
+          (dark ? Colors.white : Colors.black).withValues(
+            alpha: dark ? .08 : .06,
+          ),
+        );
+        if (dark) {
+          expect(decoration.boxShadow, isEmpty);
+        } else {
+          expect(decoration.boxShadow, [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: .04),
+              offset: const Offset(0, 1),
+              blurRadius: 2,
+            ),
+            BoxShadow(
+              color: Colors.black.withValues(alpha: .06),
+              offset: const Offset(0, 6),
+              blurRadius: 20,
+            ),
+          ]);
+        }
         expect(
           tester.getSize(find.byKey(const ValueKey('generation-animation'))),
-          const Size(56, 56),
+          const Size(44, 44),
         );
         expect(
           tester.getSize(
@@ -129,20 +162,26 @@ void main() {
           const Size(44, 44),
         );
         for (final field in ['scene', 'goal', 'equipment', 'level', 'limits']) {
-          expect(tester.getSize(_face(field)).height, 26);
+          expect(tester.getSize(_face(field)).height, 24);
           expect(tester.getSize(_face(field)).width, lessThan(130));
         }
         final scene =
             tester.widget<Container>(_face('scene')).decoration!
                 as BoxDecoration;
-        expect(scene.color, palette.accent.withValues(alpha: .12));
+        expect(scene.color, palette.accent.withValues(alpha: dark ? .18 : .10));
         expect(scene.border, isNull);
-        final inferred =
-            tester.widget<Container>(_face('level')).decoration!
-                as BoxDecoration;
+        final inferredContainer = tester.widget<Container>(_face('level'));
+        final inferred = inferredContainer.decoration! as BoxDecoration;
+        final inferredOutline =
+            inferredContainer.foregroundDecoration! as BoxDecoration;
         expect(inferred.color, Colors.transparent);
-        expect((inferred.border! as Border).top.width, 1);
-        expect((inferred.border! as Border).top.color, SfCardTokens.edge);
+        expect((inferredOutline.border! as Border).top.width, 1);
+        expect(
+          (inferredOutline.border! as Border).top.color,
+          (dark ? Colors.white : Colors.black).withValues(
+            alpha: dark ? .12 : .10,
+          ),
+        );
         expect(
           tester.widget<Text>(find.text('进阶')).style!.color,
           palette.muted,
@@ -150,10 +189,14 @@ void main() {
         for (final internal in ['教练待办', '交付卡片', '核对方案', '（你说的）', '（默认）']) {
           expect(find.textContaining(internal), findsNothing);
         }
-        final title = tester.widget<Text>(find.text('正在为你准备 · 居家拉伸')).style!;
+        final title = tester.widget<Text>(find.text('为你准备 · 居家拉伸')).style!;
         expect(title.fontSize, 15);
         expect(title.fontWeight, FontWeight.w600);
-        expect(tester.widget<Text>(find.text('读懂你的需求')).style!.fontSize, 16);
+        expect(title.height, 1.35);
+        final status = tester.widget<Text>(find.text('读懂你的需求')).style!;
+        expect(status.fontSize, 13);
+        expect(status.fontWeight, FontWeight.w500);
+        expect(status.height, 18 / 13);
         expect(tester.widget<Text>(find.text('取消')).style!.fontSize, 13);
         await tester.tap(find.text('取消'));
         expect(cancelled, isTrue);
@@ -166,17 +209,19 @@ void main() {
     tester,
   ) async {
     await _show(tester, reduced: true);
-    expect(find.text('正在想怎么练…'), findsOneWidget);
+    expect(find.text('正在想怎么练'), findsOneWidget);
     expect(find.text('居家'), findsNothing);
     expect(find.text('徒手'), findsNothing);
     expect(find.text('无伤痛'), findsNothing);
-    expect(find.byKey(const ValueKey('generation-dots')), findsOneWidget);
-    for (var index = 0; index < 3; index++) {
-      expect(
-        tester.getSize(find.byKey(ValueKey('generation-dot-$index'))),
-        const Size(6, 6),
-      );
-    }
+    expect(find.byKey(const ValueKey('generation-dots')), findsNothing);
+    expect(
+      tester.getSize(find.byKey(const ValueKey('generation-core'))),
+      const Size(10, 10),
+    );
+    expect(
+      tester.getSize(find.byKey(const ValueKey('generation-halo'))),
+      const Size(20, 20),
+    );
     await _show(
       tester,
       state: coach.CoachSessionState(
@@ -188,7 +233,7 @@ void main() {
       reduced: true,
     );
     expect(find.textContaining('internal_unknown'), findsNothing);
-    expect(find.text('正在想怎么练…'), findsOneWidget);
+    expect(find.text('正在想怎么练'), findsOneWidget);
   });
 
   testWidgets('SDK nodes map to status sentences and four measured segments', (
@@ -227,10 +272,10 @@ void main() {
           );
         }
         final fill = tester.widget<FractionallySizedBox>(_fill(index));
-        expect(fill.widthFactor, index <= completed ? 1 : 0);
+        expect(fill.widthFactor, index < completed ? 1 : 0);
         expect(
           tester.widget<ClipRRect>(segment).borderRadius,
-          BorderRadius.circular(2),
+          BorderRadius.circular(1.5),
         );
       }
     }
@@ -238,21 +283,24 @@ void main() {
   });
 
   testWidgets(
-    'current progress fills in 400ms easeOutCubic and status moves in 220ms',
+    'completed segment fills in 400ms and status uses staggered 160/220ms motion',
     (tester) async {
+      await _show(tester, task: _task('understand'));
       await _show(tester, task: _task('actions'));
+      expect(tester.widget<FractionallySizedBox>(_fill(0)).widthFactor, 0);
       expect(tester.widget<FractionallySizedBox>(_fill(1)).widthFactor, 0);
       await tester.pump(const Duration(milliseconds: 200));
       expect(
-        tester.widget<FractionallySizedBox>(_fill(1)).widthFactor,
+        tester.widget<FractionallySizedBox>(_fill(0)).widthFactor,
         closeTo(Curves.easeOutCubic.transform(.5), .001),
       );
       await tester.pump(const Duration(milliseconds: 200));
-      expect(tester.widget<FractionallySizedBox>(_fill(1)).widthFactor, 1);
+      expect(tester.widget<FractionallySizedBox>(_fill(0)).widthFactor, 1);
+      expect(tester.widget<FractionallySizedBox>(_fill(1)).widthFactor, 0);
       await _show(tester, task: _task('planning'));
       expect(find.text('读懂你的需求'), findsOneWidget);
       expect(find.text('安排顺序和时长'), findsOneWidget);
-      await tester.pump(const Duration(milliseconds: 110));
+      await tester.pump(const Duration(milliseconds: 80));
       final old = find
           .ancestor(of: find.text('读懂你的需求'), matching: find.byType(Transform))
           .first;
@@ -261,13 +309,13 @@ void main() {
           .first;
       expect(
         tester.widget<Transform>(old).transform.storage[13],
-        closeTo(-4, .001),
+        closeTo(-6 * Curves.easeInCubic.transform(.5), .001),
       );
       expect(
         tester.widget<Transform>(next).transform.storage[13],
-        closeTo(4, .001),
+        closeTo(6 * (1 - Curves.easeOutCubic.transform(20 / 220)), .001),
       );
-      await tester.pump(const Duration(milliseconds: 110));
+      await tester.pump(const Duration(milliseconds: 200));
       expect(find.text('读懂你的需求'), findsNothing);
       expect(find.text('安排顺序和时长'), findsOneWidget);
       await tester.pumpWidget(const SizedBox.shrink());
@@ -278,7 +326,7 @@ void main() {
     'rotation is linear and stops for reduced motion and TickerMode',
     (tester) async {
       await _show(tester);
-      await tester.pump(const Duration(milliseconds: 300));
+      await tester.pump(const Duration(milliseconds: 350));
       final rotation = find.byKey(const ValueKey('generation-rotation'));
       expect(
         tester.widget<RotationTransition>(rotation).turns.value,
@@ -300,6 +348,7 @@ void main() {
       expect(tester.widget<RotationTransition>(rotation).turns.value, value);
       await tester.pumpAndSettle();
       expect(tester.binding.hasScheduledFrame, isFalse);
+      expect(tester.binding.transientCallbackCount, 0);
     },
   );
 
@@ -369,7 +418,10 @@ void main() {
       expect(fade('scene').opacity.value, 0);
       expect(fade('goal').opacity.value, 0);
       await tester.pump(const Duration(milliseconds: 60));
-      expect(fade('scene').opacity.value, closeTo(.3, .001));
+      expect(
+        fade('scene').opacity.value,
+        closeTo(Curves.easeOutCubic.transform(.3), .001),
+      );
       expect(fade('goal').opacity.value, 0);
       await tester.pump(const Duration(milliseconds: 200));
       expect(fade('scene').opacity.value, 1);
@@ -394,22 +446,202 @@ void main() {
     },
   );
 
-  testWidgets('completion uses 300ms size transition without diagnostic text', (
+  testWidgets(
+    'completion shows check and reserves cancel space without changing height',
+    (tester) async {
+      final state = coach.CoachSessionState(
+        task: _task('review'),
+        params: _params(),
+      );
+      await _show(tester, state: state, reduced: true, onCancel: () {});
+      final card = find.byKey(const ValueKey('generation-card'));
+      final previousHeight = tester.getSize(card).height;
+      final cancelRect = tester.getRect(
+        find.byKey(const ValueKey('generation-cancel-target')),
+      );
+      expect(find.text('取消'), findsOneWidget);
+      await _show(
+        tester,
+        state: state.copyWith(task: _task('output', complete: true)),
+        waiting: false,
+        reduced: true,
+        onCancel: () {},
+      );
+      expect(tester.getSize(card).height, previousHeight);
+      expect(
+        tester.getRect(find.byKey(const ValueKey('generation-cancel-target'))),
+        cancelRect,
+      );
+      expect(find.text('取消'), findsNothing);
+      final check = tester.widget<Icon>(
+        find.byKey(const ValueKey('generation-check')),
+      );
+      expect(check.icon, Icons.check_rounded);
+      expect(check.size, 20);
+      await tester.pumpAndSettle();
+      expect(tester.binding.transientCallbackCount, 0);
+      expect(find.text('马上就好'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets('SDK output done while waiting does not announce reply success', (
     tester,
   ) async {
-    await _show(tester, task: _task('review'), reduced: true);
+    final state = coach.CoachSessionState(
+      task: _task('output', complete: true),
+    );
+    await _show(tester, state: state, onCancel: () {});
+    expect(find.text('马上就好'), findsOneWidget);
+    expect(find.byKey(const ValueKey('generation-check')), findsNothing);
+    expect(find.text('取消'), findsOneWidget);
+    await _show(tester, state: state, visualComplete: true, onCancel: () {});
+    expect(find.byKey(const ValueKey('generation-check')), findsOneWidget);
+    expect(find.text('取消'), findsNothing);
+    await tester.pump(const Duration(milliseconds: 240));
+    final rotation = find.byKey(const ValueKey('generation-rotation'));
+    final stopped = tester.widget<RotationTransition>(rotation).turns.value;
+    await tester.pump(const Duration(milliseconds: 200));
+    expect(tester.widget<RotationTransition>(rotation).turns.value, stopped);
+    expect(tester.binding.transientCallbackCount, 0);
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
+  testWidgets('success check preserves the completed segment 400ms fill', (
+    tester,
+  ) async {
+    await _show(tester, task: _task('review'));
+    await tester.pump(const Duration(milliseconds: 450));
     await _show(
       tester,
       task: _task('output', complete: true),
-      waiting: false,
-      reduced: true,
+      visualComplete: true,
     );
-    final size = tester.widget<AnimatedSize>(
-      find.byKey(const ValueKey('generation-completion-size')),
+    expect(tester.widget<FractionallySizedBox>(_fill(3)).widthFactor, 0);
+    await tester.pump(const Duration(milliseconds: 200));
+    expect(
+      tester.widget<FractionallySizedBox>(_fill(3)).widthFactor,
+      closeTo(Curves.easeOutCubic.transform(.5), .001),
     );
-    expect(size.duration, const Duration(milliseconds: 300));
-    expect(size.curve, Curves.easeOutCubic);
-    await tester.pumpAndSettle();
-    expect(find.byType(SfPolishCard), findsNothing);
+    await tester.pump(const Duration(milliseconds: 40));
+    expect(find.byKey(const ValueKey('generation-check')), findsOneWidget);
+    final rotation = find.byKey(const ValueKey('generation-rotation'));
+    final turn = tester.widget<RotationTransition>(rotation).turns.value;
+    await tester.pump(const Duration(milliseconds: 160));
+    expect(tester.widget<FractionallySizedBox>(_fill(3)).widthFactor, 1);
+    expect(tester.widget<RotationTransition>(rotation).turns.value, turn);
+    await tester.pumpWidget(const SizedBox.shrink());
   });
+
+  testWidgets(
+    'switching to reduced motion stops all in-flight tickers and pins first image',
+    (tester) async {
+      final state = coach.CoachSessionState(
+        task: _task('actions'),
+        params: _params(),
+        picks: ['h-catcow-quad', 'h-banana'],
+      );
+      final library = loadLibrary();
+      await _show(tester);
+      await _show(tester, state: state, library: library);
+      await tester.pump(const Duration(milliseconds: 75));
+      await _show(
+        tester,
+        state: state.copyWith(task: _task('planning')),
+        library: library,
+        reduced: true,
+      );
+      await tester.pump();
+      expect(find.text('挑好了 2 个动作'), findsNothing);
+      expect(find.text('安排顺序和时长'), findsOneWidget);
+      expect(find.byType(ShaderMask), findsNothing);
+      expect(
+        find.byKey(const ValueKey('generation-progress-band-2')),
+        findsNothing,
+      );
+      expect(
+        find.byKey(const ValueKey('generation-thumbnail-h-catcow-quad')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const ValueKey('generation-thumbnail-h-banana')),
+        findsNothing,
+      );
+      expect(tester.binding.transientCallbackCount, 0);
+      await tester.pump(const Duration(seconds: 2));
+      expect(tester.binding.transientCallbackCount, 0);
+      expect(tester.binding.hasScheduledFrame, isFalse);
+    },
+  );
+
+  testWidgets(
+    'visual completion closes the ring and settles the check at 240ms',
+    (tester) async {
+      await _show(tester, task: _task('review'), onCancel: () {});
+      final card = find.byKey(const ValueKey('generation-card'));
+      final height = tester.getSize(card).height;
+      await _show(
+        tester,
+        task: _task('review'),
+        visualComplete: true,
+        onCancel: () {},
+      );
+      expect(find.byKey(const ValueKey('generation-check')), findsOneWidget);
+      expect(find.text('取消'), findsNothing);
+      expect(tester.getSize(card).height, height);
+      await tester.pump(const Duration(milliseconds: 240));
+      final rotation = find.byKey(const ValueKey('generation-rotation'));
+      final turn = tester.widget<RotationTransition>(rotation).turns.value;
+      final check = find.byKey(const ValueKey('generation-check'));
+      final opacity = find
+          .ancestor(of: check, matching: find.byType(Opacity))
+          .first;
+      final scale = find
+          .ancestor(of: check, matching: find.byType(Transform))
+          .first;
+      expect(tester.widget<Opacity>(opacity).opacity, 1);
+      expect(
+        tester.widget<Transform>(scale).transform.storage[0],
+        closeTo(1, .001),
+      );
+      await tester.pump(const Duration(milliseconds: 350));
+      expect(tester.widget<RotationTransition>(rotation).turns.value, turn);
+      expect(tester.binding.transientCallbackCount, 0);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  for (final scale in [1.0, 1.5]) {
+    testWidgets('320px Chinese title stays within one line at ${scale}x', (
+      tester,
+    ) async {
+      await _show(
+        tester,
+        state: coach.CoachSessionState(
+          task: _task('planning'),
+          params: {..._params(), 'scene': _param('office', 'user')},
+        ),
+        reduced: true,
+        width: 320,
+        textScale: scale,
+        onCancel: () {},
+      );
+      final title = find.text('为你准备 · 办公室拉伸');
+      expect(title, findsOneWidget);
+      expect(tester.widget<Text>(title).maxLines, 1);
+      expect(tester.widget<Text>(title).overflow, TextOverflow.ellipsis);
+      final rect = tester.getRect(title);
+      final cancel = tester.getRect(
+        find.byKey(const ValueKey('generation-cancel-target')),
+      );
+      expect(rect.right, lessThanOrEqualTo(cancel.left));
+      expect(rect.left, greaterThanOrEqualTo(72));
+      expect(
+        tester.getRect(find.byKey(const ValueKey('generation-card'))).right,
+        lessThanOrEqualTo(320),
+      );
+      expect(tester.takeException(), isNull);
+      expect(tester.binding.transientCallbackCount, 0);
+    });
+  }
 }
