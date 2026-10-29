@@ -1,5 +1,9 @@
 # 智能健身助手（SmartFit）交接说明
 
+## 当前 +41 菜单补项（2026-10-29）
+
+同一 `codex/ui-polish-1 / +41 / 2041` 继续修复菜单：单240ms控制器、固定面板、键盘共用占位及独立重绘边界。我的计划原地展开仍等待SDK最小公开接口授权，不能记为完成。用户无真机且明确不启动模拟器，由用户远程安装验收；当前软件验证与新APK回执见[本轮记录](ui-polish-1-plus41-menu-supplement-2026-10-29.md)。新交付独立位于 `E:/AII-3D/3D-Sport-AI/deliveries/ui-polish-1-plus41-supplement/`；下方SDK488初包及其他旧验证均保留为历史。
+
 ## 当前接手入口（2026-10-29，同一+41 / SDK488）
 
 当前 `codex/ui-polish-1` 在原+41上继续接入SDK main `488ce82b9dc7031925ba12c18f252b4e596e7776`，三包与锁文件一致，版本仍+41/2041。单动作preview，整套training；完成页感受仅写本地记录与日志，SDK推荐/训练/正式库样式不由SF重写。先读 [SDK488补充记录](ui-polish-1-plus41-sdk488-2026-10-29.md)，最新包/源码/验证位于 `../deliveries/ui-polish-1-plus41-sdk488/`（相对App树）。二/五项SDK接口待办仍在；+41待真机确认，main与release/1.0不动。

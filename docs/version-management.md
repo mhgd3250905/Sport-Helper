@@ -1,5 +1,9 @@
 # 版本管理与台账
 
+## 当前 +41 菜单补项（2026-10-29）
+
+同一 `codex/ui-polish-1 / +41 / 2041` 继续修复菜单：单240ms控制器、固定面板、键盘共用占位及独立重绘边界。我的计划原地展开仍等待SDK最小公开接口授权，不能记为完成。用户无真机且明确不启动模拟器，由用户远程安装验收；当前软件验证与新APK回执见[本轮记录](ui-polish-1-plus41-menu-supplement-2026-10-29.md)。新交付独立位于 `E:/AII-3D/3D-Sport-AI/deliveries/ui-polish-1-plus41-supplement/`；下方SDK488初包及其他旧验证均保留为历史。
+
 ## 当前同一 +41 / SDK488（2026-10-29）
 
 App仍为 `0.1.0+41 / 2041`，分支仍为 `codex/ui-polish-1`。三包声明/锁文件和coach传递override统一固定 `488ce82b9dc7031925ba12c18f252b4e596e7776`，非SDK依赖不变。单动作preview、整套training、完成感受本地保存和日志、SDK样式归属见[补充记录](ui-polish-1-plus41-sdk488-2026-10-29.md)。新包和全部验证独立保存于 `../../deliveries/ui-polish-1-plus41-sdk488/`，不替换下方首包及旧截图；最终源码/包哈希以新目录 `release-apk.json` 为准。main仍adc79ab，release/1.0未动，+41未合main或推送。

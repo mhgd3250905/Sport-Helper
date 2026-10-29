@@ -18,13 +18,12 @@ import '../library_page.dart';
 import '../plan_page.dart';
 import '../player_page.dart';
 import '../theme/app_theme.dart';
-import '../theme/measure_size.dart';
 import '../theme/solid_surface.dart';
 import '../theme/sf_icons.dart';
 import '../theme/tokens.dart';
-import '../theme/ui_polish_tokens.dart';
 import '../training_route.dart';
 import 'chat_widgets.dart';
+import 'chat_composer_dock.dart';
 import 'coach_ui_adapter.dart';
 import 'cosmos.dart';
 import 'coach_task_bubble.dart';
@@ -55,11 +54,9 @@ class _ChatHomePageState extends State<ChatHomePage>
   StreamSubscription<String>? _actions;
   late final _scroll = widget.scrollController ?? ScrollController();
 
-  /// Height of the input dock (chips + input, incl. the bottom
-  /// safe area); the conversation reserves it as bottom padding so the
-  /// newest message can always scroll clear of the controls.
-  double _dockHeight = 112;
-  double _inputHeight = SfComposerTokens.inputHeight;
+  /// Only the reverse list's viewport follows the dock. Its cached subtree
+  /// keeps message state while the menu animates; the page is not rebuilt.
+  final _dockExtent = ValueNotifier<double>(112);
   String? _pendingDeliveryId;
   String? _pendingUserId;
   DateTime? _pendingDeliveryAt;
@@ -88,7 +85,6 @@ class _ChatHomePageState extends State<ChatHomePage>
       return;
     }
     setState(() => _panelOpen = true);
-    _dismissInput();
   }
 
   void _closePanel() {
@@ -131,6 +127,7 @@ class _ChatHomePageState extends State<ChatHomePage>
     _actions?.cancel();
     if (widget.scrollController == null) _scroll.dispose();
     _input.dispose();
+    _dockExtent.dispose();
     super.dispose();
   }
 
@@ -290,7 +287,7 @@ class _ChatHomePageState extends State<ChatHomePage>
         },
         child: Scaffold(
           backgroundColor: SfColors.skyBottom,
-          resizeToAvoidBottomInset: true,
+          resizeToAvoidBottomInset: false,
           body: ListenableBuilder(
             listenable: PerformanceLab.buildEnabled
                 ? Listenable.merge([s.store, PerformanceLab.instance])
@@ -307,26 +304,42 @@ class _ChatHomePageState extends State<ChatHomePage>
                 builder: (context, _) => Stack(
                   fit: StackFit.expand,
                   children: [
-                    Positioned.fill(
-                      child: GestureDetector(
-                        behavior: HitTestBehavior.translucent,
-                        onTap: _panelOpen ? _closePanel : null,
-                        child: _messages(),
+                    ValueListenableBuilder<double>(
+                      valueListenable: _dockExtent,
+                      child: RepaintBoundary(
+                        key: const ValueKey('chat-messages-boundary'),
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.translucent,
+                          onTap: _closePanel,
+                          child: _messages(),
+                        ),
                       ),
+                      builder: (context, extent, child) =>
+                          Positioned.fill(bottom: extent, child: child!),
                     ),
                     Positioned(
                       left: 0,
                       right: 0,
                       bottom: 0,
-                      child: SfMeasureSize(
-                        onSize: (s) {
-                          if (mounted && (s.height - _dockHeight).abs() > .5) {
-                            setState(() => _dockHeight = s.height);
-                          }
-                        },
-                        child: RepaintBoundary(
-                          key: const ValueKey('chat-composer-dock-boundary'),
-                          child: _composerDock(),
+                      child: RepaintBoundary(
+                        key: const ValueKey('chat-composer-dock-boundary'),
+                        child: ChatComposerDock(
+                          panelOpen: _panelOpen,
+                          focusNode: _input,
+                          extent: _dockExtent,
+                          suggestions: SuggestionStrip(
+                            items: _chat.typing ? const [] : _chat.suggestions,
+                            onTap: _send,
+                          ),
+                          input: ChatInputBar(
+                            focusNode: _input,
+                            onSend: _send,
+                            enabled: !_chat.typing,
+                            onPlans: _togglePanel,
+                            panelOpen: _panelOpen,
+                            onTextTap: _inputTapped,
+                          ),
+                          panel: _featurePanel(),
                         ),
                       ),
                     ),
@@ -340,87 +353,7 @@ class _ChatHomePageState extends State<ChatHomePage>
     );
   }
 
-  Widget _composerDock() => Column(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: SfComposerTokens.outerPadding.bottom,
-            height: _inputHeight + SfDockPolishTokens.fadeAboveInput,
-            child: IgnorePointer(
-              child: DecoratedBox(
-                key: const ValueKey('chat-composer-dock'),
-                decoration: BoxDecoration(
-                  gradient: SfDockPolishTokens.gradient,
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            height: SfComposerTokens.outerPadding.bottom,
-            child: ColoredBox(color: SfDockPolishTokens.background),
-          ),
-          SafeArea(
-            top: false,
-            bottom: false,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SuggestionStrip(
-                  items: _chat.typing ? const [] : _chat.suggestions,
-                  onTap: _send,
-                ),
-                SfMeasureSize(
-                  onSize: (size) {
-                    final height =
-                        size.height - SfComposerTokens.outerPadding.vertical;
-                    if (mounted && (height - _inputHeight).abs() > .5) {
-                      setState(() => _inputHeight = height);
-                    }
-                  },
-                  child: ChatInputBar(
-                    focusNode: _input,
-                    onSend: _send,
-                    enabled: !_chat.typing,
-                    onPlans: _togglePanel,
-                    panelOpen: _panelOpen,
-                    onTextTap: _inputTapped,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-      ColoredBox(
-        color: SfDockPolishTokens.background,
-        child: SafeArea(top: false, child: _panelSlot(context)),
-      ),
-    ],
-  );
-
-  Widget _panelSlot(BuildContext context) {
-    final panel = _panelOpen
-        ? _featurePanel()
-        : const SizedBox(width: double.infinity);
-    if (MediaQuery.disableAnimationsOf(context)) return panel;
-    return AnimatedSize(
-      key: const ValueKey('chat-panel-transition'),
-      duration: SfMotion.medium,
-      curve: SfMotion.standard,
-      alignment: Alignment.topCenter,
-      child: panel,
-    );
-  }
-
-  Widget _featurePanel() {
+  ChatFeaturePanel _featurePanel() {
     final entries =
         <({String key, String label, SfGlyph icon, VoidCallback tap})>[
           (
@@ -534,7 +467,7 @@ class _ChatHomePageState extends State<ChatHomePage>
         entries: rows,
         controller: _scroll,
         initiallySeen: _seen,
-        dockHeight: _dockHeight,
+        dockHeight: 0,
         // Keep the viewport behind Android's transparent status bar. The
         // initial safe clearance belongs to the scrollable content instead.
         topInset: MediaQuery.paddingOf(context).top,

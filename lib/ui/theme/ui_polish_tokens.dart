@@ -91,6 +91,8 @@ abstract final class SfPlanPolishTokens {
 
 abstract final class SfDockPolishTokens {
   static const fadeAboveInput = 72.0;
+  static const menuDuration = Duration(milliseconds: 240);
+  static const menuRise = 8.0;
   static Color get background => SfFeaturePanelTokens.background;
   static LinearGradient get gradient => SfComposerTokens.dockGradient;
 }

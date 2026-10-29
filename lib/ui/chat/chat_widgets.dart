@@ -300,6 +300,36 @@ class ChatFeaturePanel extends StatelessWidget {
 
   final List<ChatPanelAction> actions;
 
+  /// Fixed for a viewport/text configuration; never measures an animating
+  /// panel. The existing grid remains scrollable at accessibility sizes.
+  static double heightFor({
+    required double width,
+    required double viewportHeight,
+    required TextScaler textScaler,
+    required int actionCount,
+  }) {
+    final style = SfType.label;
+    final scale = textScaler.scale(style.fontSize!) / style.fontSize!;
+    final columns =
+        ((width - SfFeaturePanelTokens.padding.horizontal) /
+                (SfFeaturePanelTokens.minTileWidth * scale))
+            .floor()
+            .clamp(1, SfFeaturePanelTokens.maxColumns);
+    final rows = (actionCount / columns).ceil();
+    final labelHeight = textScaler.scale(style.fontSize!) * style.height!;
+    final height =
+        SfFeaturePanelTokens.padding.vertical +
+        rows *
+            (SfFeaturePanelTokens.tileSize +
+                SfFeaturePanelTokens.labelGap +
+                labelHeight) +
+        (rows - 1).clamp(0, rows) * SfFeaturePanelTokens.rowGap;
+    return height.clamp(
+      0,
+      viewportHeight * SfFeaturePanelTokens.maxHeightFraction,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final media = MediaQuery.of(context);

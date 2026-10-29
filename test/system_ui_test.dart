@@ -129,7 +129,17 @@ void main() {
         matching: find.byType(Viewport),
       );
       expect(tester.getRect(viewport).top, 0);
-      expect(tester.getRect(viewport).bottom, 844);
+      expect(
+        tester.getRect(viewport).bottom,
+        closeTo(
+          tester
+              .getRect(
+                find.byKey(const ValueKey('chat-composer-dock-boundary')),
+              )
+              .top,
+          .01,
+        ),
+      );
       expect(tester.getRect(find.byType(ChatInputBar)).bottom, 820);
 
       final controller = widget.controller;
