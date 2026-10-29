@@ -490,50 +490,63 @@ void main() {
     expect(s.store.safetyAccepted, isFalse);
   });
 
-  testWidgets('drawer: saved plans, show one in the chat, app entries', (
-    tester,
-  ) async {
-    tall(tester);
-    final s = services();
-    await s.store.acceptSafety(blocked: false);
-    await tester.pumpWidget(SmartFitApp(services: s));
-    await tester.pumpAndSettle();
+  testWidgets(
+    'saved plans expand, return through the row menu, and app entries',
+    (tester) async {
+      tall(tester);
+      final s = services();
+      await s.store.acceptSafety(blocked: false);
+      await tester.pumpWidget(SmartFitApp(services: s));
+      await tester.pumpAndSettle();
 
-    await showManualChatCard(s);
-    await tester.pumpAndSettle();
-    final plan = s.chat.currentPlan!;
-    await tester.tap(find.byKey(ValueKey('plan-expand-${plan.id}')));
-    await tester.pumpAndSettle();
-    await tester.tap(find.byKey(ValueKey('plan-save-${plan.id}')));
-    await tester.pumpAndSettle();
-    await say(tester, '讲个笑话');
+      await showManualChatCard(s);
+      await tester.pumpAndSettle();
+      final plan = s.chat.currentPlan!;
+      await tester.tap(find.byKey(ValueKey('plan-expand-${plan.id}')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(ValueKey('plan-save-${plan.id}')));
+      await tester.pumpAndSettle();
+      await say(tester, '讲个笑话');
 
-    await tester.tap(find.byKey(const ValueKey('chat-panel-toggle')));
-    await tester.pumpAndSettle();
-    expect(find.text('我的计划'), findsWidgets);
-    await tester.tap(find.byKey(const ValueKey('panel-plans')));
-    await tester.pumpAndSettle();
-    final saved = s.store.savedPlans.single;
-    await tester.tap(find.byKey(ValueKey('saved-${saved.id}')));
-    await tester.pumpAndSettle();
-    expect(s.chat.messages.last.plan?.id, plan.id); // shown again as a card
+      await tester.tap(find.byKey(const ValueKey('chat-panel-toggle')));
+      await tester.pumpAndSettle();
+      expect(find.text('我的计划'), findsWidgets);
+      await tester.tap(find.byKey(const ValueKey('panel-plans')));
+      await tester.pumpAndSettle();
+      final saved = s.store.savedPlans.single;
+      await tester.tap(find.byKey(ValueKey('saved-${saved.id}')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const ValueKey('saved-plans-scroll')), findsOneWidget);
+      expect(find.text('查看详情').hitTestable(), findsOneWidget);
+      expect(s.chat.messages.last.plan, isNull);
+      await tester.tap(find.byKey(ValueKey('plan-expand-${plan.id}')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(ValueKey('saved-menu-${saved.id}')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('点一下在对话里调出'));
+      await tester.pumpAndSettle();
+      expect(s.chat.messages.last.plan?.id, plan.id); // shown again as a card
 
-    // New conversation is in the drawer; the form opens from the chat.
-    await tester.tap(find.byKey(const ValueKey('chat-panel-toggle')));
-    await tester.pumpAndSettle();
-    expect(find.byKey(const ValueKey('panel-library')), findsOneWidget);
-    expect(find.byKey(const ValueKey('panel-settings')), findsOneWidget);
-    expect(find.byKey(const ValueKey('chat-new-conversation')), findsOneWidget);
-    expect(find.byKey(const ValueKey('drawer-custom')), findsNothing);
-    await tester.tap(find.byKey(const ValueKey('panel-library')));
-    await tester.pumpAndSettle();
-    expect(find.byType(LibraryPage), findsOneWidget);
-    await tester.tap(find.byTooltip('返回').first);
-    await tester.pumpAndSettle();
-    s.chat.command('@custom');
-    await tester.pumpAndSettle();
-    expect(find.byType(CustomPlanPage), findsOneWidget);
-  });
+      // New conversation is in the drawer; the form opens from the chat.
+      await tester.tap(find.byKey(const ValueKey('chat-panel-toggle')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const ValueKey('panel-library')), findsOneWidget);
+      expect(find.byKey(const ValueKey('panel-settings')), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey('chat-new-conversation')),
+        findsOneWidget,
+      );
+      expect(find.byKey(const ValueKey('drawer-custom')), findsNothing);
+      await tester.tap(find.byKey(const ValueKey('panel-library')));
+      await tester.pumpAndSettle();
+      expect(find.byType(LibraryPage), findsOneWidget);
+      await tester.tap(find.byTooltip('返回').first);
+      await tester.pumpAndSettle();
+      s.chat.command('@custom');
+      await tester.pumpAndSettle();
+      expect(find.byType(CustomPlanPage), findsOneWidget);
+    },
+  );
 
   testWidgets('the custom form (opened from the chat) still generates plans', (
     tester,
