@@ -1,14 +1,16 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smartfit/app/services.dart';
 import 'package:smartfit/domain/exercise.dart';
 import 'package:smartfit/domain/plan.dart';
 import 'package:smartfit/ui/chat/coach_ui_adapter.dart';
-import 'package:smartfit/ui/exercise_video.dart';
+import 'package:smartfit/ui/guide_media.dart';
 import 'package:smartfit/ui/plan_page.dart';
 import 'package:smartfit/ui/theme.dart';
 import 'package:ugk_trainer/ugk_trainer.dart'
-    show DrillMediaHandoff, DrillMediaView;
+    show PackedAlphaPlatform, PackedAlphaUriPlatform, UgkPackedAlphaVideo;
 
 import 'app_flow_test.dart' show services;
 
@@ -144,29 +146,127 @@ Future<AppServices> _show(
     ),
   );
   await tester.pumpAndSettle();
+  addTearDown(() async {
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+    await s.dispose();
+  });
   return s;
 }
 
-Iterable<ExerciseVideo> _running(WidgetTester tester) => tester
-    .widgetList<ExerciseVideo>(find.byType(ExerciseVideo))
-    .where((v) => v.playing && !v.paused);
+class _PreviewPlatform extends PackedAlphaPlatform
+    implements PackedAlphaUriPlatform {
+  final _events = StreamController<Map<Object?, Object?>>.broadcast(sync: true);
+  final sources = <Uri>[];
+  final operations = <(String, int)>[];
+  final live = <int>{};
+  var maxLive = 0;
 
-ExerciseVideo _video(WidgetTester tester, String slot) =>
-    tester.widget<ExerciseVideo>(
+  @override
+  bool get isSupported => true;
+  @override
+  Stream<Map<Object?, Object?>> get events => _events.stream;
+  @override
+  Future<({int playerId, int textureId})> create(String asset) =>
+      createUri(Uri(scheme: 'asset', host: '', path: '/$asset'));
+  @override
+  Future<({int playerId, int textureId})> createUri(Uri uri) async {
+    sources.add(uri);
+    final id = sources.length;
+    live.add(id);
+    if (live.length > maxLive) maxLive = live.length;
+    operations.add(('create', id));
+    return (playerId: id, textureId: 100 + id);
+  }
+
+  @override
+  Future<Object?> command(int id, String type, [Object? value]) async {
+    operations.add((type, id));
+    if (type == 'dispose') live.remove(id);
+    return type == 'position' ? .25 : null;
+  }
+
+  void ready(int id) {
+    _events.add({'playerId': id, 'type': 'ready'});
+    _events.add({'playerId': id, 'type': 'first-frame'});
+  }
+
+  Future<void> close() => _events.close();
+}
+
+Exercise _packed(Exercise exercise, {List<String>? cues}) {
+  final media = exercise.media;
+  return _copyExercise(
+    exercise,
+    cues: cues,
+    media: ExerciseMedia(
+      id: media.id,
+      video: media.video,
+      poster: media.poster,
+      loopSeconds: media.loopSeconds,
+      posterSeconds: media.posterSeconds,
+      source: media.source,
+      videoAvailable: media.videoAvailable,
+      lightVideo: media.lightVideo,
+      lightPoster: media.lightPoster,
+      lightVideoAvailable: media.lightVideoAvailable,
+      playbackPoster: media.playbackPoster,
+      lightPlaybackPoster: media.lightPlaybackPoster,
+      packedAlphaVideo: media.video,
+      alphaPlaybackPoster: media.playbackPosterFor(light: false),
+    ),
+  );
+}
+
+Finder _key(String value) => find.byKey(ValueKey(value));
+Finder _toggle(String slot) => _key('guide-media-control-$slot');
+ListView _list(WidgetTester tester) =>
+    tester.widget<ListView>(_key('plan-article'));
+GuideMedia _media(WidgetTester tester, String slot) =>
+    tester.widget<GuideMedia>(
       find.descendant(
-        of: find.byKey(ValueKey('article-video-$slot')),
-        matching: find.byType(ExerciseVideo),
+        of: _key('article-video-$slot'),
+        matching: find.byType(GuideMedia),
       ),
     );
+UgkPackedAlphaVideo _video(WidgetTester tester, String slot) =>
+    tester.widget<UgkPackedAlphaVideo>(_key('guide-media-video-$slot'));
 
-Finder _toggle(String slot) =>
-    find.byKey(ValueKey('article-video-toggle-$slot'));
-
-ListView _list(WidgetTester tester) =>
-    tester.widget<ListView>(find.byKey(const ValueKey('plan-article')));
+String? _asset(ImageProvider provider) => switch (provider) {
+  AssetImage(:final assetName) => assetName,
+  ResizeImage(:final imageProvider) => _asset(imageProvider),
+  _ => null,
+};
 
 void main() {
-  tearDown(() => SfColors.palette = SfPalette.dark);
+  late _PreviewPlatform platform;
+  setUp(() {
+    platform = _PreviewPlatform();
+    UgkPackedAlphaVideo.debugPlatform = platform;
+    UgkPackedAlphaVideo.debugFilterBuilder = (_) => const SizedBox.expand();
+  });
+  tearDown(() async {
+    UgkPackedAlphaVideo.debugPlatform = null;
+    UgkPackedAlphaVideo.debugFilterBuilder = null;
+    SfColors.palette = SfPalette.dark;
+    await platform.close();
+  });
+
+  Future<void> play(WidgetTester tester, String slot) async {
+    final before = platform.sources.length;
+    await tester.tap(_toggle(slot));
+    for (var frame = 0; frame < 6; frame++) {
+      await tester.pump();
+    }
+    expect(platform.sources.length, before + 1);
+    platform.ready(platform.sources.length);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 80));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 200));
+    await tester.pump();
+    expect(_key('guide-media-loading-$slot'), findsNothing);
+  }
 
   testWidgets('article hides empty or duplicate arrangement sections', (
     tester,
@@ -184,7 +284,7 @@ void main() {
     }
   });
 
-  testWidgets('article localizes protocol sections and uses primary action', (
+  testWidgets('article localizes protocol sections and keeps shared duration', (
     tester,
   ) async {
     final plan = TrainingPlan.fromJson({
@@ -197,16 +297,12 @@ void main() {
     final s = await _show(tester, plan: plan);
     expect(find.text('热身'), findsOneWidget);
     expect(find.text('warmup'), findsNothing);
-    final cardDuration = toCoachRoutine(plan, s.library).durationLabel;
-    expect(find.text(cardDuration), findsOneWidget);
-    expect(cardDuration, isNot('${plan.targetMinutes} 分钟'));
-    expect(
-      tester
-          .widget<SfPrimaryButton>(find.byKey(const ValueKey('start')))
-          .emphasized,
-      isFalse,
-    );
-    await tester.scrollUntilVisible(find.text('主练'), 200);
+    final duration = toCoachRoutine(plan, s.library).durationLabel;
+    expect(find.text(duration), findsOneWidget);
+    expect(duration, isNot('${plan.targetMinutes} 分钟'));
+    final face = tester.widget<Container>(_key('guide-training-button'));
+    expect((face.decoration! as BoxDecoration).color, SfPalette.dark.accent);
+    await tester.scrollUntilVisible(find.text('主训'), 200);
     await tester.pumpAndSettle();
     expect(find.text('main'), findsNothing);
     await tester.scrollUntilVisible(find.text('放松'), 200);
@@ -215,119 +311,75 @@ void main() {
     final controller = _list(tester).controller!;
     controller.jumpTo(controller.position.maxScrollExtent);
     await tester.pumpAndSettle();
-    final action = tester.getRect(find.byKey(const ValueKey('start')));
-    final last = tester.getRect(find.byKey(const ValueKey('plan-move-2:0')));
-    expect(last.bottom, lessThanOrEqualTo(action.top - SfSpace.x6));
+    final action = tester.getRect(_key('guide-training-button'));
+    final last = tester.getRect(_key('guide-card-2:0'));
+    expect(last.bottom, lessThanOrEqualTo(action.top - 24));
+    expect(platform.sources, isEmpty);
     expect(tester.takeException(), isNull);
   });
 
   for (final palette in [SfPalette.light, SfPalette.dark]) {
-    final theme = palette.isDark ? 'dark' : 'light';
     testWidgets(
-      '$theme article uses themed text and stills and retains manual preview control',
+      '${palette.brightness.name} article mounts only themed text and static stills',
       (tester) async {
         final s = await _show(tester, palette: palette);
         final exercise = s.library['h-catcow-quad'];
-        final media = exercise.media;
-        final video = find.byKey(const ValueKey('article-video-0:0'));
+        final video = _key('article-video-0:0');
         expect(Theme.of(tester.element(video)).brightness, palette.brightness);
         expect(
           tester.widget<Text>(find.text(_plan.summary)).style!.color,
           palette.muted,
         );
         expect(
-          tester
-              .widget<Text>(find.text('1. ${exercise.cues.first}'))
-              .style!
-              .color,
+          tester.widget<Text>(_key('guide-step-text-0:0-1')).style!.color,
           palette.text,
         );
-        final poster = media.playbackPosterFor(light: !palette.isDark);
-        final otherPoster = media.playbackPosterFor(light: palette.isDark);
+        final candidate =
+            toCoachRecommendationExercise(exercise).stillCutout ??
+            exercise.media.playbackPosterFor(light: !palette.isDark);
         final stills = tester
             .widgetList<Image>(
               find.descendant(of: video, matching: find.byType(Image)),
             )
-            .map((image) => image.image)
-            .whereType<AssetImage>()
-            .map((image) => image.assetName);
-        expect(stills, contains(poster));
-        expect(stills, isNot(contains(otherPoster)));
-        final surface = tester.widget<DrillMediaView>(
-          find.descendant(of: video, matching: find.byType(DrillMediaView)),
-        );
-        expect(surface.stage, palette.mediaStage);
-        expect(
-          surface.media.videoAsset,
-          palette.isDark ? media.video : media.lightVideo!,
-        );
-        expect(find.byType(DrillMediaHandoff), findsNothing);
-        final control = _toggle('0:0');
-        expect(control.hitTestable(), findsOneWidget);
-        expect(tester.widget<SfCircleButton>(control).iconColor, palette.text);
-        expect(_running(tester), isEmpty);
-
-        await tester.tap(control);
-        await tester.pumpAndSettle();
-        expect(_running(tester), hasLength(1));
-        expect(
-          tester.widget<SfCircleButton>(control).tooltip,
-          '暂停${exercise.name}示范',
-        );
-        await tester.tap(control);
-        await tester.pumpAndSettle();
-        expect(_video(tester, '0:0').playing, isTrue);
-        expect(_video(tester, '0:0').paused, isTrue);
-        expect(_running(tester), isEmpty);
-        await tester.tap(control);
-        await tester.pumpAndSettle();
-        expect(_running(tester), hasLength(1));
-
-        final view = tester.getRect(find.byKey(const ValueKey('plan-article')));
-        final videoRect = tester.getRect(video);
-        _list(tester).controller!.jumpTo(videoRect.bottom - view.top + 2);
-        await tester.pumpAndSettle();
-        expect(
-          tester.getRect(find.byKey(const ValueKey('plan-move-0:0'))).bottom,
-          greaterThan(view.top),
-        );
-        expect(_video(tester, '0:0').playing, isFalse);
-        expect(_running(tester), isEmpty);
-        _list(tester).controller!.jumpTo(0);
-        await tester.pumpAndSettle();
-        expect(_video(tester, '0:0').playing, isFalse);
-        expect(control.hitTestable(), findsOneWidget);
-        expect(
-          tester.widget<SfCircleButton>(control).tooltip,
-          '播放${exercise.name}示范',
-        );
-        expect(_running(tester), isEmpty);
+            .map((image) => _asset(image.image))
+            .whereType<String>();
+        expect(stills, contains(candidate));
+        expect(tester.widget<AspectRatio>(video).aspectRatio, 4 / 3);
+        expect(_toggle('0:0').hitTestable(), findsOneWidget);
+        expect(find.byType(UgkPackedAlphaVideo), findsNothing);
+        expect(platform.sources, isEmpty);
+        expect(_media(tester, '0:0').coordinator.activeSlot, isNull);
         expect(tester.takeException(), isNull);
       },
     );
   }
 
   testWidgets(
-    'article keeps introduction, original sections and global move numbers without autoplay',
+    'article preserves custom sections and global numbers without autoplay',
     (tester) async {
       final s = await _show(tester);
-      expect(find.byKey(const ValueKey('plan-introduction')), findsOneWidget);
+      expect(_key('plan-introduction'), findsOneWidget);
       expect(find.text('安排说明'), findsOneWidget);
       expect(find.text(_plan.title), findsOneWidget);
       expect(find.text('3 个动作'), findsOneWidget);
       expect(find.text('先活动开'), findsOneWidget);
-      expect(find.byKey(const ValueKey('preview')), findsNothing);
-      expect(find.byType(SfPanel), findsNothing);
-      expect(_running(tester), isEmpty);
       final items = _plan.items.toList();
-      for (var i = 0; i < items.length; i++) {
-        final title = find.text(
-          '${i + 1}. ${s.library[items[i].exerciseId].name}',
-        );
-        await tester.scrollUntilVisible(title, 220);
+      for (var index = 0; index < items.length; index++) {
+        final name = _key('guide-name-$index:0');
+        await tester.scrollUntilVisible(name, 220);
         await tester.pumpAndSettle();
-        expect(title, findsOneWidget);
-        expect(_running(tester), isEmpty);
+        expect(
+          tester.widget<Text>(name).data,
+          s.library[items[index].exerciseId].name,
+        );
+        expect(
+          find.descendant(
+            of: _key('guide-number-$index:0'),
+            matching: find.text('${index + 1}'),
+          ),
+          findsOneWidget,
+        );
+        expect(platform.sources, isEmpty);
       }
       expect(find.text('收尾放松'), findsOneWidget);
       expect(find.text('怎么做'), findsWidgets);
@@ -336,121 +388,114 @@ void main() {
     },
   );
 
-  testWidgets('preview requires a tap and pauses/resumes its retained frame', (
+  testWidgets('preview requires a tap and pauses/resumes one retained frame', (
     tester,
   ) async {
-    final s = await _show(tester);
-    final control = _toggle('0:0');
-    expect(_video(tester, '0:0').playing, isFalse);
-    expect(
-      tester.widget<SfCircleButton>(control).tooltip,
-      '播放${s.library['h-catcow-quad'].name}示范',
-    );
-    await tester.tap(control);
-    await tester.pumpAndSettle();
-    expect(_running(tester), hasLength(1));
-    expect(_video(tester, '0:0').playing, isTrue);
-    await tester.tap(control);
-    await tester.pumpAndSettle();
-    expect(_running(tester), isEmpty);
-    expect(_video(tester, '0:0').playing, isTrue);
-    expect(_video(tester, '0:0').paused, isTrue);
-    await tester.tap(control);
-    await tester.pumpAndSettle();
-    expect(_video(tester, '0:0').paused, isFalse);
-    expect(_running(tester), hasLength(1));
-    expect(tester.takeException(), isNull);
-  });
-
-  testWidgets('selecting another visible preview pauses the previous one', (
-    tester,
-  ) async {
-    await _show(tester, height: 1000);
+    await _show(tester, transform: _packed);
+    final coordinator = _media(tester, '0:0').coordinator;
+    expect(platform.sources, isEmpty);
+    await play(tester, '0:0');
+    final controller = _video(tester, '0:0').controller;
+    expect(controller.wantsPlay, isTrue);
+    expect(coordinator.activeSlot, '0:0');
     await tester.tap(_toggle('0:0'));
     await tester.pumpAndSettle();
-    final view = tester.getRect(find.byKey(const ValueKey('plan-article')));
-    final second = _toggle('1:0');
-    final shift = tester.getRect(second).bottom - view.bottom + 64;
-    if (shift > 0) {
-      _list(tester).controller!.jumpTo(shift);
-      await tester.pumpAndSettle();
-    }
-    expect(_video(tester, '0:0').playing, isTrue);
-    await tester.tap(second);
+    expect(_video(tester, '0:0').controller, same(controller));
+    expect(controller.wantsPlay, isFalse);
+    expect(coordinator.activeSlot, '0:0');
+    expect(platform.live, hasLength(1));
+    await tester.tap(_toggle('0:0'));
     await tester.pumpAndSettle();
-    expect(_video(tester, '0:0').playing, isTrue);
-    expect(_video(tester, '0:0').paused, isTrue);
-    expect(_video(tester, '1:0').playing, isTrue);
-    expect(_video(tester, '1:0').paused, isFalse);
-    expect(_running(tester), hasLength(1));
+    expect(_video(tester, '0:0').controller, same(controller));
+    expect(controller.wantsPlay, isTrue);
+    expect(platform.sources, hasLength(1));
+    expect(platform.maxLive, 1);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('selecting B releases A before allocating its decoder', (
+    tester,
+  ) async {
+    await _show(tester, height: 1800, transform: _packed);
+    await play(tester, '0:0');
+    final coordinator = _media(tester, '0:0').coordinator;
+    expect(_toggle('1:0').hitTestable(), findsOneWidget);
+    await play(tester, '1:0');
+    expect(coordinator.activeSlot, '1:0');
+    expect(_key('guide-media-video-0:0'), findsNothing);
+    expect(_key('guide-media-video-1:0'), findsOneWidget);
+    expect(platform.live, {2});
+    expect(platform.maxLive, 1);
+    expect(
+      platform.operations.indexOf(('dispose', 1)),
+      lessThan(platform.operations.indexOf(('create', 2))),
+    );
     expect(tester.takeException(), isNull);
   });
 
   testWidgets(
-    'video leaving the viewport stops even while its article remains',
+    'under 20 percent media visibility releases while long article remains',
     (tester) async {
       await _show(
         tester,
-        transform: (e) => e.id == 'h-catcow-quad'
-            ? _copyExercise(e, cues: List.filled(9, e.cues.first))
-            : e,
+        transform: (e) => _packed(
+          e,
+          cues: e.id == 'h-catcow-quad' ? List.filled(9, e.cues.first) : null,
+        ),
       );
-      await tester.tap(_toggle('0:0'));
-      await tester.pumpAndSettle();
-      final view = tester.getRect(find.byKey(const ValueKey('plan-article')));
-      final video = tester.getRect(
-        find.byKey(const ValueKey('article-video-0:0')),
-      );
-      _list(tester).controller!.jumpTo(video.bottom - view.top + 2);
+      await play(tester, '0:0');
+      final coordinator = _media(tester, '0:0').coordinator;
+      final view = tester.getRect(_key('plan-article'));
+      final media = tester.getRect(_key('article-video-0:0'));
+      _list(
+        tester,
+      ).controller!.jumpTo(media.bottom - view.top - media.height * .15);
       await tester.pumpAndSettle();
       expect(
-        tester.getRect(find.byKey(const ValueKey('plan-move-0:0'))).bottom,
+        tester.getRect(_key('plan-move-0:0')).bottom,
         greaterThan(view.top),
       );
-      expect(_video(tester, '0:0').playing, isFalse);
-      expect(_running(tester), isEmpty);
+      expect(coordinator.activeSlot, isNull);
+      expect(_key('guide-media-video-0:0'), findsNothing);
+      expect(platform.live, isEmpty);
       _list(tester).controller!.jumpTo(0);
       await tester.pumpAndSettle();
-      expect(_video(tester, '0:0').playing, isFalse);
-      expect(_running(tester), isEmpty);
+      expect(_key('guide-media-video-0:0'), findsNothing);
+      expect(_toggle('0:0').hitTestable(), findsOneWidget);
+      expect(platform.sources, hasLength(1));
       expect(tester.takeException(), isNull);
     },
   );
 
-  testWidgets(
-    '320px/1.5x article and final section clear the floating action',
-    (tester) async {
-      await _show(
-        tester,
-        width: 320,
-        scale: 1.5,
-        transform: (e) => e.id == 'h-catcow-quad'
-            ? _copyExercise(e, cues: List.filled(6, e.cues.first))
-            : e,
-      );
-      final start = find.byKey(const ValueKey('start'));
-      final scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
-      expect(scaffold.bottomNavigationBar, isNull);
-      expect(
-        scaffold.floatingActionButtonLocation,
-        FloatingActionButtonLocation.endFloat,
-      );
-      expect(start.hitTestable(), findsOneWidget);
-      expect(tester.getRect(start).height, greaterThanOrEqualTo(52));
-      final controller = _list(tester).controller!;
-      controller.jumpTo(controller.position.maxScrollExtent);
-      await tester.pumpAndSettle();
-      final last = tester.getRect(find.byKey(const ValueKey('plan-move-2:0')));
-      final action = tester.getRect(start);
-      expect(last.bottom, lessThanOrEqualTo(action.top - 12));
-      expect(action.right, lessThanOrEqualTo(320 - 12));
-      expect(action.bottom, lessThanOrEqualTo(844 - 24));
-      expect(_running(tester), isEmpty);
-      expect(tester.takeException(), isNull);
-    },
-  );
+  testWidgets('320px/1.5x final article clears the fixed training bar', (
+    tester,
+  ) async {
+    await _show(
+      tester,
+      width: 320,
+      scale: 1.5,
+      transform: (e) => e.id == 'h-catcow-quad'
+          ? _copyExercise(e, cues: List.filled(6, e.cues.first))
+          : e,
+    );
+    final scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
+    expect(scaffold.floatingActionButton, isNull);
+    expect(_key('start').hitTestable(), findsOneWidget);
+    final action = tester.getRect(_key('guide-training-button'));
+    expect(action.height, 52);
+    expect(action.left, 20);
+    expect(action.right, 300);
+    expect(action.bottom, 844 - 24 - 12);
+    final controller = _list(tester).controller!;
+    controller.jumpTo(controller.position.maxScrollExtent);
+    await tester.pumpAndSettle();
+    final last = tester.getRect(_key('guide-card-2:0'));
+    expect(last.bottom, lessThanOrEqualTo(action.top - 24));
+    expect(platform.sources, isEmpty);
+    expect(tester.takeException(), isNull);
+  });
 
-  testWidgets('a move declared without video has no misleading play control', (
+  testWidgets('a move without video has no misleading play control', (
     tester,
   ) async {
     await _show(
@@ -474,8 +519,8 @@ void main() {
     );
     expect(_toggle('0:0'), findsNothing);
     expect(find.text('此动作暂无视频示范'), findsOneWidget);
-    expect(_video(tester, '0:0').playing, isFalse);
-    expect(_running(tester), isEmpty);
+    expect(_key('guide-media-video-0:0'), findsNothing);
+    expect(platform.sources, isEmpty);
     expect(tester.takeException(), isNull);
   });
 }

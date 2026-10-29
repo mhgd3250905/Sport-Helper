@@ -7,11 +7,14 @@ import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
 open class MainActivity : FlutterActivity() {
+    private var guidePosters: GuidePosterExtractor? = null
     private var exportResult: MethodChannel.Result? = null
     private var exportBytes: ByteArray? = null
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
+        guidePosters?.dispose()
+        guidePosters = GuidePosterExtractor(this, flutterEngine.dartExecutor.binaryMessenger)
         MethodChannel(
             flutterEngine.dartExecutor.binaryMessenger,
             "smartfit/runtime_log_export"
@@ -89,6 +92,8 @@ open class MainActivity : FlutterActivity() {
     }
 
     override fun onDestroy() {
+        guidePosters?.dispose()
+        guidePosters = null
         finishExport(false, "export_activity_closed")
         super.onDestroy()
     }
