@@ -1,5 +1,7 @@
 # +41 我的计划：同一张卡变形的 SDK 接口缺口
 
+**同日后续：SDK71 已发布 header / collapsedSummary / onToggle，技术缺口已补齐。** App 已于 `31fd3f0b0741175536b0a72ff2e0fc4f71b18f9f` 接入并重新打包，同一 +41/2041，软件检查通过，仍待开哥远程验收。见[新候选](ui-polish-1-plus41-single-card-2026-10-29.md)。以下为 SDK475 时的原始阻断记录，保留历史来源。
+
 核对时间：2026-10-29（Asia/Shanghai）。App 分支 `codex/ui-polish-1`，HEAD `4047072ba71838b2782180a2cd2d486ab0df8c8c`；现有修复候选 APK 源 `9777eb4a2eed52dda173bd31e2e7f3f69d413b83`。SDK 声明、解析、本地 HEAD 与远端 main 均核实为 `475a5d84b5d0fce839d9d4475da22a6d1ce2df19`。
 
 **第一项暂停。当前接口不能满足单卡变形，不能把现有 +41 当作该项已验收，也不生成另一个假称修好的 release APK。** 本轮未改 App/SDK 代码，不再增加收起卡或 App 动画。

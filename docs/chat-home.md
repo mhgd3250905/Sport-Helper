@@ -1,5 +1,15 @@
 # 对话式主界面
 
+## 当前 +41 单卡变形 / SDK71（2026-10-29）
+
+同一 `codex/ui-polish-1 / 0.1.0+41 / 2041` 已重新打包，源码 `31fd3f0b0741175536b0a72ff2e0fc4f71b18f9f`。三包及 coach 传递 override 统一锁定 SDK main `71efb9218c5899d5f2811a82ee74aa74a105e07c`；严格锁解析通过，非 SDK 依赖不变。全量 **615/615、0 跳过**，`flutter analyze --no-pub` **0 问题**。
+
+“我的计划”每条只保留一个固定 Key 的 `CoachPlanExpanded`，传入常驻 header、收起摘要和 onToggle，复用 SDK 单层外壳与内部高度/内容动效；新旧条目同帧互斥。查看详情、开练、菜单和展开后按需滚动保留。单卡浅深逐帧身份/几何、中途反向和旧应用流程 20 项定向回归首次全过。
+
+新 APK `SmartFit-ui-polish-1-single-card-0.1.0+41-31fd3f0-internal-arm64-v8a-release.apk`，143,599,186 B / 136.95 MiB，SHA-256 `66e98c1b8ce2733c841eba45b88b4d0a5f3e4bdca6efb53551a11ec37a22f803`；同签名、ZIP/ELF16KB、存储 JNI 通过。用户已取消本轮录屏，本机未启模拟器或操作设备，交由开哥远程安装验收。本次未合入 App main、未操作 release/1.0；+42 仍待 Hark 定案、+41 验收合 main 后开展。以下 SDK475 及更早记录属于历史，不替代本候选。
+
+[本轮实现、测试与 APK 回执](ui-polish-1-plus41-single-card-2026-10-29.md)。
+
 ## 当前 +41 验收更正与流畅度摸排（2026-10-29）
 
 开哥确认“我的计划”两卡切换不合格；SDK475收起整卡高度为零，单卡修复按指令暂停，接口缺口已列明，不在App另写动画、不出冒称修复的release包。全App本轮只读报告，应用/SDK/测试代码未改；profile采集包源4047072、同+41/2041已备，开哥远程回传原始JSON和录屏后补实测最大值/超16ms帧数与排序。见[当前报告](ui-motion-audit-2026-10-29.md)及其接口缺口、采集步骤。下方原包测试/“已补齐”记录属于当时检查点，不代表本次单卡验收通过；App main与release/1.0不动，+42待Hark定案且+41合main后再从新main开展。
