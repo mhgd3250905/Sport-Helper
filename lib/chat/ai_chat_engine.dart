@@ -136,7 +136,8 @@ class AiChatEngine
                 level: request.level,
                 avoid: request.avoid,
               ),
-      );
+      )
+      ?.withSessionVersion(agent.sessionState);
 
   @override
   Future<ChatReply> reply(String input, ChatState state) =>

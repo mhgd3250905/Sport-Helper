@@ -117,6 +117,15 @@ class ChatController extends ChangeNotifier {
     final plan = sdk.plan == null
         ? null
         : TrainingPlan.fromJson(sdk.plan!.plan.toJson());
+    final previous = messages
+        .where(
+          (m) =>
+              m.conversationMessageId == sdk.id &&
+              m.plan != null &&
+              plan != null &&
+              jsonEncode(m.plan!.toJson()) == jsonEncode(plan.toJson()),
+        )
+        .firstOrNull;
     return ChatMessage(
       id: sdk.id,
       conversationMessageId: sdk.id,
@@ -130,6 +139,8 @@ class ChatController extends ChangeNotifier {
       isPlanningFailure: sdk.isFailure || sdk.isPlanningFailure,
       plan: plan,
       validatedPlan: sdk.plan,
+      sdkVersion: sdk.plan?.version ?? previous?.planVersion,
+      savedRef: sdk.plan?.savedRef ?? previous?.planSavedRef,
       actions: sdk.actions,
       request: plan == null ? null : requestForPlan(plan),
       aiVisible: true,
@@ -298,6 +309,7 @@ class ChatController extends ChangeNotifier {
         _restoring = false;
       }
       _syncQuestions(appendMissing: true);
+      _restorePlanProvenance();
     }
     final lastCard = messages.lastWhere((m) => m.isPlan, orElse: () => _none);
     if (lastCard != _none) {
@@ -706,9 +718,107 @@ class ChatController extends ChangeNotifier {
   /// The plan on the latest card (what "再短一点" edits).
   TrainingPlan? get currentPlan => _state.plan;
 
-  bool isSaved(TrainingPlan p) => store.savedFor(p) != null;
+  coach.CoachPlanFocus? get planFocus => _conversation?.focus;
+
+  Future<void> clearPlanFocus() async {
+    if (_disposed || _conversation == null) return;
+    final wasTyping = typing;
+    _conversation!.clearPlanFocus();
+    if (wasTyping) {
+      _replyEpoch++;
+      typing = false;
+      _cancelDiagnostic('clear_plan_focus');
+      _endProgress();
+      if (engine case final ManagedChatEngine managed) managed.cancelPending();
+    }
+    notifyListeners();
+    await _persist();
+  }
+
+  bool isSaved(TrainingPlan p) => _savedSnapshotFor(p) != null;
+
+  SavedPlan? _savedSnapshotFor(TrainingPlan p) => store.savedPlans
+      .where(
+        (saved) =>
+            saved.plan.id == p.id &&
+            store.savedForSnapshot(
+                  p,
+                  sdkVersion: saved.sdkVersion,
+                  savedId: saved.id,
+                ) !=
+                null,
+      )
+      .firstOrNull;
+
+  SavedPlan? savedTargetFor(ChatMessage message) {
+    final ref = message.planSavedRef;
+    return ref == null
+        ? null
+        : store.savedPlans.where((p) => p.id == ref.externalId).firstOrNull;
+  }
+
+  bool isPlanCardSaved(ChatMessage message) {
+    final plan = message.plan;
+    if (plan == null) return false;
+    if (message.isSavedPlanDisplay) return isSaved(plan);
+    final target = savedTargetFor(message);
+    if (target != null) {
+      return store.savedForSnapshot(
+            plan,
+            sdkVersion: message.planVersion,
+            savedId: target.id,
+          ) !=
+          null;
+    }
+    return store.savedForSnapshot(plan, sdkVersion: message.planVersion) !=
+        null;
+  }
+
+  Future<SavedPlan> savePlanCard(
+    ChatMessage message, {
+    bool saveAsCopy = false,
+  }) async {
+    final plan = message.plan!;
+    if (message.isSavedPlanDisplay && !saveAsCopy) {
+      // A local display card need not belong to this SDK session's ledger.
+      // Keep its known saved version without inventing SDK provenance.
+      final existing = _savedSnapshotFor(plan);
+      if (existing != null) return existing;
+    }
+    final target = savedTargetFor(message);
+    final SavedPlan saved;
+    if (target != null && saveAsCopy) {
+      saved = await store.savePlan(
+        plan,
+        name: target.name,
+        sdkVersion: message.planVersion,
+        forceNew: true,
+      );
+    } else if (target != null) {
+      saved =
+          await store.updateSavedPlan(
+            target.id,
+            plan,
+            sdkVersion: message.planVersion,
+          ) ??
+          await store.savePlan(plan, sdkVersion: message.planVersion);
+    } else {
+      saved = await store.savePlan(plan, sdkVersion: message.planVersion);
+    }
+    notifyListeners();
+    await _persist();
+    return saved;
+  }
 
   Future<SavedPlan> save(TrainingPlan p) async {
+    final card = messages
+        .where(
+          (m) =>
+              m.plan != null &&
+              jsonEncode(m.plan!.toJson()) == jsonEncode(p.toJson()),
+        )
+        .lastOrNull;
+    if (card != null) return savePlanCard(card);
     final saved = await store.savePlan(p);
     notifyListeners();
     return saved;
@@ -762,8 +872,82 @@ class ChatController extends ChangeNotifier {
   }
 
   /// A saved plan picked in the drawer: show it as a card in the chat.
-  Future<void> showSaved(SavedPlan p) =>
-      _send('@saved:${p.id}', label: p.name, trustedAppCommand: true);
+  Future<void> showSaved(SavedPlan p) async {
+    final start = messages.length;
+    await _send('@saved:${p.id}', label: p.name, trustedAppCommand: true);
+    if (_disposed || !store.trainingAllowed) return;
+    final display = messages
+        .skip(start)
+        .where(
+          (m) =>
+              !m.isUser &&
+              (m.plan?.id == p.plan.id || m.text == '「${p.name}」来了。'),
+        )
+        .lastOrNull;
+    if (display == null) return;
+    _replace(display.copyWith(plan: p.plan, isSavedPlanDisplay: true));
+    if (_conversation == null) {
+      await _persist();
+      return;
+    }
+    final decoded = const coach.PlanCodec().decodeStrict(p.plan.toJson());
+    final focused =
+        decoded.ok &&
+        _conversation!
+            .focusExternalPlan(
+              externalId: p.id,
+              plan: decoded.plan!,
+              title: p.name,
+            )
+            .ok;
+    if (!focused) _bot(const BotMessage('这套计划暂时无法在对话里编辑'));
+    // Persist the focus snapshot as part of this operation, not the 80ms
+    // background persistence timer. The caller can safely navigate/restart.
+    notifyListeners();
+    await _persist();
+  }
+
+  void _restorePlanProvenance() {
+    final conversation = _conversation;
+    if (conversation == null) return;
+    final restorable = engine is RestorableChatEngine
+        ? engine as RestorableChatEngine
+        : null;
+    for (var index = 0; index < messages.length; index++) {
+      var message = messages[index];
+      final plan = message.plan;
+      if (plan == null) continue;
+      final readmitted = restorable?.restorePlan(plan, message.request);
+      final version = message.planVersion;
+      final ref = message.planSavedRef;
+      final versions = conversation.agent.sessionState.plans[plan.id];
+      final stored = versions?.where((v) => v.version == version).firstOrNull;
+      // App display metadata is only retained when the validated SDK snapshot
+      // proves the same version and contents. Never infer it from a title.
+      final contentsMatch =
+          stored != null &&
+          jsonEncode(
+                TrainingPlan.fromJson(
+                  Map<String, dynamic>.from(stored.plan),
+                ).toJson(),
+              ) ==
+              jsonEncode(plan.toJson());
+      final referenceMatches =
+          ref == null ||
+          (version != null &&
+              versions != null &&
+              plan.id == 'ext:${ref.externalId}' &&
+              versions.any((v) => v.version == ref.baseVersion) &&
+              ref.baseVersion <= version);
+      message = message.copyWith(
+        validatedPlan: readmitted,
+        clearPlanProvenance:
+            (version != null || ref != null) &&
+            (!contentsMatch || !referenceMatches),
+      );
+      messages[index] = message;
+    }
+  }
 
   TrainingPlan? _planById(String id) {
     for (final m in messages.reversed) {
@@ -890,6 +1074,8 @@ class ChatController extends ChangeNotifier {
         isPlanningFailure: m.isPlanningFailure,
         plan: plan,
         validatedPlan: validatedPlan,
+        sdkVersion: validatedPlan?.version,
+        savedRef: validatedPlan?.savedRef,
         coachTask: aiVisible ? _latestTask : m.coachTask,
         actions: m.actions,
         request: m.request,
@@ -914,9 +1100,13 @@ class ChatController extends ChangeNotifier {
   /// Also used at lifecycle boundaries and by explicit local verification.
   Future<void> flushPersistence() => _persist();
 
+  Future<void> _persistenceTail = Future<void>.value();
+
   Future<void> _persist() async {
     _persistenceTimer?.cancel();
     try {
+      // Capture before queuing: AppServices disposes the SDK immediately after
+      // chat.dispose(), which resets its ledger before a queued write executes.
       final conversation = _conversation;
       final snapshot = conversation == null
           ? null
@@ -927,11 +1117,26 @@ class ChatController extends ChangeNotifier {
                 <coach.CoachConversationMessage>[])
           _displayMessage(m).toJson().cast<String, dynamic>(),
       ];
-      await store.setConversation(
-        [for (final m in messages) m.toJson().cast<String, dynamic>()],
-        sessionJson: snapshot,
-        sdkMessages: sdkMessages,
+      final displayMessages = [
+        for (final m in messages) m.toJson().cast<String, dynamic>(),
+      ];
+      // Keep selections ordered after earlier local display writes so a slow
+      // older write cannot erase an imported focus snapshot.
+      final write = _persistenceTail.then(
+        (_) => store.setConversation(
+          displayMessages,
+          sessionJson: snapshot,
+          sdkMessages: sdkMessages,
+          // A final queued write may outlive both UI notifiers. It must still
+          // save the captured data without notifying a disposed AppStore.
+          notify: !_disposed,
+        ),
       );
+      _persistenceTail = write.then<void>(
+        (_) {},
+        onError: (Object _, StackTrace _) {},
+      );
+      await write;
     } on Object catch (error) {
       RuntimeLog.instance.record(
         'chat.persist.error',

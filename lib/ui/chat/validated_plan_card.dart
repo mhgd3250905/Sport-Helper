@@ -17,6 +17,9 @@ class ValidatedPlanCard extends StatelessWidget {
     required this.onSave,
     required this.onOpen,
     this.landing = false,
+    this.updatingSavedPlan = false,
+    this.savedOverride,
+    this.onSaveCopy,
   });
 
   final coach.ValidatedPlan validatedPlan;
@@ -26,6 +29,9 @@ class ValidatedPlanCard extends StatelessWidget {
   final ValueChanged<TrainingPlan> onSave;
   final ValueChanged<TrainingPlan> onOpen;
   final bool landing;
+  final bool updatingSavedPlan;
+  final bool? savedOverride;
+  final ValueChanged<TrainingPlan>? onSaveCopy;
 
   @override
   Widget build(BuildContext context) {
@@ -33,10 +39,13 @@ class ValidatedPlanCard extends StatelessWidget {
     return PlanCard(
       plan: plan,
       library: library,
-      saved: isSaved(plan),
+      saved: savedOverride ?? isSaved(plan),
       landing: landing,
+      saveLabel: updatingSavedPlan ? '更新到我的计划' : null,
+      savedLabel: updatingSavedPlan ? '已更新' : null,
       onStart: (origin) => onStart(plan, origin),
       onSave: () => onSave(plan),
+      onSaveCopy: onSaveCopy == null ? null : () => onSaveCopy!(plan),
       onOpen: () => onOpen(plan),
     );
   }

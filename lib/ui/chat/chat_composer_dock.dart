@@ -7,6 +7,7 @@ import '../theme/measure_size.dart';
 import '../theme/tokens.dart';
 import '../theme/ui_polish_tokens.dart';
 import 'chat_widgets.dart';
+import 'plan_focus_label.dart';
 
 /// Owns the one menu timeline. Keyboard and menu occupy the same bottom slot,
 /// so swapping them never adds their heights together.
@@ -19,6 +20,8 @@ class ChatComposerDock extends StatefulWidget {
     required this.suggestions,
     required this.input,
     required this.panel,
+    this.planFocusTitle,
+    this.onClearPlanFocus,
   });
 
   final bool panelOpen;
@@ -26,6 +29,8 @@ class ChatComposerDock extends StatefulWidget {
   final ValueNotifier<double> extent;
   final Widget suggestions, input;
   final ChatFeaturePanel panel;
+  final String? planFocusTitle;
+  final VoidCallback? onClearPlanFocus;
 
   @override
   State<ChatComposerDock> createState() => _ChatComposerDockState();
@@ -368,6 +373,17 @@ class _ChatComposerDockState extends State<ChatComposerDock>
             mainAxisSize: MainAxisSize.min,
             children: [
               widget.suggestions,
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: PlanFocusLabel(
+                    title: widget.planFocusTitle,
+                    onClear: widget.onClearPlanFocus,
+                    bottomGap: 8,
+                  ),
+                ),
+              ),
               SfMeasureSize(
                 onSize: (size) {
                   if (!mounted) return;

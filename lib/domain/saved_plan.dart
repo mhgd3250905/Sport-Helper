@@ -8,6 +8,7 @@ class SavedPlan {
     required this.plan,
     required this.savedAt,
     this.lastUsedAt,
+    this.sdkVersion,
   });
 
   final String id;
@@ -16,9 +17,13 @@ class SavedPlan {
   final DateTime savedAt;
   final DateTime? lastUsedAt;
 
+  /// The SDK's plan version. Plans saved before version tracking have none.
+  final int? sdkVersion;
+
   /// Most recent of saved / last started, for "上次那个" and sorting.
-  DateTime get touchedAt =>
-      lastUsedAt != null && lastUsedAt!.isAfter(savedAt) ? lastUsedAt! : savedAt;
+  DateTime get touchedAt => lastUsedAt != null && lastUsedAt!.isAfter(savedAt)
+      ? lastUsedAt!
+      : savedAt;
 
   SavedPlan copyWith({String? name, DateTime? lastUsedAt}) => SavedPlan(
     id: id,
@@ -26,6 +31,7 @@ class SavedPlan {
     plan: plan,
     savedAt: savedAt,
     lastUsedAt: lastUsedAt ?? this.lastUsedAt,
+    sdkVersion: sdkVersion,
   );
 
   Map<String, Object?> toJson() => {
@@ -34,6 +40,7 @@ class SavedPlan {
     'plan': plan.toJson(),
     'savedAt': savedAt.toIso8601String(),
     'lastUsedAt': ?lastUsedAt?.toIso8601String(),
+    'sdkVersion': ?sdkVersion,
   };
 
   factory SavedPlan.fromJson(Map<String, dynamic> j) => SavedPlan(
@@ -42,5 +49,6 @@ class SavedPlan {
     plan: TrainingPlan.fromJson(Map<String, dynamic>.from(j['plan'] as Map)),
     savedAt: DateTime.tryParse(j['savedAt'] as String? ?? '') ?? DateTime(2026),
     lastUsedAt: DateTime.tryParse(j['lastUsedAt'] as String? ?? ''),
+    sdkVersion: j['sdkVersion'] is int ? j['sdkVersion'] as int : null,
   );
 }

@@ -1,5 +1,11 @@
 # 版本管理与台账
 
+## 当前 +43 计划讨论候选（2026-10-29）
+
+App `codex/plan-focus` / `0.1.0+43`，基于 +42 `d90054902c1cb850f246ecfad100af81b0f31bad`，尚未合并或推送。三包与 coach override 固定 `b490eec43b408a8a35ce81a7830833bc6a3ff278`，仅六个 SDK 锁引用值变化。发到对话导入完整 SDK focus；SDK 管理讨论与修改；App 支持重启、更新原记录、另存和旧 sdkVersion 数据迁移。详见[本轮记录](plan-focus-plus43-2026-10-29.md)。
+
+internal arm64 实际 2043、最终源 SHA/APK 哈希及门禁以 `E:/AII-3D/3D-Sport-AI/deliveries/plan-focus-plus43/release-apk.json` 与 `package-metadata.json` 为准；测试、真实接口、软件截图分别留存，不据此认定真机验收完成。main 为 `31fd3f0b0741175536b0a72ff2e0fc4f71b18f9f`；release/1.0 与 SDK 仓库未操作。以下为各原时点的历史记录。
+
 ## 当前 +41 验收更正与流畅度摸排（2026-10-29）
 
 开哥确认“我的计划”两卡切换不合格；SDK475收起整卡高度为零，单卡修复按指令暂停，接口缺口已列明，不在App另写动画、不出冒称修复的release包。全App本轮只读报告，应用/SDK/测试代码未改；profile采集包源4047072、同+41/2041已备，开哥远程回传原始JSON和录屏后补实测最大值/超16ms帧数与排序。见[当前报告](ui-motion-audit-2026-10-29.md)及其接口缺口、采集步骤。下方原包测试/“已补齐”记录属于当时检查点，不代表本次单卡验收通过；App main与release/1.0不动，+42待Hark定案且+41合main后再从新main开展。

@@ -63,6 +63,9 @@ class ChatMessage {
     this.isPlanningFailure = false,
     this.plan,
     this.validatedPlan,
+    this.sdkVersion,
+    this.savedRef,
+    this.isSavedPlanDisplay = false,
     this.coachTask,
     this.actions,
     this.request,
@@ -92,6 +95,15 @@ class ChatMessage {
   /// A plan card (assistant only) and the request it was made for.
   final TrainingPlan? plan;
   final coach.ValidatedPlan? validatedPlan;
+  final int? sdkVersion;
+  final coach.CoachSavedPlanRef? savedRef;
+
+  /// Host-selected cards remain visible if the editing gate rejects them.
+  /// This does not admit them for AI output or training.
+  final bool isSavedPlanDisplay;
+  int? get planVersion => validatedPlan?.version ?? sdkVersion;
+  coach.CoachSavedPlanRef? get planSavedRef =>
+      validatedPlan?.savedRef ?? savedRef;
 
   /// SDK task event snapshot, used only to render the completed checklist.
   final coach.CoachTaskState? coachTask;
@@ -118,6 +130,12 @@ class ChatMessage {
     bool clearActions = false,
     bool? aiVisible,
     bool? questionAnswered,
+    coach.ValidatedPlan? validatedPlan,
+    int? sdkVersion,
+    coach.CoachSavedPlanRef? savedRef,
+    bool clearPlanProvenance = false,
+    TrainingPlan? plan,
+    bool? isSavedPlanDisplay,
     List<String>? answeredChoices,
     Map<String, List<String>>? answeredForm,
   }) => ChatMessage(
@@ -133,8 +151,11 @@ class ChatMessage {
     answeredChoices: answeredChoices ?? this.answeredChoices,
     answeredForm: answeredForm ?? this.answeredForm,
     isPlanningFailure: isPlanningFailure,
-    plan: plan,
-    validatedPlan: validatedPlan,
+    plan: plan ?? this.plan,
+    validatedPlan: validatedPlan ?? this.validatedPlan,
+    sdkVersion: clearPlanProvenance ? null : sdkVersion ?? this.sdkVersion,
+    savedRef: clearPlanProvenance ? null : savedRef ?? this.savedRef,
+    isSavedPlanDisplay: isSavedPlanDisplay ?? this.isSavedPlanDisplay,
     coachTask: coachTask,
     actions: clearActions ? null : actions ?? this.actions,
     request: request,
@@ -156,6 +177,9 @@ class ChatMessage {
     if (answeredForm.isNotEmpty) 'answeredForm': answeredForm,
     if (isPlanningFailure) 'isPlanningFailure': true,
     'plan': ?plan?.toJson(),
+    'sdkVersion': ?planVersion,
+    'savedRef': ?planSavedRef?.toJson(),
+    if (isSavedPlanDisplay) 'savedPlanDisplay': true,
     'coachTask': ?coachTask?.toJson(),
     if (validatedPlan != null || plan?.source == 'ai') 'isAiPlan': true,
     if (actions != null)
@@ -179,7 +203,7 @@ class ChatMessage {
     if (plan != null && (j['isAiPlan'] == true || plan.source == 'ai')) {
       validatedPlan = restoreWith?.restorePlan(plan, request);
       // Stored AI data is untrusted until the current SDK admits it again.
-      if (validatedPlan == null) plan = null;
+      if (validatedPlan == null && j['savedPlanDisplay'] != true) plan = null;
     }
     coach.CoachTaskState? coachTask;
     if (j['coachTask'] is Map) {
@@ -232,10 +256,24 @@ class ChatMessage {
       aiVisible: j['aiVisible'] == true,
       plan: plan,
       validatedPlan: validatedPlan,
+      sdkVersion: j['sdkVersion'] is int && (j['sdkVersion'] as int) > 0
+          ? j['sdkVersion'] as int
+          : null,
+      savedRef: _savedPlanRef(j['savedRef']),
+      isSavedPlanDisplay: j['savedPlanDisplay'] == true,
       coachTask: coachTask,
       actions: actions,
       request: request,
     );
+  }
+}
+
+coach.CoachSavedPlanRef? _savedPlanRef(Object? value) {
+  if (value is! Map) return null;
+  try {
+    return coach.CoachSavedPlanRef.fromJson(Map<String, Object?>.from(value));
+  } on Object {
+    return null;
   }
 }
 

@@ -345,33 +345,99 @@ class AppStore extends ChangeNotifier {
   SavedPlan? savedFor(TrainingPlan p) =>
       savedPlans.where((s) => s.plan.id == p.id).firstOrNull;
 
-  /// Keeps [p] (once per plan id). The name defaults to the plan title,
-  /// numbered when that name is taken ("核心训练 2").
+  /// Finds this exact content and SDK version, rather than an older card with
+  /// the same plan id. [savedFor] remains available for identity-only lookups.
+  SavedPlan? savedForSnapshot(
+    TrainingPlan p, {
+    int? sdkVersion,
+    String? savedId,
+  }) => savedPlans
+      .where(
+        (saved) =>
+            (savedId == null || saved.id == savedId) &&
+            saved.sdkVersion == sdkVersion &&
+            _samePlanSnapshot(saved.plan, p),
+      )
+      .firstOrNull;
+
+  /// Keeps the latest snapshot for this plan id without changing the saved
+  /// record's name or history. [forceNew] keeps the original and creates a
+  /// separate record named from [name], the existing name, or the plan title,
+  /// followed by " 新版". Duplicate names receive a numeric suffix.
   Future<SavedPlan> savePlan(
     TrainingPlan p, {
     String? name,
     DateTime? now,
+    int? sdkVersion,
+    bool forceNew = false,
   }) async {
     final existing = savedFor(p);
-    if (existing != null) return existing;
-    final base = (name ?? p.title).trim().isEmpty
-        ? '我的计划'
-        : (name ?? p.title).trim();
+    if (!forceNew && existing != null) {
+      return (await updateSavedPlan(existing.id, p, sdkVersion: sdkVersion))!;
+    }
+    final originalName = (name ?? (forceNew ? existing?.name : null) ?? p.title)
+        .trim();
+    final displayName = originalName.isEmpty ? '我的计划' : originalName;
+    final base = forceNew ? '$displayName 新版' : displayName;
     var n = base;
     for (var i = 2; savedPlans.any((s) => s.name == n); i++) {
       n = '$base $i';
     }
     final at = now ?? DateTime.now();
+    final baseId = 'saved-${at.microsecondsSinceEpoch}';
+    var id = baseId;
+    for (var i = 2; savedPlans.any((saved) => saved.id == id); i++) {
+      id = '$baseId-$i';
+    }
     final saved = SavedPlan(
-      id: 'saved-${at.microsecondsSinceEpoch}',
+      id: id,
       name: n,
       plan: p,
       savedAt: at,
+      sdkVersion: sdkVersion,
     );
     savedPlans.insert(0, saved);
     await _save();
     return saved;
   }
+
+  /// Replaces only this saved record's plan snapshot and SDK version. A deleted
+  /// record returns null so callers can offer an ordinary save instead.
+  Future<SavedPlan?> updateSavedPlan(
+    String savedId,
+    TrainingPlan p, {
+    int? sdkVersion,
+  }) async {
+    final index = savedPlans.indexWhere((saved) => saved.id == savedId);
+    if (index < 0) return null;
+    final previous = savedPlans[index];
+    if (previous.sdkVersion == sdkVersion &&
+        _samePlanSnapshot(previous.plan, p)) {
+      return previous;
+    }
+    final updated = SavedPlan(
+      id: previous.id,
+      name: previous.name,
+      plan: p,
+      savedAt: previous.savedAt,
+      lastUsedAt: previous.lastUsedAt,
+      sdkVersion: sdkVersion,
+    );
+    savedPlans[index] = updated;
+    await _save();
+    return updated;
+  }
+
+  static bool _samePlanSnapshot(TrainingPlan first, TrainingPlan second) =>
+      jsonEncode(_snapshotForComparison(first)) ==
+      jsonEncode(_snapshotForComparison(second));
+
+  static Map<String, Object?> _snapshotForComparison(TrainingPlan plan) => {
+    ...plan.toJson(),
+    // These describe sets; block, action, segment and dose ordering is retained.
+    'equipment': plan.equipment.toSet().toList()..sort(),
+    if (plan.avoid.isNotEmpty) 'avoid': plan.avoid.toList()..sort(),
+  };
 
   Future<void> renamePlan(String id, String name) {
     final i = savedPlans.indexWhere((s) => s.id == id);
@@ -402,6 +468,7 @@ class AppStore extends ChangeNotifier {
     List<Map<String, dynamic>> log, {
     required String? sessionJson,
     List<Map<String, dynamic>> sdkMessages = const [],
+    bool notify = true,
   }) {
     coachSessionJson = sessionJson;
     coachDisplayMessages
@@ -414,6 +481,6 @@ class AppStore extends ChangeNotifier {
             ? log.sublist(log.length - chatLogLimit)
             : log,
       );
-    return _save();
+    return _save(notify: notify);
   }
 }

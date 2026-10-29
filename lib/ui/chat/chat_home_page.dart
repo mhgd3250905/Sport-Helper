@@ -236,6 +236,16 @@ class _ChatHomePageState extends State<ChatHomePage>
     _toast('已保存为「${saved.name}」');
   }
 
+  Future<void> _savePlanCard(
+    ChatMessage message, {
+    bool saveAsCopy = false,
+  }) async {
+    SfHaptic.selection.play();
+    final updating = _chat.savedTargetFor(message) != null && !saveAsCopy;
+    final saved = await _chat.savePlanCard(message, saveAsCopy: saveAsCopy);
+    _toast(updating ? '已更新「${saved.name}」' : '已保存为「${saved.name}」');
+  }
+
   Future<void> _details(ChatMessage m, {TrainingPlan? validatedPlan}) async {
     _dismissInput();
     final plan = await Navigator.of(context).push<TrainingPlan>(
@@ -327,6 +337,9 @@ class _ChatHomePageState extends State<ChatHomePage>
                           panelOpen: _panelOpen,
                           focusNode: _input,
                           extent: _dockExtent,
+                          planFocusTitle: _chat.planFocus?.title,
+                          onClearPlanFocus: () =>
+                              unawaited(_chat.clearPlanFocus()),
                           suggestions: SuggestionStrip(
                             items: _chat.typing ? const [] : _chat.suggestions,
                             onTap: _send,
@@ -545,11 +558,17 @@ class _ChatHomePageState extends State<ChatHomePage>
             library: library,
             landing: fresh,
             isSaved: _chat.isSaved,
+            updatingSavedPlan: _chat.savedTargetFor(m) != null,
+            savedOverride: _chat.isPlanCardSaved(m),
+            onSaveCopy: _chat.savedTargetFor(m) == null
+                ? null
+                : (_) => unawaited(_savePlanCard(m, saveAsCopy: true)),
             onStart: (plan, _) => _start(plan),
-            onSave: _save,
+            onSave: (_) => unawaited(_savePlanCard(m)),
             onOpen: (plan) => _details(m, validatedPlan: plan),
           ),
-        ] else if (m.isPlan && m.plan!.source != 'ai') ...[
+        ] else if (m.isPlan &&
+            (m.plan!.source != 'ai' || m.isSavedPlanDisplay)) ...[
           if (hasText) const SizedBox(height: SfSpace.x3),
           PlanCard(
             plan: m.plan!,

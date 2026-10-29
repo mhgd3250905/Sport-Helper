@@ -18,12 +18,17 @@ class PlanCard extends StatelessWidget {
     required this.onSave,
     required this.onOpen,
     this.landing = false,
+    this.saveLabel,
+    this.savedLabel,
+    this.onSaveCopy,
   });
   final TrainingPlan plan;
   final ExerciseLibrary library;
   final bool saved, landing;
   final void Function(OriginRect) onStart;
   final VoidCallback onSave, onOpen;
+  final String? saveLabel, savedLabel;
+  final VoidCallback? onSaveCopy;
   static const exerciseHeight = CoachPlanCard.exerciseHeight;
   static const setHeight = CoachPlanCard.setHeight;
   @override
@@ -39,7 +44,7 @@ class PlanCard extends StatelessWidget {
       child: ClipRRect(
         key: ValueKey('plan-clip-${plan.id}'),
         borderRadius: BorderRadius.circular(SfCardTokens.radius),
-        child: withSmartfitCoachUi(
+        child: withSmartfitPlanSaveUi(
           context,
           CoachPlanCard(
             cutoutTopInset: alphaHero ? 0 : null,
@@ -57,6 +62,10 @@ class PlanCard extends StatelessWidget {
             onSave: onSave,
             onOpen: onOpen,
           ),
+          planId: plan.id,
+          saveLabel: saveLabel,
+          savedLabel: savedLabel,
+          onSaveCopy: onSaveCopy,
         ),
       ),
     );

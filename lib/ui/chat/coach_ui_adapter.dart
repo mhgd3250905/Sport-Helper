@@ -24,6 +24,97 @@ Widget withSmartfitCoachUi(BuildContext context, Widget child) =>
     ? child
     : CoachUiTheme(style: smartfitCoachUiStyle(), child: child);
 
+/// Only this plan card replaces its save copy and adds a host-owned action.
+/// The SDK continues to own its footer, start button and expansion timeline.
+Widget withSmartfitPlanSaveUi(
+  BuildContext context,
+  Widget child, {
+  required String planId,
+  String? saveLabel,
+  String? savedLabel,
+  VoidCallback? onSaveCopy,
+}) {
+  if (saveLabel == null && savedLabel == null && onSaveCopy == null) {
+    return withSmartfitCoachUi(context, child);
+  }
+  final base = CoachUiTheme.contains(context)
+      ? CoachUiTheme.of(context)
+      : smartfitCoachUiStyle();
+  final strings = base.strings;
+  final builders = base.builders;
+  final primaryBuilder =
+      builders.textAction ?? smartfitCoachUiStyle().builders.textAction!;
+  return CoachUiTheme(
+    style: CoachUiStyle(
+      colors: base.colors,
+      typography: base.typography,
+      strings: CoachUiStrings(
+        expand: strings.expand,
+        collapse: strings.collapse,
+        expandDetails: strings.expandDetails,
+        collapseDetails: strings.collapseDetails,
+        save: saveLabel ?? strings.save,
+        saved: savedLabel ?? strings.saved,
+        start: strings.start,
+        cancel: strings.cancel,
+        preparing: strings.preparing,
+        progressHint: strings.progressHint,
+        answerHint: strings.answerHint,
+        submitAnswer: strings.submitAnswer,
+        multipleHint: strings.multipleHint,
+        planFromActions: strings.planFromActions,
+        actionUnavailable: strings.actionUnavailable,
+        planDetails: strings.planDetails,
+        timeLabel: strings.timeLabel,
+      ),
+      builders: CoachUiBuilders(
+        pressable: builders.pressable,
+        controlFace: builders.controlFace,
+        textAction: (context, action) {
+          final primary = primaryBuilder(context, action);
+          if (onSaveCopy == null ||
+              action.key != ValueKey('plan-save-$planId')) {
+            return primary;
+          }
+          return Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              KeyedSubtree(
+                key: ValueKey('plan-primary-save-$planId'),
+                child: primary,
+              ),
+              const SizedBox(width: 12),
+              SfPressable(
+                key: ValueKey('plan-save-copy-$planId'),
+                semanticLabel: '另存一份',
+                onTap: onSaveCopy,
+                child: SizedBox(
+                  height: 44,
+                  child: Center(
+                    child: Text(
+                      '另存一份',
+                      style: SfType.callout.copyWith(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: SfColors.accent,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+        surface: builders.surface,
+        icon: builders.icon,
+        startButton: builders.startButton,
+        media: builders.media,
+      ),
+    ),
+    child: child,
+  );
+}
+
 /// Saved plans reuse the SDK plan view and its normal App theme. Its left
 /// action opens details instead of saving, using the approved primary ink.
 Widget withSmartfitSavedPlanUi(
