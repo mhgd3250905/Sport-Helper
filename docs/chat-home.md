@@ -2,6 +2,8 @@
 
 ## 当前 +41 两项补齐 / SDK475（2026-10-29）
 
+最终打包源 `9777eb4a2eed52dda173bd31e2e7f3f69d413b83`；全量611/611、0跳过，分析0问题，实际2041、同签名/16KB/JNI通过，APK143,599,186B / 136.95MiB。26张浅深原图及交互回执已核对，截图8092与打包源仅测试正文差异有Git证据。当前仅待用户远程真机确认，未合入或推送App main。
+
 SDK远端main已核实发布475a5d8，用户授权后三包及coach传递override统一锁定完整SHA。计划列表直接接入公开CoachPlanExpanded，菜单修复沿用826ea92；同一+41/2041的最终源码、测试、APK和截图见[本轮记录](ui-polish-1-plus41-plan-expand-2026-10-29.md)与独立目录 `E:/AII-3D/3D-Sport-AI/deliveries/ui-polish-1-plus41-plan-expand/`。下方826菜单候选、488初包及更早记录均属历史。没有真机/模拟器操作，最终等待用户远程安装确认；App main、release/1.0不动。
 
 ## 当前 +41 菜单补项（2026-10-29）

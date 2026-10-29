@@ -28,8 +28,22 @@
 
 ## 验证与回执
 
-最终计划列表实现、测试结果、APK身份、源码与SHA256以本轮交付回执为准；本文件在最终构建后补齐实际结果。旧菜单候选的607测试不替代SDK475和两项合并后的全量验证。
+最终打包源为 `9777eb4a2eed52dda173bd31e2e7f3f69d413b83`；功能提交为 `8092d1201775f6d3bf70d68da8206dc715ce0aa3`，打包源在它之后仅修订旧应用流程测试。App全量 **611/611通过、0跳过**，`flutter analyze --no-pub` **0问题**，严格锁文件与非SDK依赖审计通过。旧菜单候选的607测试仅保留为中间检查点。
 
-前图仍为本次补项前的 `d6bd79cd8dc6c5439f67779bd6e894af7981faa3`，使用同一真实App入口、390×844逻辑视口与字体/素材；菜单候选中途图继续保留。最终后图在最终功能提交后重采，并记录首次展开、互斥切换、详情入口和需要滚动的展开项。软件截图证明外观和实际导航，不证明真机帧耗时。
+| 最终交付 | 实际结果 |
+| --- | --- |
+| APK | `SmartFit-ui-polish-1-plan-expand-0.1.0+41-9777eb4-internal-arm64-v8a-release.apk` |
+| 大小 | 143,599,186 B / 136.95 MiB，比826菜单候选增加65,536 B |
+| SHA-256 | `f71427ef198396401c0523cc0765c798948b2ae76687afcd60d4f53cabb0a61a` |
+| 身份 | `com.ugk.smartfit.internal`，同一+41，原生versionCode 2041，internal arm64 release |
+| 门禁 | 同签名、ZIP/ELF16KB、存储JNI、源码/SDK/素材指纹及严格锁解析通过 |
+| 图与交互 | 26张PNG哈希/大小逐一复核，浅深各一份真实导航/互斥展开/收起/详情到底/滚动状态回执通过 |
+
+首轮全量610通过、1条旧“点条目即回对话”断言失败，原日志完整保留；修订测试为先检查原地展开与聊天未改变，再收起、通过条目菜单调回对话，原应用入口流程检查保留。没有修改产品去迁就旧断言，最终全量重跑611项全部通过。
+
+前图仍为本次补项前的 `d6bd79cd8dc6c5439f67779bd6e894af7981faa3`，使用同一真实App入口、390×844逻辑视口与字体/素材；菜单候选中途图继续保留。最终后图实际取自干净的8092功能提交，记录首次展开、互斥切换、详情入口和需要滚动的展开项。打包源9777与8092之间只有test/app_flow_test.dart内旧测试正文变化，生产文件、assets、pubspecs及截图harness均无差异，证据存于screenshot-source-equivalence.json；截图保留真实8092来源，不冒称从9777重采。before使用归档的原harness，after使用含新增交互的harness，两者共用原3计划/字体/视口配置；追加9计划的滚动回归单独标记。软件截图证明外观和实际导航，不证明真机帧耗时。
 
 用户明确本机无真机、禁止启动模拟器，由用户远程安装验收。本轮没有设备操作、真机录屏或“全部帧≤16ms”的通过结论；两个版本号保持不变。App main与release/1.0不动，等待用户远程确认后再决定合main。
+
+
+[全部截图索引](../../deliveries/ui-polish-1-plus41-plan-expand/screenshots/index.html)、[计划浅深对照](../../deliveries/ui-polish-1-plus41-plan-expand/screenshots/plan-before-after-contact-sheet.jpg)和[菜单浅深对照](../../deliveries/ui-polish-1-plus41-plan-expand/screenshots/menu-before-after-contact-sheet.jpg)可直接审阅。release-apk.json、validation.json及package-metadata.json按实际文件绑定；后续仅文档收束提交不替代上面的打包源码。
