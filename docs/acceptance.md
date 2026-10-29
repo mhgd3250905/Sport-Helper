@@ -6,6 +6,8 @@
 
 最终internal全量598/598、0跳过，flutter analyze零问题，离线严格锁文件通过。新增完成页4种感受/未选、同ID重试/持久化、AI隔离、preview与整套training及SDK样式归属已验证；截图4/4场景、58原图及哈希通过。首次全量仅3条旧SF天空/旧结束文案断言失败，改为SDK界面与真实结果字段验证后全量复跑通过，未跳过或放宽运行时保护。
 
+最终c8c64e3源码已打包，实际APK143,533,650B；aapt为 `com.ugk.smartfit.internal / 0.1.0 / 2041`。同签名、ZIP/ELF16KB和存储JNI均通过，交付APK实际大小与SHA256再次核对一致。详细包信息以新目录release-apk.json为准，设备操作和安装仍为false。
+
 ## 历史：+41 首包（2026-10-29）
 
 本批验证、40张浅深前后软件截图、可做项和SDK待办见[+41交付记录](ui-polish-1-plus41-2026-10-29.md)，原始回执见交付目录 `validation/`、`screenshots/manifest.json` 和 `release-apk.json`。本批未操作设备，未增加真实模型、量化性能或iOS验收结论。+40 已由用户明确确认真机通过，并授权合入/推送 main `adc79ab`；+41 自身仍待用户真机确认后安排合main。`release/1.0` 未操作。

@@ -6,6 +6,8 @@ App仍为 `0.1.0+41 / 2041`，分支仍为 `codex/ui-polish-1`。三包声明/�
 
 当前SDK488验证：598/598、0跳过，analyze0问题，严格锁文件通过；58张浅深软件图和harness哈希已核对。旧的586项记录仅属于下方SDK1532首包。
 
+最终包源 `c8c64e3868849cf24e6a917a963d50cc63a0195c`；`SmartFit-ui-polish-1-sdk488-0.1.0+41-c8c64e3-internal-arm64-v8a-release.apk`，143,533,650B / 136.88MiB，SHA256 `9fcb1da1b43fd289904bc7113f64d10956c779ae979e177f51cb64a59b3b641b`。aapt确认 `com.ugk.smartfit.internal / 0.1.0 / 2041`；与旧+41同签名、ZIP/ELF16KB和存储JNI通过，未装机。
+
 ## 历史：同批 +41 首包（2026-10-29，SDK1532基线）
 
 `0.1.0+41` / `codex/ui-polish-1`，internal arm64 Android构建号2041；打包源码、大小、哈希及实际身份以 `../../deliveries/ui-polish-1-plus41/release-apk.json` 为准。+40 功能源 `428c5f3` 经开哥真机确认，含其后8份文档收束的 `adc79abef2b7195872e589f6225486e944b66644` 已合入并推送 main；本批从该新 main 继续。SDK 三包固定1532f082不变，`release/1.0` 未操作。+41 仍待真机确认，未合main、未推送、未打tag。详见[本批逐项交付与SDK限制](ui-polish-1-plus41-2026-10-29.md)。

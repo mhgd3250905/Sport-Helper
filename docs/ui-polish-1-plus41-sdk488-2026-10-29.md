@@ -37,4 +37,16 @@ SDK升级后的完成页通用文案不再作为是否完整完成的判据。�
 
 APK及源码指纹、实际aapt身份、同签名、16KB/ELF/JNI门禁见 `release-apk.json`；最终源码以其中 `source` 为准。新截图使用实际App/SDK组件和可信图片，原0–6浅深前后图与新增预览/训练/完成/感受软件静帧在新目录 `screenshots/`，不冒充原生视频或真机验收。
 
+| 最终交付回执 | 已核实结果 |
+| --- | --- |
+| 打包源码 | `c8c64e3868849cf24e6a917a963d50cc63a0195c`；随后仅补文档的提交不替换此源码绑定 |
+| APK | `SmartFit-ui-polish-1-sdk488-0.1.0+41-c8c64e3-internal-arm64-v8a-release.apk`，位于本说明开头的新交付目录 |
+| 大小 | 143,533,650 B / 136.88 MiB；比SDK1532的同+41 c636首包增加65,632 B |
+| SHA-256 | `9fcb1da1b43fd289904bc7113f64d10956c779ae979e177f51cb64a59b3b641b`；已按交付文件实际字节和哈希二次核对 |
+| 实际包身份 | aapt `com.ugk.smartfit.internal / 0.1.0 / 2041`，internal arm64 release |
+| 门禁 | 与旧+41同签名，ZIP/ELF16KB、存储JNI、严格锁文件、SDK及素材指纹全部通过 |
+| 软件验证 | App全量598/598、0跳过；分析零问题；58原图和两截图入口哈希核对通过 |
+
+[截图对照页](../../deliveries/ui-polish-1-plus41-sdk488/screenshots/index.html)及[原图索引](../../deliveries/ui-polish-1-plus41-sdk488/screenshots/README.md)保留全部真实软件渲染证据；训练页面图均附“软件静帧 / SDK站立首帧（非视频）”说明。两主题反馈JSON证明完成后 `justRight` 已持久化并重载，history/session各1条。
+
 本轮不合入或推送App main，不操作release/1.0、不打tag、不安装手机、不新增真实模型调用。App main仍是已推送的+40 `adc79abef2b7195872e589f6225486e944b66644`；+41等待开哥真机确认。
