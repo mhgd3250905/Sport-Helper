@@ -33,6 +33,29 @@ SDK 三包和 coach override 保持 `b490eec43b408a8a35ce81a7830833bc6a3ff278`�
 
 ## 整合验证与当前状态
 
-整合修复的目标回归、全量测试、analyze、实际 arm64 APK、包体上限及远端对齐正在执行。原候选验证不充当 +47 整合验证；最终实际数量、提交、APK 哈希和 main/remote SHA 以本批回执为准。
+实现提交 I 为 **`ee6b83ea46b3d0ae9eccaf875b30a968087105c6`**。使用 Flutter 3.44.7、交付开关、实际解析且干净的 b490eec 官方目录执行整合验证；全量 **764/764、0 失败/跳过**，`flutter analyze --no-pub` **0 问题**。目标 UI 回归 56 项与缓存回归 65 项通过，均已包含在全量，不相加。真实匿名 HTTPS 媒体冒烟、严格整份依赖锁解析通过。
 
-证据目录：`E:/AII-3D/3D-Sport-AI/deliveries/main-integration-plus47/`。其中 `validation.json`、`release-apk.json`、`apk-size-comparison.json`、截图源绑定和最终 Git 对齐观察分别记录各自事实。用户的初审与合并授权不替代 +47 真机安装、原生播放或帧时间实测；本轮不操作设备。
+| 实包项目 | 实际结果 |
+| --- | --- |
+| APK | `E:/AII-3D/3D-Sport-AI/deliveries/main-integration-plus47/SmartFit-main-integration-0.1.0+47-ee6b83e-internal-arm64-v8a-release.apk` |
+| 大小 | **42,598,106B / 42.598MB / 40.625MiB**，低于 45,000,000B |
+| SHA-256 | `db67ca4505840338b25bd7a5ee11b0d188b5f18e4d05817a274b377672ea5ef7` |
+| 包 / 构建号 | `com.ugk.smartfit.internal` / 2047 |
+| 签名 | 与 +43 相同；证书 SHA-256 `3761270a4764157f0e389014a9e5b800b05403bfddce0f4f7f8c039f6a53bdc7` |
+| 门禁 | 实际 ZIP 与 AssetManifest 无 MP4；保留 1,737 份静态/音频字节与原 Noto；原生库由 AGP 压缩；ZIP/ELF 16KB、存储 JNI 全通过 |
+
+| 体积项（实际 APK 压缩字节） | +43 | +47 | 节省 |
+| --- | ---: | ---: | ---: |
+| 内置视频 | 88,252,106 | 0 | 88,252,106 |
+| 音频 / LC32 | 9,351,981 | 9,351,981 | 0 |
+| Noto 字体 | 2,697,438 | 2,697,438 | 0 |
+| 品牌展示图 | 825,496 | 37,564 | 787,932 |
+| 原生库（含本轮代码变化） | 21,355,072 | 9,424,578 | 11,930,494 |
+| 其他 / ZIP 签名开销 | 21,182,761 | 21,086,545 | 96,216 |
+| **总 APK** | **143,664,854** | **42,598,106** | **101,066,748** |
+
+图文页与生成卡 C 各有浅/深软件截图，四张均已目视复核；使用实际整合组件、正常动效、原字体及资源，没有溢出。截图目录为 `screenshots/`，图像 SHA、渲染尺寸和实现源绑定见 `screenshot-source.json` 与 `visual-review.json`。+45 原交付的其他阶段截图继续保留，未宣称本轮重拍所有阶段。
+
+本次后续收束提交 D **只修改 README.md/docs/**，记录真实结果。APK、测试、截图的编译源码始终是 I；D 不更改运行/资源/测试输入，不把 D 冒称新的 APK 源码。main 按用户授权从基线快进到 D 并推送；最终 D 完整 SHA、远端 main 一致性与保护分支观察由 `git-scope-observation-post-main.json` / `delivery-status-post-main.json` 记录，避免文档自引用 SHA。合入前检查与合入后检查分别保留，不用前者替代推送回执。
+
+证据目录：`E:/AII-3D/3D-Sport-AI/deliveries/main-integration-plus47/`。`validation-post-main.json`、`release-apk.json`、`apk-size-comparison.json`、全量测试/分析日志各自记录其事实；Git 内精确公开台账见 [reports/main-integration-plus47.json](reports/main-integration-plus47.json)。用户初审和合并授权不替代 +47 真机安装、保留数据覆盖安装、原生播放或帧时间实测；本轮没有设备操作。

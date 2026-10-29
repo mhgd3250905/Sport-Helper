@@ -2,7 +2,11 @@
 
 ## 当前 +47 主线整合（2026-10-30）
 
-当前接手本批 **+47 / 2047**，在 `codex/main-integration-plus47` 整合并审核 +44 guide-lite、+45 task-bubble-v2、+46 slim-assets 后推进 main、保存提交 push。保留所有原分支/工作树/产物，不动 release/1.0 与 SDK，不打 tag、不操作设备。已知审阅发现、媒体交界与新证据见[本批记录](main-integration-plus47-2026-10-30.md)；原 Noto 随本批保留。
+当前版本 **0.1.0+47 / internal arm64 2047**，已在 `codex/main-integration-plus47` 审核整合 +44 guide-lite、+45 task-bubble-v2、+46 slim-assets，修复播放过渡、连续替换与缓存超额三项问题。全量 764/764、0 跳过/失败，analyze 0；42,598,106B 实包、同签名、ZIP/ELF 16KB、JNI 及无 MP4 门禁通过。
+
+APK/测试/软件截图源码为 `ee6b83ea46b3d0ae9eccaf875b30a968087105c6`。本次 README/docs-only 收束提交用于按用户授权快进并推送 main；后续读取 `deliveries/main-integration-plus47/git-scope-observation-post-main.json` 与 `delivery-status-post-main.json` 核对最终主线完整 SHA，不能把文档收束 SHA 改称 APK 编译源码。具体路径和哈希见[本批记录](main-integration-plus47-2026-10-30.md)及[精确台账](reports/main-integration-plus47.json)。
+
+原分支/工作树/产物保留，SDK 三包保持 b490eec、整份锁文件不变，release/1.0 不动，不打 tag。原 Noto 保留。新截图仅软件证据，本轮没有设备操作或原生性能验收。
 
 以下内容保留各原时点记录，其中旧 main、版本及候选合并状态不代表本批最终状态。
 

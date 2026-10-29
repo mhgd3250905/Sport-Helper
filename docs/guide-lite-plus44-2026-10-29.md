@@ -1,5 +1,7 @@
 # 训练图文页轻量化：+44 / 2044
 
+> 历史候选记录：本页测试、APK 与未合并状态属于原交付时点。本批已按用户授权审核并整合为 +47，新增修复、版本台账和最终 main 对齐入口见[+47 整合记录](main-integration-plus47-2026-10-30.md)。本页原始证据保留。
+
 本轮页面归属已核对：App `lib/ui/plan_page.dart`，从聊天卡、我的计划及手工模板进入；页面不是 `ugk_trainer` 的页面。候选分支 `codex/guide-lite` 从已验收并合入 main 的 +43 `94e924fe287770f56d4e8ceeedd521e2871267da` 建立。App 版本为 `0.1.0+44`，internal arm64 的原生构建号以 APK 元数据核对为 2044；最终源码和包身份见 `E:/AII-3D/3D-Sport-AI/deliveries/guide-lite-plus44/release-apk.json`。
 
 SDK 三包及 coach override 保持 `b490eec43b408a8a35ce81a7830833bc6a3ff278`，整份 `pubspec.lock` 与 +43 相同，没有增加依赖。只读参考 SDK 公开接口，没有修改 SDK 仓库或缓存源码。main 与 release/1.0 不在本轮变更范围，候选保留未合并、未推送，交开哥真机验收。

@@ -2,7 +2,9 @@
 
 ## 当前 +47 主线整合（2026-10-30）
 
-独立的 +44 图文页、+45 生成卡 v2、+46 资源瘦身正整合为 **0.1.0+47 / internal arm64 2047**。基线为已验收 +43 main `94e924fe`；用户已授权审核后合入 main 并保存提交 push。审阅、冲突裁决、版本与证据入口见[本批整合记录](docs/main-integration-plus47-2026-10-30.md)。SDK 三包及整份锁保持 b490eec，release/1.0 不动；原 Noto 字体保留。
+已审核并整合 +44 图文页、+45 生成卡 v2、+46 资源瘦身，版本为 **0.1.0+47 / internal arm64 2047**。基线是已验收 +43 main `94e924fe`；审核发现的播放过渡、连续替换动作和缓存超额问题已修复。全量 **764/764、0 跳过**，analyze **0 问题**；同签名 APK **42,598,106B（42.60MB / 40.62MiB）**，ZIP/ELF 16KB、存储 JNI 及无 MP4 门禁通过。
+
+APK、测试与浅深色截图绑定实现提交 `ee6b83ea46b3d0ae9eccaf875b30a968087105c6`；随后仅 README/docs 收束，按用户授权推进并推送 main。主线完整 SHA 与远端对齐由本批 `post-main` 回执记录。详见[整合与交付记录](docs/main-integration-plus47-2026-10-30.md)、[精确产物台账](docs/reports/main-integration-plus47.json)。SDK 三包及整份锁保持 b490eec，release/1.0 不动，原 Noto 保留；本轮没有设备安装或真机性能验收。
 
 以下内容保留各原时点记录，其中旧 main、版本及候选合并状态不代表本批最终状态。
 

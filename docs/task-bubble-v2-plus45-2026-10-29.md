@@ -1,5 +1,7 @@
 # 生成卡 v2：+45 候选记录
 
+> 历史候选记录：本页测试、APK 与未合并状态属于原交付时点。本批已按用户授权审核并整合为 +47，新增修复、版本台账和最终 main 对齐入口见[+47 整合记录](main-integration-plus47-2026-10-30.md)。本页原始证据保留。
+
 分支 `codex/task-bubble-v2`，基于已验收并推送的 +43 main `94e924fe287770f56d4e8ceeedd521e2871267da`，版本 `0.1.0+45`（internal arm64 2045）。交接中旧 31fd3f0 基线已由开哥明确更正；+44 属于独立 guide-lite，两个候选互不依赖。三包与 coach override 固定 `b490eec43b408a8a35ce81a7830833bc6a3ff278`，整份 pubspec.lock 不变。
 
 ## 实现与边界

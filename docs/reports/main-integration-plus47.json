@@ -1,0 +1,119 @@
+{
+  "schema": "smartfit-plus47-public-ledger@1",
+  "version": "0.1.0+47",
+  "nativeVersionCode": 2047,
+  "baseSource": "94e924fe287770f56d4e8ceeedd521e2871267da",
+  "artifactAndTestSource": "ee6b83ea46b3d0ae9eccaf875b30a968087105c6",
+  "artifactSourceIdentity": {
+    "algorithm": "smartfit-android-public-inputs-v1",
+    "head": "ee6b83ea46b3d0ae9eccaf875b30a968087105c6",
+    "sourceFingerprint": "a4a4021b54fc84f9fb20bcaccb6ee6e63efcfbc4d4650e6f92b58167147afe46",
+    "inputCount": 2700
+  },
+  "publicInputsIdentity": {
+    "algorithm": "smartfit-android-public-files-v1",
+    "sha256": "e8bc998f3695ac2c96be5f070b09bccfedb23a54eff4ce1bf94ed3c090f626d8",
+    "inputCount": 2700
+  },
+  "reviewedFeatureHeads": {
+    "codex/ui-polish-1": "e3b85cc95def724675ea2ea72ad41718eb17e84e",
+    "codex/guide-lite": "30d3a4a13a97f1d5e6187420d079cf3c47c13bae",
+    "codex/task-bubble-v2": "d17128e15e709857001f6f90c7251ecb582f4cdc",
+    "codex/slim-assets": "6ef6bf773590a758a17c5ab79d95f8fb96241dc8"
+  },
+  "review": {
+    "fixedBlockingFindings": 3,
+    "mediaCompatibilityResolutions": 2
+  },
+  "sdk": "b490eec43b408a8a35ce81a7830833bc6a3ff278",
+  "entireDependencyLockUnchanged": true,
+  "tests": {
+    "passed": 764,
+    "skipped": 0,
+    "failed": 0,
+    "exitCode": 0,
+    "log": "flutter-test-full.log",
+    "sha256": "1efe4ae1b68c81c57f736b168ac3643692bc93af42122725e18285b93f6640e8"
+  },
+  "analysis": {
+    "issues": 0,
+    "exitCode": 0,
+    "log": "flutter-analyze.log",
+    "sha256": "f38ea052b9262b644bfb4d5bb78ca2a9295e771bf261122e4db54b618c22ea65"
+  },
+  "apk": {
+    "apk": "E:\\AII-3D\\3D-Sport-AI\\deliveries\\main-integration-plus47\\SmartFit-main-integration-0.1.0+47-ee6b83e-internal-arm64-v8a-release.apk",
+    "bytes": 42598106,
+    "sha256": "db67ca4505840338b25bd7a5ee11b0d188b5f18e4d05817a274b377672ea5ef7",
+    "package": "com.ugk.smartfit.internal",
+    "versionCode": 2047,
+    "signerCertificateSha256": "3761270a4764157f0e389014a9e5b800b05403bfddce0f4f7f8c039f6a53bdc7",
+    "sameSigningCertificate": true,
+    "zipalign16KBPassed": true,
+    "nativeElf16KBPassed": true,
+    "storageJniPassed": true,
+    "noMp4InZipOrAssetManifest": true
+  },
+  "sizeComparison": {
+    "baselineBytes": 143664854,
+    "savedBytes": 101066748,
+    "unit": "bytes",
+    "report": "apk-size-comparison.json"
+  },
+  "font": "Original bundled Noto retained; no system-font trial adopted.",
+  "screenshots": {
+    "source": "ee6b83ea46b3d0ae9eccaf875b30a968087105c6",
+    "count": 4,
+    "normalMotion": true,
+    "softwareRenderOnly": true,
+    "images": [
+      {
+        "file": "bubble-dark.png",
+        "bytes": 162696,
+        "sha256": "e959019e4901d8e7bee6fcaccce4acfe66c6ea237fccf16784d7ed8f177cd053",
+        "width": 1170,
+        "height": 2532
+      },
+      {
+        "file": "bubble-light.png",
+        "bytes": 159590,
+        "sha256": "a81817037fb1a700b567d7fe69b9486ef5f94913c9c5fe9f4400780e11d3e890",
+        "width": 1170,
+        "height": 2532
+      },
+      {
+        "file": "guide-dark.png",
+        "bytes": 249939,
+        "sha256": "48940784904f2127228ff455f2d13760ceacc70e009cf46664a3d59985db37fa",
+        "width": 1170,
+        "height": 3240
+      },
+      {
+        "file": "guide-light.png",
+        "bytes": 273304,
+        "sha256": "6f72f926cc74e8fc521e8426edd8f5abc7e6773e43fe84633341d26c96c5eec2",
+        "width": 1170,
+        "height": 3240
+      }
+    ],
+    "sourceReceipt": "screenshot-source.json",
+    "visualReview": "visual-review.json"
+  },
+  "mainCloseout": {
+    "rule": "README.md/docs/**-only descendant of artifactAndTestSource; main fast-forwards to that closeout commit. Its full SHA is observed after push, not self-referenced in this file.",
+    "statusReceipt": "delivery-status-post-main.json",
+    "scopeReceipt": "git-scope-observation-post-main.json",
+    "validationReceipt": "validation-post-main.json"
+  },
+  "protection": {
+    "localRelease": "6c786c08450d5a988db32af025ef0a1f8f5ae331",
+    "remoteRelease": "96fefa0b75b6764a9ff14d67dfbeb3e040bd2d31",
+    "originalFeatureHeadsPreserved": true,
+    "originalWorktreesPreserved": true,
+    "sdkSourcesModified": false,
+    "tagsCreated": false,
+    "deviceActionsPerformed": false
+  },
+  "evidenceDirectory": "E:\\AII-3D\\3D-Sport-AI\\deliveries\\main-integration-plus47",
+  "acceptanceLimit": "Source, automated tests, APK and software screenshots do not establish native device playback, retained-data installation or phone Raster P99 acceptance."
+}

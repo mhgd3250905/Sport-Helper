@@ -2,7 +2,18 @@
 
 ## 当前 +47 主线整合（2026-10-30）
 
-本批统一为 **0.1.0+47 / 2047**，基线 main `94e924fe287770f56d4e8ceeedd521e2871267da`，纳入 +41 收束文档及 +44/+45/+46 固定提交。用户明确授权本次审核、合并与 push，旧候选“未合并/未推送”边界作为历史保留。分支提交、SDK 完整 SHA、保护分支与整合回执见[本批记录](main-integration-plus47-2026-10-30.md)。不复用 +46 APK 身份，不创建 tag。
+本批统一为 **0.1.0+47 / 2047**，从已验收 main `94e924fe287770f56d4e8ceeedd521e2871267da` 纳入 +41 收束文档及 +44/+45/+46 固定提交，审核发现已修复。用户明确授权本次合并与 push，原候选“未合并/未推送”描述原时点；原分支、工作树和交付目录保留，不创建 tag。
+
+| 项目 | 本批精确记录 |
+| --- | --- |
+| 实现 / APK / 测试源码 I | `ee6b83ea46b3d0ae9eccaf875b30a968087105c6` |
+| 验证 | Flutter 3.44.7；全量 764/764、0 跳过/失败；analyze 0 问题 |
+| APK | `SmartFit-main-integration-0.1.0+47-ee6b83e-internal-arm64-v8a-release.apk`；42,598,106B |
+| APK SHA-256 | `db67ca4505840338b25bd7a5ee11b0d188b5f18e4d05817a274b377672ea5ef7` |
+| SDK 三包及 coach override | `b490eec43b408a8a35ce81a7830833bc6a3ff278`；整份锁文件对基线不变 |
+| 主线收束 D | 包含本台账的后续 README/docs-only 提交；APK 源码仍为 I，最终 main 完整 SHA 与远端一致性见 `git-scope-observation-post-main.json` |
+
+同签名、ZIP/ELF 16KB、存储 JNI、无 MP4 与 45,000,000B 上限均通过；实际包较 +43 减少 101,066,748B。完整版本、保护分支与证据见[本批记录](main-integration-plus47-2026-10-30.md)和[精确产物台账](reports/main-integration-plus47.json)。本轮不操作设备，不把构建检查计作真机验收。
 
 以下内容保留各原时点记录，其中旧 main、版本及候选合并状态不代表本批最终状态。
 
