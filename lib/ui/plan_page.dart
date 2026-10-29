@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -7,7 +8,7 @@ import '../domain/exercise.dart';
 import '../domain/plan.dart';
 import '../domain/plan_validator.dart';
 import '../domain/scenario.dart';
-import 'exercise_video.dart';
+import 'cached_exercise_media.dart';
 import 'plan_presentation.dart';
 import 'player_page.dart';
 import 'theme.dart';
@@ -37,8 +38,7 @@ class _PlanPageState extends State<PlanPage> with WidgetsBindingObserver {
   final _scroll = ScrollController();
   final _viewport = GlobalKey();
   final _videos = <String, GlobalKey>{};
-  final _started = <String>{};
-  String? _active;
+  final _coordinator = GuidePreviewCoordinator();
   bool _measurementQueued = false;
   bool _previewOn = true;
 
@@ -47,6 +47,7 @@ class _PlanPageState extends State<PlanPage> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _scroll.addListener(_measureAfterLayout);
+    _coordinator.addListener(_measureAfterLayout);
   }
 
   @override
@@ -67,45 +68,28 @@ class _PlanPageState extends State<PlanPage> with WidgetsBindingObserver {
       final viewport = _viewport.currentContext?.findRenderObject();
       if (viewport is! RenderBox || !viewport.hasSize) return;
       final view = viewport.localToGlobal(Offset.zero) & viewport.size;
-      final outside = <String>[];
-      for (final slot in _started) {
-        final box = _videos[slot]?.currentContext?.findRenderObject();
-        if (box is! RenderBox || !box.attached || !box.hasSize) {
-          outside.add(slot);
-          continue;
-        }
+      final slot = _coordinator.activeSlot;
+      if (slot == null) return;
+      final box = _videos[slot]?.currentContext?.findRenderObject();
+      var visible = 0.0;
+      if (box is RenderBox && box.attached && box.hasSize) {
         final rect = box.localToGlobal(Offset.zero) & box.size;
-        if (!rect.overlaps(view)) outside.add(slot);
+        final overlap = rect.intersect(view);
+        final area = rect.width * rect.height;
+        if (area > 0 && overlap.width > 0 && overlap.height > 0) {
+          visible = overlap.width * overlap.height / area;
+        }
       }
-      // Scrolling can stop a preview, but never starts one. Measure the video
-      // rectangle rather than its long article section below it.
-      if (outside.isNotEmpty) {
-        setState(() {
-          _started.removeAll(outside);
-          if (outside.contains(_active)) _active = null;
-        });
-      }
+      if (visible < .2) unawaited(_coordinator.release(slot));
     });
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _coordinator.dispose();
     _scroll.dispose();
     super.dispose();
-  }
-
-  void _togglePreview(String slot) {
-    if (!_previewOn) return;
-    setState(() {
-      if (_active == slot) {
-        _active = null;
-      } else {
-        _started.add(slot);
-        _active = slot;
-      }
-    });
-    _measureAfterLayout();
   }
 
   void _swap(int bi, int ii) {
@@ -155,8 +139,7 @@ class _PlanPageState extends State<PlanPage> with WidgetsBindingObserver {
     }
     setState(() {
       final slot = '$bi:$ii';
-      _started.remove(slot);
-      if (_active == slot) _active = null;
+      unawaited(_coordinator.release(slot));
       _plan = updated.copyWith(
         id: '${updated.id.split('~').first}~${DateTime.now().microsecondsSinceEpoch}',
       );
@@ -182,9 +165,8 @@ class _PlanPageState extends State<PlanPage> with WidgetsBindingObserver {
     // including a chat-owned workout launched during this route's pop animation.
     setState(() {
       _previewOn = false;
-      _active = null;
-      _started.clear();
     });
+    await _coordinator.stop();
     await WidgetsBinding.instance.endOfFrame;
     if (!mounted) return;
     if (widget.returnPlanOnStart) {
@@ -327,9 +309,6 @@ class _PlanPageState extends State<PlanPage> with WidgetsBindingObserver {
     final exercise = lib[item.exerciseId];
     final slot = '$bi:$ii';
     final videoKey = _videos.putIfAbsent(slot, GlobalKey.new);
-    final light = Theme.of(context).brightness == Brightness.light;
-    final available = exercise.media.videoAvailableFor(light: light);
-    final active = _previewOn && _active == slot;
     final dose = block.type == BlockType.circuit
         ? item.copyWith(sets: 1).doseText()
         : item.doseText();
@@ -375,37 +354,12 @@ class _PlanPageState extends State<PlanPage> with WidgetsBindingObserver {
                 child: AspectRatio(
                   key: ValueKey('article-video-$slot'),
                   aspectRatio: 1,
-                  child: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      ExerciseVideo(
-                        key: ValueKey('plan-demo-$slot-${exercise.id}'),
-                        exercise: exercise,
-                        playing: _previewOn && _started.contains(slot),
-                        paused: !active,
-                        radius: SfRadius.sm,
-                      ),
-                      if (available)
-                        Center(
-                          child: SfCircleButton(
-                            key: ValueKey('article-video-toggle-$slot'),
-                            tooltip:
-                                '${active ? '暂停' : '播放'}${exercise.name}示范',
-                            icon: active ? SfGlyph.pause : SfGlyph.play,
-                            size: 60,
-                            fill: light
-                                ? SfPalette.light.surfaceHigh
-                                : SfPalette.dark.surfaceHigh,
-                            iconColor: light
-                                ? SfPalette.light.text
-                                : SfPalette.dark.text,
-                            haptic: SfHaptic.selection,
-                            onPressed: _previewOn
-                                ? () => _togglePreview(slot)
-                                : null,
-                          ),
-                        ),
-                    ],
+                  child: GuideMedia(
+                    key: ValueKey('plan-demo-$slot-${exercise.id}'),
+                    exercise: exercise,
+                    slot: slot,
+                    coordinator: _coordinator,
+                    enabled: _previewOn,
                   ),
                 ),
               ),

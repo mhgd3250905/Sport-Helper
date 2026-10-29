@@ -1,4 +1,4 @@
-"""Regression coverage for release integrity and the small bundle contract."""
+"""Regression coverage for release integrity and cache-only video packaging."""
 
 import json
 from pathlib import Path
@@ -73,9 +73,13 @@ class BuiltinAssetsTests(unittest.TestCase):
         metadata_before, voice_before = self.metadata.read_bytes(), self.voice.read_bytes()
         report = build(self.source, self.app, apply=True)
         assets = self.app / "assets" / "training_media"
-        self.assertEqual(len(list(assets.rglob("*.mp4"))), 32)
-        self.assertEqual(report["groups"]["videos"]["files"], 32)
+        self.assertEqual(len(list(assets.rglob("*.mp4"))), 0)
+        self.assertEqual(report["groups"]["videos"], {"files": 0, "bytes": 0})
+        self.assertEqual(report["videoDelivery"], "cache-only")
+        self.assertEqual(report["videoCatalog"]["files"], 32)
         self.assertEqual(report["groups"]["covers"]["files"], 33)
+        self.assertEqual(report["groups"]["thumbs"]["files"], 33)
+        self.assertEqual(report["bundle"]["files"], 69)
         manifests = {path.name for path in (assets / "v0.3.0-app" / "packages").glob("*.json")}
         self.assertEqual(manifests, {"builtin.json", "realistic-dark.json"})
         self.assertEqual(self.snapshot(self.source.parent), source_before)
@@ -85,6 +89,7 @@ class BuiltinAssetsTests(unittest.TestCase):
         after = (self.app / "pubspec.yaml").read_text("utf-8")
         self.assertEqual(after.split("flutter:")[0], self.pubspec.split("flutter:")[0])
         self.assertNotIn("assets/cutouts/", after)
+        self.assertNotIn("assets/training_media/v0.3.0/realistic/", after)
         self.assertEqual(report, build(self.source, self.app, apply=True))
         self.assertEqual(report, build(self.source, self.app, verify_only=True))
 
@@ -133,24 +138,23 @@ class BuiltinAssetsTests(unittest.TestCase):
 
     def test_post_build_corruption_is_detected(self):
         build(self.source, self.app, apply=True)
-        path = self.app / "assets" / "training_media" / "v0.3.0" / "realistic" / "dark" / "action-00.mp4"
+        path = self.app / "assets" / "training_media" / "v0.3.0-app" / "common-lossy" / "covers" / "action-00.webp"
         path.write_bytes(b"corrupt")
         with self.assertRaisesRegex(AssetError, "mismatch"):
             build(self.source, self.app, verify_only=True)
 
 
 class CheckedInBundleTests(unittest.TestCase):
-    def test_offline_theme_assets_match_original_manifests_and_their_index(self):
+    def test_static_payloads_and_download_metadata_match_original_manifests(self):
         root = APP_ROOT / "assets" / "training_media"
         files = [path for path in root.rglob("*") if path.is_file()]
-        self.assertGreater(sum(path.stat().st_size for path in files), 85_000_000)
-        self.assertLess(sum(path.stat().st_size for path in files), 100_000_000)
-        self.assertEqual(len(files), 1132)
+        self.assertEqual(sum(path.stat().st_size for path in files), 5_628_386)
+        self.assertEqual(len(files), 941)
         main_paths = list(root.rglob("app-manifest.json"))
         self.assertEqual(len(main_paths), 1)
         app = main_paths[0].parent
         manifest = json.loads(main_paths[0].read_bytes())
-        self.assertEqual(len(list(root.rglob("*.mp4"))), 191)
+        self.assertEqual(len(list(root.rglob("*.mp4"))), 0)
         self.assertEqual({path.relative_to(app).as_posix() for path in app.rglob("*.json")},
                          {"app-manifest.json", "assets-index.json", "packages/builtin.json", "packages/realistic-dark.json", "packages/realistic-light.json"})
         references = {}
@@ -162,20 +166,34 @@ class CheckedInBundleTests(unittest.TestCase):
             for ref in json.loads(path.read_bytes())['files']:
                 references[ref['path']] = ref
         builtin = json.loads((app / "packages" / "builtin.json").read_bytes())
+        self.assertEqual(len(builtin["files"]), 32)
+        indexed_videos = {entry['path']: entry for entry in builtin['files']}
         for descriptor in builtin["files"]:
             path = app / descriptor["path"]
-            self.assertEqual(path.stat().st_size, descriptor["bytes"])
-            self.assertEqual(digest(path), descriptor["sha256"])
+            self.assertFalse(path.exists())
+            self.assertGreater(descriptor['bytes'], 0)
+            self.assertRegex(descriptor['sha256'], r'^[0-9a-f]{64}$')
         action_ids = {action["id"] for action in manifest["actions"]}
         for group in ("covers", "thumbs"):
             self.assertEqual({path.stem for path in (app / "common-lossy" / group).glob("*.webp")}, action_ids)
+        report = json.loads((APP_ROOT / 'tools/media/builtin-assets-report.json').read_bytes())
+        self.assertEqual(report['videoDelivery'], 'cache-only')
+        self.assertEqual(report['groups']['videos'], {'files': 0, 'bytes': 0})
+        self.assertEqual(report['bundle'], {'files': len(files), 'bytes': sum(p.stat().st_size for p in files)})
+        actual_inventory = [asset_builder.MediaFile(p, p.relative_to(root).as_posix(),
+                                                  p.stat().st_size, digest(p), 'checked-in')
+                            for p in files]
+        self.assertEqual(report['bundleInventorySha256'], asset_builder.inventory_hash(actual_inventory))
+        self.assertTrue(report['validatedOutput'])
+        self.assertEqual(report['outputVerification']['method'], 'checked-in-static-payload-hashes')
+        self.assertFalse(report['outputVerification']['sourceVideosReDecoded'])
         local = json.loads((app / 'assets-index.json').read_bytes())
         self.assertEqual(local['sourceAppManifestSha256'], digest(main_paths[0]))
         self.assertEqual(len(local['actions']), 93)
         for aid, themes in local['actions'].items():
             self.assertEqual(set(themes), {'dark', 'light'})
             for theme, media in themes.items():
-                for role in ('video', 'poster', 'thumbnail', 'playbackPoster'):
+                for role in ('poster', 'thumbnail', 'playbackPoster'):
                     descriptor = media[role]
                     path = APP_ROOT / descriptor['asset']
                     self.assertTrue(path.is_file())
@@ -184,12 +202,25 @@ class CheckedInBundleTests(unittest.TestCase):
                 ref = references[f'../v0.3.0/realistic/{theme}/{aid}.mp4']
                 self.assertEqual(media['video']['sha256'], ref['sha256'])
                 self.assertEqual(media['video']['bytes'], ref['bytes'])
+                self.assertFalse((APP_ROOT / media['video']['asset']).exists())
+                indexed_videos[ref['path']] = ref
                 self.assertIn('/' + theme + '/', media['poster']['asset'])
                 playback = media['playbackPoster']
                 self.assertEqual(playback['sourceSha256'], media['video']['sha256'])
                 self.assertEqual(playback['sourceFrame'], 0)
                 self.assertEqual(playback['sourceTimeSeconds'], 0)
                 self.assertIn(f'/{theme}/first-frames/', playback['asset'])
+        self.assertEqual(len(indexed_videos), 191)
+        self.assertEqual(report['videoCatalog'], {
+            'files': len(indexed_videos), 'bytes': sum(f['bytes'] for f in indexed_videos.values())})
+        # Every bundled still has an index receipt or an inherited common
+        # manifest receipt. Rehash all payloads, including the common images.
+        for group in ('covers', 'thumbs'):
+            paths = sorted((app / 'common-lossy' / group).glob('*.webp'))
+            self.assertEqual(report['groups'][group]['files'], len(paths))
+            self.assertEqual(report['groups'][group]['bytes'], sum(p.stat().st_size for p in paths))
+        pubspec = (APP_ROOT / 'pubspec.yaml').read_text('utf-8')
+        self.assertNotIn('assets/training_media/v0.3.0/realistic/', pubspec)
 
 
 class OfflineThemeBuildTests(BuiltinAssetsTests):
@@ -246,13 +277,24 @@ class OfflineThemeBuildTests(BuiltinAssetsTests):
         report = build(self.source, self.app, apply=True, offline_themes=True)
         self.assertEqual(report['offlineActionCount'], 2)
         self.assertEqual(report['offlineThemes'], ['dark', 'light'])
+        self.assertEqual(report['videoDelivery'], 'cache-only')
+        self.assertEqual(report['groups']['videos'], {'files': 0, 'bytes': 0})
+        self.assertEqual(report['videoCatalog']['files'], 35)
+        self.assertEqual(report['bundle']['files'], 83)
+        self.assertEqual(len(list((self.app / 'assets/training_media').rglob('*.mp4'))), 0)
+        self.assertNotIn('assets/training_media/v0.3.0/realistic/',
+                         (self.app / 'pubspec.yaml').read_text('utf-8'))
         index = json.loads((self.app / 'assets/training_media/v0.3.0-app/assets-index.json').read_bytes())
         for aid in self.selected:
             for theme in ('dark', 'light'):
                 media = index['actions'][aid][theme]
-                for role in ('video', 'poster', 'thumbnail', 'playbackPoster'):
+                for role in ('poster', 'thumbnail', 'playbackPoster'):
                     ref = index['actions'][aid][theme][role]
                     self.assertEqual(digest(self.app / ref['asset']), ref['sha256'])
+                video = self.source.parent / f'v0.3.0/realistic/{theme}/{aid}.mp4'
+                self.assertFalse((self.app / media['video']['asset']).exists())
+                self.assertEqual(media['video']['sha256'], digest(video))
+                self.assertEqual(media['video']['bytes'], video.stat().st_size)
                 keyframe = self.source.parent / f'v0.3.0/realistic/{theme}/keyframes/{aid}_2.webp'
                 keyframe_color = (243, 241, 239) if theme == 'light' else (16, 16, 19)
                 for role in ('poster', 'thumbnail'):

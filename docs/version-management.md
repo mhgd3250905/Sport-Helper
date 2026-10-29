@@ -1,6 +1,12 @@
 # 版本管理与台账
 
-## 当前 +43 计划讨论候选（2026-10-29）
+## 当前 +46 资源瘦身候选（2026-10-30）
+
+`codex/slim-assets` / `0.1.0+46`（internal arm64 2046），基于已验收 +43 的 main `94e924fe287770f56d4e8ceeedd521e2871267da`。三包及 coach override 保持 `b490eec43b408a8a35ce81a7830833bc6a3ff278`，整份 `pubspec.lock` 不变。全量 705/705、analyze 0 问题。+44/+45 各自独立，本轮不合并、不推送、不打 tag；main、release/1.0 与 SDK 不动。详见[本轮记录](slim-assets-plus46-2026-10-30.md)，实际提交、versionCode、APK 哈希及体积以最终回执为准。
+
+以下为各原时点台账；旧“当前”、main SHA 和“未合并”只描述当时。+43 现已验收并进入上述 main。
+
+## 历史 +43 计划讨论候选（2026-10-29 原时点）
 
 App `codex/plan-focus` / `0.1.0+43`，基于 +42 `d90054902c1cb850f246ecfad100af81b0f31bad`，尚未合并或推送。三包与 coach override 固定 `b490eec43b408a8a35ce81a7830833bc6a3ff278`，仅六个 SDK 锁引用值变化。发到对话导入完整 SDK focus；SDK 管理讨论与修改；App 支持重启、更新原记录、另存和旧 sdkVersion 数据迁移。详见[本轮记录](plan-focus-plus43-2026-10-29.md)。
 

@@ -2,12 +2,27 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:smartfit/ui/cached_exercise_media.dart';
 import 'package:smartfit/ui/exercise_video.dart';
 import 'package:smartfit/ui/theme.dart';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
 import 'package:ugk_trainer/ugk_trainer.dart';
 
 import 'posehub_ui_support.dart';
+
+String _asset(Image image) {
+  ImageProvider provider = image.image;
+  while (provider is ResizeImage) {
+    provider = provider.imageProvider;
+  }
+  return (provider as AssetImage).assetName;
+}
+
+Future<void> _frames(WidgetTester tester) async {
+  for (var i = 0; i < 8; i++) {
+    await tester.pump();
+  }
+}
 
 void main() {
   final binding = TestWidgetsFlutterBinding.ensureInitialized();
@@ -51,17 +66,12 @@ void main() {
           ),
         );
         await tester.pumpAndSettle();
-        expect(find.byType(PoseHubStandingImage), findsOneWidget);
+        expect(find.byType(ExerciseFrameZero), findsOneWidget);
+        expect(find.byType(UgkPackedAlphaVideo), findsNothing);
         final image = tester.widget<Image>(
-          find.descendant(
-            of: find.byType(PoseHubStandingImage),
-            matching: find.byType(Image),
-          ),
+          find.byKey(ValueKey('exercise-frame-zero-${action.id}')),
         );
-        expect(
-          (image.image as AssetImage).assetName,
-          endsWith('/standing/${action.id}.webp'),
-        );
+        expect(_asset(image), endsWith('/standing/${action.id}.webp'));
         expect(repo.fileRequests, isEmpty);
         expect(repo.actionRequests, isEmpty);
         expect(platform.uris, isEmpty);
@@ -94,9 +104,9 @@ void main() {
             ),
           ),
         );
-        await tester.pump();
+        await _frames(tester);
         expect(repo.actionRequests, [action.id]);
-        expect(find.byType(PoseHubStandingImage), findsOneWidget);
+        expect(find.byType(ExerciseFrameZero), findsOneWidget);
         expect(platform.uris, isEmpty);
         pending.completeError(StateError('UI-only transport failure'));
         await tester.pump();
@@ -104,7 +114,7 @@ void main() {
         expect(find.byType(PoseHubMediaPreparationPanel), findsNothing);
         expect(find.textContaining('准备失败'), findsNothing);
         expect(find.textContaining('重试'), findsNothing);
-        expect(find.byType(PoseHubStandingImage), findsOneWidget);
+        expect(find.byType(ExerciseFrameZero), findsOneWidget);
         expect(platform.uris, isEmpty);
         expect(tester.takeException(), isNull);
         await tester.pumpWidget(const SizedBox.shrink());
@@ -152,9 +162,9 @@ void main() {
         ),
       );
       await tester.pumpWidget(show(a));
-      await tester.pump();
+      await _frames(tester);
       await tester.pumpWidget(show(b));
-      await tester.pump();
+      await _frames(tester);
       first.complete(base);
       await tester.pump();
       expect(platform.uris, isEmpty);
@@ -163,8 +173,7 @@ void main() {
       expect(snapshot.ready, isFalse);
       expect(snapshot.videoSeconds, isNull);
       second.complete(base);
-      await tester.pump();
-      await tester.pump();
+      await _frames(tester);
       expect(platform.uris, [b.video.resolve(base)]);
       platform.ready(1);
       await tester.pump();
@@ -176,22 +185,20 @@ void main() {
       expect(snapshot.videoSeconds, isNull);
       await tester.pumpWidget(show(b, covered: true));
       await tester.pump();
-      expect(
-        tester.widget<PoseHubPackMedia>(find.byType(PoseHubPackMedia)).playing,
-        isFalse,
-      );
+      await _frames(tester);
+      expect(find.byType(UgkPackedAlphaVideo), findsNothing);
+      expect(platform.commands, contains((1, 'dispose', null)));
+      expect(find.byType(ExerciseFrameZero), findsOneWidget);
       await tester.pumpWidget(show(b));
       await tester.pump();
       binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
-      await tester.pump();
-      expect(
-        tester.widget<PoseHubPackMedia>(find.byType(PoseHubPackMedia)).playing,
-        isFalse,
-      );
-      expect(
-        tester.widget<PoseHubPackMedia>(find.byType(PoseHubPackMedia)).paused,
-        isTrue,
-      );
+      await _frames(tester);
+      expect(find.byType(UgkPackedAlphaVideo), findsNothing);
+      expect(find.byType(ExerciseFrameZero), findsOneWidget);
+      snapshot = await handle.capture();
+      expect(snapshot!.mediaId, b.id);
+      expect(snapshot.ready, isFalse);
+      expect(snapshot.videoSeconds, isNull);
       await tester.pumpWidget(const SizedBox.shrink());
       await tester.pump();
       expect(await handle.capture(), isNull);

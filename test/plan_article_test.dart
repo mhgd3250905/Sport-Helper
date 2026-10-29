@@ -1,16 +1,89 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smartfit/app/services.dart';
 import 'package:smartfit/domain/exercise.dart';
 import 'package:smartfit/domain/plan.dart';
 import 'package:smartfit/ui/chat/coach_ui_adapter.dart';
-import 'package:smartfit/ui/exercise_video.dart';
+import 'package:smartfit/ui/cached_exercise_media.dart';
 import 'package:smartfit/ui/plan_page.dart';
 import 'package:smartfit/ui/theme.dart';
 import 'package:ugk_trainer/ugk_trainer.dart'
-    show DrillMediaHandoff, DrillMediaView;
+    show
+        DrillMediaHandoff,
+        DrillMediaView,
+        UgkPackedAlphaVideo,
+        PackedAlphaPlatform,
+        PackedAlphaUriPlatform;
 
 import 'app_flow_test.dart' show services;
+
+/// Native transport only. The actual exported SDK widget/controller still run;
+/// these tests make no decoding or composed-alpha claim for the fixture MP4s.
+class _ArticlePlatform extends PackedAlphaPlatform
+    implements PackedAlphaUriPlatform {
+  final assets = <String>[];
+  final operations = <(String, int)>[];
+  final stream = StreamController<Map<Object?, Object?>>.broadcast(sync: true);
+  @override
+  bool get isSupported => true;
+  @override
+  Stream<Map<Object?, Object?>> get events => stream.stream;
+  @override
+  Future<({int playerId, int textureId})> create(String asset) async {
+    assets.add(asset);
+    final id = assets.length;
+    operations.add(('create', id));
+    scheduleMicrotask(() {
+      stream.add({'playerId': id, 'type': 'ready'});
+      stream.add({'playerId': id, 'type': 'first-frame'});
+    });
+    return (playerId: id, textureId: id + 100);
+  }
+
+  @override
+  Future<({int playerId, int textureId})> createUri(Uri sourceUri) =>
+      throw StateError('This legacy layout fixture uses asset media only');
+  @override
+  Future<Object?> command(int id, String type, [Object? value]) async {
+    operations.add((type, id));
+    return type == 'position' ? .25 : null;
+  }
+}
+
+late _ArticlePlatform _platform;
+
+Exercise _playable(Exercise source, SfPalette palette) {
+  final media = source.media;
+  return _copyExercise(
+    source,
+    media: ExerciseMedia(
+      id: media.id,
+      video: media.video,
+      poster: media.poster,
+      loopSeconds: media.loopSeconds,
+      posterSeconds: media.posterSeconds,
+      source: media.source,
+      videoAvailable: media.videoAvailable,
+      lightVideo: media.lightVideo,
+      lightPoster: media.lightPoster,
+      lightVideoAvailable: media.lightVideoAvailable,
+      playbackPoster: media.playbackPoster,
+      lightPlaybackPoster: media.lightPlaybackPoster,
+      packedAlphaVideo: palette.isDark ? media.video : media.lightVideo,
+      alphaPlaybackPoster: media.playbackPosterFor(light: !palette.isDark),
+    ),
+  );
+}
+
+String? _assetOf(Image image) {
+  ImageProvider provider = image.image;
+  while (provider is ResizeImage) {
+    provider = provider.imageProvider;
+  }
+  return provider is AssetImage ? provider.assetName : null;
+}
 
 const _plan = TrainingPlan(
   id: 'article',
@@ -109,14 +182,20 @@ Future<AppServices> _show(
   SfPalette palette = SfPalette.dark,
   TrainingPlan plan = _plan,
   Exercise Function(Exercise)? transform,
+  bool playable = false,
 }) async {
   tester.view.physicalSize = Size(width, height);
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
   var s = services();
-  if (transform != null) {
+  if (transform != null || playable) {
     s = AppServices(
-      library: ExerciseLibrary(s.library.all.map(transform).toList()),
+      library: ExerciseLibrary(
+        s.library.all.map((exercise) {
+          final value = transform?.call(exercise) ?? exercise;
+          return playable ? _playable(value, palette) : value;
+        }).toList(),
+      ),
       catalog: s.catalog,
       store: s.store,
       voiceLibrary: s.voiceLibrary,
@@ -129,6 +208,7 @@ Future<AppServices> _show(
       services: s,
       child: MaterialApp(
         theme: buildTheme(palette),
+        themeAnimationDuration: Duration.zero,
         builder: (context, child) => SfPaletteScope(
           child: MediaQuery(
             data: MediaQuery.of(context).copyWith(
@@ -144,29 +224,47 @@ Future<AppServices> _show(
     ),
   );
   await tester.pumpAndSettle();
+  addTearDown(() async {
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+  });
   return s;
 }
 
-Iterable<ExerciseVideo> _running(WidgetTester tester) => tester
-    .widgetList<ExerciseVideo>(find.byType(ExerciseVideo))
+Iterable<CachedExerciseMedia> _running(WidgetTester tester) => tester
+    .widgetList<CachedExerciseMedia>(find.byType(CachedExerciseMedia))
     .where((v) => v.playing && !v.paused);
 
-ExerciseVideo _video(WidgetTester tester, String slot) =>
-    tester.widget<ExerciseVideo>(
+CachedExerciseMedia _video(WidgetTester tester, String slot) =>
+    tester.widget<CachedExerciseMedia>(
       find.descendant(
         of: find.byKey(ValueKey('article-video-$slot')),
-        matching: find.byType(ExerciseVideo),
+        matching: find.byType(CachedExerciseMedia),
       ),
     );
 
 Finder _toggle(String slot) =>
     find.byKey(ValueKey('article-video-toggle-$slot'));
 
+Icon _icon(WidgetTester tester, String slot) => tester.widget<Icon>(
+  find.descendant(of: _toggle(slot), matching: find.byType(Icon)).last,
+);
+
 ListView _list(WidgetTester tester) =>
     tester.widget<ListView>(find.byKey(const ValueKey('plan-article')));
 
 void main() {
-  tearDown(() => SfColors.palette = SfPalette.dark);
+  setUp(() {
+    _platform = _ArticlePlatform();
+    UgkPackedAlphaVideo.debugPlatform = _platform;
+    UgkPackedAlphaVideo.debugFilterBuilder = (_) => const SizedBox.expand();
+  });
+  tearDown(() async {
+    UgkPackedAlphaVideo.debugPlatform = null;
+    UgkPackedAlphaVideo.debugFilterBuilder = null;
+    SfColors.palette = SfPalette.dark;
+    await _platform.stream.close();
+  });
 
   testWidgets('article hides empty or duplicate arrangement sections', (
     tester,
@@ -226,7 +324,7 @@ void main() {
     testWidgets(
       '$theme article uses themed text and stills and retains manual preview control',
       (tester) async {
-        final s = await _show(tester, palette: palette);
+        final s = await _show(tester, palette: palette, playable: true);
         final exercise = s.library['h-catcow-quad'];
         final media = exercise.media;
         final video = find.byKey(const ValueKey('article-video-0:0'));
@@ -248,32 +346,31 @@ void main() {
             .widgetList<Image>(
               find.descendant(of: video, matching: find.byType(Image)),
             )
-            .map((image) => image.image)
-            .whereType<AssetImage>()
-            .map((image) => image.assetName);
+            .map(_assetOf)
+            .whereType<String>();
         expect(stills, contains(poster));
         expect(stills, isNot(contains(otherPoster)));
-        final surface = tester.widget<DrillMediaView>(
-          find.descendant(of: video, matching: find.byType(DrillMediaView)),
-        );
-        expect(surface.stage, palette.mediaStage);
-        expect(
-          surface.media.videoAsset,
-          palette.isDark ? media.video : media.lightVideo!,
-        );
+        expect(find.byType(DrillMediaView), findsNothing);
+        expect(find.byType(UgkPackedAlphaVideo), findsNothing);
+        expect(_platform.assets, isEmpty);
         expect(find.byType(DrillMediaHandoff), findsNothing);
         final control = _toggle('0:0');
         expect(control.hitTestable(), findsOneWidget);
-        expect(tester.widget<SfCircleButton>(control).iconColor, palette.text);
+        expect(
+          _icon(tester, '0:0').color,
+          palette.isDark ? Colors.white : palette.accent,
+        );
+        expect(tester.getSize(control), const Size(44, 44));
         expect(_running(tester), isEmpty);
 
         await tester.tap(control);
         await tester.pumpAndSettle();
         expect(_running(tester), hasLength(1));
         expect(
-          tester.widget<SfCircleButton>(control).tooltip,
-          '暂停${exercise.name}示范',
+          _platform.assets.single,
+          palette.isDark ? media.video : media.lightVideo!,
         );
+        expect(_icon(tester, '0:0').icon, Icons.pause_rounded);
         await tester.tap(control);
         await tester.pumpAndSettle();
         expect(_video(tester, '0:0').playing, isTrue);
@@ -297,10 +394,7 @@ void main() {
         await tester.pumpAndSettle();
         expect(_video(tester, '0:0').playing, isFalse);
         expect(control.hitTestable(), findsOneWidget);
-        expect(
-          tester.widget<SfCircleButton>(control).tooltip,
-          '播放${exercise.name}示范',
-        );
+        expect(_icon(tester, '0:0').icon, Icons.play_arrow_rounded);
         expect(_running(tester), isEmpty);
         expect(tester.takeException(), isNull);
       },
@@ -339,13 +433,10 @@ void main() {
   testWidgets('preview requires a tap and pauses/resumes its retained frame', (
     tester,
   ) async {
-    final s = await _show(tester);
+    await _show(tester, playable: true);
     final control = _toggle('0:0');
     expect(_video(tester, '0:0').playing, isFalse);
-    expect(
-      tester.widget<SfCircleButton>(control).tooltip,
-      '播放${s.library['h-catcow-quad'].name}示范',
-    );
+    expect(_icon(tester, '0:0').icon, Icons.play_arrow_rounded);
     await tester.tap(control);
     await tester.pumpAndSettle();
     expect(_running(tester), hasLength(1));
@@ -362,35 +453,52 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('selecting another visible preview pauses the previous one', (
-    tester,
-  ) async {
-    await _show(tester, height: 1000);
-    await tester.tap(_toggle('0:0'));
-    await tester.pumpAndSettle();
-    final view = tester.getRect(find.byKey(const ValueKey('plan-article')));
-    final second = _toggle('1:0');
-    final shift = tester.getRect(second).bottom - view.bottom + 64;
-    if (shift > 0) {
-      _list(tester).controller!.jumpTo(shift);
+  testWidgets(
+    'selecting another visible preview releases the previous decoder',
+    (tester) async {
+      await _show(tester, height: 1000, playable: true);
+      await tester.tap(_toggle('0:0'));
       await tester.pumpAndSettle();
-    }
-    expect(_video(tester, '0:0').playing, isTrue);
-    await tester.tap(second);
-    await tester.pumpAndSettle();
-    expect(_video(tester, '0:0').playing, isTrue);
-    expect(_video(tester, '0:0').paused, isTrue);
-    expect(_video(tester, '1:0').playing, isTrue);
-    expect(_video(tester, '1:0').paused, isFalse);
-    expect(_running(tester), hasLength(1));
-    expect(tester.takeException(), isNull);
-  });
+      final view = tester.getRect(find.byKey(const ValueKey('plan-article')));
+      final second = _toggle('1:0');
+      final shift = tester.getRect(second).bottom - view.bottom + 64;
+      if (shift > 0) {
+        _list(tester).controller!.jumpTo(shift);
+        await tester.pumpAndSettle();
+      }
+      expect(_video(tester, '0:0').playing, isTrue);
+      final visibleMedia = tester
+          .getRect(find.byKey(const ValueKey('article-video-1:0')))
+          .intersect(view);
+      expect(visibleMedia.height, greaterThan(48));
+      // The right-side button can overlap the floating training action. Tap
+      // the visible left side of the same media instead of the covered centre.
+      final point = visibleMedia.topLeft + const Offset(24, 24);
+      expect(
+        tester.getRect(find.byKey(const ValueKey('start'))).contains(point),
+        isFalse,
+      );
+      await tester.tapAt(point);
+      await tester.pumpAndSettle();
+      expect(_video(tester, '0:0').playing, isFalse);
+      expect(_video(tester, '1:0').playing, isTrue);
+      expect(_video(tester, '1:0').paused, isFalse);
+      expect(_running(tester), hasLength(1));
+      expect(find.byType(UgkPackedAlphaVideo), findsOneWidget);
+      expect(
+        _platform.operations.indexOf(('dispose', 1)),
+        lessThan(_platform.operations.indexOf(('create', 2))),
+      );
+      expect(tester.takeException(), isNull);
+    },
+  );
 
   testWidgets(
     'video leaving the viewport stops even while its article remains',
     (tester) async {
       await _show(
         tester,
+        playable: true,
         transform: (e) => e.id == 'h-catcow-quad'
             ? _copyExercise(e, cues: List.filled(9, e.cues.first))
             : e,

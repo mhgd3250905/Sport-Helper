@@ -1,6 +1,12 @@
 # 本机验收记录
 
-## 当前 +43 计划讨论候选（2026-10-29）
+## 当前 +46 资源瘦身候选（2026-10-30）
+
+基于用户已验收的 +43 / main `94e924fe`，本轮 +46 全量 705/705、0 跳过，analyze 0 问题，素材工具 Python 22/22 通过。APK 门禁、体积对比及字体源图回执统一位于 `E:/AII-3D/3D-Sport-AI/deliveries/slim-assets-plus46/`，范围见[本轮记录](slim-assets-plus46-2026-10-30.md)。目标体积须以实际 APK 核验；软件验证不替代真机验收。字体选择待用户回复，Noto 保留；本轮未安装设备。
+
+以下各节仅为对应日期的历史检查点；其候选状态及旧 main SHA 不替代本轮回执。+43 后续已验收合入 main。
+
+## 历史 +43 计划讨论候选（2026-10-29 原时点）
 
 `codex/plan-focus` / `0.1.0+43` 接入 SDK b490eec 的 focus、恢复和版本保存，交开哥真机验收。三轮真实回复、末轮 messages、四张实际聊天组件浅深软件截图、最终全量测试/分析及 APK 门禁分别见[本轮记录](plan-focus-plus43-2026-10-29.md)和 `E:/AII-3D/3D-Sport-AI/deliveries/plan-focus-plus43/validation.json`。真实 v3 的 targetMinutes 为 5，SDK 估时为 313 秒。本轮候选未合并、未推送；以下保留历史检查点，不替代当前交付证据。
 

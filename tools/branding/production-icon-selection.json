@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "variant": "A2",
-  "source": "assets/brand/source/smartfit-icon-v3-fullbody-zoom.png",
+  "source": "design/brand-source/smartfit-icon-v3-fullbody-zoom.png",
   "sourceSha256": "ad29f8ed04a444bdea1cb46433d4c5c412613a263144e1ad2021c7527f4c8894",
   "proposedDate": "2026-10-24",
   "status": "user_selected_default",

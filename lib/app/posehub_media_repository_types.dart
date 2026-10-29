@@ -43,12 +43,38 @@ class PoseHubMediaException implements Exception {
   String toString() => message;
 }
 
-/// Optional settings capability. Only this repository's current version and
-/// catalogue are managed; bundled images, other versions and user data stay.
+/// Optional settings capability for the App's shared published-video budget.
+/// Images, partial downloads, unknown files and playing videos are preserved.
 abstract interface class PoseHubVideoCache {
-  /// Published video bytes on disk, excluding images and unfinished downloads.
+  /// Shared published-video budget, including preserved unknown legacy SHA
+  /// objects conservatively. Image paths and unfinished downloads are excluded.
   Future<int> videoCacheBytes();
   Future<void> clearVideoCache();
+}
+
+const poseHubVideoCacheLimitBytes = 300000000;
+
+/// Trusted legacy descriptor. The old SDK stores this video at version/SHA.
+class PoseHubLegacyVideoFile {
+  const PoseHubLegacyVideoFile({
+    required this.version,
+    required this.bytes,
+    required this.sha256,
+  });
+
+  final String version;
+  final int bytes;
+  final String sha256;
+}
+
+/// Optional playback capability; older repository fakes need not implement it.
+abstract interface class PoseHubVideoCacheAccess {
+  /// Validates a published video and records its use, without downloading.
+  Future<Uri?> cachedVideo(String actionId);
+
+  /// Protects a video before asynchronous preparation/playback begins. Release
+  /// after the decoder is disposed; repeated release calls have no effect.
+  void Function() retainVideo(String actionId);
 }
 
 /// Internal platform boundary, so the public service also compiles for Web.
@@ -56,6 +82,7 @@ abstract interface class PoseHubMediaFileStore {
   Uri get mediaBaseUri;
   Future<Uri?> cached(coach.PoseHubPackFile file);
   Future<Uri?> reusable(coach.PoseHubPackFile file);
+  void Function() retainVideo(coach.PoseHubPackFile file);
   Future<Uri> bundled(
     coach.PoseHubPackFile file,
     Uint8List bytes,

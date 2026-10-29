@@ -66,7 +66,7 @@ def png_bytes(image: Image.Image) -> bytes:
 
 def read_source(root: Path, variant: str) -> tuple[Image.Image, bytes]:
     filename, digest = VARIANTS[variant]
-    content = (root / "assets/brand/source" / filename).read_bytes()
+    content = (root / "design/brand-source" / filename).read_bytes()
     if sha256(content) != digest:
         raise ValueError(f"Icon {variant}: source hash differs from the reviewed artwork")
     image = Image.open(io.BytesIO(content))
@@ -152,7 +152,7 @@ def verify_selected_production(
     )
     variant = LOCAL_DEFAULT_VARIANT
     if (selection.get("schemaVersion") != 1 or selection.get("variant") != variant
-            or selection.get("source") != f"assets/brand/source/{VARIANTS[variant][0]}"
+            or selection.get("source") != f"design/brand-source/{VARIANTS[variant][0]}"
             or selection.get("sourceSha256") != VARIANTS[variant][1]):
         raise ValueError("Production selection differs from the local default artwork")
     expected = selected_production_assets(generated)
@@ -224,7 +224,7 @@ def build_assets(root: Path = ROOT) -> dict[str, bytes]:
         ).encode("utf-8")
         variants[variant] = {
             "label": VARIANT_LABELS[variant],
-            "source": f"assets/brand/source/{VARIANTS[variant][0]}",
+            "source": f"design/brand-source/{VARIANTS[variant][0]}",
             "sourceSize": [1024, 1024],
             "sourceMode": "RGB",
             "sourceSha256": sha256(source_bytes),

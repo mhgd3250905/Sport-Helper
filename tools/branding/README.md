@@ -7,7 +7,7 @@ original full-body artwork and make it slightly larger with complete feet.
 branch to main. This selects the production icon resources; it does not itself
 publish a new production binary.
 
-| Parameter | Source in assets/brand/source | Composition |
+| Parameter | Source in design/brand-source | Composition |
 | --- | --- | --- |
 | A | smartfit-icon-v3.png | Original full body |
 | B | smartfit-icon-v4-crop.png | Original supplied crop; lower legs cut by source |

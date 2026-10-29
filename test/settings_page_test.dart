@@ -113,17 +113,20 @@ void main() {
           findsOneWidget,
         );
         final icon = tester.widget<Image>(
-          find.byWidgetPredicate(
-            (widget) =>
-                widget is Image &&
-                widget.image is AssetImage &&
-                (widget.image as AssetImage).assetName.endsWith(
-                  'smartfit-icon-v4-crop.png',
-                ),
-          ),
+          find.byWidgetPredicate((widget) {
+            if (widget is! Image) return false;
+            ImageProvider provider = widget.image;
+            while (provider is ResizeImage) {
+              provider = provider.imageProvider;
+            }
+            return provider is AssetImage &&
+                provider.assetName ==
+                    'ios/Runner/Assets.xcassets/AppIconB.appiconset/Icon-App-60x60@3x.png';
+          }),
         );
         expect(icon.width, 56);
         expect(icon.height, 56);
+        expect((icon.image as ResizeImage).width, 56);
         expect(
           find.text(
             '版本 0.9.8 (7042)${TrainingMediaConfig.isInternal ? ' · 内测' : ''}',

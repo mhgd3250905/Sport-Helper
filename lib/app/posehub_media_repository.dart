@@ -14,7 +14,10 @@ export 'posehub_media_repository_types.dart'
         PoseHubDownloadPhase,
         PoseHubDownloadState,
         PoseHubMediaException,
-        PoseHubVideoCache;
+        PoseHubLegacyVideoFile,
+        PoseHubVideoCache,
+        PoseHubVideoCacheAccess,
+        poseHubVideoCacheLimitBytes;
 
 abstract interface class PoseHubMediaRepository {
   static Future<PoseHubMediaRepository> create({
@@ -44,8 +47,12 @@ abstract interface class PoseHubMediaRepository {
     bool allowInsecureLocalhost = false,
     Duration timeout = const Duration(seconds: 15),
     Duration progressInterval = const Duration(milliseconds: 100),
-    int maxConcurrent = 3,
+    int maxConcurrent = 2,
     int maxRedirects = 5,
+    int maxVideoCacheBytes = poseHubVideoCacheLimitBytes,
+    // Explicit AppCache parent for fixtures; no device directories are queried.
+    String? legacyCacheDirectory,
+    List<PoseHubLegacyVideoFile> legacyVideos = const [],
   }) => _create(
     catalog: catalog,
     catalogRevision: catalogRevision,
@@ -58,6 +65,9 @@ abstract interface class PoseHubMediaRepository {
     progressInterval: progressInterval,
     maxConcurrent: maxConcurrent,
     maxRedirects: maxRedirects,
+    maxVideoCacheBytes: maxVideoCacheBytes,
+    legacyCacheDirectory: legacyCacheDirectory,
+    legacyVideos: legacyVideos,
   );
 
   /// Created immediately; it does not promise that all catalogue files exist.
@@ -79,8 +89,11 @@ Future<PoseHubMediaRepository> _create({
   bool allowInsecureLocalhost = false,
   Duration timeout = const Duration(seconds: 15),
   Duration progressInterval = const Duration(milliseconds: 100),
-  int maxConcurrent = 3,
+  int maxConcurrent = 2,
   int maxRedirects = 5,
+  int maxVideoCacheBytes = poseHubVideoCacheLimitBytes,
+  String? legacyCacheDirectory,
+  List<PoseHubLegacyVideoFile> legacyVideos = const [],
 }) async {
   if (!RegExp(r'^[a-f0-9]{64}$').hasMatch(catalogRevision) ||
       !RegExp(r'^[a-z0-9]+(?:-[a-z0-9]+)*$').hasMatch(packVersion) ||
@@ -89,6 +102,8 @@ Future<PoseHubMediaRepository> _create({
       progressInterval < Duration.zero ||
       maxConcurrent < 1 ||
       maxConcurrent > 3 ||
+      maxVideoCacheBytes < 1 ||
+      maxVideoCacheBytes > poseHubVideoCacheLimitBytes ||
       maxRedirects < 0 ||
       maxRedirects > 8) {
     throw const FormatException('Invalid media repository configuration.');
@@ -103,11 +118,16 @@ Future<PoseHubMediaRepository> _create({
     packVersion: packVersion,
     rootDirectory: rootDirectory,
     files: files.values.toList(),
-    videos: catalog.allActions.map((action) => action.video).toList(),
+    videos: {
+      for (final action in catalog.allActions) action.video.path: action.video,
+    }.values.toList(),
     mediaBaseUrls: bases,
     allowInsecureLocalhost: allowInsecureLocalhost,
     timeout: timeout,
     maxRedirects: maxRedirects,
+    maxVideoCacheBytes: maxVideoCacheBytes,
+    legacyCacheDirectory: legacyCacheDirectory,
+    legacyVideos: legacyVideos,
   );
   return _Repository(
     catalog,
@@ -121,7 +141,11 @@ Future<PoseHubMediaRepository> _create({
   );
 }
 
-class _Repository implements PoseHubMediaRepository, PoseHubVideoCache {
+class _Repository
+    implements
+        PoseHubMediaRepository,
+        PoseHubVideoCache,
+        PoseHubVideoCacheAccess {
   _Repository(
     this.catalog,
     this.files,
@@ -138,6 +162,7 @@ class _Repository implements PoseHubMediaRepository, PoseHubVideoCache {
         (_actionsForFile[file.path] ??= {}).add(action.id);
         (_filesForHash[file.sha256] ??= []).add(file);
         if (role.key != 'video') _images.add(file.path);
+        if (role.key == 'video') _videos.add(file.path);
       }
     }
   }
@@ -159,6 +184,7 @@ class _Repository implements PoseHubMediaRepository, PoseHubVideoCache {
   final _actionsForFile = <String, Set<String>>{};
   final _filesForHash = <String, List<coach.PoseHubPackFile>>{};
   final _images = <String>{};
+  final _videos = <String>{};
   final _lastProgress = <String, DateTime>{};
   final _queue = <({Completer<void> ready, int? generation})>[];
   int _active = 0;
@@ -334,6 +360,12 @@ class _Repository implements PoseHubMediaRepository, PoseHubVideoCache {
   }
 
   Future<Uri> _ensureFile(coach.PoseHubPackFile file, int? generation) async {
+    // Content aliases may be the source of materialize(), so keep them alive
+    // until this request has finished copying and publishing its own path.
+    final releases = [
+      for (final alias in _filesForHash[file.sha256]!)
+        if (_videos.contains(alias.path)) store.retainVideo(alias),
+    ];
     try {
       _check(generation);
       _set(file, PoseHubDownloadPhase.checking);
@@ -354,6 +386,10 @@ class _Repository implements PoseHubMediaRepository, PoseHubVideoCache {
       final safe = _safeError(error);
       _set(file, PoseHubDownloadPhase.failed, error: safe);
       throw safe;
+    } finally {
+      for (final release in releases) {
+        release();
+      }
     }
   }
 
@@ -438,6 +474,9 @@ class _Repository implements PoseHubMediaRepository, PoseHubVideoCache {
           // A disposed consumer does not start a new mirror request. Each
           // failed transport has already closed and removed its own temp file.
           _check(generation);
+          if (error is PoseHubMediaException && error.code == 'cache_full') {
+            rethrow;
+          }
           failure = error;
         }
       }
@@ -503,6 +542,25 @@ class _Repository implements PoseHubMediaRepository, PoseHubVideoCache {
     );
     return next;
   }
+
+  @override
+  Future<Uri?> cachedVideo(String actionId) async {
+    final video = _action(actionId).video;
+    await _clearing;
+    _check();
+    final uri = await store.cached(video);
+    _check();
+    _set(
+      video,
+      uri == null ? PoseHubDownloadPhase.idle : PoseHubDownloadPhase.ready,
+      received: uri == null ? 0 : video.bytes,
+    );
+    return uri;
+  }
+
+  @override
+  void Function() retainVideo(String actionId) =>
+      store.retainVideo(_action(actionId).video);
 
   @override
   Future<int> videoCacheBytes() async {

@@ -12,6 +12,7 @@ class _Fixture {
   _Fixture({
     int actions = 2,
     int videoBytes = 4096,
+    List<int>? videoSizes,
     int coverBytes = 48,
     bool sharedVideos = false,
   }) {
@@ -23,7 +24,9 @@ class _Fixture {
         final path = 'media/$id/$role.${role == 'video' ? 'mp4' : 'webp'}';
         final bytes = Uint8List.fromList(
           List.generate(
-            role == 'video' ? videoBytes : (role == 'cover' ? coverBytes : 24),
+            role == 'video'
+                ? (videoSizes?[i] ?? videoBytes)
+                : (role == 'cover' ? coverBytes : 24),
             (n) =>
                 (n * 17 +
                     role.length +
@@ -154,10 +157,11 @@ void main() {
     bool offline = false,
     Duration timeout = const Duration(seconds: 3),
     Duration progressInterval = const Duration(milliseconds: 25),
-    int concurrent = 3,
+    int concurrent = 2,
     int redirects = 5,
     String? revision,
     String packVersion = 'r1-v3',
+    int cacheBytes = poseHubVideoCacheLimitBytes,
   }) async {
     final result = await PoseHubMediaRepository.forTesting(
       catalog: fixture.catalog,
@@ -171,6 +175,7 @@ void main() {
       progressInterval: progressInterval,
       maxConcurrent: concurrent,
       maxRedirects: redirects,
+      maxVideoCacheBytes: cacheBytes,
     );
     repositories.add(result);
     return result;
@@ -574,7 +579,14 @@ void main() {
         await request.response.close();
         active--;
       };
-      final repo = await create(concurrent: 2);
+      final repo = await PoseHubMediaRepository.forTesting(
+        catalog: fixture.catalog,
+        catalogRevision: fixture.revision,
+        mediaBaseUrls: [base],
+        rootDirectory: support.path,
+        allowInsecureLocalhost: true,
+      );
+      repositories.add(repo);
       final work = Future.wait(
         fixture.catalog.allActions.take(3).map((a) => repo.ensureFile(a.video)),
       );
@@ -593,6 +605,10 @@ void main() {
       gate.complete();
       await work;
       expect(highest, 2);
+      expect(requested, [
+        for (final action in fixture.catalog.allActions.take(3))
+          '/${action.video.path}',
+      ]);
       expect(requested.length, 3);
       expect(requested.any((path) => path.contains('action-3')), isFalse);
     },
@@ -933,7 +949,7 @@ void main() {
   );
 
   test(
-    'video cache usage and clear preserve images, data and other versions',
+    'global video usage and clear preserve images, data and unknown versions',
     () async {
       final repo = await create(
         bundled: (file) async => fixture.bodies[file.path],
@@ -968,17 +984,20 @@ void main() {
             : File.fromUri(Directory(directory).uri.resolve(video.path));
         final bytes = isTrainingData
             ? utf8.encode('keep-user-data')
-            : fixture.bodies[video.path]!;
+            : utf8.encode('unrecognized-old-video');
         await keep.parent.create(recursive: true);
         await keep.writeAsBytes(bytes);
         preserved[keep] = bytes;
       }
+      final unknownBytes = preserved.entries
+          .where((entry) => entry.key.path.contains('posehub-media'))
+          .fold<int>(0, (n, entry) => n + entry.value.length);
       expect(
         await cache.videoCacheBytes(),
-        3 + fixture.catalog.allActions.last.video.bytes,
+        3 + fixture.catalog.allActions.last.video.bytes + unknownBytes,
       );
       await cache.clearVideoCache();
-      expect(await cache.videoCacheBytes(), 0);
+      expect(await cache.videoCacheBytes(), unknownBytes);
       expect(await stale.exists(), isFalse);
       for (final action in fixture.catalog.allActions) {
         expect(
@@ -1206,6 +1225,412 @@ void main() {
       }
     },
   );
+
+  test(
+    'cache-only lookup validates, touches and never requests a miss',
+    () async {
+      final repo = await create();
+      final access = repo as PoseHubVideoCacheAccess;
+      final action = fixture.first;
+      expect(await access.cachedVideo(action.id), isNull);
+      expect(requested, isEmpty);
+      final uri = await repo.ensureFile(action.video);
+      final file = File.fromUri(uri);
+      final old = DateTime.utc(2020);
+      await file.setLastModified(old);
+      expect(await access.cachedVideo(action.id), uri);
+      expect((await file.lastModified()).isAfter(old), isTrue);
+      expect(requested, ['/${action.video.path}']);
+      await file.writeAsBytes(Uint8List(action.video.bytes));
+      expect(await access.cachedVideo(action.id), isNull);
+      expect(requested, ['/${action.video.path}']);
+      expect(
+        repo.watchFile(action.video).value.phase,
+        PoseHubDownloadPhase.idle,
+      );
+    },
+  );
+
+  test(
+    'cache hits persist their LRU order across repository restart',
+    () async {
+      fixture = _Fixture(actions: 3);
+      final actions = fixture.catalog.allActions.toList();
+      final first = await create(cacheBytes: 8192);
+      await first.ensureFile(actions[0].video);
+      await first.ensureFile(actions[1].video);
+      final a = File.fromUri(actions[0].video.resolve(first.mediaBaseUri));
+      final b = File.fromUri(actions[1].video.resolve(first.mediaBaseUri));
+      await a.setLastModified(DateTime.utc(2020));
+      await b.setLastModified(DateTime.utc(2021));
+      await (first as PoseHubVideoCacheAccess).cachedVideo(actions[0].id);
+      final lastUse = await a.lastModified();
+      expect(lastUse.isAfter(await b.lastModified()), isTrue);
+      first.dispose();
+      final reopened = await create(cacheBytes: 8192);
+      expect(await a.lastModified(), lastUse);
+      await reopened.ensureFile(actions[2].video);
+      expect(await a.exists(), isTrue);
+      expect(await b.exists(), isFalse);
+      expect(await (reopened as PoseHubVideoCache).videoCacheBytes(), 8192);
+      expect(requested, [
+        for (final action in actions) '/${action.video.path}',
+      ]);
+      await noParts(reopened);
+    },
+  );
+
+  test(
+    'reopening enforces the cap on older unbounded published videos',
+    () async {
+      fixture = _Fixture(actions: 3);
+      final actions = fixture.catalog.allActions.toList();
+      final first = await create();
+      for (var index = 0; index < actions.length; index++) {
+        final uri = await first.ensureFile(actions[index].video);
+        await File.fromUri(uri).setLastModified(DateTime.utc(2020 + index));
+      }
+      first.dispose();
+      final current = await create(cacheBytes: 8192, offline: true);
+      expect(await (current as PoseHubVideoCache).videoCacheBytes(), 8192);
+      expect(
+        await File.fromUri(
+          actions[0].video.resolve(current.mediaBaseUri),
+        ).exists(),
+        isFalse,
+      );
+      for (final action in actions.skip(1)) {
+        expect(
+          await File.fromUri(
+            action.video.resolve(current.mediaBaseUri),
+          ).exists(),
+          isTrue,
+        );
+      }
+      expect(requested, hasLength(3));
+    },
+  );
+
+  test(
+    'reference-counted playing pins reject additions and release idempotently',
+    () async {
+      fixture = _Fixture(actions: 3);
+      final actions = fixture.catalog.allActions.toList();
+      final repo = await create(cacheBytes: 4096);
+      final access = repo as PoseHubVideoCacheAccess;
+      final firstUri = await repo.ensureFile(actions[0].video);
+      final releaseOne = access.retainVideo(actions[0].id);
+      final releaseTwo = access.retainVideo(actions[0].id);
+      final full = isA<PoseHubMediaException>().having(
+        (e) => e.code,
+        'code',
+        'cache_full',
+      );
+      await expectLater(repo.ensureFile(actions[1].video), throwsA(full));
+      expect(
+        await File.fromUri(firstUri).readAsBytes(),
+        fixture.bodies[actions[0].video.path],
+      );
+      releaseOne();
+      releaseOne();
+      await expectLater(repo.ensureFile(actions[2].video), throwsA(full));
+      expect(await (repo as PoseHubVideoCache).videoCacheBytes(), 4096);
+      await noParts(repo);
+      releaseTwo();
+      releaseTwo();
+      await repo.ensureFile(actions[1].video);
+      expect(await File.fromUri(firstUri).exists(), isFalse);
+      expect(await access.cachedVideo(actions[1].id), isNotNull);
+      await noParts(repo);
+    },
+  );
+
+  test(
+    'insufficient unpinned room preserves every old file before rejecting',
+    () async {
+      fixture = _Fixture(actions: 3, videoSizes: [4096, 4096, 8192]);
+      final actions = fixture.catalog.allActions.toList();
+      final repo = await create(cacheBytes: 8192);
+      await repo.ensureFile(actions[0].video);
+      await repo.ensureFile(actions[1].video);
+      final release = (repo as PoseHubVideoCacheAccess).retainVideo(
+        actions[1].id,
+      );
+      try {
+        await expectLater(
+          repo.ensureFile(actions[2].video),
+          throwsA(
+            isA<PoseHubMediaException>().having(
+              (e) => e.code,
+              'code',
+              'cache_full',
+            ),
+          ),
+        );
+        for (final action in actions.take(2)) {
+          expect(
+            await File.fromUri(
+              action.video.resolve(repo.mediaBaseUri),
+            ).readAsBytes(),
+            fixture.bodies[action.video.path],
+          );
+        }
+        expect(await (repo as PoseHubVideoCache).videoCacheBytes(), 8192);
+        await noParts(repo);
+      } finally {
+        release();
+      }
+    },
+  );
+
+  test(
+    'same-root handles serialize concurrent publication under one cap',
+    () async {
+      fixture = _Fixture(actions: 4);
+      final actions = fixture.catalog.allActions.toList();
+      final first = await create(cacheBytes: 8192);
+      await first.ensureFile(actions[0].video);
+      await first.ensureFile(actions[1].video);
+      final second = await create(cacheBytes: 8192);
+      final snapshots = <Future<int>>[];
+      for (final (repo, action) in [
+        (first, actions[2]),
+        (second, actions[3]),
+      ]) {
+        final state = repo.watchFile(action.video);
+        state.addListener(() {
+          if (state.value.phase == PoseHubDownloadPhase.ready) {
+            snapshots.add((repo as PoseHubVideoCache).videoCacheBytes());
+          }
+        });
+      }
+      await Future.wait([
+        first.ensureFile(actions[2].video),
+        second.ensureFile(actions[3].video),
+      ]);
+      expect(await (first as PoseHubVideoCache).videoCacheBytes(), 8192);
+      expect(
+        await Future.wait(snapshots),
+        everyElement(lessThanOrEqualTo(8192)),
+      );
+      for (final action in actions.take(2)) {
+        expect(
+          await File.fromUri(action.video.resolve(first.mediaBaseUri)).exists(),
+          isFalse,
+        );
+      }
+      for (final action in actions.skip(2)) {
+        expect(
+          await File.fromUri(action.video.resolve(first.mediaBaseUri)).exists(),
+          isTrue,
+        );
+      }
+      await noParts(first);
+    },
+  );
+
+  test(
+    'LRU budgets unknown version videos while preserving images and parts',
+    () async {
+      fixture = _Fixture(actions: 3);
+      final actions = fixture.catalog.allActions.toList();
+      final repo = await create(
+        cacheBytes: 8192,
+        bundled: (file) async => fixture.bodies[file.path],
+      );
+      await repo.ensureAction(actions[0].id);
+      await repo.ensureFile(actions[1].video);
+      final oldest = File.fromUri(actions[0].video.resolve(repo.mediaBaseUri));
+      await oldest.setLastModified(DateTime.utc(2020));
+      final preserved = <File>[
+        File('${oldest.path}.123_456_789.part'),
+        File('${oldest.parent.path}/unknown.mp4'),
+        File(
+          '${support.path}/posehub-media/r1-v2/${fixture.revision}/media/other/video.mp4',
+        ),
+        File(
+          '${support.path}/posehub-media/r1-v3/${'b' * 64}/media/other/video.mp4',
+        ),
+        File('${support.path}/posehub-media/${'d' * 64}/media/other/video.mp4'),
+      ];
+      for (final file in preserved) {
+        await file.parent.create(recursive: true);
+        await file.writeAsString('preserved');
+      }
+      await repo.ensureFile(actions[2].video);
+      expect(await oldest.exists(), isFalse);
+      for (final file in preserved) {
+        expect(await file.readAsString(), 'preserved');
+      }
+      for (final image in [actions[0].cover, actions[0].thumbnail]) {
+        expect(
+          await File.fromUri(image.resolve(repo.mediaBaseUri)).readAsBytes(),
+          fixture.bodies[image.path],
+        );
+      }
+      expect(
+        await (repo as PoseHubVideoCache).videoCacheBytes(),
+        actions[2].video.bytes + 4 * utf8.encode('preserved').length,
+      );
+    },
+  );
+
+  test('bad incoming hash cannot evict a healthy old cached video', () async {
+    final repo = await create(cacheBytes: 4096);
+    final first = fixture.first.video;
+    final second = fixture.catalog.allActions.last.video;
+    final original = await repo.ensureFile(first);
+    handler = (request) async {
+      request.response.contentLength = second.bytes;
+      request.response.add(Uint8List(second.bytes));
+      await request.response.close();
+    };
+    await expectLater(
+      repo.ensureFile(second),
+      throwsA(
+        isA<PoseHubMediaException>().having((e) => e.code, 'code', 'sha256'),
+      ),
+    );
+    expect(
+      await File.fromUri(original).readAsBytes(),
+      fixture.bodies[first.path],
+    );
+    expect(await (repo as PoseHubVideoCache).videoCacheBytes(), 4096);
+    await noParts(repo);
+  });
+
+  test('clear and a second handle preserve a retained playing video', () async {
+    final first = await create(cacheBytes: 4096);
+    final uri = await first.ensureFile(fixture.first.video);
+    final access = first as PoseHubVideoCacheAccess;
+    final release = access.retainVideo(fixture.first.id);
+    final second = await create(cacheBytes: 4096);
+    await (second as PoseHubVideoCache).clearVideoCache();
+    expect(await File.fromUri(uri).exists(), isTrue);
+    await expectLater(
+      second.ensureFile(fixture.catalog.allActions.last.video),
+      throwsA(
+        isA<PoseHubMediaException>().having(
+          (e) => e.code,
+          'code',
+          'cache_full',
+        ),
+      ),
+    );
+    release();
+    await (second as PoseHubVideoCache).clearVideoCache();
+    expect(await File.fromUri(uri).exists(), isFalse);
+  });
+
+  test('an unsafe publish destination cannot evict any old video', () async {
+    fixture = _Fixture(actions: 3);
+    final actions = fixture.catalog.allActions.toList();
+    final repo = await create(cacheBytes: 8192);
+    await repo.ensureFile(actions[0].video);
+    await repo.ensureFile(actions[1].video);
+    final invalid = Directory.fromUri(
+      actions[2].video.resolve(repo.mediaBaseUri),
+    );
+    await invalid.create(recursive: true);
+    await expectLater(
+      repo.ensureFile(actions[2].video),
+      throwsA(
+        isA<PoseHubMediaException>().having(
+          (e) => e.code,
+          'code',
+          'unsafe_cache',
+        ),
+      ),
+    );
+    for (final action in actions.take(2)) {
+      expect(
+        await File.fromUri(
+          action.video.resolve(repo.mediaBaseUri),
+        ).readAsBytes(),
+        fixture.bodies[action.video.path],
+      );
+    }
+    expect(await invalid.exists(), isTrue);
+    expect(await (repo as PoseHubVideoCache).videoCacheBytes(), 8192);
+    await noParts(repo);
+  });
+
+  test('video cap cannot be disabled or increased beyond 300MB', () async {
+    expect(poseHubVideoCacheLimitBytes, 300000000);
+    for (final cap in [0, -1, 300000001]) {
+      await expectLater(create(cacheBytes: cap), throwsFormatException);
+    }
+    expect(requested, isEmpty);
+  });
+
+  test(
+    'unsafe ownership cannot delete files or leak a failed small cap',
+    () async {
+      final first = await create(cacheBytes: 8192);
+      final uri = await first.ensureFile(fixture.first.video);
+      first.dispose();
+      final index = File(
+        '${support.path}/posehub-media/video-cache-owners-v1.json',
+      );
+      final original = await index.readAsBytes();
+      final outside = File('${support.path}/outside-cache.mp4');
+      await outside.writeAsString('preserve-outside-cache');
+      await index.writeAsString(
+        jsonEncode({
+          'format': 'smartfit-video-cache-owners@1',
+          'videos': [
+            {
+              'relative':
+                  'r1-v3/${fixture.revision}/media/../../../outside-cache.mp4',
+              'bytes': fixture.first.video.bytes,
+              'sha256': fixture.first.video.sha256,
+            },
+          ],
+        }),
+      );
+      await expectLater(
+        create(cacheBytes: 1),
+        throwsA(
+          isA<PoseHubMediaException>().having(
+            (e) => e.code,
+            'code',
+            'unsafe_cache',
+          ),
+        ),
+      );
+      expect(
+        await File.fromUri(uri).readAsBytes(),
+        fixture.bodies[fixture.first.video.path],
+      );
+      expect(await outside.readAsString(), 'preserve-outside-cache');
+      await index.writeAsBytes(original);
+      final healthy = await create(cacheBytes: 8192);
+      await healthy.ensureFile(fixture.catalog.allActions.last.video);
+      expect(await (healthy as PoseHubVideoCache).videoCacheBytes(), 8192);
+    },
+  );
+
+  test('failed unknown-budget initialization releases its limit token', () async {
+    final unknown = File(
+      '${support.path}/posehub-media/r1-v2/${'c' * 64}/media/unknown/video.mp4',
+    );
+    await unknown.parent.create(recursive: true);
+    await unknown.writeAsBytes(Uint8List(6000));
+    await expectLater(
+      create(cacheBytes: 4096),
+      throwsA(
+        isA<PoseHubMediaException>().having(
+          (e) => e.code,
+          'code',
+          'cache_full',
+        ),
+      ),
+    );
+    final healthy = await create(cacheBytes: 8192);
+    expect(await (healthy as PoseHubVideoCache).videoCacheBytes(), 6000);
+    expect(await unknown.length(), 6000);
+    expect(requested, isEmpty);
+  });
 
   test(
     'action failure returns immediately and retry shares healthy pending files',

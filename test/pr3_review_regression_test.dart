@@ -1,10 +1,11 @@
 // Regressions for the PR #3 review (changes requested, 2026-10-20):
-// P1 media packaging now uses the small verified release bundle, P2 ring follows a paused
+// P1 media packaging keeps verified stills with cache-only videos, P2 ring follows a paused
 // skip/back, P2 switch/choice state semantics, P2 plan-detail "换一个" is
 // its own accessible action.
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -98,116 +99,144 @@ Widget _host(Widget child) => MaterialApp(
 );
 
 void main() {
-  test(
-    'P1: every App action has verified offline videos and stills in both themes',
-    () {
-      final index = _json('assets/packs/index.json');
-      final versions = {
-        for (final e in index['packs'] as List) e['id']: e['version'],
-      };
-      // Pack metadata and its history remain intact while media lives in the
-      // independent release manifest. Voice and chime consumers still use packs.
-      for (final dir in Directory(
-        'assets/packs',
-      ).listSync().whereType<Directory>()) {
-        final f = File('${dir.path}/pack.json');
-        if (!f.existsSync()) continue;
-        final pack = _json(f.path);
-        expect(
-          versions[pack['id']],
-          pack['version'],
-          reason: '${pack['id']} index version',
-        );
-      }
-      const root = 'assets/training_media';
-      const release = '$root/v0.3.0-app';
-      final manifest = _json('$release/app-manifest.json');
-      final packageFiles = Directory(
-        '$release/packages',
-      ).listSync().whereType<File>().toList();
-      expect(packageFiles.map((file) => file.uri.pathSegments.last).toSet(), {
-        'builtin.json',
-        'realistic-dark.json',
-        'realistic-light.json',
-      });
-      final packages = manifest['packages'] as Map<String, dynamic>;
-      for (final id in ['builtin', 'realistic-dark', 'realistic-light']) {
-        final descriptor = (packages[id] as Map)['manifest'] as Map;
-        final file = File('$release/${descriptor['path']}');
-        expect(file.lengthSync(), descriptor['bytes']);
-        expect(descriptor['sha256'], matches(RegExp(r'^[0-9a-f]{64}$')));
-      }
-      final builtin = _json('$release/packages/builtin.json')['files'] as List;
-      expect(builtin, hasLength(32));
-      for (final descriptor in builtin.cast<Map>()) {
-        expect(descriptor['path'], startsWith('../v0.3.0/realistic/dark/'));
-        expect(descriptor['sha256'], matches(RegExp(r'^[0-9a-f]{64}$')));
-        expect(
-          File('$release/${descriptor['path']}').lengthSync(),
-          descriptor['bytes'],
-        );
-      }
-      final bundled = Directory(
-        root,
-      ).listSync(recursive: true).whereType<File>().toList();
+  test('P1: cache-only videos retain verified metadata and all themed stills', () {
+    final index = _json('assets/packs/index.json');
+    final versions = {
+      for (final e in index['packs'] as List) e['id']: e['version'],
+    };
+    // Pack metadata and its history remain intact while media lives in the
+    // independent release manifest. Voice and chime consumers still use packs.
+    for (final dir in Directory(
+      'assets/packs',
+    ).listSync().whereType<Directory>()) {
+      final f = File('${dir.path}/pack.json');
+      if (!f.existsSync()) continue;
+      final pack = _json(f.path);
       expect(
-        bundled.where((file) => file.path.endsWith('.mp4')),
-        hasLength(191),
+        versions[pack['id']],
+        pack['version'],
+        reason: '${pack['id']} index version',
       );
-      final localIndex = _json('$release/assets-index.json')['actions'] as Map;
-      expect(localIndex, hasLength(93));
-      for (final entry in localIndex.entries) {
-        for (final theme in ['dark', 'light']) {
-          final media = (entry.value as Map)[theme] as Map;
-          final video = media['video'] as Map;
-          expect(
-            video['asset'],
-            '$root/v0.3.0/realistic/$theme/${entry.key}.mp4',
-          );
-          final source =
-              [
-                ...(_json('$release/packages/builtin.json')['files'] as List),
-                ...(_json('$release/packages/realistic-$theme.json')['files']
-                    as List),
-              ].cast<Map>().firstWhere(
-                (f) =>
-                    f['path'] == '../v0.3.0/realistic/$theme/${entry.key}.mp4',
-              );
-          expect(video['sha256'], source['sha256']);
-          for (final role in [
-            'video',
-            'poster',
-            'thumbnail',
-            'playbackPoster',
-          ]) {
-            final descriptor = media[role] as Map;
-            expect(
-              File(descriptor['asset'] as String).lengthSync(),
-              descriptor['bytes'],
+    }
+    const root = 'assets/training_media';
+    const release = '$root/v0.3.0-app';
+    final manifest = _json('$release/app-manifest.json');
+    final packageFiles = Directory(
+      '$release/packages',
+    ).listSync().whereType<File>().toList();
+    expect(packageFiles.map((file) => file.uri.pathSegments.last).toSet(), {
+      'builtin.json',
+      'realistic-dark.json',
+      'realistic-light.json',
+    });
+    final packages = manifest['packages'] as Map<String, dynamic>;
+    for (final id in ['builtin', 'realistic-dark', 'realistic-light']) {
+      final descriptor = (packages[id] as Map)['manifest'] as Map;
+      final file = File('$release/${descriptor['path']}');
+      expect(file.lengthSync(), descriptor['bytes']);
+      expect(
+        sha256.convert(file.readAsBytesSync()).toString(),
+        descriptor['sha256'],
+      );
+    }
+    final builtin = _json('$release/packages/builtin.json')['files'] as List;
+    expect(builtin, hasLength(32));
+    final indexedVideos = <String, Map>{};
+    for (final descriptor in builtin.cast<Map>()) {
+      expect(descriptor['path'], startsWith('../v0.3.0/realistic/dark/'));
+      expect(descriptor['sha256'], matches(RegExp(r'^[0-9a-f]{64}$')));
+      expect(descriptor['bytes'], isPositive);
+      expect(File('$release/${descriptor['path']}').existsSync(), isFalse);
+      indexedVideos[descriptor['path'] as String] = descriptor;
+    }
+    final bundled = Directory(
+      root,
+    ).listSync(recursive: true).whereType<File>().toList();
+    expect(bundled.where((file) => file.path.endsWith('.mp4')), isEmpty);
+    expect(bundled, hasLength(941));
+    expect(
+      bundled.every(
+        (file) => file.path.endsWith('.webp') || file.path.endsWith('.json'),
+      ),
+      isTrue,
+    );
+    final localIndex = _json('$release/assets-index.json')['actions'] as Map;
+    expect(localIndex, hasLength(93));
+    for (final entry in localIndex.entries) {
+      for (final theme in ['dark', 'light']) {
+        final media = (entry.value as Map)[theme] as Map;
+        final video = media['video'] as Map;
+        expect(
+          video['asset'],
+          '$root/v0.3.0/realistic/$theme/${entry.key}.mp4',
+        );
+        final source =
+            [
+              ...(_json('$release/packages/builtin.json')['files'] as List),
+              ...(_json('$release/packages/realistic-$theme.json')['files']
+                  as List),
+            ].cast<Map>().firstWhere(
+              (f) => f['path'] == '../v0.3.0/realistic/$theme/${entry.key}.mp4',
             );
-            expect(descriptor['sha256'], matches(RegExp(r'^[0-9a-f]{64}$')));
-          }
+        expect(video['sha256'], source['sha256']);
+        expect(video['bytes'], source['bytes']);
+        expect(File(video['asset'] as String).existsSync(), isFalse);
+        indexedVideos[source['path'] as String] = source;
+        for (final role in ['poster', 'thumbnail', 'playbackPoster']) {
+          final descriptor = media[role] as Map;
+          final file = File(descriptor['asset'] as String);
+          expect(file.lengthSync(), descriptor['bytes']);
+          expect(
+            sha256.convert(file.readAsBytesSync()).toString(),
+            descriptor['sha256'],
+          );
         }
+        final playback = media['playbackPoster'] as Map;
+        expect(playback['sourceSha256'], video['sha256']);
+        expect(playback['sourceFrame'], 0);
+        expect(playback['sourceTimeSeconds'], 0);
       }
-      final bytes = bundled.fold<int>(
+    }
+    expect(indexedVideos, hasLength(191));
+    final bytes = bundled.fold<int>(
+      0,
+      (total, file) => total + file.lengthSync(),
+    );
+    expect(bytes, 5_628_386);
+    // The import verified source videos before deriving frame-zero stills.
+    // This receipt rehashes the current static payload without re-decoding it.
+    final report = _json('tools/media/builtin-assets-report.json');
+    expect(report['videoDelivery'], 'cache-only');
+    expect(report['videoCatalog'], {
+      'files': indexedVideos.length,
+      'bytes': indexedVideos.values.fold<int>(
         0,
-        (total, file) => total + file.lengthSync(),
-      );
-      expect(bytes, inExclusiveRange(85_000_000, 100_000_000));
-      // The reproducible Python builder verifies every source and destination
-      // SHA-256; its report records the exact checked-in asset inventory.
-      final report = _json('tools/media/builtin-assets-report.json');
-      expect((report['bundle'] as Map)['bytes'], bytes);
-      expect((report['bundle'] as Map)['files'], bundled.length);
-      expect(report['validatedOutput'], isTrue);
-      expect((report['sourceInputs'] as Map)['unchangedAfterBuild'], isTrue);
-      expect(
-        report['bundleInventorySha256'],
-        matches(RegExp(r'^[0-9a-f]{64}$')),
-      );
-      expect(report['legacyPackMediaRemaining'], 0);
-    },
-  );
+        (sum, file) => sum + (file['bytes'] as int),
+      ),
+    });
+    expect((report['groups'] as Map)['videos'], {'files': 0, 'bytes': 0});
+    expect((report['bundle'] as Map)['bytes'], bytes);
+    expect((report['bundle'] as Map)['files'], bundled.length);
+    expect(report['validatedOutput'], isTrue);
+    expect((report['sourceInputs'] as Map)['unchangedAfterBuild'], isTrue);
+    expect(
+      (report['sourceInputs'] as Map)['verificationScope'],
+      'recorded-import-provenance',
+    );
+    expect(
+      (report['outputVerification'] as Map)['sourceVideosReDecoded'],
+      isFalse,
+    );
+    final inventory = [
+      for (final file in bundled)
+        '${file.path.replaceAll('\\', '/').substring(root.length + 1)}\u0000${file.lengthSync()}\u0000${sha256.convert(file.readAsBytesSync())}\n',
+    ]..sort();
+    expect(
+      report['bundleInventorySha256'],
+      sha256.convert(utf8.encode(inventory.join())).toString(),
+    );
+    expect(report['legacyPackMediaRemaining'], 0);
+  });
 
   for (final back in [false, true]) {
     testWidgets(
