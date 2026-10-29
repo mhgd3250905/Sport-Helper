@@ -18,7 +18,7 @@ void main() {
 
   group('library', () {
     test(
-      '93 exercises have registered offline videos and stills in both themes',
+      '93 exercises retain downloadable video metadata and bundled stills in both themes',
       () {
         expect(lib.length, 93);
         const root = 'assets/training_media/v0.3.0-app/';
@@ -28,10 +28,18 @@ void main() {
                     File('${root}packages/$package.json').readAsStringSync(),
                   )
                   as Map;
-          return {
-            for (final file in json['files'] as List)
-              Uri.parse(root).resolve((file as Map)['path'] as String).path,
-          };
+          final paths = <String>{};
+          for (final file in (json['files'] as List).cast<Map>()) {
+            expect(
+              file['bytes'],
+              isA<int>().having((n) => n, 'bytes', isPositive),
+            );
+            expect(file['sha256'], matches(r'^[a-f0-9]{64}$'));
+            final path = file['path'] as String;
+            expect(path, endsWith('.mp4'));
+            expect(paths.add(Uri.parse(root).resolve(path).path), isTrue);
+          }
+          return paths;
         }
 
         final builtin = registered('builtin');
@@ -49,7 +57,11 @@ void main() {
             expect(poster, isNotNull, reason: '${e.id} light=$light');
             expect(allVideos, contains(video));
             expect(e.media.videoAvailableFor(light: light), isTrue);
-            expect(File(video!).existsSync(), isTrue, reason: video);
+            expect(
+              File(video!).existsSync(),
+              isFalse,
+              reason: 'Videos use verified cache/download delivery: $video',
+            );
             expect(File(poster!).existsSync(), isTrue, reason: poster);
           }
           expect(e.cue, isNotEmpty);

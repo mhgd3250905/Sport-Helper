@@ -367,9 +367,14 @@ class _AppIdentity extends StatelessWidget {
                   SfSettingsTokens.appIconRadius,
                 ),
                 child: Image.asset(
-                  'assets/brand/source/smartfit-icon-v4-crop.png',
+                  'ios/Runner/Assets.xcassets/AppIconB.appiconset/Icon-App-60x60@3x.png',
                   width: SfSettingsTokens.appIconSize,
                   height: SfSettingsTokens.appIconSize,
+                  cacheWidth:
+                      (SfSettingsTokens.appIconSize *
+                              MediaQuery.devicePixelRatioOf(context))
+                          .round()
+                          .clamp(1, 180),
                 ),
               ),
               const SizedBox(width: 14),

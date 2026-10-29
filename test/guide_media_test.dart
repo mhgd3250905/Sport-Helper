@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smartfit/app/services.dart';
 import 'package:smartfit/domain/exercise.dart';
+import 'package:smartfit/ui/cached_exercise_media.dart'
+    show CachedExerciseMedia, ExerciseFrameZero;
 import 'package:smartfit/ui/guide_media.dart';
 import 'package:smartfit/ui/theme.dart';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
@@ -51,8 +53,9 @@ class _VideoPlatform extends PackedAlphaPlatform
 Finder _media(String slot) => find.byKey(ValueKey('guide-media-$slot'));
 Finder _control(String slot) =>
     find.byKey(ValueKey('guide-media-control-$slot'));
-Finder _poster(String slot) => find.byKey(ValueKey('guide-media-poster-$slot'));
-Finder _video(String slot) => find.byKey(ValueKey('guide-media-video-$slot'));
+Finder _poster(String slot) =>
+    find.byKey(ValueKey('cached-media-poster-$slot'));
+Finder _video(String slot) => find.byKey(ValueKey('cached-media-video-$slot'));
 
 double _opacity(WidgetTester tester, String slot) => tester
     .widget<FadeTransition>(
@@ -243,6 +246,58 @@ void main() {
       },
     );
   }
+
+  testWidgets(
+    '4:3 guide contains the same square poster and video without crop',
+    (tester) async {
+      await show(tester);
+      final media = tester.getRect(_media('0'));
+      final squareFinder = find.byKey(const ValueKey('guide-media-square-0'));
+      final square = tester.getRect(squareFinder);
+      expect(media.size, const Size(320, 240));
+      expect(square.size, const Size(240, 240));
+      expect(square.center, media.center);
+      final cached = tester.widget<CachedExerciseMedia>(
+        find.descendant(
+          of: squareFinder,
+          matching: find.byType(CachedExerciseMedia),
+        ),
+      );
+      expect(cached.radius, 0);
+      final stage = tester.widget<ColoredBox>(
+        find.byKey(const ValueKey('guide-media-stage-0')),
+      );
+      final approvedStage = Theme.of(
+        tester.element(_media('0')),
+      ).colorScheme.surfaceContainerHighest;
+      expect(stage.color, approvedStage);
+      expect(cached.stageColor, approvedStage);
+      final frameFinder = find.descendant(
+        of: squareFinder,
+        matching: find.byType(ExerciseFrameZero),
+      );
+      expect(tester.getRect(frameFinder), square);
+      final image = tester.widget<Image>(
+        find.descendant(of: frameFinder, matching: find.byType(Image)),
+      );
+      expect(image.fit, BoxFit.contain);
+      expect(image.width, isNull);
+      expect(image.height, isNull);
+      await tap(tester, '0');
+      expect(tester.getRect(_video('0')), square);
+      expect(tester.getRect(_poster('0')), square);
+      await advance(tester, 1);
+      expect(tester.getRect(_video('0')), square);
+      final face = tester.getRect(
+        find.byKey(const ValueKey('guide-media-control-face-0')),
+      );
+      expect(media.right - face.right, 12);
+      expect(face.top - media.top, 12);
+      expect(platform.sources, hasLength(1));
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox.shrink());
+    },
+  );
 
   testWidgets('ready and first frame at position zero keep the poster opaque', (
     tester,

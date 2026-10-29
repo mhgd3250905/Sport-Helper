@@ -58,7 +58,7 @@
   "variants": {
     "A": {
       "label": "original full body",
-      "source": "assets/brand/source/smartfit-icon-v3.png",
+      "source": "design/brand-source/smartfit-icon-v3.png",
       "sourceSize": [
         1024,
         1024
@@ -76,7 +76,7 @@
     },
     "B": {
       "label": "user crop",
-      "source": "assets/brand/source/smartfit-icon-v4-crop.png",
+      "source": "design/brand-source/smartfit-icon-v4-crop.png",
       "sourceSize": [
         1024,
         1024
@@ -94,7 +94,7 @@
     },
     "A2": {
       "label": "enlarged full body",
-      "source": "assets/brand/source/smartfit-icon-v3-fullbody-zoom.png",
+      "source": "design/brand-source/smartfit-icon-v3-fullbody-zoom.png",
       "sourceSize": [
         1024,
         1024

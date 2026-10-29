@@ -10,6 +10,15 @@ param(
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+if ([string]::IsNullOrWhiteSpace($MediaPrimaryUrl)) {
+  throw 'SMARTFIT_MEDIA_PRIMARY_URL / MediaPrimaryUrl is required for release/internal builds.'
+}
+$primaryMediaOrigin = [uri]$MediaPrimaryUrl
+if (-not $primaryMediaOrigin.IsAbsoluteUri -or $primaryMediaOrigin.Scheme -ne 'https' -or
+    $primaryMediaOrigin.UserInfo -or $primaryMediaOrigin.Query -or $primaryMediaOrigin.Fragment -or
+    -not $primaryMediaOrigin.AbsolutePath.EndsWith('/')) {
+  throw 'MediaPrimaryUrl must be a public HTTPS directory without credentials or query.'
+}
 $appKey = $null
 $defines = @()
 try {

@@ -20,11 +20,14 @@ double contrast(Color fg, Color bg) {
   return (a > b ? a + .05 : b + .05) / (a > b ? b + .05 : a + .05);
 }
 
-Iterable<String> _assetsIn(WidgetTester tester) => tester
-    .widgetList<Image>(find.byType(Image))
-    .map((i) => i.image)
-    .whereType<AssetImage>()
-    .map((a) => a.assetName);
+Iterable<String> _assetsIn(WidgetTester tester) =>
+    tester.widgetList<Image>(find.byType(Image)).map((image) {
+      ImageProvider provider = image.image;
+      while (provider is ResizeImage) {
+        provider = provider.imageProvider;
+      }
+      return provider is AssetImage ? provider.assetName : null;
+    }).whereType<String>();
 
 void main() {
   tearDown(() => SfColors.palette = SfPalette.dark);
@@ -126,10 +129,12 @@ void main() {
         ),
       );
       expect(stage.first.color, SfPalette.light.mediaStage);
+      expect(find.byType(trainer.UgkPackedAlphaVideo), findsNothing);
+      expect(find.byType(Texture), findsNothing);
     });
 
     testWidgets(
-      'theme switches immediately update still and repository theme',
+      'theme switches immediately update frame zero without a decoder',
       (tester) async {
         final e = lib['h-banana'];
         Widget host(SfPalette palette) => MaterialApp(
@@ -148,16 +153,8 @@ void main() {
         ]) {
           await tester.pumpWidget(host(palette));
           await tester.pumpAndSettle();
-          final view = tester.widget<trainer.DrillMediaView>(
-            find.byType(trainer.DrillMediaView),
-          );
-          expect(view.media.theme, palette.isDark ? 'dark' : 'light');
-          expect(view.media.videoAvailable, isTrue);
-          expect(view.media.posterTime, 0);
-          expect(
-            view.media.posterAsset,
-            e.media.playbackPosterFor(light: !palette.isDark),
-          );
+          expect(find.byType(trainer.UgkPackedAlphaVideo), findsNothing);
+          expect(find.byType(Texture), findsNothing);
           expect(
             _assetsIn(tester),
             contains(e.media.playbackPosterFor(light: !palette.isDark)),

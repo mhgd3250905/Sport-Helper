@@ -101,7 +101,7 @@ void main() {
   );
 
   test(
-    'shared media observations retain builtin/offline outcomes and detach cleanly',
+    'shipping cache misses log offline outcomes and detach cleanly',
     () async {
       final directory = await Directory.systemTemp.createTemp(
         'smartfit-media-log-',
@@ -116,12 +116,21 @@ void main() {
       final log = RuntimeLog(enabled: true);
       final observer = TrainingMediaLog(repository, log: log)..start();
       try {
-        await repository.ensureVideo('h-squat');
-        // Keep the unavailable-download diagnostic seam using an action that
-        // has no App metadata and is intentionally outside the offline bundle.
+        expect(await repository.availableActionIds(), isEmpty);
+        expect(await repository.availableVideo('h-squat'), isNull);
+        expect(await repository.cacheBytes(), 0);
+        // Builtin is a retained source package name, not proof that a video
+        // payload ships. Both metadata-backed and catalog-only misses use the
+        // real offline path with the current asset manifest and empty cache.
         expect(
-          File('${TrainingMediaConfig.videoRoot}/abs-A.mp4').existsSync(),
+          File(
+            'assets/training_media/v0.3.0/realistic/dark/h-squat.mp4',
+          ).existsSync(),
           isFalse,
+        );
+        await expectLater(
+          repository.ensureVideo('h-squat'),
+          throwsA(isA<StateError>()),
         );
         await expectLater(
           repository.ensureVideo('abs-A'),
@@ -130,19 +139,22 @@ void main() {
         final resources = events(
           log,
         ).where((event) => event['event'] == 'media.resource.state').toList();
-        final builtin = resources.singleWhere(
-          (event) => event['fields']['actionId'] == 'h-squat',
+        for (final id in ['h-squat', 'abs-A']) {
+          final miss = resources.singleWhere(
+            (event) =>
+                event['fields']['actionId'] == id &&
+                event['fields']['phase'] == 'offline',
+          );
+          expect(miss['fields']['reason'], 'offline');
+          expect(miss['fields'].containsKey('verified'), false);
+          expect(miss['fields'].containsKey('source'), false);
+        }
+        expect(
+          resources.where((event) => event['fields']['phase'] == 'ready'),
+          isEmpty,
         );
-        expect(builtin['fields']['phase'], 'ready');
-        expect(builtin['fields'].containsKey('verified'), false);
-        expect(builtin['fields']['source'], 'builtin');
-        final remote = resources.singleWhere(
-          (event) =>
-              event['fields']['actionId'] == 'abs-A' &&
-              event['fields']['phase'] == 'offline',
-        );
-        expect(remote['fields']['phase'], 'offline');
-        expect(remote['fields']['reason'], 'offline');
+        expect(await repository.availableActionIds(), isEmpty);
+        expect(await repository.cacheBytes(), 0);
         observer.dispose();
         final count = log.entryCount;
         await repository.clearCache();

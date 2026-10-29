@@ -41,6 +41,7 @@ class _PlanPageState extends State<PlanPage> with WidgetsBindingObserver {
   final _coordinator = GuidePreviewCoordinator();
   bool _measurementQueued = false;
   String? _releasingSlot;
+  bool _previewOn = true;
 
   @override
   void initState() {
@@ -111,7 +112,7 @@ class _PlanPageState extends State<PlanPage> with WidgetsBindingObserver {
     super.dispose();
   }
 
-  Future<void> _swap(int bi, int ii) async {
+  void _swap(int bi, int ii) {
     final s = AppServices.of(context);
     final item = _plan.blocks[bi].items[ii];
     final e = s.library[item.exerciseId];
@@ -156,8 +157,9 @@ class _PlanPageState extends State<PlanPage> with WidgetsBindingObserver {
       );
       return;
     }
-    await _coordinator.release('$bi:$ii');
-    if (!mounted) return;
+    // Commit against the current plan synchronously. Playback retirement stays
+    // in the coordinator's queue, ahead of any subsequent preview claim.
+    unawaited(_coordinator.release('$bi:$ii'));
     setState(() {
       _plan = updated.copyWith(
         id: '${updated.id.split('~').first}~${DateTime.now().microsecondsSinceEpoch}',
@@ -182,6 +184,7 @@ class _PlanPageState extends State<PlanPage> with WidgetsBindingObserver {
     }
     // The trainer must not mount while an article preview still owns playback,
     // including a chat-owned workout launched during this route's pop animation.
+    setState(() => _previewOn = false);
     await _coordinator.stop();
     await WidgetsBinding.instance.endOfFrame;
     if (!mounted) return;
@@ -196,6 +199,7 @@ class _PlanPageState extends State<PlanPage> with WidgetsBindingObserver {
         builder: (_) => PlayerPage(plan: _plan),
       ),
     );
+    if (mounted) setState(() => _previewOn = true);
   }
 
   @override
@@ -498,6 +502,7 @@ class _PlanPageState extends State<PlanPage> with WidgetsBindingObserver {
                             exercise: exercise,
                             slot: slot,
                             coordinator: _coordinator,
+                            enabled: _previewOn,
                           ),
                         ),
                       ),
@@ -602,7 +607,7 @@ class _PlanPageState extends State<PlanPage> with WidgetsBindingObserver {
                                     fill: Colors.transparent,
                                     iconColor: SfColors.muted,
                                     haptic: SfHaptic.selection,
-                                    onPressed: () => unawaited(_swap(bi, ii)),
+                                    onPressed: () => _swap(bi, ii),
                                   ),
                               ],
                             ),

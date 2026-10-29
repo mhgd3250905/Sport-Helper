@@ -12,6 +12,9 @@ Future<PoseHubMediaFileStore> createPoseHubMediaStore({
   required bool allowInsecureLocalhost,
   required Duration timeout,
   required int maxRedirects,
+  required int maxVideoCacheBytes,
+  required String? legacyCacheDirectory,
+  required List<PoseHubLegacyVideoFile> legacyVideos,
 }) => Future.error(
   const PoseHubMediaException(
     'unsupported',

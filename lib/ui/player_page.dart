@@ -138,6 +138,7 @@ class _PlayerPageState extends State<PlayerPage> {
               radius: request.theme.radius,
               playbackHandle: issuePlayback,
               mediaPreparer: request.mediaPreparer,
+              training: true,
             );
           },
           voice: s.trainerVoice(),

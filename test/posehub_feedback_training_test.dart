@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smartfit/domain/exercise.dart';
 import 'package:smartfit/domain/plan.dart';
+import 'package:smartfit/ui/cached_exercise_media.dart';
 import 'package:smartfit/ui/exercise_video.dart';
 import 'package:smartfit/ui/player_page.dart';
 import 'package:smartfit/ui/theme.dart';
@@ -113,7 +114,10 @@ void main() {
         expect(player.poseHubMediaPreparer, same(services.poseHubPreparer));
         expect(video.mediaPreparer, isA<PoseHubMediaPrefetcher>());
         expect(video.mediaPreparer, isNot(same(services.poseHubPreparer)));
-        expect(find.byType(PoseHubStandingImage), findsOneWidget);
+        expect(find.byType(ExerciseFrameZero), findsOneWidget);
+        expect(find.byType(CachedExerciseMedia), findsOneWidget);
+        expect(find.byType(UgkPackedAlphaVideo), findsNothing);
+        expect(video.training, isTrue);
         await tester.tap(find.byKey(const ValueKey('skip')));
         await tester.pump();
         String counter() => tester
@@ -142,12 +146,8 @@ void main() {
         final paused = counter();
         await tester.pump(const Duration(seconds: 2));
         expect(counter(), paused);
-        expect(
-          tester
-              .widget<PoseHubPackMedia>(find.byType(PoseHubPackMedia))
-              .playing,
-          isFalse,
-        );
+        expect(find.byType(UgkPackedAlphaVideo), findsNothing);
+        expect(find.byType(ExerciseFrameZero), findsOneWidget);
         expect(
           tester.widget<ExerciseVideo>(find.byType(ExerciseVideo)).paused,
           isTrue,

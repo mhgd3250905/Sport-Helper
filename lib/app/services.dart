@@ -90,28 +90,33 @@ class AppServices {
   final TrainingMediaRepository? media;
   TrainingMediaLog? _mediaLog;
   String? _prefetchedPlan;
+  int _prefetchEpoch = 0;
 
   void _prefetchChatPlan() => prefetchPlan(chat.currentPlan);
 
   /// Start downloads without delaying navigation, the clock or voice output.
   void prefetchPlan(TrainingPlan? plan) {
-    final repository = media;
-    if (repository == null || plan == null) return;
+    if (plan == null || (media == null && poseHubMedia == null)) return;
     final ids = plan.exerciseIds;
     final signature = '${plan.id}/${ids.join(',')}';
     if (_prefetchedPlan == signature) return;
     _prefetchedPlan = signature;
+    final epoch = ++_prefetchEpoch;
     final log = RuntimeLog.instance;
     final operation = log.newOperation('prefetch');
     log.record(
       'media.prefetch_start',
       operation: operation,
-      fields: {'count': ids.length, 'offline': repository.isOffline},
+      fields: {
+        'count': ids.length,
+        if (media != null) 'offline': media!.isOffline,
+      },
     );
     final timer = Stopwatch()..start();
     unawaited(
-      repository
-          .prefetchActions(ids)
+      (poseHubMedia != null
+              ? _prefetchPoseHub(ids, epoch)
+              : media!.prefetchActions(ids))
           .then((_) {
             log.record(
               'media.prefetch_end',
@@ -131,8 +136,41 @@ class AppServices {
                 'elapsedMs': timer.elapsedMilliseconds,
               },
             );
+          })
+          .whenComplete(() {
+            if (_prefetchedPlan == signature) _prefetchedPlan = null;
           }),
     );
+  }
+
+  Future<void> _prefetchPoseHub(Iterable<String> ids, int epoch) async {
+    final repository = poseHubMedia!;
+    final ordered = ids
+        .where((id) => poseHubCatalog?.tryGet(id) != null)
+        .toSet()
+        .toList(growable: false);
+    var next = 0;
+    var failed = false;
+    Future<void> worker() async {
+      while (epoch == _prefetchEpoch && next < ordered.length) {
+        final id = ordered[next++];
+        try {
+          await repository.ensureAction(id);
+        } on Object {
+          failed = true;
+        }
+      }
+    }
+
+    // Start the first action before the second worker; never hold navigation,
+    // training clocks or voice while these two ordered workers prepare files.
+    await Future.wait([worker(), worker()]);
+    if (failed) {
+      throw const PoseHubMediaException(
+        'prefetch_failed',
+        'Some training videos could not be cached.',
+      );
+    }
   }
 
   final coach.Catalog? coachCatalog;

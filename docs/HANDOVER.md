@@ -1,10 +1,18 @@
 # 智能健身助手（SmartFit）交接说明
 
-## 当前 +45 生成卡 v2 候选（2026-10-29）
+## 当前 +47 主线整合（2026-10-30）
 
-先读[本轮记录](task-bubble-v2-plus45-2026-10-29.md)。使用独立工作树 `Sport-Helper-task-bubble-v2`、分支 `codex/task-bubble-v2`，基线为已验收合入 main 的 +43 `94e924fe287770f56d4e8ceeedd521e2871267da`，版本 +45/2045；+44 guide-lite 保持独立。只改 App 展示，包含获授权的完成交接时序与 UI 身份保持；SDK b490/完整 lock 不变。完整动效 APK、八张实际组件浅深软件截图及最终源码绑定回执均独立存放 `E:/AII-3D/3D-Sport-AI/deliveries/task-bubble-v2-plus45/`。保持候选未合并、未推送、未打 tag，交开哥验收；release/1.0 不动。以下各节仅属其原时点。
+当前接手本批 **+47 / 2047**，在 `codex/main-integration-plus47` 整合并审核 +44 guide-lite、+45 task-bubble-v2、+46 slim-assets 后推进 main、保存提交 push。保留所有原分支/工作树/产物，不动 release/1.0 与 SDK，不打 tag、不操作设备。已知审阅发现、媒体交界与新证据见[本批记录](main-integration-plus47-2026-10-30.md)；原 Noto 随本批保留。
 
-## 当前 +43 计划讨论候选（2026-10-29）
+以下内容保留各原时点记录，其中旧 main、版本及候选合并状态不代表本批最终状态。
+
+## 历史 +46 资源瘦身候选（2026-10-30 原时点）
+
+接手 `codex/slim-assets` / +46（internal arm64 2046），独立基于已验收 +43 的 main `94e924fe`。SDK 三包、override 和整份锁文件保持 b490eec；+44/+45 不依赖、不合并。全量 705/705、analyze 0 问题；按需媒体、跨版本缓存与边界见[本轮记录](slim-assets-plus46-2026-10-30.md)。完整提交和 APK 实数以最终回执为准；字体等待用户选择，当前 Noto 保留。main、release/1.0、SDK 保持原状，未推送、打 tag 或操作设备。
+
+以下为各原时点交接快照；“当前”“待验收”“未合并”和旧 main SHA 都只适用于对应日期。+43 现已验收并合入上述 main。
+
+## 历史 +43 计划讨论候选（2026-10-29 原时点）
 
 本轮在 `codex/plan-focus`，从未合并的 +42 d900549 开始，三包锁 SDK `b490eec43b408a8a35ce81a7830833bc6a3ff278`。已保存计划导入、SDK focus 标签、重启恢复、新版更新/另存与版本迁移见[实施记录](plan-focus-plus43-2026-10-29.md)。最终源码 SHA、APK2043 与验证回执位于 `E:/AII-3D/3D-Sport-AI/deliveries/plan-focus-plus43/`；三轮真实接口和软件截图分别保留原始证据。候选交开哥真机验收，保持未合并、未推送，release/1.0 与 SDK 仓库不动。以下为历史接手记录。
 

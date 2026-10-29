@@ -45,7 +45,7 @@ Future<trainer.TrainingMediaRepository> _repository({
   bool pending = true,
   trainer.TrainingMediaNetworkProbe? probe,
   void Function(Directory directory)? onCacheDirectory,
-  bool onlyBuiltin = false,
+  bool syntheticBuiltinVideoKeys = false,
 }) async {
   final directory = await Directory.systemTemp.createTemp(
     'smartfit-media-app-',
@@ -53,9 +53,10 @@ Future<trainer.TrainingMediaRepository> _repository({
   onCacheDirectory?.call(directory);
   addTearDown(() => directory.delete(recursive: true));
   Set<String>? bundled;
-  if (onlyBuiltin) {
-    // Retain a limited-bundle fixture for download/fallback seam coverage.
-    // The shipping App now bundles every metadata-backed action in both themes.
+  if (syntheticBuiltinVideoKeys) {
+    // Synthetic SDK scheduling fixture only: advertise the original builtin
+    // descriptors as bundled, without loading nonexistent MP4 payloads. The
+    // shipping asset manifest contains no videos; default tests use it as-is.
     final original =
         jsonDecode(
               File(
@@ -67,10 +68,10 @@ Future<trainer.TrainingMediaRepository> _repository({
       for (final entry in original['files'] as List)
         'assets/training_media/${(entry as Map)['path'].toString().substring(3)}',
     };
-    bundled = (await AssetManifest.loadFromAssetBundle(rootBundle))
-        .listAssets()
-        .where((path) => !path.endsWith('.mp4') || videos.contains(path))
-        .toSet();
+    bundled = {
+      ...(await AssetManifest.loadFromAssetBundle(rootBundle)).listAssets(),
+      ...videos,
+    };
   }
   final media = await trainer.TrainingMediaRepository.create(
     manifestAsset: TrainingMediaConfig.manifestAsset,
@@ -194,7 +195,7 @@ void main() {
   );
 
   test(
-    'debug pending preview keeps all 93 App actions with new media paths',
+    'shipping stills keep all 93 preview actions with cache-only video metadata',
     () async {
       final media = await _repository();
       final (library, _, _, catalog) = await AppServices.loadContent(
@@ -207,7 +208,7 @@ void main() {
       for (final exercise in library.all) {
         expect(
           exercise.media.video,
-          '${TrainingMediaConfig.videoRoot}/${exercise.id}.mp4',
+          'assets/training_media/v0.3.0/realistic/dark/${exercise.id}.mp4',
         );
         expect(
           exercise.media.poster,
@@ -215,7 +216,7 @@ void main() {
         );
         expect(
           exercise.media.lightVideo,
-          '${TrainingMediaConfig.lightVideoRoot}/${exercise.id}.mp4',
+          'assets/training_media/v0.3.0/realistic/light/${exercise.id}.mp4',
         );
         expect(
           exercise.media.lightPoster,
@@ -225,30 +226,31 @@ void main() {
         expect(exercise.media.videoAvailableFor(light: true), isTrue);
       }
       final ready = await media.availableActionIds();
-      expect(ready, containsAll(expectedIds));
-      expect(
-        ready,
-        hasLength(98),
-      ); // 93 App actions plus 5 retained builtin clips.
-      expect(
-        (await media.availableVideo('h-squat'))!.assetKey,
-        '${TrainingMediaConfig.videoRoot}/h-squat.mp4',
-      );
+      expect(ready, isEmpty);
+      expect(media.readyActionIds, isEmpty);
+      expect(await media.availableVideo('h-squat'), isNull);
+      expect(await media.cacheBytes(), 0);
+      final assets = (await AssetManifest.loadFromAssetBundle(
+        rootBundle,
+      )).listAssets();
+      expect(assets.where((path) => path.endsWith('.mp4')), isEmpty);
       for (final id in ['n-pelvis-circle', 'n-windshield', 'h-banana']) {
         for (final theme in ['dark', 'light']) {
-          final resource = await media.ensureVideo(id, theme: theme);
-          expect(
-            resource.assetKey,
-            'assets/training_media/v0.3.0/realistic/$theme/$id.mp4',
+          expect(await media.availableVideo(id, theme: theme), isNull);
+          await expectLater(
+            media.ensureVideo(id, theme: theme),
+            throwsA(isA<StateError>()),
           );
-          expect(resource.cachePath, isNull);
+          expect(media.stateFor(id).phase, trainer.TrainingMediaPhase.offline);
         }
       }
+      expect(await media.availableActionIds(), isEmpty);
+      expect(await media.cacheBytes(), 0);
     },
   );
 
   test(
-    'offline App generator keeps the requested bundled demonstration',
+    'offline empty cache still permits the requested metadata-backed plan',
     () async {
       final media = await _repository();
       await media.canDownload();
@@ -264,13 +266,13 @@ void main() {
         media: media,
       );
       expect(media.isOffline, isTrue);
-      expect(media.readyActionIds, contains('n-pelvis-circle'));
+      expect(media.readyActionIds, isEmpty);
       final result = await services.generator.generate(
         const ScenarioRequest(scene: 'office', minutes: 5),
       );
       expect(result.issues, isEmpty);
       expect(result.plan, isNotNull);
-      expect(result.plan!.items.single.exerciseId, isIn(media.readyActionIds));
+      expect(await media.availableVideo('n-pelvis-circle'), isNull);
       expect(result.plan!.items.single.exerciseId, 'n-pelvis-circle');
       expect(result.plan!.items.single.replacedFrom, isNull);
       expect(
@@ -347,7 +349,7 @@ void main() {
       var holdDownloads = false;
       var pendingProbes = 0;
       final media = await _repository(
-        onlyBuiltin: true,
+        syntheticBuiltinVideoKeys: true,
         probe: () async {
           if (!holdDownloads) return trainer.TrainingMediaNetwork.wifi;
           pendingProbes++;
@@ -415,7 +417,7 @@ void main() {
     var holdDownloads = false;
     var pendingProbes = 0;
     final media = await _repository(
-      onlyBuiltin: true,
+      syntheticBuiltinVideoKeys: true,
       probe: () async {
         if (!holdDownloads) return trainer.TrainingMediaNetwork.wifi;
         pendingProbes++;
@@ -506,7 +508,7 @@ void main() {
     int? holdFromProbe;
     final media = (await tester.runAsync(
       () => _repository(
-        onlyBuiltin: true,
+        syntheticBuiltinVideoKeys: true,
         probe: () async {
           probes++;
           return holdFromProbe == null || probes < holdFromProbe
@@ -561,15 +563,9 @@ void main() {
       reason: 'The plan is available while background prefetch is pending.',
     );
     await _open(tester, services, PlayerPage(plan: plan));
-    expect(find.text('正在加载动作视频'), findsOneWidget);
+    expect(find.text('正在加载动作视频'), findsNothing);
     expect(
-      find.byWidgetPredicate(
-        (widget) =>
-            widget is Image &&
-            widget.image is AssetImage &&
-            (widget.image as AssetImage).assetName ==
-                '${TrainingMediaConfig.assetRoot}/theme-lossy/dark/first-frames/n-pelvis-circle.webp',
-      ),
+      find.byKey(const ValueKey('exercise-frame-zero-n-pelvis-circle')),
       findsOneWidget,
     );
     // Playback uses this exact clip's frame-zero poster, rather than the
@@ -577,7 +573,7 @@ void main() {
     const waitingPosterPath =
         '${TrainingMediaConfig.assetRoot}/theme-lossy/dark/first-frames/n-pelvis-circle.webp';
     final posterFinder = find.byKey(
-      const ValueKey('drill-poster-$waitingPosterPath'),
+      const ValueKey('exercise-frame-zero-n-pelvis-circle'),
     );
     final legacyIndex =
         jsonDecode(
@@ -617,8 +613,11 @@ void main() {
     await tester.pump();
     void expectCorrectWaitingImage() {
       final current = tester.widget<Image>(posterFinder);
-      expect(current.image, isA<AssetImage>());
-      expect((current.image as AssetImage).assetName, waitingPosterPath);
+      final provider = current.image is ResizeImage
+          ? (current.image as ResizeImage).imageProvider
+          : current.image;
+      expect(provider, isA<AssetImage>());
+      expect((provider as AssetImage).assetName, waitingPosterPath);
       final pixels = find.descendant(
         of: posterFinder,
         matching: find.byType(RawImage),
@@ -654,7 +653,8 @@ void main() {
       trainer.TrainingMediaPhase.offline,
     );
     expect(find.text('正在加载动作视频'), findsNothing);
-    expect(find.text('示范暂时加载不了，计时和语音仍可继续'), findsOneWidget);
+    expect(find.text('示范暂时加载不了，计时和语音仍可继续'), findsNothing);
+    expect(find.byType(SnackBar), findsNothing);
     final spokenBefore = output.spoken.length;
     final chimesBefore = output.chimes.length;
     final counterAfterFailure = tester
@@ -756,7 +756,7 @@ void main() {
       expect(cleared, findsOneWidget);
       expect(await tester.runAsync(media.cacheBytes), 0);
       expect(await tester.runAsync(staleBlob.exists), isFalse);
-      expect(media.readyActionIds, hasLength(98));
+      expect(media.readyActionIds, isEmpty);
       await reloaded.load();
       expect(reloaded.savedPlans.single.plan.id, plan.id);
       expect(reloaded.lastPlan!.id, plan.id);

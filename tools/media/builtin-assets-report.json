@@ -38,24 +38,36 @@
       "bytes": 312112
     },
     "videos": {
-      "files": 191,
-      "bytes": 88252106
+      "files": 0,
+      "bytes": 0
     }
   },
   "bundle": {
-    "files": 1132,
-    "bytes": 93880492
+    "files": 941,
+    "bytes": 5628386
   },
-  "bundleInventorySha256": "860b9df496ae284394074b63ee173aafc505e1cb3314b037fb7eadca192380b6",
+  "bundleInventorySha256": "b25edf52e3b6b3e2c71fb665dad323a302e748da4eaf9c5d32217e04da930722",
   "sourceInputs": {
     "files": 791,
     "inventorySha256": "3282ac25245f8d495ccb02f424e3e088cf2ed5f00a82875af2cc24c3349cfde2",
-    "unchangedAfterBuild": true
+    "unchangedAfterBuild": true,
+    "verificationScope": "recorded-import-provenance"
   },
   "protectedPackFilesInventorySha256": "71c643587a4e2703d3c0820f9e94f00032ccf07931a8e725a4d43fc4fdf77626",
   "legacyPackMediaRemaining": 0,
   "cutoutsBundled": false,
   "validatedOutput": true,
   "generatedIndexLineEndings": "LF",
-  "inventoryRecheckedAfterNormalization": true
+  "inventoryRecheckedAfterNormalization": true,
+  "videoDelivery": "cache-only",
+  "videoCatalog": {
+    "files": 191,
+    "bytes": 88252106
+  },
+  "previousBundleInventorySha256": "860b9df496ae284394074b63ee173aafc505e1cb3314b037fb7eadca192380b6",
+  "outputVerification": {
+    "method": "checked-in-static-payload-hashes",
+    "sourceVideosReDecoded": false,
+    "staticPayloadsUnchangedFromPreviousBundle": true
+  }
 }

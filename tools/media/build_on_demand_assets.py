@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
-"""Build hash-verified offline, theme-matched media from a Pose Hub release.
+"""Build hash-verified static media for cache-only Pose Hub video delivery.
 
-The source release is read-only. The CLI bundles both realistic themes for App
-exercise metadata, plus build-time compressed theme keyframes and playback
-posters decoded from each clip's first frame. The original
-small-bundle API is retained with --legacy-small-bundle.
-Relative release paths are preserved so the same manifests work for assets and
-HTTP downloads. No video encoding or manifest rewriting is performed.
+The source release is read-only. The CLI bundles both realistic themes' stills,
+plus playback posters decoded from each verified source clip's first frame.
+Video descriptors remain in the manifests/index; MP4 payloads are downloaded
+into the runtime cache and never copied into App assets. The original metadata
+selection API is retained with --legacy-small-bundle.
+Relative release paths are preserved for HTTP downloads. No video encoding or
+source manifest rewriting is performed.
 
 Preview: python tools/media/build_on_demand_assets.py --source <v0.3.0-app>
 Apply:   python tools/media/build_on_demand_assets.py --source <v0.3.0-app> --apply
@@ -194,7 +195,7 @@ def protected_inventory(app_root: Path) -> str:
 
 def pubspec_assets(pubspec: str, files: list[MediaFile]) -> str:
     directories = sorted({"assets/training_media/" + str(PurePosixPath(item.relative).parent) + "/"
-                          for item in files})
+                          for item in files if item.group != "videos"})
     block = BEGIN + "\n" + "\n".join(f"    - {directory}" for directory in directories) + "\n" + END
     pubspec = re.sub(r"^    - assets/cutouts/[^\n]*\n", "", pubspec, flags=re.MULTILINE)
     if BEGIN in pubspec:
@@ -378,6 +379,10 @@ def _build(source: Path, app_root: Path, *, apply: bool = False,
     manifest, files = load_release(source)
     if offline_staging is not None:
         files = _offline_themes(source, app_root, manifest, files, offline_staging)
+    # Validate videos and derive frame-zero receipts before selecting payloads.
+    # Retain their descriptors unchanged, but publish only stills and metadata.
+    videos = [item for item in files if item.group == "videos"]
+    files = [item for item in files if item.group != "videos"]
     inputs = manifest.pop("_buildInputs")
     original_sources = inventory_hash(inputs)
     original_metadata = protected_inventory(app_root)
@@ -431,9 +436,11 @@ def _build(source: Path, app_root: Path, *, apply: bool = False,
                               (["packages/realistic-light.json"] if offline_staging is not None else []),
         "offlineThemes": ["dark", "light"] if offline_staging is not None else [],
         "offlineActionCount": len(manifest.get('_offlineActions', [])),
+        "videoDelivery": "cache-only",
+        "videoCatalog": {"files": len(videos), "bytes": sum(item.size for item in videos)},
         "groups": {group: {"files": counts[group],
                            "bytes": sum(item.size for item in files if item.group == group)}
-                   for group in sorted(counts)},
+                   for group in sorted(set(counts) | {"videos"})},
         "bundle": {"files": len(files), "bytes": sum(item.size for item in files)},
         "bundleInventorySha256": inventory_hash(files),
         "sourceInputs": {"files": len(inputs), "inventorySha256": original_sources,
@@ -459,7 +466,7 @@ def main() -> None:
     mode.add_argument("--verify-only", action="store_true")
     parser.add_argument("--baseline-apk", type=Path)
     parser.add_argument("--legacy-small-bundle", action="store_true",
-                        help="Retain the original 32-video dark-only bundle")
+                        help="Use the original dark-only metadata selection; videos remain cache-only")
     parser.add_argument("--report", type=Path)
     args = parser.parse_args()
     report = build(args.source, args.app_root, apply=args.apply,

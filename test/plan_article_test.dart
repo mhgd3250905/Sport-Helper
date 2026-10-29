@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:smartfit/app/services.dart';
 import 'package:smartfit/domain/exercise.dart';
 import 'package:smartfit/domain/plan.dart';
+import 'package:smartfit/domain/plan_validator.dart';
 import 'package:smartfit/ui/chat/coach_ui_adapter.dart';
 import 'package:smartfit/ui/guide_media.dart';
 import 'package:smartfit/ui/plan_page.dart';
@@ -85,6 +86,7 @@ Exercise _copyExercise(
   Exercise source, {
   List<String>? cues,
   ExerciseMedia? media,
+  String? alternative,
 }) => Exercise(
   id: source.id,
   name: source.name,
@@ -99,7 +101,7 @@ Exercise _copyExercise(
   repSeconds: source.repSeconds,
   cues: cues ?? source.cues,
   cautions: source.cautions,
-  alternative: source.alternative,
+  alternative: alternative ?? source.alternative,
   media: media ?? source.media,
 );
 
@@ -230,7 +232,7 @@ GuideMedia _media(WidgetTester tester, String slot) =>
       ),
     );
 UgkPackedAlphaVideo _video(WidgetTester tester, String slot) =>
-    tester.widget<UgkPackedAlphaVideo>(_key('guide-media-video-$slot'));
+    tester.widget<UgkPackedAlphaVideo>(_key('cached-media-video-$slot'));
 
 String? _asset(ImageProvider provider) => switch (provider) {
   AssetImage(:final assetName) => assetName,
@@ -335,7 +337,7 @@ void main() {
           palette.text,
         );
         final candidate =
-            toCoachRecommendationExercise(exercise).stillCutout ??
+            exercise.media.alphaPlaybackPoster ??
             exercise.media.playbackPosterFor(light: !palette.isDark);
         final stills = tester
             .widgetList<Image>(
@@ -422,8 +424,8 @@ void main() {
     expect(_toggle('1:0').hitTestable(), findsOneWidget);
     await play(tester, '1:0');
     expect(coordinator.activeSlot, '1:0');
-    expect(_key('guide-media-video-0:0'), findsNothing);
-    expect(_key('guide-media-video-1:0'), findsOneWidget);
+    expect(_key('cached-media-video-0:0'), findsNothing);
+    expect(_key('cached-media-video-1:0'), findsOneWidget);
     expect(platform.live, {2});
     expect(platform.maxLive, 1);
     expect(
@@ -456,11 +458,11 @@ void main() {
         greaterThan(view.top),
       );
       expect(coordinator.activeSlot, isNull);
-      expect(_key('guide-media-video-0:0'), findsNothing);
+      expect(_key('cached-media-video-0:0'), findsNothing);
       expect(platform.live, isEmpty);
       _list(tester).controller!.jumpTo(0);
       await tester.pumpAndSettle();
-      expect(_key('guide-media-video-0:0'), findsNothing);
+      expect(_key('cached-media-video-0:0'), findsNothing);
       expect(_toggle('0:0').hitTestable(), findsOneWidget);
       expect(platform.sources, hasLength(1));
       expect(tester.takeException(), isNull);
@@ -495,6 +497,60 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('two replacements before a frame preserve both current edits', (
+    tester,
+  ) async {
+    final plan = _plan.copyWith(
+      blocks: [
+        for (final block in _plan.blocks)
+          block.copyWith(
+            items: [
+              for (final item in block.items) item.copyWith(perSide: false),
+            ],
+          ),
+      ],
+    );
+    final app = await _show(
+      tester,
+      height: 1800,
+      plan: plan,
+      transform: (exercise) => _copyExercise(
+        _packed(exercise),
+        alternative: switch (exercise.id) {
+          'h-catcow-quad' => 'h-banana',
+          'h-banana' => 'h-catcow-quad',
+          _ => null,
+        },
+      ),
+    );
+    expect(PlanValidator(app.library).validate(plan), isEmpty);
+    await play(tester, '0:0');
+    expect(platform.live, {1});
+    expect(_key('swap-h-catcow-quad').hitTestable(), findsOneWidget);
+    expect(_key('swap-h-banana').hitTestable(), findsOneWidget);
+    // The first replacement retires a live surface at the next frame. A second
+    // input before that frame must read the newly committed plan, not its prior
+    // snapshot while awaiting retirement.
+    await tester.tap(_key('swap-h-catcow-quad'));
+    await tester.tap(_key('swap-h-banana'));
+    await tester.pumpAndSettle();
+    final edited = app.store.lastPlan!;
+    expect(edited.blocks[0].items.single.exerciseId, 'h-banana');
+    expect(edited.blocks[1].items.single.exerciseId, 'h-catcow-quad');
+    expect(edited.blocks[2].items.single.exerciseId, 'n-windshield');
+    expect(
+      edited.notes,
+      containsAll([
+        '手动把「${app.library['h-catcow-quad'].name}」换成「${app.library['h-banana'].name}」',
+        '手动把「${app.library['h-banana'].name}」换成「${app.library['h-catcow-quad'].name}」',
+      ]),
+    );
+    expect(platform.sources, hasLength(1));
+    expect(platform.live, isEmpty);
+    expect(platform.operations, contains(('dispose', 1)));
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('a move without video has no misleading play control', (
     tester,
   ) async {
@@ -519,7 +575,7 @@ void main() {
     );
     expect(_toggle('0:0'), findsNothing);
     expect(find.text('此动作暂无视频示范'), findsOneWidget);
-    expect(_key('guide-media-video-0:0'), findsNothing);
+    expect(_key('cached-media-video-0:0'), findsNothing);
     expect(platform.sources, isEmpty);
     expect(tester.takeException(), isNull);
   });

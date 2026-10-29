@@ -1,4 +1,6 @@
 import java.util.Base64
+import java.net.URI
+import java.util.zip.ZipFile
 
 plugins {
     id("com.android.application")
@@ -25,6 +27,35 @@ require(propertyIconVariant == null || definedIconVariant == null ||
 val smartfitIconVariant = propertyIconVariant ?: definedIconVariant.orEmpty()
 require(smartfitIconVariant in setOf("", "A", "B", "A2")) {
     "smartfitIconVariant / SMARTFIT_ICON_VARIANT must be A, B, or A2 (or omitted)."
+}
+
+// A release/internal artifact must have an explicit video origin. Decode only
+// this public setting; never include the other dart-defines in diagnostics.
+val mediaPrimaryDefines = providers.gradleProperty("dart-defines").orNull
+    .orEmpty().split(",").mapNotNull { encoded ->
+        runCatching { String(Base64.getDecoder().decode(encoded), Charsets.UTF_8) }
+            .getOrNull()
+    }.filter { it.startsWith("SMARTFIT_MEDIA_PRIMARY_URL=") }
+    .map { it.substringAfter("=").trim() }.distinct()
+
+gradle.taskGraph.whenReady {
+    val protectedBuild = allTasks.any {
+        it.project == project &&
+            (it.name.contains("release", ignoreCase = true) ||
+                it.name.contains("internal", ignoreCase = true))
+    }
+    if (protectedBuild) {
+        require(mediaPrimaryDefines.size == 1 && mediaPrimaryDefines.single().isNotEmpty()) {
+            "SMARTFIT_MEDIA_PRIMARY_URL is required for release/internal builds."
+        }
+        val mediaOrigin = runCatching { URI(mediaPrimaryDefines.single()) }.getOrNull()
+        require(mediaOrigin != null && mediaOrigin.scheme == "https" &&
+            !mediaOrigin.host.isNullOrEmpty() && mediaOrigin.userInfo == null &&
+            mediaOrigin.rawQuery == null && mediaOrigin.rawFragment == null &&
+            mediaOrigin.path.endsWith("/") && mediaOrigin.normalize() == mediaOrigin) {
+            "SMARTFIT_MEDIA_PRIMARY_URL must be a public HTTPS directory without credentials or query."
+        }
+    }
 }
 
 android {
@@ -76,6 +107,14 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
     }
+
+    packaging {
+        jniLibs {
+            // Keep the ELF bytes/alignment; Android extracts these compressed
+            // libraries at install time rather than mapping them from the APK.
+            useLegacyPackaging = true
+        }
+    }
 }
 
 kotlin {
@@ -86,4 +125,32 @@ kotlin {
 
 flutter {
     source = "../.."
+}
+
+// Check the actual APK, including transitive Flutter package assets. Source
+// directory checks alone cannot prevent a dependency from bundling a video.
+tasks.configureEach {
+    if (name.startsWith("assemble") &&
+        (name.contains("Release") || name.contains("Internal"))) {
+        doLast {
+            fileTree(layout.buildDirectory.dir("outputs/apk")) {
+                include("**/*.apk")
+            }.files.forEach { apk ->
+                ZipFile(apk).use { archive ->
+                    val entries = archive.entries().asSequence().toList()
+                    require(entries.none { it.name.endsWith(".mp4", ignoreCase = true) }) {
+                        "Slim asset gate: APK must not contain bundled MP4 files."
+                    }
+                    val manifest = archive.getEntry("assets/flutter_assets/AssetManifest.bin")
+                    require(manifest != null) { "Slim asset gate: missing Flutter AssetManifest.bin." }
+                    val assetNames = archive.getInputStream(manifest).use { stream ->
+                        String(stream.readBytes(), Charsets.ISO_8859_1)
+                    }
+                    require(!assetNames.contains(".mp4", ignoreCase = true)) {
+                        "Slim asset gate: AssetManifest must not reference MP4 files."
+                    }
+                }
+            }
+        }
+    }
 }

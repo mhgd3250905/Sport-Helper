@@ -7,6 +7,8 @@ import 'package:crypto/crypto.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
 
+import 'posehub_global_video_cache_io.dart';
+import 'posehub_legacy_video_catalog.dart';
 import 'posehub_media_repository_types.dart';
 
 Future<PoseHubMediaFileStore> createPoseHubMediaStore({
@@ -19,6 +21,9 @@ Future<PoseHubMediaFileStore> createPoseHubMediaStore({
   required bool allowInsecureLocalhost,
   required Duration timeout,
   required int maxRedirects,
+  required int maxVideoCacheBytes,
+  required String? legacyCacheDirectory,
+  required List<PoseHubLegacyVideoFile> legacyVideos,
 }) async {
   for (final mediaBaseUrl in mediaBaseUrls) {
     _checkUrl(mediaBaseUrl, allowInsecureLocalhost);
@@ -59,14 +64,40 @@ Future<PoseHubMediaFileStore> createPoseHubMediaStore({
   if (!_within(canonical.path, supportPath)) {
     throw const FormatException('Media cache escaped application support.');
   }
-  return _FileStore(
+  Directory? legacyRoot;
+  var trustedLegacy = legacyVideos;
+  if (rootDirectory == null || legacyCacheDirectory != null) {
+    final cache = Directory(
+      legacyCacheDirectory ?? (await getApplicationCacheDirectory()).path,
+    );
+    await cache.create(recursive: true);
+    legacyRoot = Directory(
+      '${await cache.resolveSymbolicLinks()}/training-media',
+    );
+    if (rootDirectory == null) {
+      trustedLegacy = await loadPoseHubLegacyVideoCatalog();
+    }
+  }
+  final store = _FileStore(
     canonical,
     files,
     videos,
     allowInsecureLocalhost,
     timeout,
     maxRedirects,
+    poseHubGlobalVideoCache(parent),
+    '$packVersion/$revision',
+    maxVideoCacheBytes,
+    legacyRoot,
+    trustedLegacy,
   );
+  try {
+    await store.initializeVideoCache();
+    return store;
+  } on Object {
+    store.dispose();
+    rethrow;
+  }
 }
 
 void _checkedPath(String path) {
@@ -116,7 +147,13 @@ class _FileStore implements PoseHubMediaFileStore {
     this.allowLocal,
     this.timeout,
     this.maxRedirects,
-  );
+    this._videoCache,
+    this._namespace,
+    int maxVideoCacheBytes,
+    this._legacyRoot,
+    this._legacyVideos,
+  ) : _videoPaths = {for (final file in videos) file.path: file},
+      _detachBudget = _videoCache.attach(maxVideoCacheBytes);
 
   final Directory root;
   final List<coach.PoseHubPackFile> files;
@@ -124,6 +161,13 @@ class _FileStore implements PoseHubMediaFileStore {
   final bool allowLocal;
   final Duration timeout;
   final int maxRedirects;
+  final Map<String, coach.PoseHubPackFile> _videoPaths;
+  final PoseHubGlobalVideoCache _videoCache;
+  final String _namespace;
+  final void Function() _detachBudget;
+  final Directory? _legacyRoot;
+  final List<PoseHubLegacyVideoFile> _legacyVideos;
+  final _retained = <Object, String>{};
   final _clients = <HttpClient, String>{};
   final _random = Random.secure();
   bool _disposed = false;
@@ -194,19 +238,127 @@ class _FileStore implements PoseHubMediaFileStore {
   }
 
   @override
+  void Function() retainVideo(coach.PoseHubPackFile file) {
+    _check();
+    final known = _videoPaths[file.path];
+    if (known == null ||
+        known.bytes != file.bytes ||
+        known.sha256 != file.sha256) {
+      throw const FormatException('Unknown cache video.');
+    }
+    final token = Object();
+    final identity = '$_namespace/${file.path}';
+    _retained[token] = identity;
+    _videoCache.pins.update(identity, (count) => count + 1, ifAbsent: () => 1);
+    return () => _releaseVideo(token);
+  }
+
+  void _releaseVideo(Object token) {
+    final path = _retained.remove(token);
+    if (path == null) return;
+    final count = _videoCache.pins[path]!;
+    if (count == 1) {
+      _videoCache.pins.remove(path);
+    } else {
+      _videoCache.pins[path] = count - 1;
+    }
+  }
+
+  Future<void> initializeVideoCache() => _videoCache.ordered(
+    () => _videoCache.initialize(
+      namespace: _namespace,
+      videos: videos,
+      legacyRoot: _legacyRoot,
+      legacyVideos: _legacyVideos,
+    ),
+  );
+
+  /// Repeat the existing no-link/root checks immediately before the synchronous
+  /// eviction/publication commit, so a new pin cannot interleave with deletes.
+  File _videoTargetSync(String relative) {
+    _check();
+    if (FileSystemEntity.typeSync(root.path, followLinks: false) !=
+        FileSystemEntityType.directory) {
+      throw const PoseHubMediaException(
+        'unsafe_cache',
+        'Media cache path is invalid.',
+      );
+    }
+    final resolvedRoot = root.resolveSymbolicLinksSync();
+    final sameRoot = Platform.isWindows
+        ? resolvedRoot.toLowerCase() == root.path.toLowerCase()
+        : resolvedRoot == root.path;
+    if (!sameRoot) {
+      throw const PoseHubMediaException(
+        'unsafe_cache',
+        'Media cache path is invalid.',
+      );
+    }
+    var path = root.path;
+    final parts = relative.split('/');
+    for (var index = 0; index < parts.length; index++) {
+      path = '$path${Platform.pathSeparator}${parts[index]}';
+      final type = FileSystemEntity.typeSync(path, followLinks: false);
+      if (type == FileSystemEntityType.link ||
+          (type != FileSystemEntityType.notFound &&
+              type !=
+                  (index == parts.length - 1
+                      ? FileSystemEntityType.file
+                      : FileSystemEntityType.directory))) {
+        throw const PoseHubMediaException(
+          'unsafe_cache',
+          'Media cache path is invalid.',
+        );
+      }
+      if (type != FileSystemEntityType.notFound &&
+          !_within(File(path).resolveSymbolicLinksSync(), root.path)) {
+        throw const PoseHubMediaException(
+          'unsafe_cache',
+          'Media cache path is invalid.',
+        );
+      }
+    }
+    return File(path);
+  }
+
+  void _touchVideo(String path) {
+    final target = _videoTargetSync(path);
+    // mtime is the persistent LRU record; no image or separate index is changed.
+    target.setLastModifiedSync(_videoCache.nextUse());
+  }
+
+  @override
   Future<Uri?> cached(coach.PoseHubPackFile file) async {
+    if (_videoPaths.containsKey(file.path)) {
+      return _videoCache.ordered(() async {
+        final target = await _target(file.path);
+        if (!await _verified(target, file)) return null;
+        _touchVideo(file.path);
+        return target.uri;
+      });
+    }
     final target = await _target(file.path);
     return await _verified(target, file) ? target.uri : null;
   }
 
   @override
   Future<Uri?> reusable(coach.PoseHubPackFile file) async {
+    if (videos.any((video) => video.sha256 == file.sha256)) {
+      return _videoCache.ordered(() => _reusable(file));
+    }
+    return _reusable(file);
+  }
+
+  Future<Uri?> _reusable(coach.PoseHubPackFile file) async {
     final aliases = files.where(
       (f) => f.sha256 == file.sha256 && f.bytes == file.bytes,
     );
     for (final alias in aliases) {
       final target = await _target(alias.path);
-      if (await _verified(target, file)) return target.uri;
+      if (await _verified(target, file)) {
+        if (_videoPaths.containsKey(alias.path)) _touchVideo(alias.path);
+        return target.uri;
+      }
     }
     return null;
   }
@@ -349,6 +501,25 @@ class _FileStore implements PoseHubMediaFileStore {
       await output.close();
       output = null;
       _check();
+      if (_videoPaths.containsKey(file.path)) {
+        return await _videoCache.ordered(() async {
+          final published = await _target(file.path);
+          if (await _verified(published, file)) {
+            _touchVideo(file.path);
+            return published.uri;
+          }
+          final entries = await _videoCache.publishedVideos();
+          final destination = _videoTargetSync(file.path);
+          _videoCache.makeRoom(
+            entries,
+            incoming: '$_namespace/${file.path}',
+            incomingBytes: file.bytes,
+          );
+          temp.renameSync(destination.path);
+          _touchVideo(file.path);
+          return destination.uri;
+        });
+      }
       // Preserve a winner from another request. Replacement only occurs after
       // all incoming bytes are validated, within our versioned media namespace.
       if (await _verified(target, file)) return target.uri;
@@ -365,6 +536,10 @@ class _FileStore implements PoseHubMediaFileStore {
 
   @override
   Future<Uri> materialize(coach.PoseHubPackFile file, Uri source) async {
+    if (_videoPaths.containsKey(file.path)) {
+      final hit = await cached(file);
+      if (hit != null) return hit;
+    }
     final target = await _target(file.path, createParents: true);
     if (await _verified(target, file)) return target.uri;
     return _publish(
@@ -386,26 +561,25 @@ class _FileStore implements PoseHubMediaFileStore {
 
   @override
   Future<int> videoCacheBytes() async {
-    _check();
-    var bytes = 0;
-    for (final video in videos) {
-      final target = await _target(video.path);
-      try {
-        final stat = await target.stat();
-        if (stat.type == FileSystemEntityType.file) bytes += stat.size;
-      } on FileSystemException {
-        // A download/clear may change an entry during this usage snapshot.
-      }
-    }
-    return bytes;
+    return _videoCache.ordered(() async {
+      _check();
+      return _videoCache.bytes();
+    });
   }
 
   @override
   Future<void> clearVideoCache() async {
+    return _videoCache.ordered(_clearVideoCache);
+  }
+
+  Future<void> _clearVideoCache() async {
     _check();
+    await _videoCache.clear();
+    // Only this handle's completed/cancelled job namespace may clean its own
+    // stale parts. Global eviction never visits another handle's partial bytes.
     for (final video in videos) {
       final target = await _target(video.path);
-      if (await target.exists()) await target.delete();
+      if (_videoCache.pins.containsKey('$_namespace/${video.path}')) continue;
       if (!await target.parent.exists()) continue;
       final filename = target.uri.pathSegments.last;
       final ownedPart = RegExp(
@@ -423,6 +597,10 @@ class _FileStore implements PoseHubMediaFileStore {
   void dispose() {
     if (_disposed) return;
     _disposed = true;
+    _detachBudget();
+    for (final token in _retained.keys.toList()) {
+      _releaseVideo(token);
+    }
     for (final client in _clients.keys.toList()) {
       client.close(force: true);
     }
