@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:ugk_coach_ui/ugk_coach_ui.dart';
 
 import '../../data/app_store.dart';
@@ -17,6 +18,8 @@ import '../theme/ui_polish_tokens.dart';
 import '../theme/widgets.dart';
 import 'coach_ui_adapter.dart';
 import 'expand_route.dart';
+import 'saved_plan_actions.dart';
+import 'saved_plan_animated_list.dart';
 
 /// One saved plan expands in place through the SDK's shared presentation.
 class SavedPlansPage extends StatefulWidget {
@@ -47,10 +50,13 @@ class _SavedPlansPageState extends State<SavedPlansPage> {
   Timer? _revealTimer;
   int _revealEpoch = 0;
   bool _autoRevealing = false;
+  Timer? _emptyTimer;
+  late bool _emptyReady;
 
   @override
   void initState() {
     super.initState();
+    _emptyReady = widget.store.savedPlans.isEmpty;
     widget.store.addListener(_storeChanged);
   }
 
@@ -61,6 +67,8 @@ class _SavedPlansPageState extends State<SavedPlansPage> {
     oldWidget.store.removeListener(_storeChanged);
     widget.store.addListener(_storeChanged);
     _cancelReveal();
+    _emptyTimer?.cancel();
+    _emptyReady = widget.store.savedPlans.isEmpty;
     if (!widget.store.savedPlans.any((plan) => plan.id == _expandedId)) {
       _expandedId = null;
     }
@@ -70,6 +78,16 @@ class _SavedPlansPageState extends State<SavedPlansPage> {
     _cancelReveal();
     if (!widget.store.savedPlans.any((plan) => plan.id == _expandedId)) {
       _expandedId = null;
+    }
+    _emptyTimer?.cancel();
+    if (widget.store.savedPlans.isEmpty) {
+      _emptyTimer = Timer(SfSavedPlanTokens.removal, () {
+        if (mounted && widget.store.savedPlans.isEmpty) {
+          setState(() => _emptyReady = true);
+        }
+      });
+    } else {
+      _emptyReady = false;
     }
     setState(() {});
   }
@@ -163,21 +181,19 @@ class _SavedPlansPageState extends State<SavedPlansPage> {
     );
   }
 
-  Widget _entry(SavedPlan saved) {
-    return SizedBox(
-      key: ValueKey('saved-entry-${saved.id}'),
-      child: _SavedPlanEntry(
-        key: _entryKeys.putIfAbsent(saved.id, GlobalKey.new),
-        saved: saved,
-        library: widget.library,
-        expanded: _expandedId == saved.id,
-        onToggle: () => _toggle(saved),
-        onShow: _show,
-        onStart: _start,
-        onRename: (plan) => _rename(context, plan),
-        onDelete: (plan) => _delete(context, plan),
-        onDetails: _details,
-      ),
+  Widget _entry(SavedPlan saved, {required bool expanded}) {
+    return _SavedPlanEntry(
+      key: _entryKeys.putIfAbsent(saved.id, GlobalKey.new),
+      saved: saved,
+      library: widget.library,
+      expanded: expanded,
+      onToggle: () => _toggle(saved),
+      onShow: _show,
+      onStart: _start,
+      onRename: (plan) => _rename(context, plan),
+      onDelete: (plan) => _delete(context, plan),
+      onDetails: _details,
+      onInteract: _cancelReveal,
     );
   }
 
@@ -185,137 +201,87 @@ class _SavedPlansPageState extends State<SavedPlansPage> {
   void dispose() {
     widget.store.removeListener(_storeChanged);
     _revealTimer?.cancel();
+    _emptyTimer?.cancel();
     _revealEpoch++;
     _scroll.dispose();
     super.dispose();
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    backgroundColor: SfColors.background,
-    appBar: AppBar(
-      title: const Text('我的计划'),
+  Widget build(BuildContext context) {
+    // A removed item's old builder must retain its expanded snapshot while
+    // the list animates its removal, rather than starting an SDK collapse too.
+    final expandedId = _expandedId;
+    return Scaffold(
       backgroundColor: SfColors.background,
-      surfaceTintColor: Colors.transparent,
-    ),
-    body: SafeArea(
-      child: SizedBox.expand(
-        key: _viewport,
-        child: CustomScrollView(
-          key: const ValueKey('saved-plans-scroll'),
-          controller: _scroll,
-          slivers: [
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  SfSpace.x6,
-                  SfSpace.x3,
-                  SfSpace.x6,
-                  SfSpace.x4,
-                ),
-                child: Text(
-                  '${widget.store.savedPlans.length} 套',
-                  style: SfType.label,
+      appBar: AppBar(
+        title: const Text('我的计划'),
+        backgroundColor: SfColors.background,
+        surfaceTintColor: Colors.transparent,
+      ),
+      body: SafeArea(
+        child: SizedBox.expand(
+          key: _viewport,
+          child: CustomScrollView(
+            key: const ValueKey('saved-plans-scroll'),
+            controller: _scroll,
+            slivers: [
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                    textBaseline: TextBaseline.alphabetic,
+                    children: [
+                      Text(
+                        '${widget.store.savedPlans.length} 套',
+                        style: SfType.label.copyWith(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: SfSavedPlanTokens.secondary,
+                        ),
+                      ),
+                      const Spacer(),
+                      Text(
+                        '长按可编辑',
+                        style: SfType.caption.copyWith(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w400,
+                          color: SfSavedPlanTokens.tertiary,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            if (widget.store.savedPlans.isEmpty)
-              SliverToBoxAdapter(child: _Empty(onCompose: widget.onCompose))
-            else
+              if (widget.store.savedPlans.isEmpty && _emptyReady)
+                SliverToBoxAdapter(child: _Empty(onCompose: widget.onCompose)),
               SliverPadding(
-                padding: const EdgeInsets.fromLTRB(
-                  SfSpace.x4,
-                  0,
-                  SfSpace.x4,
-                  SfSpace.x4,
-                ),
-                sliver: SliverList.separated(
-                  itemCount: widget.store.savedPlans.length,
-                  separatorBuilder: (_, _) =>
-                      const SizedBox(height: SfSpace.x2),
-                  itemBuilder: (context, i) =>
-                      _entry(widget.store.savedPlans[i]),
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+                sliver: SavedPlanAnimatedList(
+                  plans: List.of(widget.store.savedPlans),
+                  itemBuilder: (_, plan) =>
+                      _entry(plan, expanded: expandedId == plan.id),
                 ),
               ),
-          ],
+            ],
+          ),
         ),
       ),
-    ),
-  );
+    );
+  }
 
   Future<void> _rename(BuildContext context, SavedPlan p) async {
-    final name = await showDialog<String>(
-      context: context,
-      builder: (_) => _RenameSavedPlanDialog(name: p.name),
-    );
+    final name = await renameSavedPlan(context, p.name);
     if (mounted && name != null && name.trim().isNotEmpty) {
       await widget.store.renamePlan(p.id, name);
     }
   }
 
   Future<void> _delete(BuildContext context, SavedPlan p) async {
-    final ok = await showDialog<bool>(
-      context: context,
-      builder: (c) => AlertDialog(
-        title: Text('删除「${p.name}」？'),
-        content: const Text('删除后可以在对话里重新生成。'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(c, false),
-            child: Text('取消', style: TextStyle(color: SfColors.muted)),
-          ),
-          TextButton(
-            key: const ValueKey('delete-ok'),
-            onPressed: () => Navigator.pop(c, true),
-            child: Text('删除', style: TextStyle(color: SfColors.danger)),
-          ),
-        ],
-      ),
-    );
-    if (ok == true) await widget.store.deletePlan(p.id);
+    final ok = await confirmDeleteSavedPlan(context, p.name);
+    if (mounted && ok == true) await widget.store.deletePlan(p.id);
   }
-}
-
-class _RenameSavedPlanDialog extends StatefulWidget {
-  const _RenameSavedPlanDialog({required this.name});
-  final String name;
-
-  @override
-  State<_RenameSavedPlanDialog> createState() => _RenameSavedPlanDialogState();
-}
-
-class _RenameSavedPlanDialogState extends State<_RenameSavedPlanDialog> {
-  late final _text = TextEditingController(text: widget.name);
-
-  @override
-  void dispose() {
-    _text.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) => AlertDialog(
-    title: const Text('重命名'),
-    content: TextField(
-      key: const ValueKey('rename-field'),
-      controller: _text,
-      autofocus: true,
-      maxLength: 20,
-      decoration: const InputDecoration(hintText: '计划名称'),
-      onSubmitted: (value) => Navigator.pop(context, value),
-    ),
-    actions: [
-      TextButton(
-        onPressed: () => Navigator.pop(context),
-        child: Text('取消', style: TextStyle(color: SfColors.muted)),
-      ),
-      TextButton(
-        key: const ValueKey('rename-ok'),
-        onPressed: () => Navigator.pop(context, _text.text),
-        child: const Text('确定'),
-      ),
-    ],
-  );
 }
 
 /// Stable slots let the SDK retain one surface and header through reversals.
@@ -331,6 +297,7 @@ class _SavedPlanEntry extends StatefulWidget {
     required this.onRename,
     required this.onDelete,
     required this.onDetails,
+    required this.onInteract,
   });
   final SavedPlan saved;
   final ExerciseLibrary library;
@@ -341,14 +308,23 @@ class _SavedPlanEntry extends StatefulWidget {
   final ValueChanged<SavedPlan> onRename;
   final ValueChanged<SavedPlan> onDelete;
   final ValueChanged<SavedPlan> onDetails;
+  final VoidCallback onInteract;
 
   @override
   State<_SavedPlanEntry> createState() => _SavedPlanEntryState();
 }
 
-class _SavedPlanEntryState extends State<_SavedPlanEntry> {
+class _SavedPlanEntryState extends State<_SavedPlanEntry>
+    with SingleTickerProviderStateMixin {
   late Widget _header;
   late Widget _summary;
+  late final _press = AnimationController(
+    vsync: this,
+    value: 1,
+    lowerBound: .98,
+    upperBound: 1.01,
+  );
+  bool _menuVisible = false;
 
   @override
   void initState() {
@@ -371,9 +347,7 @@ class _SavedPlanEntryState extends State<_SavedPlanEntry> {
     _header = _SavedPlanHeader(
       key: ValueKey('saved-header-${widget.saved.id}'),
       saved: widget.saved,
-      onShow: () => widget.onShow(widget.saved),
-      onRename: () => widget.onRename(widget.saved),
-      onDelete: () => widget.onDelete(widget.saved),
+      onMenu: () => unawaited(_openMenu()),
     );
     _summary = _SavedPlanSummary(
       key: ValueKey('saved-summary-${widget.saved.id}'),
@@ -383,12 +357,78 @@ class _SavedPlanEntryState extends State<_SavedPlanEntry> {
     );
   }
 
+  void _down(PointerDownEvent _) {
+    if (_menuVisible) return;
+    widget.onInteract();
+    _press.animateTo(
+      .98,
+      duration: SfSavedPlanTokens.press,
+      curve: Curves.easeOut,
+    );
+  }
+
+  void _up(PointerEvent _) {
+    if (!_menuVisible) _release();
+  }
+
+  void _release() => _press.animateTo(
+    1,
+    duration: SfSavedPlanTokens.rebound,
+    curve: Curves.easeOutBack,
+  );
+
+  Rect _bounds() {
+    final box = context.findRenderObject()! as RenderBox;
+    return box.localToGlobal(Offset.zero) & box.size;
+  }
+
+  Rect _highlightBounds() {
+    final bounds = _bounds();
+    return Rect.fromCenter(
+      center: bounds.center,
+      width: bounds.width * _press.value,
+      height: bounds.height * _press.value,
+    );
+  }
+
+  Future<void> _openMenu() async {
+    if (_menuVisible) return;
+    widget.onInteract();
+    _menuVisible = true;
+    unawaited(HapticFeedback.mediumImpact());
+    _release();
+    final action = await showSavedPlanMenu(
+      context,
+      cardRect: _bounds,
+      highlightRect: _highlightBounds,
+      cardAnimation: _press,
+    );
+    if (!mounted) return;
+    _menuVisible = false;
+    switch (action) {
+      case SavedPlanAction.show:
+        widget.onShow(widget.saved);
+      case SavedPlanAction.rename:
+        widget.onRename(widget.saved);
+      case SavedPlanAction.delete:
+        widget.onDelete(widget.saved);
+      case null:
+        break;
+    }
+  }
+
+  @override
+  void dispose() {
+    _press.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final saved = widget.saved;
     final routine = toCoachRoutine(saved.plan, widget.library);
     final alpha = SfAlphaCards.enabledOf(context);
-    return withSmartfitSavedPlanUi(
+    final card = withSmartfitSavedPlanUi(
       context,
       CoachPlanExpanded(
         key: ValueKey('saved-expanded-${saved.id}'),
@@ -407,7 +447,7 @@ class _SavedPlanEntryState extends State<_SavedPlanEntry> {
             if (widget.library.tryGet(id) case final exercise?)
               toCoachExercise(exercise, alphaCards: alpha),
         ]),
-        header: _header,
+        header: widget.expanded ? _header : const SizedBox.shrink(),
         collapsedSummary: _summary,
         expanded: widget.expanded,
         onToggle: widget.onToggle,
@@ -416,6 +456,26 @@ class _SavedPlanEntryState extends State<_SavedPlanEntry> {
         actionLabel: '查看详情',
         onAction: () => widget.onDetails(saved),
         onStart: (from) => widget.onStart(saved, from),
+      ),
+      compact: !widget.expanded,
+    );
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onLongPress: _openMenu,
+      // During the SDK's outgoing-body/summary handoff the summary temporarily
+      // ignores input. Keep the compact card tappable for a quick reversal;
+      // nested play/header controls still win their own gesture arena.
+      onTap: widget.expanded ? null : widget.onToggle,
+      child: Listener(
+        onPointerDown: _down,
+        onPointerUp: _up,
+        onPointerCancel: _up,
+        child: AnimatedBuilder(
+          animation: _press,
+          child: card,
+          builder: (_, child) =>
+              Transform.scale(scale: _press.value, child: child),
+        ),
       ),
     );
   }
@@ -438,19 +498,15 @@ class _SavedPlanHeader extends StatelessWidget {
   const _SavedPlanHeader({
     super.key,
     required this.saved,
-    required this.onShow,
-    required this.onRename,
-    required this.onDelete,
+    required this.onMenu,
   });
 
   final SavedPlan saved;
-  final VoidCallback onShow;
-  final VoidCallback onRename;
-  final VoidCallback onDelete;
+  final VoidCallback onMenu;
 
   @override
   Widget build(BuildContext context) => Row(
-    key: ValueKey('saved-${saved.id}'),
+    key: ValueKey('saved-open-header-${saved.id}'),
     children: [
       Expanded(
         child: Text(
@@ -460,30 +516,12 @@ class _SavedPlanHeader extends StatelessWidget {
           style: SfCardTokens.title,
         ),
       ),
-      PopupMenuButton<String>(
+      IconButton(
         key: ValueKey('saved-menu-${saved.id}'),
         tooltip: '更多',
         padding: EdgeInsets.zero,
-        constraints: const BoxConstraints(minWidth: SfSpace.x6 * 5),
         icon: SfIcon(SfGlyph.more, color: SfColors.muted, size: SfSpace.x5),
-        onSelected: (value) {
-          switch (value) {
-            case 'show':
-              onShow();
-            case 'rename':
-              onRename();
-            case 'delete':
-              onDelete();
-          }
-        },
-        itemBuilder: (_) => [
-          const PopupMenuItem(value: 'show', child: Text('点一下在对话里调出')),
-          const PopupMenuItem(value: 'rename', child: Text('重命名')),
-          PopupMenuItem(
-            value: 'delete',
-            child: Text('删除', style: TextStyle(color: SfColors.danger)),
-          ),
-        ],
+        onPressed: onMenu,
       ),
     ],
   );
@@ -509,59 +547,125 @@ class _SavedPlanSummary extends StatelessWidget {
         .whereType<Exercise>()
         .firstOrNull;
     final used = saved.lastUsedAt == null ? '' : '${_ago(saved.lastUsedAt!)}练过';
-    return Row(
-      children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(SfRadius.lg - SfSpace.x2),
-          child: SizedBox.square(
-            dimension: SfSpace.x8 + SfSpace.x6,
-            child: first == null
-                ? null
-                : Image.asset(
-                    sfPoster(first),
-                    fit: BoxFit.contain,
-                    errorBuilder: (_, _, _) => const SizedBox.shrink(),
-                  ),
-          ),
-        ),
-        const SizedBox(width: SfSpace.x3),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '${planDurationLabel(p, library)} · ${p.items.length} 个动作',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: SfCardTokens.metadata,
+    // The SDK supplies 6px at its surface. These 10px complete the requested
+    // 16px inset without changing its expanded-body width or measurement.
+    return Padding(
+      padding: const EdgeInsets.all(10),
+      child: SizedBox(
+        key: ValueKey('saved-${saved.id}'),
+        height: 76,
+        child: Row(
+          children: [
+            Container(
+              key: ValueKey('saved-thumbnail-${saved.id}'),
+              width: 76,
+              height: 76,
+              clipBehavior: Clip.antiAlias,
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: SfSavedPlanTokens.insetFill,
+                borderRadius: BorderRadius.circular(14),
               ),
-              if (used.isNotEmpty)
-                Text(used, maxLines: 1, style: SfType.caption),
-            ],
-          ),
+              child: first == null
+                  ? null
+                  : Image.asset(
+                      toCoachRecommendationExercise(first).stillCutout ??
+                          sfPoster(first),
+                      fit: BoxFit.contain,
+                      alignment: Alignment.center,
+                      excludeFromSemantics: true,
+                      errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                    ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    saved.name,
+                    key: ValueKey('saved-title-${saved.id}'),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: SfType.body.copyWith(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      height: 1.3,
+                      color: SfColors.text,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    '${planDurationLabel(p, library)} · ${p.items.length} 个动作',
+                    key: ValueKey('saved-meta-${saved.id}'),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: SfType.caption.copyWith(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w400,
+                      color: SfSavedPlanTokens.secondary,
+                    ),
+                  ),
+                  if (used.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      used,
+                      key: ValueKey('saved-used-${saved.id}'),
+                      maxLines: 1,
+                      style: SfType.caption.copyWith(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w400,
+                        color: SfSavedPlanTokens.tertiary,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            const SizedBox(width: 12),
+            Semantics(
+              key: ValueKey('saved-start-${saved.id}'),
+              button: true,
+              label: '开始训练',
+              child: Tooltip(
+                message: '开始训练',
+                child: InkResponse(
+                  onTap: () {
+                    unawaited(HapticFeedback.mediumImpact());
+                    // Where the tile is now; once this page is gone the
+                    // player folds back into the middle of the chat.
+                    final at = rectOf(context);
+                    var first = true;
+                    onStart(() {
+                      if (!first) return null;
+                      first = false;
+                      return at;
+                    });
+                  },
+                  customBorder: const CircleBorder(),
+                  child: Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: SfColors.accent.withValues(
+                        alpha: SfColors.isDark ? .20 : .12,
+                      ),
+                    ),
+                    alignment: Alignment.center,
+                    child: SfIcon(
+                      SfGlyph.play,
+                      size: 20,
+                      color: SfColors.accent,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
-        const SizedBox(width: SfSpace.x2),
-        SfCircleButton(
-          key: ValueKey('saved-start-${saved.id}'),
-          tooltip: '开始训练',
-          size: SfSpace.x5 * 2,
-          icon: SfGlyph.play,
-          fill: SfColors.isDark ? SfColors.surface : SfColors.surfaceHigh,
-          iconColor: SfColors.accentText,
-          haptic: SfHaptic.medium,
-          onPressed: () {
-            // Where the tile is now; once this page is gone the
-            // player folds back into the middle of the chat.
-            final at = rectOf(context);
-            var first = true;
-            onStart(() {
-              if (!first) return null;
-              first = false;
-              return at;
-            });
-          },
-        ),
-      ],
+      ),
     );
   }
 

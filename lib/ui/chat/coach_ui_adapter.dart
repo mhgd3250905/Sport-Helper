@@ -26,11 +26,38 @@ Widget withSmartfitCoachUi(BuildContext context, Widget child) =>
 
 /// Saved plans reuse the SDK plan view and its normal App theme. Its left
 /// action opens details instead of saving, using the approved primary ink.
-Widget withSmartfitSavedPlanUi(BuildContext context, Widget child) =>
-    CoachUiTheme(
-      style: smartfitCoachUiStyle(planDetailsAction: true),
-      child: child,
-    );
+Widget withSmartfitSavedPlanUi(
+  BuildContext context,
+  Widget child, {
+  bool compact = false,
+}) {
+  final base = smartfitCoachUiStyle(planDetailsAction: true);
+  final builders = base.builders;
+  return CoachUiTheme(
+    style: compact
+        ? CoachUiStyle(
+            colors: base.colors,
+            typography: base.typography,
+            strings: base.strings,
+            builders: CoachUiBuilders(
+              // The SDK retains its collapse control even when invisible.
+              // A zero-size public control plus an empty header lets the
+              // compact summary use the whole width without a second shell.
+              pressable: (context, control) => control.expanded != null
+                  ? const SizedBox.shrink()
+                  : builders.pressable!(context, control),
+              controlFace: builders.controlFace,
+              textAction: builders.textAction,
+              surface: builders.surface,
+              icon: builders.icon,
+              startButton: builders.startButton,
+              media: builders.media,
+            ),
+          )
+        : base,
+    child: child,
+  );
+}
 
 /// Recommendation layout, controls and card tokens use the SDK defaults.
 /// Only fixed labels are localized; trusted artwork is supplied as model data.

@@ -248,13 +248,13 @@ void main() {
     await openPlans();
     expect(find.text('1 套'), findsOneWidget);
     expect(find.textContaining('套 · 点一下'), findsNothing);
-    await tester.tap(find.byKey(ValueKey('saved-menu-${saved.id}')));
+    await tester.longPress(find.byKey(ValueKey('saved-expanded-${saved.id}')));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('点一下在对话里调出'));
+    await tester.tap(find.text('发到对话'));
     await tester.pumpAndSettle();
     expect(app.chat.messages.last.plan?.id, plan.id);
     await openPlans();
-    await tester.tap(find.byKey(ValueKey('saved-menu-${saved.id}')));
+    await tester.longPress(find.byKey(ValueKey('saved-expanded-${saved.id}')));
     await tester.pumpAndSettle();
     await tester.tap(find.text('删除').last);
     await tester.pumpAndSettle();

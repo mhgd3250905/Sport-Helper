@@ -91,6 +91,40 @@ abstract final class SfPlanPolishTokens {
       SfType.callout.copyWith(fontSize: 14, color: SfColors.accent);
 }
 
+/// Approved second-batch saved-plan values. Do not retune these independently.
+abstract final class SfSavedPlanTokens {
+  static const pageInset = 20.0;
+  static const gap = 12.0;
+  static const inset = 16.0;
+  static const thumbnail = 76.0;
+  static const thumbnailRadius = 14.0;
+  static const thumbnailInset = 6.0;
+  static const textGap = 14.0;
+  static const playSize = 44.0;
+  static const playIcon = 20.0;
+  static const menuWidth = 208.0;
+  static const menuHeight = 165.0;
+  static const menuGap = 8.0;
+  static const menuRadius = 16.0;
+  static const menuItemHeight = 48.0;
+  static const press = Duration(milliseconds: 120);
+  static const rebound = Duration(milliseconds: 160);
+  static const menuEnter = Duration(milliseconds: 180);
+  static const menuExit = Duration(milliseconds: 120);
+  static const maskEnter = Duration(milliseconds: 160);
+  static const removal = Duration(milliseconds: 240);
+  static Color get insetFill =>
+      SfColors.isDark ? const Color(0xFF223031) : const Color(0xFFF1F4F3);
+  static Color get secondary => SfColors.isDark
+      ? Colors.white.withValues(alpha: .64)
+      : const Color(0xFF5F6B68);
+  static Color get tertiary => SfColors.isDark
+      ? Colors.white.withValues(alpha: .42)
+      : const Color(0xFF8A9592);
+  static Color get destructive =>
+      SfColors.isDark ? const Color(0xFFFF6B6B) : const Color(0xFFD64545);
+}
+
 abstract final class SfDockPolishTokens {
   static const fadeAboveInput = 72.0;
   static const menuDuration = Duration(milliseconds: 240);

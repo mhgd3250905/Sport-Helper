@@ -514,16 +514,18 @@ void main() {
       await tester.tap(find.byKey(const ValueKey('panel-plans')));
       await tester.pumpAndSettle();
       final saved = s.store.savedPlans.single;
-      await tester.tap(find.byKey(ValueKey('saved-${saved.id}')));
+      await tester.tap(find.byKey(ValueKey('saved-expanded-${saved.id}')));
       await tester.pumpAndSettle();
       expect(find.byKey(const ValueKey('saved-plans-scroll')), findsOneWidget);
       expect(find.text('查看详情').hitTestable(), findsOneWidget);
       expect(s.chat.messages.last.plan, isNull);
       await tester.tap(find.byKey(ValueKey('plan-expand-${plan.id}')));
       await tester.pumpAndSettle();
-      await tester.tap(find.byKey(ValueKey('saved-menu-${saved.id}')));
+      await tester.longPress(
+        find.byKey(ValueKey('saved-expanded-${saved.id}')),
+      );
       await tester.pumpAndSettle();
-      await tester.tap(find.text('点一下在对话里调出'));
+      await tester.tap(find.text('发到对话'));
       await tester.pumpAndSettle();
       expect(s.chat.messages.last.plan?.id, plan.id); // shown again as a card
 

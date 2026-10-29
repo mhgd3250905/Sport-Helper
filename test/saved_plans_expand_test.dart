@@ -103,9 +103,17 @@ double _fade(WidgetTester tester, SavedPlan plan, String key) =>
     tester.widget<FadeTransition>(_slot(plan, key)).opacity.value;
 
 Future<void> _tapRow(WidgetTester tester, SavedPlan plan) async {
-  await tester.tap(find.byKey(ValueKey('saved-${plan.id}')));
+  final row = _expanded(tester, plan).expanded
+      ? find.byKey(ValueKey('saved-open-header-${plan.id}'))
+      : _card(plan);
+  // The collapsed card's host gesture remains available while the SDK's
+  // summary is temporarily inactive. Its center also avoids the play control.
+  await tester.tap(row);
   await tester.pump();
 }
+
+double _contentHeight(WidgetTester tester, SavedPlan plan) =>
+    tester.getSize(_slot(plan, 'plan-expanded-size')).height;
 
 ScrollController _scroll(WidgetTester tester) => tester
     .widget<CustomScrollView>(find.byKey(const ValueKey('saved-plans-scroll')))
@@ -116,7 +124,7 @@ void main() {
 
   for (final palette in [SfPalette.light, SfPalette.dark]) {
     testWidgets(
-      'one ${palette.brightness.name} SDK surface and the exact header survive every 16ms frame',
+      'one ${palette.brightness.name} SDK surface and summary survive every 16ms frame',
       (tester) async {
         final app = await _show(tester, count: 1, palette: palette);
         final plan = app.store.savedPlans.single;
@@ -129,29 +137,38 @@ void main() {
         expect(_shell(plan), findsOneWidget);
         final shellElement = tester.element(_shell(plan));
         final shellRender = tester.renderObject(_shell(plan));
-        final header = find.byKey(ValueKey('saved-header-${plan.id}'));
-        final headerElement = tester.element(header);
-        final title = find.descendant(
-          of: header,
-          matching: find.text(plan.name),
-        );
-        final titleOrigin = tester.getTopLeft(title);
+        final summary = find.byKey(ValueKey('saved-summary-${plan.id}'));
+        final summaryElement = tester.element(summary);
+        Widget? expandedHeader;
         final shellOrigin = tester.getTopLeft(_shell(plan));
         final shellWidth = tester.getSize(_shell(plan)).width;
         final collapsedHeight = tester.getSize(_card(plan)).height;
+        expect(collapsedHeight, 108);
 
         void verifyPermanentParts() {
           expect(tester.state(_card(plan)), same(sdkState));
           expect(_shell(plan), findsOneWidget);
           expect(tester.element(_shell(plan)), same(shellElement));
           expect(tester.renderObject(_shell(plan)), same(shellRender));
-          expect(tester.element(header), same(headerElement));
-          expect(_expanded(tester, plan).header, same(initial.header));
+          expect(tester.element(summary), same(summaryElement));
           expect(
             _expanded(tester, plan).collapsedSummary,
             same(initial.collapsedSummary),
           );
-          expect(tester.getTopLeft(title), titleOrigin);
+          if (_expanded(tester, plan).expanded) {
+            expandedHeader ??= _expanded(tester, plan).header;
+            expect(_expanded(tester, plan).header, same(expandedHeader));
+            expect(
+              find.byKey(ValueKey('saved-open-header-${plan.id}')),
+              findsOneWidget,
+            );
+          } else {
+            expect(_expanded(tester, plan).header, isA<SizedBox>());
+            expect(
+              find.byKey(ValueKey('saved-open-header-${plan.id}')),
+              findsNothing,
+            );
+          }
           expect(tester.getTopLeft(_shell(plan)), shellOrigin);
           expect(tester.getSize(_shell(plan)).width, shellWidth);
           final entry = find.byKey(ValueKey('saved-entry-${plan.id}'));
@@ -159,7 +176,6 @@ void main() {
             of: entry,
             matching: find.byWidgetPredicate(
               (widget) =>
-                  widget is FadeTransition ||
                   widget is AnimatedSwitcher ||
                   widget is Hero ||
                   widget is Opacity,
@@ -169,17 +185,24 @@ void main() {
             find.ancestor(of: _shell(plan), matching: prohibited),
             findsNothing,
           );
-          expect(find.ancestor(of: header, matching: prohibited), findsNothing);
-          expect(
+          // The list's permanent exit wrappers remain fully visible outside a
+          // deletion; expansion must never fade or shrink the shared shell.
+          for (final fade in tester.widgetList<FadeTransition>(
             find.ancestor(
-              of: header,
-              matching: find.descendant(
-                of: entry,
-                matching: find.byType(AnimatedSize),
-              ),
+              of: _shell(plan),
+              matching: find.byType(FadeTransition),
             ),
-            findsNothing,
-          );
+          )) {
+            expect(fade.opacity.value, 1);
+          }
+          for (final size in tester.widgetList<SizeTransition>(
+            find.ancestor(
+              of: _shell(plan),
+              matching: find.byType(SizeTransition),
+            ),
+          )) {
+            expect(size.sizeFactor.value, 1);
+          }
           expect(tester.takeException(), isNull);
         }
 
@@ -252,28 +275,18 @@ void main() {
       final shellRenders = {
         for (final plan in plans) plan.id: tester.renderObject(_shell(plan)),
       };
-      final headers = {
-        for (final plan in plans) plan.id: _expanded(tester, plan).header,
+      final summaries = {
+        for (final plan in plans)
+          plan.id: _expanded(tester, plan).collapsedSummary,
       };
-      final headerElements = {
+      final summaryElements = {
         for (final plan in plans)
           plan.id: tester.element(
-            find.byKey(ValueKey('saved-header-${plan.id}')),
+            find.byKey(ValueKey('saved-summary-${plan.id}')),
           ),
       };
-      final titleOffsets = {
-        for (final plan in plans)
-          plan.id:
-              tester.getTopLeft(
-                find.descendant(
-                  of: find.byKey(ValueKey('saved-header-${plan.id}')),
-                  matching: find.text(plan.name),
-                ),
-              ) -
-              tester.getTopLeft(_card(plan)),
-      };
-      final collapsedFirst = tester.getSize(_card(first)).height;
-      final collapsedSecond = tester.getSize(_card(second)).height;
+      final collapsedFirst = _contentHeight(tester, first);
+      final collapsedSecond = _contentHeight(tester, second);
 
       void verifyIdentities({
         required bool firstOpen,
@@ -295,18 +308,14 @@ void main() {
             tester.renderObject(_shell(plan)),
             same(shellRenders[plan.id]),
           );
-          expect(_expanded(tester, plan).header, same(headers[plan.id]));
-          final header = find.byKey(ValueKey('saved-header-${plan.id}'));
-          expect(tester.element(header), same(headerElements[plan.id]));
-          final title = find.descendant(
-            of: header,
-            matching: find.text(plan.name),
+          expect(
+            _expanded(tester, plan).collapsedSummary,
+            same(summaries[plan.id]),
           );
-          final relative =
-              tester.getTopLeft(title) - tester.getTopLeft(_card(plan));
-          final original = titleOffsets[plan.id]!;
-          expect(relative.dx, closeTo(original.dx, .000001));
-          expect(relative.dy, closeTo(original.dy, .000001));
+          expect(
+            tester.element(find.byKey(ValueKey('saved-summary-${plan.id}'))),
+            same(summaryElements[plan.id]),
+          );
         }
         expect(tester.takeException(), isNull);
       }
@@ -317,51 +326,45 @@ void main() {
         await tester.pump(const Duration(milliseconds: 16));
         verifyIdentities(firstOpen: true, secondOpen: false);
       }
-      final expandingAt80 = tester.getSize(_card(first)).height;
+      final expandingAt80 = _contentHeight(tester, first);
       expect(expandingAt80, greaterThan(collapsedFirst));
 
       // Reverse at 80ms, before either the 280ms size or delayed body enter ends.
       await _tapRow(tester, first);
-      expect(tester.getSize(_card(first)).height, closeTo(expandingAt80, .01));
+      expect(_contentHeight(tester, first), closeTo(expandingAt80, .01));
       verifyIdentities(firstOpen: false, secondOpen: false);
       for (var frame = 0; frame < 2; frame++) {
         await tester.pump(const Duration(milliseconds: 16));
         verifyIdentities(firstOpen: false, secondOpen: false);
       }
-      final collapsingAt32 = tester.getSize(_card(first)).height;
+      final collapsingAt32 = _contentHeight(tester, first);
       expect(collapsingAt32, lessThan(expandingAt80));
       expect(collapsingAt32, greaterThan(collapsedFirst));
 
       // Reverse again while collapse is still active; no replacement card.
       await _tapRow(tester, first);
-      expect(tester.getSize(_card(first)).height, closeTo(collapsingAt32, .01));
+      expect(_contentHeight(tester, first), closeTo(collapsingAt32, .01));
       verifyIdentities(firstOpen: true, secondOpen: false);
       for (var frame = 0; frame < 3; frame++) {
         await tester.pump(const Duration(milliseconds: 16));
         verifyIdentities(firstOpen: true, secondOpen: false);
       }
-      final beforeSwitchFirst = tester.getSize(_card(first)).height;
-      final beforeSwitchSecond = tester.getSize(_card(second)).height;
+      final beforeSwitchFirst = _contentHeight(tester, first);
+      final beforeSwitchSecond = _contentHeight(tester, second);
       expect(beforeSwitchFirst, greaterThan(collapsingAt32));
 
       // The old expanded=false and new expanded=true arrive in one host frame.
       await _tapRow(tester, second);
       verifyIdentities(firstOpen: false, secondOpen: true);
-      expect(
-        tester.getSize(_card(first)).height,
-        closeTo(beforeSwitchFirst, .01),
-      );
-      expect(
-        tester.getSize(_card(second)).height,
-        closeTo(beforeSwitchSecond, .01),
-      );
+      expect(_contentHeight(tester, first), closeTo(beforeSwitchFirst, .01));
+      expect(_contentHeight(tester, second), closeTo(beforeSwitchSecond, .01));
       var previousFirst = beforeSwitchFirst;
       var previousSecond = beforeSwitchSecond;
       for (var frame = 0; frame < 18; frame++) {
         await tester.pump(const Duration(milliseconds: 16));
         verifyIdentities(firstOpen: false, secondOpen: true);
-        final firstHeight = tester.getSize(_card(first)).height;
-        final secondHeight = tester.getSize(_card(second)).height;
+        final firstHeight = _contentHeight(tester, first);
+        final secondHeight = _contentHeight(tester, second);
         expect(firstHeight, lessThanOrEqualTo(previousFirst + .01));
         expect(secondHeight, greaterThanOrEqualTo(previousSecond - .01));
         if (frame == 0) {
@@ -371,18 +374,15 @@ void main() {
         previousFirst = firstHeight;
         previousSecond = secondHeight;
       }
-      expect(tester.getSize(_card(first)).height, closeTo(collapsedFirst, .01));
-      expect(
-        tester.getSize(_card(second)).height,
-        greaterThan(collapsedSecond),
-      );
+      expect(_contentHeight(tester, first), closeTo(collapsedFirst, .01));
+      expect(_contentHeight(tester, second), greaterThan(collapsedSecond));
       expect(_scroll(tester).offset, 0);
       await tester.pumpWidget(const SizedBox.shrink());
     },
   );
 
   testWidgets(
-    'nested menu, summary start and expanded start never toggle the card',
+    'long-press menu, summary start and expanded start never toggle the card',
     (tester) async {
       SavedPlan? shown;
       SavedPlan? started;
@@ -410,10 +410,10 @@ void main() {
 
       Future<void> showFromMenu() async {
         final wasExpanded = _expanded(tester, saved).expanded;
-        await tester.tap(find.byKey(ValueKey('saved-menu-${saved.id}')));
+        await tester.longPress(_card(saved));
         await tester.pumpAndSettle();
         expect(_expanded(tester, saved).expanded, wasExpanded);
-        await tester.tap(find.text('点一下在对话里调出'));
+        await tester.tap(find.text('发到对话'));
         await tester.pumpAndSettle();
         expect(shown, same(saved));
         expect(_expanded(tester, saved).expanded, wasExpanded);
@@ -512,7 +512,7 @@ void main() {
   );
 
   testWidgets(
-    'one entry expands and the original row menu survives collapse and rename',
+    'one entry expands and its long-press menu survives collapse and rename',
     (tester) async {
       SavedPlan? shown;
       final app = await _show(tester, onShow: (plan) => shown = plan);
@@ -536,7 +536,7 @@ void main() {
       await tester.tap(find.byKey(ValueKey('plan-expand-${second.plan.id}')));
       await tester.pumpAndSettle();
       expect(_expanded(tester, second).expanded, isFalse);
-      await tester.tap(find.byKey(ValueKey('saved-menu-${second.id}')));
+      await tester.longPress(_card(second));
       await tester.pumpAndSettle();
       await tester.tap(find.text('重命名'));
       await tester.pumpAndSettle();
@@ -544,6 +544,7 @@ void main() {
         find.byKey(const ValueKey('rename-field')),
         '重命名后方案',
       );
+      await tester.pump();
       await tester.tap(find.byKey(const ValueKey('rename-ok')));
       await tester.pumpAndSettle();
       await _tapRow(tester, second);
@@ -551,9 +552,9 @@ void main() {
       expect(_expanded(tester, second).plan.title, '重命名后方案');
       await tester.tap(find.byKey(ValueKey('plan-expand-${second.plan.id}')));
       await tester.pumpAndSettle();
-      await tester.tap(find.byKey(ValueKey('saved-menu-${second.id}')));
+      await tester.longPress(_card(second));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('点一下在对话里调出'));
+      await tester.tap(find.text('发到对话'));
       await tester.pumpAndSettle();
       expect(shown!.id, second.id);
       expect(shown!.name, '重命名后方案');
