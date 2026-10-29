@@ -102,10 +102,10 @@ void main() {
       );
       expect(bubble.task, isNull);
       expect(bubble.sessionState, isNull);
-      expect(find.text('正在想怎么练…'), findsOneWidget);
+      expect(find.text('正在想怎么练'), findsOneWidget);
       expect(find.text('读懂你的需求'), findsOneWidget);
       expect(find.text('马上就好'), findsNothing);
-      expect(find.text('正在为你准备 · 居家拉伸'), findsNothing);
+      expect(find.text('为你准备 · 居家拉伸'), findsNothing);
       for (var segment = 1; segment < 4; segment++) {
         expect(
           tester

@@ -1,5 +1,9 @@
 # 版本管理与台账
 
+## 当前 +45 生成卡 v2 候选（2026-10-29）
+
+App `codex/task-bubble-v2` / `0.1.0+45`，预期 internal arm64 2045，基于已验收合入并推送的 main `94e924fe287770f56d4e8ceeedd521e2871267da`。+44 留给独立 `codex/guide-lite`，没有互相合入。SDK 三包、coach override 与整份 pubspec.lock 均保持 b490eec43b408a8a35ce81a7830833bc6a3ff278。实际打包提交、版本、签名、16KB、SHA256 和软件截图以独立目录 `E:/AII-3D/3D-Sport-AI/deliveries/task-bubble-v2-plus45/` 的源码绑定回执为准，见[本轮记录](task-bubble-v2-plus45-2026-10-29.md)。候选只作本地提交，不合并、不推送、不打 tag；main、release/1.0 和 SDK 仓库不动。下方为原时点历史记录。
+
 ## 当前 +43 计划讨论候选（2026-10-29）
 
 App `codex/plan-focus` / `0.1.0+43`，基于 +42 `d90054902c1cb850f246ecfad100af81b0f31bad`，尚未合并或推送。三包与 coach override 固定 `b490eec43b408a8a35ce81a7830833bc6a3ff278`，仅六个 SDK 锁引用值变化。发到对话导入完整 SDK focus；SDK 管理讨论与修改；App 支持重启、更新原记录、另存和旧 sdkVersion 数据迁移。详见[本轮记录](plan-focus-plus43-2026-10-29.md)。

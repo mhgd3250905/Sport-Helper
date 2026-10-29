@@ -14,6 +14,7 @@ import 'package:smartfit/domain/scenario.dart';
 import 'package:smartfit/ui/chat/coach_ui_adapter.dart';
 import 'package:smartfit/ui/chat/chat_home_page.dart';
 import 'package:smartfit/ui/chat/chat_widgets.dart';
+import 'package:smartfit/ui/chat/coach_delivery_transition.dart';
 import 'package:smartfit/ui/chat/coach_task_bubble.dart';
 import 'package:smartfit/ui/chat/plan_card.dart';
 import 'package:smartfit/ui/chat/validated_plan_card.dart';
@@ -163,10 +164,8 @@ void main() {
     ],
   );
 
-  Finder cancelButton() => find.descendant(
-    of: find.byType(CoachTaskBubble),
-    matching: find.widgetWithText(TextButton, '取消'),
-  );
+  Finder cancelButton() =>
+      find.byKey(const ValueKey('generation-cancel-target')).hitTestable();
 
   void expectTask(ChatController chat, String current, String stamp) {
     final nodes = chat.activeTask!.nodes;
@@ -529,9 +528,9 @@ void main() {
     await tester.pump(const Duration(milliseconds: 450));
     expect(find.byType(CoachTaskBubble), findsOneWidget);
     expect(chat.activeTask, isNull);
-    expect(find.text('正在想怎么练…'), findsOneWidget);
+    expect(find.text('正在想怎么练'), findsOneWidget);
     expect(find.text('读懂你的需求'), findsOneWidget);
-    expect(find.byKey(const ValueKey('generation-dots')), findsOneWidget);
+    expect(find.byKey(const ValueKey('generation-core')), findsOneWidget);
     expect(
       tester.widget<ChatInputBar>(find.byType(ChatInputBar)).enabled,
       isFalse,
@@ -555,6 +554,282 @@ void main() {
     await pending;
     await tester.pumpAndSettle();
     expect(find.text('取消后不能显示'), findsNothing);
+  });
+
+  testWidgets('reply data and typing finish before the 890ms visual delivery', (
+    tester,
+  ) async {
+    tall(tester);
+    final (chat, engine, app) = await setup();
+    await showChat(tester, chat, app);
+    await tester.pumpAndSettle();
+    final generated = await app.generator.generate(
+      const ScenarioRequest(templateId: 'office-relax'),
+    );
+    final plan = generated.plan!;
+    final request = chat.send('在家安排一套拉伸');
+    await tester.pump();
+    final wrapper = find.byType(CoachDeliveryTransition);
+    final originalState = tester.state(wrapper);
+    expect(
+      tester.widget<CoachDeliveryTransition>(wrapper).key,
+      isA<GlobalKey>(),
+    );
+    engine.pending.single.complete(
+      ChatReply(
+        messages: [BotMessage('已经写入的计划', plan: plan)],
+        state: engine.states.single.copyWith(plan: plan),
+      ),
+    );
+    await request;
+    await chat.flushPersistence();
+    expect(chat.typing, isFalse);
+    expect(chat.currentPlan, same(plan));
+    expect(chat.messages.last.plan, same(plan));
+    expect(app.store.chatLog.last['plan'], isNotNull);
+    await tester.pump();
+    expect(tester.state(wrapper), same(originalState));
+    expect(
+      tester.widget<ChatInputBar>(find.byType(ChatInputBar)).enabled,
+      isTrue,
+    );
+    expect(find.byType(PlanCard), findsNothing);
+    expect(find.text('已经写入的计划'), findsNothing);
+    expect(
+      tester
+          .widget<CoachTaskBubble>(find.byType(CoachTaskBubble))
+          .visualComplete,
+      isTrue,
+    );
+    // CoachAppear removes its entry-animation ancestors after 640 ms. The
+    // wrapper must keep its state when that SDK subtree is reparented.
+    await tester.pump(const Duration(milliseconds: 650));
+    expect(tester.state(wrapper), same(originalState));
+    expect(find.byType(PlanCard), findsNothing);
+    await tester.pump(const Duration(milliseconds: 239));
+    expect(tester.state(wrapper), same(originalState));
+    expect(find.byType(PlanCard), findsNothing);
+    await tester.pump(const Duration(milliseconds: 1));
+    expect(find.byType(PlanCard), findsOneWidget);
+    expect(find.text('已经写入的计划'), findsOneWidget);
+    expect(find.byType(CoachTaskBubble), findsNothing);
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('a recommendation also uses the successful visual marker', (
+    tester,
+  ) async {
+    tall(tester);
+    final (chat, engine, app) = await setup();
+    await showChat(tester, chat, app);
+    await tester.pumpAndSettle();
+    final request = chat.send('推荐一个动作');
+    await tester.pump();
+    final actions = engine.restoreActions(['h-wall-angel'])!;
+    engine.pending.single.complete(
+      ChatReply(
+        messages: [BotMessage('这个动作适合你', actions: actions)],
+        state: engine.states.single,
+      ),
+    );
+    await request;
+    expect(chat.typing, isFalse);
+    expect(chat.messages.last.actions, same(actions));
+    await tester.pump();
+    expect(
+      tester
+          .widget<CoachDeliveryTransition>(find.byType(CoachDeliveryTransition))
+          .successful,
+      isTrue,
+    );
+    expect(find.byType(CoachRecommendCard), findsNothing);
+    await tester.pump(const Duration(milliseconds: 890));
+    expect(find.byType(CoachRecommendCard), findsOneWidget);
+    expect(find.byType(CoachTaskBubble), findsNothing);
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('a new request skips the previous completed visual immediately', (
+    tester,
+  ) async {
+    tall(tester);
+    final (chat, engine, app) = await setup();
+    await showChat(tester, chat, app);
+    await tester.pumpAndSettle();
+    final plan = (await app.generator.generate(
+      const ScenarioRequest(templateId: 'office-relax'),
+    )).plan!;
+    final first = chat.send('第一套计划');
+    await tester.pump();
+    engine.pending.single.complete(
+      ChatReply(
+        messages: [BotMessage('', plan: plan)],
+        state: engine.states.single.copyWith(plan: plan),
+      ),
+    );
+    await first;
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(find.byType(PlanCard), findsNothing);
+    final second = chat.send('把时间改短');
+    await tester.pump();
+    final deliveryKeys = tester
+        .widgetList<CoachDeliveryTransition>(
+          find.byType(CoachDeliveryTransition),
+        )
+        .map((widget) => widget.key)
+        .toList();
+    expect(deliveryKeys, hasLength(2));
+    expect(deliveryKeys.every((key) => key is GlobalKey), isTrue);
+    expect(deliveryKeys.toSet(), hasLength(2));
+    expect(find.byType(PlanCard), findsOneWidget);
+    expect(find.byType(CoachTaskBubble), findsOneWidget);
+    expect(
+      tester
+          .widget<CoachTaskBubble>(find.byType(CoachTaskBubble))
+          .visualComplete,
+      isFalse,
+    );
+    expect(find.byKey(const ValueKey('generation-check')), findsNothing);
+    engine.pending.last.complete(
+      ChatReply(
+        messages: const [BotMessage('继续讨论')],
+        state: engine.states.last,
+      ),
+    );
+    await second;
+    await tester.pumpAndSettle();
+    final cachedPreparation = find.byType(CoachTaskBubble);
+    expect(cachedPreparation, findsOneWidget);
+    expect(cachedPreparation.hitTestable(), findsNothing);
+    expect(
+      TickerMode.valuesOf(tester.element(cachedPreparation)).enabled,
+      isFalse,
+    );
+    final cachedFade = find
+        .ancestor(of: cachedPreparation, matching: find.byType(FadeTransition))
+        .first;
+    expect(tester.widget<FadeTransition>(cachedFade).opacity.value, 0);
+    expect(tester.binding.transientCallbackCount, 0);
+    expect(find.byKey(const ValueKey('generation-check')), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  for (final failure in [true, false]) {
+    testWidgets(
+      '${failure ? 'failure' : 'ordinary text'} retains the original 300ms transition without a check',
+      (tester) async {
+        tall(tester);
+        final (chat, engine, app) = await setup();
+        await showChat(tester, chat, app);
+        await tester.pumpAndSettle();
+        final request = chat.send('生成计划');
+        await tester.pump();
+        engine.eventBus.add(
+          coach.AgentEvent(
+            'done-without-successful-reply',
+            coach.AgentEventKind.node,
+            task: coach.CoachTaskState(
+              type: 'plan',
+              reused: false,
+              nodes: [
+                coach.CoachNodeState(
+                  id: 'output',
+                  status: 'done',
+                  stamp: 'SDK事实',
+                ),
+              ],
+            ),
+          ),
+        );
+        await tester.pump();
+        expect(find.byKey(const ValueKey('generation-check')), findsNothing);
+        engine.pending.single.complete(
+          ChatReply(
+            messages: [
+              failure
+                  ? const BotMessage('', isPlanningFailure: true)
+                  : const BotMessage('普通文字回复'),
+            ],
+            state: engine.states.single,
+          ),
+        );
+        await request;
+        await tester.pump();
+        expect(chat.typing, isFalse);
+        expect(
+          tester
+              .widget<CoachDeliveryTransition>(
+                find.byType(CoachDeliveryTransition),
+              )
+              .successful,
+          isFalse,
+        );
+        final fade = tester.widget<AnimatedCrossFade>(
+          find.byKey(const ValueKey('coach-delivery-crossfade')),
+        );
+        expect(fade.duration, const Duration(milliseconds: 300));
+        expect(fade.sizeCurve, Curves.easeOutCubic);
+        expect(fade.crossFadeState, CrossFadeState.showSecond);
+        final preparation = find.byType(CoachTaskBubble, skipOffstage: false);
+        expect(
+          tester.widget<CoachTaskBubble>(preparation).visualComplete,
+          isFalse,
+        );
+        expect(
+          TickerMode.valuesOf(tester.element(preparation)).enabled,
+          isFalse,
+        );
+        expect(find.byKey(const ValueKey('generation-check')), findsNothing);
+        await tester.pump(const Duration(milliseconds: 300));
+        expect(find.byKey(const ValueKey('generation-check')), findsNothing);
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
+
+  testWidgets('new conversation removes a completed visual hold safely', (
+    tester,
+  ) async {
+    tall(tester);
+    final (chat, engine, app) = await setup();
+    await showChat(tester, chat, app);
+    await tester.pumpAndSettle();
+    final plan = (await app.generator.generate(
+      const ScenarioRequest(templateId: 'office-relax'),
+    )).plan!;
+    final request = chat.send('安排一套计划');
+    await tester.pump();
+    engine.pending.single.complete(
+      ChatReply(
+        messages: [BotMessage('', plan: plan)],
+        state: engine.states.single.copyWith(plan: plan),
+      ),
+    );
+    await request;
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.byKey(const ValueKey('generation-check')), findsOneWidget);
+    final oldKey =
+        tester
+                .widget<CoachDeliveryTransition>(
+                  find.byType(CoachDeliveryTransition),
+                )
+                .key!
+            as GlobalKey;
+    await chat.newConversation();
+    await tester.pumpAndSettle();
+    expect(chat.messages.single.greeting, isTrue);
+    expect(find.byType(CoachTaskBubble), findsNothing);
+    expect(find.byType(CoachDeliveryTransition), findsNothing);
+    expect(find.byType(PlanCard), findsNothing);
+    expect(oldKey.currentState, isNull);
+    await tester.pump(const Duration(seconds: 2));
+    expect(find.byKey(const ValueKey('generation-check')), findsNothing);
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets(
