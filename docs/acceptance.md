@@ -1,5 +1,9 @@
 # 本机验收记录
 
+## 当前 +44 训练图文候选（2026-10-29）
+
++43 已由开哥真机验收并合入 main `94e924fe`。本轮 +44 / 2044 以该 main 开始，懒加载、唯一播放、离屏释放、字体与底栏布局的软件验证和 APK 检查分别存于 `E:/AII-3D/3D-Sport-AI/deliveries/guide-lite-plus44/`，汇总 `validation.json`。实际页面归属与实施边界见[本轮记录](guide-lite-plus44-2026-10-29.md)。+44 尚待开哥真机验收，候选未合并、未推送；以下为历史记录。
+
 ## 当前 +43 计划讨论候选（2026-10-29）
 
 `codex/plan-focus` / `0.1.0+43` 接入 SDK b490eec 的 focus、恢复和版本保存，交开哥真机验收。三轮真实回复、末轮 messages、四张实际聊天组件浅深软件截图、最终全量测试/分析及 APK 门禁分别见[本轮记录](plan-focus-plus43-2026-10-29.md)和 `E:/AII-3D/3D-Sport-AI/deliveries/plan-focus-plus43/validation.json`。真实 v3 的 targetMinutes 为 5，SDK 估时为 313 秒。本轮候选未合并、未推送；以下保留历史检查点，不替代当前交付证据。

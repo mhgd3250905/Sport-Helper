@@ -5,7 +5,7 @@ import 'package:smartfit/ui/about_page.dart';
 import 'package:smartfit/ui/chat/chat_home_page.dart';
 import 'package:smartfit/ui/plan_page.dart';
 import 'package:smartfit/ui/player_page.dart';
-import 'package:smartfit/ui/exercise_video.dart';
+import 'package:smartfit/ui/guide_media.dart';
 
 import 'app_flow_test.dart' show services, tall, showManualChatCard;
 
@@ -58,13 +58,14 @@ void main() {
       await tester.pump(const Duration(milliseconds: 50));
       final retiringDetails = find.descendant(
         of: find.byType(PlanPage, skipOffstage: false),
-        matching: find.byType(ExerciseVideo, skipOffstage: false),
+        matching: find.byType(GuideMedia, skipOffstage: false),
         skipOffstage: false,
       );
+      expect(retiringDetails, findsWidgets);
       expect(
         tester
-            .widgetList<ExerciseVideo>(retiringDetails)
-            .every((v) => !v.playing),
+            .widgetList<GuideMedia>(retiringDetails)
+            .every((v) => v.coordinator.activeSlot == null),
         isTrue,
         reason: 'The old preview stops before the chat-owned trainer starts',
       );

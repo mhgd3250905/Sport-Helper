@@ -1,5 +1,9 @@
 # 版本管理与台账
 
+## 当前 +44 训练图文候选（2026-10-29）
+
+分支 `codex/guide-lite`，基于已验收的 App main `94e924fe287770f56d4e8ceeedd521e2871267da`，版本 `0.1.0+44`，internal arm64 预期 versionCode 2044；实际身份、源 SHA、包哈希和验证回执见 `E:/AII-3D/3D-Sport-AI/deliveries/guide-lite-plus44/`。SDK 三包/override 仍为 `b490eec43b408a8a35ce81a7830833bc6a3ff278`，整份 lock 与 +43 完全一致。候选保留未合并、未推送，main/release/1.0 不变；详见[本轮记录](guide-lite-plus44-2026-10-29.md)。以下为历史检查点。
+
 ## 当前 +43 计划讨论候选（2026-10-29）
 
 App `codex/plan-focus` / `0.1.0+43`，基于 +42 `d90054902c1cb850f246ecfad100af81b0f31bad`，尚未合并或推送。三包与 coach override 固定 `b490eec43b408a8a35ce81a7830833bc6a3ff278`，仅六个 SDK 锁引用值变化。发到对话导入完整 SDK focus；SDK 管理讨论与修改；App 支持重启、更新原记录、另存和旧 sdkVersion 数据迁移。详见[本轮记录](plan-focus-plus43-2026-10-29.md)。

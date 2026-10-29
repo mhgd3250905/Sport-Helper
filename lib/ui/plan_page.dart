@@ -1,4 +1,4 @@
-import 'dart:math' as math;
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 
@@ -7,7 +7,8 @@ import '../domain/exercise.dart';
 import '../domain/plan.dart';
 import '../domain/plan_validator.dart';
 import '../domain/scenario.dart';
-import 'exercise_video.dart';
+import 'guide_media.dart';
+import 'guide_layout_tokens.dart';
 import 'plan_presentation.dart';
 import 'player_page.dart';
 import 'theme.dart';
@@ -37,16 +38,16 @@ class _PlanPageState extends State<PlanPage> with WidgetsBindingObserver {
   final _scroll = ScrollController();
   final _viewport = GlobalKey();
   final _videos = <String, GlobalKey>{};
-  final _started = <String>{};
-  String? _active;
+  final _coordinator = GuidePreviewCoordinator();
   bool _measurementQueued = false;
-  bool _previewOn = true;
+  String? _releasingSlot;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _scroll.addListener(_measureAfterLayout);
+    _coordinator.addListener(_measureAfterLayout);
   }
 
   @override
@@ -64,51 +65,53 @@ class _PlanPageState extends State<PlanPage> with WidgetsBindingObserver {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _measurementQueued = false;
       if (!mounted) return;
+      final slot = _coordinator.activeSlot;
+      if (slot == null || slot == _releasingSlot) return;
       final viewport = _viewport.currentContext?.findRenderObject();
       if (viewport is! RenderBox || !viewport.hasSize) return;
-      final view = viewport.localToGlobal(Offset.zero) & viewport.size;
-      final outside = <String>[];
-      for (final slot in _started) {
-        final box = _videos[slot]?.currentContext?.findRenderObject();
-        if (box is! RenderBox || !box.attached || !box.hasSize) {
-          outside.add(slot);
-          continue;
-        }
+      final bounds = viewport.localToGlobal(Offset.zero) & viewport.size;
+      final covered =
+          SfGuideTokens.buttonHeight +
+          SfGuideTokens.buttonBottom +
+          MediaQuery.paddingOf(context).bottom;
+      final view = Rect.fromLTRB(
+        bounds.left,
+        bounds.top,
+        bounds.right,
+        bounds.bottom - covered,
+      );
+      final box = _videos[slot]?.currentContext?.findRenderObject();
+      var visible = 0.0;
+      if (box is RenderBox && box.attached && box.hasSize) {
         final rect = box.localToGlobal(Offset.zero) & box.size;
-        if (!rect.overlaps(view)) outside.add(slot);
+        final area = rect.width * rect.height;
+        final intersection = rect.intersect(view);
+        if (area > 0 && intersection.width > 0 && intersection.height > 0) {
+          visible = intersection.width * intersection.height / area;
+        }
       }
-      // Scrolling can stop a preview, but never starts one. Measure the video
-      // rectangle rather than its long article section below it.
-      if (outside.isNotEmpty) {
-        setState(() {
-          _started.removeAll(outside);
-          if (outside.contains(_active)) _active = null;
-        });
-      }
+      // Only the active media rectangle is measured. Long instructions below
+      // it must not keep an offscreen decoder alive.
+      if (visible >= .2) return;
+      _releasingSlot = slot;
+      unawaited(
+        _coordinator.release(slot).whenComplete(() {
+          if (_releasingSlot == slot) _releasingSlot = null;
+        }),
+      );
     });
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _coordinator.removeListener(_measureAfterLayout);
+    _coordinator.dispose();
     _scroll.dispose();
     super.dispose();
   }
 
-  void _togglePreview(String slot) {
-    if (!_previewOn) return;
-    setState(() {
-      if (_active == slot) {
-        _active = null;
-      } else {
-        _started.add(slot);
-        _active = slot;
-      }
-    });
-    _measureAfterLayout();
-  }
-
-  void _swap(int bi, int ii) {
+  Future<void> _swap(int bi, int ii) async {
     final s = AppServices.of(context);
     final item = _plan.blocks[bi].items[ii];
     final e = s.library[item.exerciseId];
@@ -153,10 +156,9 @@ class _PlanPageState extends State<PlanPage> with WidgetsBindingObserver {
       );
       return;
     }
+    await _coordinator.release('$bi:$ii');
+    if (!mounted) return;
     setState(() {
-      final slot = '$bi:$ii';
-      _started.remove(slot);
-      if (_active == slot) _active = null;
       _plan = updated.copyWith(
         id: '${updated.id.split('~').first}~${DateTime.now().microsecondsSinceEpoch}',
       );
@@ -180,11 +182,7 @@ class _PlanPageState extends State<PlanPage> with WidgetsBindingObserver {
     }
     // The trainer must not mount while an article preview still owns playback,
     // including a chat-owned workout launched during this route's pop animation.
-    setState(() {
-      _previewOn = false;
-      _active = null;
-      _started.clear();
-    });
+    await _coordinator.stop();
     await WidgetsBinding.instance.endOfFrame;
     if (!mounted) return;
     if (widget.returnPlanOnStart) {
@@ -198,267 +196,516 @@ class _PlanPageState extends State<PlanPage> with WidgetsBindingObserver {
         builder: (_) => PlayerPage(plan: _plan),
       ),
     );
-    if (mounted) setState(() => _previewOn = true);
   }
 
   @override
   Widget build(BuildContext context) {
-    final s = AppServices.of(context);
-    final lib = s.library;
+    final services = AppServices.of(context);
+    final library = services.library;
     if (_plan.items.isEmpty ||
-        _plan.items.any((item) => !lib.contains(item.exerciseId))) {
+        _plan.items.any((item) => !library.contains(item.exerciseId))) {
       return const Scaffold(
         appBar: SfTopBar(title: '训练图文'),
         body: Center(child: Text('计划包含尚未可用的动作。已保存计划仍保留。')),
       );
     }
-    final textSize = MediaQuery.textScalerOf(context).scale(17);
-    final buttonHeight = math.max(52.0, textSize * 1.2 + 24);
-    final buttonWidth = math.min(
-      MediaQuery.sizeOf(context).width - 32,
-      math.max(160.0, textSize * 4 + 76),
-    );
-    final bottomInset = MediaQuery.paddingOf(context).bottom;
-    var ordinal = 0;
+    final rows = _articleRows();
+    final rowIndices = {
+      for (var index = 0; index < rows.length; index++)
+        ValueKey(rows[index].id): index,
+    };
+    final safeBottom = MediaQuery.paddingOf(context).bottom;
     return Scaffold(
       appBar: const SfTopBar(title: '训练图文'),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      floatingActionButton: SizedBox(
-        width: buttonWidth,
-        child: SfPrimaryButton(
-          key: const ValueKey('start'),
-          icon: SfGlyph.play,
-          label: '前往训练',
-          height: buttonHeight,
-          onPressed: () => _startTraining(s),
-        ),
-      ),
-      body: SizedBox.expand(
-        key: _viewport,
-        child: NotificationListener<SizeChangedLayoutNotification>(
-          onNotification: (_) {
-            _measureAfterLayout();
-            return false;
-          },
-          child: ListView(
-            key: const ValueKey('plan-article'),
-            controller: _scroll,
-            padding: EdgeInsets.fromLTRB(
-              SfSpace.x4,
-              0,
-              SfSpace.x4,
-              buttonHeight + bottomInset + SfSpace.x6 + SfSpace.x4,
+      body: Stack(
+        children: [
+          SizedBox.expand(
+            key: _viewport,
+            child: NotificationListener<SizeChangedLayoutNotification>(
+              onNotification: (_) {
+                _measureAfterLayout();
+                return false;
+              },
+              child: ListView.builder(
+                key: const ValueKey('plan-article'),
+                controller: _scroll,
+                addAutomaticKeepAlives: false,
+                addRepaintBoundaries: false,
+                padding: EdgeInsets.fromLTRB(
+                  SfGuideTokens.pageInset,
+                  0,
+                  SfGuideTokens.pageInset,
+                  SfGuideTokens.bottomSpace + safeBottom,
+                ),
+                itemCount: rows.length,
+                findChildIndexCallback: (key) => rowIndices[key],
+                itemBuilder: (context, index) {
+                  final row = rows[index];
+                  final child = switch (row.kind) {
+                    _GuideRowKind.intro => _intro(library),
+                    _GuideRowKind.section => _blockHeader(
+                      _plan.blocks[row.block],
+                    ),
+                    _GuideRowKind.move => _moveArticle(
+                      row.block,
+                      row.item,
+                      row.ordinal,
+                      library,
+                    ),
+                    _GuideRowKind.safetyTitle => _sectionLabel('训练提醒'),
+                    _GuideRowKind.safetyNote => Padding(
+                      padding: EdgeInsets.only(
+                        bottom: row.item < _plan.safetyNotes.length - 1 ? 8 : 0,
+                      ),
+                      child: Text(row.note, style: SfGuideTokens.step),
+                    ),
+                  };
+                  return KeyedSubtree(key: ValueKey(row.id), child: child);
+                },
+              ),
             ),
-            children: [
-              _intro(lib),
-              for (var bi = 0; bi < _plan.blocks.length; bi++) ...[
-                _blockHeader(_plan.blocks[bi]),
-                for (var ii = 0; ii < _plan.blocks[bi].items.length; ii++)
-                  _moveArticle(bi, ii, ++ordinal, lib),
-              ],
-              if (_plan.safetyNotes.isNotEmpty) ...[
-                const SfSectionTitle('训练提醒'),
-                for (final note in _plan.safetyNotes)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: SfSpace.x2),
-                    child: Text(note, style: SfType.label),
-                  ),
-              ],
-            ],
           ),
-        ),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: _trainingBar(services, safeBottom),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _intro(ExerciseLibrary lib) => Padding(
-    key: const ValueKey('plan-introduction'),
-    padding: const EdgeInsets.symmetric(horizontal: SfSpace.x1),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          _plan.title,
-          style: SfType.title.copyWith(fontWeight: FontWeight.w800),
-        ),
-        const SizedBox(height: SfSpace.x2),
-        Wrap(
-          spacing: SfSpace.x3,
-          runSpacing: SfSpace.x1,
-          children: [
-            Text(planDurationLabel(_plan, lib), style: SfType.label),
-            Text('${_plan.items.length} 个动作', style: SfType.label),
-            Text(levelZh(_plan.level), style: SfType.label),
-            Text(_plan.scene == 'office' ? '办公室' : '居家', style: SfType.label),
-          ],
-        ),
-        if (_plan.summary.trim().isNotEmpty &&
-            _plan.summary.trim() != _plan.title.trim()) ...[
-          const SizedBox(height: SfSpace.x3),
-          Text(
-            '安排说明',
-            style: SfType.callout.copyWith(fontWeight: FontWeight.w600),
+  List<_GuideRow> _articleRows() {
+    final rows = <_GuideRow>[const _GuideRow(_GuideRowKind.intro, 'intro')];
+    var ordinal = 0;
+    for (var bi = 0; bi < _plan.blocks.length; bi++) {
+      rows.add(_GuideRow(_GuideRowKind.section, 'section-$bi', block: bi));
+      for (var ii = 0; ii < _plan.blocks[bi].items.length; ii++) {
+        rows.add(
+          _GuideRow(
+            _GuideRowKind.move,
+            'move-$bi:$ii',
+            block: bi,
+            item: ii,
+            ordinal: ++ordinal,
           ),
-          const SizedBox(height: SfSpace.x1),
-          Text(
-            _plan.summary,
-            style: SfType.body.copyWith(color: SfColors.muted, height: 1.5),
+        );
+      }
+    }
+    if (_plan.safetyNotes.isNotEmpty) {
+      rows.add(const _GuideRow(_GuideRowKind.safetyTitle, 'safety-title'));
+      for (var index = 0; index < _plan.safetyNotes.length; index++) {
+        rows.add(
+          _GuideRow(
+            _GuideRowKind.safetyNote,
+            'safety-$index',
+            item: index,
+            note: _plan.safetyNotes[index],
           ),
-          for (final note in _plan.notes)
-            Padding(
-              padding: const EdgeInsets.only(top: SfSpace.x2),
-              child: Text(note, style: SfType.label.copyWith(height: 1.5)),
+        );
+      }
+    }
+    return rows;
+  }
+
+  Widget _trainingBar(AppServices services, double safeBottom) => Column(
+    key: const ValueKey('guide-training-bar'),
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      IgnorePointer(
+        child: SizedBox(
+          height: SfGuideTokens.footerFade,
+          width: double.infinity,
+          child: DecoratedBox(
+            key: const ValueKey('guide-training-gradient'),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  SfColors.background.withValues(alpha: 0),
+                  SfColors.background,
+                ],
+              ),
             ),
+          ),
+        ),
+      ),
+      ColoredBox(
+        color: SfColors.background,
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(
+            SfGuideTokens.pageInset,
+            0,
+            SfGuideTokens.pageInset,
+            SfGuideTokens.buttonBottom + safeBottom,
+          ),
+          child: SfPressable(
+            key: const ValueKey('start'),
+            semanticLabel: '前往训练',
+            haptic: SfHaptic.light,
+            onTap: () => unawaited(_startTraining(services)),
+            child: Container(
+              key: const ValueKey('guide-training-button'),
+              height: SfGuideTokens.buttonHeight,
+              decoration: BoxDecoration(
+                color: SfColors.accent,
+                borderRadius: BorderRadius.circular(SfGuideTokens.buttonRadius),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SfIcon(
+                    SfGlyph.play,
+                    size: 20,
+                    filled: true,
+                    color: SfColors.onAccent,
+                  ),
+                  const SizedBox(width: 8),
+                  Text('前往训练', style: SfGuideTokens.button),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    ],
+  );
+
+  Widget _intro(ExerciseLibrary library) => Column(
+    key: const ValueKey('plan-introduction'),
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        _plan.title,
+        key: const ValueKey('guide-title'),
+        style: SfGuideTokens.title,
+      ),
+      const SizedBox(height: 8),
+      Wrap(
+        spacing: SfGuideTokens.tagGap,
+        runSpacing: SfGuideTokens.tagGap,
+        children: [
+          _tag(planDurationLabel(_plan, library), 0),
+          _tag('${_plan.items.length} 个动作', 1),
+          _tag(levelZh(_plan.level), 2),
+          _tag(_plan.scene == 'office' ? '办公室' : '居家', 3),
         ],
+      ),
+      if (_plan.summary.trim().isNotEmpty &&
+          _plan.summary.trim() != _plan.title.trim()) ...[
+        const SizedBox(height: 12),
+        Text('安排说明', style: SfGuideTokens.caption),
+        const SizedBox(height: 4),
+        Text(
+          _plan.summary,
+          style: SfGuideTokens.step.copyWith(color: SfColors.muted),
+        ),
+        for (final note in _plan.notes)
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Text(
+              note,
+              style: SfGuideTokens.muscles.copyWith(height: 1.5),
+            ),
+          ),
       ],
+    ],
+  );
+
+  Widget _tag(String text, int index) => Container(
+    key: ValueKey('guide-tag-$index'),
+    height: SfGuideTokens.tagHeight,
+    padding: SfGuideTokens.tagPadding,
+    decoration: BoxDecoration(
+      color: SfColors.surfaceHigh,
+      borderRadius: BorderRadius.circular(SfGuideTokens.tagRadius),
     ),
+    child: Center(widthFactor: 1, child: Text(text, style: SfGuideTokens.tag)),
+  );
+
+  Widget _sectionLabel(String label, {Key? key}) => Padding(
+    key: key,
+    padding: SfGuideTokens.sectionPadding,
+    child: Text(label, style: SfGuideTokens.section),
   );
 
   Widget _blockHeader(PlanBlock block) {
+    final protocolName = block.name.trim().toLowerCase();
+    final mainName =
+        const {
+          'main',
+          'main_set',
+          'main-set',
+          'workout',
+        }.contains(protocolName) ||
+        (protocolName.isEmpty && block.type == BlockType.main);
+    final title = mainName ? '主训' : planSectionLabel(block);
     final extra = block.type == BlockType.circuit && block.rounds > 1
         ? ' · 循环 ${block.rounds} 轮，轮间休息 ${block.restBetweenRoundsSeconds} 秒'
         : '';
-    return SfSectionTitle('${planSectionLabel(block)}$extra');
+    return _sectionLabel(
+      '$title$extra',
+      key: ValueKey('guide-section-${block.id}'),
+    );
   }
 
-  Widget _moveArticle(int bi, int ii, int ordinal, ExerciseLibrary lib) {
+  Widget _moveArticle(int bi, int ii, int ordinal, ExerciseLibrary library) {
     final block = _plan.blocks[bi];
     final item = block.items[ii];
-    final exercise = lib[item.exerciseId];
+    final exercise = library[item.exerciseId];
     final slot = '$bi:$ii';
     final videoKey = _videos.putIfAbsent(slot, GlobalKey.new);
-    final light = Theme.of(context).brightness == Brightness.light;
-    final available = exercise.media.videoAvailableFor(light: light);
-    final active = _previewOn && _active == slot;
     final dose = block.type == BlockType.circuit
         ? item.copyWith(sets: 1).doseText()
         : item.doseText();
     return Padding(
       key: ValueKey('plan-move-$slot'),
-      padding: const EdgeInsets.only(bottom: SfSpace.x8),
-      child: SizeChangedLayoutNotifier(
-        child: Semantics(
-          key: ValueKey('item-${exercise.id}'),
-          container: true,
-          explicitChildNodes: true,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Text(
-                      '$ordinal. ${exercise.name}',
-                      style: SfType.title.copyWith(fontWeight: FontWeight.w700),
-                    ),
-                  ),
-                  if (exercise.alternative != null) ...[
-                    const SizedBox(width: SfSpace.x2),
-                    SfCircleButton(
-                      key: ValueKey('swap-${exercise.id}'),
-                      tooltip: '换一个',
-                      icon: SfGlyph.swap,
-                      size: 40,
-                      filled: false,
-                      fill: Colors.transparent,
-                      iconColor: SfColors.muted,
-                      haptic: SfHaptic.selection,
-                      onPressed: () => _swap(bi, ii),
-                    ),
-                  ],
-                ],
+      padding: EdgeInsets.only(
+        bottom: ii < block.items.length - 1 ? SfGuideTokens.cardGap : 0,
+      ),
+      child: RepaintBoundary(
+        key: ValueKey('guide-repaint-$slot'),
+        child: SizeChangedLayoutNotifier(
+          child: Semantics(
+            key: ValueKey('item-${exercise.id}'),
+            container: true,
+            explicitChildNodes: true,
+            child: DecoratedBox(
+              key: ValueKey('guide-card-$slot'),
+              decoration: BoxDecoration(
+                color: SfGuideTokens.cardFill(context),
+                borderRadius: BorderRadius.circular(SfGuideTokens.cardRadius),
+                boxShadow: SfGuideTokens.cardShadow,
               ),
-              const SizedBox(height: SfSpace.x3),
-              SizedBox(
-                key: videoKey,
-                child: AspectRatio(
-                  key: ValueKey('article-video-$slot'),
-                  aspectRatio: 1,
-                  child: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      ExerciseVideo(
-                        key: ValueKey('plan-demo-$slot-${exercise.id}'),
-                        exercise: exercise,
-                        playing: _previewOn && _started.contains(slot),
-                        paused: !active,
-                        radius: SfRadius.sm,
-                      ),
-                      if (available)
-                        Center(
-                          child: SfCircleButton(
-                            key: ValueKey('article-video-toggle-$slot'),
-                            tooltip:
-                                '${active ? '暂停' : '播放'}${exercise.name}示范',
-                            icon: active ? SfGlyph.pause : SfGlyph.play,
-                            size: 60,
-                            fill: light
-                                ? SfPalette.light.surfaceHigh
-                                : SfPalette.dark.surfaceHigh,
-                            iconColor: light
-                                ? SfPalette.light.text
-                                : SfPalette.dark.text,
-                            haptic: SfHaptic.selection,
-                            onPressed: _previewOn
-                                ? () => _togglePreview(slot)
-                                : null,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(SfGuideTokens.cardRadius),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    SizedBox(
+                      key: videoKey,
+                      child: ClipRRect(
+                        borderRadius: const BorderRadius.vertical(
+                          top: Radius.circular(SfGuideTokens.cardRadius),
+                        ),
+                        child: AspectRatio(
+                          key: ValueKey('article-video-$slot'),
+                          aspectRatio: SfGuideTokens.mediaRatio,
+                          child: GuideMedia(
+                            key: ValueKey('plan-demo-$slot-${exercise.id}'),
+                            exercise: exercise,
+                            slot: slot,
+                            coordinator: _coordinator,
                           ),
                         ),
-                    ],
-                  ),
+                      ),
+                    ),
+                    Padding(
+                      key: ValueKey('guide-body-$slot'),
+                      padding: SfGuideTokens.bodyPadding,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _moveNumber(ordinal, slot),
+                              const SizedBox(width: SfGuideTokens.nameGap),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    LayoutBuilder(
+                                      builder: (context, constraints) => Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              exercise.name,
+                                              key: ValueKey('guide-name-$slot'),
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: SfGuideTokens.name,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          ConstrainedBox(
+                                            constraints: BoxConstraints(
+                                              maxWidth:
+                                                  constraints.maxWidth / 2,
+                                            ),
+                                            child: _dose(dose, slot),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      height: SfGuideTokens.muscleGap,
+                                    ),
+                                    Text(
+                                      exercise.muscles.join('、'),
+                                      key: ValueKey('guide-muscles-$slot'),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: SfGuideTokens.muscles,
+                                      semanticsLabel:
+                                          '目标肌群：${exercise.muscles.join('、')}',
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: SfGuideTokens.dividerGap),
+                          SizedBox(
+                            key: ValueKey('guide-divider-$slot'),
+                            height: 1,
+                            child: ColoredBox(
+                              color: SfColors.line.withValues(alpha: .6),
+                            ),
+                          ),
+                          const SizedBox(height: SfGuideTokens.instructionGap),
+                          Text('怎么做', style: SfGuideTokens.caption),
+                          const SizedBox(height: SfGuideTokens.instructionGap),
+                          for (
+                            var index = 0;
+                            index < exercise.cues.length;
+                            index++
+                          ) ...[
+                            if (index > 0)
+                              const SizedBox(height: SfGuideTokens.stepGap),
+                            _step(exercise.cues[index], index + 1, slot),
+                          ],
+                          if (exercise.cautions.isNotEmpty ||
+                              item.note != null ||
+                              exercise.alternative != null) ...[
+                            const SizedBox(height: 12),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    '注意要点',
+                                    style: SfGuideTokens.caption,
+                                  ),
+                                ),
+                                if (exercise.alternative != null)
+                                  SfCircleButton(
+                                    key: ValueKey('swap-${exercise.id}'),
+                                    tooltip: '换一个',
+                                    icon: SfGlyph.swap,
+                                    size: 40,
+                                    filled: false,
+                                    fill: Colors.transparent,
+                                    iconColor: SfColors.muted,
+                                    haptic: SfHaptic.selection,
+                                    onPressed: () => unawaited(_swap(bi, ii)),
+                                  ),
+                              ],
+                            ),
+                            if (exercise.cautions.isNotEmpty) ...[
+                              const SizedBox(height: 4),
+                              Text(
+                                '留意部位：${exercise.cautions.join('、')}',
+                                style: SfGuideTokens.step,
+                              ),
+                            ],
+                            if (item.note case final note?) ...[
+                              const SizedBox(height: 4),
+                              Text(note, style: SfGuideTokens.step),
+                            ],
+                          ],
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: SfSpace.x3),
-              Text(
-                dose,
-                key: ValueKey('plan-dose-$slot'),
-                style: SfType.callout.copyWith(
-                  color: SfColors.accentText,
-                  fontWeight: FontWeight.w600,
-                  height: 1.5,
-                ),
-              ),
-              const SizedBox(height: SfSpace.x2),
-              Text(
-                '目标肌群 · ${exercise.muscles.join('、')}',
-                style: SfType.label.copyWith(height: 1.5),
-              ),
-              const SizedBox(height: SfSpace.x3),
-              Text(
-                '怎么做',
-                style: SfType.callout.copyWith(fontWeight: FontWeight.w600),
-              ),
-              for (var i = 0; i < exercise.cues.length; i++)
-                Padding(
-                  padding: const EdgeInsets.only(top: SfSpace.x1),
-                  child: Text(
-                    '${i + 1}. ${exercise.cues[i]}',
-                    style: SfType.body.copyWith(height: 1.5),
-                  ),
-                ),
-              if (exercise.cautions.isNotEmpty || item.note != null) ...[
-                const SizedBox(height: SfSpace.x3),
-                Text(
-                  '注意要点',
-                  style: SfType.callout.copyWith(fontWeight: FontWeight.w600),
-                ),
-                if (exercise.cautions.isNotEmpty) ...[
-                  const SizedBox(height: SfSpace.x1),
-                  Text(
-                    '留意部位：${exercise.cautions.join('、')}',
-                    style: SfType.body.copyWith(height: 1.5),
-                  ),
-                ],
-                if (item.note case final note?) ...[
-                  const SizedBox(height: SfSpace.x1),
-                  Text(note, style: SfType.body.copyWith(height: 1.5)),
-                ],
-              ],
-            ],
+            ),
           ),
         ),
       ),
     );
   }
+
+  Widget _moveNumber(int ordinal, String slot) => Container(
+    key: ValueKey('guide-number-$slot'),
+    width: SfGuideTokens.numberSize,
+    height: SfGuideTokens.numberSize,
+    decoration: BoxDecoration(
+      color: SfColors.accent.withValues(alpha: .12),
+      borderRadius: BorderRadius.circular(SfGuideTokens.numberRadius),
+    ),
+    alignment: Alignment.center,
+    child: Text('$ordinal', style: SfGuideTokens.number),
+  );
+
+  Widget _dose(String text, String slot) => Tooltip(
+    message: text,
+    child: Container(
+      key: ValueKey('guide-dose-chip-$slot'),
+      height: SfGuideTokens.tagHeight,
+      padding: SfGuideTokens.tagPadding,
+      decoration: BoxDecoration(
+        color: SfGuideTokens.doseFill,
+        borderRadius: BorderRadius.circular(SfGuideTokens.tagRadius),
+      ),
+      child: Center(
+        widthFactor: 1,
+        child: Text(
+          text,
+          key: ValueKey('plan-dose-$slot'),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: SfGuideTokens.dose,
+        ),
+      ),
+    ),
+  );
+
+  Widget _step(String text, int ordinal, String slot) => Row(
+    key: ValueKey('guide-step-$slot-$ordinal'),
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Container(
+        key: ValueKey('guide-step-number-$slot-$ordinal'),
+        width: SfGuideTokens.stepSize,
+        height: SfGuideTokens.stepSize,
+        decoration: BoxDecoration(
+          color: SfColors.surfaceHigh,
+          borderRadius: BorderRadius.circular(SfGuideTokens.stepSize / 2),
+        ),
+        alignment: Alignment.center,
+        child: Text('$ordinal', style: SfGuideTokens.stepNumber),
+      ),
+      const SizedBox(width: SfGuideTokens.stepGap),
+      Expanded(
+        child: Text(
+          text,
+          key: ValueKey('guide-step-text-$slot-$ordinal'),
+          style: SfGuideTokens.step,
+        ),
+      ),
+    ],
+  );
+}
+
+enum _GuideRowKind { intro, section, move, safetyTitle, safetyNote }
+
+class _GuideRow {
+  const _GuideRow(
+    this.kind,
+    this.id, {
+    this.block = 0,
+    this.item = 0,
+    this.ordinal = 0,
+    this.note = '',
+  });
+  final _GuideRowKind kind;
+  final String id;
+  final int block, item, ordinal;
+  final String note;
 }

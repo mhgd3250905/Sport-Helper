@@ -1,5 +1,9 @@
 # 智能健身助手（SmartFit）交接说明
 
+## 当前 +44 训练图文候选（2026-10-29）
+
+`codex/guide-lite` / +44 从已验收 main `94e924fe` 开始，SDK 三包 b490eec 与全 lock 不变。训练图文页在 App `lib/ui/plan_page.dart`；本轮通过 SDK 公开播放器接口实现宿主懒加载与唯一预览，没有改 SDK。见[实施记录](guide-lite-plus44-2026-10-29.md)与外部 `deliveries/guide-lite-plus44/` 的最终源、APK2044、测试与软件截图回执。候选交开哥真机验收，保持未合并、未推送，release/1.0 不动。以下为历史接手记录。
+
 ## 当前 +43 计划讨论候选（2026-10-29）
 
 本轮在 `codex/plan-focus`，从未合并的 +42 d900549 开始，三包锁 SDK `b490eec43b408a8a35ce81a7830833bc6a3ff278`。已保存计划导入、SDK focus 标签、重启恢复、新版更新/另存与版本迁移见[实施记录](plan-focus-plus43-2026-10-29.md)。最终源码 SHA、APK2043 与验证回执位于 `E:/AII-3D/3D-Sport-AI/deliveries/plan-focus-plus43/`；三轮真实接口和软件截图分别保留原始证据。候选交开哥真机验收，保持未合并、未推送，release/1.0 与 SDK 仓库不动。以下为历史接手记录。
