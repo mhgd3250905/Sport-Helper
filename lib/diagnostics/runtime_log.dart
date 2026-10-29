@@ -107,6 +107,14 @@ class RuntimeLog {
     'platform',
     'state',
     'operationId',
+    'feeling',
+  };
+  static const _feelingValues = {
+    'easy',
+    'justRight',
+    'tired',
+    'uncomfortable',
+    'unselected',
   };
   static final _token = RegExp(r'^[A-Za-z0-9_.+\-]{1,96}$');
   static final _event = RegExp(r'^[a-z][a-z0-9_.]{0,63}$');
@@ -143,6 +151,7 @@ class RuntimeLog {
   Map<String, Object?> _safeFields(Map fields) => {
     for (final entry in fields.entries)
       if (_fields.contains(entry.key) &&
+          (entry.key != 'feeling' || _feelingValues.contains(entry.value)) &&
           (entry.value is bool ||
               entry.value is int ||
               (entry.value is double && (entry.value as double).isFinite) ||

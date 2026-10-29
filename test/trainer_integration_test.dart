@@ -10,7 +10,6 @@ import 'package:smartfit/ui/chat/cosmos.dart';
 import 'package:smartfit/ui/exercise_video.dart';
 import 'package:smartfit/ui/player_page.dart';
 import 'package:smartfit/ui/theme/app_theme.dart';
-import 'package:smartfit/ui/theme/celebration.dart';
 import 'package:smartfit/ui/theme/tokens.dart';
 import 'package:smartfit/voice/voice_library.dart';
 import 'package:smartfit/voice/voice_queue.dart';
@@ -152,11 +151,11 @@ void main() {
         15,
       ); // 10 seconds prep, then part of 3 × 3 seconds.
       expect(find.byKey(const ValueKey('complete-set-button')), findsNothing);
-      expect(find.text('训练完成！'), findsNothing);
+      expect(find.text('练完了！'), findsNothing);
       expect(s.store.sessionResults, isEmpty);
       expect(s.store.history, isEmpty);
       await _advance(tester, 6);
-      expect(find.text('训练完成！'), findsOneWidget);
+      expect(find.text('练完了！'), findsOneWidget);
       final result = s.store.sessionResults.single;
       expect(result.full, isTrue);
       expect(result.items.single.completedSets, 1);
@@ -241,9 +240,17 @@ void main() {
       final returned = <trainer.SessionResult>[];
       await _open(tester, s, _plan(), returned: returned);
       await _advance(tester, 15); // Default preparation + timed work.
-      expect(find.text('训练完成！'), findsOneWidget);
-      expect(find.byType(SfFinishTimeline), findsOneWidget);
-      expect(find.byType(SfFinishMark), findsOneWidget);
+      expect(find.text('练完了！'), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey('completion-celebration')),
+        findsOneWidget,
+      );
+      expect(
+        tester
+            .widget<trainer.TrainerPlayer>(find.byType(trainer.TrainerPlayer))
+            .feedbackBuilder,
+        isNull,
+      );
       final result = s.store.sessionResults.single;
       expect(result.full, isTrue);
       expect(result.endedEarly, isFalse);
@@ -267,7 +274,7 @@ void main() {
 
   for (final palette in [SfPalette.dark, SfPalette.light]) {
     testWidgets(
-      'injects ${palette.brightness.name} App styling, media and language',
+      'retains ${palette.brightness.name} SDK styling with brand accent, media and language',
       (tester) async {
         final output = _Output();
         final s = _services(storage: _Storage(), output: output);
@@ -279,21 +286,21 @@ void main() {
         final player = tester.widget<trainer.TrainerPlayer>(
           find.byType(trainer.TrainerPlayer),
         );
+        final defaults = palette.isDark
+            ? trainer.TrainerTheme.dark
+            : trainer.TrainerTheme.light;
         expect(player.theme.brightness, palette.brightness);
-        expect(player.theme.background, palette.background);
-        expect(player.theme.surface, palette.surface);
-        expect(player.theme.surfaceHigh, palette.surfaceHigh);
-        expect(player.theme.border, palette.line);
-        expect(player.theme.shadow, palette.shadow);
-        expect(
-          player.theme.track,
-          Color.alphaBlend(palette.track, palette.surfaceHigh),
-        );
+        expect(player.theme.background, defaults.background);
+        expect(player.theme.surface, defaults.surface);
+        expect(player.theme.surfaceHigh, defaults.surfaceHigh);
+        expect(player.theme.border, defaults.border);
+        expect(player.theme.shadow, defaults.shadow);
+        expect(player.theme.track, defaults.track);
         expect(player.theme.track.a, 1);
-        expect(
-          player.theme.ringKnob,
-          palette.isDark ? palette.text : palette.surface,
-        );
+        expect(player.theme.ringKnob, defaults.ringKnob);
+        expect(player.theme.cardSurface, defaults.cardSurface);
+        expect(player.theme.cardBorder, defaults.cardBorder);
+        expect(player.theme.primaryForeground, const Color(0xFFFFFFFF));
         expect(player.theme.accent, palette.accent);
         expect(player.theme.accentSubtle, palette.accentSoft);
         expect(player.theme.pausedColor, palette.accent);
@@ -304,9 +311,24 @@ void main() {
         expect(player.voice!.settings.language, 'en');
         expect(player.voice!.settings.volume, .4);
         expect(player.strings.completeSet, '完成本组');
+        expect(player.startMode, trainer.TrainerStartMode.training);
+        expect(find.byKey(const ValueKey('start-training')), findsNothing);
+        expect(player.feedbackBuilder, isNull);
+        expect(player.onCompleted, isNotNull);
         expect(
           player.drillOf('h-forearm-plank')!.name,
           s.library['h-forearm-plank'].name,
+        );
+        final drill = player.drillOf('h-forearm-plank')!;
+        final exercise = s.library['h-forearm-plank'];
+        expect(drill.cues, exercise.cues);
+        expect(drill.precautions, exercise.cautions);
+        expect(drill.targetMuscles, exercise.muscles.join('、'));
+        expect(
+          drill.thumbnailAsset,
+          palette.isDark
+              ? exercise.media.poster
+              : exercise.media.lightPoster ?? exercise.media.poster,
         );
         // The shared next-up card reads TrainerDrill.media directly,
         // independently of the App's main mediaBuilder slot.
@@ -322,12 +344,7 @@ void main() {
           media.posterFor(light: !palette.isDark),
           palette.isDark ? source.poster : source.lightPoster ?? source.poster,
         );
-        expect(
-          tester
-              .widget<CosmosBackground>(find.byType(CosmosBackground))
-              .animate,
-          isFalse,
-        );
+        expect(find.byType(CosmosBackground), findsNothing);
         final video = tester.widget<ExerciseVideo>(find.byType(ExerciseVideo));
         expect(
           video.exercise.media.video,
@@ -342,7 +359,7 @@ void main() {
         );
         await tester.tap(find.byKey(const ValueKey('pause')));
         await _advance(tester, 15);
-        expect(find.text('训练完成！'), findsOneWidget);
+        expect(find.text('练完了！'), findsOneWidget);
         expect(output.spoken, isEmpty, reason: 'No English clips are bundled.');
         expect(output.chimes, isNotEmpty);
         await tester.pumpWidget(const SizedBox());

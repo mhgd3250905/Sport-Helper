@@ -1,6 +1,10 @@
 # 智能健身助手（SmartFit）交接说明
 
-## 当前接手入口（2026-10-29，+41）
+## 当前接手入口（2026-10-29，同一+41 / SDK488）
+
+当前 `codex/ui-polish-1` 在原+41上继续接入SDK main `488ce82b9dc7031925ba12c18f252b4e596e7776`，三包与锁文件一致，版本仍+41/2041。单动作preview，整套training；完成页感受仅写本地记录与日志，SDK推荐/训练/正式库样式不由SF重写。先读 [SDK488补充记录](ui-polish-1-plus41-sdk488-2026-10-29.md)，最新包/源码/验证位于 `../deliveries/ui-polish-1-plus41-sdk488/`（相对App树）。二/五项SDK接口待办仍在；+41待真机确认，main与release/1.0不动。
+
+## 历史接手入口（2026-10-29，+41首包）
 
 `codex/ui-polish-1` / `0.1.0+41`，独立工作树 `Sport-Helper-ui-polish-1`，以已推送的 main `adc79ab` 为基线。用户明确确认 +40 真机通过并授权此次 main 合并/推送；+41 的验收与主线准入仍等待用户下一步。`release/1.0` 未操作。先读[本批逐项状态及SDK限制](ui-polish-1-plus41-2026-10-29.md)和[版本台账](version-management.md)。不得把SDK正式动作库或原地展开未完成项当成已通过，也不得把软件截图冒充真机验收。
 

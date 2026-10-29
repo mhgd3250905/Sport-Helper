@@ -19,7 +19,6 @@ import 'package:smartfit/ui/chat/plan_card.dart';
 import 'package:smartfit/ui/chat/validated_plan_card.dart';
 import 'package:smartfit/ui/theme/app_theme.dart';
 import 'package:smartfit/ui/theme/polish_card.dart';
-import 'package:smartfit/ui/theme/ui_polish_tokens.dart';
 import 'package:smartfit/ui/theme/widgets.dart';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
 import 'package:ugk_coach_ui/ugk_coach_ui.dart';
@@ -610,29 +609,31 @@ void main() {
       expect(card, findsOneWidget);
       expect(find.text(note), findsOneWidget);
       final style = CoachUiTheme.of(tester.element(card));
-      expect(style.builders.surface, isNotNull);
-      expect(style.builders.controlFace, isNotNull);
-      expect(style.builders.pressable, isNotNull);
-      const surfaceRequest = CoachCardSurface(
-        padding: EdgeInsets.all(12),
-        width: 300,
-        child: SizedBox.shrink(),
+      final defaults = CoachUiStyle.fromTheme(Theme.of(tester.element(card)));
+      expect(style.builders.surface, isNull);
+      expect(style.builders.controlFace, isNull);
+      expect(style.builders.pressable, isNull);
+      expect(style.builders.media, isNull);
+      expect(style.builders.icon, isNull);
+      expect(style.builders.textAction, isNull);
+      expect(style.builders.startButton, isNull);
+      expect(style.colors.cardSurface, defaults.colors.cardSurface);
+      expect(style.colors.cardBorder, defaults.colors.cardBorder);
+      expect(style.colors.primaryForeground, defaults.colors.primaryForeground);
+      expect(style.typography.callout, defaults.typography.callout);
+      expect(style.typography.caption, defaults.typography.caption);
+      expect(
+        find.descendant(of: card, matching: find.byType(SfPolishCard)),
+        findsNothing,
       );
-      final surface = style.builders.surface!(
-        tester.element(card),
-        surfaceRequest,
+      final title = tester.widget<Text>(
+        find.text(library['h-wall-angel'].name),
       );
-      expect(surface, isA<SfPolishCard>());
-      final appSurface = surface as SfPolishCard;
-      expect(appSurface.padding, const EdgeInsets.all(12));
-      expect(appSurface.width, 300);
-      expect(appSurface.child, same(surfaceRequest.child));
-      expect(style.colors.surface, SfCardTokens.fill);
-      expect(style.colors.outline, SfCardTokens.edge);
-      expect(style.typography.callout.fontSize, 15);
-      expect(style.typography.callout.fontWeight, FontWeight.w600);
-      expect(style.typography.callout.height, 1.35);
-      expect(style.typography.caption.fontSize, 12);
+      expect(title.style!.fontSize, 15);
+      expect(title.style!.fontWeight, FontWeight.w600);
+      expect(title.style!.height, 1.35);
+      final tags = tester.widget<Text>(find.text('入门 · 墙'));
+      expect(tags.style!.fontSize, 12);
       final recommendation = tester.widget<CoachRecommendCard>(card);
       expect(recommendation.library.tryGet('h-wall-angel')!.levelLabel, '入门');
       expect(

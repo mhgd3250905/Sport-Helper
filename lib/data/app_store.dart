@@ -1,7 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
-import 'package:ugk_trainer/ugk_trainer.dart' show SessionResult;
+import 'package:ugk_trainer/ugk_trainer.dart'
+    show SessionResult, TrainingFeeling;
 
 import '../app/user_memory_store.dart';
 import '../core/storage/local_state_storage.dart';
@@ -20,6 +21,7 @@ class HistoryEntry {
     required this.completed,
     required this.total,
     this.sessionId,
+    this.feeling,
   });
   final String title;
   final DateTime at;
@@ -30,6 +32,9 @@ class HistoryEntry {
   /// Null for records saved before ugk_trainer was introduced.
   final String? sessionId;
 
+  /// Optional completion-page feedback; old records have no selection.
+  final TrainingFeeling? feeling;
+
   Map<String, Object?> toJson() => {
     'title': title,
     'at': at.toIso8601String(),
@@ -37,6 +42,7 @@ class HistoryEntry {
     'completed': completed,
     'total': total,
     if (sessionId != null) 'sessionId': sessionId,
+    if (feeling != null) 'feeling': feeling!.name,
   };
 
   factory HistoryEntry.fromJson(Map<String, dynamic> j) => HistoryEntry(
@@ -46,6 +52,9 @@ class HistoryEntry {
     completed: (j['completed'] as num?)?.toInt() ?? 0,
     total: (j['total'] as num?)?.toInt() ?? 0,
     sessionId: j['sessionId'] as String?,
+    feeling: TrainingFeeling.values
+        .where((feeling) => feeling.name == j['feeling'])
+        .firstOrNull,
   );
 }
 
@@ -246,19 +255,25 @@ class AppStore extends ChangeNotifier {
   /// TrainerPlayer's onFinished callback. Commit only after durable storage
   /// succeeds; failures reach ResultSaver so its completion page can retry.
   Future<void> saveSession(SessionResult result) => _enqueueWrite(() async {
+    final previousFeeling = _sessions[result.sessionId]?.feeling;
+    // A delayed automatic-save retry must not erase completion-page feedback.
+    final receipt = result.feeling == null && previousFeeling != null
+        ? result.withFeeling(previousFeeling)
+        : result;
     final entry = HistoryEntry(
-      sessionId: result.sessionId,
-      title: result.planTitle,
-      at: result.endedAt,
-      minutes: result.minutes,
-      completed: result.completedExercises,
-      total: result.totalExercises,
+      sessionId: receipt.sessionId,
+      title: receipt.planTitle,
+      at: receipt.endedAt,
+      minutes: receipt.minutes,
+      completed: receipt.completedExercises,
+      total: receipt.totalExercises,
+      feeling: receipt.feeling,
     );
     final nextHistory = [
       entry,
       ...history.where((h) => h.sessionId != result.sessionId),
     ];
-    final nextSessions = {..._sessions, result.sessionId: result};
+    final nextSessions = {..._sessions, receipt.sessionId: receipt};
     await _storage.write(
       key,
       _encodeState(
@@ -266,7 +281,7 @@ class AppStore extends ChangeNotifier {
         updatedSessions: nextSessions.values,
       ),
     );
-    _sessions[result.sessionId] = result;
+    _sessions[receipt.sessionId] = receipt;
     // Other App methods may have updated memory while storage was pending.
     // Preserve those edits; their queued saves will persist the merged state.
     history.removeWhere((h) => h.sessionId == result.sessionId);

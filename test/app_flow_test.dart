@@ -19,6 +19,7 @@ import 'package:smartfit/ui/library_page.dart';
 import 'package:smartfit/ui/player_page.dart';
 import 'package:smartfit/voice/voice_library.dart';
 import 'package:smartfit/voice/voice_queue.dart';
+import 'package:ugk_trainer/ugk_trainer.dart' as trainer;
 
 import 'support.dart';
 
@@ -158,11 +159,26 @@ void main() {
       await _openDiscomfort(tester);
       await tester.tap(find.text('跳过这个动作'));
       await tester.pumpAndSettle();
-      expect(find.text('今天先到这里'), findsOneWidget);
+      expect(find.text('练完了！'), findsOneWidget);
       expect(s.store.history, hasLength(1));
       // ugk_trainer records only completed work, never skipped exercises.
       expect(s.store.history.single.completed, 0);
       expect(s.store.history.single.total, 1);
+      final result = s.store.sessionResults.single;
+      expect(result.full, isFalse);
+      expect(result.items.single.status, trainer.ItemStatus.skipped);
+      expect(s.store.history.single.sessionId, result.sessionId);
+      expect(
+        tester
+            .widget<Text>(
+              find.byKey(const ValueKey('completion-exercises-value')),
+            )
+            .data,
+        '0/1',
+      );
+      await tester.pump(const Duration(seconds: 2));
+      expect(s.store.history, hasLength(1));
+      expect(s.store.sessionResults, hasLength(1));
       await tester.pumpWidget(const SizedBox());
     },
   );
@@ -197,22 +213,41 @@ void main() {
   );
 
   testWidgets(
-    'the player keeps its sky still and shows pause through the resume control',
+    'the player keeps the SDK background and pauses and resumes through its control',
     (tester) async {
       final s = services();
-      s.store.starfield =
-          true; // even with star dust on, the workout keeps it still
+      // The App's sky preference cannot replace the SDK training background.
+      s.store.starfield = true;
       await showPlayer(tester, s);
-      final sky = tester.widget<CosmosBackground>(
-        find.byType(CosmosBackground),
+      final player = tester.widget<trainer.TrainerPlayer>(
+        find.byType(trainer.TrainerPlayer),
       );
-      expect(sky.animate, isFalse);
+      final defaults = player.theme.brightness == Brightness.light
+          ? trainer.TrainerTheme.light
+          : trainer.TrainerTheme.dark;
+      expect(player.theme.background, defaults.background);
+      expect(find.byType(CosmosBackground), findsNothing);
+      expect(
+        tester.widget<ExerciseVideo>(find.byType(ExerciseVideo)).paused,
+        isFalse,
+      );
       expect(find.text('已暂停'), findsNothing);
       await tester.tap(find.byKey(const ValueKey('pause')));
       await tester.pump();
       expect(find.text('已暂停'), findsNothing);
       expect(find.byTooltip('继续训练'), findsOneWidget);
       expect(find.byKey(const ValueKey('counter')), findsOneWidget);
+      expect(
+        tester.widget<ExerciseVideo>(find.byType(ExerciseVideo)).paused,
+        isTrue,
+      );
+      await tester.tap(find.byKey(const ValueKey('pause')));
+      await tester.pump();
+      expect(
+        tester.widget<ExerciseVideo>(find.byType(ExerciseVideo)).paused,
+        isFalse,
+      );
+      expect(find.byTooltip('暂停训练'), findsOneWidget);
       await tester.pumpWidget(const SizedBox());
     },
   );
@@ -227,13 +262,27 @@ void main() {
       await _openDiscomfort(tester);
       await tester.tap(find.text('结束今天的训练'));
       await tester.pumpAndSettle();
-      expect(find.text('今天先到这里'), findsOneWidget);
-      expect(find.text('训练完成！'), findsNothing);
+      // The SDK shares its heading; recorded flags/counts identify an early end.
+      expect(find.text('练完了！'), findsOneWidget);
       expect(s.store.history, hasLength(1));
       expect(s.store.history.single.completed, 0);
       expect(s.store.history.single.total, greaterThan(0));
+      final result = s.store.sessionResults.single;
+      expect(result.endedEarly, isTrue);
+      expect(result.full, isFalse);
+      expect(result.discomfort.last.action, trainer.DiscomfortAction.end);
+      expect(s.store.history.single.sessionId, result.sessionId);
+      expect(
+        tester
+            .widget<Text>(
+              find.byKey(const ValueKey('completion-exercises-value')),
+            )
+            .data,
+        '0/${result.totalExercises}',
+      );
       await tester.pump(const Duration(seconds: 2));
       expect(s.store.history, hasLength(1));
+      expect(s.store.sessionResults, hasLength(1));
       await tester.pumpWidget(const SizedBox());
     },
   );

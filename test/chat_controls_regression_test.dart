@@ -7,11 +7,10 @@ import 'package:smartfit/data/app_store.dart';
 import 'package:smartfit/ui/library_page.dart';
 import 'package:smartfit/ui/chat/saved_plans_page.dart';
 import 'package:smartfit/ui/theme/app_theme.dart';
-import 'package:smartfit/ui/theme/action_tile.dart';
-import 'package:smartfit/ui/theme/ui_polish_tokens.dart';
 import 'package:smartfit/ui/theme/widgets.dart';
 import 'package:smartfit/voice/voice_library.dart';
 import 'package:smartfit/voice/voice_queue.dart';
+import 'package:ugk_coach_ui/ugk_coach_ui.dart';
 
 import 'support.dart';
 
@@ -127,7 +126,7 @@ void main() {
   });
 
   testWidgets(
-    'library cards fit the bundled font at narrow widths and enlarged text',
+    'legacy library reuses SDK recommendation cards at narrow widths and enlarged text',
     (tester) async {
       final loader = FontLoader('NotoSansSC')
         ..addFont(rootBundle.load('assets/fonts/NotoSansSC.ttf'));
@@ -160,27 +159,30 @@ void main() {
             ),
           );
           await tester.pumpAndSettle();
-          final tiles = find.byType(SfActionTile);
-          expect(tiles, findsWidgets);
-          final first = tester.getRect(tiles.at(0));
-          final next = tester.getRect(tiles.at(1));
+          expect(find.byType(CoachRecommendCard), findsOneWidget);
+          final ids = services.library.all
+              .take(2)
+              .map((exercise) => exercise.id)
+              .toList();
+          final firstTile = find.byKey(ValueKey('recommend-surface-${ids[0]}'));
+          final nextTile = find.byKey(ValueKey('recommend-surface-${ids[1]}'));
+          final first = tester.getRect(firstTile);
+          final next = tester.getRect(nextTile);
           expect(first.size, next.size);
-          expect(next.left - first.right, SfCardTokens.gridGap);
+          expect(next.left - first.right, 12);
           final artwork = tester.getRect(
-            find
-                .descendant(of: tiles.first, matching: find.byType(AspectRatio))
-                .first,
+            find.byKey(ValueKey('recommend-image-area-${ids[0]}')),
           );
           expect(artwork.left - first.left, 12);
           expect(artwork.top - first.top, 12);
           expect(artwork.width, first.width - 24);
           expect(artwork.height, artwork.width);
           final firstTexts = find.descendant(
-            of: tiles.at(0),
+            of: firstTile,
             matching: find.byType(Text),
           );
           final nextTexts = find.descendant(
-            of: tiles.at(1),
+            of: nextTile,
             matching: find.byType(Text),
           );
           expect(
@@ -193,7 +195,7 @@ void main() {
           );
           expect(
             first.bottom - tester.getRect(firstTexts.last).bottom,
-            SfCardTokens.inset,
+            closeTo(12, .000001),
           );
           expect(
             tester.takeException(),

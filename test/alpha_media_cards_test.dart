@@ -497,20 +497,16 @@ void main() {
   );
 
   testWidgets(
-    'library thumbnails use alpha on one card face with no image-area layer',
+    'legacy library uses the SDK recommendation renderer and trusted standing assets',
     (tester) async {
       final services = makeServices();
       addTearDown(services.dispose);
       await pump(tester, const LibraryPage(), services: services);
       expect(find.byType(ExerciseVideo), findsNothing);
-      expect(
-        _images(tester),
-        contains(library['h-squat'].media.alphaThumbnail),
-      );
-      expect(
-        _images(tester),
-        contains(library['w-bird-dog'].media.alphaThumbnail),
-      );
+      expect(find.byType(CoachRecommendCard), findsOneWidget);
+      expect(find.byType(SfPolishCard), findsNothing);
+      expect(_images(tester), contains(_standing('h-squat')));
+      expect(_images(tester), contains(_standing('w-bird-dog')));
       expect(
         _images(tester),
         contains(plain['h-catcow-quad'].media.lightPoster),
@@ -529,7 +525,7 @@ void main() {
         services: services,
       );
       expect(find.byType(SfAlphaArtwork), findsNothing);
-      expect(_images(tester), contains(library['h-squat'].media.lightPoster));
+      expect(_images(tester), contains(_standing('h-squat')));
       expect(tester.takeException(), isNull);
     },
   );

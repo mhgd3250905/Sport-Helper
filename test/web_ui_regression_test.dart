@@ -160,8 +160,9 @@ void main() {
     tester,
   ) async {
     await _show(tester, _services(), const LibraryPage(), const Size(844, 390));
+    final action = find.byKey(const ValueKey('recommend-action-h-squat'));
     await tester.scrollUntilVisible(
-      find.text('徒手深蹲'),
+      action,
       500,
       scrollable: find.byWidgetPredicate(
         (widget) =>
@@ -169,8 +170,9 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    await tester.tap(find.text('徒手深蹲'));
+    await tester.tap(action);
     await tester.pumpAndSettle();
+    expect(find.byType(BottomSheet), findsOneWidget);
     expect(tester.takeException(), isNull);
     await tester.ensureVisible(find.text('注意'));
     await tester.pumpAndSettle();

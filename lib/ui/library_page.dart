@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:ugk_coach_ui/ugk_coach_ui.dart';
 import 'package:ugk_trainer/ugk_trainer.dart'
-    show DrillMediaPlaybackHandle, PoseHubSinglePracticePage;
+    show
+        DrillMediaPlaybackHandle,
+        PoseHubSinglePracticePage,
+        SessionResult,
+        TrainerStartMode;
 
 import '../app/services.dart';
 import '../domain/exercise.dart';
 import 'action_issue_actions.dart';
 import 'alpha_artwork.dart';
+import 'chat/coach_ui_adapter.dart';
 import 'exercise_video.dart';
 import 'posehub_library_page.dart';
 import 'theme.dart';
-import 'theme/action_tile.dart';
 import 'theme/trainer_theme.dart';
-import 'theme/ui_polish_tokens.dart';
 
 /// Every move in the library, filterable by category; tap to watch. Opened
 /// from the chat ("看看动作库", "有哪些拉伸动作" → [initial]) or the drawer.
@@ -95,41 +99,42 @@ class _LibraryPageState extends State<LibraryPage> {
     );
   }
 
-  Widget _grid(BuildContext context, List<Exercise> list) => LayoutBuilder(
-    key: ValueKey('grid-$_cat'),
-    builder: (context, bounds) {
-      final tileWidth =
-          (bounds.maxWidth - SfSpace.x4 * 2 - SfCardTokens.gridGap) / 2;
-      return GridView.builder(
+  // The legacy catalogue has no PoseHub browser model. Reuse the public SDK
+  // recommendation renderer rather than maintaining another action-card style.
+  Widget _grid(BuildContext context, List<Exercise> list) =>
+      SingleChildScrollView(
+        key: ValueKey('grid-$_cat'),
         padding: const EdgeInsets.fromLTRB(
           SfSpace.x4,
           SfSpace.x1,
           SfSpace.x4,
           SfSpace.x6,
         ),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          mainAxisSpacing: SfCardTokens.gridGap,
-          crossAxisSpacing: SfCardTokens.gridGap,
-          mainAxisExtent: SfActionTile.heightFor(context, tileWidth),
+        child: withSmartfitRecommendUi(
+          context,
+          CoachRecommendCard(
+            actionIds: [for (final exercise in list) exercise.id],
+            note: '',
+            library: CoachExerciseLibrary([
+              for (final exercise in list)
+                toCoachRecommendationExercise(exercise),
+            ]),
+            onOpenAction: (id) =>
+                _show(list.firstWhere((exercise) => exercise.id == id)),
+          ),
         ),
-        itemCount: list.length,
-        itemBuilder: (_, i) =>
-            _Tile(exercise: list[i], onTap: () => _show(list[i])),
       );
-    },
-  );
 
   void _show(Exercise e) => showExerciseDetails(context, e);
 }
 
 /// Shared action details for the library and validated coach action cards.
-Future<void> showExerciseDetails(BuildContext context, Exercise e) {
+Future<void> showExerciseDetails(BuildContext context, Exercise e) async {
   final services = AppServices.of(context);
   final action = services.poseHubCatalog?.tryGet(e.id);
   if (action != null) {
-    return Navigator.of(context).push<void>(
-      MaterialPageRoute(
+    await Navigator.of(context).push<SessionResult>(
+      MaterialPageRoute<SessionResult>(
         builder: (_) => PoseHubSinglePracticePage(
           action: action,
           mediaBaseUri:
@@ -138,9 +143,12 @@ Future<void> showExerciseDetails(BuildContext context, Exercise e) {
           mediaPreparer: services.poseHubPreparer,
           theme: SmartFitTrainerTheme.of(context),
           voice: services.trainerVoice(),
+          startMode: TrainerStartMode.preview,
+          onCompleted: services.recordTrainingCompletion,
         ),
       ),
     );
+    return;
   }
   return showModalBottomSheet<void>(
     context: context,
@@ -314,40 +322,3 @@ Widget _detailLine(SfGlyph icon, String label, String text, {Color? color}) =>
         ),
       ],
     );
-
-/// The App-owned fallback uses the same card surface and title slots.
-/// The SDK-owned PoseHub browser above retains its own card layout.
-class _Tile extends StatelessWidget {
-  const _Tile({required this.exercise, required this.onTap});
-  final Exercise exercise;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final e = exercise;
-    final alpha = SfAlphaCards.hasCover(
-      e,
-      enabled: SfAlphaCards.enabledOf(context),
-    );
-    return SfPressable(
-      semanticLabel: e.name,
-      onTap: onTap,
-      child: SfActionTile(
-        title: e.name,
-        metadata:
-            '${e.category.zh} · ${levelZh(e.level)} · ${e.effectiveEquipmentIds.isEmpty ? '徒手' : e.effectiveEquipmentIds.map(equipmentLabel).join('/')}',
-        artwork: alpha
-            ? SfAlphaAsset(
-                asset: e.media.alphaThumbnail ?? e.media.alphaCover!,
-                fit: BoxFit.contain,
-                alignment: Alignment.center,
-              )
-            : Image.asset(
-                sfPoster(e),
-                fit: BoxFit.contain,
-                errorBuilder: (_, _, _) => const SizedBox.shrink(),
-              ),
-      ),
-    );
-  }
-}

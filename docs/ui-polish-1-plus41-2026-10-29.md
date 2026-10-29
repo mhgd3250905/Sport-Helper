@@ -1,5 +1,7 @@
 # SmartFit 界面体验修复第一批 / +41
 
+> 同一+41后续已接入SDK main `488ce82`：推荐卡、动作库和训练页改用SDK默认样式，单动作preview及本地完成感受已接通。最新源码、包及验证以 [SDK488补充记录](ui-polish-1-plus41-sdk488-2026-10-29.md) 为准；下文保留原c6369c4首包回执。第四项正式库样式现已由SDK解决，第二/五项接口限制仍在。
+
 2026-10-29（Asia/Shanghai），分支 `codex/ui-polish-1`，独立工作树 `Sport-Helper-ui-polish-1`。开哥明确反馈 +40 已真机确认通过，并授权将 `codex/coach-v2` 合入 main、推送。已核对 `428c5f3..adc79ab` 仅包含 8 份文档收束；main 从 `7344df2` 快进到 `adc79abef2b7195872e589f6225486e944b66644` 并推送，远端 SHA 已核实。本候选以该新 main 为基线。`release/1.0` 未操作。
 
 App 为 `0.1.0+41`，internal arm64 Android 构建号应为 `2041`，实际身份以 APK aapt 回执为准。SDK 三包及传递 override 仍固定 `1532f0825b93777139be0e92e715ebec144a73b9`，未改 SDK、未换依赖、未复制 SDK 组件，也未操作 SDK 缓存。

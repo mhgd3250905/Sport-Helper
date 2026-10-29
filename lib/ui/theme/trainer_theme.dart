@@ -3,7 +3,8 @@ import 'package:ugk_trainer/ugk_trainer.dart' show TrainerTheme;
 
 import 'tokens.dart';
 
-/// The same SmartFit palette for the shared player, action browser and media.
+/// The SDK owns training and action-card surfaces. Map only the brand accent
+/// and bundled font, keeping its card, text and primary-foreground defaults.
 abstract final class SmartFitTrainerTheme {
   static TrainerTheme of(BuildContext context) => fromPalette(
     Theme.of(context).brightness == Brightness.light
@@ -11,28 +12,14 @@ abstract final class SmartFitTrainerTheme {
         : SfPalette.dark,
   );
 
-  static TrainerTheme fromPalette(SfPalette p) => TrainerTheme(
-    brightness: p.brightness,
-    background: p.background,
-    surface: p.surface,
-    surfaceHigh: p.surfaceHigh,
-    border: p.line,
-    shadow: p.shadow,
-    track: Color.alphaBlend(p.track, p.surfaceHigh),
-    ringKnob: p.isDark ? p.text : p.surface,
-    accent: p.accent,
-    accentSubtle: p.accentSoft,
-    accentText: p.accentText,
-    onAccent: p.onAccent,
-    pausedColor: p.accent,
-    onPaused: p.onAccent,
-    text: p.text,
-    muted: p.muted,
-    faint: p.faint,
-    caution: p.caution,
-    danger: p.danger,
-    mediaStage: p.mediaStage,
-    fontFamily: sfFontFamily,
-    radius: SfRadius.lg,
-  );
+  static TrainerTheme fromPalette(SfPalette p) =>
+      (p.isDark ? TrainerTheme.dark : TrainerTheme.light).copyWith(
+        accent: p.accent,
+        accentSubtle: p.accentSoft,
+        accentText: p.accentText,
+        onAccent: p.onAccent,
+        pausedColor: p.accent,
+        onPaused: p.onAccent,
+        fontFamily: sfFontFamily,
+      );
 }

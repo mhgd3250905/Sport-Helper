@@ -143,6 +143,34 @@ class AppServices {
   coach.UserMemoryStore get userMemoryStore =>
       memoryStore ?? store.aiMemoryStore;
 
+  /// The optional completion-page receipt updates the already saved workout.
+  /// This local feedback never becomes a coach turn, memory or recommendation.
+  /// Throwing preserves the SDK completion page's retry of the same receipt.
+  Future<void> recordTrainingCompletion(SessionResult result) async {
+    final fields = <String, Object?>{
+      'feeling': result.feeling?.name ?? 'unselected',
+      'completed': result.completedExercises,
+      'total': result.totalExercises,
+    };
+    try {
+      await store.saveSession(result);
+      RuntimeLog.instance.record(
+        'training.completion.feedback',
+        fields: {...fields, 'success': true},
+      );
+    } on Object catch (error) {
+      RuntimeLog.instance.record(
+        'training.completion.feedback',
+        fields: {
+          ...fields,
+          'success': false,
+          'errorType': RuntimeLog.errorType(error),
+        },
+      );
+      rethrow;
+    }
+  }
+
   Future<void> setAiMemoryEnabled(bool enabled) async {
     final engine = chatEngine;
     if (engine is AiChatEngine) engine.enableUserMemory = enabled;

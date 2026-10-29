@@ -30,6 +30,6 @@ abstract final class AppBuildInfo {
       value.trim().isEmpty ? 'unknown' : value.trim();
 
   static const sdkRef =
-      'ugk_coach / ugk_trainer / ugk_coach_ui @ 1532f0825b93777139be0e92e715ebec144a73b9';
+      'ugk_coach / ugk_trainer / ugk_coach_ui @ 488ce82b9dc7031925ba12c18f252b4e596e7776';
   static const performanceBase = '7344df22744feb2550f8d989bebd154c6d1ec9c5';
 }

@@ -67,6 +67,31 @@ void main() {
               .crossAxisCount,
           2,
         );
+        final firstAction = catalog.semanticCompleteActions.first;
+        final sdkTheme = palette.isDark
+            ? TrainerTheme.dark
+            : TrainerTheme.light;
+        final surface = tester.widget<DecoratedBox>(
+          find.byKey(ValueKey('posehub-card-surface-${firstAction.id}')),
+        );
+        final decoration = surface.decoration as BoxDecoration;
+        expect(decoration.color, sdkTheme.cardSurface);
+        expect(decoration.border, Border.all(color: sdkTheme.cardBorder));
+        expect(decoration.borderRadius, BorderRadius.circular(20));
+        expect(decoration.gradient, isNull);
+        expect(decoration.boxShadow, isNull);
+        final title = tester.widget<Text>(find.text(firstAction.nameZh));
+        expect(title.style!.fontSize, 15);
+        expect(title.style!.fontWeight, FontWeight.w600);
+        expect(title.style!.height, 1.35);
+        expect(
+          tester
+              .widget<AspectRatio>(
+                find.byKey(ValueKey('posehub-image-area-${firstAction.id}')),
+              )
+              .aspectRatio,
+          1,
+        );
         expect(find.textContaining('待补'), findsNothing);
         expect(find.textContaining('219'), findsNothing);
         expect(
@@ -181,9 +206,23 @@ void main() {
         expect(platform.uris, isEmpty);
         expect(repo.actionRequests, [action.id]);
         final player = tester.widget<TrainerPlayer>(find.byType(TrainerPlayer));
-        expect(player.prepSeconds, 0);
+        expect(player.startMode, TrainerStartMode.preview);
+        expect(player.prepSeconds, 10);
+        expect(player.onCompleted, services.recordTrainingCompletion);
         expect(player.poseHubActionOf!(action.id), same(action));
         expect(player.poseHubMediaPreparer, same(services.poseHubPreparer));
+        expect(find.byKey(const ValueKey('pause')).hitTestable(), findsNothing);
+        expect(find.byKey(const ValueKey('progress')), findsNothing);
+        expect(services.store.history, isEmpty);
+        final mediaState = tester.state(find.byType(PoseHubPackMedia));
+        await tester.pump(const Duration(seconds: 15));
+        expect(services.store.history, isEmpty);
+        expect(find.byKey(const ValueKey('start-training')), findsOneWidget);
+        await tester.tap(find.byKey(const ValueKey('start-training')));
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 350));
+        expect(tester.state(find.byType(PoseHubPackMedia)), same(mediaState));
+        expect(find.byKey(const ValueKey('progress')), findsOneWidget);
         await tester.tap(find.byKey(const ValueKey('pause')));
         await tester.pump();
         expect(
@@ -200,7 +239,7 @@ void main() {
   }
 
   testWidgets(
-    'coach action opens SDK training, not the legacy production sheet',
+    'coach action opens SDK preview and leaving it never saves a workout',
     (tester) async {
       final repo = PoseHubUiRepository(
         mediaBaseUri: base,
@@ -228,6 +267,20 @@ void main() {
       await tester.pump(const Duration(milliseconds: 350));
       expect(find.byType(TrainerPlayer), findsOneWidget);
       expect(find.byType(BottomSheet), findsNothing);
+      final preview = tester.widget<TrainerPlayer>(find.byType(TrainerPlayer));
+      final single = tester.widget<PoseHubSinglePracticePage>(
+        find.byType(PoseHubSinglePracticePage),
+      );
+      expect(single.startMode, TrainerStartMode.preview);
+      expect(preview.startMode, TrainerStartMode.preview);
+      expect(preview.prepSeconds, 10);
+      expect(preview.onCompleted, services.recordTrainingCompletion);
+      expect(services.store.history, isEmpty);
+      await tester.pump(const Duration(seconds: 15));
+      await tester.tap(find.byKey(const ValueKey('close')));
+      await tester.pumpAndSettle();
+      expect(find.byType(TrainerPlayer), findsNothing);
+      expect(services.store.history, isEmpty);
       await tester.pumpWidget(const SizedBox.shrink());
       await tester.pump();
       repo.dispose();
@@ -267,14 +320,18 @@ void main() {
     },
   );
 
-  test('SmartFit shared SDK theme maps both palettes', () {
+  test('SDK shared surfaces remain defaults with SmartFit brand accents', () {
     for (final palette in [SfPalette.light, SfPalette.dark]) {
       final theme = SmartFitTrainerTheme.fromPalette(palette);
-      expect(theme.background, palette.background);
-      expect(theme.surface, palette.surface);
-      expect(theme.surfaceHigh, palette.surfaceHigh);
+      final defaults = palette.isDark ? TrainerTheme.dark : TrainerTheme.light;
+      expect(theme.background, defaults.background);
+      expect(theme.surface, defaults.surface);
+      expect(theme.surfaceHigh, defaults.surfaceHigh);
       expect(theme.accent, palette.accent);
-      expect(theme.mediaStage, palette.mediaStage);
+      expect(theme.mediaStage, defaults.mediaStage);
+      expect(theme.cardSurface, defaults.cardSurface);
+      expect(theme.cardBorder, defaults.cardBorder);
+      expect(theme.primaryForeground, defaults.primaryForeground);
       expect(theme.fontFamily, sfFontFamily);
     }
   });

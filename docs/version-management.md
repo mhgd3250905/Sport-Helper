@@ -1,6 +1,12 @@
 # 版本管理与台账
 
-## 当前 +41 候选（2026-10-29）
+## 当前同一 +41 / SDK488（2026-10-29）
+
+App仍为 `0.1.0+41 / 2041`，分支仍为 `codex/ui-polish-1`。三包声明/锁文件和coach传递override统一固定 `488ce82b9dc7031925ba12c18f252b4e596e7776`，非SDK依赖不变。单动作preview、整套training、完成感受本地保存和日志、SDK样式归属见[补充记录](ui-polish-1-plus41-sdk488-2026-10-29.md)。新包和全部验证独立保存于 `../../deliveries/ui-polish-1-plus41-sdk488/`，不替换下方首包及旧截图；最终源码/包哈希以新目录 `release-apk.json` 为准。main仍adc79ab，release/1.0未动，+41未合main或推送。
+
+当前SDK488验证：598/598、0跳过，analyze0问题，严格锁文件通过；58张浅深软件图和harness哈希已核对。旧的586项记录仅属于下方SDK1532首包。
+
+## 历史：同批 +41 首包（2026-10-29，SDK1532基线）
 
 `0.1.0+41` / `codex/ui-polish-1`，internal arm64 Android构建号2041；打包源码、大小、哈希及实际身份以 `../../deliveries/ui-polish-1-plus41/release-apk.json` 为准。+40 功能源 `428c5f3` 经开哥真机确认，含其后8份文档收束的 `adc79abef2b7195872e589f6225486e944b66644` 已合入并推送 main；本批从该新 main 继续。SDK 三包固定1532f082不变，`release/1.0` 未操作。+41 仍待真机确认，未合main、未推送、未打tag。详见[本批逐项交付与SDK限制](ui-polish-1-plus41-2026-10-29.md)。
 

@@ -24,21 +24,14 @@ Widget withSmartfitCoachUi(BuildContext context, Widget child) =>
     ? child
     : CoachUiTheme(style: smartfitCoachUiStyle(), child: child);
 
-/// Recommendation layout and surfaces stay SDK-owned, with only App colors
-/// and localized fixed labels injected into its own theme scope.
+/// Recommendation layout, controls and card tokens use the SDK defaults.
+/// Only fixed labels are localized; trusted artwork is supplied as model data.
 Widget withSmartfitRecommendUi(BuildContext context, Widget child) {
-  final style = smartfitCoachUiStyle();
+  final style = CoachUiStyle.fromTheme(Theme.of(context));
   return CoachUiTheme(
     style: CoachUiStyle(
       colors: style.colors,
-      typography: CoachUiTypography(
-        body: SfType.body,
-        callout: SfCardTokens.title,
-        label: SfType.label,
-        caption: SfCardTokens.metadata,
-        greeting: SfType.greeting,
-      ),
-      builders: style.builders,
+      typography: style.typography,
       strings: const CoachUiStrings(
         planFromActions: '排成计划',
         actionUnavailable: '动作暂不可用',

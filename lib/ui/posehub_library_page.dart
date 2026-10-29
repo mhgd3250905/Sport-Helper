@@ -49,6 +49,7 @@ class _PoseHubLibraryPageState extends State<PoseHubLibraryPage> {
       mediaPreparer: preparer,
       voice: services?.trainerVoice(),
       theme: SmartFitTrainerTheme.of(context),
+      onCompleted: services?.recordTrainingCompletion,
     );
   }
 }
