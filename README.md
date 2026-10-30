@@ -1,5 +1,11 @@
 # 智能健身助手 SmartFit
 
+## +49 已纳入 main（2026-10-30）
+
+已按开哥明确授权从main `d8d6db76fc631f47afbf3740f67d2d00ebfff2f6` 快进纳入已验收的 `09bc71b69ffe5b51e9691e4b424feecfce7289df`，版本保持0.1.0+49 / internal arm64 2049。SDK三包及coach override锁定 `66dd98a549c1ff5fedecb626a7c88583090a1440`，实时核实为SDK远端main，包含c97a79a5与66dd98a5。在main重新全量测试 **861/861**、0失败/跳过，analyze **0问题**；全新release arm64 **42,655,230B / 42.655MB**，同签名、ZIP/ELF16KB、JNI、无MP4门禁通过。后续只追加README/docs收束，最终main及推送核验见交付目录 `final-main-receipt.json`。release/1.0、guide-lite及其他分支不动，不打tag，不改SDK源码，不再操作手机。 详见[main复验记录](docs/trainer-transition-plus49-main-2026-10-30.md)与[产物台账](docs/reports/trainer-transition-plus49-main.json)。
+
+以下候选分支、旧测试/包及“未合并”等描述保留原时点事实；当前main状态以本节及最终推送回执为准。
+
 ## +49 关闭流畅度修复已验收（2026-10-30）
 
 构建源码`88379139dafe0a07f03635da8a95cc93f0704068`，+49/2049及SDK三包66dd保持。RuntimeLog批量持久化移出UI线程，转场/SDK/业务保存不变；全量861/861、0失败/跳过，analyze0。release 42.655MB，profile 53.609MB，同签名/16KB/JNI/无mp4门禁通过。新profile已保留数据覆盖安装，同机五次退出均34帧，最大回调间隔16.6ms。开哥亲自测试后明确“验收通过”，自动手机操作已停止。详见[关闭专项报告](docs/trainer-transition-plus49-close-fix-2026-10-30.md)与[台账](docs/reports/trainer-transition-plus49-close-fix.json)。候选未合并、未推送、未打tag；main、release/1.0及SDK源码不动。下方旧843项与旧包记录保留原时点事实。

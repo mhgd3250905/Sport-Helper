@@ -1,0 +1,53 @@
+{
+  "schema": "smartfit-plus49-main-delivery@1",
+  "version": "0.1.0+49",
+  "internalArm64Code": 2049,
+  "branch": "main",
+  "buildSource": "09bc71b69ffe5b51e9691e4b424feecfce7289df",
+  "previousMain": "d8d6db76fc631f47afbf3740f67d2d00ebfff2f6",
+  "acceptedCandidate": "09bc71b69ffe5b51e9691e4b424feecfce7289df",
+  "integration": "fast-forward",
+  "sdkPin": "66dd98a549c1ff5fedecb626a7c88583090a1440",
+  "sdkPublishedMainVerified": true,
+  "sdkIncludesC97And66dd": true,
+  "tests": {
+    "passed": 861,
+    "skipped": 0,
+    "failed": 0
+  },
+  "analysisIssues": 0,
+  "testsAndBuildExecutedOnMain": true,
+  "artifact": {
+    "apk": "E:\\AII-3D\\3D-Sport-AI\\deliveries\\trainer-transition-plus49-main-20261030\\SmartFit-main-0.1.0+49-09bc71b-internal-arm64-v8a-release.apk",
+    "bytes": 42655230,
+    "sha256": "b488e2aedda2088fa94e433bcbabf48866a99bc4b3d14a3f7033ef6c17c705e4",
+    "signerCertificateSha256": "3761270a4764157f0e389014a9e5b800b05403bfddce0f4f7f8c039f6a53bdc7",
+    "sameSigningCertificate": true,
+    "nativeElf16KBPassed": true,
+    "zipalign16KBPassed": true,
+    "storageJniPassed": true,
+    "noMp4InZipOrAssetManifest": true,
+    "bundledNotoPreserved": true
+  },
+  "evidenceDirectory": "E:\\AII-3D\\3D-Sport-AI\\deliveries\\trainer-transition-plus49-main-20261030",
+  "freshMainReleaseBuild": true,
+  "buildRetry": {
+    "historicalOtherModeApksTriggeredWholeOutputGate": true,
+    "archivedHistoricalApks": 4,
+    "filesDeleted": false,
+    "sourceOrGateChanged": false,
+    "evidence": "E:\\AII-3D\\3D-Sport-AI\\deliveries\\trainer-transition-plus49-main-20261030\\stale-generated-apks.json",
+    "missingFontPolicyInputRestoredWithoutChanges": true,
+    "policyInputProvenance": "E:\\AII-3D\\3D-Sport-AI\\deliveries\\trainer-transition-plus49-main-20261030\\policy-input-provenance.json"
+  },
+  "pushAuthorization": "Explicit user authorization; push only after all main checks pass.",
+  "pushReceipt": "E:\\AII-3D\\3D-Sport-AI\\deliveries\\trainer-transition-plus49-main-20261030\\final-main-receipt.json",
+  "pushStatusAtDocumentationWrite": "not_yet_pushed",
+  "finalMainSha": "Subsequent README/docs-only commit; exact local and remote HEAD in final-main-receipt.json.",
+  "otherBranchesChanged": false,
+  "tagCreated": false,
+  "releaseBranchChanged": false,
+  "sdkSourceChanged": false,
+  "deviceActionsPerformed": false,
+  "previousCandidateDeviceAcceptance": "User explicitly accepted the +49 close fix before main integration; this rebuild was not installed."
+}
