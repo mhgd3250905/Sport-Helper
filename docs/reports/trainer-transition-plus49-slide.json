@@ -1,0 +1,122 @@
+{
+  "schema": "smartfit-plus49-slide-delivery@1",
+  "candidateKind": "training-horizontal-slide",
+  "recordedAtUtc": "2026-10-30T10:10:17.867242+00:00",
+  "version": "0.1.0+49",
+  "internalArm64Code": 2049,
+  "branch": "codex/trainer-transition",
+  "buildSource": "ca246228922dd3a2371180657609cb733537e69a",
+  "sdkPin": "66dd98a549c1ff5fedecb626a7c88583090a1440",
+  "allSdkPracticeEntriesIntegrated": true,
+  "sdkSourceModified": false,
+  "pendingSdkEntryItems": [],
+  "entryDurationMs": 300,
+  "exitDurationMs": 280,
+  "removedAnimationsDurationMs": 0,
+  "routeOpaque": true,
+  "routeEffect": "SlideTransition only",
+  "entryCurve": "easeOutCubic",
+  "physicalExitCurve": "easeInCubic",
+  "passesChromeAnimation": false,
+  "unifiedEntry": "lib/ui/open_training.dart::openTraining",
+  "entries": [
+    {
+      "entry": "chat",
+      "file": "lib/ui/chat/chat_home_page.dart",
+      "method": "_start",
+      "variants": [
+        "collapsed",
+        "expanded",
+        "validated",
+        "saved-display"
+      ]
+    },
+    {
+      "entry": "saved_plan",
+      "file": "lib/ui/chat/saved_plans_page.dart",
+      "method": "_start",
+      "via": "ChatHomePage._start",
+      "retainsSourcePage": true
+    },
+    {
+      "entry": "guide",
+      "file": "lib/ui/plan_page.dart",
+      "method": "_startTraining",
+      "variants": [
+        "chat-details",
+        "saved-details",
+        "custom-plan"
+      ]
+    },
+    {
+      "entry": "action_library",
+      "file": "lib/ui/posehub_library_page.dart",
+      "method": "onOpenPractice",
+      "sdkFallbackReachable": false
+    },
+    {
+      "entry": "recommendation",
+      "file": "lib/ui/library_page.dart",
+      "method": "showExerciseDetails",
+      "preservesSdkPreview": true
+    }
+  ],
+  "tests": {
+    "passed": 843,
+    "skipped": 0,
+    "failed": 0
+  },
+  "analysisIssues": 0,
+  "softwareKeyframes": 30,
+  "softwareCaptureReceipt": "E:\\AII-3D\\3D-Sport-AI\\deliveries\\trainer-transition-plus49-slide\\software-capture.json",
+  "testsReceipt": "E:\\AII-3D\\3D-Sport-AI\\deliveries\\trainer-transition-plus49-slide\\tests-source-binding.json",
+  "artifacts": {
+    "release": {
+      "apk": "E:\\AII-3D\\3D-Sport-AI\\deliveries\\trainer-transition-plus49-slide\\SmartFit-trainer-transition-0.1.0+49-ca24622-internal-arm64-v8a-release.apk",
+      "bytes": 42655670,
+      "sha256": "b18a926a7f5a4a4653f66c18d3ae24f8efe43aaf4b5dbdfcb1d31953d004a21f",
+      "signerCertificateSha256": "3761270a4764157f0e389014a9e5b800b05403bfddce0f4f7f8c039f6a53bdc7",
+      "nativeElf16KBPassed": true,
+      "zipalign16KBPassed": true,
+      "storageJniPassed": true,
+      "noMp4InZipOrAssetManifest": true,
+      "retainedOriginalNoto": true
+    },
+    "profile": {
+      "apk": "E:\\AII-3D\\3D-Sport-AI\\deliveries\\trainer-transition-plus49-slide\\SmartFit-trainer-transition-0.1.0+49-ca24622-internal-arm64-v8a-profile.apk",
+      "bytes": 53609054,
+      "sha256": "dbc13879db082cf67176c894be6934e0442a41f837f7deb721bd8c5e35ae44c6",
+      "signerCertificateSha256": "3761270a4764157f0e389014a9e5b800b05403bfddce0f4f7f8c039f6a53bdc7",
+      "nativeElf16KBPassed": true,
+      "zipalign16KBPassed": true,
+      "storageJniPassed": true,
+      "noMp4InZipOrAssetManifest": true,
+      "retainedOriginalNoto": true
+    }
+  },
+  "releaseMaximumBytes": 45000000,
+  "diagnostics": {
+    "path": "设置 → 内测工具·正式版不显示 → 训练进出帧耗时",
+    "retainedResults": 10,
+    "copy": true,
+    "systemShare": true,
+    "enabledFlavor": "internal",
+    "productionEntryVisible": false,
+    "phoneTestGroups": 10,
+    "roundsPerGroup": 3,
+    "exportAfterEachGroup": true
+  },
+  "phoneAcceptance": {
+    "status": "pending",
+    "deviceMeasured": false,
+    "recordingAvailable": false
+  },
+  "git": {
+    "merged": false,
+    "pushed": false,
+    "tagCreated": false,
+    "mainChanged": false,
+    "releaseBranchChanged": false
+  },
+  "documentationCommit": "Subsequent README/docs-only closeout; exact HEAD in external final-closeout.json."
+}

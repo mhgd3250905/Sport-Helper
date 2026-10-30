@@ -2,7 +2,7 @@
 
 本记录取代此前的训练转场方案。基线为3934da7，版本0.1.0+49 / internal arm64 2049；分支codex/trainer-transition。SDK三包及coach override已统一升级至 `66dd98a549c1ff5fedecb626a7c88583090a1440`，公开补充接口已接入动作库及推荐入口。相对3934da7的锁文件仅三包ref/resolved-ref六个值升级，版本约束、标量引号和非SDK依赖保持。已提交的上一份性能候选通过后续提交撤回并替换，不改写Git历史；最初工作树干净，没有未提交改动需要丢弃。
 
-本轮代码已完成5个逻辑入口的统一接入：对话计划卡（收起/展开）、我的计划、图文详情、动作库、推荐。动作库/推荐继续使用SDK预览和开始训练语义，路由与媒体进入宿主统一门禁；不复制SDK UI。候选不合并、不推送main、不打tag；release/1.0与SDK源码不动。**最终全量测试、analyze、release/profile构建及签名/16KB/JNI门禁、真机无闪烁与帧耗时仍待最终验证**。本页不预填测试数量、最终提交或APK结果；这些只由本轮实际回执回填，不继承旧包通过结果。
+本轮代码已完成5个逻辑入口的统一接入：对话计划卡（收起/展开）、我的计划、图文详情、动作库、推荐。动作库/推荐继续使用SDK预览和开始训练语义，路由与媒体进入宿主统一门禁；不复制SDK UI。候选不合并、不推送main、不打tag；release/1.0与SDK源码不动。本轮固定源码全量 **843/843通过，0失败/跳过；flutter analyze 0问题**。release/profile新包均完成同签名、16KB及JNI验证。真机全程无闪烁、录屏与帧耗时仍待开哥反馈；本次结果取自新回执，不继承旧包。
 
 ## 删除内容
 
@@ -26,7 +26,7 @@
 
 ## 防闪烁实现与回归
 
-下表列出已实现行为及对应自动化用例；用例覆盖范围不等同于本轮最终全量通过或真机验收，最终结果待本次真实日志回填。
+下表列出的自动化用例已随本轮固定源码全量通过。软件用例和关键帧不替代手机原生播放、全程无闪烁或帧耗时验收。
 
 | 要求 | 实现 | 对应测试 |
 | --- | --- | --- |
@@ -59,12 +59,25 @@ Flutter反向tween需要reverseCurve=easeInCubic.flipped，使实际右移位移
 
 SDK `66dd98a549c1ff5fedecb626a7c88583090a1440` 提供公开 `PoseHubActionBrowser.onOpenPractice`，交给宿主完整配置的PoseHubSinglePracticePage载荷；单练页透传startGate、mediaBuilder、onExitStarted、beforeExitPop。App动作库在 `lib/ui/posehub_library_page.dart` 传入onOpenPractice并调用唯一openTraining；推荐动作在 `lib/ui/library_page.dart::showExerciseDetails` 用同一入口承接公开SDK单练页。
 
-`lib/ui/single_practice_page.dart`只组合公开路由/媒体hooks，保留action、theme、voice、startMode及onFinished/onStartTraining/onCompleted等回调语义，继续渲染SDK PoseHubSinglePracticePage/TrainerPlayer。preview不被宿主改成自动training；其媒体由宿主路由canPlay门禁限制，训练开始与剂量、计时、语音、记录仍由SDK负责。原调用方startGate与宿主门禁一起等待。没有复制SDK UI、访问私有State或观察pop后偷换路由。
+`lib/ui/single_practice_page.dart`只组合公开路由/媒体hooks，保留action、theme、voice、startMode及onFinished/onStartTraining/onCompleted等回调语义，继续渲染SDK PoseHubSinglePracticePage/TrainerPlayer。preview不被宿主改成自动training；其媒体由宿主路由canPlay门禁限制，训练开始与剂量、计时、语音、记录仍由SDK负责。training同时等待原调用方startGate与宿主门禁；preview按SDK语义忽略原gate，但其媒体挂载和预取仍须等宿主路由门禁。没有复制SDK UI、访问私有State或观察pop后偷换路由。
 
 SDK源码保留未传onOpenPractice时的legacy MaterialPageRoute fallback以兼容其它调用者；本候选App的所有PoseHubActionBrowser调用点均传入非空onOpenPractice，SDK `_openPractice`先回调并return，因此该fallback在App训练路径不可达。它仍存在于固定SDK源码，不把它误报为App删除的代码。
 
-对应自动化用例已加入training_practice_entries_test、training_single_practice_test以及相关SDK样式/动作库回归：覆盖SDK preview原始字段和开始按钮、进入门禁、共享导航锁、0/150/300ms完整画面、来源页保留、预览退出不记训练、训练保存/失败重试及无宿主动作模型的公共SDK媒体。最终全量结果尚待回填。
+对应自动化用例已加入training_practice_entries_test、training_single_practice_test以及相关SDK样式/动作库回归：覆盖SDK preview原始字段和开始按钮、进入门禁、共享导航锁、0/150/300ms完整画面、来源页保留、预览退出不记训练、训练保存/失败重试及无宿主动作模型的公共SDK媒体。这些用例已包含在本轮全量通过数量内。
 
-## 当前验证状态
+## 最终软件验证与交付
 
-代码与SDK补充入口已实现。完整commit SHA、全量测试数量/analyze结论、release/profile APK路径与大小、同签名/16KB/JNI门禁，等待root依据本次最终日志和实际产物回填。开哥真机全程无闪烁、入口状态保留、录屏及帧耗时分享另行确认；本页不以旧候选结果或软件用例代替这些验收。
+构建/测试源码：`ca246228922dd3a2371180657609cb733537e69a`；SDK三包及coach override：`66dd98a549c1ff5fedecb626a7c88583090a1440`。后续仅README/docs收束；最终分支HEAD由交付目录 `final-closeout.json` 记录。版本为0.1.0+49，internal arm64 versionCode=2049。
+
+Flutter 3.44.7：全量 **843/843通过，0失败/跳过**；`flutter analyze --no-pub` 0问题；严格离线lock通过。锁文件只更新三包ref/resolved-ref六个值，非SDK依赖逐字保持。真实v3媒体HTTPS样本校验通过。包装辅助脚本另有33/33通过，不计入Flutter数量。
+
+| arm64 internal产物 | 大小（十进制MB） | APK路径 |
+| --- | --- | --- |
+| release | 42.656 MB / 42,655,670B | `E:\AII-3D\3D-Sport-AI\deliveries\trainer-transition-plus49-slide\SmartFit-trainer-transition-0.1.0+49-ca24622-internal-arm64-v8a-release.apk` |
+| profile | 53.609 MB / 53,609,054B | `E:\AII-3D\3D-Sport-AI\deliveries\trainer-transition-plus49-slide\SmartFit-trainer-transition-0.1.0+49-ca24622-internal-arm64-v8a-profile.apk` |
+
+两包均同原签名，ZIP/ELF 16KB、JNI导出门禁通过；release小于45,000,000B，AssetManifest及ZIP无mp4，原Noto字体和必要静态/音频资源保留。profile官方VM service的原始JAR→merged→stripped→APK来源链已校验。逐包SHA及门禁见[机器台账](reports/trainer-transition-plus49-slide.json)和交付目录 `validation-release.json`、`validation-profile.json`。
+
+软件关键帧30张位于交付目录 `software-frames/`，包含三个计划入口×浅深，进入0/150/300ms、退出140/280ms；8项实际计划入口矩阵（另含对话展开）通过，SDK动作库/推荐入口另有4项浅深矩阵。它们是软件渲染证据，不能据此填写真机帧耗时或无闪烁通过。
+
+候选保留 `codex/trainer-transition`，未合并、未推送、未打tag；main、release/1.0与SDK源码保持。开哥按上方10组手机步骤录屏并分享JSON后，再做真机结论。
