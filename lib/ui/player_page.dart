@@ -105,19 +105,44 @@ class _PlayerPageState extends State<PlayerPage> {
     final issuePlayback = issueStore.enabled
         ? (_issuePlayback ??= DrillMediaPlaybackHandle())
         : null;
+    final theme = SmartFitTrainerTheme.of(context);
+    final motion = _motion;
+    final returningFromCompletion = motion?.exitingFromCompletion == true;
+    final stage = returningFromCompletion ? motion?.mediaRect : null;
+    final lastExercise = motion?.exercise;
     return Stack(
+      key: const ValueKey('training-player-layers'),
       fit: StackFit.expand,
       children: [
+        if (stage != null && lastExercise != null) ...[
+          ColoredBox(color: theme.mediaStage),
+          Positioned.fromRect(
+            rect: stage,
+            child: TrainingTransitionPoster(
+              key: const ValueKey('training-completion-exit-poster'),
+              exercise: lastExercise,
+              mirrored: motion!.mirrored,
+              cacheWidth: (stage.width * MediaQuery.devicePixelRatioOf(context))
+                  .round(),
+            ),
+          ),
+        ],
         TrainerPlayer(
           plan: session.trainerPlan(plan),
           startMode: TrainerStartMode.training,
           startGate: _motion?.startGate,
           chromeAnimation: _motion?.chrome,
-          onExitStarted: _motion?.exitStarted,
+          onExitStarted: motion == null
+              ? null
+              : () => motion.exitStarted(fromCompletion: _sessionFinished),
           beforeExitPop: _motion?.beforeExitPop,
           rhythms: session.trainerRhythms(s.library),
           strings: TrainerStrings.zh(),
-          theme: SmartFitTrainerTheme.of(context),
+          // ResultStage fades with SDK chrome. Let that real completion view
+          // reveal the retained poster beneath its scaffold during exit A.
+          theme: returningFromCompletion
+              ? theme.copyWith(mediaStage: Colors.transparent)
+              : theme,
           poseHubActionOf: s.poseHubCatalog?.tryGet,
           poseHubMediaBaseUri: s.poseHubMedia?.mediaBaseUri,
           poseHubMediaPreparer: s.poseHubPreparer,

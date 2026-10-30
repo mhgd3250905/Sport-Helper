@@ -34,6 +34,8 @@ SDK地板强制不透明，前280ms让已挂载的真实SDK保留布局但暂不
 
 关闭确认、自然完成点完成、系统返回统一从onExitStarted启动250ms线性chrome反向；静态海报替换视频并卸载播放器，保存同时进行。beforeExitPop只等退场future，不重复保存。失败捕获于宿主实际保存回调，SDK完整完成页和重试保留，宿主问题按钮恢复显示。
 
+自然完成点“完成”时，SDK的真实完成页按chrome淡出，宿主用公开theme将其Scaffold底色设为透明，让已缓存的最后动作海报从下层显露，避免250ms末尾才突然冒出一张图；完成页内容及保存仍归SDK。
+
 SDK pop后独立Navigator OverlayEntry继续380ms缩回，背景在240ms内淡出；到位后真实源图恢复、海报再120ms交叉淡出。来源卡不可见则260ms整层1→.94淡出。visualCompleted包含整个回程尾段，完成记录只在它结束后插一次：240ms上浮12px/淡入且布局高度平滑展开，列表300ms easeOutCubic滚到该记录。
 
 回程期间通过来源route的LocalHistoryEntry接管返回键，避免误退下层页；重复点击/返回/后台会清理overlay。进入取消不完成startGate，不启动或保存会话；后台发生在慢保存期间，晚成功也直接终态，不新建挂起的回程。直接卸载清理Ticker和FrameRecorder。减少动效进入/退出只用150ms交叉淡化，保留原图；退出页面淡化与chrome共用同一段150ms，pop后不再追加第二段。减少动效慢保存超过400ms时，可见的宿主层维持24px等待指示，数据仍由SDK保存；失败恢复完整SDK完成页。有限控制器使用AnimationBehavior.preserve，避免系统再次压缩已选定的150ms。

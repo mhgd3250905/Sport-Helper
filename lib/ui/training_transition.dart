@@ -37,6 +37,7 @@ class TrainingTransitionMotion extends ChangeNotifier {
   bool mirrored = false, entered = false, exiting = false;
   bool saveFailed = false, aborted = false, _disposed = false;
   bool interrupted = false;
+  bool exitingFromCompletion = false;
   Timer? _savingDelay;
   bool showSaving = false;
 
@@ -84,13 +85,14 @@ class TrainingTransitionMotion extends ChangeNotifier {
     }
   }
 
-  void exitStarted() {
+  void exitStarted({bool fromCompletion = false}) {
     if (exiting || aborted) return;
     if (!entered) {
       abort();
       return;
     }
     final from = chrome.value;
+    exitingFromCompletion = fromCompletion;
     exiting = true;
     saveFailed = false;
     _exit.value = from;
@@ -135,6 +137,7 @@ class TrainingTransitionMotion extends ChangeNotifier {
   void replay() {
     if (_disposed) return;
     exiting = false;
+    exitingFromCompletion = false;
     saveFailed = false;
     _exit.value = 1;
     chrome.parent = _exit;

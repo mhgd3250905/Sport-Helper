@@ -823,7 +823,20 @@ void main() {
       await tester.ensureVisible(_key('finish'));
       await tester.tap(_key('finish'));
       await tester.pump();
-      await tester.pump(const Duration(milliseconds: 250));
+      expect(_key('training-completion-exit-poster'), findsOneWidget);
+      final player = tester.widget<trainer.TrainerPlayer>(
+        find.byType(trainer.TrainerPlayer),
+      );
+      expect(player.theme.mediaStage.a, 0);
+      final layers = tester.widget<Stack>(_key('training-player-layers'));
+      expect(
+        layers.children.indexWhere((child) => child is trainer.TrainerPlayer),
+        greaterThan(1),
+      );
+      await tester.pump(const Duration(milliseconds: 125));
+      expect(_key('training-completion-exit-poster'), findsOneWidget);
+      expect(find.byType(ExerciseVideo), findsNothing);
+      await tester.pump(const Duration(milliseconds: 125));
       await tester.pump(const Duration(microseconds: 1));
       await tester.pump();
       expect(f.popped, hasLength(1));
