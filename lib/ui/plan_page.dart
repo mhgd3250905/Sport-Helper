@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:ugk_trainer/ugk_trainer.dart' show SessionResult;
 
 import '../app/services.dart';
 import '../domain/exercise.dart';
@@ -13,6 +14,7 @@ import 'plan_presentation.dart';
 import 'player_page.dart';
 import 'theme.dart';
 import 'training_route.dart';
+import 'training_entry_placeholder.dart';
 
 /// A sectioned training article with explicit, independently paused previews.
 /// App validation, replacements and training navigation stay here.
@@ -21,14 +23,18 @@ class PlanPage extends StatefulWidget {
     super.key,
     required this.plan,
     this.request,
-    this.returnPlanOnStart = false,
+    this.onTrainingStarting,
+    this.onTrainingFinished,
   });
   final TrainingPlan plan;
   final ScenarioRequest? request;
 
-  /// Chat details return the edited plan so the home owns the workout
-  /// and its completion summary, just like the card's start button.
-  final bool returnPlanOnStart;
+  /// The conversation owner retains AI restore/recall and persistence gates.
+  final Future<bool> Function(TrainingPlan plan)? onTrainingStarting;
+
+  /// Keep this source route alive while the trainer expands and returns.
+  final void Function(TrainingPlan plan, SessionResult result)?
+  onTrainingFinished;
   @override
   State<PlanPage> createState() => _PlanPageState();
 }
@@ -38,10 +44,13 @@ class _PlanPageState extends State<PlanPage> with WidgetsBindingObserver {
   final _scroll = ScrollController();
   final _viewport = GlobalKey();
   final _videos = <String, GlobalKey>{};
+  final _mediaOpacity = <String, ValueNotifier<double>>{};
   final _coordinator = GuidePreviewCoordinator();
   bool _measurementQueued = false;
   String? _releasingSlot;
   bool _previewOn = true;
+  bool _starting = false;
+  int _launchEpoch = 0;
 
   @override
   void initState() {
@@ -59,6 +68,11 @@ class _PlanPageState extends State<PlanPage> with WidgetsBindingObserver {
 
   @override
   void didChangeMetrics() => _measureAfterLayout();
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed) _launchEpoch++;
+  }
 
   void _measureAfterLayout() {
     if (_measurementQueued || !mounted) return;
@@ -109,6 +123,9 @@ class _PlanPageState extends State<PlanPage> with WidgetsBindingObserver {
     _coordinator.removeListener(_measureAfterLayout);
     _coordinator.dispose();
     _scroll.dispose();
+    for (final opacity in _mediaOpacity.values) {
+      opacity.dispose();
+    }
     super.dispose();
   }
 
@@ -182,25 +199,94 @@ class _PlanPageState extends State<PlanPage> with WidgetsBindingObserver {
       );
       return;
     }
-    // The trainer must not mount while an article preview still owns playback,
-    // including a chat-owned workout launched during this route's pop animation.
+    if (_starting) return;
+    _starting = true;
+    final launchEpoch = _launchEpoch;
+    final source = _trainingSource();
+    final first = _plan.items.firstOrNull?.exerciseId;
+    if (first != null) {
+      unawaited(TrainingTransitionPoster.precache(context, s.library[first]));
+    }
+    // Release the preview first, preserving its route and measured image slot.
     setState(() => _previewOn = false);
     await _coordinator.stop();
     await WidgetsBinding.instance.endOfFrame;
     if (!mounted) return;
-    if (widget.returnPlanOnStart) {
-      Navigator.of(context).pop(_plan);
+    if (launchEpoch != _launchEpoch) {
+      setState(() {
+        _previewOn = true;
+        _starting = false;
+      });
+      return;
+    }
+    if (widget.onTrainingStarting != null &&
+        !await widget.onTrainingStarting!(_plan)) {
+      if (mounted) {
+        setState(() {
+          _previewOn = true;
+          _starting = false;
+        });
+      }
+      return;
+    }
+    if (!mounted) return;
+    if (launchEpoch != _launchEpoch) {
+      setState(() {
+        _previewOn = true;
+        _starting = false;
+      });
       return;
     }
     s.prefetchPlan(_plan);
-    final route = TrainingRoute<void>(
+    final route = TrainingRoute<SessionResult>(
       context: context,
+      source: source,
       settings: const RouteSettings(name: 'player'),
       builder: (_) => PlayerPage(plan: _plan),
     );
-    await Navigator.of(context).push(route);
+    final result = await Navigator.of(context).push(route);
     await route.completed;
-    if (mounted) setState(() => _previewOn = true);
+    await route.visualCompleted;
+    if (mounted) {
+      setState(() {
+        _previewOn = true;
+        _starting = false;
+      });
+      if (result != null) widget.onTrainingFinished?.call(_plan, result);
+    }
+  }
+
+  TrainingTransitionSource? _trainingSource() {
+    final view = _viewport.currentContext?.findRenderObject();
+    if (view is! RenderBox || !view.hasSize) return null;
+    final viewport = view.localToGlobal(Offset.zero) & view.size;
+    Rect? rectOf(String slot) {
+      final box = _videos[slot]?.currentContext?.findRenderObject();
+      if (box is! RenderBox || !box.attached || !box.hasSize) return null;
+      final rect = box.localToGlobal(Offset.zero) & box.size;
+      return rect.overlaps(viewport) ? rect : null;
+    }
+
+    String? selected = _coordinator.activeSlot;
+    if (selected == null || rectOf(selected) == null) {
+      var area = 0.0;
+      selected = null;
+      for (final slot in _videos.keys) {
+        final rect = rectOf(slot)?.intersect(viewport);
+        if (rect != null && rect.width * rect.height > area) {
+          area = rect.width * rect.height;
+          selected = slot;
+        }
+      }
+    }
+    if (selected == null) return null;
+    final slot = selected;
+    return TrainingTransitionSource(
+      initialRect: rectOf(slot),
+      rect: () => rectOf(slot),
+      opacity: _mediaOpacity.putIfAbsent(slot, () => ValueNotifier(1)),
+      repaintKey: _videos[slot],
+    );
   }
 
   @override
@@ -489,21 +575,29 @@ class _PlanPageState extends State<PlanPage> with WidgetsBindingObserver {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    SizedBox(
-                      key: videoKey,
-                      child: ClipRRect(
-                        borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(SfGuideTokens.cardRadius),
-                        ),
-                        child: AspectRatio(
-                          key: ValueKey('article-video-$slot'),
-                          aspectRatio: SfGuideTokens.mediaRatio,
-                          child: GuideMedia(
-                            key: ValueKey('plan-demo-$slot-${exercise.id}'),
-                            exercise: exercise,
-                            slot: slot,
-                            coordinator: _coordinator,
-                            enabled: _previewOn,
+                    ValueListenableBuilder<double>(
+                      valueListenable: _mediaOpacity.putIfAbsent(
+                        slot,
+                        () => ValueNotifier(1),
+                      ),
+                      builder: (_, opacity, child) =>
+                          Opacity(opacity: opacity, child: child),
+                      child: RepaintBoundary(
+                        key: videoKey,
+                        child: ClipRRect(
+                          borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(SfGuideTokens.cardRadius),
+                          ),
+                          child: AspectRatio(
+                            key: ValueKey('article-video-$slot'),
+                            aspectRatio: SfGuideTokens.mediaRatio,
+                            child: GuideMedia(
+                              key: ValueKey('plan-demo-$slot-${exercise.id}'),
+                              exercise: exercise,
+                              slot: slot,
+                              coordinator: _coordinator,
+                              enabled: _previewOn,
+                            ),
                           ),
                         ),
                       ),

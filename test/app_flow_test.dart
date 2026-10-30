@@ -14,9 +14,11 @@ import 'package:smartfit/ui/exercise_video.dart';
 import 'package:smartfit/ui/chat/chat_widgets.dart';
 import 'package:smartfit/ui/chat/cosmos.dart';
 import 'package:smartfit/ui/chat/plan_card.dart';
+import 'package:smartfit/ui/chat/chat_timeline.dart';
 import 'package:smartfit/ui/custom_plan_page.dart';
 import 'package:smartfit/ui/library_page.dart';
 import 'package:smartfit/ui/player_page.dart';
+import 'package:smartfit/ui/training_route.dart';
 import 'package:smartfit/voice/voice_library.dart';
 import 'package:smartfit/voice/voice_queue.dart';
 import 'package:ugk_trainer/ugk_trainer.dart' as trainer;
@@ -357,30 +359,51 @@ void main() {
     expect(s.store.savedPlans.single.plan.id, plan.id);
     expect(find.text('已保存'), findsOneWidget);
     expect(find.textContaining('已保存为「'), findsOneWidget);
+    await tester.tap(find.byKey(ValueKey('plan-expand-${plan.id}')));
+    await tester.pumpAndSettle();
 
-    // Only the still training page moves; the existing chat keeps its bounds.
+    // The still card image moves; the real trainer is mounted behind its gate.
     // The visible informational toast must let this tap reach the start button.
     final screen = tester.getRect(find.byType(ChatHomePage));
     final chatElement = tester.element(find.byType(ChatHomePage));
     await tester.tap(find.byKey(ValueKey('plan-start-${plan.id}')));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 60));
-    expect(find.byType(PlayerPage), findsOneWidget);
-    expect(tester.getRect(find.byType(PlayerPage)).size, screen.size);
-    expect(
-      tester.getRect(find.byType(PlayerPage)).top,
-      greaterThan(screen.top),
-    );
+    await tester.pump();
+    final enteringPlayer = find.byType(PlayerPage, skipOffstage: false);
+    expect(enteringPlayer, findsOneWidget);
+    expect(tester.getRect(enteringPlayer), screen);
+    final motion = TrainingTransitionScope.maybeOf(
+      tester.element(enteringPlayer),
+    )!;
+    expect(motion.entered, isFalse);
+    expect(motion.chrome.value, lessThan(1));
     expect(
       find.byKey(const ValueKey('training-entry-placeholder')),
+      findsNothing,
+    );
+    expect(
+      find.byType(trainer.TrainerPlayer, skipOffstage: false),
       findsOneWidget,
     );
-    expect(find.byType(trainer.TrainerPlayer), findsNothing);
+    expect(find.byType(ExerciseVideo, skipOffstage: false), findsNothing);
+    expect(
+      tester
+          .widget<trainer.TrainerPlayer>(
+            find.byType(trainer.TrainerPlayer, skipOffstage: false),
+          )
+          .startGate,
+      isNotNull,
+    );
     expect(tester.element(find.byType(ChatHomePage)), same(chatElement));
     expect(tester.getRect(find.byType(ChatHomePage)), screen);
-    await tester.pump(const Duration(milliseconds: 500));
+    await tester.pump(const Duration(milliseconds: 560));
+    await tester.pump();
     expect(tester.getRect(find.byType(PlayerPage)), screen); // full screen
-    expect(find.byType(ChatHomePage), findsNothing);
+    expect(motion.entered, isTrue);
+    expect(motion.chrome.value, 1);
+    expect(find.byType(ChatHomePage), findsOneWidget);
+    expect(tester.getRect(find.byType(ChatHomePage)), screen);
     expect(s.store.lastPlan?.id, plan.id);
     await tester.tap(find.byKey(const ValueKey('skip')));
     await tester.pump(const Duration(milliseconds: 200));
@@ -395,6 +418,30 @@ void main() {
       find.byKey(const ValueKey('training-transition-poster')),
       findsOneWidget,
     );
+    final messagesBeforeReceipt = s.chat.messages.length;
+    await tester.pump(const Duration(milliseconds: 50));
+    await tester.pump(const Duration(microseconds: 1));
+    await tester.pump();
+    expect(find.byType(PlayerPage), findsNothing);
+    expect(find.byKey(const ValueKey('training-return-morph')), findsOneWidget);
+    final cardBeforeReceipt = tester.getRect(find.byType(PlanCard));
+    final scroll = tester
+        .widget<ChatTimeline>(find.byType(ChatTimeline))
+        .controller;
+    final offsetBeforeReceipt = scroll.offset;
+    await tester.pump(const Duration(milliseconds: 499));
+    expect(s.chat.messages.length, messagesBeforeReceipt);
+    expect(tester.getRect(find.byType(PlanCard)), cardBeforeReceipt);
+    expect(scroll.offset, offsetBeforeReceipt);
+    await tester.pump(const Duration(milliseconds: 1));
+    await tester.pump();
+    expect(s.chat.messages.length, messagesBeforeReceipt + 1);
+    expect(tester.getRect(find.byType(PlanCard)), cardBeforeReceipt);
+    expect(scroll.offset, offsetBeforeReceipt);
+    expect(
+      find.byType(TrainingFinishedEntry, skipOffstage: false),
+      findsOneWidget,
+    );
     await tester.pumpAndSettle();
     expect(find.byType(PlayerPage), findsNothing);
     expect(s.store.history, hasLength(1));
@@ -404,39 +451,52 @@ void main() {
     expect(s.chat.messages.last.isPlan, isFalse); // a word after the workout
   });
 
-  testWidgets('reduced motion: the player opens directly at full screen', (
-    tester,
-  ) async {
-    tall(tester);
-    tester.platformDispatcher.accessibilityFeaturesTestValue =
-        const FakeAccessibilityFeatures(disableAnimations: true);
-    addTearDown(tester.platformDispatcher.clearAccessibilityFeaturesTestValue);
-    final s = services();
-    await s.store.acceptSafety(blocked: false);
-    await tester.pumpWidget(SmartFitApp(services: s));
-    await tester.pumpAndSettle();
-    await showManualChatCard(s);
-    await tester.pumpAndSettle();
-    final plan = s.chat.currentPlan!;
-    final screen = tester.getRect(find.byType(ChatHomePage));
-    await tester.tap(find.byKey(ValueKey('plan-start-${plan.id}')));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 60));
-    expect(tester.getRect(find.byType(PlayerPage)), screen);
-    expect(
-      find.ancestor(
-        of: find.byType(PlayerPage),
-        matching: find.byType(FadeTransition),
-      ),
-      findsNothing,
-    );
-    await tester.pump(const Duration(milliseconds: 500));
-    await tester.tap(find.byKey(const ValueKey('close')));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('结束'));
-    await tester.pumpAndSettle();
-    expect(find.byType(PlayerPage), findsNothing);
-  });
+  testWidgets(
+    'reduced motion: the gated player crossfades for 150ms at full screen',
+    (tester) async {
+      tall(tester);
+      tester.platformDispatcher.accessibilityFeaturesTestValue =
+          const FakeAccessibilityFeatures(disableAnimations: true);
+      addTearDown(
+        tester.platformDispatcher.clearAccessibilityFeaturesTestValue,
+      );
+      final s = services();
+      await s.store.acceptSafety(blocked: false);
+      await tester.pumpWidget(SmartFitApp(services: s));
+      await tester.pumpAndSettle();
+      await showManualChatCard(s);
+      await tester.pumpAndSettle();
+      final plan = s.chat.currentPlan!;
+      final screen = tester.getRect(find.byType(ChatHomePage));
+      await tester.tap(find.byKey(ValueKey('plan-start-${plan.id}')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 60));
+      await tester.pump();
+      expect(tester.getRect(find.byType(PlayerPage)), screen);
+      final motion = TrainingTransitionScope.maybeOf(
+        tester.element(find.byType(PlayerPage)),
+      )!;
+      expect(motion.entrance.duration, const Duration(milliseconds: 150));
+      expect(motion.entered, isFalse);
+      expect(find.byType(ExerciseVideo, skipOffstage: false), findsNothing);
+      expect(
+        find.ancestor(
+          of: find.byType(PlayerPage),
+          matching: find.byType(FadeTransition),
+        ),
+        findsOneWidget,
+      );
+      await tester.pump(const Duration(milliseconds: 150));
+      await tester.pump();
+      expect(motion.entered, isTrue);
+      expect(motion.chrome.value, 1);
+      await tester.tap(find.byKey(const ValueKey('close')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('结束'));
+      await tester.pumpAndSettle();
+      expect(find.byType(PlayerPage), findsNothing);
+    },
+  );
 
   testWidgets(
     'drawer ▶ starts a saved plan in the player and comes back to the chat',
@@ -463,7 +523,21 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(ValueKey('saved-start-${saved.id}')));
       await tester.pump();
-      await tester.pump(const Duration(milliseconds: 600));
+      await tester.pump(const Duration(milliseconds: 60));
+      await tester.pump();
+      final entering = find.byType(PlayerPage, skipOffstage: false);
+      expect(entering, findsOneWidget);
+      expect(
+        find.byType(trainer.TrainerPlayer, skipOffstage: false),
+        findsOneWidget,
+      );
+      expect(find.byType(ExerciseVideo, skipOffstage: false), findsNothing);
+      expect(
+        TrainingTransitionScope.maybeOf(tester.element(entering))!.entered,
+        isFalse,
+      );
+      await tester.pump(const Duration(milliseconds: 560));
+      await tester.pump();
       expect(find.byType(PlayerPage), findsOneWidget);
       await tester.tap(find.byKey(const ValueKey('close')));
       await tester.pumpAndSettle();

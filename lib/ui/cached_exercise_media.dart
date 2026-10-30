@@ -39,10 +39,14 @@ class ExerciseFrameZero extends StatefulWidget {
     required this.exercise,
     this.extractMissing = false,
     this.verifiedSource,
+    this.cacheWidth,
   });
   final Exercise exercise;
   final bool extractMissing;
   final Uri? verifiedSource;
+
+  /// Freeze decode size while a host morph changes only the painted bounds.
+  final int? cacheWidth;
 
   @override
   State<ExerciseFrameZero> createState() => _ExerciseFrameZeroState();
@@ -177,9 +181,10 @@ class _ExerciseFrameZeroState extends State<ExerciseFrameZero> {
       builder: (context, constraints) => _image(
         candidates,
         0,
-        (constraints.maxWidth * MediaQuery.devicePixelRatioOf(context))
-            .round()
-            .clamp(1, 0x7fffffff),
+        widget.cacheWidth ??
+            (constraints.maxWidth * MediaQuery.devicePixelRatioOf(context))
+                .round()
+                .clamp(1, 0x7fffffff),
       ),
     );
   }

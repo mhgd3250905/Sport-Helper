@@ -1,0 +1,19 @@
+{
+  "schema": "smartfit-plus48-morph@1",
+  "status": "validation-in-progress",
+  "branch": "codex/trainer-transition",
+  "version": "0.1.0+48",
+  "internalArm64VersionCode": 2048,
+  "sdkPin": "c97a79a5f03ba1f46f017b995f7f8d97fb3016a9",
+  "sourceCommit": null,
+  "fullTests": null,
+  "analyzeIssues": null,
+  "actualDeviceUiMaxMs": null,
+  "actualDeviceRasterMaxMs": null,
+  "phoneAcceptance": "pending",
+  "mainMerged": false,
+  "pushed": false,
+  "tagCreated": false,
+  "sdkSourceChanged": false,
+  "report": "docs/trainer-transition-plus48-morph-2026-10-30.md"
+}

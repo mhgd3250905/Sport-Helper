@@ -2,229 +2,248 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:smartfit/ui/theme/app_theme.dart';
-import 'package:smartfit/ui/theme/tokens.dart';
+import 'package:smartfit/ui/theme.dart';
 import 'package:smartfit/ui/training_route.dart';
+import 'package:smartfit/ui/training_entry_placeholder.dart';
 
-class _FramePainter extends CustomPainter {
-  _FramePainter(ValueNotifier<int> frames) : super(repaint: frames);
+import 'support.dart';
 
-  int paints = 0;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    paints++;
-    canvas.drawRect(Offset.zero & size, Paint()..color = Colors.grey);
-  }
-
-  @override
-  bool shouldRepaint(_FramePainter oldDelegate) => false;
+void expectRect(Rect actual, Rect? expected) {
+  expect(expected, isNotNull);
+  expect(actual.left, closeTo(expected!.left, 1e-4));
+  expect(actual.top, closeTo(expected.top, 1e-4));
+  expect(actual.width, closeTo(expected.width, 1e-4));
+  expect(actual.height, closeTo(expected.height, 1e-4));
 }
-
-Finder _ancestor(Finder child, Type type) =>
-    find.ancestor(of: child, matching: find.byType(type));
 
 void main() {
   for (final brightness in Brightness.values) {
     for (final reduced in [false, true]) {
-      testWidgets(
-        '${brightness.name}, reduced=$reduced: one unchanged page, 320/260 motion, opaque resting stage',
-        (tester) async {
-          tester.view.physicalSize = const Size(390, 844);
-          tester.view.devicePixelRatio = 1;
-          final sourceFrame = ValueNotifier(0);
-          final videoFrame = ValueNotifier(0);
-          final sourcePainter = _FramePainter(sourceFrame);
-          final videoPainter = _FramePainter(videoFrame);
-          final nav = GlobalKey<NavigatorState>();
-          const sourceKey = ValueKey('source-chat');
-          const stageKey = ValueKey('training-stage');
-          final stage = find.byKey(stageKey);
-          final source = find.byKey(sourceKey, skipOffstage: false);
-          final palette = brightness == Brightness.dark
-              ? SfPalette.dark
-              : SfPalette.light;
-
-          try {
+      for (final interruption in ['none', 'back', 'remove']) {
+        testWidgets(
+          '${brightness.name} reduced=$reduced: zero route, measured card morph, independent return, interruption=$interruption',
+          (tester) async {
+            tester.view.physicalSize = const Size(390, 844);
+            tester.view.devicePixelRatio = 1;
+            final nav = GlobalKey<NavigatorState>();
+            final image = GlobalKey();
+            final alpha = ValueNotifier<double>(1);
+            final exercise = loadLibrary()['h-forearm-plank'];
+            TrainingRoute<void>? route;
+            TrainingTransitionMotion? motion;
+            var started = false;
+            var visualDone = false;
+            addTearDown(() async {
+              await tester.pumpWidget(const SizedBox.shrink());
+              alpha.dispose();
+              tester.view.reset();
+            });
             await tester.pumpWidget(
               MaterialApp(
                 navigatorKey: nav,
-                theme: buildTheme(palette),
+                theme: buildTheme(
+                  brightness == Brightness.dark
+                      ? SfPalette.dark
+                      : SfPalette.light,
+                ),
                 builder: (context, child) => MediaQuery(
                   data: MediaQuery.of(
                     context,
                   ).copyWith(disableAnimations: reduced),
                   child: child!,
                 ),
-                home: Scaffold(
-                  key: sourceKey,
-                  body: CustomPaint(
-                    painter: sourcePainter,
-                    child: const SizedBox.expand(),
+                home: Builder(
+                  builder: (context) => Scaffold(
+                    body: Stack(
+                      children: [
+                        Positioned(
+                          left: 20,
+                          top: 70,
+                          width: 200,
+                          height: 150,
+                          child: ValueListenableBuilder<double>(
+                            valueListenable: alpha,
+                            builder: (_, opacity, child) =>
+                                Opacity(opacity: opacity, child: child),
+                            child: RepaintBoundary(
+                              key: image,
+                              child: const ColoredBox(color: Colors.green),
+                            ),
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Rect? sourceRect() {
+                              final box = image.currentContext
+                                  ?.findRenderObject();
+                              return box is RenderBox && box.hasSize
+                                  ? box.localToGlobal(Offset.zero) & box.size
+                                  : null;
+                            }
+
+                            route = TrainingRoute<void>(
+                              context: context,
+                              source: TrainingTransitionSource(
+                                rect: sourceRect,
+                                initialRect: sourceRect(),
+                                opacity: alpha,
+                                repaintKey: image,
+                              ),
+                              builder: (context) {
+                                final m = TrainingTransitionScope.maybeOf(
+                                  context,
+                                )!;
+                                if (motion == null) {
+                                  motion = m;
+                                  unawaited(
+                                    m.startGate.then((_) => started = true),
+                                  );
+                                }
+                                m.reportMedia(exercise, mirrored: false);
+                                return Stack(
+                                  children: [
+                                    Positioned(
+                                      left: 0,
+                                      top: 220,
+                                      width: 390,
+                                      height: 390,
+                                      child: SizedBox(
+                                        key: m.mediaKey,
+                                        child: TrainingEntranceMedia(
+                                          motion: m,
+                                          exercise: exercise,
+                                          mirrored: false,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                            unawaited(
+                              route!.visualCompleted.then(
+                                (_) => visualDone = true,
+                              ),
+                            );
+                            unawaited(nav.currentState!.push(route!));
+                          },
+                          child: const Text('open'),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
             );
-            final sourceElement = tester.element(source);
-            final sourceRect = tester.getRect(source);
-            sourcePainter.paints = 0;
-            sourceFrame.value++;
+            final original = tester.getRect(find.byKey(image));
+            await tester.tap(find.text('open'));
             await tester.pump();
-            expect(sourcePainter.paints, 1, reason: 'Paint probe works.');
-
-            final route = TrainingRoute<void>(
-              context: sourceElement,
-              settings: const RouteSettings(name: 'player'),
-              builder: (context) => Scaffold(
-                key: stageKey,
-                backgroundColor: Theme.of(context).colorScheme.surface,
-                body: CustomPaint(
-                  painter: videoPainter,
-                  child: const SizedBox.expand(),
-                ),
-              ),
-            );
-            unawaited(nav.currentState!.push(route));
             await tester.pump();
-            await tester.pump(); // Leave Hero's zero-time offstage pre-layout.
-            final stageElement = tester.element(stage);
-            expect(route.opaque, isTrue);
-            expect(
-              route.transitionDuration,
-              reduced ? Duration.zero : const Duration(milliseconds: 320),
-            );
-            expect(
-              route.reverseTransitionDuration,
-              reduced ? Duration.zero : const Duration(milliseconds: 260),
-            );
-            expect(
-              route.canTransitionFrom(ModalRoute.of(sourceElement)!),
-              isFalse,
-            );
+            expect(route!.opaque, isFalse);
+            expect(route!.transitionDuration, Duration.zero);
+            expect(route!.reverseTransitionDuration, Duration.zero);
+            expect(started, isFalse);
+            expect(alpha.value, reduced ? 1 : 0);
             if (reduced) {
-              await tester.pump();
-              expect(_ancestor(stage, SlideTransition), findsNothing);
-              expect(_ancestor(stage, FadeTransition), findsNothing);
-            } else {
-              expect(route.animation!.value, 0);
-              expect(
-                tester
-                    .widget<SlideTransition>(_ancestor(stage, SlideTransition))
-                    .position
-                    .value,
-                const Offset(0, .06),
-              );
-              await tester.pump(const Duration(milliseconds: 160));
-              expect(route.animation!.value, closeTo(.5, 1e-6));
-              expect(
-                tester
-                    .widget<SlideTransition>(_ancestor(stage, SlideTransition))
-                    .position
-                    .value
-                    .dy,
-                closeTo(.06 * (1 - Curves.easeOutCubic.transform(.5)), 1e-6),
-              );
-              expect(
-                tester
-                    .widget<FadeTransition>(_ancestor(stage, FadeTransition))
-                    .opacity
-                    .value,
-                closeTo(Curves.easeOutCubic.transform(.5 / .7), 1e-6),
-              );
-              expect(tester.getRect(source), sourceRect);
-              expect(tester.element(source), same(sourceElement));
-              expect(tester.element(stage), same(stageElement));
-              expect(_ancestor(stage, ScaleTransition), findsNothing);
-              expect(_ancestor(stage, ClipRRect), findsNothing);
-              expect(route.barrierColor, isNull);
-              expect(
-                tester
-                    .widgetList<ModalBarrier>(find.byType(ModalBarrier))
-                    .every(
-                      (barrier) =>
-                          barrier.color == null || barrier.color!.a == 0,
-                    ),
-                isTrue,
-                reason: 'The route adds no dimming to the source page.',
-              );
-              await tester.pump(const Duration(milliseconds: 159));
-              expect(route.animation!.status, AnimationStatus.forward);
+              await tester.pump(const Duration(milliseconds: 149));
+              expect(started, isFalse);
               await tester.pump(const Duration(milliseconds: 1));
-              expect(route.animation!.value, 1);
-              // Flutter settles the completed status on its next elapsed frame.
-              await tester.pump(const Duration(microseconds: 1));
+            } else {
+              final poster = find.byKey(
+                const ValueKey('training-morph-poster'),
+              );
+              expectRect(tester.getRect(poster), original);
+              await tester.pump(const Duration(milliseconds: 210));
+              final t = Curves.easeInOutCubicEmphasized.transform(.5);
+              expectRect(
+                tester.getRect(poster),
+                Rect.lerp(original, const Rect.fromLTWH(0, 220, 390, 390), t),
+              );
+              expect(
+                tester.widget<TrainingTransitionPoster>(poster).radius,
+                closeTo(20 * (1 - t), 1e-6),
+              );
+              expect(motion!.chrome.value, 0);
+              await tester.pump(const Duration(milliseconds: 70));
+              expect(motion!.chrome.value, 0);
+              await tester.pump(const Duration(milliseconds: 140));
+              expectRect(
+                tester.getRect(poster),
+                const Rect.fromLTWH(0, 220, 390, 390),
+              );
+              expect(motion!.chrome.value, closeTo(.5, 1e-6));
+              await tester.pump(const Duration(milliseconds: 139));
+              expect(started, isFalse);
+              await tester.pump(const Duration(milliseconds: 1));
             }
-            expect(route.animation!.status, AnimationStatus.completed);
-            expect(tester.element(stage), same(stageElement));
-            expect(tester.getRect(stage), const Rect.fromLTWH(0, 0, 390, 844));
-            expect(
-              tester.widget<Scaffold>(stage).backgroundColor,
-              palette.surface,
-            );
-            expect(find.byKey(sourceKey), findsNothing);
-
-            sourcePainter.paints = 0;
-            videoPainter.paints = 0;
-            for (var i = 0; i < 6; i++) {
-              sourceFrame.value++;
-              videoFrame.value++;
-              await tester.pump(const Duration(milliseconds: 16));
-            }
-            expect(videoPainter.paints, 6);
-            expect(sourcePainter.paints, 0);
-
-            var completed = false;
-            unawaited(route.completed.then((_) => completed = true));
+            await tester.pump();
+            expect(started, isTrue);
+            expect(motion!.chrome.value, 1);
+            expectRect(tester.getRect(find.byKey(image)), original);
+            motion!.exitStarted();
+            await tester.pump();
+            await tester.pump(Duration(milliseconds: reduced ? 149 : 249));
+            expect(motion!.chrome.value, greaterThan(0));
+            await tester.pump(const Duration(milliseconds: 1));
+            await tester.pump();
             nav.currentState!.pop();
             await tester.pump();
-            if (!reduced) {
-              expect(route.animation!.status, AnimationStatus.reverse);
-              expect(completed, isFalse);
-              await tester.pump(const Duration(milliseconds: 130));
-              final progress = Curves.easeInCubic.transform(.5);
-              expect(
-                tester
-                    .widget<SlideTransition>(_ancestor(stage, SlideTransition))
-                    .position
-                    .value
-                    .dy,
-                closeTo(.06 * progress, 1e-6),
-              );
-              expect(
-                tester
-                    .widget<FadeTransition>(_ancestor(stage, FadeTransition))
-                    .opacity
-                    .value,
-                closeTo(1 - progress, 1e-6),
-              );
-              expect(tester.getRect(source), sourceRect);
-              await tester.pump(const Duration(milliseconds: 129));
-              expect(stage, findsOneWidget);
-              expect(completed, isFalse);
+            await tester.pump();
+            expect(visualDone, isFalse);
+            final returning = find.byKey(
+              const ValueKey('training-return-poster'),
+            );
+            expect(returning, findsOneWidget);
+            if (interruption == 'remove') {
+              await tester.pumpWidget(const SizedBox.shrink());
+              expect(visualDone, isTrue);
+              expect(returning, findsNothing);
+              expect(tester.binding.transientCallbackCount, 0);
+              expect(tester.takeException(), isNull);
+              return;
+            }
+            if (interruption == 'back') {
+              expect(await nav.currentState!.maybePop(), isTrue);
+              await tester.pump();
+              expect(visualDone, isTrue);
+              expect(returning, findsNothing);
+              expect(find.byKey(image), findsOneWidget);
+              expect(alpha.value, 1);
+              expect(tester.binding.transientCallbackCount, 0);
+              expect(tester.takeException(), isNull);
+              return;
+            }
+            if (reduced) {
+              await tester.pump(const Duration(milliseconds: 149));
+              expect(visualDone, isFalse);
               await tester.pump(const Duration(milliseconds: 1));
-              await tester.pump(const Duration(microseconds: 1));
+            } else {
+              await tester.pump(const Duration(milliseconds: 190));
+              expectRect(
+                tester.getRect(returning),
+                Rect.lerp(
+                  const Rect.fromLTWH(0, 220, 390, 390),
+                  original,
+                  Curves.easeInOutCubicEmphasized.transform(.5),
+                ),
+              );
+              await tester.pump(const Duration(milliseconds: 190));
+              expectRect(tester.getRect(returning), original);
+              expect(alpha.value, 1);
+              expect(visualDone, isFalse);
+              await tester.pump(const Duration(milliseconds: 119));
+              expect(visualDone, isFalse);
+              await tester.pump(const Duration(milliseconds: 1));
             }
             await tester.pump();
-            expect(stage, findsNothing);
-            expect(completed, isTrue);
-            expect(tester.element(source), same(sourceElement));
-            sourcePainter.paints = 0;
-            sourceFrame.value++;
-            await tester.pump();
-            expect(
-              sourcePainter.paints,
-              1,
-              reason: 'Returning resumes painting.',
-            );
+            expect(visualDone, isTrue);
+            expect(returning, findsNothing);
+            expect(alpha.value, 1);
+            expectRect(tester.getRect(find.byKey(image)), original);
             expect(tester.takeException(), isNull);
-          } finally {
-            await tester.pumpWidget(const SizedBox.shrink());
-            sourceFrame.dispose();
-            videoFrame.dispose();
-            tester.view.reset();
-          }
-        },
-      );
+          },
+        );
+      }
     }
   }
 }

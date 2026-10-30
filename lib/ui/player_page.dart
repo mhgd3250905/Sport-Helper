@@ -12,6 +12,7 @@ import 'alpha_artwork.dart';
 import 'exercise_video.dart';
 import 'theme/trainer_theme.dart';
 import 'training_entry_placeholder.dart';
+import 'training_route.dart';
 
 /// App styling, assets and storage injected into the shared training player.
 class PlayerPage extends StatefulWidget {
@@ -32,35 +33,38 @@ class _PlayerPageState extends State<PlayerPage> {
   diagnostic_voice.JustAudioVoiceOutput? _voiceOutput;
   DrillMediaPlaybackHandle? _issuePlayback;
   String? _visibleActionId;
-  Animation<double>? _routeAnimation;
-  bool _entered = false;
+  TrainingTransitionMotion? _motion;
   bool _sessionFinished = false;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final animation = ModalRoute.of(context)?.animation;
-    if (identical(animation, _routeAnimation)) {
-      if (animation == null) _entered = true;
-      return;
-    }
-    _routeAnimation?.removeStatusListener(_routeStatusChanged);
-    _routeAnimation = animation;
-    _entered =
-        animation == null ||
-        (ModalRoute.of(context)?.offstage == false &&
-            animation.status == AnimationStatus.completed);
-    animation?.addStatusListener(_routeStatusChanged);
+    final motion = TrainingTransitionScope.maybeOf(context);
+    if (identical(motion, _motion)) return;
+    _motion?.removeListener(_motionChanged);
+    _motion = motion;
+    motion?.addListener(_motionChanged);
   }
 
-  void _routeStatusChanged(AnimationStatus status) {
+  void _motionChanged() {
     if (!mounted) return;
-    setState(() {
-      if (status == AnimationStatus.completed &&
-          ModalRoute.of(context)?.offstage == false) {
-        _entered = true;
-      }
-    });
+    if (_motion?.entered == true) {
+      _startLog(AppServices.of(context), widget.plan);
+    }
+    setState(() {});
+  }
+
+  void _startLog(AppServices s, TrainingPlan plan) {
+    _log.start(
+      actionCount: plan.items.length,
+      voice: s.store.voice.voice,
+      chimes: s.store.voice.chimes,
+    );
+    if (s.voiceOutput case final diagnostic_voice.JustAudioVoiceOutput output) {
+      _voiceOutput = output;
+      output.beforeSessionBegin = _audioBeginning;
+      output.trainingOperation = _log.operation;
+    }
   }
 
   String? _audioBeginning() {
@@ -70,7 +74,7 @@ class _PlayerPageState extends State<PlayerPage> {
 
   @override
   void dispose() {
-    _routeAnimation?.removeStatusListener(_routeStatusChanged);
+    _motion?.removeListener(_motionChanged);
     final output = _voiceOutput;
     if (output?.beforeSessionBegin == _audioBeginning) {
       output?.beforeSessionBegin = null;
@@ -87,47 +91,16 @@ class _PlayerPageState extends State<PlayerPage> {
   Widget build(BuildContext context) {
     final s = AppServices.of(context);
     final plan = widget.plan;
-    // Hero pre-layout makes ModalRoute.animation temporarily report completed
-    // while the page is offstage, before its actual 320ms entrance starts.
-    // A zero-duration route may leave that pre-layout without a status change.
-    final route = ModalRoute.of(context);
-    if (!_entered &&
-        (route == null ||
-            (!route.offstage &&
-                route.animation?.status == AnimationStatus.completed))) {
-      _entered = true;
-    }
     if (plan.exerciseIds.any((id) => !s.library.contains(id))) {
       return const Scaffold(
         body: SafeArea(child: Center(child: Text('计划包含尚未可用的动作，暂时无法开始。'))),
       );
     }
-    if (!_entered) {
-      final phases = session.SessionBuilder(s.library).phases(plan);
-      final first = phases.firstOrNull?.exerciseId;
-      return first == null
-          ? Scaffold(
-              backgroundColor: SmartFitTrainerTheme.of(context).mediaStage,
-            )
-          : TrainingEntryPlaceholder(
-              key: const ValueKey('training-entry-placeholder'),
-              exercise: s.library[first],
-            );
-    }
     return _player(context, s, plan);
   }
 
   Widget _player(BuildContext context, AppServices s, TrainingPlan plan) {
-    _log.start(
-      actionCount: plan.items.length,
-      voice: s.store.voice.voice,
-      chimes: s.store.voice.chimes,
-    );
-    if (s.voiceOutput case final diagnostic_voice.JustAudioVoiceOutput output) {
-      _voiceOutput = output;
-      output.beforeSessionBegin = _audioBeginning;
-      output.trainingOperation = _log.operation;
-    }
+    if (_motion == null || _motion!.entered) _startLog(s, plan);
     final issueStore = s.store.actionIssueStore;
     final issuePlayback = issueStore.enabled
         ? (_issuePlayback ??= DrillMediaPlaybackHandle())
@@ -138,6 +111,10 @@ class _PlayerPageState extends State<PlayerPage> {
         TrainerPlayer(
           plan: session.trainerPlan(plan),
           startMode: TrainerStartMode.training,
+          startGate: _motion?.startGate,
+          chromeAnimation: _motion?.chrome,
+          onExitStarted: _motion?.exitStarted,
+          beforeExitPop: _motion?.beforeExitPop,
           rhythms: session.trainerRhythms(s.library),
           strings: TrainerStrings.zh(),
           theme: SmartFitTrainerTheme.of(context),
@@ -178,19 +155,38 @@ class _PlayerPageState extends State<PlayerPage> {
             );
           },
           mediaBuilder: (context, request) {
-            // The SDK keeps requesting its paused last frame while an early
-            // exit is saving. That frame must not reopen App-owned issue UI
-            // above the navigator whose pending receipt will shortly pop.
-            if (_sessionFinished && !request.paused) _sessionFinished = false;
-            _visibleActionId = _sessionFinished ? null : request.drill.id;
-            final animation = ModalRoute.of(context)?.animation;
-            if (animation != null &&
-                animation.status != AnimationStatus.completed) {
-              return TrainingTransitionPoster(
-                key: const ValueKey('training-transition-poster'),
-                exercise: s.library[request.drill.id],
-                mirrored: request.mirrored,
-                radius: request.theme.radius,
+            final motion = _motion;
+            if (_sessionFinished && !request.paused) {
+              _sessionFinished = false;
+              if (motion?.exiting == true) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (mounted && identical(_motion, motion)) motion?.replay();
+                });
+              }
+            }
+            _visibleActionId = request.drill.id;
+            final exercise = s.library[request.drill.id];
+            motion?.reportMedia(exercise, mirrored: request.mirrored);
+            if (motion != null && !motion.canPlay) {
+              return SizedBox(
+                key: motion.mediaKey,
+                child: motion.entered
+                    ? TrainingTransitionPoster(
+                        key: const ValueKey('training-transition-poster'),
+                        exercise: exercise,
+                        mirrored: request.mirrored,
+                        radius: request.theme.radius,
+                      )
+                    : motion.reduced
+                    ? TrainingTransitionPoster(
+                        exercise: exercise,
+                        mirrored: request.mirrored,
+                      )
+                    : TrainingEntranceMedia(
+                        motion: motion,
+                        exercise: exercise,
+                        mirrored: request.mirrored,
+                      ),
               );
             }
             _log.visibleAction(request.drill.id, paused: request.paused);
@@ -198,21 +194,24 @@ class _PlayerPageState extends State<PlayerPage> {
                 case final diagnostic_voice.JustAudioVoiceOutput output) {
               output.trainingOperation = _log.operation;
             }
-            return ExerciseVideo(
-              key: const ValueKey('trainer-media'),
-              exercise: s.library[request.drill.id],
-              paused: request.paused,
-              mirrored: request.mirrored,
-              radius: request.theme.radius,
-              playbackHandle: issuePlayback,
-              mediaPreparer: request.mediaPreparer,
-              training: true,
+            return SizedBox(
+              key: motion?.mediaKey,
+              child: ExerciseVideo(
+                key: const ValueKey('trainer-media'),
+                exercise: s.library[request.drill.id],
+                paused: request.paused,
+                mirrored: request.mirrored,
+                radius: request.theme.radius,
+                playbackHandle: issuePlayback,
+                mediaPreparer: request.mediaPreparer,
+                training: true,
+              ),
             );
           },
           voice: s.trainerVoice(),
           onFinished: (result) async {
+            _motion?.rememberStage();
             _sessionFinished = true;
-            _visibleActionId = null;
             _log.finished(result);
             _log.saving();
             try {
@@ -220,6 +219,7 @@ class _PlayerPageState extends State<PlayerPage> {
               _log.saved();
             } on Object catch (error) {
               _log.saveFailed(error);
+              _motion?.exitSaveFailed();
               rethrow;
             }
           },
@@ -228,7 +228,12 @@ class _PlayerPageState extends State<PlayerPage> {
             // Its identical receipt was durably saved by onFinished already.
             // A feeling chosen after a failed save still follows the usual path.
             if (result.endedEarly && result.feeling == null) return;
-            await s.recordTrainingCompletion(result);
+            try {
+              await s.recordTrainingCompletion(result);
+            } on Object {
+              _motion?.exitSaveFailed();
+              rethrow;
+            }
           },
           tick: widget.tick,
           notificationIcon: 'drawable/ic_stat_training',
@@ -237,21 +242,62 @@ class _PlayerPageState extends State<PlayerPage> {
           Positioned(
             right: 12,
             top: (MediaQuery.sizeOf(context).height - 48) / 2,
-            child: ActionIssueMarkButton(
-              key: const ValueKey('player-action-issue'),
-              store: issueStore,
-              library: s.library,
-              playbackHandle: issuePlayback,
-              actionIdAtTap: () =>
-                  _sessionFinished ||
-                      (_routeAnimation?.status ?? AnimationStatus.completed) !=
-                          AnimationStatus.completed
-                  ? null
-                  : _visibleActionId,
-              iconOnly: true,
+            child: _IssueMotion(
+              motion: _motion,
+              child: ActionIssueMarkButton(
+                key: const ValueKey('player-action-issue'),
+                store: issueStore,
+                library: s.library,
+                playbackHandle: issuePlayback,
+                actionIdAtTap: () =>
+                    (_sessionFinished && _motion?.saveFailed != true) ||
+                        (_motion != null &&
+                            !_motion!.canPlay &&
+                            !_motion!.saveFailed)
+                    ? null
+                    : _visibleActionId,
+                iconOnly: true,
+              ),
             ),
           ),
       ],
+    );
+  }
+}
+
+/// Match the SDK transport interval without animating the media stage.
+class _IssueMotion extends StatelessWidget {
+  const _IssueMotion({required this.motion, required this.child});
+  final TrainingTransitionMotion? motion;
+  final Widget child;
+  @override
+  Widget build(BuildContext context) {
+    final m = motion;
+    if (m == null || m.saveFailed) return child;
+    return AnimatedBuilder(
+      animation: m.chrome,
+      child: child,
+      builder: (_, child) {
+        final phase = const Interval(
+          60 / 280,
+          260 / 280,
+        ).transform(m.chrome.value);
+        final t =
+            (m.chrome.status == AnimationStatus.reverse
+                    ? Curves.easeInCubic
+                    : Curves.easeOutCubic)
+                .transform(phase);
+        return IgnorePointer(
+          ignoring: m.chrome.value < 1,
+          child: Opacity(
+            opacity: t,
+            child: Transform.translate(
+              offset: Offset(0, m.reduced ? 0 : 16 * (1 - t)),
+              child: child,
+            ),
+          ),
+        );
+      },
     );
   }
 }

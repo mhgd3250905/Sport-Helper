@@ -10,11 +10,11 @@ import 'package:smartfit/domain/exercise.dart';
 import 'package:smartfit/domain/plan.dart';
 import 'package:smartfit/main.dart';
 import 'package:smartfit/ui/chat/chat_widgets.dart';
+import 'package:smartfit/ui/chat/chat_timeline.dart';
 import 'package:smartfit/ui/library_page.dart';
 import 'package:smartfit/ui/plan_page.dart';
 import 'package:smartfit/ui/player_page.dart';
 import 'package:smartfit/ui/theme.dart';
-import 'package:ugk_coach_ui/ugk_coach_ui.dart';
 
 import 'app_flow_test.dart' show services;
 
@@ -115,8 +115,8 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final chat = find.byType(CoachChatList);
-      final widget = tester.widget<CoachChatList>(chat);
+      final chat = find.byType(ChatTimeline);
+      final widget = tester.widget<ChatTimeline>(chat);
       expect(widget.topInset, 32);
       expect(widget.fadeTop, isFalse);
       final list = find.descendant(of: chat, matching: find.byType(ListView));

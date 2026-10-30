@@ -7,7 +7,7 @@ import 'package:smartfit/chat/chat_models.dart';
 import 'package:smartfit/main.dart';
 import 'package:smartfit/ui/chat/chat_home_page.dart';
 import 'package:smartfit/ui/theme/app_theme.dart';
-import 'package:ugk_coach_ui/ugk_coach_ui.dart' show CoachChatList;
+import 'package:smartfit/ui/chat/chat_timeline.dart';
 
 import 'app_flow_test.dart' show services;
 
@@ -301,7 +301,7 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(scroll.position.maxScrollExtent, greaterThan(400));
-      final chatState = tester.state(find.byType(CoachChatList));
+      final chatState = tester.state(find.byType(ChatTimeline));
       final listRender = tester.renderObject(find.byKey(_listBoundary));
       final dockRender = tester.renderObject(find.byKey(_dockBoundary));
       expect(listRender, isA<RenderRepaintBoundary>());
@@ -327,7 +327,7 @@ void main() {
           scroll.position.pixels,
           closeTo(scroll.position.minScrollExtent, .1),
         );
-        expect(tester.state(find.byType(CoachChatList)), same(chatState));
+        expect(tester.state(find.byType(ChatTimeline)), same(chatState));
         expect(
           tester.renderObject(find.byKey(_listBoundary)),
           same(listRender),

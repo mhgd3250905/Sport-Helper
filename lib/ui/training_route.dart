@@ -1,107 +1,93 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../diagnostics/frame_recorder.dart';
+import '../diagnostics/runtime_log.dart';
+import '../domain/exercise.dart';
+import 'theme/trainer_theme.dart';
+import 'training_entry_placeholder.dart';
 
-/// Only a still poster is composed during these transitions. PlayerPage mounts
-/// the trainer after entry and removes its video surface as exit begins, so a
-/// live decoder is never animated together with the unchanged underlying page.
+part 'training_transition.dart';
+
+/// A host-owned image. Entry freezes the tap position; return rechecks it.
+class TrainingTransitionSource {
+  const TrainingTransitionSource({
+    required this.rect,
+    required this.opacity,
+    this.initialRect,
+    this.repaintKey,
+  });
+  final Rect? Function() rect;
+  final Rect? initialRect;
+  final ValueNotifier<double> opacity;
+  final GlobalKey? repaintKey;
+
+  void show(double value) {
+    if (repaintKey != null && repaintKey!.currentContext == null) return;
+    opacity.value = value;
+  }
+}
+
+/// Zero-time overlay route: the host animates a still image, never a video
+/// texture. Its independent return layer survives the SDK's ordinary pop.
 class TrainingRoute<T> extends PageRouteBuilder<T> {
   TrainingRoute({
     required BuildContext context,
     required WidgetBuilder builder,
+    this.source,
     super.settings,
-  }) : super(
-         transitionDuration: MediaQuery.disableAnimationsOf(context)
-             ? Duration.zero
-             : const Duration(milliseconds: 320),
-         reverseTransitionDuration: MediaQuery.disableAnimationsOf(context)
-             ? Duration.zero
-             : const Duration(milliseconds: 260),
-         pageBuilder: (context, _, _) => builder(context),
+  }) : _sourceRoute = ModalRoute.of(context),
+       super(
+         opaque: false,
+         transitionDuration: Duration.zero,
+         reverseTransitionDuration: Duration.zero,
+         pageBuilder: (context, _, _) => _TrainingTransitionHost(
+           route: ModalRoute.of(context)! as TrainingRoute,
+           builder: builder,
+         ),
        );
 
-  static const _fadeIn = Interval(0, .7, curve: Curves.easeOutCubic);
-  double _reverseFrom = 1;
-  double _exitOpacity = 1;
-  double _exitOffset = 0;
+  final TrainingTransitionSource? source;
+  final ModalRoute<dynamic>? _sourceRoute;
+  final _visual = Completer<void>();
+  _TrainingTransitionHostState? _host;
+  OverlayEntry? _returnEntry;
+  bool _returning = false;
+  bool _finishingVisual = false;
+  LocalHistoryEntry? _returnHistory;
 
-  @override
-  Widget buildTransitions(
-    BuildContext context,
-    Animation<double> animation,
-    Animation<double> secondaryAnimation,
-    Widget child,
-  ) {
-    if (MediaQuery.disableAnimationsOf(context)) return child;
-    return AnimatedBuilder(
-      animation: animation,
-      child: child,
-      builder: (_, child) {
-        final exiting = animation.status == AnimationStatus.reverse;
-        final exitProgress = Curves.easeInCubic.transform(
-          (_reverseFrom == 0 ? 1.0 : 1 - animation.value / _reverseFrom).clamp(
-            0.0,
-            1.0,
-          ),
-        );
-        final offset = exiting
-            ? _exitOffset + (.06 - _exitOffset) * exitProgress
-            : .06 * (1 - Curves.easeOutCubic.transform(animation.value));
-        final opacity = exiting
-            ? _exitOpacity * (1 - exitProgress)
-            : _fadeIn.transform(animation.value);
-        return SlideTransition(
-          position: AlwaysStoppedAnimation(Offset(0, offset)),
-          child: FadeTransition(
-            opacity: AlwaysStoppedAnimation(opacity),
-            child: child,
-          ),
-        );
-      },
-    );
-  }
+  /// Includes the post-pop shrink and the 120ms source-image cross-fade.
+  Future<void> get visualCompleted => _visual.future;
 
-  // Do not drive a Material/Cupertino route's secondary scale, slide or shade.
   @override
   bool canTransitionFrom(TransitionRoute<dynamic> previousRoute) => false;
 
   @override
-  void install() {
-    super.install();
-    animation!.addStatusListener(_recordTransition);
+  bool didPop(T? result) {
+    _host?.prepareReturn();
+    return super.didPop(result);
   }
 
-  void _recordTransition(AnimationStatus status) {
-    if (offstage) return; // Hero pre-layout temporarily reports completed.
-    final recorder = FrameRecorder.instance;
-    switch (status) {
-      case AnimationStatus.forward:
-        if (transitionDuration != Duration.zero) {
-          recorder.beginScenario(FrameScenario.trainingRouteEntry);
-        }
-      case AnimationStatus.completed:
-        recorder.endScenario(FrameScenario.trainingRouteEntry);
-      case AnimationStatus.reverse:
-        // Returning before entry finishes must start at the currently visible
-        // poster position/alpha, without a jump to the full-entry fade curve.
-        _reverseFrom = animation!.value;
-        _exitOpacity = _fadeIn.transform(_reverseFrom);
-        _exitOffset = .06 * (1 - Curves.easeOutCubic.transform(_reverseFrom));
-        recorder.endScenario(FrameScenario.trainingRouteEntry);
-        if (reverseTransitionDuration != Duration.zero) {
-          recorder.beginScenario(FrameScenario.trainingRouteExit);
-        }
-      case AnimationStatus.dismissed:
-        recorder.endScenario(FrameScenario.trainingRouteExit);
+  void _finishVisual() {
+    if (_finishingVisual) return;
+    _finishingVisual = true;
+    final entry = _returnEntry;
+    _returnEntry = null;
+    if (entry != null) {
+      entry.remove();
+      entry.dispose();
     }
+    source?.show(1);
+    _returnHistory?.remove();
+    _returnHistory = null;
+    FrameRecorder.instance.endScenario(FrameScenario.trainingRouteExit);
+    if (!_visual.isCompleted) _visual.complete();
   }
 
   @override
   void dispose() {
-    animation!.removeStatusListener(_recordTransition);
-    FrameRecorder.instance
-      ..endScenario(FrameScenario.trainingRouteEntry)
-      ..endScenario(FrameScenario.trainingRouteExit);
+    if (!_returning) _finishVisual();
     super.dispose();
   }
 }

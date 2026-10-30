@@ -22,6 +22,7 @@ import '../theme/solid_surface.dart';
 import '../theme/sf_icons.dart';
 import '../theme/tokens.dart';
 import '../training_route.dart';
+import '../training_entry_placeholder.dart';
 import 'chat_widgets.dart';
 import 'chat_composer_dock.dart';
 import 'coach_ui_adapter.dart';
@@ -31,6 +32,8 @@ import 'coach_delivery_transition.dart';
 import 'plan_card.dart';
 import 'saved_plans_page.dart';
 import 'validated_plan_card.dart';
+import 'chat_timeline.dart';
+import 'training_card_media.dart';
 
 /// The home screen: one conversation floating in an endless sky. No app
 /// bar, no borders; the input's left icon opens the feature panel.
@@ -63,8 +66,13 @@ class _ChatHomePageState extends State<ChatHomePage>
   Set<String> _replyStartIds = {};
   final Map<String, String> _deliveryEntryIds = {};
   final Map<String, GlobalKey> _deliveryKeys = {};
+  final _trainingMedia = <String, TrainingCardMediaRegistry>{};
+  final _finishedEntries = <String>{};
+  final _finishedSessions = <String>{};
   final _input = FocusNode();
   bool _panelOpen = false;
+  bool _trainingInFlight = false;
+  int _trainingLaunchEpoch = 0;
 
   /// Messages already on screen when the page opened don't animate in.
   final _seen = <String>{};
@@ -102,6 +110,7 @@ class _ChatHomePageState extends State<ChatHomePage>
     if (state == AppLifecycleState.inactive ||
         state == AppLifecycleState.paused ||
         state == AppLifecycleState.detached) {
+      _trainingLaunchEpoch++;
       unawaited(_chat.flushPersistence());
     }
     if ((state == AppLifecycleState.inactive ||
@@ -129,6 +138,9 @@ class _ChatHomePageState extends State<ChatHomePage>
     if (widget.scrollController == null) _scroll.dispose();
     _input.dispose();
     _dockExtent.dispose();
+    for (final registry in _trainingMedia.values) {
+      registry.dispose();
+    }
     super.dispose();
   }
 
@@ -195,7 +207,8 @@ class _ChatHomePageState extends State<ChatHomePage>
   }
 
   /// Open the stable video stage directly; the summary follows back in chat.
-  Future<void> _start(TrainingPlan p) async {
+  Future<void> _start(TrainingPlan p, {String? messageId}) async {
+    if (_trainingInFlight) return;
     final s = AppServices.of(context);
     if (p.items.any((item) => !s.library.contains(item.exerciseId))) {
       _toast('计划包含尚未可用的动作，暂时无法开始；已保存计划仍保留。');
@@ -210,27 +223,69 @@ class _ChatHomePageState extends State<ChatHomePage>
       );
       return;
     }
-    if (!await _chat.started(p)) return;
-    if (!mounted) return;
-    s.prefetchPlan(p);
-    _dismissInput();
-    final route = TrainingRoute<SessionResult>(
-      context: context,
-      settings: const RouteSettings(name: 'player'),
-      builder: (_) => PlayerPage(plan: p),
-    );
-    final result = await Navigator.of(context).push(route);
-    // popped resolves as reverse begins; completed waits for its overlay removal.
-    await route.completed;
-    if (!mounted) return;
-    _dismissInput();
-    if (result != null) {
-      _chat.finished(
-        p,
-        completed: result.completedExercises,
-        total: result.totalExercises,
+    // Capture the image and begin decode on the tap, before persistence yields.
+    final source = messageId == null
+        ? null
+        : _trainingMedia[messageId]?.capture();
+    final first = p.items.firstOrNull;
+    if (first != null) {
+      unawaited(
+        TrainingTransitionPoster.precache(context, s.library[first.exerciseId]),
       );
     }
+    _trainingInFlight = true;
+    final launchEpoch = _trainingLaunchEpoch;
+    try {
+      if (!await _chat.started(p) ||
+          !mounted ||
+          launchEpoch != _trainingLaunchEpoch) {
+        return;
+      }
+      s.prefetchPlan(p);
+      _dismissInput();
+      final route = TrainingRoute<SessionResult>(
+        context: context,
+        source: source,
+        settings: const RouteSettings(name: 'player'),
+        builder: (_) => PlayerPage(plan: p),
+      );
+      final result = await Navigator.of(context).push(route);
+      await route.completed;
+      // The zero-duration route has gone, but its still-only shrink/crossfade
+      // overlay owns the visual exit until this future completes.
+      await route.visualCompleted;
+      if (!mounted) return;
+      _dismissInput();
+      if (result != null) await _finishTraining(p, result);
+    } finally {
+      _trainingInFlight = false;
+    }
+  }
+
+  Future<void> _finishTraining(TrainingPlan plan, SessionResult result) async {
+    if (!mounted || !_finishedSessions.add(result.sessionId)) return;
+    final previous = _chat.messages.map((message) => message.id).toSet();
+    _chat.finished(
+      plan,
+      completed: result.completedExercises,
+      total: result.totalExercises,
+    );
+    final added = _chat.messages.where(
+      (message) => !previous.contains(message.id),
+    );
+    if (added.isEmpty) return;
+    setState(() => _finishedEntries.addAll(added.map((message) => message.id)));
+    // The new row's first layout has zero height, including padding. Older
+    // visible rows therefore keep their exact positions in this frame.
+    await WidgetsBinding.instance.endOfFrame;
+    if (!mounted || !_scroll.hasClients) return;
+    unawaited(
+      _scroll.animateTo(
+        _scroll.position.minScrollExtent,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOutCubic,
+      ),
+    );
   }
 
   Future<void> _save(TrainingPlan p) async {
@@ -251,19 +306,20 @@ class _ChatHomePageState extends State<ChatHomePage>
 
   Future<void> _details(ChatMessage m, {TrainingPlan? validatedPlan}) async {
     _dismissInput();
-    final plan = await Navigator.of(context).push<TrainingPlan>(
+    await Navigator.of(context).push<void>(
       MaterialPageRoute(
         settings: const RouteSettings(name: 'plan'),
         builder: (_) => PlanPage(
           plan: validatedPlan ?? m.plan!,
           request: m.request,
-          returnPlanOnStart: true,
+          onTrainingStarting: _chat.started,
+          onTrainingFinished: (plan, result) =>
+              unawaited(_finishTraining(plan, result)),
         ),
       ),
     );
     if (!mounted) return;
     _dismissInput();
-    if (plan != null) await _start(plan);
   }
 
   void _toast(String text, {SfGlyph icon = SfGlyph.checkCircle}) {
@@ -491,15 +547,14 @@ class _ChatHomePageState extends State<ChatHomePage>
     );
     return withSmartfitCoachUi(
       context,
-      CoachChatList(
+      ChatTimeline(
         entries: rows,
         controller: _scroll,
         initiallySeen: _seen,
-        dockHeight: 0,
+        finishedEntries: _finishedEntries,
         // Keep the viewport behind Android's transparent status bar. The
         // initial safe clearance belongs to the scrollable content instead.
         topInset: MediaQuery.paddingOf(context).top,
-        fadeTop: false,
         timeMarkBuilder: (at, now) => TimeMark(at, now: now),
       ),
     );
@@ -568,34 +623,55 @@ class _ChatHomePageState extends State<ChatHomePage>
         ],
         if (m.validatedPlan case final validated?) ...[
           if (hasText) const SizedBox(height: SfSpace.x3),
-          ValidatedPlanCard(
-            validatedPlan: validated,
-            library: library,
-            landing: fresh,
-            isSaved: _chat.isSaved,
-            updatingSavedPlan: _chat.savedTargetFor(m) != null,
-            savedOverride: _chat.isPlanCardSaved(m),
-            onSaveCopy: _chat.savedTargetFor(m) == null
-                ? null
-                : (_) => unawaited(_savePlanCard(m, saveAsCopy: true)),
-            onStart: (plan, _) => _start(plan),
-            onSave: (_) => unawaited(_savePlanCard(m)),
-            onOpen: (plan) => _details(m, validatedPlan: plan),
+          _trainingCard(
+            m,
+            ValidatedPlanCard(
+              validatedPlan: validated,
+              library: library,
+              landing: fresh,
+              isSaved: _chat.isSaved,
+              updatingSavedPlan: _chat.savedTargetFor(m) != null,
+              savedOverride: _chat.isPlanCardSaved(m),
+              onSaveCopy: _chat.savedTargetFor(m) == null
+                  ? null
+                  : (_) => unawaited(_savePlanCard(m, saveAsCopy: true)),
+              onStart: (plan, _) => _start(plan, messageId: m.id),
+              onSave: (_) => unawaited(_savePlanCard(m)),
+              onOpen: (plan) => _details(m, validatedPlan: plan),
+            ),
           ),
         ] else if (m.isPlan &&
             (m.plan!.source != 'ai' || m.isSavedPlanDisplay)) ...[
           if (hasText) const SizedBox(height: SfSpace.x3),
-          PlanCard(
-            plan: m.plan!,
-            landing: fresh,
-            library: library,
-            saved: _chat.isSaved(m.plan!),
-            onStart: (_) => _start(m.plan!),
-            onSave: () => _save(m.plan!),
-            onOpen: () => _details(m),
+          _trainingCard(
+            m,
+            PlanCard(
+              plan: m.plan!,
+              landing: fresh,
+              library: library,
+              saved: _chat.isSaved(m.plan!),
+              onStart: (_) => _start(m.plan!, messageId: m.id),
+              onSave: () => _save(m.plan!),
+              onOpen: () => _details(m),
+            ),
           ),
         ],
       ],
     );
+  }
+
+  Widget _trainingCard(ChatMessage message, Widget child) {
+    final plan =
+        message.plan ??
+        (message.validatedPlan == null
+            ? null
+            : TrainingPlan.fromJson(message.validatedPlan!.plan.toJson()));
+    final exerciseId = plan?.items.firstOrNull?.exerciseId;
+    if (exerciseId == null) return child;
+    final registry = _trainingMedia.putIfAbsent(
+      message.id,
+      () => TrainingCardMediaRegistry(exerciseId),
+    );
+    return TrainingCardMedia(registry: registry, child: child);
   }
 }
