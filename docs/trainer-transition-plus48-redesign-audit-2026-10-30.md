@@ -33,7 +33,7 @@ SDK 的 [TickerMode(false)](E:/AII-3D/3D-Pose-SDK/packages/ugk_trainer/lib/src/u
 | MediaQuery 强制 false，但平台 disableAnimations=true | 声明仍为 320/260；Flutter 默认 AnimationBehavior.normal 再乘 0.05，实际约 16/13ms |
 | 进入时 MediaQuery=false，退出时变 true | controller 仍跑 260ms reverse，但 Fade/Slide 包装被直接移除，末尾直接移除整页 |
 
-后两条是**可复现条件，不是对用户手机状态的认定**。当前 App 未发现主动覆写这两个值以制造该分歧；缺少那次真实 flags、route 起止时间和 FrameTiming，不能断言手机命中了其中哪一条，也不能用声明时长排除缩时。正常分支的弱位移/尾段淡出，与真正被减动效跳过或缩短，必须区分。
+后两条是**可复现条件，不是对用户手机状态的认定**。用户在核查后确认录屏时手机动画设置**均为 1×**；本次问题不能归因为已开启系统缩时。当前 App 也未发现主动覆写这两个值以制造该分歧。仍缺少那次运行时 flags、route 起止时间和 FrameTiming；保留上表作为软件对照，不将仿真条件写成手机事实。现有证据确定的是保存等待发生在 reverse 前、正常 reverse 的位移与淡出变化集中在后半段。
 
 后续宿主动效应统一选择 normal 与 reduced 的时间线。按本次 reduced=150ms 的要求自行处理后，有限动效 controller 应避免再被平台默认缩至 5%，并记录两层 flag、选定时长、实际起止与中断原因以便核验。
 
@@ -79,19 +79,21 @@ ScrollController 已由宿主拥有，300ms 滚动、offset/可见锚点保留�
 
 图文入口也有明确的 App 接线工作：聊天打开详情时设置了 `returnPlanOnStart:true`，当前 [PlanPage._startTraining](E:/AII-3D/3D-Sport-AI/Sport-Helper-trainer-transition/lib/ui/plan_page.dart:191) 先 pop 图文页，再由 ChatHome._details/_start 打开训练。这会先销毁新设计要求保留的图文媒体锚点，并可能与新训练 push 发生过渡重叠。新版必须保留该来源 route，由图文上下文 push/返回，完成摘要另行通知聊天 owner；不能继续先 pop 来源页再伪造一个锚点。这属于宿主修正，不是 SDK 缺口。
 
-## 数值冲突：未擅自修改
+## 用户确认的 560ms 进入时序（替换原阶段 B）
 
-| 进入控件 | 开始 | 时长 | 完成 |
-| --- | ---: | ---: | ---: |
-| 顶部卡 | 280ms | 220ms | 500ms |
-| 胶囊 | 320ms | 220ms | 540ms |
-| 提示卡 | 360ms | 220ms | 580ms |
-| 数字/前后按钮/问题标记 | 400ms | 220ms | 620ms |
-| 暂停按钮 | 400ms | 260ms | 660ms |
+用户明确选择保留进入总长 **560ms**，以下数值替换原阶段 B，原阶段 A 和其余设计不变。此前 660ms 的冲突已经解决，不再作为待澄清事项。
 
-因此全部照做时，控件到 **660ms** 才结束，与“总长 560ms、560ms 开始视频/计时”冲突。若 560ms 挂视频，会与最后 100ms 动画重叠，也违背动画期间无纹理。已单独询问优先级，未自行压缩时长或移动起点。
+| 进入控件 | 开始 | 时长 | 完成 | 变换与曲线 |
+| --- | ---: | ---: | ---: | --- |
+| 顶部进度卡 | 280ms | 200ms | 480ms | 从 y=-12px 归位并淡入，easeOutCubic |
+| 下一个 / 不舒服胶囊 | 300ms | 200ms | 500ms | 从 y=-8px 归位并淡入，easeOutCubic |
+| 提示卡 | 320ms | 200ms | 520ms | 从 y=+16px 归位并淡入，easeOutCubic |
+| 倒计时 / 前后按钮 / 右侧问题标记 | 340ms | 200ms | 540ms | 从 y=+16px 归位并淡入，easeOutCubic |
+| 暂停大按钮 | 340ms | 220ms | 560ms | scale 0.85→1 用 easeOutBack；opacity 0→1 单独用 easeOutCubic |
 
-退出的 250+380=630ms 对应约 19 个 30fps 帧间隔；若“缩到位后”再串行加 120ms 交叉淡化，完整可见序列为 750ms、约 23 帧。应明确“约19帧”是否只指缩回前两段、120ms 尾段是否在路由外继续；当前不擅自叠加、删减或覆盖这段。
+**560ms 到达最后一层的终态后，阶段 C 才允许挂载 ExerciseVideo、启动计时和语音。** 实现时的 fake-async 回归必须断言：559ms 时仍没有视频实例且计时/语音未开始；560ms 时所有控件 opacity=1、平移=0、暂停 scale=1，计时不早于 560ms 启动。还需逐项覆盖表内起点/终点和两种暂停曲线；不将一份静态时序表的算术校验冒充实际动画测试。这些新版行为测试需等 SDK 接口补齐后随实现落地，当前尚未执行。
+
+用户同时确认退出数值保持不变：控件退场为四层各160ms、间隔30ms，总长250ms；保存成功且控件退完后进行380ms舞台缩回；缩到位后保留120ms海报交叉淡化，背景仍按原240ms淡出。原先针对退出数值的澄清不再保留，也不自行压缩或删掉尾段。
 
 ## 本轮证据与交付边界
 
@@ -99,4 +101,4 @@ ScrollController 已由宿主拥有，300ms 滚动、offset/可见锚点保留�
 
 证据目录：`E:/AII-3D/3D-Sport-AI/deliveries/trainer-transition-plus48-redesign-audit/`，包含 `diagnose_existing_transition_test.dart`、`diagnostic-r1.log`、`software-observations.json`。上一版 773/773、analyze 0、签名/16KB/JNI 与两份 APK 继续作为 **旧 c0 候选**证据保留，不冒充新设计验证。
 
-新版 UI 尚未实现，没有新的 release/profile APK、进入/退出录屏或真机 UI/Raster 最大帧耗时。先交 SDK 接口合同；SDK 发布可用接口并由用户给定新 pin、同时澄清时序后，再继续本分支。当前 pin 652 不动，不改 SDK、不合 main、不推送、不打 tag。文档提交及源码保护观察见本轮外部 `audit-closeout.json`。
+新版 UI 尚未实现，没有新的 release/profile APK、进入/退出录屏或真机 UI/Raster 最大帧耗时。先交 SDK 接口合同；进入时序现已定稿，SDK 发布可用接口并由用户给定新 pin 后，再继续本分支。当前 pin 652 不动，不改 SDK、不合 main、不推送、不打 tag。首次核查提交及源码保护观察见外部 `audit-closeout.json`；本次用户确认的补充提交见同目录 `timing-confirmation-closeout.json`，不覆盖原回执。
