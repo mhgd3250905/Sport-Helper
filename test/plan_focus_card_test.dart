@@ -180,7 +180,7 @@ void main() {
               saved: false,
               saveLabel: '更新到我的计划',
               savedLabel: '已更新',
-              onStart: (_) => starts++,
+              onStart: () => starts++,
               onSave: () => saves++,
               onSaveCopy: () => copies++,
               onOpen: () {},
@@ -247,7 +247,7 @@ void main() {
           saved: saved,
           saveLabel: '更新到我的计划',
           savedLabel: '已更新',
-          onStart: (_) {},
+          onStart: () {},
           onSave: () {
             saves++;
             setState(() => saved = true);
@@ -289,7 +289,7 @@ void main() {
           },
           savedOverride: true,
           updatingSavedPlan: true,
-          onStart: (_, _) {},
+          onStart: (_) {},
           onSave: (_) =>
               fail('The saved override disables the primary action.'),
           onSaveCopy: (plan) => copied = plan,
@@ -329,7 +329,7 @@ void main() {
               saveLabel: '更新到我的计划',
               savedLabel: '已更新',
               onSaveCopy: () {},
-              onStart: (_) {},
+              onStart: () {},
               onSave: () {},
               onOpen: () {},
             ),
@@ -337,7 +337,7 @@ void main() {
               plan: ordinary,
               library: library,
               saved: false,
-              onStart: (_) {},
+              onStart: () {},
               onSave: () {},
               onOpen: () {},
             ),

@@ -307,7 +307,7 @@ void main() {
         plan: _plan,
         library: fixture.library,
         saved: false,
-        onStart: (_) {},
+        onStart: () {},
         onSave: () {},
         onOpen: () {},
       );

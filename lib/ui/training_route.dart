@@ -1,179 +1,348 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
+import '../app/training_transition_activity.dart';
 import '../diagnostics/frame_recorder.dart';
-import '../diagnostics/runtime_log.dart';
 import '../diagnostics/performance_report.dart';
 import '../diagnostics/training_transition_timings.dart';
-import '../app/training_transition_activity.dart';
-import '../domain/exercise.dart';
 import 'theme/trainer_theme.dart';
-import 'training_entry_placeholder.dart';
-import 'training_poster_flight.dart';
 
-part 'training_transition.dart';
-
-/// A host-owned image. Entry freezes the tap position; return rechecks it.
-class TrainingTransitionSource {
-  const TrainingTransitionSource({
-    required this.rect,
-    required this.opacity,
-    this.initialRect,
-    this.repaintKey,
-  });
-  final Rect? Function() rect;
-  final Rect? initialRect;
-  final ValueNotifier<double> opacity;
-  final GlobalKey? repaintKey;
-
-  void show(double value) {
-    if (repaintKey != null && repaintKey!.currentContext == null) return;
-    opacity.value = value;
-  }
-}
-
-/// Zero-time overlay route: the host animates a still image, never a video
-/// texture. Its independent return layer survives the SDK's ordinary pop.
+/// One opaque horizontal route. The full SDK page exists from its first frame;
+/// only its translation changes. startGate keeps native playback and training
+/// work out of the slide, rather than hiding or delaying the SDK controls.
 class TrainingRoute<T> extends PageRouteBuilder<T> {
   TrainingRoute({
     required BuildContext context,
     required WidgetBuilder builder,
-    this.source,
+    this.sourceEntry = 'plan',
     super.settings,
-  }) : _sourceRoute = ModalRoute.of(context),
+  }) : reducedMotion = MediaQuery.disableAnimationsOf(context),
        _theme = Theme.of(context).brightness.name,
-       _reduced = MediaQuery.disableAnimationsOf(context),
        _releaseEntry = TrainingTransitionActivity.instance.hold(),
-       _entryTiming = _beginTiming(context, TrainingTransitionKind.entry),
        super(
-         opaque: false,
-         transitionDuration: Duration.zero,
-         reverseTransitionDuration: Duration.zero,
-         pageBuilder: (context, _, _) => _TrainingTransitionHost(
+         opaque: true,
+         allowSnapshotting: false,
+         transitionDuration: MediaQuery.disableAnimationsOf(context)
+             ? Duration.zero
+             : const Duration(milliseconds: 300),
+         reverseTransitionDuration: MediaQuery.disableAnimationsOf(context)
+             ? Duration.zero
+             : const Duration(milliseconds: 280),
+         pageBuilder: (context, _, _) => _TrainingRoutePage(
            route: ModalRoute.of(context)! as TrainingRoute,
            builder: builder,
          ),
-       );
-
-  final TrainingTransitionSource? source;
-  final ModalRoute<dynamic>? _sourceRoute;
-  final String _theme;
-  final bool _reduced;
-  final VoidCallback _releaseEntry;
-  final TrainingTransitionTimingToken? _entryTiming;
-  TrainingTransitionTimingToken? _exitTiming;
-  VoidCallback? _releaseExit;
-  var _entryFinished = false;
-  var _exitOutcome = 'completed';
-  final _visual = Completer<void>();
-  _TrainingTransitionHostState? _host;
-  OverlayEntry? _returnEntry;
-  bool _returning = false;
-  bool _finishingVisual = false;
-  LocalHistoryEntry? _returnHistory;
-
-  /// Includes the post-pop shrink and the 120ms source-image cross-fade.
-  Future<void> get visualCompleted => _visual.future;
-
-  static TrainingTransitionTimingToken? _beginTiming(
-    BuildContext context,
-    TrainingTransitionKind kind,
-  ) {
+         transitionsBuilder: (context, animation, _, child) => Stack(
+           fit: StackFit.expand,
+           children: [
+             // Unlike ModalRoute's barrier this stays interactive while the
+             // controller is reversed/dismissed and a durable save is pending.
+             const AbsorbPointer(
+               key: ValueKey('training-navigation-lock'),
+               child: SizedBox.expand(),
+             ),
+             SlideTransition(
+               key: const ValueKey('training-slide'),
+               position: (ModalRoute.of(context)! as TrainingRoute)._position,
+               child: child,
+             ),
+           ],
+         ),
+       ) {
     final environment = PerformanceReportService.instance;
     TrainingTransitionTimings.instance.setEnvironment(
       renderer: environment.renderer,
       rendererBackend: environment.rendererBackend,
       rendererVerified: environment.rendererVerified,
     );
-    return TrainingTransitionTimings.instance.begin(
-      kind,
-      theme: Theme.of(context).brightness.name,
-      reducedMotion: MediaQuery.disableAnimationsOf(context),
+    _entryTiming = _beginTiming(TrainingTransitionKind.entry);
+    FrameRecorder.instance.beginScenario(FrameScenario.trainingRouteEntry);
+  }
+
+  final String sourceEntry;
+  final bool reducedMotion;
+  final String _theme;
+  final VoidCallback _releaseEntry;
+  late final control = TrainingRouteControl._(this);
+  TrainingTransitionTimingToken? _entryTiming, _exitTiming;
+  VoidCallback? _releaseExit;
+  Future<void>? _exitFuture;
+  bool _entryEnded = false, _disposed = false, _aborted = false;
+  int _exitCycle = 0;
+  late final CurvedAnimation _curve;
+  late final Animation<Offset> _position;
+
+  TrainingTransitionTimingToken? _beginTiming(TrainingTransitionKind kind) =>
+      TrainingTransitionTimings.instance.begin(
+        kind,
+        theme: _theme,
+        reducedMotion: reducedMotion,
+        sourceEntry: sourceEntry,
+      );
+
+  @override
+  void install() {
+    super.install();
+    _curve = CurvedAnimation(
+      parent: animation!,
+      curve: Curves.easeOutCubic,
+      // The tween runs 1 -> 0 on reverse; flip the curve so physical rightward
+      // displacement is easeInCubic(elapsed), rather than its complement.
+      reverseCurve: Curves.easeInCubic.flipped,
     );
-  }
-
-  void _entryEnded() {
-    if (_entryFinished) return;
-    _entryFinished = true;
-    TrainingTransitionTimings.instance.finish(_entryTiming);
-    // Keep file verification and deferred model updates out of the 560ms
-    // gate-release frame. This does not delay the gate, video or training.
-    WidgetsBinding.instance.addPostFrameCallback((_) => _releaseEntry());
-  }
-
-  void _exitStarted() {
-    _exitOutcome = 'completed';
-    _releaseExit ??= TrainingTransitionActivity.instance.hold();
-    _exitTiming = TrainingTransitionTimings.instance.begin(
-      TrainingTransitionKind.exit,
-      theme: _theme,
-      reducedMotion: _reduced,
-    );
-  }
-
-  void _exitFailed() {
-    TrainingTransitionTimings.instance.finish(
-      _exitTiming,
-      outcome: 'save_failed',
-    );
-    _exitTiming = null;
-    _releaseExit?.call();
-    _releaseExit = null;
-  }
-
-  void _ensureReturnRecording() {
-    // The SDK deliberately reports onExitStarted once until Replay. A durable
-    // retry can therefore reach pop without a second callback. Preserve the
-    // existing retry visuals while recording/freezing its actual return too.
-    if (_exitTiming == null && _releaseExit == null) {
-      _exitStarted();
-      _exitTiming?.metadata['resumedAfterSaveFailure'] = true;
-    }
+    _position = Tween<Offset>(
+      begin: const Offset(1, 0),
+      end: Offset.zero,
+    ).animate(_curve);
+    controller!.addStatusListener(_statusChanged);
   }
 
   @override
   bool canTransitionFrom(TransitionRoute<dynamic> previousRoute) => false;
 
   @override
-  bool didPop(T? result) {
-    _host?.prepareReturn();
-    return super.didPop(result);
+  RoutePopDisposition get popDisposition {
+    // Leaving before the gate opens must never start or save a session.
+    if (!control.entered) return RoutePopDisposition.pop;
+    return super.popDisposition;
   }
 
-  void _finishVisual() {
-    if (_finishingVisual) return;
-    _finishingVisual = true;
-    final entry = _returnEntry;
-    _returnEntry = null;
-    if (entry != null) {
-      entry.remove();
-      entry.dispose();
+  void _statusChanged(AnimationStatus status) {
+    if (_disposed) return;
+    if (status == AnimationStatus.completed && !control.exiting) {
+      // Also used for a zero-duration route: paint the complete poster and
+      // chrome once before releasing the SDK gate, never a blank video frame.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_disposed || _aborted || control.exiting) return;
+        if (controller!.status != AnimationStatus.completed) return;
+        if (!_entryEnded) {
+          _entryEnded = true;
+          TrainingTransitionTimings.instance.finish(_entryTiming);
+          FrameRecorder.instance.endScenario(FrameScenario.trainingRouteEntry);
+          _releaseEntry();
+        }
+        control._entered();
+      });
     }
-    source?.show(1);
-    _returnHistory?.remove();
-    _returnHistory = null;
+  }
+
+  void _beginExit() {
+    if (_disposed || control.exiting) return;
+    _exitCycle++;
+    final cycle = _exitCycle;
+    control._exiting();
+    _releaseExit = TrainingTransitionActivity.instance.hold();
+    _exitTiming = _beginTiming(TrainingTransitionKind.exit);
+    FrameRecorder.instance.beginScenario(FrameScenario.trainingRouteExit);
+    // A route is explicitly allowed to be active with its controller dismissed
+    // (the framework's interactive-pop lifecycle). Do not pop or dispose the SDK
+    // before its durable save/receipt is complete.
+    _exitFuture = () async {
+      try {
+        await controller!.reverse().orCancel;
+      } on TickerCanceled {
+        return;
+      }
+      if (_disposed || cycle != _exitCycle) return;
+      control._retireMedia();
+      _endExitTiming();
+    }();
+  }
+
+  void _endExitTiming({String outcome = 'completed'}) {
+    TrainingTransitionTimings.instance.finish(_exitTiming, outcome: outcome);
+    _exitTiming = null;
     FrameRecorder.instance.endScenario(FrameScenario.trainingRouteExit);
-    if (!_entryFinished) {
-      _entryFinished = true;
-      TrainingTransitionTimings.instance.finish(
-        _entryTiming,
-        outcome: 'aborted',
-      );
-    }
-    TrainingTransitionTimings.instance.finish(
-      _exitTiming,
-      outcome: _exitOutcome,
-    );
-    _releaseEntry();
     _releaseExit?.call();
     _releaseExit = null;
-    if (!_visual.isCompleted) _visual.complete();
+  }
+
+  Future<void> _beforeExitPop() async {
+    _beginExit();
+    await _exitFuture;
+  }
+
+  void _saveFailed() {
+    if (_disposed || !control.exiting) return;
+    _exitCycle++;
+    _endExitTiming(outcome: 'save_failed');
+    _exitFuture = null;
+    control._failed();
+    // Let the SDK finish replacing its retained early-exit frame with its
+    // public retry view before sliding that complete view back into sight.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_disposed && control.saveFailed && isActive) {
+        controller!.forward();
+        // A very fast failed save can reverse then forward at value=1 without
+        // a value tick. Refresh ModalRoute's cached pointer/focus state too.
+        changedInternalState();
+      }
+    });
+    WidgetsBinding.instance.ensureVisualUpdate();
+  }
+
+  void abortEntrance() {
+    if (_disposed || control.entered || _aborted) return;
+    _aborted = true;
+    if (isCurrent) navigator?.pop();
+    controller?.value = 0;
+  }
+
+  @override
+  bool didPop(T? result) {
+    if (!control.entered) {
+      _aborted = true;
+    } else if (!control.exiting) {
+      _beginExit();
+    }
+    return super.didPop(result);
   }
 
   @override
   void dispose() {
-    if (!_returning) _finishVisual();
+    _disposed = true;
+    controller?.removeStatusListener(_statusChanged);
+    if (!_entryEnded) {
+      TrainingTransitionTimings.instance.finish(
+        _entryTiming,
+        outcome: 'aborted',
+      );
+      FrameRecorder.instance.endScenario(FrameScenario.trainingRouteEntry);
+    }
+    _endExitTiming(outcome: _aborted ? 'aborted' : 'completed');
+    _releaseEntry();
+    control.dispose();
+    _curve.dispose();
     super.dispose();
+  }
+}
+
+/// Public host state only; the SDK owns clocks, confirmation, records and pop.
+class TrainingRouteControl extends ChangeNotifier {
+  TrainingRouteControl._(this._route);
+  final TrainingRoute<dynamic> _route;
+  final _gate = Completer<void>();
+  bool entered = false,
+      exiting = false,
+      mediaRetired = false,
+      saveFailed = false;
+  Future<void> get startGate => _gate.future;
+  bool get canPlay => entered && !mediaRetired;
+
+  void beginExit() => _route._beginExit();
+  Future<void> beforeExitPop() => _route._beforeExitPop();
+  void exitSaveFailed() => _route._saveFailed();
+  void retryExitSave() {
+    if (saveFailed) beginExit();
+  }
+
+  void replay() {
+    exiting = false;
+    mediaRetired = false;
+    saveFailed = false;
+    notifyListeners();
+  }
+
+  void _entered() {
+    if (entered) return;
+    entered = true;
+    if (!_gate.isCompleted) _gate.complete();
+    notifyListeners();
+  }
+
+  void _exiting() {
+    exiting = true;
+    saveFailed = false;
+    notifyListeners();
+  }
+
+  void _retireMedia() {
+    mediaRetired = true;
+    notifyListeners();
+  }
+
+  void _failed() {
+    exiting = false;
+    mediaRetired = true;
+    saveFailed = true;
+    notifyListeners();
+  }
+}
+
+class TrainingRouteScope extends InheritedNotifier<TrainingRouteControl> {
+  const TrainingRouteScope({
+    super.key,
+    required TrainingRouteControl control,
+    required super.child,
+  }) : super(notifier: control);
+  static TrainingRouteControl? maybeOf(BuildContext context) => context
+      .dependOnInheritedWidgetOfExactType<TrainingRouteScope>()
+      ?.notifier;
+}
+
+class _TrainingRoutePage extends StatefulWidget {
+  const _TrainingRoutePage({required this.route, required this.builder});
+  final TrainingRoute<dynamic> route;
+  final WidgetBuilder builder;
+  @override
+  State<_TrainingRoutePage> createState() => _TrainingRoutePageState();
+}
+
+class _TrainingRoutePageState extends State<_TrainingRoutePage>
+    with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed && !widget.route.control.entered) {
+      widget.route.abortEntrance();
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = SmartFitTrainerTheme.of(context);
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle(
+        statusBarColor: theme.mediaStage,
+        systemNavigationBarColor: theme.mediaStage,
+        statusBarIconBrightness: dark ? Brightness.light : Brightness.dark,
+        statusBarBrightness: dark ? Brightness.dark : Brightness.light,
+        systemNavigationBarIconBrightness: dark
+            ? Brightness.light
+            : Brightness.dark,
+        systemStatusBarContrastEnforced: false,
+        systemNavigationBarContrastEnforced: false,
+      ),
+      child: ColoredBox(
+        key: const ValueKey('training-route-background'),
+        color: theme.mediaStage,
+        child: TrainingRouteScope(
+          control: widget.route.control,
+          child: ListenableBuilder(
+            listenable: widget.route.control,
+            child: Builder(builder: widget.builder),
+            builder: (_, child) => IgnorePointer(
+              ignoring:
+                  !widget.route.control.entered || widget.route.control.exiting,
+              child: child,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

@@ -5,7 +5,6 @@ import '../app/training_transition_activity.dart';
 
 /// Keeps the source route's real retained layer and scroll position. Updates
 /// remain in the model and are rendered once after the short transition ends.
-/// A selected source image can still hide/show through its local notifier.
 class TrainingTransitionFreeze extends StatefulWidget {
   const TrainingTransitionFreeze({
     super.key,

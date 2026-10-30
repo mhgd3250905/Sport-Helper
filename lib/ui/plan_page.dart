@@ -11,10 +11,9 @@ import '../domain/scenario.dart';
 import 'guide_media.dart';
 import 'guide_layout_tokens.dart';
 import 'plan_presentation.dart';
-import 'player_page.dart';
+import 'open_training.dart';
 import 'theme.dart';
-import 'training_route.dart';
-import 'training_entry_placeholder.dart';
+import 'training_poster_image.dart';
 
 /// A sectioned training article with explicit, independently paused previews.
 /// App validation, replacements and training navigation stay here.
@@ -32,7 +31,7 @@ class PlanPage extends StatefulWidget {
   /// The conversation owner retains AI restore/recall and persistence gates.
   final Future<bool> Function(TrainingPlan plan)? onTrainingStarting;
 
-  /// Keep this source route alive while the trainer expands and returns.
+  /// The article stays mounted while training slides in and back out.
   final void Function(TrainingPlan plan, SessionResult result)?
   onTrainingFinished;
   @override
@@ -44,7 +43,6 @@ class _PlanPageState extends State<PlanPage> with WidgetsBindingObserver {
   final _scroll = ScrollController();
   final _viewport = GlobalKey();
   final _videos = <String, GlobalKey>{};
-  final _mediaOpacity = <String, ValueNotifier<double>>{};
   final _coordinator = GuidePreviewCoordinator();
   bool _measurementQueued = false;
   String? _releasingSlot;
@@ -68,7 +66,7 @@ class _PlanPageState extends State<PlanPage> with WidgetsBindingObserver {
         ? null
         : AppServices.of(context).library.tryGet(first);
     if (exercise != null) {
-      unawaited(TrainingTransitionPoster.precache(context, exercise));
+      unawaited(TrainingPosterImages.precache(context, exercise));
     }
     _measureAfterLayout();
   }
@@ -130,9 +128,6 @@ class _PlanPageState extends State<PlanPage> with WidgetsBindingObserver {
     _coordinator.removeListener(_measureAfterLayout);
     _coordinator.dispose();
     _scroll.dispose();
-    for (final opacity in _mediaOpacity.values) {
-      opacity.dispose();
-    }
     super.dispose();
   }
 
@@ -194,114 +189,42 @@ class _PlanPageState extends State<PlanPage> with WidgetsBindingObserver {
     s.prefetchPlan(_plan);
   }
 
-  Future<void> _startTraining(AppServices s) async {
-    if (!s.store.trainingAllowed) {
-      showSfToast(
-        context,
-        s.store.safetyAccepted
-            ? '根据你的安全确认，暂不开始训练；可以在动作库里看示范。'
-            : '请先在对话里完成安全确认，再开始训练。',
-        icon: SfGlyph.shield,
-        bottom: 24,
-      );
-      return;
-    }
+  Future<void> _startTraining() async {
     if (_starting) return;
     _starting = true;
     final launchEpoch = _launchEpoch;
-    final source = _trainingSource();
-    final first = _plan.items.firstOrNull?.exerciseId;
-    final posterReady = first == null
-        ? Future<void>.value()
-        : TrainingTransitionPoster.precache(context, s.library[first]);
-    // Release the preview first, preserving its route and measured image slot.
-    setState(() => _previewOn = false);
-    await _coordinator.stop();
-    await WidgetsBinding.instance.endOfFrame;
-    if (!mounted) return;
-    if (launchEpoch != _launchEpoch) {
-      setState(() {
-        _previewOn = true;
-        _starting = false;
-      });
-      return;
-    }
-    if (widget.onTrainingStarting != null &&
-        !await widget.onTrainingStarting!(_plan)) {
+    final plan = _plan;
+    SessionResult? result;
+    try {
+      result = await openTraining(
+        context,
+        plan: plan,
+        sourceEntry: 'guide',
+        onStarting: () async {
+          if (widget.onTrainingStarting != null &&
+              !await widget.onTrainingStarting!(plan)) {
+            return false;
+          }
+          if (!mounted || launchEpoch != _launchEpoch) return false;
+          // Retire only the preview decoder. The article and its scroll state
+          // remain mounted, with the same still in the same media rectangle.
+          setState(() => _previewOn = false);
+          await _coordinator.stop();
+          await WidgetsBinding.instance.endOfFrame;
+          return mounted && launchEpoch == _launchEpoch;
+        },
+      );
+    } finally {
       if (mounted) {
         setState(() {
           _previewOn = true;
           _starting = false;
         });
       }
-      return;
     }
-    if (!mounted) return;
-    if (launchEpoch != _launchEpoch) {
-      setState(() {
-        _previewOn = true;
-        _starting = false;
-      });
-      return;
+    if (mounted && result != null) {
+      widget.onTrainingFinished?.call(plan, result);
     }
-    await posterReady;
-    if (!mounted) return;
-    if (launchEpoch != _launchEpoch) {
-      setState(() {
-        _previewOn = true;
-        _starting = false;
-      });
-      return;
-    }
-    final route = TrainingRoute<SessionResult>(
-      context: context,
-      source: source,
-      settings: const RouteSettings(name: 'player'),
-      builder: (_) => PlayerPage(plan: _plan),
-    );
-    final result = await Navigator.of(context).push(route);
-    await route.completed;
-    await route.visualCompleted;
-    if (mounted) {
-      setState(() {
-        _previewOn = true;
-        _starting = false;
-      });
-      if (result != null) widget.onTrainingFinished?.call(_plan, result);
-    }
-  }
-
-  TrainingTransitionSource? _trainingSource() {
-    final view = _viewport.currentContext?.findRenderObject();
-    if (view is! RenderBox || !view.hasSize) return null;
-    final viewport = view.localToGlobal(Offset.zero) & view.size;
-    Rect? rectOf(String slot) {
-      final box = _videos[slot]?.currentContext?.findRenderObject();
-      if (box is! RenderBox || !box.attached || !box.hasSize) return null;
-      final rect = box.localToGlobal(Offset.zero) & box.size;
-      return rect.overlaps(viewport) ? rect : null;
-    }
-
-    String? selected = _coordinator.activeSlot;
-    if (selected == null || rectOf(selected) == null) {
-      var area = 0.0;
-      selected = null;
-      for (final slot in _videos.keys) {
-        final rect = rectOf(slot)?.intersect(viewport);
-        if (rect != null && rect.width * rect.height > area) {
-          area = rect.width * rect.height;
-          selected = slot;
-        }
-      }
-    }
-    if (selected == null) return null;
-    final slot = selected;
-    return TrainingTransitionSource(
-      initialRect: rectOf(slot),
-      rect: () => rectOf(slot),
-      opacity: _mediaOpacity.putIfAbsent(slot, () => ValueNotifier(1)),
-      repaintKey: _videos[slot],
-    );
   }
 
   @override
@@ -375,7 +298,7 @@ class _PlanPageState extends State<PlanPage> with WidgetsBindingObserver {
             left: 0,
             right: 0,
             bottom: 0,
-            child: _trainingBar(services, safeBottom),
+            child: _trainingBar(safeBottom),
           ),
         ],
       ),
@@ -415,7 +338,7 @@ class _PlanPageState extends State<PlanPage> with WidgetsBindingObserver {
     return rows;
   }
 
-  Widget _trainingBar(AppServices services, double safeBottom) => Column(
+  Widget _trainingBar(double safeBottom) => Column(
     key: const ValueKey('guide-training-bar'),
     mainAxisSize: MainAxisSize.min,
     children: [
@@ -451,7 +374,7 @@ class _PlanPageState extends State<PlanPage> with WidgetsBindingObserver {
             key: const ValueKey('start'),
             semanticLabel: '前往训练',
             haptic: SfHaptic.light,
-            onTap: () => unawaited(_startTraining(services)),
+            onTap: () => unawaited(_startTraining()),
             child: Container(
               key: const ValueKey('guide-training-button'),
               height: SfGuideTokens.buttonHeight,
@@ -590,29 +513,21 @@ class _PlanPageState extends State<PlanPage> with WidgetsBindingObserver {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    ValueListenableBuilder<double>(
-                      valueListenable: _mediaOpacity.putIfAbsent(
-                        slot,
-                        () => ValueNotifier(1),
-                      ),
-                      builder: (_, opacity, child) =>
-                          Opacity(opacity: opacity, child: child),
-                      child: RepaintBoundary(
-                        key: videoKey,
-                        child: ClipRRect(
-                          borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(SfGuideTokens.cardRadius),
-                          ),
-                          child: AspectRatio(
-                            key: ValueKey('article-video-$slot'),
-                            aspectRatio: SfGuideTokens.mediaRatio,
-                            child: GuideMedia(
-                              key: ValueKey('plan-demo-$slot-${exercise.id}'),
-                              exercise: exercise,
-                              slot: slot,
-                              coordinator: _coordinator,
-                              enabled: _previewOn,
-                            ),
+                    RepaintBoundary(
+                      key: videoKey,
+                      child: ClipRRect(
+                        borderRadius: const BorderRadius.vertical(
+                          top: Radius.circular(SfGuideTokens.cardRadius),
+                        ),
+                        child: AspectRatio(
+                          key: ValueKey('article-video-$slot'),
+                          aspectRatio: SfGuideTokens.mediaRatio,
+                          child: GuideMedia(
+                            key: ValueKey('plan-demo-$slot-${exercise.id}'),
+                            exercise: exercise,
+                            slot: slot,
+                            coordinator: _coordinator,
+                            enabled: _previewOn,
                           ),
                         ),
                       ),

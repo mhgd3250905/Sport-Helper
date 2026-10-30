@@ -23,8 +23,6 @@ import 'package:smartfit/voice/voice_library.dart';
 import 'package:smartfit/voice/voice_queue.dart';
 import 'package:ugk_trainer/ugk_trainer.dart' show DrillMediaPlaybackSnapshot;
 
-import 'app_flow_test.dart' show widgetFixtureStateEncoder;
-
 class _Storage implements LocalStateStorage {
   final values = <String, String>{};
   @override
@@ -79,11 +77,7 @@ class _Library extends ExerciseLibrary {
 AppServices _services(_Storage storage, {bool enabled = true}) => AppServices(
   library: ExerciseLibrary([_exercise('test-a'), _exercise('test-b')]),
   catalog: TemplateCatalog([]),
-  store: AppStore(
-    storage,
-    actionIssueEnabled: enabled,
-    stateEncoder: widgetFixtureStateEncoder,
-  )..starfield = false,
+  store: AppStore(storage, actionIssueEnabled: enabled)..starfield = false,
   voiceLibrary: VoiceLibrary.empty,
   voiceOutput: const MutedVoiceOutput(),
 );
@@ -378,8 +372,7 @@ void main() {
       });
       await _show(tester, services, const AboutPage());
       await tester.scrollUntilVisible(
-        find.byKey(const ValueKey('action-issues-open')),
-        250,
+        find.byKey(const ValueKey('action-issues-open')), 250,
         scrollable: find.byType(Scrollable).first,
       );
       await tester.tap(find.byKey(const ValueKey('action-issues-open')));

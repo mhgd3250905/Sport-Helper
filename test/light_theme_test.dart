@@ -9,12 +9,7 @@ import 'package:smartfit/ui/theme.dart';
 import 'package:ugk_trainer/ugk_trainer.dart' as trainer;
 
 import 'app_flow_test.dart'
-    show
-        MemoryStorage,
-        services,
-        tall,
-        showManualChatCard,
-        widgetFixtureStateEncoder;
+    show MemoryStorage, services, tall, showManualChatCard;
 import 'support.dart';
 
 double _lum(Color c) => c.computeLuminance();
@@ -271,10 +266,7 @@ void main() {
 
   group('switching', () {
     test('a new install follows the system; a stored choice is kept', () async {
-      final fresh = AppStore(
-        MemoryStorage(),
-        stateEncoder: widgetFixtureStateEncoder,
-      );
+      final fresh = AppStore(MemoryStorage());
       await fresh.load();
       expect(fresh.appearance, 'system');
       final storage = MemoryStorage();

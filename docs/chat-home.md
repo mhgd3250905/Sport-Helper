@@ -1,22 +1,10 @@
 # 对话式主界面
 
-## 当前 +49 训练过渡性能候选（2026-10-30）
+## 当前 +49 标准滑动候选（2026-10-30）
 
-**0.1.0+49 / internal arm64 2049**，分支 `codex/trainer-transition`。打包/全量测试源码 `c1d1c3994061cb451bed2b92501a665dc0bd61e4`；SDK三包及override仍锁 `c97a79a5f03ba1f46f017b995f7f8d97fb3016a9`，整份锁文件与3934da7相同。全量 **827/827、0跳过/失败**，analyze **0问题**；release **42,657,842B**、profile **53,609,054B**，同签名、16KB及JNI检查通过。+48设计时长/曲线/编排保留；新增内部近10次FrameTiming与复制页面。真机指标尚未采集，候选未合并、未推送、未打tag；main/release/1.0与SDK源码未改。 详见[逐项定位、产物及真机采集步骤](trainer-transition-plus49-performance-2026-10-30.md)。
+本轮按新交接移除卡片展开/缩回及控件错开，统一宿主训练入口为 opaque 水平滑动：进入300ms easeOutCubic，退出280ms easeInCubic，系统移除动画时0ms。版本0.1.0+49 / internal arm64 2049，SDK三包仍锁c97a79a5。对话计划卡、我的计划、图文详情走唯一openTraining；按开哥补充决定，SDK封装的动作库/推荐动作单练留待SDK公开接口接入。最近10次帧耗时支持复制和系统分享。候选保持未合并、未推送、未打tag，release/1.0与SDK源码不动。 实现与最终验证见[本轮交付记录](trainer-transition-plus49-slide-2026-10-30.md)。
 
-## 历史 +48 设计候选（设计已确认，性能由 +49 继续）
-
-本轮按最新版完整交接接入 SDK `c97a79a5f03ba1f46f017b995f7f8d97fb3016a9` 的 startGate/chromeAnimation/onExitStarted/beforeExitPop；进入560ms、退出控件250ms及舞台380ms+120ms，路由本身0ms。真实训练UI从开始即挂载，门禁前无视频、计时或语音；图文来源页保留，完成记录在缩回结束后平滑插入。候选源码 `ccdf1b1729ee6365edb3669aaacae320c23bd49f` 已通过全量 **798/798（0跳过/失败）**、analyze **0问题**；release **42,628,010B**、profile **59,584,897B**，同签名、ZIP/ELF 16KB、JNI及无MP4检查通过。浅深软件视频已交付，真机UI/Raster最大值仍待测。最终源绑定、产物和待验边界见[新版+48记录](trainer-transition-plus48-morph-2026-10-30.md)。旧c0候选及652接口摸排仅保留作历史；main/release不动，不合并、不推送、不打tag，等待开哥真机确认。
-
-## 旧 +48 训练过渡候选（c0，已被新版替代）
-
-本候选为 **0.1.0+48 / internal arm64 2048**，分支 `codex/trainer-transition`，基于 +47 main `d8d6db76fc631f47afbf3740f67d2d00ebfff2f6`。SDK 三包及 override 升级并锁定 `652135f532bac1a06fbf133dc497692d6b44c78a`。进入/退出为 320/260ms，进入结束前不启动训练计时、语音或视频；提前结束保存和回退由新版 SDK 管理。最终源码、测试、构建与真机待验边界见[+48 记录](trainer-transition-plus48-2026-10-30.md)。**等待开哥真机确认后再合入并推送 main**；release/1.0 和 SDK 源码不动，不打 tag。
-
-全量 **773/773、0 跳过/失败**，`flutter analyze` **0 问题**。release **42,602,114B（42.60MB）**、profile **53,506,134B（53.51MB）**，同签名、ZIP/ELF 16KB、存储 JNI、原 Noto 和无 MP4 门禁通过。APK/测试源码固定 `c0a0fc0bf26a4955cc1bfe4e7f943e1a487594db`，其后仅 README/docs 收束；真机 UI/Raster 最大帧耗时待远程采集。
-
-下方 +47 是已合入 main 的基线记录，不代表本候选已经合并。
-
-## 当前 +47 主线整合（2026-10-30）
+## 已合入 +47 主线整合（2026-10-30）
 
 本批 **+47 / 2047** 保留 +43 已保存计划 focus 与会话恢复，接入 +45 生成卡正常动效及 890ms 视觉完成时序，计划/消息/持久化即时可用。图文入口整合 +44 懒列表与 4:3 排版、+46 缓存视频和离线首帧训练；SDK 阶段、文案数据、取消与模型提示不改。全量 764/764、0 跳过，analyze 0；正常动效生成卡 C 与图文页的浅深色新截图已复核，均绑定实现源码 `ee6b83ea46b3d0ae9eccaf875b30a968087105c6`。验收边界与最终 Git 对齐见[整合记录](main-integration-plus47-2026-10-30.md)。
 
@@ -202,7 +190,7 @@ App 生命周期内长期持有一个 `CoachSession`，关闭 AI 界面不清空
 |---|---|---|---|---|
 | [历史图像索引](../../deliveries/flat-release-20261026/retired-evidence/manifest.json) | [历史图像索引](../../deliveries/flat-release-20261026/retired-evidence/manifest.json) | [历史图像索引](../../deliveries/flat-release-20261026/retired-evidence/manifest.json) | [历史图像索引](../../deliveries/flat-release-20261026/retired-evidence/manifest.json) | [历史图像索引](../../deliveries/flat-release-20261026/retired-evidence/manifest.json) |
 
-- 计划卡片封面上的「开始」圆盘、抽屉里已存计划的 ▶：`CardExpandRoute`（`lib/ui/chat/expand_route.dart`）做容器变换——卡片 500 ms 内放大到全屏（`fastOutSlowIn`），先铺天空底色，跟练页按全屏尺寸布局后随卡片宽度缩放并淡入（中途不重排），背后的对话只变暗不缩放。返回 420 ms 收回卡片当前位置；从抽屉开始的（抽屉已关）收回到对话中间。系统「减少动画 / 移除动画」时只淡入淡出。路由展开后不透明，对话页（含星尘）停止绘制。
+- 计划卡片的开始按钮、我的计划直接播放、图文页前往训练都调用唯一 `openTraining`：完整SDK页面以300ms从右滑入，以280ms向右滑出，底页不缩放、不变暗；移除动画时0ms。我的计划列表保持原route，完成记录在训练route完全结束后插入。具体门禁与SDK封装例外见本轮标准滑动记录。
 - 跟练页（`PlayerPage`）结构参照 HipLab 训练页：顶栏关闭 · 区块名 + 进度条 · n/N；视频直接放在与渲染底一致的舞台上（保持媒体原色与原构图），左上「已暂停 / 换左侧」、右上「不舒服」标签；动作名、组次与剂量、计时环（训练中强调色，准备/休息中性色）、要领；训练中下方显示「下一个」；底部上一个 / 暂停（全页唯一强调色圆盘）/ 跳过。完成页、不舒服面板、结束确认框同一套 token。计时、语音时序、视频播放与左右镜像、中断恢复、记录逻辑都没改。
 
 ## 视觉与性能

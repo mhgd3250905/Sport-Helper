@@ -7,6 +7,8 @@ import '../diagnostics/training_transition_timings.dart';
 import '../diagnostics/performance_report.dart';
 import 'theme.dart';
 
+enum _ExportAction { copy, share }
+
 /// A small internal-only viewer; opening it never starts or clears a sample.
 class TrainingTransitionTimingsPage extends StatefulWidget {
   const TrainingTransitionTimingsPage({super.key, this.recorder});
@@ -20,7 +22,7 @@ class TrainingTransitionTimingsPage extends StatefulWidget {
 class _TrainingTransitionTimingsPageState
     extends State<TrainingTransitionTimingsPage> {
   late final TrainingTransitionTimings _recorder;
-  bool _copying = false;
+  _ExportAction? _exporting;
   String? _message;
   Future<void>? _refreshingEnvironment;
 
@@ -47,21 +49,39 @@ class _TrainingTransitionTimingsPageState
     if (mounted) setState(() {});
   }
 
-  Future<void> _copy() async {
-    if (_copying) return;
+  Future<void> _export(_ExportAction action) async {
+    if (_exporting != null) return;
     setState(() {
-      _copying = true;
+      _exporting = action;
       _message = null;
     });
     try {
       await _refreshingEnvironment;
+      if (!mounted) return;
       final json = await _recorder.exportJson();
-      await Clipboard.setData(ClipboardData(text: json));
-      if (mounted) setState(() => _message = '已复制最近10次训练过渡JSON');
+      if (!mounted) return;
+      if (action == _ExportAction.copy) {
+        await Clipboard.setData(ClipboardData(text: json));
+        if (mounted) setState(() => _message = '已复制最近10次训练过渡JSON');
+      } else {
+        await const AndroidPerformanceReportPlatform().share(
+          filename: performanceReportFilename(DateTime.now()),
+          contents: json,
+        );
+        if (mounted) {
+          setState(() => _message = '系统分享已打开，可选择飞书；取消分享不会清空统计。');
+        }
+      }
     } on Object {
-      if (mounted) setState(() => _message = '复制未完成，请重试；已有采样保留。');
+      if (mounted) {
+        setState(
+          () => _message = action == _ExportAction.copy
+              ? '复制未完成，请重试；已有采样保留。'
+              : '分享未打开，请重试；已有采样保留。',
+        );
+      }
     } finally {
-      if (mounted) setState(() => _copying = false);
+      if (mounted) setState(() => _exporting = null);
     }
   }
 
@@ -74,24 +94,37 @@ class _TrainingTransitionTimingsPageState
         listenable: _recorder,
         builder: (context, _) {
           final results = _recorder.results;
+          final canExport =
+              _exporting == null &&
+              (results.isNotEmpty || _recorder.hasPendingResults);
           return ListView(
             key: const ValueKey('transition-timings-results'),
             padding: const EdgeInsets.all(20),
             children: [
               Text(
-                '自动保留最近10次进入/退出。每次进出各做5次；首次单列，'
-                '本次启动的第2–5次用于热启动比较。引擎帧可能延迟回传约1秒，复制会等已结束的采样补齐。',
+                '自动保留最近10次进入/退出。对话计划卡、我的计划、图文详情，'
+                '各测浅色和深色，共6组。每组进出3次，包含提前结束、完成和系统返回。'
+                '每组测完立即分享，避免最近10次滚动覆盖之前的结果。'
+                '引擎帧可能延迟回传约1秒，复制和分享会等待已结束的采样补齐。',
                 style: SfType.body,
               ),
               const SizedBox(height: 12),
               SfPrimaryButton(
                 key: const ValueKey('transition-timings-copy'),
-                label: _copying ? '正在准备JSON…' : '复制最近10次JSON',
-                onPressed:
-                    _copying ||
-                        (results.isEmpty && !_recorder.hasPendingResults)
-                    ? null
-                    : _copy,
+                label: _exporting == _ExportAction.copy
+                    ? '正在准备JSON…'
+                    : '复制最近10次JSON',
+                onPressed: canExport ? () => _export(_ExportAction.copy) : null,
+              ),
+              const SizedBox(height: 8),
+              SfSecondaryButton(
+                key: const ValueKey('transition-timings-share'),
+                label: _exporting == _ExportAction.share
+                    ? '正在准备分享…'
+                    : '分享最近10次JSON',
+                onPressed: canExport
+                    ? () => _export(_ExportAction.share)
+                    : null,
               ),
               if (_message != null) ...[
                 const SizedBox(height: 8),
@@ -102,7 +135,7 @@ class _TrainingTransitionTimingsPageState
               ],
               if (_recorder.persistenceFailed) ...[
                 const SizedBox(height: 8),
-                Text('本地JSON保存未完成，当前内存结果仍可复制。', style: SfType.caption),
+                Text('本地JSON保存未完成，当前内存结果仍可复制和分享。', style: SfType.caption),
               ],
               const SizedBox(height: 16),
               if (_recorder.pendingResultCount > 0)
@@ -117,7 +150,7 @@ class _TrainingTransitionTimingsPageState
               Text(
                 '统计为Flutter引擎的build/raster线程耗时，P90使用最近秩法。'
                 '超16ms帧指build或raster任一超过16ms，不是两者相加。'
-                '目标仅用于profile、正常动效、完整第2–5次：build P90≤8ms，raster P90≤12ms，超16ms≤1帧。'
+                '首次会单独标记；未测、减少动效和中断会明确显示，不自动判断真机验收是否通过。'
                 '渲染后端以实际引擎证据为准；未验证时不会推断Skia或Impeller。',
                 style: SfType.caption,
               ),
@@ -145,7 +178,6 @@ class _TimingResultCard extends StatelessWidget {
     final run = result['runInProcess'];
     final first = result['firstAfterProcessStart'] == true;
     final rendererVerified = result['rendererVerified'] == true;
-    final eligible = result['eligibleForWarmTarget'] == true;
     final outcome = result['outcome'];
     final label = result['kind'] == 'entry' ? '进入' : '退出';
     return Card(
@@ -161,6 +193,12 @@ class _TimingResultCard extends StatelessWidget {
               style: SfType.headline,
             ),
             const SizedBox(height: 6),
+            Text(switch (result['sourceEntry']) {
+              'chat' => '入口：对话计划卡',
+              'saved_plan' => '入口：我的计划',
+              'guide' => '入口：图文详情',
+              _ => '入口：未记录',
+            }, style: SfType.caption),
             Text(
               '${result['buildMode']} · ${result['theme']} · ${result['frameCount']}帧',
               style: SfType.caption,
@@ -187,15 +225,17 @@ class _TimingResultCard extends StatelessWidget {
               style: SfType.caption,
             ),
             Text(
-              eligible
-                  ? (result['meetsNumericTarget'] == true
-                        ? '本次热启动数值达到目标'
-                        : '本次热启动数值未达到目标')
-                  : first
-                  ? '首次单列，不作为热启动达标结论'
+              result['transitionStyle'] != 'horizontal_slide'
+                  ? '历史记录未标记为本次滑动转场，请分开比较。'
+                  : result['reducedMotion'] == true
+                  ? '移除动画已开启，本次为直接切换。'
                   : outcome != 'completed'
-                  ? '过渡中断/保存失败，不作达标结论'
-                  : '仅profile完整第2–5次正常动效参与目标判定',
+                  ? '过渡中断或保存失败，保留已收到的真实帧。'
+                  : result['truncated'] == true
+                  ? '采样达到容量上限，数据已截断。'
+                  : result['hasMeasuredFrames'] != true
+                  ? '尚无真实帧，耗时保持未测。'
+                  : '滑动转场记录，保留实测值供对比。',
               style: SfType.caption,
             ),
             Text('${result['startedAtUtc']}', style: SfType.caption),

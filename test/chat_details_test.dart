@@ -76,15 +76,18 @@ void main() {
       );
       await tester.pump();
       expect(find.byType(PlayerPage, skipOffstage: false), findsOneWidget);
-      await tester.pump(const Duration(milliseconds: 560));
+      await tester.pump(const Duration(milliseconds: 300));
       await tester.pump();
       expect(find.byType(PlayerPage), findsOneWidget);
       expect(s.store.lastPlan?.id, plan.id);
       final route =
           ModalRoute.of(tester.element(find.byType(PlayerPage)))!
               as TrainingRoute;
-      expect(route.transitionDuration, Duration.zero);
-      expect(route.reverseTransitionDuration, Duration.zero);
+      expect(route.transitionDuration, const Duration(milliseconds: 300));
+      expect(
+        route.reverseTransitionDuration,
+        const Duration(milliseconds: 280),
+      );
       final summaries = s.chat.messages
           .where((message) => message.text.contains('这次先到这儿'))
           .length;
@@ -94,30 +97,20 @@ void main() {
       await tester.pump();
       await tester.pump();
       expect(s.store.history, hasLength(1));
-      await tester.pump(const Duration(milliseconds: 249));
-      expect(find.byType(PlayerPage), findsOneWidget);
+      await tester.pump(const Duration(milliseconds: 279));
+      expect(find.byType(PlayerPage, skipOffstage: false), findsOneWidget);
       expect(
         s.chat.messages
             .where((message) => message.text.contains('这次先到这儿'))
             .length,
         summaries,
-        reason: 'Saving can complete while real controls are still retiring.',
+        reason: 'A saved receipt is not presented before the slide finishes.',
       );
-      await tester.pump(const Duration(milliseconds: 2));
+      await tester.pump(const Duration(milliseconds: 1));
+      await tester.pump(const Duration(microseconds: 1));
+      await tester.pump();
       await tester.pump();
       expect(find.byType(PlayerPage), findsNothing);
-      expect(
-        find.byKey(const ValueKey('training-return-poster')),
-        findsOneWidget,
-      );
-      expect(
-        s.chat.messages
-            .where((message) => message.text.contains('这次先到这儿'))
-            .length,
-        summaries,
-        reason:
-            'The zero-duration pop does not insert the chat receipt before the independent shrink finishes.',
-      );
       await tester.pumpAndSettle();
       expect(find.byType(PlanPage), findsOneWidget);
       expect(tester.element(find.byType(PlanPage)), same(detailElement));

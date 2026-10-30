@@ -1,24 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:ugk_trainer/ugk_trainer.dart';
-import 'package:ugk_trainer/engine.dart' as trainer;
-import 'package:ugk_coach/ugk_coach.dart' as coach;
 
-import '../app/services.dart';
 import '../app/gated_posehub_media_preparer.dart';
-import '../domain/exercise.dart' show equipmentLabel, ExerciseLibrary;
+import '../app/services.dart';
+import '../domain/exercise.dart' show equipmentLabel;
 import '../domain/plan.dart';
 import '../domain/session.dart' as session;
 import '../diagnostics/training_log.dart';
 import '../voice/just_audio_output.dart' as diagnostic_voice;
-import '../voice/voice_queue.dart' as app_voice show VoiceSettings;
 import 'action_issue_actions.dart';
 import 'alpha_artwork.dart';
 import 'exercise_video.dart';
 import 'theme/trainer_theme.dart';
-import 'training_entry_placeholder.dart';
+import 'training_poster_image.dart';
 import 'training_route.dart';
 
-/// App styling, assets and storage injected into the shared training player.
+/// App styling, assets and durable callbacks; all training UI belongs to SDK.
 class PlayerPage extends StatefulWidget {
   const PlayerPage({
     super.key,
@@ -27,7 +24,6 @@ class PlayerPage extends StatefulWidget {
   });
   final TrainingPlan plan;
   final Duration tick;
-
   @override
   State<PlayerPage> createState() => _PlayerPageState();
 }
@@ -37,51 +33,35 @@ class _PlayerPageState extends State<PlayerPage> {
   diagnostic_voice.JustAudioVoiceOutput? _voiceOutput;
   DrillMediaPlaybackHandle? _issuePlayback;
   String? _visibleActionId;
-  TrainingTransitionMotion? _motion;
-  bool _sessionFinished = false;
-  TrainingPlan? _cachedPlan;
-  coach.TrainingPlan? _trainerPlan;
-  ExerciseLibrary? _cachedLibrary;
-  Map<String, trainer.Rhythm>? _rhythms;
-  app_voice.VoiceSettings? _cachedVoiceSettings;
-  TrainerVoice? _voice;
-  PoseHubMediaPreparer? _mediaPreparer;
-  TrainingTransitionMotion? _preparerMotion;
-  bool _prefetchStarted = false;
+  TrainingRouteControl? _control;
+  PoseHubMediaPreparer? _preparer;
+  TrainingRouteControl? _preparerControl;
+  bool _sessionFinished = false, _prefetchStarted = false;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final motion = TrainingTransitionScope.maybeOf(context);
-    if (identical(motion, _motion)) return;
-    _motion?.removeListener(_motionChanged);
-    _motion = motion;
-    motion?.addListener(_motionChanged);
+    _control = TrainingRouteScope.maybeOf(context);
   }
 
-  void _motionChanged() {
-    if (!mounted) return;
-    if (_motion?.entered == true) {
-      _startLog(AppServices.of(context), widget.plan);
-    }
-    setState(() {});
-  }
-
-  void _startLog(AppServices s, TrainingPlan plan) {
+  void _startLog(AppServices services) {
     if (!_prefetchStarted) {
       _prefetchStarted = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted && (_motion == null || _motion!.canPlay)) {
-          s.prefetchPlan(plan);
+        if (mounted &&
+            (_control?.entered ?? true) &&
+            _control?.exiting != true) {
+          services.prefetchPlan(widget.plan);
         }
       });
     }
     _log.start(
-      actionCount: plan.items.length,
-      voice: s.store.voice.voice,
-      chimes: s.store.voice.chimes,
+      actionCount: widget.plan.items.length,
+      voice: services.store.voice.voice,
+      chimes: services.store.voice.chimes,
     );
-    if (s.voiceOutput case final diagnostic_voice.JustAudioVoiceOutput output) {
+    if (services.voiceOutput
+        case final diagnostic_voice.JustAudioVoiceOutput output) {
       _voiceOutput = output;
       output.beforeSessionBegin = _audioBeginning;
       output.trainingOperation = _log.operation;
@@ -95,7 +75,6 @@ class _PlayerPageState extends State<PlayerPage> {
 
   @override
   void dispose() {
-    _motion?.removeListener(_motionChanged);
     final output = _voiceOutput;
     if (output?.beforeSessionBegin == _audioBeginning) {
       output?.beforeSessionBegin = null;
@@ -110,193 +89,129 @@ class _PlayerPageState extends State<PlayerPage> {
 
   @override
   Widget build(BuildContext context) {
-    final s = AppServices.of(context);
+    final services = AppServices.of(context);
     final plan = widget.plan;
-    if (plan.exerciseIds.any((id) => !s.library.contains(id))) {
+    if (plan.exerciseIds.any((id) => !services.library.contains(id))) {
       return const Scaffold(
         body: SafeArea(child: Center(child: Text('计划包含尚未可用的动作，暂时无法开始。'))),
       );
     }
-    return _player(context, s, plan);
-  }
-
-  Widget _player(BuildContext context, AppServices s, TrainingPlan plan) {
-    if (_motion == null || _motion!.entered) _startLog(s, plan);
-    final issueStore = s.store.actionIssueStore;
+    final control = _control;
+    if (control == null || control.entered) _startLog(services);
+    if (_preparer == null || !identical(_preparerControl, control)) {
+      _preparerControl = control;
+      final delegate = services.poseHubPreparer;
+      _preparer = delegate == null || control == null
+          ? delegate
+          : GatedPoseHubMediaPreparer(delegate, control.startGate);
+    }
+    final issueStore = services.store.actionIssueStore;
     final issuePlayback = issueStore.enabled
         ? (_issuePlayback ??= DrillMediaPlaybackHandle())
         : null;
-    final theme = SmartFitTrainerTheme.of(context);
-    final motion = _motion;
-    if (!identical(_cachedPlan, plan)) {
-      _cachedPlan = plan;
-      _trainerPlan = session.trainerPlan(plan);
-    }
-    if (!identical(_cachedLibrary, s.library)) {
-      _cachedLibrary = s.library;
-      _rhythms = session.trainerRhythms(s.library);
-    }
-    if (!identical(_cachedVoiceSettings, s.store.voice)) {
-      _cachedVoiceSettings = s.store.voice;
-      _voice = s.trainerVoice();
-    }
-    if (_mediaPreparer == null || !identical(_preparerMotion, motion)) {
-      _preparerMotion = motion;
-      final preparer = s.poseHubPreparer;
-      _mediaPreparer = preparer == null || motion == null
-          ? preparer
-          : GatedPoseHubMediaPreparer(preparer, motion.startGate);
-    }
-    final returningFromCompletion = motion?.exitingFromCompletion == true;
-    final stage = returningFromCompletion ? motion?.mediaRect : null;
-    final lastExercise = motion?.exercise;
     return Stack(
       key: const ValueKey('training-player-layers'),
       fit: StackFit.expand,
       children: [
-        if (stage != null && lastExercise != null) ...[
-          ColoredBox(color: theme.mediaStage),
-          Positioned.fromRect(
-            rect: stage,
-            child: TrainingTransitionPoster(
-              key: const ValueKey('training-completion-exit-poster'),
-              exercise: lastExercise,
-              mirrored: motion!.mirrored,
-              cacheWidth: (stage.width * MediaQuery.devicePixelRatioOf(context))
-                  .round(),
-            ),
-          ),
-        ],
         TrainerPlayer(
-          plan: _trainerPlan!,
+          plan: session.trainerPlan(plan),
           startMode: TrainerStartMode.training,
-          startGate: _motion?.startGate,
-          chromeAnimation: _motion?.chrome,
-          onExitStarted: motion == null
-              ? null
-              : () => motion.exitStarted(fromCompletion: _sessionFinished),
-          beforeExitPop: _motion?.beforeExitPop,
-          rhythms: _rhythms!,
+          startGate: control?.startGate,
+          onExitStarted: control?.beginExit,
+          beforeExitPop: control?.beforeExitPop,
+          rhythms: session.trainerRhythms(services.library),
           strings: TrainerStrings.zh(),
-          // ResultStage fades with SDK chrome. Let that real completion view
-          // reveal the retained poster beneath its scaffold during exit A.
-          theme: returningFromCompletion
-              ? theme.copyWith(mediaStage: Colors.transparent)
-              : theme,
-          poseHubActionOf: s.poseHubCatalog?.tryGet,
-          poseHubMediaBaseUri: s.poseHubMedia?.mediaBaseUri,
-          poseHubMediaPreparer: _mediaPreparer,
+          theme: SmartFitTrainerTheme.of(context),
+          poseHubActionOf: services.poseHubCatalog?.tryGet,
+          poseHubMediaBaseUri: services.poseHubMedia?.mediaBaseUri,
+          poseHubMediaPreparer: _preparer,
           drillOf: (id) {
-            final e = s.library.tryGet(id);
-            if (e == null) return null;
-            final m = e.media;
-            final alphaThumb = SfAlphaCards.enabledOf(context)
-                ? m.alphaThumbnail
+            final exercise = services.library.tryGet(id);
+            if (exercise == null) return null;
+            final media = exercise.media;
+            final alpha = SfAlphaCards.enabledOf(context)
+                ? media.alphaThumbnail
                 : null;
             return TrainerDrill(
               id: id,
-              name: e.name,
-              cue: e.cue,
-              cues: e.cues,
-              precautions: e.cautions,
-              targetMuscles: e.muscles.join('、'),
-              equipment: e.effectiveEquipmentIds.isEmpty
+              name: exercise.name,
+              cue: exercise.cue,
+              cues: exercise.cues,
+              precautions: exercise.cautions,
+              targetMuscles: exercise.muscles.join('、'),
+              equipment: exercise.effectiveEquipmentIds.isEmpty
                   ? '徒手'
-                  : e.effectiveEquipmentIds.map(equipmentLabel).join('、'),
+                  : exercise.effectiveEquipmentIds
+                        .map(equipmentLabel)
+                        .join('、'),
               thumbnailAsset:
-                  alphaThumb ??
+                  alpha ??
                   (Theme.of(context).brightness == Brightness.light
-                      ? m.lightPoster ?? m.poster
-                      : m.poster),
+                      ? media.lightPoster ?? media.poster
+                      : media.poster),
               media: DrillMedia(
-                id: m.playerId,
-                videoAsset: m.video,
-                posterAsset: alphaThumb ?? m.poster,
-                duration: m.loopSeconds,
-                posterTime: m.posterSeconds,
-                lightVideoAsset: m.lightVideo,
-                lightPosterAsset: alphaThumb ?? m.lightPoster,
+                id: media.playerId,
+                videoAsset: media.video,
+                posterAsset: alpha ?? media.poster,
+                duration: media.loopSeconds,
+                posterTime: media.posterSeconds,
+                lightVideoAsset: media.lightVideo,
+                lightPosterAsset: alpha ?? media.lightPoster,
               ),
             );
           },
           mediaBuilder: (context, request) {
-            final motion = _motion;
             if (_sessionFinished && !request.paused) {
               _sessionFinished = false;
-              if (motion?.exiting == true) {
+              if (control?.saveFailed == true) {
                 WidgetsBinding.instance.addPostFrameCallback((_) {
-                  if (mounted && identical(_motion, motion)) motion?.replay();
+                  if (mounted) control?.replay();
                 });
               }
             }
             _visibleActionId = request.drill.id;
-            final exercise = s.library[request.drill.id];
-            motion?.reportMedia(exercise, mirrored: request.mirrored);
-            if (motion != null && !motion.canPlay) {
-              return SizedBox(
-                key: motion.mediaKey,
-                child: motion.entered
-                    ? TrainingTransitionPoster(
-                        key: const ValueKey('training-transition-poster'),
-                        exercise: exercise,
-                        mirrored: request.mirrored,
-                        radius: request.theme.radius,
-                      )
-                    : motion.reduced
-                    ? TrainingTransitionPoster(
-                        exercise: exercise,
-                        mirrored: request.mirrored,
-                      )
-                    : TrainingEntranceMedia(
-                        motion: motion,
-                        exercise: exercise,
-                        mirrored: request.mirrored,
-                      ),
+            final exercise = services.library[request.drill.id];
+            if (control != null && !control.canPlay) {
+              return TrainingPoster(
+                key: const ValueKey('training-route-poster'),
+                exercise: exercise,
+                mirrored: request.mirrored,
+                radius: request.theme.radius,
               );
             }
             _log.visibleAction(request.drill.id, paused: request.paused);
-            if (s.voiceOutput
-                case final diagnostic_voice.JustAudioVoiceOutput output) {
-              output.trainingOperation = _log.operation;
-            }
-            return SizedBox(
-              key: motion?.mediaKey,
-              child: ExerciseVideo(
-                key: const ValueKey('trainer-media'),
-                exercise: s.library[request.drill.id],
-                paused: request.paused,
-                mirrored: request.mirrored,
-                radius: request.theme.radius,
-                playbackHandle: issuePlayback,
-                mediaPreparer: request.mediaPreparer,
-                training: true,
-              ),
+            return ExerciseVideo(
+              key: const ValueKey('trainer-media'),
+              exercise: exercise,
+              paused: request.paused || control?.exiting == true,
+              mirrored: request.mirrored,
+              radius: request.theme.radius,
+              playbackHandle: issuePlayback,
+              mediaPreparer: request.mediaPreparer,
+              training: true,
             );
           },
-          voice: _voice!,
+          voice: services.trainerVoice(),
           onFinished: (result) async {
-            _motion?.rememberStage();
             _sessionFinished = true;
             _log.finished(result);
             _log.saving();
             try {
-              await s.store.saveSession(result);
+              await services.store.saveSession(result);
               _log.saved();
             } on Object catch (error) {
               _log.saveFailed(error);
-              _motion?.exitSaveFailed();
+              control?.exitSaveFailed();
               rethrow;
             }
           },
           onCompleted: (result) async {
-            // Confirmed early exit has no completion-page feeling to persist.
-            // Its identical receipt was durably saved by onFinished already.
-            // A feeling chosen after a failed save still follows the usual path.
+            control?.retryExitSave();
             if (result.endedEarly && result.feeling == null) return;
             try {
-              await s.recordTrainingCompletion(result);
+              await services.recordTrainingCompletion(result);
             } on Object {
-              _motion?.exitSaveFailed();
+              control?.exitSaveFailed();
               rethrow;
             }
           },
@@ -307,62 +222,18 @@ class _PlayerPageState extends State<PlayerPage> {
           Positioned(
             right: 12,
             top: (MediaQuery.sizeOf(context).height - 48) / 2,
-            child: _IssueMotion(
-              motion: _motion,
-              child: ActionIssueMarkButton(
-                key: const ValueKey('player-action-issue'),
-                store: issueStore,
-                library: s.library,
-                playbackHandle: issuePlayback,
-                actionIdAtTap: () =>
-                    (_sessionFinished && _motion?.saveFailed != true) ||
-                        (_motion != null &&
-                            !_motion!.canPlay &&
-                            !_motion!.saveFailed)
-                    ? null
-                    : _visibleActionId,
-                iconOnly: true,
-              ),
+            child: ActionIssueMarkButton(
+              key: const ValueKey('player-action-issue'),
+              store: issueStore,
+              library: services.library,
+              playbackHandle: issuePlayback,
+              actionIdAtTap: () => _sessionFinished || control?.exiting == true
+                  ? null
+                  : _visibleActionId,
+              iconOnly: true,
             ),
           ),
       ],
-    );
-  }
-}
-
-/// Match the SDK transport interval without animating the media stage.
-class _IssueMotion extends StatelessWidget {
-  const _IssueMotion({required this.motion, required this.child});
-  final TrainingTransitionMotion? motion;
-  final Widget child;
-  @override
-  Widget build(BuildContext context) {
-    final m = motion;
-    if (m == null || m.saveFailed) return child;
-    return AnimatedBuilder(
-      animation: m.chrome,
-      child: RepaintBoundary(child: child),
-      builder: (_, child) {
-        final phase = const Interval(
-          60 / 280,
-          260 / 280,
-        ).transform(m.chrome.value);
-        final t =
-            (m.chrome.status == AnimationStatus.reverse
-                    ? Curves.easeInCubic
-                    : Curves.easeOutCubic)
-                .transform(phase);
-        return IgnorePointer(
-          ignoring: m.chrome.value < 1,
-          child: FadeTransition(
-            opacity: AlwaysStoppedAnimation(t),
-            child: Transform.translate(
-              offset: Offset(0, m.reduced ? 0 : 16 * (1 - t)),
-              child: child,
-            ),
-          ),
-        );
-      },
     );
   }
 }

@@ -13,84 +13,6 @@ import '../domain/plan.dart';
 import '../domain/saved_plan.dart';
 import '../voice/voice_queue.dart';
 
-/// Receives only a detached JSON tree, never the Store or its listeners.
-typedef AppStateEncoder =
-    Future<String> Function(Map<String, Object?> snapshot);
-
-const _smallStateEncodingLimit = 16 * 1024;
-
-String _encodeJsonSnapshot(Map<String, Object?> snapshot) =>
-    jsonEncode(snapshot);
-
-/// A conservative UTF-8 JSON bound, stopping as soon as the small-state
-/// allowance is exhausted. Six bytes cover every escaped UTF-16 code unit.
-/// This never encodes a large string just to decide where to encode it.
-int _jsonSizeBound(Object? value, int limit) {
-  if (value is String) return value.length * 6 + 2;
-  if (value is num) return 32;
-  if (value is bool || value == null) return 5;
-  var bytes = 2;
-  if (value is List) {
-    for (final item in value) {
-      bytes += 1 + _jsonSizeBound(item, limit - bytes);
-      if (bytes >= limit) return bytes;
-    }
-  } else if (value is Map<String, Object?>) {
-    for (final entry in value.entries) {
-      bytes += 2 + _jsonSizeBound(entry.key, limit - bytes);
-      if (bytes >= limit) return bytes;
-      bytes += _jsonSizeBound(entry.value, limit - bytes);
-      if (bytes >= limit) return bytes;
-    }
-  }
-  return bytes;
-}
-
-Future<String> _encodeAppState(Map<String, Object?> snapshot) async {
-  final bound = _jsonSizeBound(snapshot, _smallStateEncodingLimit);
-  final worker = bound >= _smallStateEncodingLimit;
-  final kind = worker ? 'compute' : 'inline_small';
-  final watch = Stopwatch()..start();
-  RuntimeLog.instance.record(
-    'state.serialization.started',
-    fields: {'kind': kind, if (!worker) 'bytes': bound},
-  );
-  try {
-    return worker
-        ? await compute(
-            _encodeJsonSnapshot,
-            snapshot,
-            debugLabel: 'smartfit_state_json',
-          )
-        : _encodeJsonSnapshot(snapshot);
-  } finally {
-    RuntimeLog.instance.record(
-      'state.serialization.completed',
-      // Wall time includes worker startup/scheduling; it is not UI CPU time.
-      fields: {'kind': kind, 'elapsedMs': watch.elapsedMicroseconds / 1000},
-    );
-  }
-}
-
-Object? _freezeJson(Object? value) {
-  if (value is Map) {
-    return Map<String, Object?>.unmodifiable({
-      for (final entry in value.entries)
-        entry.key as String: _freezeJson(entry.value),
-    });
-  }
-  if (value is List) {
-    return List<Object?>.unmodifiable(value.map(_freezeJson));
-  }
-  if (value == null || value is String || value is num || value is bool) {
-    return value;
-  }
-  throw JsonUnsupportedObjectError(value);
-}
-
-Map<String, Object?> _freezeState(Map<String, Object?> state) =>
-    _freezeJson(state)! as Map<String, Object?>;
-
 class HistoryEntry {
   const HistoryEntry({
     required this.title,
@@ -138,16 +60,11 @@ class HistoryEntry {
 
 /// On-device state, one JSON value under `smartfit.state.v1`.
 class AppStore extends ChangeNotifier {
-  AppStore(
-    this._storage, {
-    this.actionIssueEnabled = actionIssueBuildEnabled,
-    AppStateEncoder? stateEncoder,
-  }) : _stateEncoder = stateEncoder ?? _encodeAppState;
+  AppStore(this._storage, {this.actionIssueEnabled = actionIssueBuildEnabled});
 
   static const key = 'smartfit.state.v1';
   static const _retiredVisualKey = 'glassQuality';
   final LocalStateStorage _storage;
-  final AppStateEncoder _stateEncoder;
   final bool actionIssueEnabled;
 
   late final actionIssueStore = LocalActionIssueStore(
@@ -221,10 +138,7 @@ class AppStore extends ChangeNotifier {
         j.remove(_retiredVisualKey);
         try {
           // Persist the original map so unrelated keys and long histories survive.
-          await _enqueueWrite(() async {
-            final encoded = await _stateEncoder(_freezeState(j));
-            await _storage.write(key, encoded);
-          });
+          await _enqueueWrite(() => _storage.write(key, jsonEncode(j)));
         } on Object catch (error) {
           RuntimeLog.instance.record(
             'state.retired_preference_cleanup_deferred',
@@ -303,10 +217,10 @@ class AppStore extends ChangeNotifier {
     return pending;
   }
 
-  Map<String, Object?> _snapshotState({
+  String _encodeState({
     Iterable<HistoryEntry>? updatedHistory,
     Iterable<SessionResult>? updatedSessions,
-  }) => _freezeState({
+  }) => jsonEncode({
     'safetyAccepted': safetyAccepted,
     'safetyBlocked': safetyBlocked,
     'voice': voice.toJson(),
@@ -329,24 +243,10 @@ class AppStore extends ChangeNotifier {
         : chatLog,
   });
 
-  Future<void> _writeState({
-    Iterable<HistoryEntry>? updatedHistory,
-    Iterable<SessionResult>? updatedSessions,
-  }) async {
-    // Capture at the head of the write queue. A settings/chat edit made while
-    // encoding is pending belongs to its later queued write, not this one.
-    final snapshot = _snapshotState(
-      updatedHistory: updatedHistory,
-      updatedSessions: updatedSessions,
-    );
-    final encoded = await _stateEncoder(snapshot);
-    await _storage.write(key, encoded);
-  }
-
   Future<void> _save({bool notify = true}) async {
     if (notify) notifyListeners();
     try {
-      await _enqueueWrite(() => _writeState());
+      await _enqueueWrite(() => _storage.write(key, _encodeState()));
     } on Object {
       // Storage unavailable (tests): keep the in-memory state.
     }
@@ -374,9 +274,12 @@ class AppStore extends ChangeNotifier {
       ...history.where((h) => h.sessionId != result.sessionId),
     ];
     final nextSessions = {..._sessions, receipt.sessionId: receipt};
-    await _writeState(
-      updatedHistory: nextHistory,
-      updatedSessions: nextSessions.values,
+    await _storage.write(
+      key,
+      _encodeState(
+        updatedHistory: nextHistory,
+        updatedSessions: nextSessions.values,
+      ),
     );
     _sessions[receipt.sessionId] = receipt;
     // Other App methods may have updated memory while storage was pending.
@@ -425,7 +328,7 @@ class AppStore extends ChangeNotifier {
   Future<void> setAiMemoryEnabled(bool enabled) {
     aiMemoryEnabled = enabled;
     notifyListeners();
-    return _enqueueWrite(() => _writeState());
+    return _enqueueWrite(() => _storage.write(key, _encodeState()));
   }
 
   Future<void> setAppearance(String a) {

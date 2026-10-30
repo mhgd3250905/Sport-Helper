@@ -190,10 +190,12 @@ class TrainingTransitionTimings extends ChangeNotifier
     WidgetsBinding.instance.addObserver(this);
   }
 
+  /// [sourceEntry] is a stable route identifier, never plan/user content.
   TrainingTransitionTimingToken? begin(
     TrainingTransitionKind kind, {
     String theme = 'unknown',
     bool reducedMotion = false,
+    String? sourceEntry,
   }) {
     // main initializes real collection before runApp. Merely constructing a
     // widget in a test/preview must not arm batch-tail timers or synthesize data.
@@ -217,7 +219,8 @@ class TrainingTransitionTimings extends ChangeNotifier
         'kind': kind.name,
         'runInProcess': run,
         'firstAfterProcessStart': run == 1,
-        'warmAcceptanceRun': run >= 2 && run <= 5,
+        'transitionStyle': 'horizontal_slide',
+        'sourceEntry': ?sourceEntry,
         'startedAtUtc': time.toIso8601String(),
         'theme': const {'light', 'dark'}.contains(theme) ? theme : 'unknown',
         'reducedMotion': reducedMotion,
@@ -492,11 +495,10 @@ Map<String, Object?> summarizeTransitionTimings(Map<String, Object?> sample) {
   final over = frames
       .where((row) => row['buildUs']! > 16000 || row['rasterUs']! > 16000)
       .length;
-  final valid =
+  final complete =
       frames.isNotEmpty &&
       sample['outcome'] == 'completed' &&
-      sample['truncated'] != true &&
-      sample['reducedMotion'] != true;
+      sample['truncated'] != true;
   return {
     ...sample,
     'frameCount': frames.length,
@@ -508,13 +510,7 @@ Map<String, Object?> summarizeTransitionTimings(Map<String, Object?> sample) {
     'rasterOver16ms': rasters.where((value) => value > 16000).length,
     'over16msFrames': over,
     'hasMeasuredFrames': frames.isNotEmpty,
-    'eligibleForWarmTarget':
-        valid &&
-        sample['warmAcceptanceRun'] == true &&
-        sample['buildMode'] == 'profile',
-    'meetsNumericTarget': valid
-        ? percentile(builds)! <= 8 && percentile(rasters)! <= 12 && over <= 1
-        : null,
+    'sampleComplete': complete,
   };
 }
 
@@ -541,6 +537,13 @@ List<Map<String, Object?>> _decodeResults(String json) {
                     TrainingTransitionTimings.maximumFramesPerTransition),
       )
       .take(TrainingTransitionTimings.retainedResults)
-      .map((row) => Map<String, Object?>.from(row))
+      .map(
+        (row) => Map<String, Object?>.from(row)
+          // Older persisted reports used an obsolete performance target. Keep
+          // their measured frames, but do not retain a superseded verdict.
+          ..remove('warmAcceptanceRun')
+          ..remove('eligibleForWarmTarget')
+          ..remove('meetsNumericTarget'),
+      )
       .toList();
 }

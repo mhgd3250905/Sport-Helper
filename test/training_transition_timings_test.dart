@@ -197,7 +197,6 @@ void main() {
         'outcome': 'completed',
         'truncated': false,
         'reducedMotion': false,
-        'warmAcceptanceRun': true,
         'buildMode': 'profile',
       });
       expect(sample['buildP90Ms'], 9);
@@ -207,13 +206,14 @@ void main() {
       expect(sample['buildOver16ms'], 0);
       expect(sample['rasterOver16ms'], 1);
       expect(sample['over16msFrames'], 1);
-      expect(sample['eligibleForWarmTarget'], isTrue);
-      expect(sample['meetsNumericTarget'], isFalse);
+      expect(sample['sampleComplete'], isTrue);
+      expect(sample.containsKey('eligibleForWarmTarget'), isFalse);
+      expect(sample.containsKey('meetsNumericTarget'), isFalse);
     },
   );
 
   test(
-    'empty sample stays unmeasured, and interruption never passes a target',
+    'empty interrupted sample stays unmeasured without an acceptance verdict',
     () async {
       final recorder = create();
       final token = recorder.begin(TrainingTransitionKind.entry);
@@ -224,13 +224,13 @@ void main() {
       expect(result['frameCount'], 0);
       expect(result['buildP90Ms'], isNull);
       expect(result['rasterMaxMs'], isNull);
-      expect(result['meetsNumericTarget'], isNull);
-      expect(result['eligibleForWarmTarget'], isFalse);
+      expect(result['sampleComplete'], isFalse);
+      expect(result.containsKey('meetsNumericTarget'), isFalse);
     },
   );
 
   test(
-    'first and warm runs are tracked per direction and process, not restored totals',
+    'run sequence and first marker are per direction and process, with latest ten retained',
     () async {
       final recorder = create();
       for (var i = 0; i < 6; i++) {
@@ -247,8 +247,10 @@ void main() {
           .where((r) => r['kind'] == 'entry')
           .toList();
       expect(entryRuns.map((r) => r['runInProcess']), [6, 5, 4, 3, 2]);
-      expect(entryRuns.where((r) => r['warmAcceptanceRun'] == true).length, 4);
-      expect(entryRuns.first['warmAcceptanceRun'], isFalse);
+      expect(
+        entryRuns.every((row) => row['firstAfterProcessStart'] == false),
+        isTrue,
+      );
       final restored = create();
       now += 10000;
       await restored.initialize();
@@ -259,6 +261,75 @@ void main() {
       expect(restored.results.first['runInProcess'], 1);
       expect(restored.results.first['firstAfterProcessStart'], isTrue);
       expect(restored.results.length, 10);
+    },
+  );
+
+  test(
+    'source entry and horizontal slide identity survive export and restore',
+    () async {
+      final recorder = create();
+      for (final entry in ['chat', 'saved_plan', 'guide']) {
+        now += 1000;
+        final token = recorder.begin(
+          TrainingTransitionKind.entry,
+          theme: 'dark',
+          sourceEntry: entry,
+        );
+        now += 500;
+        recorder.finish(token);
+      }
+      final report = jsonDecode(await recorder.exportJson()) as Map;
+      final rows = (report['results'] as List).cast<Map>();
+      expect(rows.map((row) => row['sourceEntry']), [
+        'guide',
+        'saved_plan',
+        'chat',
+      ]);
+      expect(
+        rows.every((row) => row['transitionStyle'] == 'horizontal_slide'),
+        isTrue,
+      );
+      expect(rows.every((row) => row['theme'] == 'dark'), isTrue);
+      final restored = create();
+      await restored.initialize();
+      expect(restored.results.map((row) => row['sourceEntry']), [
+        'guide',
+        'saved_plan',
+        'chat',
+      ]);
+    },
+  );
+
+  test(
+    'legacy stored frames survive without obsolete performance target verdicts',
+    () async {
+      storage.contents = jsonEncode({
+        'schema': 'smartfit-training-transition-timings@1',
+        'results': [
+          {
+            'id': 'legacy-entry',
+            'startedAtUtc': '2026-10-29T00:00:00Z',
+            'kind': 'entry',
+            'frameCount': 1,
+            'frames': [
+              {'frameNumber': 1, 'buildUs': 5000, 'rasterUs': 8000},
+            ],
+            'buildP90Ms': 5.0,
+            'warmAcceptanceRun': true,
+            'eligibleForWarmTarget': true,
+            'meetsNumericTarget': true,
+          },
+        ],
+      });
+      final recorder = create();
+      await recorder.initialize();
+      final row = recorder.results.single;
+      expect(row['buildP90Ms'], 5);
+      expect(row['frames'], hasLength(1));
+      expect(row['transitionStyle'], isNull);
+      expect(row.containsKey('warmAcceptanceRun'), isFalse);
+      expect(row.containsKey('eligibleForWarmTarget'), isFalse);
+      expect(row.containsKey('meetsNumericTarget'), isFalse);
     },
   );
 
@@ -355,7 +426,7 @@ void main() {
   );
 
   test(
-    'raw frames are bounded, and truncated sample cannot claim target compliance',
+    'raw frames are bounded, with truncation explicitly marking an incomplete sample',
     () async {
       number = -1;
       now = 1;
@@ -369,7 +440,7 @@ void main() {
       await recorder.exportJson();
       expect(recorder.results.single['frameCount'], 600);
       expect(recorder.results.single['truncated'], isTrue);
-      expect(recorder.results.single['meetsNumericTarget'], isNull);
+      expect(recorder.results.single['sampleComplete'], isFalse);
     },
   );
 

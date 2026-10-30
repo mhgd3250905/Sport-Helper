@@ -25,7 +25,7 @@ import 'package:ugk_coach_ui/ugk_coach_ui.dart';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
 import 'package:ugk_trainer/ugk_trainer.dart' as trainer;
 
-import 'app_flow_test.dart' show MemoryStorage, widgetFixtureStateEncoder;
+import 'app_flow_test.dart' show MemoryStorage;
 import 'support.dart';
 import 'posehub_ui_support.dart' show PoseHubUiRepository;
 
@@ -91,9 +91,6 @@ TrainingPlan _plan() => const TrainingPlan(
 Iterable<String> _images(WidgetTester tester) => tester
     .widgetList<Image>(find.byType(Image))
     .map((image) => image.image)
-    .map(
-      (provider) => provider is ResizeImage ? provider.imageProvider : provider,
-    )
     .whereType<AssetImage>()
     .map((asset) => asset.assetName);
 
@@ -203,8 +200,7 @@ void main() {
       plain['h-catcow-quad'],
     ]),
     catalog: loadCatalog(),
-    store: AppStore(MemoryStorage(), stateEncoder: widgetFixtureStateEncoder)
-      ..starfield = false,
+    store: AppStore(MemoryStorage())..starfield = false,
     voiceLibrary: VoiceLibrary.empty,
     voiceOutput: const MutedVoiceOutput(),
     chatReplyDelay: Duration.zero,
@@ -277,7 +273,7 @@ void main() {
                 plan: _plan(),
                 library: library,
                 saved: false,
-                onStart: (_) => starts++,
+                onStart: () => starts++,
                 onSave: () => saves++,
                 onOpen: () => opens++,
               ),

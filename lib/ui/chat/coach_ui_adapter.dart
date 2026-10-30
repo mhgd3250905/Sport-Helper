@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../training_poster_image.dart';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
 import 'package:ugk_coach_ui/ugk_coach_ui.dart';
 
@@ -261,7 +260,6 @@ CoachUiStyle smartfitCoachUiStyle({bool planDetailsAction = false}) {
       media: (context, request) => _isTrainerStandingAsset(request.asset)
           ? Image.asset(
               request.asset,
-              cacheWidth: TrainingPosterImages.decodeWidth(context),
               fit: request.fit,
               alignment: request.alignment,
               semanticLabel: request.semanticLabel,

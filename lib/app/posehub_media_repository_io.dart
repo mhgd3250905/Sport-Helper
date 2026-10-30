@@ -10,7 +10,6 @@ import 'package:ugk_coach/ugk_coach.dart' as coach;
 import 'posehub_global_video_cache_io.dart';
 import 'posehub_legacy_video_catalog.dart';
 import 'posehub_media_repository_types.dart';
-import 'training_transition_activity.dart';
 
 Future<PoseHubMediaFileStore> createPoseHubMediaStore({
   required String revision,
@@ -226,20 +225,13 @@ class _FileStore implements PoseHubMediaFileStore {
 
   Future<bool> _verified(File file, coach.PoseHubPackFile expected) async {
     try {
-      await TrainingTransitionActivity.instance.waitUntilIdle();
       if (await FileSystemEntity.type(file.path, followLinks: false) !=
               FileSystemEntityType.file ||
           await file.length() != expected.bytes) {
         return false;
       }
-      final digest = _DigestResult();
-      final hash = sha256.startChunkedConversion(digest);
-      await for (final chunk in file.openRead()) {
-        await TrainingTransitionActivity.instance.waitUntilIdle();
-        hash.add(chunk);
-      }
-      hash.close();
-      return digest.value?.toString() == expected.sha256;
+      return (await sha256.bind(file.openRead()).first).toString() ==
+          expected.sha256;
     } on FileSystemException {
       return false;
     }
@@ -339,10 +331,8 @@ class _FileStore implements PoseHubMediaFileStore {
   Future<Uri?> cached(coach.PoseHubPackFile file) async {
     if (_videoPaths.containsKey(file.path)) {
       return _videoCache.ordered(() async {
-        await TrainingTransitionActivity.instance.waitUntilIdle();
         final target = await _target(file.path);
         if (!await _verified(target, file)) return null;
-        await TrainingTransitionActivity.instance.waitUntilIdle();
         _touchVideo(file.path);
         return target.uri;
       });
@@ -484,7 +474,6 @@ class _FileStore implements PoseHubMediaFileStore {
       await temp.create(exclusive: true);
       output = await temp.open(mode: FileMode.write);
       await for (final chunk in input) {
-        await TrainingTransitionActivity.instance.waitUntilIdle();
         _check();
         received += chunk.length;
         if (received > file.bytes) {
@@ -520,7 +509,6 @@ class _FileStore implements PoseHubMediaFileStore {
             return published.uri;
           }
           final entries = await _videoCache.publishedVideos();
-          await TrainingTransitionActivity.instance.waitUntilIdle();
           final destination = _videoTargetSync(file.path);
           _videoCache.makeRoom(
             entries,

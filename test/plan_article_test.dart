@@ -15,7 +15,7 @@ import 'package:smartfit/ui/training_route.dart';
 import 'package:ugk_trainer/ugk_trainer.dart'
     show PackedAlphaPlatform, PackedAlphaUriPlatform, UgkPackedAlphaVideo;
 
-import 'app_flow_test.dart' show services;
+import 'app_flow_test.dart' show services, warmTrainingPoster;
 
 const _plan = TrainingPlan(
   id: 'article',
@@ -229,8 +229,9 @@ ListView _list(WidgetTester tester) =>
 GuideMedia _media(WidgetTester tester, String slot) =>
     tester.widget<GuideMedia>(
       find.descendant(
-        of: _key('article-video-$slot'),
-        matching: find.byType(GuideMedia),
+        of: find.byKey(ValueKey('article-video-$slot'), skipOffstage: false),
+        matching: find.byType(GuideMedia, skipOffstage: false),
+        skipOffstage: false,
       ),
     );
 UgkPackedAlphaVideo _video(WidgetTester tester, String slot) =>
@@ -428,69 +429,66 @@ void main() {
       scroll.jumpTo(36);
       await tester.pump();
       final offset = scroll.offset;
+      await warmTrainingPoster(tester, app, _plan, sourceContext: article);
       await tester.tap(_key('start'));
-      // Retirement precedes push. The real gated SDK tree is laid out but
-      // offstage for the first 280ms; route animation itself has zero duration.
+      // Preview retirement precedes the one shared opaque slide route.
       final player = find.byType(PlayerPage, skipOffstage: false);
       for (var i = 0; i < 12 && player.evaluate().isEmpty; i++) {
         await tester.pump();
       }
       expect(player, findsOneWidget);
-      await tester.pump(); // Establish the host ticker's zero-time frame.
+      await tester.pump();
       final playerContext = tester.element(player);
       final route = ModalRoute.of(playerContext)! as TrainingRoute;
-      final motion = TrainingTransitionScope.maybeOf(playerContext)!;
-      var visuallyComplete = false;
-      unawaited(route.visualCompleted.then((_) => visuallyComplete = true));
-      expect(route.transitionDuration, Duration.zero);
-      expect(route.reverseTransitionDuration, Duration.zero);
-      expect(route.opaque, isFalse);
-      expect(motion.entered, isFalse);
-      expect(_key('training-entry-placeholder'), findsNothing);
+      final control = TrainingRouteScope.maybeOf(playerContext)!;
+      var routeComplete = false;
+      unawaited(route.completed.then((_) => routeComplete = true));
+      expect(route.transitionDuration, const Duration(milliseconds: 300));
+      expect(
+        route.reverseTransitionDuration,
+        const Duration(milliseconds: 280),
+      );
+      expect(route.opaque, isTrue);
+      expect(control.entered, isFalse);
       expect(coordinator.activeSlot, isNull);
       expect(platform.live, isEmpty);
       expect(_media(tester, '0:0').enabled, isFalse);
       final createsBeforeStart = platform.sources.length;
-      await tester.pump(const Duration(milliseconds: 280));
-      await tester.pump(const Duration(milliseconds: 279));
-      expect(motion.entered, isFalse);
+      await tester.pump(const Duration(milliseconds: 299));
+      expect(control.entered, isFalse);
       expect(platform.sources, hasLength(createsBeforeStart));
       expect(platform.live, isEmpty);
       await tester.pump(const Duration(milliseconds: 1));
       await tester.pump(const Duration(microseconds: 1));
       await tester.pump();
-      expect(motion.entered, isTrue);
-      expect(motion.chrome.value, 1);
+      expect(control.entered, isTrue);
       expect(_media(tester, '0:0').enabled, isFalse);
       await tester.tap(_key('close'));
       await tester.pumpAndSettle();
+      // Gate release starts async media creation. Capture the actual paused
+      // handle after the confirmation is fully shown, immediately before exit.
+      final playingHandles = {...platform.live};
+      expect(playingHandles, isNotEmpty);
       await tester.tap(_key('close-confirm'));
       await tester.pump();
       await tester.pump();
-      expect(motion.exiting, isTrue);
+      expect(control.exiting, isTrue);
       expect(route.isActive, isTrue);
       expect(_media(tester, '0:0').enabled, isFalse);
       expect(coordinator.activeSlot, isNull);
-      expect(platform.live, isEmpty);
-      await tester.pump(const Duration(milliseconds: 249));
+      await tester.pump(const Duration(milliseconds: 279));
       expect(route.isActive, isTrue);
-      expect(visuallyComplete, isFalse);
+      expect(routeComplete, isFalse);
       expect(_media(tester, '0:0').enabled, isFalse);
-      await tester.pump(const Duration(milliseconds: 1));
-      await tester.pump(const Duration(microseconds: 1));
-      await tester.pump();
-      expect(route.isActive, isFalse);
-      expect(player, findsNothing);
-      expect(_key('training-return-morph'), findsOneWidget);
-      expect(visuallyComplete, isFalse);
-      expect(_media(tester, '0:0').enabled, isFalse);
-      await tester.pump(const Duration(milliseconds: 499));
-      expect(visuallyComplete, isFalse);
-      expect(_media(tester, '0:0').enabled, isFalse);
+      expect(
+        platform.live,
+        playingHandles,
+        reason: 'Retain the paused texture until the page is offscreen.',
+      );
       await tester.pump(const Duration(milliseconds: 1));
       await tester.pump(const Duration(microseconds: 1));
       await tester.pumpAndSettle();
-      expect(visuallyComplete, isTrue);
+      expect(routeComplete, isTrue);
       expect(find.byType(PlayerPage), findsNothing);
       expect(tester.element(find.byType(PlanPage)), same(article));
       expect(_list(tester).controller, same(scroll));

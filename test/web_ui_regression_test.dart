@@ -12,7 +12,6 @@ import 'package:smartfit/voice/voice_library.dart';
 import 'package:smartfit/voice/voice_queue.dart';
 
 import 'support.dart';
-import 'app_flow_test.dart' show widgetFixtureStateEncoder;
 
 class _Storage implements LocalStateStorage {
   @override
@@ -24,7 +23,7 @@ class _Storage implements LocalStateStorage {
 AppServices _services() => AppServices(
   library: loadLibrary(),
   catalog: loadCatalog(),
-  store: AppStore(_Storage(), stateEncoder: widgetFixtureStateEncoder),
+  store: AppStore(_Storage()),
   voiceLibrary: VoiceLibrary.empty,
   voiceOutput: const MutedVoiceOutput(),
 );

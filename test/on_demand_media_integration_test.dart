@@ -23,7 +23,6 @@ import 'package:ugk_coach/ugk_coach.dart' as coach;
 import 'package:ugk_trainer/ugk_trainer.dart' as trainer;
 
 import 'support.dart';
-import 'app_flow_test.dart' show widgetFixtureStateEncoder;
 
 class _Storage implements LocalStateStorage {
   final data = <String, String>{};
@@ -524,23 +523,19 @@ void main() {
     final holdAfter = probes + 1; // Hold the explicit plan's first prefetch.
     holdFromProbe = holdAfter;
     final output = _Output();
-    late final AppServices services;
+    final services = AppServices(
+      library: content.$1,
+      catalog: TemplateCatalog([_template('n-pelvis-circle')]),
+      store: AppStore(_Storage())..starfield = false,
+      voiceLibrary: content.$3,
+      voiceOutput: output,
+      media: media,
+      chatReplyDelay: Duration.zero,
+    );
+    addTearDown(services.chat.dispose);
+    await services.store.acceptSafety(blocked: false);
+    services.chat.start();
     await tester.runAsync(() async {
-      // Construct both queued writers in the real-I/O zone too. Reading the
-      // lazy services.chat in addTearDown outside here seeds a fake-zone tail.
-      services = AppServices(
-        library: content.$1,
-        catalog: TemplateCatalog([_template('n-pelvis-circle')]),
-        store: AppStore(_Storage(), stateEncoder: widgetFixtureStateEncoder)
-          ..starfield = false,
-        voiceLibrary: content.$3,
-        voiceOutput: output,
-        media: media,
-        chatReplyDelay: Duration.zero,
-      );
-      addTearDown(services.chat.dispose);
-      await services.store.acceptSafety(blocked: false);
-      services.chat.start();
       final manualPlan = TrainingPlan(
         id: 'manual-pending-media',
         source: 'template',
@@ -711,7 +706,7 @@ void main() {
         () => AppServices.loadContent(media: media),
       ))!;
       final storage = _Storage();
-      final store = AppStore(storage, stateEncoder: widgetFixtureStateEncoder);
+      final store = AppStore(storage);
       final services = AppServices(
         library: content.$1,
         catalog: content.$2,

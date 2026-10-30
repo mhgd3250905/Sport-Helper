@@ -6,7 +6,6 @@ import 'package:smartfit/app/services.dart';
 import 'package:smartfit/domain/exercise.dart';
 import 'package:smartfit/domain/plan.dart';
 import 'package:smartfit/domain/saved_plan.dart';
-import 'package:smartfit/ui/chat/expand_route.dart';
 import 'package:smartfit/ui/chat/saved_plans_page.dart';
 import 'package:smartfit/ui/plan_presentation.dart';
 import 'package:smartfit/ui/theme.dart';
@@ -53,7 +52,7 @@ Future<AppServices> _show(
   double height = 844,
   bool used = false,
   ValueChanged<SavedPlan>? onShow,
-  void Function(SavedPlan, OriginRect)? onStart,
+  void Function(SavedPlan, BuildContext)? onStart,
 }) async {
   tester.view.physicalSize = Size(390, height);
   tester.view.devicePixelRatio = 1;
@@ -270,7 +269,7 @@ void main() {
         onShow: (saved) => shown = saved,
         onStart: (saved, from) {
           started = saved;
-          expect(from(), isNotNull);
+          expect(from, same(tester.element(find.byType(SavedPlansPage))));
         },
       );
       final saved = app.store.savedPlans.single;

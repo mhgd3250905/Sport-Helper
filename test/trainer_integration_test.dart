@@ -17,7 +17,6 @@ import 'package:ugk_coach/ugk_coach.dart' as coach;
 import 'package:ugk_trainer/ugk_trainer.dart' as trainer;
 
 import 'support.dart';
-import 'app_flow_test.dart' show widgetFixtureStateEncoder;
 
 class _Storage implements LocalStateStorage {
   final values = <String, String>{};
@@ -76,8 +75,7 @@ AppServices _services({
 }) => AppServices(
   library: library ?? loadLibrary(),
   catalog: loadCatalog(),
-  store: AppStore(storage, stateEncoder: widgetFixtureStateEncoder)
-    ..starfield = false,
+  store: AppStore(storage)..starfield = false,
   voiceLibrary: loadVoices(),
   voiceOutput: output ?? _Output(),
   chatReplyDelay: Duration.zero,

@@ -17,7 +17,6 @@ import 'package:smartfit/voice/voice_queue.dart';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
 
 import 'support.dart';
-import 'app_flow_test.dart' show widgetFixtureStateEncoder;
 
 class _Storage implements LocalStateStorage {
   final values = <String, String>{};
@@ -38,7 +37,7 @@ AppServices _services(_Storage storage, {AppStore? store, bool ai = false}) {
   return AppServices(
     library: loadLibrary(),
     catalog: loadCatalog(),
-    store: store ?? AppStore(storage, stateEncoder: widgetFixtureStateEncoder),
+    store: store ?? AppStore(storage),
     voiceLibrary: VoiceLibrary.empty,
     voiceOutput: const MutedVoiceOutput(),
     coachCatalog: ai

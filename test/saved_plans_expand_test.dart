@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smartfit/app/services.dart';
+import 'package:smartfit/app/training_transition_activity.dart';
 import 'package:smartfit/domain/exercise.dart';
 import 'package:smartfit/domain/plan.dart';
 import 'package:smartfit/domain/saved_plan.dart';
 import 'package:smartfit/ui/chat/saved_plans_page.dart';
-import 'package:smartfit/ui/chat/expand_route.dart';
 import 'package:smartfit/ui/plan_page.dart';
 import 'package:smartfit/ui/theme.dart';
 import 'package:ugk_coach_ui/ugk_coach_ui.dart';
@@ -51,7 +51,7 @@ Future<AppServices> _show(
   double height = 844,
   SfPalette palette = SfPalette.light,
   ValueChanged<SavedPlan>? onShow,
-  void Function(SavedPlan, OriginRect)? onStart,
+  void Function(SavedPlan, BuildContext)? onStart,
 }) async {
   tester.view.physicalSize = Size(390, height);
   tester.view.devicePixelRatio = 1;
@@ -394,7 +394,7 @@ void main() {
         onStart: (plan, from) {
           started = plan;
           startCount++;
-          expect(from(), isNotNull);
+          expect(from, same(tester.element(find.byType(SavedPlansPage))));
         },
       );
       final saved = app.store.savedPlans.single;
@@ -446,12 +446,12 @@ void main() {
     'saved entries reuse the controlled SDK card and preserve start and detail data',
     (tester) async {
       SavedPlan? started;
-      OriginRect? origin;
+      BuildContext? sourceContext;
       final app = await _show(
         tester,
         onStart: (plan, from) {
           started = plan;
-          origin = from;
+          sourceContext = from;
         },
       );
       final first = app.store.savedPlans.first;
@@ -495,7 +495,7 @@ void main() {
       expect(text.style!.color, SfColors.accent);
       await tester.tap(find.byKey(ValueKey('plan-start-${first.plan.id}')));
       expect(started, same(first));
-      expect(origin!(), isNotNull);
+      expect(sourceContext, same(tester.element(find.byType(SavedPlansPage))));
       expect(_expanded(tester, first).expanded, isTrue);
       await tester.tap(action);
       await tester.pumpAndSettle();
@@ -611,4 +611,37 @@ void main() {
     expect(tester.takeException(), isNull);
     await tester.pumpWidget(const SizedBox.shrink());
   });
+  testWidgets(
+    'training slide buffers saved-list data without changing its anchor',
+    (tester) async {
+      final app = await _show(tester, count: 3, moves: 8, height: 540);
+      final first = app.store.savedPlans.first;
+      await _tapRow(tester, first);
+      await tester.pumpAndSettle();
+      final scroll = _scroll(tester);
+      final offset = scroll.offset;
+      final card = _expanded(tester, first);
+      final state = tester.state(
+        find.byKey(ValueKey('saved-expanded-${first.id}')),
+      );
+      final release = TrainingTransitionActivity.instance.hold();
+      addTearDown(release);
+      await app.store.renamePlan(first.id, '转场期间的新名称');
+      await tester.pump(const Duration(milliseconds: 280));
+      expect(_expanded(tester, first), same(card));
+      expect(_expanded(tester, first).plan.title, first.name);
+      expect(scroll.offset, offset);
+      expect(scroll.position.isScrollingNotifier.value, isFalse);
+      release();
+      await tester.pumpAndSettle();
+      expect(_expanded(tester, first).plan.title, '转场期间的新名称');
+      expect(_expanded(tester, first).expanded, isTrue);
+      expect(
+        tester.state(find.byKey(ValueKey('saved-expanded-${first.id}'))),
+        same(state),
+      );
+      expect(scroll.offset, offset);
+      await tester.pumpWidget(const SizedBox.shrink());
+    },
+  );
 }

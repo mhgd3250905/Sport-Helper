@@ -5,7 +5,6 @@ import '../../domain/plan.dart';
 import '../alpha_artwork.dart';
 import '../theme/ui_polish_tokens.dart';
 import 'coach_ui_adapter.dart';
-import 'expand_route.dart';
 
 /// App adapter: domain snapshots and navigation; card rendering lives in SDK.
 class PlanCard extends StatelessWidget {
@@ -25,7 +24,7 @@ class PlanCard extends StatelessWidget {
   final TrainingPlan plan;
   final ExerciseLibrary library;
   final bool saved, landing;
-  final void Function(OriginRect) onStart;
+  final VoidCallback onStart;
   final VoidCallback onSave, onOpen;
   final String? saveLabel, savedLabel;
   final VoidCallback? onSaveCopy;
@@ -58,7 +57,7 @@ class PlanCard extends StatelessWidget {
             ]),
             saved: saved,
             landing: landing,
-            onStart: onStart,
+            onStart: (_) => onStart(),
             onSave: onSave,
             onOpen: onOpen,
           ),

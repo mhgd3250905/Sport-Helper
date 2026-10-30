@@ -24,15 +24,15 @@ import 'core/storage/local_state_storage.dart';
 import 'data/app_store.dart';
 import 'diagnostics/runtime_log.dart';
 import 'diagnostics/frame_recorder.dart';
-import 'diagnostics/training_transition_timings.dart';
 import 'diagnostics/performance_report.dart';
 import 'diagnostics/performance_routes.dart';
 import 'diagnostics/performance_vm.dart';
 import 'diagnostics/performance_conditions.dart';
+import 'diagnostics/training_transition_timings.dart';
 import 'ui/chat/chat_home_page.dart';
-import 'ui/training_transition_freeze.dart';
 import 'ui/theme/app_theme.dart';
 import 'ui/theme/tokens.dart';
+import 'ui/training_transition_freeze.dart';
 import 'voice/just_audio_output.dart';
 
 /// The bundled font's licence on the 开源软件许可 page.
@@ -49,6 +49,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await configureSystemUi();
   await AppBuildInfo.initialize();
+  await TrainingTransitionTimings.instance.initialize();
   final storage = SharedPreferencesLocalStateStorage();
   final log = RuntimeLog.instance = RuntimeLog(
     enabled: RuntimeLog.buildEnabled,
@@ -206,7 +207,6 @@ Future<void> main() async {
   );
   log.record('app.ready');
   if (FrameRecorder.buildEnabled) {
-    await TrainingTransitionTimings.instance.initialize();
     FrameRecorder.instance.start();
     installPerformanceServiceExtension();
     unawaited(PerformanceReportService.instance.initialize());

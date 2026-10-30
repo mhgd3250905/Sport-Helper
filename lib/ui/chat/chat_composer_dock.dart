@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
+import '../../app/training_transition_activity.dart';
 import '../theme/measure_size.dart';
 import '../theme/tokens.dart';
 import '../theme/ui_polish_tokens.dart';
@@ -38,6 +39,7 @@ class ChatComposerDock extends StatefulWidget {
 
 class _ChatComposerDockState extends State<ChatComposerDock>
     with SingleTickerProviderStateMixin, WidgetsBindingObserver {
+  final _trainingActivity = TrainingTransitionActivity.instance;
   late final _controller = AnimationController(
     vsync: this,
     duration: SfDockPolishTokens.menuDuration,
@@ -60,6 +62,12 @@ class _ChatComposerDockState extends State<ChatComposerDock>
   bool _keyboardSizedPanel = false, _toKeyboard = false;
   bool _reduced = false;
   bool _extentScheduled = false;
+  bool _trainingDirty = false;
+  bool _trainingFlushScheduled = false;
+  bool _flushingTrainingUpdates = false;
+  MediaQueryData? _currentMedia, _pendingMedia;
+  AnimationStatus? _pendingStatus;
+  double? _pendingComposerHeight, _pendingInputHeight;
 
   double get _safe =>
       _keyboardHeight > 0 || _keyboardSizedPanel ? 0 : _safeBottom;
@@ -96,12 +104,26 @@ class _ChatComposerDockState extends State<ChatComposerDock>
     WidgetsBinding.instance.addObserver(this);
     widget.focusNode.addListener(_focusChanged);
     _controller.addStatusListener(_statusChanged);
+    _trainingActivity.addListener(_trainingActivityChanged);
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final media = MediaQuery.of(context);
+    if (_trainingActivity.active && _currentMedia != null) {
+      _pendingMedia = media;
+      _trainingDirty = true;
+      return;
+    }
+    _applyMedia(media);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _publishExtent();
+    });
+  }
+
+  void _applyMedia(MediaQueryData media) {
+    _currentMedia = media;
     _reduced = media.disableAnimations;
     _safeBottom = media.viewPadding.bottom;
     _preferredHeight = ChatFeaturePanel.heightFor(
@@ -112,9 +134,6 @@ class _ChatComposerDockState extends State<ChatComposerDock>
     );
     if (!_keyboardSizedPanel) _panelHeight = _preferredHeight;
     _readKeyboard();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _publishExtent();
-    });
   }
 
   @override
@@ -170,15 +189,24 @@ class _ChatComposerDockState extends State<ChatComposerDock>
   }
 
   void _focusChanged() {
+    if (_trainingActivity.active) {
+      _trainingDirty = true;
+      return;
+    }
     if (!widget.focusNode.hasFocus && _toKeyboard) {
       _toKeyboard = false;
       _handoffExtent = 0;
-      _metrics.value++;
+      if (!_flushingTrainingUpdates) _metrics.value++;
       _publishExtent();
     }
   }
 
   void _statusChanged(AnimationStatus status) {
+    if (_trainingActivity.active) {
+      _trainingDirty = true;
+      _pendingStatus = status;
+      return;
+    }
     if (status == AnimationStatus.completed) _openingCarry = false;
     if (status == AnimationStatus.dismissed) _closingCarry = false;
     if (status == AnimationStatus.completed && _keyboardHeight == 0) {
@@ -235,6 +263,10 @@ class _ChatComposerDockState extends State<ChatComposerDock>
 
   @override
   void didChangeMetrics() {
+    if (_trainingActivity.active) {
+      _trainingDirty = true;
+      return;
+    }
     _readKeyboard();
     if (_controller.isCompleted && _keyboardHeight == 0) {
       _handoffExtent = 0;
@@ -245,6 +277,11 @@ class _ChatComposerDockState extends State<ChatComposerDock>
 
   void _publishExtent() {
     if (!mounted) return;
+    if (_trainingActivity.active) {
+      _trainingDirty = true;
+      return;
+    }
+    if (_flushingTrainingUpdates) return;
     // Reduced motion can change the timeline synchronously in didUpdateWidget.
     // A sibling viewport cannot be marked dirty during that build phase.
     // Normal animation ticks publish before build and stay in the same frame.
@@ -268,9 +305,63 @@ class _ChatComposerDockState extends State<ChatComposerDock>
     }
   }
 
+  void _trainingActivityChanged() {
+    if (_trainingActivity.active || !_trainingDirty || !mounted) return;
+    if (SchedulerBinding.instance.schedulerPhase ==
+        SchedulerPhase.persistentCallbacks) {
+      if (_trainingFlushScheduled) return;
+      _trainingFlushScheduled = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _trainingFlushScheduled = false;
+        _flushTrainingUpdates();
+      });
+      return;
+    }
+    _flushTrainingUpdates();
+  }
+
+  /// IME observers and size notifications do not flow through the chat model.
+  /// Keep their published geometry unchanged throughout either training slide,
+  /// then apply the latest environment once while the source is offscreen.
+  void _flushTrainingUpdates() {
+    if (!mounted || _trainingActivity.active || !_trainingDirty) return;
+    _trainingDirty = false;
+    _flushingTrainingUpdates = true;
+    try {
+      final media = _pendingMedia;
+      _pendingMedia = null;
+      if (media != null) {
+        _applyMedia(media);
+      } else {
+        _readKeyboard();
+      }
+      _focusChanged();
+      final status = _pendingStatus;
+      _pendingStatus = null;
+      if (status != null) _statusChanged(status);
+      if (_controller.isCompleted && _keyboardHeight == 0) {
+        _handoffExtent = 0;
+      }
+      if (_pendingComposerHeight case final height?) {
+        _composerHeight = height;
+      }
+      _pendingComposerHeight = null;
+      if (_pendingInputHeight case final height?) {
+        _inputHeight = height;
+        setState(() {});
+      }
+      _pendingInputHeight = null;
+    } finally {
+      _flushingTrainingUpdates = false;
+    }
+    _metrics.value++;
+    _publishExtent();
+  }
+
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _trainingActivity.removeListener(_trainingActivityChanged);
     widget.focusNode.removeListener(_focusChanged);
     _motion.dispose();
     _controller.dispose();
@@ -341,6 +432,11 @@ class _ChatComposerDockState extends State<ChatComposerDock>
     onSize: (size) {
       if (!mounted) return;
       if ((size.height - _composerHeight).abs() < .01) return;
+      if (_trainingActivity.active) {
+        _pendingComposerHeight = size.height;
+        _trainingDirty = true;
+        return;
+      }
       _composerHeight = size.height;
       _publishExtent();
     },
@@ -390,6 +486,11 @@ class _ChatComposerDockState extends State<ChatComposerDock>
                   final height =
                       size.height - SfComposerTokens.outerPadding.vertical;
                   if ((height - _inputHeight).abs() > .5) {
+                    if (_trainingActivity.active) {
+                      _pendingInputHeight = height;
+                      _trainingDirty = true;
+                      return;
+                    }
                     setState(() => _inputHeight = height);
                   }
                 },

@@ -91,7 +91,7 @@ Future<_Actions> _host(
               plan: _plan,
               library: loadLibrary(),
               saved: false,
-              onStart: (_) => actions.starts++,
+              onStart: () => actions.starts++,
               onSave: () => actions.saves++,
               onOpen: () => actions.opens++,
             ),

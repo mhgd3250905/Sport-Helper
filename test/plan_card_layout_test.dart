@@ -73,7 +73,7 @@ void main() {
                   plan: _single,
                   library: s.library,
                   saved: false,
-                  onStart: (_) => starts++,
+                  onStart: () => starts++,
                   onSave: () => saves++,
                   onOpen: () {},
                 ),

@@ -107,7 +107,7 @@ void main() {
                     plan: _plan,
                     library: library,
                     saved: false,
-                    onStart: (_) {},
+                    onStart: () {},
                     onSave: () {},
                     onOpen: () {},
                   ),

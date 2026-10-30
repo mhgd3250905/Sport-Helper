@@ -3,7 +3,6 @@ import 'package:ugk_coach/ugk_coach.dart' as coach;
 
 import '../../domain/exercise.dart';
 import '../../domain/plan.dart';
-import 'expand_route.dart';
 import 'plan_card.dart';
 
 /// The AI boundary accepts a gate result, then adapts it for the App's trainer.
@@ -25,7 +24,7 @@ class ValidatedPlanCard extends StatelessWidget {
   final coach.ValidatedPlan validatedPlan;
   final ExerciseLibrary library;
   final bool Function(TrainingPlan) isSaved;
-  final void Function(TrainingPlan, OriginRect) onStart;
+  final ValueChanged<TrainingPlan> onStart;
   final ValueChanged<TrainingPlan> onSave;
   final ValueChanged<TrainingPlan> onOpen;
   final bool landing;
@@ -43,7 +42,7 @@ class ValidatedPlanCard extends StatelessWidget {
       landing: landing,
       saveLabel: updatingSavedPlan ? '更新到我的计划' : null,
       savedLabel: updatingSavedPlan ? '已更新' : null,
-      onStart: (origin) => onStart(plan, origin),
+      onStart: () => onStart(plan),
       onSave: () => onSave(plan),
       onSaveCopy: onSaveCopy == null ? null : () => onSaveCopy!(plan),
       onOpen: () => onOpen(plan),

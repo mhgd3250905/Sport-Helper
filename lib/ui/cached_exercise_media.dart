@@ -12,7 +12,6 @@ import '../app/services.dart';
 import '../domain/exercise.dart';
 import 'guide_cached_poster.dart';
 import 'theme.dart';
-import 'training_poster_image.dart';
 
 typedef CachedMediaStatus = ({
   bool loading,
@@ -46,7 +45,7 @@ class ExerciseFrameZero extends StatefulWidget {
   final bool extractMissing;
   final Uri? verifiedSource;
 
-  /// Freeze decode size while a host morph changes only the painted bounds.
+  /// Optional canonical decode width shared with a prewarmed training poster.
   final int? cacheWidth;
 
   @override
@@ -182,7 +181,10 @@ class _ExerciseFrameZeroState extends State<ExerciseFrameZero> {
       builder: (context, constraints) => _image(
         candidates,
         0,
-        widget.cacheWidth ?? TrainingPosterImages.decodeWidth(context),
+        widget.cacheWidth ??
+            (constraints.maxWidth * MediaQuery.devicePixelRatioOf(context))
+                .round()
+                .clamp(1, 0x7fffffff),
       ),
     );
   }
@@ -517,7 +519,12 @@ class _CachedExerciseMediaState extends State<CachedExerciseMedia>
 
   void _decoderChanged() {
     if (_controller?.failed == true) {
-      unawaited(_fail(_epoch));
+      final epoch = _epoch;
+      // The public SDK controller is notifying its listeners right now.
+      // Retire it after that notification returns, keeping the still visible.
+      scheduleMicrotask(() {
+        if (_current && epoch == _epoch) unawaited(_fail(epoch));
+      });
     } else {
       _scheduleProbe();
     }
@@ -709,6 +716,11 @@ class _CachedExerciseMediaState extends State<CachedExerciseMedia>
                     color: widget.stageColor ?? SfColors.mediaStage,
                     child: ExerciseFrameZero(
                       exercise: widget.exercise,
+                      cacheWidth: widget.retainWhenCovered
+                          ? (MediaQuery.sizeOf(context).width *
+                                    MediaQuery.devicePixelRatioOf(context))
+                                .round()
+                          : null,
                       extractMissing: widget.extractMissingPoster,
                       verifiedSource: _source ?? _legacyPosterSource,
                     ),

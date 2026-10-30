@@ -15,7 +15,6 @@ import 'package:smartfit/ui/training_media_settings.dart';
 
 import 'posehub_ui_support.dart';
 import 'settings_support.dart';
-import 'app_flow_test.dart' show widgetFixtureStateEncoder;
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -37,11 +36,7 @@ void main() {
       addTearDown(tester.view.reset);
       final storage = PoseHubUiStorage();
       storage.values[LocalActionIssueStore.recordingKey] = 'false';
-      final store = AppStore(
-        storage,
-        actionIssueEnabled: true,
-        stateEncoder: widgetFixtureStateEncoder,
-      );
+      final store = AppStore(storage, actionIssueEnabled: true);
       final services = settingsServices(store: store);
       addTearDown(services.dispose);
       await tester.pumpWidget(

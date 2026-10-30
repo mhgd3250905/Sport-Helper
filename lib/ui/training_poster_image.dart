@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../app/services.dart';
 import '../domain/exercise.dart';
+import 'theme.dart';
 
-/// The card, prewarm and flight use one ResizeImage key in Flutter's ImageCache.
-/// Changing a painted rect never starts another codec or changes this key.
+/// Prewarm and the full training page use the same screen-width decode key.
 abstract final class TrainingPosterImages {
   static int decodeWidth(BuildContext context) =>
       (MediaQuery.sizeOf(context).width *
@@ -33,6 +33,10 @@ abstract final class TrainingPosterImages {
       ResizeImage.resizeIfNeeded(width, null, AssetImage(asset));
 
   static Future<void> precache(BuildContext context, Exercise exercise) async {
+    await prepare(context, exercise);
+  }
+
+  static Future<bool> prepare(BuildContext context, Exercise exercise) async {
     final assets = candidates(context, exercise);
     final width = decodeWidth(context);
     for (final asset in assets) {
@@ -42,25 +46,47 @@ abstract final class TrainingPosterImages {
         context,
         onError: (_, _) => failed = true,
       );
-      if (!failed || !context.mounted) return;
+      if (!failed) return true;
+      if (!context.mounted) return false;
     }
+    return false;
   }
 }
 
-/// Resolves only when the asset/theme/decode key changes. The builder receives
-/// a stable pixel child and its intrinsic ratio, so contain fitting can be
-/// preserved by paint transforms without relaying out Image on every frame.
-class DecodedTrainingPoster extends StatefulWidget {
-  const DecodedTrainingPoster({
+/// The same square, contain-fitted still that covers the video until it emits
+/// a real first frame. It is the actual media, never an entrance placeholder.
+class TrainingPoster extends StatelessWidget {
+  const TrainingPoster({
     super.key,
     required this.exercise,
-    required this.builder,
-    this.cacheWidth,
+    this.mirrored = false,
+    this.radius = 0,
   });
   final Exercise exercise;
-  final int? cacheWidth;
-  final Widget Function(BuildContext, Widget pixels, Size intrinsicSize)
-  builder;
+  final bool mirrored;
+  final double radius;
+  @override
+  Widget build(BuildContext context) => ClipRRect(
+    clipBehavior: Clip.antiAlias,
+    borderRadius: BorderRadius.circular(radius),
+    child: ColoredBox(
+      color: SfColors.mediaStage,
+      child: Transform.flip(
+        flipX: mirrored,
+        child: AspectRatio(
+          aspectRatio: 1,
+          child: DecodedTrainingPoster(exercise: exercise),
+        ),
+      ),
+    ),
+  );
+}
+
+/// Resolves only when the asset/theme/decode key changes, retaining the still
+/// across ordinary SDK updates without another codec or empty image frame.
+class DecodedTrainingPoster extends StatefulWidget {
+  const DecodedTrainingPoster({super.key, required this.exercise});
+  final Exercise exercise;
 
   @override
   State<DecodedTrainingPoster> createState() => _DecodedTrainingPosterState();
@@ -89,8 +115,7 @@ class _DecodedTrainingPosterState extends State<DecodedTrainingPoster> {
 
   void _resolve() {
     final assets = TrainingPosterImages.candidates(context, widget.exercise);
-    final width =
-        widget.cacheWidth ?? TrainingPosterImages.decodeWidth(context);
+    final width = TrainingPosterImages.decodeWidth(context);
     final signature =
         '$width/${assets.join('|')}/${DefaultAssetBundle.of(context).hashCode}';
     if (_signature == signature) return;
@@ -150,20 +175,14 @@ class _DecodedTrainingPosterState extends State<DecodedTrainingPoster> {
   @override
   Widget build(BuildContext context) {
     final image = _info?.image;
-    return widget.builder(
-      context,
-      RepaintBoundary(
-        child: image == null
-            ? const SizedBox.expand()
-            : RawImage(
-                image: image,
-                fit: BoxFit.contain,
-                filterQuality: FilterQuality.medium,
-              ),
-      ),
-      image == null
-          ? const Size(1, 1)
-          : Size(image.width.toDouble(), image.height.toDouble()),
+    return RepaintBoundary(
+      child: image == null
+          ? const SizedBox.expand()
+          : RawImage(
+              image: image,
+              fit: BoxFit.contain,
+              filterQuality: FilterQuality.medium,
+            ),
     );
   }
 }

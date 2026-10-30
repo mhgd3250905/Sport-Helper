@@ -1,10 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:ugk_coach_ui/ugk_coach_ui.dart';
 
 import '../../data/app_store.dart';
+import '../../app/training_transition_activity.dart';
 import '../../domain/exercise.dart';
 import '../../domain/plan.dart';
 import '../../domain/saved_plan.dart';
@@ -17,7 +19,7 @@ import '../theme/tokens.dart';
 import '../theme/ui_polish_tokens.dart';
 import '../theme/widgets.dart';
 import 'coach_ui_adapter.dart';
-import 'expand_route.dart';
+import 'training_card_media.dart';
 import 'saved_plan_actions.dart';
 import 'saved_plan_animated_list.dart';
 
@@ -35,7 +37,7 @@ class SavedPlansPage extends StatefulWidget {
   final AppStore store;
   final ExerciseLibrary library;
   final void Function(SavedPlan) onShow;
-  final void Function(SavedPlan, OriginRect from) onStart;
+  final void Function(SavedPlan, BuildContext sourceContext) onStart;
   final VoidCallback? onCompose;
 
   @override
@@ -43,6 +45,7 @@ class SavedPlansPage extends StatefulWidget {
 }
 
 class _SavedPlansPageState extends State<SavedPlansPage> {
+  final _trainingActivity = TrainingTransitionActivity.instance;
   final _scroll = ScrollController();
   final _viewport = GlobalKey();
   final _entryKeys = <String, GlobalKey>{};
@@ -52,12 +55,14 @@ class _SavedPlansPageState extends State<SavedPlansPage> {
   bool _autoRevealing = false;
   Timer? _emptyTimer;
   late bool _emptyReady;
+  bool _storeDirty = false;
 
   @override
   void initState() {
     super.initState();
     _emptyReady = widget.store.savedPlans.isEmpty;
     widget.store.addListener(_storeChanged);
+    _trainingActivity.addListener(_trainingActivityChanged);
   }
 
   @override
@@ -66,6 +71,10 @@ class _SavedPlansPageState extends State<SavedPlansPage> {
     if (oldWidget.store == widget.store) return;
     oldWidget.store.removeListener(_storeChanged);
     widget.store.addListener(_storeChanged);
+    if (_trainingActivity.active) {
+      _storeDirty = true;
+      return;
+    }
     _cancelReveal();
     _emptyTimer?.cancel();
     _emptyReady = widget.store.savedPlans.isEmpty;
@@ -75,6 +84,11 @@ class _SavedPlansPageState extends State<SavedPlansPage> {
   }
 
   void _storeChanged() {
+    if (_trainingActivity.active) {
+      _storeDirty = true;
+      return;
+    }
+    _storeDirty = false;
     _cancelReveal();
     if (!widget.store.savedPlans.any((plan) => plan.id == _expandedId)) {
       _expandedId = null;
@@ -82,6 +96,10 @@ class _SavedPlansPageState extends State<SavedPlansPage> {
     _emptyTimer?.cancel();
     if (widget.store.savedPlans.isEmpty) {
       _emptyTimer = Timer(SfSavedPlanTokens.removal, () {
+        if (_trainingActivity.active) {
+          _storeDirty = true;
+          return;
+        }
         if (mounted && widget.store.savedPlans.isEmpty) {
           setState(() => _emptyReady = true);
         }
@@ -90,6 +108,21 @@ class _SavedPlansPageState extends State<SavedPlansPage> {
       _emptyReady = false;
     }
     setState(() {});
+  }
+
+  void _trainingActivityChanged() {
+    if (SchedulerBinding.instance.schedulerPhase ==
+        SchedulerPhase.persistentCallbacks) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _trainingActivityChanged();
+      });
+      return;
+    }
+    if (_trainingActivity.active) {
+      _cancelReveal();
+    } else if (_storeDirty && mounted) {
+      _storeChanged();
+    }
   }
 
   void _cancelReveal() {
@@ -103,6 +136,7 @@ class _SavedPlansPageState extends State<SavedPlansPage> {
   }
 
   void _toggle(SavedPlan plan) {
+    if (_trainingActivity.active) return;
     _cancelReveal();
     final expand = _expandedId != plan.id;
     setState(() => _expandedId = expand ? plan.id : null);
@@ -115,7 +149,10 @@ class _SavedPlansPageState extends State<SavedPlansPage> {
         _revealTimer = null;
         // The SDK has no onEnd. Measure only after its last layout frame.
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (!mounted || epoch != _revealEpoch || _expandedId != plan.id) {
+          if (!mounted ||
+              _trainingActivity.active ||
+              epoch != _revealEpoch ||
+              _expandedId != plan.id) {
             return;
           }
           final entryContext = _entryKeys[plan.id]?.currentContext;
@@ -159,9 +196,10 @@ class _SavedPlansPageState extends State<SavedPlansPage> {
     widget.onShow(plan);
   }
 
-  void _start(SavedPlan plan, OriginRect from) {
+  void _start(SavedPlan plan) {
+    if (_trainingActivity.active) return;
     _cancelReveal();
-    widget.onStart(plan, from);
+    widget.onStart(plan, context);
   }
 
   void _details(SavedPlan saved) {
@@ -182,7 +220,7 @@ class _SavedPlansPageState extends State<SavedPlansPage> {
   }
 
   Widget _entry(SavedPlan saved, {required bool expanded}) {
-    return _SavedPlanEntry(
+    final entry = _SavedPlanEntry(
       key: _entryKeys.putIfAbsent(saved.id, GlobalKey.new),
       saved: saved,
       library: widget.library,
@@ -195,11 +233,20 @@ class _SavedPlansPageState extends State<SavedPlansPage> {
       onDetails: _details,
       onInteract: _cancelReveal,
     );
+    final first = saved.plan.items.firstOrNull?.exerciseId;
+    final exercise = first == null ? null : widget.library.tryGet(first);
+    if (exercise == null) return entry;
+    return TrainingCardMedia(
+      key: ValueKey('saved-training-poster-${saved.id}'),
+      exercise: exercise,
+      child: entry,
+    );
   }
 
   @override
   void dispose() {
     widget.store.removeListener(_storeChanged);
+    _trainingActivity.removeListener(_trainingActivityChanged);
     _revealTimer?.cancel();
     _emptyTimer?.cancel();
     _revealEpoch++;
@@ -212,59 +259,66 @@ class _SavedPlansPageState extends State<SavedPlansPage> {
     // A removed item's old builder must retain its expanded snapshot while
     // the list animates its removal, rather than starting an SDK collapse too.
     final expandedId = _expandedId;
-    return Scaffold(
-      backgroundColor: SfColors.background,
-      appBar: AppBar(
-        title: const Text('我的计划'),
+    return AnimatedBuilder(
+      animation: _trainingActivity,
+      builder: (_, child) =>
+          TickerMode(enabled: !_trainingActivity.active, child: child!),
+      child: Scaffold(
         backgroundColor: SfColors.background,
-        surfaceTintColor: Colors.transparent,
-      ),
-      body: SafeArea(
-        child: SizedBox.expand(
-          key: _viewport,
-          child: CustomScrollView(
-            key: const ValueKey('saved-plans-scroll'),
-            controller: _scroll,
-            slivers: [
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.baseline,
-                    textBaseline: TextBaseline.alphabetic,
-                    children: [
-                      Text(
-                        '${widget.store.savedPlans.length} 套',
-                        style: SfType.label.copyWith(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: SfSavedPlanTokens.secondary,
+        appBar: AppBar(
+          title: const Text('我的计划'),
+          backgroundColor: SfColors.background,
+          surfaceTintColor: Colors.transparent,
+        ),
+        body: SafeArea(
+          child: SizedBox.expand(
+            key: _viewport,
+            child: CustomScrollView(
+              key: const ValueKey('saved-plans-scroll'),
+              controller: _scroll,
+              slivers: [
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.baseline,
+                      textBaseline: TextBaseline.alphabetic,
+                      children: [
+                        Text(
+                          '${widget.store.savedPlans.length} 套',
+                          style: SfType.label.copyWith(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: SfSavedPlanTokens.secondary,
+                          ),
                         ),
-                      ),
-                      const Spacer(),
-                      Text(
-                        '长按可编辑',
-                        style: SfType.caption.copyWith(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w400,
-                          color: SfSavedPlanTokens.tertiary,
+                        const Spacer(),
+                        Text(
+                          '长按可编辑',
+                          style: SfType.caption.copyWith(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w400,
+                            color: SfSavedPlanTokens.tertiary,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              if (widget.store.savedPlans.isEmpty && _emptyReady)
-                SliverToBoxAdapter(child: _Empty(onCompose: widget.onCompose)),
-              SliverPadding(
-                padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
-                sliver: SavedPlanAnimatedList(
-                  plans: List.of(widget.store.savedPlans),
-                  itemBuilder: (_, plan) =>
-                      _entry(plan, expanded: expandedId == plan.id),
+                if (widget.store.savedPlans.isEmpty && _emptyReady)
+                  SliverToBoxAdapter(
+                    child: _Empty(onCompose: widget.onCompose),
+                  ),
+                SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+                  sliver: SavedPlanAnimatedList(
+                    plans: List.of(widget.store.savedPlans),
+                    itemBuilder: (_, plan) =>
+                        _entry(plan, expanded: expandedId == plan.id),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -304,7 +358,7 @@ class _SavedPlanEntry extends StatefulWidget {
   final bool expanded;
   final VoidCallback onToggle;
   final ValueChanged<SavedPlan> onShow;
-  final void Function(SavedPlan, OriginRect) onStart;
+  final ValueChanged<SavedPlan> onStart;
   final ValueChanged<SavedPlan> onRename;
   final ValueChanged<SavedPlan> onDelete;
   final ValueChanged<SavedPlan> onDetails;
@@ -353,7 +407,7 @@ class _SavedPlanEntryState extends State<_SavedPlanEntry>
       key: ValueKey('saved-summary-${widget.saved.id}'),
       saved: widget.saved,
       library: widget.library,
-      onStart: (from) => widget.onStart(widget.saved, from),
+      onStart: () => widget.onStart(widget.saved),
     );
   }
 
@@ -455,7 +509,7 @@ class _SavedPlanEntryState extends State<_SavedPlanEntry>
         actionIcon: CoachGlyph.chevronRight,
         actionLabel: '查看详情',
         onAction: () => widget.onDetails(saved),
-        onStart: (from) => widget.onStart(saved, from),
+        onStart: (_) => widget.onStart(saved),
       ),
       compact: !widget.expanded,
     );
@@ -537,7 +591,7 @@ class _SavedPlanSummary extends StatelessWidget {
 
   final SavedPlan saved;
   final ExerciseLibrary library;
-  final ValueChanged<OriginRect> onStart;
+  final VoidCallback onStart;
 
   @override
   Widget build(BuildContext context) {
@@ -633,15 +687,7 @@ class _SavedPlanSummary extends StatelessWidget {
                 child: InkResponse(
                   onTap: () {
                     unawaited(HapticFeedback.mediumImpact());
-                    // Where the tile is now; once this page is gone the
-                    // player folds back into the middle of the chat.
-                    final at = rectOf(context);
-                    var first = true;
-                    onStart(() {
-                      if (!first) return null;
-                      first = false;
-                      return at;
-                    });
+                    onStart();
                   },
                   customBorder: const CircleBorder(),
                   child: Container(

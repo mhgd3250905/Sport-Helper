@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -20,7 +19,8 @@ import 'package:smartfit/ui/custom_plan_page.dart';
 import 'package:smartfit/ui/library_page.dart';
 import 'package:smartfit/ui/player_page.dart';
 import 'package:smartfit/ui/training_route.dart';
-import 'package:smartfit/ui/training_entry_placeholder.dart';
+import 'package:smartfit/ui/training_poster_image.dart';
+import 'package:smartfit/ui/chat/saved_plans_page.dart';
 import 'package:smartfit/voice/voice_library.dart';
 import 'package:smartfit/voice/voice_queue.dart';
 import 'package:ugk_trainer/ugk_trainer.dart' as trainer;
@@ -35,19 +35,10 @@ class MemoryStorage implements LocalStateStorage {
   Future<void> write(String key, String value) async => data[key] = value;
 }
 
-/// Widget fake clocks cannot await a native Isolate's queued continuation.
-/// The explicit test-runner flag keeps in-memory fixtures in their fake zone;
-/// dedicated serialization tests and unflagged software probes use real workers.
-AppStateEncoder? get widgetFixtureStateEncoder =>
-    const bool.fromEnvironment('SMARTFIT_WIDGET_FAKE_STATE_ENCODER')
-    ? (snapshot) async => jsonEncode(snapshot)
-    : null;
-
 AppServices services({VoiceOutput output = const MutedVoiceOutput()}) {
-  final store =
-      AppStore(MemoryStorage(), stateEncoder: widgetFixtureStateEncoder)
-        // A drifting sky never settles: keep it still so pumpAndSettle can.
-        ..starfield = false;
+  final store = AppStore(MemoryStorage())
+    // A drifting sky never settles: keep it still so pumpAndSettle can.
+    ..starfield = false;
   return AppServices(
     library: loadLibrary(),
     catalog: loadCatalog(),
@@ -58,29 +49,22 @@ AppServices services({VoiceOutput output = const MutedVoiceOutput()}) {
   );
 }
 
-/// Native image decoding progresses in real I/O; zero-duration pumps only
-/// deliver its callbacks. This prepares pixels before measuring motion time.
+/// Drain real asset decode before exercising a finite route on the fake clock.
 Future<void> warmTrainingPoster(
   WidgetTester tester,
-  AppServices s,
+  AppServices services,
   TrainingPlan plan, {
   BuildContext? sourceContext,
 }) async {
-  final context = sourceContext ?? tester.element(find.byType(ChatHomePage));
-  var ready = false;
-  unawaited(
-    TrainingTransitionPoster.precache(
+  if (plan.items.isEmpty) return;
+  final context = sourceContext ?? tester.element(find.byType(Scaffold).first);
+  await tester.runAsync(
+    () => TrainingPosterImages.precache(
       context,
-      s.library[plan.items.first.exerciseId],
-    ).then((_) => ready = true),
+      services.library[plan.items.first.exerciseId],
+    ),
   );
-  for (var i = 0; i < 30 && !ready; i++) {
-    await tester.runAsync(
-      () async => Future<void>.delayed(const Duration(milliseconds: 20)),
-    );
-    await tester.pump();
-  }
-  expect(ready, isTrue, reason: 'the source tap awaits its decoded poster');
+  await tester.pump();
 }
 
 class InterruptibleTestOutput extends MutedVoiceOutput
@@ -398,81 +382,65 @@ void main() {
     await tester.tap(find.byKey(ValueKey('plan-expand-${plan.id}')));
     await tester.pumpAndSettle();
 
-    // The still card image moves; the real trainer is mounted behind its gate.
-    // The visible informational toast must let this tap reach the start button.
+    // The informational toast must let this tap reach the start button.
     final screen = tester.getRect(find.byType(ChatHomePage));
     final chatElement = tester.element(find.byType(ChatHomePage));
+    await warmTrainingPoster(tester, s, plan, sourceContext: chatElement);
     await tester.tap(find.byKey(ValueKey('plan-start-${plan.id}')));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 60));
     await tester.pump();
     final enteringPlayer = find.byType(PlayerPage, skipOffstage: false);
     expect(enteringPlayer, findsOneWidget);
-    expect(tester.getRect(enteringPlayer), screen);
-    final motion = TrainingTransitionScope.maybeOf(
-      tester.element(enteringPlayer),
-    )!;
-    expect(motion.entered, isFalse);
-    expect(motion.chrome.value, lessThan(1));
-    expect(
-      find.byKey(const ValueKey('training-entry-placeholder')),
-      findsNothing,
-    );
-    expect(
+    expect(tester.getRect(enteringPlayer).size, screen.size);
+    expect(tester.getRect(enteringPlayer).left, greaterThan(screen.left));
+    final route =
+        ModalRoute.of(tester.element(enteringPlayer))! as TrainingRoute;
+    expect(route.transitionDuration, const Duration(milliseconds: 300));
+    expect(route.reverseTransitionDuration, const Duration(milliseconds: 280));
+    expect(route.opaque, isTrue);
+    final control = TrainingRouteScope.maybeOf(tester.element(enteringPlayer))!;
+    expect(control.entered, isFalse);
+    final sdk = tester.widget<trainer.TrainerPlayer>(
       find.byType(trainer.TrainerPlayer, skipOffstage: false),
-      findsOneWidget,
     );
+    expect(sdk.chromeAnimation, isNull);
+    expect(sdk.startGate, isNotNull);
     expect(find.byType(ExerciseVideo, skipOffstage: false), findsNothing);
     expect(
-      tester
-          .widget<trainer.TrainerPlayer>(
-            find.byType(trainer.TrainerPlayer, skipOffstage: false),
-          )
-          .startGate,
-      isNotNull,
+      tester.element(find.byType(ChatHomePage, skipOffstage: false)),
+      same(chatElement),
     );
-    expect(tester.element(find.byType(ChatHomePage)), same(chatElement));
-    expect(tester.getRect(find.byType(ChatHomePage)), screen);
-    await tester.pump(const Duration(milliseconds: 560));
+    await tester.pump(const Duration(milliseconds: 300));
     await tester.pump();
-    expect(tester.getRect(find.byType(PlayerPage)), screen); // full screen
-    expect(motion.entered, isTrue);
-    expect(motion.chrome.value, 1);
-    expect(find.byType(ChatHomePage), findsOneWidget);
-    expect(tester.getRect(find.byType(ChatHomePage)), screen);
+    expect(tester.getRect(find.byType(PlayerPage)), screen);
+    expect(control.entered, isTrue);
     expect(s.store.lastPlan?.id, plan.id);
     await tester.tap(find.byKey(const ValueKey('skip')));
     await tester.pump(const Duration(milliseconds: 200));
     await tester.tap(find.byKey(const ValueKey('close')));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('结束'));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 200));
-    expect(find.byType(PlayerPage), findsOneWidget);
-    expect(find.byType(ExerciseVideo), findsNothing);
-    expect(
-      find.byKey(const ValueKey('training-transition-poster')),
-      findsOneWidget,
-    );
-    final messagesBeforeReceipt = s.chat.messages.length;
-    await tester.pump(const Duration(milliseconds: 50));
-    await tester.pump(const Duration(microseconds: 1));
-    await tester.pump();
-    expect(find.byType(PlayerPage), findsNothing);
-    expect(find.byKey(const ValueKey('training-return-morph')), findsOneWidget);
-    final cardBeforeReceipt = tester.getRect(find.byType(PlanCard));
+    final card = find.byType(PlanCard, skipOffstage: false);
+    final cardBeforeReceipt = tester.getRect(card);
     final scroll = tester
-        .widget<ChatTimeline>(find.byType(ChatTimeline))
+        .widget<ChatTimeline>(find.byType(ChatTimeline, skipOffstage: false))
         .controller;
     final offsetBeforeReceipt = scroll.offset;
-    await tester.pump(const Duration(milliseconds: 499));
+    final messagesBeforeReceipt = s.chat.messages.length;
+    await tester.tap(find.text('结束'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 279));
+    expect(find.byType(PlayerPage, skipOffstage: false), findsOneWidget);
+    expect(control.exiting, isTrue);
     expect(s.chat.messages.length, messagesBeforeReceipt);
-    expect(tester.getRect(find.byType(PlanCard)), cardBeforeReceipt);
+    expect(tester.getRect(card), cardBeforeReceipt);
     expect(scroll.offset, offsetBeforeReceipt);
     await tester.pump(const Duration(milliseconds: 1));
+    await tester.pump(const Duration(microseconds: 1));
+    await tester.pump();
     await tester.pump();
     expect(s.chat.messages.length, messagesBeforeReceipt + 1);
-    expect(tester.getRect(find.byType(PlanCard)), cardBeforeReceipt);
+    expect(tester.getRect(card), cardBeforeReceipt);
     expect(scroll.offset, offsetBeforeReceipt);
     expect(
       find.byType(TrainingFinishedEntry, skipOffstage: false),
@@ -484,11 +452,11 @@ void main() {
     expect(find.byType(ChatHomePage), findsOneWidget);
     expect(tester.element(find.byType(ChatHomePage)), same(chatElement));
     expect(s.chat.messages.last.isUser, isFalse);
-    expect(s.chat.messages.last.isPlan, isFalse); // a word after the workout
+    expect(s.chat.messages.last.isPlan, isFalse);
   });
 
   testWidgets(
-    'reduced motion: the gated player crossfades for 150ms at full screen',
+    'reduced motion switches directly to a complete gated training page',
     (tester) async {
       tall(tester);
       tester.platformDispatcher.accessibilityFeaturesTestValue =
@@ -503,30 +471,28 @@ void main() {
       await showManualChatCard(s);
       await tester.pumpAndSettle();
       final plan = s.chat.currentPlan!;
-      await warmTrainingPoster(tester, s, plan);
       final screen = tester.getRect(find.byType(ChatHomePage));
+      await warmTrainingPoster(tester, s, plan);
       await tester.tap(find.byKey(ValueKey('plan-start-${plan.id}')));
       await tester.pump();
-      await tester.pump(const Duration(milliseconds: 60));
       await tester.pump();
-      expect(tester.getRect(find.byType(PlayerPage)), screen);
-      final motion = TrainingTransitionScope.maybeOf(
-        tester.element(find.byType(PlayerPage)),
-      )!;
-      expect(motion.entrance.duration, const Duration(milliseconds: 150));
-      expect(motion.entered, isFalse);
-      expect(find.byType(ExerciseVideo, skipOffstage: false), findsNothing);
+      final page = find.byType(PlayerPage);
+      expect(page, findsOneWidget);
+      expect(tester.getRect(page), screen);
+      final route = ModalRoute.of(tester.element(page))! as TrainingRoute;
+      expect(route.transitionDuration, Duration.zero);
+      expect(route.reverseTransitionDuration, Duration.zero);
+      expect(route.opaque, isTrue);
       expect(
-        find.ancestor(
-          of: find.byType(PlayerPage),
-          matching: find.byType(FadeTransition),
-        ),
-        findsOneWidget,
+        find.ancestor(of: page, matching: find.byType(FadeTransition)),
+        findsNothing,
       );
-      await tester.pump(const Duration(milliseconds: 150));
-      await tester.pump();
-      expect(motion.entered, isTrue);
-      expect(motion.chrome.value, 1);
+      expect(
+        tester
+            .widget<trainer.TrainerPlayer>(find.byType(trainer.TrainerPlayer))
+            .chromeAnimation,
+        isNull,
+      );
       await tester.tap(find.byKey(const ValueKey('close')));
       await tester.pumpAndSettle();
       await tester.tap(find.text('结束'));
@@ -536,7 +502,7 @@ void main() {
   );
 
   testWidgets(
-    'drawer ▶ starts a saved plan in the player and comes back to the chat',
+    'saved-plan start returns to the retained list and its original scroll state',
     (tester) async {
       tall(tester);
       final s = services();
@@ -558,6 +524,14 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const ValueKey('panel-plans')));
       await tester.pumpAndSettle();
+      final source = tester.element(find.byType(SavedPlansPage));
+      final sourceScroll = tester
+          .widget<CustomScrollView>(
+            find.byKey(const ValueKey('saved-plans-scroll')),
+          )
+          .controller!;
+      final sourceOffset = sourceScroll.offset;
+      await warmTrainingPoster(tester, s, saved.plan, sourceContext: source);
       await tester.tap(find.byKey(ValueKey('saved-start-${saved.id}')));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 60));
@@ -570,10 +544,10 @@ void main() {
       );
       expect(find.byType(ExerciseVideo, skipOffstage: false), findsNothing);
       expect(
-        TrainingTransitionScope.maybeOf(tester.element(entering))!.entered,
+        TrainingRouteScope.maybeOf(tester.element(entering))!.entered,
         isFalse,
       );
-      await tester.pump(const Duration(milliseconds: 560));
+      await tester.pump(const Duration(milliseconds: 300));
       await tester.pump();
       expect(find.byType(PlayerPage), findsOneWidget);
       await tester.tap(find.byKey(const ValueKey('close')));
@@ -581,8 +555,13 @@ void main() {
       await tester.tap(find.text('结束'));
       await tester.pumpAndSettle();
       expect(find.byType(PlayerPage), findsNothing);
-      expect(find.byType(ChatHomePage), findsOneWidget);
+      expect(find.byType(SavedPlansPage), findsOneWidget);
+      expect(tester.element(find.byType(SavedPlansPage)), same(source));
+      expect(sourceScroll.offset, sourceOffset);
       expect(s.store.history, hasLength(1));
+      Navigator.of(source).pop();
+      await tester.pumpAndSettle();
+      expect(find.byType(ChatHomePage), findsOneWidget);
     },
   );
 

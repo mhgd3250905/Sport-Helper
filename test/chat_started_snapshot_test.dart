@@ -102,10 +102,10 @@ void main() {
       final entering = find.byType(PlayerPage, skipOffstage: false);
       expect(entering, findsOneWidget);
       expect(
-        TrainingTransitionScope.maybeOf(tester.element(entering))!.entered,
+        TrainingRouteScope.maybeOf(tester.element(entering))!.entered,
         isFalse,
       );
-      await tester.pump(const Duration(milliseconds: 560));
+      await tester.pump(const Duration(milliseconds: 300));
       await tester.pump();
       expect(find.byType(PlayerPage), findsOneWidget);
       expect(s.chat.currentPlan?.id, modified.id);

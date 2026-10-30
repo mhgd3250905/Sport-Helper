@@ -16,14 +16,12 @@ import '../about_page.dart';
 import '../custom_plan_page.dart';
 import '../library_page.dart';
 import '../plan_page.dart';
-import '../player_page.dart';
+import '../open_training.dart';
 import '../theme/app_theme.dart';
 import '../theme/solid_surface.dart';
 import '../theme/sf_icons.dart';
 import '../theme/tokens.dart';
-import '../training_route.dart';
 import '../training_transition_freeze.dart';
-import '../training_entry_placeholder.dart';
 import 'chat_widgets.dart';
 import 'chat_composer_dock.dart';
 import 'coach_ui_adapter.dart';
@@ -67,13 +65,11 @@ class _ChatHomePageState extends State<ChatHomePage>
   Set<String> _replyStartIds = {};
   final Map<String, String> _deliveryEntryIds = {};
   final Map<String, GlobalKey> _deliveryKeys = {};
-  final _trainingMedia = <String, TrainingCardMediaRegistry>{};
   final _finishedEntries = <String>{};
   final _finishedSessions = <String>{};
   final _input = FocusNode();
   bool _panelOpen = false;
   bool _trainingInFlight = false;
-  int _trainingLaunchEpoch = 0;
 
   /// Messages already on screen when the page opened don't animate in.
   final _seen = <String>{};
@@ -111,7 +107,6 @@ class _ChatHomePageState extends State<ChatHomePage>
     if (state == AppLifecycleState.inactive ||
         state == AppLifecycleState.paused ||
         state == AppLifecycleState.detached) {
-      _trainingLaunchEpoch++;
       unawaited(_chat.flushPersistence());
     }
     if ((state == AppLifecycleState.inactive ||
@@ -139,9 +134,6 @@ class _ChatHomePageState extends State<ChatHomePage>
     if (widget.scrollController == null) _scroll.dispose();
     _input.dispose();
     _dockExtent.dispose();
-    for (final registry in _trainingMedia.values) {
-      registry.dispose();
-    }
     super.dispose();
   }
 
@@ -192,10 +184,13 @@ class _ChatHomePageState extends State<ChatHomePage>
             Navigator.of(context).pop();
             unawaited(_chat.showSaved(p));
           },
-          onStart: (p, _) {
-            Navigator.of(context).pop();
-            unawaited(_start(p.plan));
-          },
+          onStart: (p, sourceContext) => unawaited(
+            _start(
+              p.plan,
+              sourceContext: sourceContext,
+              sourceEntry: 'saved_plan',
+            ),
+          ),
           onCompose: () {
             Navigator.of(context).pop();
             WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -207,59 +202,29 @@ class _ChatHomePageState extends State<ChatHomePage>
     );
   }
 
-  /// Open the stable video stage directly; the summary follows back in chat.
-  Future<void> _start(TrainingPlan p, {String? messageId}) async {
+  /// Every host entry uses the same opaque slide route and launch guard.
+  Future<void> _start(
+    TrainingPlan plan, {
+    BuildContext? sourceContext,
+    String sourceEntry = 'chat',
+  }) async {
     if (_trainingInFlight) return;
-    final s = AppServices.of(context);
-    if (p.items.any((item) => !s.library.contains(item.exerciseId))) {
-      _toast('计划包含尚未可用的动作，暂时无法开始；已保存计划仍保留。');
-      return;
-    }
-    if (!s.store.trainingAllowed) {
-      _toast(
-        s.store.safetyAccepted
-            ? '根据你的安全确认，暂不开始训练；可以在动作库里看示范。'
-            : '请先在对话里完成安全确认，再开始训练。',
-        icon: SfGlyph.shield,
-      );
-      return;
-    }
-    // Capture the image and begin decode on the tap, before persistence yields.
-    final source = messageId == null
-        ? null
-        : _trainingMedia[messageId]?.capture();
-    final first = p.items.firstOrNull;
-    final posterReady = first == null
-        ? Future<void>.value()
-        : TrainingTransitionPoster.precache(
-            context,
-            s.library[first.exerciseId],
-          );
     _trainingInFlight = true;
-    final launchEpoch = _trainingLaunchEpoch;
     try {
-      if (!await _chat.started(p) ||
-          !mounted ||
-          launchEpoch != _trainingLaunchEpoch) {
-        return;
-      }
-      await posterReady;
-      if (!mounted || launchEpoch != _trainingLaunchEpoch) return;
-      _dismissInput();
-      final route = TrainingRoute<SessionResult>(
-        context: context,
-        source: source,
-        settings: const RouteSettings(name: 'player'),
-        builder: (_) => PlayerPage(plan: p),
+      final result = await openTraining(
+        sourceContext ?? context,
+        plan: plan,
+        sourceEntry: sourceEntry,
+        onStarting: () {
+          // openTraining already holds the source viewport before IME focus
+          // and metrics start changing. They are published after the slide.
+          _dismissInput();
+          return _chat.started(plan);
+        },
       );
-      final result = await Navigator.of(context).push(route);
-      await route.completed;
-      // The zero-duration route has gone, but its still-only shrink/crossfade
-      // overlay owns the visual exit until this future completes.
-      await route.visualCompleted;
       if (!mounted) return;
       _dismissInput();
-      if (result != null) await _finishTraining(p, result);
+      if (result != null) await _finishTraining(plan, result);
     } finally {
       _trainingInFlight = false;
     }
@@ -638,7 +603,7 @@ class _ChatHomePageState extends State<ChatHomePage>
               onSaveCopy: _chat.savedTargetFor(m) == null
                   ? null
                   : (_) => unawaited(_savePlanCard(m, saveAsCopy: true)),
-              onStart: (plan, _) => _start(plan, messageId: m.id),
+              onStart: (plan) => _start(plan),
               onSave: (_) => unawaited(_savePlanCard(m)),
               onOpen: (plan) => _details(m, validatedPlan: plan),
             ),
@@ -653,7 +618,7 @@ class _ChatHomePageState extends State<ChatHomePage>
               landing: fresh,
               library: library,
               saved: _chat.isSaved(m.plan!),
-              onStart: (_) => _start(m.plan!, messageId: m.id),
+              onStart: () => _start(m.plan!),
               onSave: () => _save(m.plan!),
               onOpen: () => _details(m),
             ),
@@ -671,10 +636,12 @@ class _ChatHomePageState extends State<ChatHomePage>
             : TrainingPlan.fromJson(message.validatedPlan!.plan.toJson()));
     final exerciseId = plan?.items.firstOrNull?.exerciseId;
     if (exerciseId == null) return child;
-    final registry = _trainingMedia.putIfAbsent(
-      message.id,
-      () => TrainingCardMediaRegistry(exerciseId),
+    final exercise = AppServices.of(context).library.tryGet(exerciseId);
+    if (exercise == null) return child;
+    return TrainingCardMedia(
+      key: ValueKey('training-card-poster-${message.id}'),
+      exercise: exercise,
+      child: child,
     );
-    return TrainingCardMedia(registry: registry, child: child);
   }
 }
