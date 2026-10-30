@@ -9,6 +9,8 @@ import 'package:smartfit/domain/exercise.dart';
 import 'package:smartfit/domain/plan.dart';
 import 'package:smartfit/main.dart';
 import 'package:smartfit/ui/player_page.dart';
+import 'package:smartfit/ui/plan_page.dart';
+import 'package:smartfit/ui/training_route.dart';
 
 import 'app_flow_test.dart' show MemoryStorage, services, tall;
 
@@ -87,9 +89,17 @@ void main() {
 
       await tester.tap(find.byKey(const ValueKey('start')));
       await tester.pump();
-      // Allow the retiring card player to stop before the chat pushes training.
+      // Retire preview playback, then keep the real trainer behind its gate.
       await tester.pump(const Duration(milliseconds: 50));
-      await tester.pump(const Duration(milliseconds: 800));
+      await tester.pump();
+      final entering = find.byType(PlayerPage, skipOffstage: false);
+      expect(entering, findsOneWidget);
+      expect(
+        TrainingTransitionScope.maybeOf(tester.element(entering))!.entered,
+        isFalse,
+      );
+      await tester.pump(const Duration(milliseconds: 560));
+      await tester.pump();
       expect(find.byType(PlayerPage), findsOneWidget);
       expect(s.chat.currentPlan?.id, modified.id);
       expect(s.store.lastPlan?.exerciseIds, {'h-band-pallof'});
@@ -101,6 +111,10 @@ void main() {
       expect(s.store.history, hasLength(1));
       expect(s.store.history.single.completed, 0);
       await tester.tap(find.byKey(const ValueKey('finish')));
+      await tester.pumpAndSettle();
+      // Training returns to its retained article source, not directly to chat.
+      expect(find.byType(PlanPage), findsOneWidget);
+      Navigator.of(tester.element(find.byType(PlanPage))).pop();
       await tester.pumpAndSettle();
       // Skipping all work no longer creates a completion/save offer. The
       // exact started snapshot can still be saved from its own plan card.

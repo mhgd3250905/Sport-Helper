@@ -11,6 +11,7 @@ import 'package:smartfit/ui/guide_media.dart';
 import 'package:smartfit/ui/plan_page.dart';
 import 'package:smartfit/ui/player_page.dart';
 import 'package:smartfit/ui/theme.dart';
+import 'package:smartfit/ui/training_route.dart';
 import 'package:ugk_trainer/ugk_trainer.dart'
     show PackedAlphaPlatform, PackedAlphaUriPlatform, UgkPackedAlphaVideo;
 
@@ -428,42 +429,68 @@ void main() {
       await tester.pump();
       final offset = scroll.offset;
       await tester.tap(_key('start'));
-      // stop() and its frame-bound retirement finish before the route push.
-      // Flush only zero-time frames so the entrance remains observable.
-      for (
-        var i = 0;
-        i < 12 && find.byType(PlayerPage).evaluate().isEmpty;
-        i++
-      ) {
+      // Retirement precedes push. The real gated SDK tree is laid out but
+      // offstage for the first 280ms; route animation itself has zero duration.
+      final player = find.byType(PlayerPage, skipOffstage: false);
+      for (var i = 0; i < 12 && player.evaluate().isEmpty; i++) {
         await tester.pump();
       }
-      expect(find.byType(PlayerPage), findsOneWidget);
-      final route = ModalRoute.of(tester.element(find.byType(PlayerPage)))!;
-      expect(route.animation!.status, AnimationStatus.forward);
-      expect(route.animation!.value, 0);
-      await tester.pump(const Duration(milliseconds: 160));
-      expect(find.byType(PlayerPage), findsOneWidget);
-      expect(_key('training-entry-placeholder'), findsOneWidget);
+      expect(player, findsOneWidget);
+      await tester.pump(); // Establish the host ticker's zero-time frame.
+      final playerContext = tester.element(player);
+      final route = ModalRoute.of(playerContext)! as TrainingRoute;
+      final motion = TrainingTransitionScope.maybeOf(playerContext)!;
+      var visuallyComplete = false;
+      unawaited(route.visualCompleted.then((_) => visuallyComplete = true));
+      expect(route.transitionDuration, Duration.zero);
+      expect(route.reverseTransitionDuration, Duration.zero);
+      expect(route.opaque, isFalse);
+      expect(motion.entered, isFalse);
+      expect(_key('training-entry-placeholder'), findsNothing);
       expect(coordinator.activeSlot, isNull);
       expect(platform.live, isEmpty);
       expect(_media(tester, '0:0').enabled, isFalse);
-      await tester.pump(const Duration(milliseconds: 200));
+      final createsBeforeStart = platform.sources.length;
+      await tester.pump(const Duration(milliseconds: 280));
+      await tester.pump(const Duration(milliseconds: 279));
+      expect(motion.entered, isFalse);
+      expect(platform.sources, hasLength(createsBeforeStart));
+      expect(platform.live, isEmpty);
+      await tester.pump(const Duration(milliseconds: 1));
+      await tester.pump(const Duration(microseconds: 1));
       await tester.pump();
-      expect(route.animation!.status, AnimationStatus.completed);
+      expect(motion.entered, isTrue);
+      expect(motion.chrome.value, 1);
+      expect(_media(tester, '0:0').enabled, isFalse);
       await tester.tap(_key('close'));
       await tester.pumpAndSettle();
       await tester.tap(_key('close-confirm'));
       await tester.pump();
       await tester.pump();
-      expect(route.animation!.status, AnimationStatus.reverse);
+      expect(motion.exiting, isTrue);
+      expect(route.isActive, isTrue);
       expect(_media(tester, '0:0').enabled, isFalse);
       expect(coordinator.activeSlot, isNull);
       expect(platform.live, isEmpty);
-      await tester.pump(const Duration(milliseconds: 259));
-      expect(find.byType(PlayerPage), findsOneWidget);
+      await tester.pump(const Duration(milliseconds: 249));
+      expect(route.isActive, isTrue);
+      expect(visuallyComplete, isFalse);
       expect(_media(tester, '0:0').enabled, isFalse);
-      await tester.pump(const Duration(milliseconds: 2));
+      await tester.pump(const Duration(milliseconds: 1));
+      await tester.pump(const Duration(microseconds: 1));
+      await tester.pump();
+      expect(route.isActive, isFalse);
+      expect(player, findsNothing);
+      expect(_key('training-return-morph'), findsOneWidget);
+      expect(visuallyComplete, isFalse);
+      expect(_media(tester, '0:0').enabled, isFalse);
+      await tester.pump(const Duration(milliseconds: 499));
+      expect(visuallyComplete, isFalse);
+      expect(_media(tester, '0:0').enabled, isFalse);
+      await tester.pump(const Duration(milliseconds: 1));
+      await tester.pump(const Duration(microseconds: 1));
       await tester.pumpAndSettle();
+      expect(visuallyComplete, isTrue);
       expect(find.byType(PlayerPage), findsNothing);
       expect(tester.element(find.byType(PlanPage)), same(article));
       expect(_list(tester).controller, same(scroll));
