@@ -61,8 +61,10 @@ class TrainingLog {
   /// The visible action may also be the upcoming action during prep/rest.
   void visibleAction(String actionId, {required bool paused}) {
     if (_operation == null) return;
-    // The completed shared player renders no media. A new media request after
-    // completion therefore marks its built-in replay, including voice-off mode.
+    // SDK early-exit saving retains a paused presentation after completion.
+    // Rebuilding that frozen frame is not a new session or a replay.
+    if (_finished && paused) return;
+    // A resumed media request marks the built-in replay, including voice-off.
     if (_finished) _begin(replayed: true);
     if (_action != actionId) {
       _action = actionId;

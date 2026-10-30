@@ -1,5 +1,11 @@
 # 智能健身助手（SmartFit）交接说明
 
+## +48 训练过渡候选（2026-10-30）
+
+本候选为 **0.1.0+48 / internal arm64 2048**，分支 `codex/trainer-transition`，基于 +47 main `d8d6db76fc631f47afbf3740f67d2d00ebfff2f6`。SDK 三包及 override 升级并锁定 `652135f532bac1a06fbf133dc497692d6b44c78a`。进入/退出为 320/260ms，进入结束前不启动训练计时、语音或视频；提前结束保存和回退由新版 SDK 管理。最终源码、测试、构建与真机待验边界见[+48 记录](trainer-transition-plus48-2026-10-30.md)。**等待开哥真机确认后再合入并推送 main**；release/1.0 和 SDK 源码不动，不打 tag。
+
+下方 +47 是已合入 main 的基线记录，不代表本候选已经合并。
+
 ## 当前 +47 主线整合（2026-10-30）
 
 当前版本 **0.1.0+47 / internal arm64 2047**，已在 `codex/main-integration-plus47` 审核整合 +44 guide-lite、+45 task-bubble-v2、+46 slim-assets，修复播放过渡、连续替换与缓存超额三项问题。全量 764/764、0 跳过/失败，analyze 0；42,598,106B 实包、同签名、ZIP/ELF 16KB、JNI 及无 MP4 门禁通过。

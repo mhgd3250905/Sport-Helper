@@ -50,6 +50,7 @@ void main() {
       final plan = s.chat.currentPlan!;
       await tester.pumpWidget(SmartFitApp(services: s));
       await tester.pumpAndSettle();
+      final chatElement = tester.element(find.byType(ChatHomePage));
       await tester.tap(find.byKey(ValueKey('plan-open-${plan.id}')));
       await tester.pumpAndSettle();
       expect(find.byType(PlanPage), findsOneWidget);
@@ -72,14 +73,39 @@ void main() {
       await tester.pump(const Duration(milliseconds: 800));
       expect(find.byType(PlayerPage), findsOneWidget);
       expect(s.store.lastPlan?.id, plan.id);
+      final route = ModalRoute.of(tester.element(find.byType(PlayerPage)))!;
+      final summaries = s.chat.messages
+          .where((message) => message.text.contains('这次先到这儿'))
+          .length;
       await tester.tap(find.byKey(const ValueKey('close')));
       await tester.pumpAndSettle();
       await tester.tap(find.text('结束'));
+      await tester.pump();
+      await tester.pump();
+      expect(route.animation!.status, AnimationStatus.reverse);
+      expect(s.store.history, hasLength(1));
+      await tester.pump(const Duration(milliseconds: 259));
+      expect(find.byType(PlayerPage), findsOneWidget);
+      expect(
+        s.chat.messages
+            .where((message) => message.text.contains('这次先到这儿'))
+            .length,
+        summaries,
+        reason: 'Chat waits for overlay removal, not the push result.',
+      );
+      await tester.pump(const Duration(milliseconds: 2));
       await tester.pumpAndSettle();
       expect(find.byType(PlanPage), findsNothing);
       expect(find.byType(ChatHomePage), findsOneWidget);
+      expect(tester.element(find.byType(ChatHomePage)), same(chatElement));
       expect(s.store.history, hasLength(1));
       expect(s.chat.messages.last.text, contains('这次先到这儿'));
+      expect(
+        s.chat.messages
+            .where((message) => message.text.contains('这次先到这儿'))
+            .length,
+        summaries + 1,
+      );
       await tester.pumpWidget(const SizedBox());
     },
   );

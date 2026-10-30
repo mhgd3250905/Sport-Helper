@@ -91,7 +91,14 @@ class _ActionIssueMarkButtonState extends State<ActionIssueMarkButton> {
         light: light,
         capturedAt: at,
       );
-      if (!mounted) return;
+      // A capture can finish after its training session ended or a close
+      // confirmation covered the route. Never put a late form above a pending
+      // training receipt; retain the original tap's identity when still valid.
+      if (!mounted ||
+          widget.actionIdAtTap() == null ||
+          ModalRoute.isCurrentOf(context) == false) {
+        return;
+      }
       final record = await showActionIssueForm(
         context,
         store: widget.store,

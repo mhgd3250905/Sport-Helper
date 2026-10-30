@@ -9,6 +9,7 @@ import 'package:smartfit/domain/plan_validator.dart';
 import 'package:smartfit/ui/chat/coach_ui_adapter.dart';
 import 'package:smartfit/ui/guide_media.dart';
 import 'package:smartfit/ui/plan_page.dart';
+import 'package:smartfit/ui/player_page.dart';
 import 'package:smartfit/ui/theme.dart';
 import 'package:ugk_trainer/ugk_trainer.dart'
     show PackedAlphaPlatform, PackedAlphaUriPlatform, UgkPackedAlphaVideo;
@@ -414,6 +415,76 @@ void main() {
     expect(platform.maxLive, 1);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets(
+    'standalone guide restores the same article and enables preview only after exit completes',
+    (tester) async {
+      final app = await _show(tester, transform: _packed);
+      await play(tester, '0:0');
+      final coordinator = _media(tester, '0:0').coordinator;
+      final article = tester.element(find.byType(PlanPage));
+      final scroll = _list(tester).controller!;
+      scroll.jumpTo(36);
+      await tester.pump();
+      final offset = scroll.offset;
+      await tester.tap(_key('start'));
+      // stop() and its frame-bound retirement finish before the route push.
+      // Flush only zero-time frames so the entrance remains observable.
+      for (
+        var i = 0;
+        i < 12 && find.byType(PlayerPage).evaluate().isEmpty;
+        i++
+      ) {
+        await tester.pump();
+      }
+      expect(find.byType(PlayerPage), findsOneWidget);
+      final route = ModalRoute.of(tester.element(find.byType(PlayerPage)))!;
+      expect(route.animation!.status, AnimationStatus.forward);
+      expect(route.animation!.value, 0);
+      await tester.pump(const Duration(milliseconds: 160));
+      expect(find.byType(PlayerPage), findsOneWidget);
+      expect(_key('training-entry-placeholder'), findsOneWidget);
+      expect(coordinator.activeSlot, isNull);
+      expect(platform.live, isEmpty);
+      expect(_media(tester, '0:0').enabled, isFalse);
+      await tester.pump(const Duration(milliseconds: 200));
+      await tester.pump();
+      expect(route.animation!.status, AnimationStatus.completed);
+      await tester.tap(_key('close'));
+      await tester.pumpAndSettle();
+      await tester.tap(_key('close-confirm'));
+      await tester.pump();
+      await tester.pump();
+      expect(route.animation!.status, AnimationStatus.reverse);
+      expect(_media(tester, '0:0').enabled, isFalse);
+      expect(coordinator.activeSlot, isNull);
+      expect(platform.live, isEmpty);
+      await tester.pump(const Duration(milliseconds: 259));
+      expect(find.byType(PlayerPage), findsOneWidget);
+      expect(_media(tester, '0:0').enabled, isFalse);
+      await tester.pump(const Duration(milliseconds: 2));
+      await tester.pumpAndSettle();
+      expect(find.byType(PlayerPage), findsNothing);
+      expect(tester.element(find.byType(PlanPage)), same(article));
+      expect(_list(tester).controller, same(scroll));
+      expect(scroll.offset, offset);
+      expect(_media(tester, '0:0').enabled, isTrue);
+      expect(coordinator.activeSlot, isNull);
+      expect(platform.live, isEmpty);
+      expect(app.store.history, hasLength(1));
+      final creates = platform.sources.length;
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(
+        platform.sources,
+        hasLength(creates),
+        reason: 'Returning does not autoplay.',
+      );
+      await play(tester, '0:0');
+      expect(coordinator.activeSlot, '0:0');
+      expect(platform.sources, hasLength(creates + 1));
+      expect(tester.takeException(), isNull);
+    },
+  );
 
   testWidgets('selecting B releases A before allocating its decoder', (
     tester,

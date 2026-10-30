@@ -358,17 +358,29 @@ void main() {
     expect(find.text('已保存'), findsOneWidget);
     expect(find.textContaining('已保存为「'), findsOneWidget);
 
-    // Training opens at stable full-screen bounds, hiding the old chat.
+    // Only the still training page moves; the existing chat keeps its bounds.
     // The visible informational toast must let this tap reach the start button.
     final screen = tester.getRect(find.byType(ChatHomePage));
+    final chatElement = tester.element(find.byType(ChatHomePage));
     await tester.tap(find.byKey(ValueKey('plan-start-${plan.id}')));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 60));
     expect(find.byType(PlayerPage), findsOneWidget);
-    expect(tester.getRect(find.byType(PlayerPage)), screen);
-    expect(find.byType(ChatHomePage), findsNothing);
+    expect(tester.getRect(find.byType(PlayerPage)).size, screen.size);
+    expect(
+      tester.getRect(find.byType(PlayerPage)).top,
+      greaterThan(screen.top),
+    );
+    expect(
+      find.byKey(const ValueKey('training-entry-placeholder')),
+      findsOneWidget,
+    );
+    expect(find.byType(trainer.TrainerPlayer), findsNothing);
+    expect(tester.element(find.byType(ChatHomePage)), same(chatElement));
+    expect(tester.getRect(find.byType(ChatHomePage)), screen);
     await tester.pump(const Duration(milliseconds: 500));
     expect(tester.getRect(find.byType(PlayerPage)), screen); // full screen
+    expect(find.byType(ChatHomePage), findsNothing);
     expect(s.store.lastPlan?.id, plan.id);
     await tester.tap(find.byKey(const ValueKey('skip')));
     await tester.pump(const Duration(milliseconds: 200));
@@ -377,11 +389,17 @@ void main() {
     await tester.tap(find.text('结束'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 200));
-    expect(find.byType(PlayerPage), findsNothing);
+    expect(find.byType(PlayerPage), findsOneWidget);
+    expect(find.byType(ExerciseVideo), findsNothing);
+    expect(
+      find.byKey(const ValueKey('training-transition-poster')),
+      findsOneWidget,
+    );
     await tester.pumpAndSettle();
     expect(find.byType(PlayerPage), findsNothing);
     expect(s.store.history, hasLength(1));
     expect(find.byType(ChatHomePage), findsOneWidget);
+    expect(tester.element(find.byType(ChatHomePage)), same(chatElement));
     expect(s.chat.messages.last.isUser, isFalse);
     expect(s.chat.messages.last.isPlan, isFalse); // a word after the workout
   });

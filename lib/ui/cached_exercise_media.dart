@@ -202,6 +202,7 @@ class CachedExerciseMedia extends StatefulWidget {
     this.slot,
     this.extractMissingPoster = false,
     this.stageColor,
+    this.retainWhenCovered = false,
   });
   final Exercise exercise;
   final bool playing, paused, mirrored, waitForLoopOnMiss;
@@ -212,6 +213,12 @@ class CachedExerciseMedia extends StatefulWidget {
   final String? slot;
   final bool extractMissingPoster;
   final Color? stageColor;
+
+  /// The trainer freezes its existing media with paused=true and TickerMode
+  /// disabled while an early-exit save is pending. A dialog or this frozen
+  /// subtree must not discard its last video frame. PlayerPage separately
+  /// unmounts media for route transitions; app backgrounding still retires it.
+  final bool retainWhenCovered;
 
   @override
   State<CachedExerciseMedia> createState() => _CachedExerciseMediaState();
@@ -264,8 +271,9 @@ class _CachedExerciseMediaState extends State<CachedExerciseMedia>
   void didChangeDependencies() {
     super.didChangeDependencies();
     final visible =
-        TickerMode.valuesOf(context).enabled &&
-        (ModalRoute.isCurrentOf(context) ?? true);
+        widget.retainWhenCovered ||
+        (TickerMode.valuesOf(context).enabled &&
+            (ModalRoute.isCurrentOf(context) ?? true));
     if (!_initialized || visible != _visible) {
       _initialized = true;
       _visible = visible;

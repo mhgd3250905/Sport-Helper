@@ -193,12 +193,13 @@ class _PlanPageState extends State<PlanPage> with WidgetsBindingObserver {
       return;
     }
     s.prefetchPlan(_plan);
-    await Navigator.of(context).push(
-      TrainingRoute<void>(
-        settings: const RouteSettings(name: 'player'),
-        builder: (_) => PlayerPage(plan: _plan),
-      ),
+    final route = TrainingRoute<void>(
+      context: context,
+      settings: const RouteSettings(name: 'player'),
+      builder: (_) => PlayerPage(plan: _plan),
     );
+    await Navigator.of(context).push(route);
+    await route.completed;
     if (mounted) setState(() => _previewOn = true);
   }
 

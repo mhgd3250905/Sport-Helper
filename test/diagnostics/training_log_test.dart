@@ -194,6 +194,10 @@ void main() {
       );
       training.finished(result);
       training.finished(result);
+      // A slow SDK early-exit save keeps rebuilding its paused last frame.
+      // It must neither start a replay operation nor restart its heartbeat.
+      training.visibleAction('h-squat', paused: true);
+      training.visibleAction('h-squat', paused: true);
       await tester.pump(const Duration(minutes: 1));
       training.saving();
       training.saveFailed(StateError('secret payload'));

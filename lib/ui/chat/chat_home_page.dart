@@ -214,12 +214,14 @@ class _ChatHomePageState extends State<ChatHomePage>
     if (!mounted) return;
     s.prefetchPlan(p);
     _dismissInput();
-    final result = await Navigator.of(context).push(
-      TrainingRoute<SessionResult>(
-        settings: const RouteSettings(name: 'player'),
-        builder: (_) => PlayerPage(plan: p),
-      ),
+    final route = TrainingRoute<SessionResult>(
+      context: context,
+      settings: const RouteSettings(name: 'player'),
+      builder: (_) => PlayerPage(plan: p),
     );
+    final result = await Navigator.of(context).push(route);
+    // popped resolves as reverse begins; completed waits for its overlay removal.
+    await route.completed;
     if (!mounted) return;
     _dismissInput();
     if (result != null) {

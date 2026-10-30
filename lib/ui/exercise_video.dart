@@ -85,6 +85,7 @@ class _ExerciseVideoState extends State<ExerciseVideo> {
         exercise: exercise,
         mediaPreparer: widget.mediaPreparer ?? services?.poseHubPreparer,
         waitForLoopOnMiss: widget.training,
+        retainWhenCovered: widget.training,
         playing: widget.playing,
         paused: widget.paused,
         mirrored: widget.mirrored,

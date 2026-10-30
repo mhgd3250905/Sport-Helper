@@ -18,6 +18,8 @@ enum FrameScenario {
   pageEntry,
   bottomBarSwitch,
   trainingPlayback,
+  trainingRouteEntry,
+  trainingRouteExit,
 }
 
 /// Bounded raw engine timings. No per-frame encoding, I/O or UI notification.
