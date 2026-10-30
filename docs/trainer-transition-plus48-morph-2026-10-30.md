@@ -42,10 +42,42 @@ SDK pop后独立Navigator OverlayEntry继续380ms缩回，背景在240ms内淡�
 
 图文页保留其来源route和实际媒体槽，先释放预览再push训练；回程后恢复预览。聊天owner仍执行started的AI恢复/记忆门禁，在visualCompleted后接收一次finished。
 
-## 验证与交付（收束中）
+## 验证与交付（候选已就绪，待开哥真机确认）
 
-定向实际SDK回归覆盖门禁、每层区间/曲线、保存失败、自然完成、生命周期和原生媒体迟到释放；聊天与图文回归覆盖完成记录一次、第一帧锚点保持和预览恢复。全量测试/analyze、源码SHA、两种APK与验包结果将在最终源绑定回执完成后补入；当前不预填成功结果。
+打包与全量测试源码为 **`ccdf1b1729ee6365edb3669aaacae320c23bd49f`**，版本 **0.1.0+48 / internal arm64 2048**，包名 `com.ugk.smartfit.internal`。SDK 三包、coach override、锁文件和“关于”页身份均为 **`c97a79a5f03ba1f46f017b995f7f8d97fb3016a9`**。后续收束只改 README/docs；最终文档 HEAD 与打包源码的区别由交付目录 `final-closeout.json` 记录，不把文档提交冒充重新构建。
 
-交付目录 `E:/AII-3D/3D-Sport-AI/deliveries/trainer-transition-plus48-morph/`，保留旧交付目录不覆盖。本机ADB没有设备，真机进出各5次的UI/Raster最大值和手机录屏待远程安装后采集；软件30fps逐帧演示另列，不能当作性能或真机验收。
+固定 Flutter 3.44.7 全量 **798通过、0跳过、0失败**，`flutter analyze` **0问题**，严格离线锁解析通过，非SDK依赖不变。source fingerprint `d50d70cb08be57dd0e72fabc6f9b9d2597151466afbd5bf35192803500dcd030`；公开构建输入2705项，内容身份 `61a87e5a48700ac36760a4d7aa04ba68fe075cb18a2ff13ed0f1ad1d6796d1c8`。测试、软件图帧和两个APK都绑定同一源码/输入。
+
+逐阶段回归覆盖：560ms最后一层终态以及计时/语音/视频门禁；进入与退出区间/曲线；提前结束保存与finished各一次、缩回结束后再插入；保存失败恢复完整完成页和问题按钮；自然完成显露最后动作海报；来源不可见回退、150ms减少动效、后台/返回/重复点击和晚到原生媒体清理；图文页返回后预览恢复；聊天offset=0/100时插入首帧无跳变。构建辅助工具另有20项单测通过，软件逐帧采集1项通过，均不叠加进798项App测试。
+
+### 两种内测包
+
+| 模式 | arm64 APK | 大小 | SHA-256 |
+| --- | --- | --- | --- |
+| release | [SmartFit-trainer-transition-0.1.0+48-ccdf1b1-internal-arm64-v8a-release.apk](E:/AII-3D/3D-Sport-AI/deliveries/trainer-transition-plus48-morph/SmartFit-trainer-transition-0.1.0+48-ccdf1b1-internal-arm64-v8a-release.apk) | 42,628,010B / 42.63MB / 40.65MiB | `8e9069a761092bcbdba9e3c661877c9199482bdf7f21d40c2b776178878f62c4` |
+| profile | [SmartFit-trainer-transition-0.1.0+48-ccdf1b1-internal-arm64-v8a-profile.apk](E:/AII-3D/3D-Sport-AI/deliveries/trainer-transition-plus48-morph/SmartFit-trainer-transition-0.1.0+48-ccdf1b1-internal-arm64-v8a-profile.apk) | 59,584,897B / 59.58MB / 56.82MiB | `4d6db18e9c9512b92503a83c0adda314f2736413263c7ad3f7ffa2d21cc94d81` |
+
+两个APK均已重新核对真实aapt包身份、源码指纹和配置身份、相同签名、ZIP及ELF 16KB、存储JNI、AssetManifest与ZIP无MP4、1737项保留图片/语音以及原Noto字体。签名证书SHA-256为 `3761270a4764157f0e389014a9e5b800b05403bfddce0f4f7f8c039f6a53bdc7`。release较+47基线增加29,904B，仍低于45,000,000B。profile含调试/分析运行时，独立核对5个原生库及官方Flutter VM service的JAR→merged→stripped→APK链，不继承旧c0的来源回执；release为4个原生库。
+
+验包回执：[release](E:/AII-3D/3D-Sport-AI/deliveries/trainer-transition-plus48-morph/validation-release.json)、[profile](E:/AII-3D/3D-Sport-AI/deliveries/trainer-transition-plus48-morph/validation-profile.json)；[全量测试与源码绑定](E:/AII-3D/3D-Sport-AI/deliveries/trainer-transition-plus48-morph/tests-source-binding.json)；[profile官方运行时来源](E:/AII-3D/3D-Sport-AI/deliveries/trainer-transition-plus48-morph/profile-vmservice-origin.json)。两种包均保留现有AI/媒体正式配置，未进行手机安装、保留数据升级或真机播放验收。
+
+### 浅深色逐帧演示
+
+| 主题 | 进入 | 退出 |
+| --- | --- | --- |
+| 浅色 | [进入](E:/AII-3D/3D-Sport-AI/deliveries/trainer-transition-plus48-morph/SmartFit-plus48-entry-light-software-30fps.mp4) | [退出](E:/AII-3D/3D-Sport-AI/deliveries/trainer-transition-plus48-morph/SmartFit-plus48-exit-light-software-30fps.mp4) |
+| 深色 | [进入](E:/AII-3D/3D-Sport-AI/deliveries/trainer-transition-plus48-morph/SmartFit-plus48-entry-dark-software-30fps.mp4) | [退出](E:/AII-3D/3D-Sport-AI/deliveries/trainer-transition-plus48-morph/SmartFit-plus48-exit-dark-software-30fps.mp4) |
+
+以上是**实际Flutter/SDK界面的软件fake-time采集**，每步33,333μs并编码为30fps，进入18帧、退出25帧（含250ms控件退场、380ms缩回、120ms海报尾段及完成记录起点）。使用真实主题、字体、海报和SDK控件；媒体解码由测试替身代替。它们说明软件时序和画面层级，**不是手机录屏、实际刷新率或帧耗时证明**。[图帧及视频哈希清单](E:/AII-3D/3D-Sport-AI/deliveries/trainer-transition-plus48-morph/software-visuals.json)明确记录此边界。
+
+### 真机待验与历史保留
+
+ADB检查没有连接设备；开哥此前已说明无本机设备，改由远程安装反馈。进出各5次profile采样尚未执行：**UI最大帧耗时未测、Raster最大帧耗时未测**，不得填0或声称≤16ms。真机30fps进入/退出录屏也待安装后采集。当前状态为“候选软件验证完成、待真机确认”，未合并、未推送、未打tag；main仍为 `d8d6db76fc631f47afbf3740f67d2d00ebfff2f6`，release/1.0及SDK仓库不动。
+
+普通动画保持560ms进入、250ms控件退场、380ms缩回及120ms交叉淡化；系统减少动效才选150ms。展开卡的SDK hero已不显示时，宿主不飞行不可见的旧hero，按无可用起点规则走fallback，不读取私有布局。
+
+中间检查与旧交付均保留，不用失败记录冒充成功：早期两条旧交互测试按新的图文路由所有权更新后恢复全量；减少动效总时长和自然完成海报连续性完善后重新全量；首轮构建被“关于页仍显示旧SDK”门禁拦截，修正并加一致性测试后重跑至798项；第二次验包缺少用户已批准的字体保留政策，补入原政策及来源记录后重新构建。最终仅接受上面ccdf1b1绑定的两个新APK，旧APK、失败日志及各轮测试归档均未覆盖。
+
+交付目录 `E:/AII-3D/3D-Sport-AI/deliveries/trainer-transition-plus48-morph/`。旧 `trainer-transition-plus48` 与 `trainer-transition-plus48-redesign-audit` 目录只保留原时点证据。
 
 方案比较参考 Flutter 官方维护的 [OpenContainer 实现](https://github.com/flutter/packages/blob/main/packages/animations/lib/src/open_container.dart) 及其 [BSD许可证](https://github.com/flutter/packages/blob/main/packages/animations/LICENSE)。本轮使用已有Flutter原语自行实现Rect/Overlay生命周期，不引入第三方转场依赖，也不复制其容器UI；避免默认容器飞行与SDK分块chrome时序相互叠加。

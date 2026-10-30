@@ -2,7 +2,7 @@
 
 ## 当前 +48 卡片展开式训练候选（2026-10-30）
 
-本轮按最新版完整交接接入 SDK `c97a79a5f03ba1f46f017b995f7f8d97fb3016a9` 的 startGate/chromeAnimation/onExitStarted/beforeExitPop；进入560ms、退出控件250ms及舞台380ms+120ms，路由本身0ms。真实训练UI从开始即挂载，门禁前无视频、计时或语音；图文来源页保留，完成记录在缩回结束后平滑插入。当前正在收束全量测试与两种内测包，最终源绑定、结果和真机待验边界见[新版+48记录](trainer-transition-plus48-morph-2026-10-30.md)。旧c0候选及652接口摸排仅保留作历史；main/release不动，不合并、不推送、不打tag，等待开哥真机确认。
+本轮按最新版完整交接接入 SDK `c97a79a5f03ba1f46f017b995f7f8d97fb3016a9` 的 startGate/chromeAnimation/onExitStarted/beforeExitPop；进入560ms、退出控件250ms及舞台380ms+120ms，路由本身0ms。真实训练UI从开始即挂载，门禁前无视频、计时或语音；图文来源页保留，完成记录在缩回结束后平滑插入。候选源码 `ccdf1b1729ee6365edb3669aaacae320c23bd49f` 已通过全量 **798/798（0跳过/失败）**、analyze **0问题**；release **42,628,010B**、profile **59,584,897B**，同签名、ZIP/ELF 16KB、JNI及无MP4检查通过。浅深软件视频已交付，真机UI/Raster最大值仍待测。最终源绑定、产物和待验边界见[新版+48记录](trainer-transition-plus48-morph-2026-10-30.md)。旧c0候选及652接口摸排仅保留作历史；main/release不动，不合并、不推送、不打tag，等待开哥真机确认。
 
 候选分支 `codex/trainer-transition`，基于 +47 main `d8d6db76fc631f47afbf3740f67d2d00ebfff2f6`，版本 `0.1.0+48` / internal arm64 2048。按本次指令，完成验证及交付后等待开哥远程真机确认，未获确认前不合入或推送 main；不打 tag，不改 `release/1.0`、SDK 源码及原工作树。
 

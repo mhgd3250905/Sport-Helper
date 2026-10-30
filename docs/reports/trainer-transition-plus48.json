@@ -142,5 +142,8 @@
     "validation-release.json",
     "validation-profile.json"
   ],
-  "remoteDeviceInstructions": "REMOTE-DEVICE-CHECK.md"
+  "remoteDeviceInstructions": "REMOTE-DEVICE-CHECK.md",
+  "historical": true,
+  "supersededBy": "trainer-transition-plus48-morph.json",
+  "historicalScope": "Original c0 APK/software receipts only; not the current card-morph candidate."
 }
