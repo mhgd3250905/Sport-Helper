@@ -1,8 +1,8 @@
 # 智能健身助手（SmartFit）交接说明
 
-## 当前 +49 关闭流畅度修复（2026-10-30，待最终验证）
+## +49 关闭流畅度修复已验收（2026-10-30）
 
-接手先读[关闭专项报告](trainer-transition-plus49-close-fix-2026-10-30.md)。基线ca24622及安装包已绑定真机，首要热点为RuntimeLog整份日志导出；本轮仅修App日志后台编码、自动flush与独立文件存储。版本+49/2049、SDK三包66dd、动画、路由及业务保存不变；新全量、APK和真机after待主代理回填。下方843项及32d87c4等历史记录不代表新修复通过，候选仍未合并/推送main或打tag，release/1.0不动。
+构建源码`88379139dafe0a07f03635da8a95cc93f0704068`，+49/2049及SDK三包66dd保持。RuntimeLog批量持久化移出UI线程，转场/SDK/业务保存不变；全量861/861、0失败/跳过，analyze0。release 42.655MB，profile 53.609MB，同签名/16KB/JNI/无mp4门禁通过。新profile已保留数据覆盖安装，同机五次退出均34帧，最大回调间隔16.6ms。开哥亲自测试后明确“验收通过”，自动手机操作已停止。详见[关闭专项报告](trainer-transition-plus49-close-fix-2026-10-30.md)与[台账](reports/trainer-transition-plus49-close-fix.json)。候选未合并、未推送、未打tag；main、release/1.0及SDK源码不动。下方旧843项与旧包记录保留原时点事实。
 
 ## 当前 +49 标准滑动候选（2026-10-30）
 

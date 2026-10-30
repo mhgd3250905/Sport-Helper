@@ -1,4 +1,4 @@
-# +49 训练页关闭流畅度修复（2026-10-30，待最终验证）
+# +49 训练页关闭流畅度修复（2026-10-30，已验收）
 
 开哥真机反馈：+49 的标准滑动方案整体效果不错，但点左上角关闭、返回来源页仍不流畅。本轮保留已确认的视觉方案，只修复真机证实的 App 诊断日志热路径；不把旧包测试通过或已有截图当作本次修复完成。
 
@@ -98,18 +98,37 @@ r5 退出后100ms内另有65条样本，其中42条包含exportJson。+303.106ms
 
 旧完整交付、APK及历史测试回执不覆盖。新修复继续保持三包66dd、+49/2049和候选未合并状态。
 
-## 当前验证状态与最终回填
+## 最终验证与验收
 
-新fixture首轮有6项失败，已定位为Flutter `expect` 跨异步Zone误报，测试改用 `expectSync` 后修正，生产日志逻辑未为此改变。主代理已回报异步日志定向9/9通过（含尾事件竞态），本轮总新增18项测试；全项目analyze为0问题。新源码全量、打包和真机after尚未完成；预计全量数量不是通过结果。源码审阅及定位完成不等于修复后性能通过，不能继承旧843项或旧包门禁。
+修复/打包源码：`88379139dafe0a07f03635da8a95cc93f0704068`。后续仅README/docs台账收束，最终HEAD由交付目录`final-closeout.json`记录。SDK三包及coach override仍为`66dd98a549c1ff5fedecb626a7c88583090a1440`；整份pubspec.lock与旧+49源码ca24622一致。
 
-| 最终项目 | 当前状态 |
-|---|---|
-| 新修复完整 commit SHA / 源绑定 | 待最终实现与验证后由主代理回填 |
-| 新全量测试数量、失败/跳过、analyze | 异步日志定向9/9、全项目analyze0为当前回执；全量待重跑并回填，首轮fixture误报及修正保留 |
-| 新 release/profile arm64 APK路径、大小、SHA-256 | 待重新打包并回填，旧包不是修复包 |
-| 同签名、16KB、JNI、release≤45MB | 待对新产物检查 |
-| 真机 after 的有效采集、同条件录屏与对比 | 待使用新源码绑定包重测；不得用无效r3作为优化后数据 |
-| 尾事件、secret epoch、失败重试、legacy及disabled回归 | 待最终回执；保留错误和复测记录 |
-| 开哥真机最终确认 | 待反馈；确认同意后才另行合入main并推送 |
+全量 **861/861通过，0失败/跳过**；Flutter 3.44.7，`flutter analyze --no-pub` 0问题，严格离线锁通过。新增18项日志异步/文件回归；首次fixture中的Flutter expect异步Zone误报改用expectSync，断言保留，最终已随全量通过。包装辅助36/36单列，不混入Flutter数量。
 
-最终结果应保持基线/修复包、采集轮次、样本窗口与软件检查各自绑定；不得把一轮的CPU采样与另一轮的scope当成同一帧精确函数耗时。
+| arm64 internal包 | 大小 | SHA-256 |
+|---|---|---|
+| release | 42,655,242B / 42.655MB | `92948f44021b7aa019ac5ca76de55e6d993cd60cd7d808570d4767a2019c9e94` |
+| profile（已覆盖安装） | 53,609,054B / 53.609MB | `2702f0949144fe8d3dc868af3c880e54983b8858b22b55c386ad0003efb17caa` |
+
+APK路径分别为`E:\AII-3D\3D-Sport-AI\deliveries\trainer-transition-plus49-close-fix\SmartFit-trainer-close-fix-0.1.0+49-8837913-internal-arm64-v8a-release.apk`与`E:\AII-3D\3D-Sport-AI\deliveries\trainer-transition-plus49-close-fix\SmartFit-trainer-close-fix-0.1.0+49-8837913-internal-arm64-v8a-profile.apk`。两包同原签名，ZIP/ELF16KB、JNI、无MP4门禁通过；release小于45MB，原Noto与必要静态/语音资源保留。包门禁是软件检查；手机安装和实测另见`device-validation.json`。
+
+覆盖安装未卸载或清数据：安装前后保存计划、46条会话记录、聊天及Coach会话的计数/摘要哈希一致。随后五次有意提前结束产生正常测试记录；不会把这些新记录误判成安装前后的数据变化。新日志文件已观察到391,664B，旧preferences保留。
+
+### 同一手机实测
+
+新包默认profile运行，未开启录屏、VM Timeline或CPU采样，浅色图文入口进出五次；五份原始JSON均绑定本轮源码，完整记录在交付目录`device-validation.json`及仓库外设备证据目录`fixed-guide-pure/`。
+
+| 指标 | 原包观察 | 修复后五次 |
+|---|---|---|
+| 每次退出帧数 | 15–16 | **34、34、34、34、34** |
+| 大于25ms的帧回调间隔 | 每次约3段 | **0** |
+| 最大退出回调间隔 | 原正常chat/saved-plan约66.4ms；Guide trace最高74.744ms | **16.600ms** |
+| 退出build P90 | 以各轮原JSON为准 | 0.554–0.749ms |
+| 退出raster P90 | 以各轮原JSON为准 | 4.853–6.142ms |
+
+首次退出单列：34帧，build最大17.826ms、raster最大8.252ms。第2–5次退出也均34帧；五轮中UI最大21.073ms、raster最大14.254ms，每次仍有1帧的build超过16ms，不能声称所有帧均低于16ms。原明显的60ms级回调空洞已不再出现。
+
+旧Guide定位轮开启过trace/采样，旧无观察器记录来自chat/saved-plan；上述是定位及同机修复证据，不冒称全部入口/主题的严格统计基准或硬件present-FPS。五轮after只覆盖浅色guide，其余入口语义与浅深布局由全量用例回归。
+
+用户随后要求交还手机，自动点击已停止，未再操作手机或补录after录屏。开哥亲自操作后明确回复 **“验收通过”**，已登记为本次+49关闭修复真机验收通过；具体手动步骤未另行枚举，不虚构覆盖清单。
+
+候选保留`codex/trainer-transition`，本轮“不合并、不推送main、不打tag”的约束继续遵守；main、release/1.0、SDK仓库不动。验收结论不扩展为额外的合并/推送指令。

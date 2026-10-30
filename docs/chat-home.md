@@ -1,8 +1,8 @@
 # 对话式主界面
 
-## 当前 +49 关闭流畅度修复（2026-10-30，待最终验证）
+## +49 关闭流畅度修复已验收（2026-10-30）
 
-本轮处理左上角关闭返回时的RuntimeLog同步CPU阻塞，不改来源页、计划卡、finished插入、滚动、主动画或SDK业务。版本仍+49/2049，三包66dd不变；定位与实现边界见[关闭专项报告](trainer-transition-plus49-close-fix-2026-10-30.md)。新全量、APK和真机after待最终回执，下方843项和32d87c4等历史交付不因此变为新修复已通过；候选不合并/推送main、不打tag，release/1.0不动。
+构建源码`88379139dafe0a07f03635da8a95cc93f0704068`，+49/2049及SDK三包66dd保持。RuntimeLog批量持久化移出UI线程，转场/SDK/业务保存不变；全量861/861、0失败/跳过，analyze0。release 42.655MB，profile 53.609MB，同签名/16KB/JNI/无mp4门禁通过。新profile已保留数据覆盖安装，同机五次退出均34帧，最大回调间隔16.6ms。开哥亲自测试后明确“验收通过”，自动手机操作已停止。详见[关闭专项报告](trainer-transition-plus49-close-fix-2026-10-30.md)与[台账](reports/trainer-transition-plus49-close-fix.json)。候选未合并、未推送、未打tag；main、release/1.0及SDK源码不动。下方旧843项与旧包记录保留原时点事实。
 
 ## 当前 +49 标准滑动候选（2026-10-30）
 
