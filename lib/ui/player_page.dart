@@ -177,6 +177,7 @@ class _PlayerPageState extends State<PlayerPage> {
                 exercise: exercise,
                 mirrored: request.mirrored,
                 radius: request.theme.radius,
+                stageColor: request.theme.mediaStage,
               );
             }
             _log.visibleAction(request.drill.id, paused: request.paused);
@@ -186,6 +187,7 @@ class _PlayerPageState extends State<PlayerPage> {
               paused: request.paused || control?.exiting == true,
               mirrored: request.mirrored,
               radius: request.theme.radius,
+              stageColor: request.theme.mediaStage,
               playbackHandle: issuePlayback,
               mediaPreparer: request.mediaPreparer,
               training: true,
@@ -206,7 +208,6 @@ class _PlayerPageState extends State<PlayerPage> {
             }
           },
           onCompleted: (result) async {
-            control?.retryExitSave();
             if (result.endedEarly && result.feeling == null) return;
             try {
               await services.recordTrainingCompletion(result);

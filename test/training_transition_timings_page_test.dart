@@ -93,11 +93,15 @@ void main() {
     await tester.pump();
   }
 
-  Future<void> seedSample(WidgetTester tester, {bool dark = false}) async {
+  Future<void> seedSample(
+    WidgetTester tester, {
+    bool dark = false,
+    String sourceEntry = 'guide',
+  }) async {
     final token = recorder.begin(
       TrainingTransitionKind.entry,
       theme: dark ? 'dark' : 'light',
-      sourceEntry: 'guide',
+      sourceEntry: sourceEntry,
     );
     now = 3000;
     recorder.finish(token);
@@ -258,12 +262,31 @@ void main() {
     'instructions require export after each three-run entry/theme group',
     (tester) async {
       await show(tester);
-      expect(find.textContaining('共6组。每组进出3次'), findsOneWidget);
+      expect(find.textContaining('共10组。每组进出3次'), findsOneWidget);
+      expect(find.textContaining('动作库、推荐'), findsOneWidget);
       expect(find.textContaining('每组测完立即分享'), findsOneWidget);
       expect(find.textContaining('第2–5次'), findsNothing);
       expect(find.textContaining('达到目标'), findsNothing);
     },
   );
+
+  for (final (entry, label) in [
+    ('action_library', '入口：动作库'),
+    ('recommendation', '入口：推荐'),
+  ]) {
+    testWidgets(
+      'SDK-owned $entry sample keeps its source label in UI and export',
+      (tester) async {
+        await show(tester);
+        await seedSample(tester, sourceEntry: entry);
+        expect(find.text(label), findsOneWidget);
+        await tester.tap(find.byKey(const ValueKey('transition-timings-copy')));
+        await tester.pumpAndSettle();
+        final copied = jsonDecode(clipboard!) as Map;
+        expect((copied['results'] as List).single['sourceEntry'], entry);
+      },
+    );
+  }
 
   testWidgets(
     'disabled formal build viewer has no tools or native export actions',

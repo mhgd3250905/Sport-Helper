@@ -2,10 +2,15 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:smartfit/app/gated_posehub_media_preparer.dart';
+import 'package:smartfit/ui/exercise_video.dart';
 import 'package:smartfit/ui/library_page.dart';
 import 'package:smartfit/ui/posehub_library_page.dart';
+import 'package:smartfit/ui/single_practice_page.dart';
 import 'package:smartfit/ui/theme.dart';
 import 'package:smartfit/ui/theme/trainer_theme.dart';
+import 'package:smartfit/ui/training_poster_image.dart';
+import 'package:smartfit/ui/training_route.dart';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
 import 'package:ugk_trainer/ugk_trainer.dart';
 
@@ -38,6 +43,58 @@ void main() {
                   .childrenDelegate
               as SliverChildBuilderDelegate)
           .childCount!;
+
+  Future<TrainingRouteControl> openPreview(
+    WidgetTester tester,
+    coach.PoseHubPackAction action,
+    Finder trigger, {
+    PoseHubUiRepository? repository,
+  }) async {
+    final library = find.byType(PoseHubLibraryPage);
+    final source = tester.element(
+      library.evaluate().isNotEmpty ? library : find.byType(Scaffold).first,
+    );
+    await tester.runAsync(
+      () => TrainingPosterImages.precacheAsset(
+        source,
+        'packages/ugk_trainer/assets/pose_hub/app-test-pack-r1/standing/${action.id}.webp',
+      ),
+    );
+    await tester.pump();
+    await tester.tap(trigger);
+    final host = find.byType(SinglePracticePage, skipOffstage: false);
+    for (var i = 0; i < 12 && host.evaluate().isEmpty; i++) {
+      await tester.pump();
+    }
+    await tester.pump();
+    expect(host, findsOneWidget);
+    final control = TrainingRouteScope.maybeOf(tester.element(host))!;
+    void expectGated() {
+      expect(control.entered, isFalse);
+      expect(find.byType(TrainingPoster, skipOffstage: false), findsOneWidget);
+      expect(find.byType(ExerciseVideo, skipOffstage: false), findsNothing);
+      expect(find.byType(PoseHubPackMedia, skipOffstage: false), findsNothing);
+      expect(platform.uris, isEmpty);
+      if (repository != null) expect(repository.actionRequests, isEmpty);
+      expect(find.byKey(const ValueKey('start-training')), findsOneWidget);
+      expect(find.byKey(const ValueKey('info-card')), findsOneWidget);
+    }
+
+    expectGated();
+    await tester.pump(const Duration(milliseconds: 150));
+    expectGated();
+    await tester.pump(const Duration(milliseconds: 150));
+    await tester.pump(const Duration(microseconds: 1));
+    await tester.pump();
+    expect(control.entered, isTrue);
+    expect(
+      find.byType(ExerciseVideo).evaluate().length +
+          find.byType(PoseHubPackMedia).evaluate().length,
+      1,
+      reason: 'The real media surface is mounted only after the slide',
+    );
+    return control;
+  }
 
   for (final palette in [SfPalette.light, SfPalette.dark]) {
     testWidgets(
@@ -163,6 +220,40 @@ void main() {
           findsOneWidget,
         );
         expect(repo.actionRequests, isEmpty);
+        FocusManager.instance.primaryFocus?.unfocus();
+        await tester.pumpAndSettle();
+        final browserState = tester.state(find.byType(PoseHubActionBrowser));
+        final position = tester
+            .state<ScrollableState>(
+              find.descendant(
+                of: find.byType(GridView),
+                matching: find.byType(Scrollable),
+              ),
+            )
+            .position;
+        final offset = position.pixels;
+        await openPreview(
+          tester,
+          last,
+          find.byKey(ValueKey('posehub-action-${last.id}')),
+          repository: repo,
+        );
+        await tester.tap(find.byKey(const ValueKey('close')));
+        await tester.pumpAndSettle();
+        expect(find.byType(TrainerPlayer), findsNothing);
+        expect(
+          tester.state(find.byType(PoseHubActionBrowser)),
+          same(browserState),
+        );
+        expect(position.pixels, offset);
+        expect(
+          tester
+              .widget<TextField>(find.byKey(const ValueKey('posehub-search')))
+              .controller!
+              .text,
+          last.nameZh,
+        );
+        expect(services.store.history, isEmpty);
         expect(tester.takeException(), isNull);
         await tester.pumpWidget(const SizedBox.shrink());
         repo.dispose();
@@ -189,9 +280,12 @@ void main() {
             home: const LibraryPage(),
           ),
         );
-        await tester.tap(find.byKey(ValueKey('posehub-action-${action.id}')));
-        await tester.pump();
-        await tester.pump(const Duration(milliseconds: 350));
+        await openPreview(
+          tester,
+          action,
+          find.byKey(ValueKey('posehub-action-${action.id}')),
+          repository: repo,
+        );
         expect(find.byType(PoseHubSinglePracticePage), findsOneWidget);
         expect(find.byType(TrainerPlayer), findsOneWidget);
         expect(find.byType(BottomSheet), findsNothing);
@@ -208,9 +302,26 @@ void main() {
         final player = tester.widget<TrainerPlayer>(find.byType(TrainerPlayer));
         expect(player.startMode, TrainerStartMode.preview);
         expect(player.prepSeconds, 10);
-        expect(player.onCompleted, services.recordTrainingCompletion);
+        expect(
+          tester
+              .widget<SinglePracticePage>(find.byType(SinglePracticePage))
+              .page
+              .onCompleted,
+          services.recordTrainingCompletion,
+        );
         expect(player.poseHubActionOf!(action.id), same(action));
-        expect(player.poseHubMediaPreparer, same(services.poseHubPreparer));
+        expect(player.poseHubMediaPreparer, isA<GatedPoseHubMediaPreparer>());
+        expect(
+          (player.poseHubMediaPreparer! as GatedPoseHubMediaPreparer).delegate,
+          same(services.poseHubPreparer),
+        );
+        expect(
+          tester
+              .widget<SinglePracticePage>(find.byType(SinglePracticePage))
+              .page
+              .mediaPreparer,
+          same(services.poseHubPreparer),
+        );
         expect(find.byKey(const ValueKey('pause')).hitTestable(), findsNothing);
         expect(find.byKey(const ValueKey('progress')), findsNothing);
         expect(services.store.history, isEmpty);
@@ -262,9 +373,8 @@ void main() {
           ),
         ),
       );
-      await tester.tap(find.text('open'));
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 350));
+      final source = tester.element(find.byType(Scaffold));
+      await openPreview(tester, action, find.text('open'), repository: repo);
       expect(find.byType(TrainerPlayer), findsOneWidget);
       expect(find.byType(BottomSheet), findsNothing);
       final preview = tester.widget<TrainerPlayer>(find.byType(TrainerPlayer));
@@ -274,13 +384,20 @@ void main() {
       expect(single.startMode, TrainerStartMode.preview);
       expect(preview.startMode, TrainerStartMode.preview);
       expect(preview.prepSeconds, 10);
-      expect(preview.onCompleted, services.recordTrainingCompletion);
+      expect(
+        tester
+            .widget<SinglePracticePage>(find.byType(SinglePracticePage))
+            .page
+            .onCompleted,
+        services.recordTrainingCompletion,
+      );
       expect(services.store.history, isEmpty);
       await tester.pump(const Duration(seconds: 15));
       await tester.tap(find.byKey(const ValueKey('close')));
       await tester.pumpAndSettle();
       expect(find.byType(TrainerPlayer), findsNothing);
       expect(services.store.history, isEmpty);
+      expect(tester.element(find.byType(Scaffold)), same(source));
       await tester.pumpWidget(const SizedBox.shrink());
       await tester.pump();
       repo.dispose();
@@ -301,9 +418,11 @@ void main() {
       );
       expect(browser.mediaPreparer, isNotNull);
       final action = catalog.semanticCompleteActions.first;
-      await tester.tap(find.byKey(ValueKey('posehub-action-${action.id}')));
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 350));
+      await openPreview(
+        tester,
+        action,
+        find.byKey(ValueKey('posehub-action-${action.id}')),
+      );
       expect(find.byType(TrainerPlayer), findsOneWidget);
       expect(
         find.descendant(

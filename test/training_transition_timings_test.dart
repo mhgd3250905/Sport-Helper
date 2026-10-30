@@ -268,7 +268,13 @@ void main() {
     'source entry and horizontal slide identity survive export and restore',
     () async {
       final recorder = create();
-      for (final entry in ['chat', 'saved_plan', 'guide']) {
+      for (final entry in [
+        'chat',
+        'saved_plan',
+        'guide',
+        'action_library',
+        'recommendation',
+      ]) {
         now += 1000;
         final token = recorder.begin(
           TrainingTransitionKind.entry,
@@ -281,6 +287,8 @@ void main() {
       final report = jsonDecode(await recorder.exportJson()) as Map;
       final rows = (report['results'] as List).cast<Map>();
       expect(rows.map((row) => row['sourceEntry']), [
+        'recommendation',
+        'action_library',
         'guide',
         'saved_plan',
         'chat',
@@ -293,6 +301,8 @@ void main() {
       final restored = create();
       await restored.initialize();
       expect(restored.results.map((row) => row['sourceEntry']), [
+        'recommendation',
+        'action_library',
         'guide',
         'saved_plan',
         'chat',

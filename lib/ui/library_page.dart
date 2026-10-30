@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ugk_coach_ui/ugk_coach_ui.dart';
 import 'package:ugk_trainer/ugk_trainer.dart'
-    show
-        DrillMediaPlaybackHandle,
-        PoseHubSinglePracticePage,
-        SessionResult,
-        TrainerStartMode;
+    show DrillMediaPlaybackHandle, PoseHubSinglePracticePage, TrainerStartMode;
 
 import '../app/services.dart';
 import '../domain/exercise.dart';
@@ -13,6 +9,7 @@ import 'action_issue_actions.dart';
 import 'alpha_artwork.dart';
 import 'chat/coach_ui_adapter.dart';
 import 'exercise_video.dart';
+import 'open_training.dart';
 import 'posehub_library_page.dart';
 import 'theme.dart';
 import 'theme/trainer_theme.dart';
@@ -133,19 +130,19 @@ Future<void> showExerciseDetails(BuildContext context, Exercise e) async {
   final services = AppServices.of(context);
   final action = services.poseHubCatalog?.tryGet(e.id);
   if (action != null) {
-    await Navigator.of(context).push<SessionResult>(
-      MaterialPageRoute<SessionResult>(
-        builder: (_) => PoseHubSinglePracticePage(
-          action: action,
-          mediaBaseUri:
-              services.poseHubMedia?.mediaBaseUri ??
-              Uri(scheme: 'file', path: '/__posehub_cache_unavailable__/'),
-          mediaPreparer: services.poseHubPreparer,
-          theme: SmartFitTrainerTheme.of(context),
-          voice: services.trainerVoice(),
-          startMode: TrainerStartMode.preview,
-          onCompleted: services.recordTrainingCompletion,
-        ),
+    await openTraining(
+      context,
+      sourceEntry: 'recommendation',
+      practice: PoseHubSinglePracticePage(
+        action: action,
+        mediaBaseUri:
+            services.poseHubMedia?.mediaBaseUri ??
+            Uri(scheme: 'file', path: '/__posehub_cache_unavailable__/'),
+        mediaPreparer: services.poseHubPreparer,
+        theme: SmartFitTrainerTheme.of(context),
+        voice: services.trainerVoice(),
+        startMode: TrainerStartMode.preview,
+        onCompleted: services.recordTrainingCompletion,
       ),
     );
     return;

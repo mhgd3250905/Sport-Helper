@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:ugk_trainer/ugk_trainer.dart' show TrainerTheme;
 
 import '../app/training_transition_activity.dart';
 import '../diagnostics/frame_recorder.dart';
@@ -16,10 +17,13 @@ class TrainingRoute<T> extends PageRouteBuilder<T> {
   TrainingRoute({
     required BuildContext context,
     required WidgetBuilder builder,
+    this.trainerTheme,
     this.sourceEntry = 'plan',
     super.settings,
   }) : reducedMotion = MediaQuery.disableAnimationsOf(context),
-       _theme = Theme.of(context).brightness.name,
+       _theme = trainerTheme == null
+           ? Theme.of(context).brightness.name
+           : (trainerTheme.isDark ? 'dark' : 'light'),
        _releaseEntry = TrainingTransitionActivity.instance.hold(),
        super(
          opaque: true,
@@ -62,6 +66,7 @@ class TrainingRoute<T> extends PageRouteBuilder<T> {
   }
 
   final String sourceEntry;
+  final TrainerTheme? trainerTheme;
   final bool reducedMotion;
   final String _theme;
   final VoidCallback _releaseEntry;
@@ -234,9 +239,6 @@ class TrainingRouteControl extends ChangeNotifier {
   void beginExit() => _route._beginExit();
   Future<void> beforeExitPop() => _route._beforeExitPop();
   void exitSaveFailed() => _route._saveFailed();
-  void retryExitSave() {
-    if (saveFailed) beginExit();
-  }
 
   void replay() {
     exiting = false;
@@ -313,8 +315,8 @@ class _TrainingRoutePageState extends State<_TrainingRoutePage>
 
   @override
   Widget build(BuildContext context) {
-    final theme = SmartFitTrainerTheme.of(context);
-    final dark = Theme.of(context).brightness == Brightness.dark;
+    final theme = widget.route.trainerTheme ?? SmartFitTrainerTheme.of(context);
+    final dark = theme.isDark;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarColor: theme.mediaStage,

@@ -102,8 +102,8 @@ class _TrainingTransitionTimingsPageState
             padding: const EdgeInsets.all(20),
             children: [
               Text(
-                '自动保留最近10次进入/退出。对话计划卡、我的计划、图文详情，'
-                '各测浅色和深色，共6组。每组进出3次，包含提前结束、完成和系统返回。'
+                '自动保留最近10次进入/退出。对话计划卡、我的计划、图文详情、动作库、推荐，'
+                '各测浅色和深色，共10组。每组进出3次，包含提前结束、完成和系统返回。'
                 '每组测完立即分享，避免最近10次滚动覆盖之前的结果。'
                 '引擎帧可能延迟回传约1秒，复制和分享会等待已结束的采样补齐。',
                 style: SfType.body,
@@ -197,6 +197,8 @@ class _TimingResultCard extends StatelessWidget {
               'chat' => '入口：对话计划卡',
               'saved_plan' => '入口：我的计划',
               'guide' => '入口：图文详情',
+              'action_library' => '入口：动作库',
+              'recommendation' => '入口：推荐',
               _ => '入口：未记录',
             }, style: SfType.caption),
             Text(

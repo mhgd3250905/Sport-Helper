@@ -412,6 +412,7 @@ void main() {
       same(chatElement),
     );
     await tester.pump(const Duration(milliseconds: 300));
+    await tester.pump(const Duration(microseconds: 1));
     await tester.pump();
     expect(tester.getRect(find.byType(PlayerPage)), screen);
     expect(control.entered, isTrue);
@@ -548,8 +549,15 @@ void main() {
         isFalse,
       );
       await tester.pump(const Duration(milliseconds: 300));
+      await tester.pump(const Duration(microseconds: 1));
       await tester.pump();
       expect(find.byType(PlayerPage), findsOneWidget);
+      expect(
+        TrainingRouteScope.maybeOf(
+          tester.element(find.byType(PlayerPage)),
+        )!.entered,
+        isTrue,
+      );
       await tester.tap(find.byKey(const ValueKey('close')));
       await tester.pumpAndSettle();
       await tester.tap(find.text('结束'));

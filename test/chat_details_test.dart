@@ -77,8 +77,15 @@ void main() {
       await tester.pump();
       expect(find.byType(PlayerPage, skipOffstage: false), findsOneWidget);
       await tester.pump(const Duration(milliseconds: 300));
+      await tester.pump(const Duration(microseconds: 1));
       await tester.pump();
       expect(find.byType(PlayerPage), findsOneWidget);
+      expect(
+        TrainingRouteScope.maybeOf(
+          tester.element(find.byType(PlayerPage)),
+        )!.entered,
+        isTrue,
+      );
       expect(s.store.lastPlan?.id, plan.id);
       final route =
           ModalRoute.of(tester.element(find.byType(PlayerPage)))!

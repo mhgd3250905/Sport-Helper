@@ -9,6 +9,7 @@ import 'package:smartfit/data/app_store.dart';
 import 'package:smartfit/domain/exercise.dart';
 import 'package:smartfit/domain/plan.dart';
 import 'package:smartfit/ui/exercise_video.dart';
+import 'package:smartfit/ui/cached_exercise_media.dart';
 import 'package:smartfit/ui/player_page.dart';
 import 'package:smartfit/ui/theme.dart';
 import 'package:smartfit/ui/training_route.dart';
@@ -327,6 +328,18 @@ void main() {
           expect(_key(key), findsOneWidget);
         }
         expect(find.byType(TrainingPoster), findsOneWidget);
+        final still = tester.widget<TrainingPoster>(
+          find.byType(TrainingPoster),
+        );
+        expect(still.stageColor, sdk.theme.mediaStage);
+        final stillFill = find.descendant(
+          of: find.byType(TrainingPoster),
+          matching: find.byType(ColoredBox),
+        );
+        expect(
+          tester.widget<ColoredBox>(stillFill.first).color,
+          sdk.theme.mediaStage,
+        );
         expect(
           tester.widget<RawImage>(find.byType(RawImage).first).image,
           isNotNull,
@@ -347,6 +360,16 @@ void main() {
         expect(f.voice.begins, 1);
         expect(native.created, hasLength(1));
         final videoBounds = tester.getRect(find.byType(ExerciseVideo));
+        expect(
+          tester.widget<ExerciseVideo>(find.byType(ExerciseVideo)).stageColor,
+          sdk.theme.mediaStage,
+        );
+        expect(
+          tester
+              .widget<CachedExerciseMedia>(find.byType(CachedExerciseMedia))
+              .stageColor,
+          sdk.theme.mediaStage,
+        );
         expect(videoBounds.width, closeTo(posterBounds.width, 1e-6));
         expect(videoBounds.height, closeTo(posterBounds.height, 1e-6));
         expect(videoBounds.top, closeTo(posterBounds.top, 1));
@@ -470,6 +493,55 @@ void main() {
       }
       expect(f.voice.begins, 1);
       expect(find.byKey(const ValueKey('counter')), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'completion receipt retry keeps the full page until an explicit finish',
+    (tester) async {
+      final f = await _mount(tester, Brightness.light);
+      await _enter(tester);
+      for (var second = 0; second < 120 && !_hasCompletion(tester); second++) {
+        await tester.pump(const Duration(seconds: 1));
+      }
+      expect(_hasCompletion(tester), isTrue);
+      expect(f.services.store.history, hasLength(1));
+      await tester.tap(_key('completion-feeling-tired'));
+      await tester.pump();
+      f.storage.failures = 1;
+      await tester.tap(_key('finish'));
+      await tester.pump();
+      for (var frame = 0; frame < 5; frame++) {
+        await tester.pump();
+      }
+      await tester.pump(const Duration(milliseconds: 350));
+      await tester.pump(const Duration(microseconds: 1));
+      await tester.pump();
+      expect(f.route.control.saveFailed, isTrue);
+      expect(_key('save-retry'), findsOneWidget);
+      await tester.tap(_key('save-retry'));
+      await tester.pump();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 350));
+      expect(f.route.control.exiting, isFalse);
+      expect(f.route.animation!.status, AnimationStatus.completed);
+      expect(f.completed, isEmpty);
+      expect(_hasCompletion(tester), isTrue);
+      expect(f.services.store.history, hasLength(1));
+      expect(
+        f.services.store.sessionResults.single.feeling,
+        trainer.TrainingFeeling.tired,
+      );
+      await tester.tap(_key('finish'));
+      await tester.pump();
+      expect(f.route.animation!.status, AnimationStatus.reverse);
+      await tester.pump(const Duration(milliseconds: 280));
+      await tester.pump(const Duration(microseconds: 1));
+      await tester.pump();
+      await tester.pump();
+      expect(f.completed, hasLength(1));
+      expect(f.services.store.history, hasLength(1));
       expect(tester.takeException(), isNull);
     },
   );

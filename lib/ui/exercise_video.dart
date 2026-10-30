@@ -19,6 +19,7 @@ class ExerciseVideo extends StatefulWidget {
     this.playbackHandle,
     this.mediaPreparer,
     this.training = false,
+    this.stageColor,
   });
 
   final Exercise exercise;
@@ -31,6 +32,7 @@ class ExerciseVideo extends StatefulWidget {
   /// A TrainerMediaRequest supplies the player's shared SDK prefetch queue.
   final PoseHubMediaPreparer? mediaPreparer;
   final bool training;
+  final Color? stageColor;
 
   @override
   State<ExerciseVideo> createState() => _ExerciseVideoState();
@@ -90,6 +92,7 @@ class _ExerciseVideoState extends State<ExerciseVideo> {
         paused: widget.paused,
         mirrored: widget.mirrored,
         radius: widget.radius,
+        stageColor: widget.stageColor,
         playbackHandle: widget.playbackHandle,
       );
     }
@@ -115,7 +118,7 @@ class _ExerciseVideoState extends State<ExerciseVideo> {
       paused: widget.paused,
       mirrored: widget.mirrored,
       radius: widget.radius,
-      stage: stage.mediaStage,
+      stage: widget.stageColor ?? stage.mediaStage,
       errorColor: stage.onStageMuted,
       errorLabel: '示范暂时加载不了，计时和语音仍可继续',
       unavailableLabel: '此动作暂无视频示范',

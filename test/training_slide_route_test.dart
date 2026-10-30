@@ -237,7 +237,7 @@ void main() {
   );
 
   testWidgets(
-    'failed save restores the full retry view; a retry can exit without another SDK notification',
+    'failed save restores the retry view; explicit finish exits without another SDK notification',
     (tester) async {
       final fixture = _SlideFixture();
       await fixture.mountAndOpen(tester);
@@ -267,14 +267,13 @@ void main() {
       expect(fixture.pageDisposed, isFalse);
       expect(fixture.gateStarts, 1);
 
-      // c97 sends onExitStarted once per session, including after save failure.
-      // The host uses the public retry method rather than private SDK state.
-      fixture.route.control.retryExitSave();
+      // SDK sends onExitStarted once per session. A later explicit finish
+      // reaches beforeExitPop after the successful retry, without that event.
+      final readyToPop = fixture.route.control.beforeExitPop();
       await tester.pump();
       expect(fixture.route.control.exiting, isTrue);
       expect(fixture.route.control.saveFailed, isFalse);
       expect(fixture.route.animation!.status, AnimationStatus.reverse);
-      final readyToPop = fixture.route.control.beforeExitPop();
       await tester.pump(const Duration(milliseconds: 280));
       await tester.pump(const Duration(microseconds: 1));
       await readyToPop;

@@ -16,6 +16,7 @@ import '../theme/tokens.dart';
 import '../theme/widgets.dart';
 import '../theme/polish_card.dart';
 import '../theme/ui_polish_tokens.dart';
+import '../training_visible_poster_preload.dart';
 
 /// Product tokens, trusted media and controls; the SDK owns conversation and
 /// routine rendering. Navigation, storage and credentials remain App concerns.
@@ -163,7 +164,7 @@ Widget withSmartfitRecommendUi(BuildContext context, Widget child) {
         actionUnavailable: '动作暂不可用',
       ),
     ),
-    child: child,
+    child: TrainingVisiblePosterPreload(child: child),
   );
 }
 

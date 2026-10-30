@@ -37,7 +37,20 @@ abstract final class TrainingPosterImages {
   }
 
   static Future<bool> prepare(BuildContext context, Exercise exercise) async {
-    final assets = candidates(context, exercise);
+    return _prepare(context, candidates(context, exercise));
+  }
+
+  static Future<void> precacheAsset(BuildContext context, String asset) async {
+    await prepareAsset(context, asset);
+  }
+
+  static Future<bool> prepareAsset(BuildContext context, String asset) =>
+      _prepare(context, [asset]);
+
+  static Future<bool> _prepare(
+    BuildContext context,
+    List<String> assets,
+  ) async {
     final width = decodeWidth(context);
     for (final asset in assets) {
       var failed = false;
@@ -61,21 +74,31 @@ class TrainingPoster extends StatelessWidget {
     required this.exercise,
     this.mirrored = false,
     this.radius = 0,
-  });
-  final Exercise exercise;
+    this.stageColor,
+  }) : asset = null;
+  const TrainingPoster.asset({
+    super.key,
+    required this.asset,
+    this.mirrored = false,
+    this.radius = 0,
+    this.stageColor,
+  }) : exercise = null;
+  final Exercise? exercise;
+  final String? asset;
   final bool mirrored;
   final double radius;
+  final Color? stageColor;
   @override
   Widget build(BuildContext context) => ClipRRect(
     clipBehavior: Clip.antiAlias,
     borderRadius: BorderRadius.circular(radius),
     child: ColoredBox(
-      color: SfColors.mediaStage,
+      color: stageColor ?? SfColors.mediaStage,
       child: Transform.flip(
         flipX: mirrored,
         child: AspectRatio(
           aspectRatio: 1,
-          child: DecodedTrainingPoster(exercise: exercise),
+          child: DecodedTrainingPoster(exercise: exercise, asset: asset),
         ),
       ),
     ),
@@ -85,8 +108,10 @@ class TrainingPoster extends StatelessWidget {
 /// Resolves only when the asset/theme/decode key changes, retaining the still
 /// across ordinary SDK updates without another codec or empty image frame.
 class DecodedTrainingPoster extends StatefulWidget {
-  const DecodedTrainingPoster({super.key, required this.exercise});
-  final Exercise exercise;
+  const DecodedTrainingPoster({super.key, this.exercise, this.asset})
+    : assert((exercise == null) != (asset == null));
+  final Exercise? exercise;
+  final String? asset;
 
   @override
   State<DecodedTrainingPoster> createState() => _DecodedTrainingPosterState();
@@ -114,7 +139,9 @@ class _DecodedTrainingPosterState extends State<DecodedTrainingPoster> {
   }
 
   void _resolve() {
-    final assets = TrainingPosterImages.candidates(context, widget.exercise);
+    final assets = widget.asset == null
+        ? TrainingPosterImages.candidates(context, widget.exercise!)
+        : [widget.asset!];
     final width = TrainingPosterImages.decodeWidth(context);
     final signature =
         '$width/${assets.join('|')}/${DefaultAssetBundle.of(context).hashCode}';

@@ -1,12 +1,14 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:ugk_trainer/ugk_trainer.dart' show SessionResult;
+import 'package:ugk_trainer/ugk_trainer.dart'
+    show SessionResult, PoseHubSinglePracticePage;
 
 import '../app/services.dart';
 import '../app/training_transition_activity.dart';
 import '../domain/plan.dart';
 import 'player_page.dart';
+import 'single_practice_page.dart';
 import 'theme.dart';
 import 'training_poster_image.dart';
 import 'training_route.dart';
@@ -17,14 +19,21 @@ final _openTrainingByNavigator = Expando<Object>();
 /// start bookkeeping, both slides and any SDK save still pending offscreen.
 Future<SessionResult?> openTraining(
   BuildContext context, {
-  required TrainingPlan plan,
+  TrainingPlan? plan,
+  PoseHubSinglePracticePage? practice,
   String sourceEntry = 'plan',
   Future<bool> Function()? onStarting,
 }) async {
+  if ((plan == null) == (practice == null)) {
+    throw ArgumentError('Provide exactly one plan or SDK practice page.');
+  }
   final navigator = Navigator.of(context);
   if (_openTrainingByNavigator[navigator] != null) return null;
-  final services = AppServices.of(context);
-  if (!services.store.trainingAllowed) {
+  final services = context.getInheritedWidgetOfExactType<AppScope>()?.services;
+  if (plan != null && services == null) {
+    throw StateError('Plan training needs the host AppScope.');
+  }
+  if (plan != null && !services!.store.trainingAllowed) {
     showSfToast(
       context,
       services.store.safetyAccepted
@@ -34,9 +43,16 @@ Future<SessionResult?> openTraining(
     );
     return null;
   }
-  if (plan.items.isEmpty ||
-      plan.items.any((item) => !services.library.contains(item.exerciseId))) {
+  if (plan != null &&
+      (plan.items.isEmpty ||
+          plan.items.any(
+            (item) => !services!.library.contains(item.exerciseId),
+          ))) {
     showSfToast(context, '计划包含尚未可用的动作，暂时无法开始。');
+    return null;
+  }
+  if (practice != null && !practice.action.trainingDefinitionComplete) {
+    showSfToast(context, '此动作暂未开放训练');
     return null;
   }
   final identity = Object();
@@ -45,11 +61,19 @@ Future<SessionResult?> openTraining(
   final watch = _LaunchLifecycle();
   WidgetsBinding.instance.addObserver(watch);
   try {
-    final first = services.library[plan.items.first.exerciseId];
-    final ready = await TrainingPosterImages.prepare(
-      context,
-      first,
-    ).timeout(const Duration(milliseconds: 150), onTimeout: () => false);
+    final poster = practice == null
+        ? TrainingPosterImages.prepare(
+            context,
+            services!.library[plan!.items.first.exerciseId],
+          )
+        : TrainingPosterImages.prepareAsset(
+            context,
+            'packages/ugk_trainer/assets/pose_hub/app-test-pack-r1/standing/${practice.action.id}.webp',
+          );
+    final ready = await poster.timeout(
+      const Duration(milliseconds: 150),
+      onTimeout: () => false,
+    );
     if (!context.mounted || !navigator.mounted || watch.interrupted) {
       return null;
     }
@@ -66,8 +90,14 @@ Future<SessionResult?> openTraining(
     final route = TrainingRoute<SessionResult>(
       context: context,
       sourceEntry: sourceEntry,
+      trainerTheme: practice?.theme,
       settings: const RouteSettings(name: 'player'),
-      builder: (_) => PlayerPage(plan: plan),
+      builder: (_) => practice == null
+          ? PlayerPage(plan: plan!)
+          : SinglePracticePage(
+              page: practice,
+              exercise: services?.library.tryGet(practice.action.id),
+            ),
     );
     final popped = navigator.push(route);
     release();

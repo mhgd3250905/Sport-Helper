@@ -106,8 +106,15 @@ void main() {
         isFalse,
       );
       await tester.pump(const Duration(milliseconds: 300));
+      await tester.pump(const Duration(microseconds: 1));
       await tester.pump();
       expect(find.byType(PlayerPage), findsOneWidget);
+      expect(
+        TrainingRouteScope.maybeOf(
+          tester.element(find.byType(PlayerPage)),
+        )!.entered,
+        isTrue,
+      );
       expect(s.chat.currentPlan?.id, modified.id);
       expect(s.store.lastPlan?.exerciseIds, {'h-band-pallof'});
       for (var i = 0; i < 12 && s.store.history.isEmpty; i++) {

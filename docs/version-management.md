@@ -2,7 +2,9 @@
 
 ## 当前 +49 标准滑动候选（2026-10-30）
 
-本轮按新交接移除卡片展开/缩回及控件错开，统一宿主训练入口为 opaque 水平滑动：进入300ms easeOutCubic，退出280ms easeInCubic，系统移除动画时0ms。版本0.1.0+49 / internal arm64 2049，SDK三包仍锁c97a79a5。对话计划卡、我的计划、图文详情走唯一openTraining；按开哥补充决定，SDK封装的动作库/推荐动作单练留待SDK公开接口接入。最近10次帧耗时支持复制和系统分享。候选保持未合并、未推送、未打tag，release/1.0与SDK源码不动。 实现与最终验证见[本轮交付记录](trainer-transition-plus49-slide-2026-10-30.md)。
+本轮代码已接入标准水平滑动：进入300ms easeOutCubic，退出280ms easeInCubic，系统移除动画时0ms；版本0.1.0+49 / internal arm64 2049。SDK三包及coach override统一固定 `66dd98a549c1ff5fedecb626a7c88583090a1440`，SDK补充接口已接完。5个逻辑入口为对话计划卡（收起/展开）、我的计划、图文详情、动作库、推荐，全部进入唯一 `openTraining` 并共用同一Navigator锁。动作库/推荐保留SDK预览与启动语义，媒体由宿主转场门禁承接；App所有浏览器调用均传 `onOpenPractice`，继续复用SDK UI。最近10次帧耗时支持复制和系统分享。
+
+代码已实现；最终全量测试、analyze、APK/签名/16KB/JNI检查与真机无闪烁/帧耗时仍待最终验证，此处不预填测试数、提交号或APK。候选未合并、未推送、未打tag，release/1.0与SDK源码不动。 实现与最终验证见[本轮交付记录](trainer-transition-plus49-slide-2026-10-30.md)。
 
 ## 已合入 +47 主线整合（2026-10-30）
 
