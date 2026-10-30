@@ -5,6 +5,7 @@ class TrainingTransitionMotion extends ChangeNotifier {
   TrainingTransitionMotion({
     required TickerProvider vsync,
     required this.reduced,
+    this.route,
   }) : entrance = AnimationController(
          vsync: vsync,
          duration: Duration(milliseconds: reduced ? 150 : 560),
@@ -24,6 +25,7 @@ class TrainingTransitionMotion extends ChangeNotifier {
     entrance.addListener(_entryTick);
   }
   final bool reduced;
+  final TrainingRoute? route;
   final AnimationController entrance;
   final AnimationController _exit;
   late final CurvedAnimation _entryChrome;
@@ -47,6 +49,7 @@ class TrainingTransitionMotion extends ChangeNotifier {
   void _entryTick() {
     if (entrance.value < 1 || entered || aborted || exiting) return;
     entered = true;
+    route?._entryEnded();
     FrameRecorder.instance.endScenario(FrameScenario.trainingRouteEntry);
     RuntimeLog.instance.record('training.transition.entry.completed');
     notifyListeners();
@@ -72,6 +75,14 @@ class TrainingTransitionMotion extends ChangeNotifier {
     mediaRect;
   }
 
+  void configureEntry({required Rect? from, required Rect? stage}) {
+    entryFrom = from;
+    entryStage = stage;
+    // Geometry becomes known once after the real SDK's first layout. Rebuild
+    // its media slot once here; flight ticks retain that exact pixel subtree.
+    notifyListeners();
+  }
+
   Future<void> enter() async {
     FrameRecorder.instance.beginScenario(FrameScenario.trainingRouteEntry);
     RuntimeLog.instance.record(
@@ -94,6 +105,7 @@ class TrainingTransitionMotion extends ChangeNotifier {
     final from = chrome.value;
     exitingFromCompletion = fromCompletion;
     exiting = true;
+    route?._exitStarted();
     saveFailed = false;
     _exit.value = from;
     chrome.parent = _exit;
@@ -121,12 +133,14 @@ class TrainingTransitionMotion extends ChangeNotifier {
   Future<void> beforeExitPop() {
     _savingDelay?.cancel();
     showSaving = false;
+    if (saveFailed) route?._ensureReturnRecording();
     return _exitMotion;
   }
 
   void exitSaveFailed() {
     if (_disposed) return;
     saveFailed = true;
+    route?._exitFailed();
     _savingDelay?.cancel();
     showSaving = false;
     _exit.stop(canceled: true);
@@ -159,6 +173,7 @@ class TrainingTransitionMotion extends ChangeNotifier {
 
   void finishExitNow() {
     interrupted = true;
+    route?._exitOutcome = 'interrupted';
     _savingDelay?.cancel();
     showSaving = false;
     if (!_disposed) _exit.value = 0;
@@ -224,6 +239,7 @@ class _TrainingTransitionHostState extends State<_TrainingTransitionHost>
     motion = TrainingTransitionMotion(
       vsync: this,
       reduced: MediaQuery.disableAnimationsOf(context),
+      route: widget.route,
     );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted || motion.aborted) return;
@@ -241,8 +257,10 @@ class _TrainingTransitionHostState extends State<_TrainingTransitionHost>
         _from = null;
       }
       _from = _from?.shift(-_origin);
-      motion.entryFrom = _from?.shift(_origin);
-      motion.entryStage = motion.mediaRect;
+      motion.configureEntry(
+        from: _from?.shift(_origin),
+        stage: motion.mediaRect,
+      );
       if (_from != null && !motion.reduced) widget.route.source?.show(0);
       setState(() {});
       unawaited(motion.enter());
@@ -275,6 +293,7 @@ class _TrainingTransitionHostState extends State<_TrainingTransitionHost>
       return;
     }
     final overlay = widget.route.navigator?.overlay;
+    widget.route._ensureReturnRecording();
     if (motion.reduced) {
       // The page and chrome already cross-faded together during exit A.
       // Adding another post-pop fade would double the specified 150ms.
@@ -333,10 +352,40 @@ class _TrainingTransitionHostState extends State<_TrainingTransitionHost>
 
   @override
   Widget build(BuildContext context) {
-    final child = TrainingTransitionScope(
-      motion: motion,
-      child: Builder(builder: widget.builder),
+    final child = RepaintBoundary(
+      child: TrainingTransitionScope(
+        motion: motion,
+        child: Builder(builder: widget.builder),
+      ),
     );
+    final stage = _stage;
+    final exercise = motion.exercise;
+    final flight = stage == null || exercise == null
+        ? null
+        : Positioned.fromRect(
+            // The layout never changes. The flight transforms only paint.
+            rect: stage,
+            child: IgnorePointer(
+              child: TrainingPosterFlight(
+                key: ValueKey(
+                  _from == null
+                      ? 'training-entry-fallback'
+                      : 'training-morph-poster',
+                ),
+                animation: motion.entrance,
+                exercise: exercise,
+                mirrored: motion.mirrored,
+                canvasSize: stage.size,
+                from: (_from ?? stage).shift(-stage.topLeft),
+                to: Offset.zero & stage.size,
+                durationMs: 560,
+                morphMs: 420,
+                beginRadius: _from == null ? 0 : 20,
+                endRadius: 0,
+                enterFallback: _from == null,
+              ),
+            ),
+          );
     final view = AnimatedBuilder(
       animation: Listenable.merge([motion.entrance, motion.chrome, motion]),
       child: child,
@@ -369,19 +418,9 @@ class _TrainingTransitionHostState extends State<_TrainingTransitionHost>
             ],
           );
         }
-        final stage = _stage;
-        final exercise = motion.exercise;
-        final e = Curves.easeInOutCubicEmphasized.transform(
-          (elapsed / 420).clamp(0.0, 1.0),
-        );
         final background = Curves.easeOutCubic.transform(
           (elapsed / 280).clamp(0.0, 1.0),
         );
-        final posterRect = stage == null
-            ? null
-            : _from == null
-            ? stage
-            : Rect.lerp(_from, stage, e)!;
         return Stack(
           fit: StackFit.expand,
           children: [
@@ -394,50 +433,7 @@ class _TrainingTransitionHostState extends State<_TrainingTransitionHost>
             // SDK floor forces alpha=1. Keep real layout from frame zero and start
             // painting at 280ms, when background=1 and chrome is still exactly 0.
             Offstage(offstage: elapsed < 280, child: child!),
-            if (!motion.entered &&
-                elapsed < 280 &&
-                posterRect != null &&
-                exercise != null)
-              Positioned.fromRect(
-                rect: posterRect,
-                child: IgnorePointer(
-                  child: _from != null
-                      ? TrainingTransitionPoster(
-                          key: const ValueKey('training-morph-poster'),
-                          exercise: exercise,
-                          mirrored: motion.mirrored,
-                          radius: 20 * (1 - e),
-                          cacheWidth:
-                              (stage!.width *
-                                      MediaQuery.devicePixelRatioOf(context))
-                                  .round(),
-                        )
-                      : Transform.scale(
-                          key: const ValueKey('training-entry-fallback'),
-                          scale:
-                              1.04 -
-                              .04 *
-                                  Curves.easeOutCubic.transform(
-                                    (elapsed / 320).clamp(0.0, 1.0),
-                                  ),
-                          child: Opacity(
-                            opacity: Curves.easeOutCubic.transform(
-                              (elapsed / 320).clamp(0.0, 1.0),
-                            ),
-                            child: TrainingTransitionPoster(
-                              exercise: exercise,
-                              mirrored: motion.mirrored,
-                              cacheWidth:
-                                  (stage!.width *
-                                          MediaQuery.devicePixelRatioOf(
-                                            context,
-                                          ))
-                                      .round(),
-                            ),
-                          ),
-                        ),
-                ),
-              ),
+            if (!motion.entered && elapsed < 280 && flight != null) flight,
           ],
         );
       },
@@ -481,50 +477,38 @@ class TrainingEntranceMedia extends StatelessWidget {
   final bool mirrored;
 
   @override
-  Widget build(BuildContext context) => AnimatedBuilder(
-    animation: motion.entrance,
-    builder: (context, _) => LayoutBuilder(
-      builder: (context, box) {
-        final stage = motion.entryStage;
-        if (motion.reduced || stage == null) {
-          return TrainingTransitionPoster(
+  Widget build(BuildContext context) {
+    final stage = motion.entryStage;
+    if (motion.reduced || stage == null) {
+      return TrainingTransitionPoster(exercise: exercise, mirrored: mirrored);
+    }
+    final from = motion.entryFrom;
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Positioned.fill(
+          child: TrainingPosterFlight(
+            key: ValueKey(
+              from == null
+                  ? 'training-entry-fallback'
+                  : 'training-morph-poster',
+            ),
+            animation: motion.entrance,
             exercise: exercise,
             mirrored: mirrored,
-          );
-        }
-        final elapsed = motion.entrance.value * 560;
-        final e = Curves.easeInOutCubicEmphasized.transform(
-          (elapsed / 420).clamp(0.0, 1.0),
-        );
-        final from = motion.entryFrom;
-        final global = from == null ? stage : Rect.lerp(from, stage, e)!;
-        final rect = global.shift(-stage.topLeft);
-        Widget poster = TrainingTransitionPoster(
-          key: ValueKey(
-            from == null ? 'training-entry-fallback' : 'training-morph-poster',
+            canvasSize: stage.size,
+            from: (from ?? stage).shift(-stage.topLeft),
+            to: Offset.zero & stage.size,
+            durationMs: 560,
+            morphMs: 420,
+            beginRadius: from == null ? 0 : 20,
+            endRadius: 0,
+            enterFallback: from == null,
           ),
-          exercise: exercise,
-          mirrored: mirrored,
-          radius: from == null ? 0 : 20 * (1 - e),
-          cacheWidth: (stage.width * MediaQuery.devicePixelRatioOf(context))
-              .round(),
-        );
-        if (from == null) {
-          final t = Curves.easeOutCubic.transform(
-            (elapsed / 320).clamp(0.0, 1.0),
-          );
-          poster = Transform.scale(
-            scale: 1.04 - .04 * t,
-            child: Opacity(opacity: t, child: poster),
-          );
-        }
-        return Stack(
-          clipBehavior: Clip.none,
-          children: [Positioned.fromRect(rect: rect, child: poster)],
-        );
-      },
-    ),
-  );
+        ),
+      ],
+    );
+  }
 }
 
 class _ReturningPoster extends StatefulWidget {
@@ -604,81 +588,79 @@ class _ReturningPosterState extends State<_ReturningPoster>
   }
 
   @override
-  Widget build(BuildContext context) => PopScope(
-    canPop: false,
-    onPopInvokedWithResult: (_, _) => _finish(),
-    child: GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: _finish,
-      child: AnimatedBuilder(
+  Widget build(BuildContext context) {
+    final fallback = widget.to == null;
+    final durationMs = widget.reduced
+        ? 150.0
+        : fallback
+        ? 260.0
+        : 500.0;
+    final poster = Positioned.fromRect(
+      rect: widget.from,
+      child: TrainingPosterFlight(
+        key: const ValueKey('training-return-poster'),
         animation: _animation,
-        builder: (context, _) {
-          final value = _animation.value;
-          final fallback = widget.to == null;
-          final ms =
-              value *
-              (widget.reduced
-                  ? 150
-                  : fallback
-                  ? 260
-                  : 500);
-          final morph = Curves.easeInOutCubicEmphasized.transform(
-            (ms / 380).clamp(0.0, 1.0),
-          );
-          final rect = widget.reduced || fallback
-              ? widget.from
-              : Rect.lerp(widget.from, widget.to, morph)!;
-          Widget layer = Stack(
-            fit: StackFit.expand,
-            children: [
-              ColoredBox(
-                color: widget.background.withValues(
-                  alpha: widget.reduced || fallback
-                      ? 1
-                      : 1 -
-                            Curves.easeInCubic.transform(
-                              (ms / 240).clamp(0.0, 1.0),
-                            ),
-                ),
-              ),
-              Positioned.fromRect(
-                rect: rect,
-                child: Opacity(
-                  opacity: widget.reduced || fallback
-                      ? 1
-                      : 1 - ((ms - 380) / 120).clamp(0.0, 1.0),
-                  child: TrainingTransitionPoster(
-                    key: const ValueKey('training-return-poster'),
-                    exercise: widget.exercise,
-                    mirrored: widget.mirrored,
-                    radius: widget.reduced || fallback ? 0 : 20 * morph,
-                    cacheWidth:
-                        (widget.from.width *
-                                MediaQuery.devicePixelRatioOf(context))
-                            .round(),
+        exercise: widget.exercise,
+        mirrored: widget.mirrored,
+        canvasSize: widget.from.size,
+        from: Offset.zero & widget.from.size,
+        to: widget.reduced || fallback
+            ? Offset.zero & widget.from.size
+            : widget.to!.shift(-widget.from.topLeft),
+        durationMs: durationMs,
+        morphMs: 380,
+        beginRadius: 0,
+        endRadius: widget.reduced || fallback ? 0 : 20,
+        fadeAfterMs: widget.reduced || fallback ? null : 380,
+      ),
+    );
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (_, _) => _finish(),
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: _finish,
+        child: AnimatedBuilder(
+          animation: _animation,
+          child: poster,
+          builder: (context, poster) {
+            final value = _animation.value;
+            final ms = value * durationMs;
+            Widget layer = Stack(
+              fit: StackFit.expand,
+              children: [
+                ColoredBox(
+                  color: widget.background.withValues(
+                    alpha: widget.reduced || fallback
+                        ? 1
+                        : 1 -
+                              Curves.easeInCubic.transform(
+                                (ms / 240).clamp(0.0, 1.0),
+                              ),
                   ),
                 ),
-              ),
-            ],
-          );
-          if (widget.reduced || fallback) {
-            final t = Curves.easeInCubic.transform(value);
-            layer = Opacity(
-              opacity: 1 - t,
-              child: Transform.scale(
-                scale: widget.reduced ? 1 : 1 - .06 * t,
-                child: layer,
-              ),
+                poster!,
+              ],
             );
-          }
-          return KeyedSubtree(
-            key: ValueKey(
-              fallback ? 'training-return-fallback' : 'training-return-morph',
-            ),
-            child: layer,
-          );
-        },
+            if (widget.reduced || fallback) {
+              final t = Curves.easeInCubic.transform(value);
+              layer = FadeTransition(
+                opacity: AlwaysStoppedAnimation(1 - t),
+                child: Transform.scale(
+                  scale: widget.reduced ? 1 : 1 - .06 * t,
+                  child: layer,
+                ),
+              );
+            }
+            return KeyedSubtree(
+              key: ValueKey(
+                fallback ? 'training-return-fallback' : 'training-return-morph',
+              ),
+              child: layer,
+            );
+          },
+        ),
       ),
-    ),
-  );
+    );
+  }
 }

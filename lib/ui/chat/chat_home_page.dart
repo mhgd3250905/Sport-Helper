@@ -22,6 +22,7 @@ import '../theme/solid_surface.dart';
 import '../theme/sf_icons.dart';
 import '../theme/tokens.dart';
 import '../training_route.dart';
+import '../training_transition_freeze.dart';
 import '../training_entry_placeholder.dart';
 import 'chat_widgets.dart';
 import 'chat_composer_dock.dart';
@@ -228,11 +229,12 @@ class _ChatHomePageState extends State<ChatHomePage>
         ? null
         : _trainingMedia[messageId]?.capture();
     final first = p.items.firstOrNull;
-    if (first != null) {
-      unawaited(
-        TrainingTransitionPoster.precache(context, s.library[first.exerciseId]),
-      );
-    }
+    final posterReady = first == null
+        ? Future<void>.value()
+        : TrainingTransitionPoster.precache(
+            context,
+            s.library[first.exerciseId],
+          );
     _trainingInFlight = true;
     final launchEpoch = _trainingLaunchEpoch;
     try {
@@ -241,7 +243,8 @@ class _ChatHomePageState extends State<ChatHomePage>
           launchEpoch != _trainingLaunchEpoch) {
         return;
       }
-      s.prefetchPlan(p);
+      await posterReady;
+      if (!mounted || launchEpoch != _trainingLaunchEpoch) return;
       _dismissInput();
       final route = TrainingRoute<SessionResult>(
         context: context,
@@ -357,20 +360,20 @@ class _ChatHomePageState extends State<ChatHomePage>
         child: Scaffold(
           backgroundColor: SfColors.skyBottom,
           resizeToAvoidBottomInset: false,
-          body: ListenableBuilder(
+          body: TrainingTransitionFreeze(
             listenable: PerformanceLab.buildEnabled
                 ? Listenable.merge([s.store, PerformanceLab.instance])
                 : s.store,
-            builder: (context, _) => CosmosBackground(
+            builder: (context) => CosmosBackground(
               showStars: PerformanceLab.buildEnabled
                   ? PerformanceLab.instance.starsVisible
                   : true,
               animate: PerformanceLab.buildEnabled
                   ? PerformanceLab.instance.starfieldFor(s.store.starfield)
                   : s.store.starfield,
-              child: ListenableBuilder(
+              child: TrainingTransitionFreeze(
                 listenable: _chat,
-                builder: (context, _) => Stack(
+                builder: (context) => Stack(
                   fit: StackFit.expand,
                   children: [
                     ValueListenableBuilder<double>(

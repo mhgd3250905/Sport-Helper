@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../app/services.dart';
 import '../domain/exercise.dart';
-import 'cached_exercise_media.dart';
 import 'theme.dart';
+import 'training_poster_image.dart';
 
 /// Matches ExerciseVideo's existing still layer, including theme, frame-zero
 /// precedence, contain fitting, mirroring and image decoding width.
@@ -22,26 +21,12 @@ class TrainingTransitionPoster extends StatelessWidget {
   final int? cacheWidth;
 
   /// Called at the source tap, before persistence/navigation awaits.
-  static Future<void> precache(BuildContext context, Exercise exercise) async {
-    final services = context
-        .getInheritedWidgetOfExactType<AppScope>()
-        ?.services;
-    final action = services?.poseHubCatalog?.tryGet(exercise.id);
-    final media = exercise.media;
-    final asset = action != null
-        ? 'packages/ugk_trainer/assets/pose_hub/app-test-pack-r1/standing/${action.id}.webp'
-        : media.alphaPlaybackPoster?.isNotEmpty == true
-        ? media.alphaPlaybackPoster!
-        : media.playbackPosterFor(
-            light: Theme.of(context).brightness == Brightness.light,
-          );
-    if (asset.isNotEmpty) {
-      await precacheImage(AssetImage(asset), context, onError: (_, _) {});
-    }
-  }
+  static Future<void> precache(BuildContext context, Exercise exercise) =>
+      TrainingPosterImages.precache(context, exercise);
 
   @override
   Widget build(BuildContext context) => ClipRRect(
+    clipBehavior: Clip.antiAlias,
     borderRadius: BorderRadius.circular(radius),
     child: ColoredBox(
       color: SfColors.mediaStage,
@@ -49,7 +34,11 @@ class TrainingTransitionPoster extends StatelessWidget {
         flipX: mirrored,
         child: AspectRatio(
           aspectRatio: 1,
-          child: ExerciseFrameZero(exercise: exercise, cacheWidth: cacheWidth),
+          child: DecodedTrainingPoster(
+            exercise: exercise,
+            cacheWidth: cacheWidth,
+            builder: (_, pixels, _) => pixels,
+          ),
         ),
       ),
     ),

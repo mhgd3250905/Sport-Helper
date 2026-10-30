@@ -1,7 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:ugk_coach_ui/ugk_coach_ui.dart';
 
 import '../training_route.dart';
+import '../../app/services.dart';
+import '../training_poster_image.dart';
 
 /// Media registered by this App card's public SDK image builder. The SDK keeps
 /// its card geometry; a workout reads the actual image box instead of copying
@@ -153,6 +157,28 @@ class _TrainingCardImage extends StatefulWidget {
 
 class _TrainingCardImageState extends State<_TrainingCardImage> {
   late final _binding = _TrainingImageBinding();
+  String? _warmed;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _warmPoster();
+  }
+
+  void _warmPoster() {
+    final exercise = context
+        .getInheritedWidgetOfExactType<AppScope>()
+        ?.services
+        .library
+        .tryGet(widget.registry.exerciseId);
+    if (exercise == null) return;
+    final key =
+        '${exercise.id}/${Theme.of(context).brightness}/'
+        '${TrainingPosterImages.decodeWidth(context)}';
+    if (_warmed == key) return;
+    _warmed = key;
+    unawaited(TrainingPosterImages.precache(context, exercise));
+  }
 
   @override
   void initState() {
@@ -174,6 +200,7 @@ class _TrainingCardImageState extends State<_TrainingCardImage> {
     if (oldWidget.registry == widget.registry) return;
     oldWidget.registry._images.remove(_binding);
     widget.registry._images.add(_binding);
+    _warmPoster();
   }
 
   @override

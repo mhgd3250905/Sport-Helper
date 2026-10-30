@@ -4,6 +4,7 @@ import '../data/app_store.dart';
 import 'frame_recorder.dart';
 import 'performance_lab.dart';
 import 'performance_report.dart';
+import 'training_transition_timings.dart';
 
 /// Changes immutable frame labels only when live render conditions change.
 class PerformanceConditions extends StatelessWidget {
@@ -26,6 +27,11 @@ class PerformanceConditions extends StatelessWidget {
       child: child,
       builder: (context, child) {
         final service = PerformanceReportService.instance;
+        TrainingTransitionTimings.instance.setEnvironment(
+          renderer: service.renderer,
+          rendererBackend: service.rendererBackend,
+          rendererVerified: service.rendererVerified,
+        );
         final media = MediaQuery.of(context);
         final rate = View.of(context).display.refreshRate;
         final stars =

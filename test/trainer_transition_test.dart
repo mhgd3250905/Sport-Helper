@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smartfit/app/services.dart';
+import 'package:smartfit/app/training_transition_activity.dart';
 import 'package:smartfit/core/storage/local_state_storage.dart';
 import 'package:smartfit/data/app_store.dart';
 import 'package:smartfit/diagnostics/frame_recorder.dart';
@@ -764,7 +765,7 @@ void main() {
   testWidgets(
     'save failure exposes full completion and issue action; retry keeps one App receipt',
     (tester) async {
-      final f = await _mount(tester, issueEnabled: true);
+      final f = await _mount(tester, issueEnabled: true, withSource: true);
       await _enter(tester);
       f.storage.failures = 1;
       await _confirmExit(tester);
@@ -782,6 +783,7 @@ void main() {
       expect(_effectiveOpacity(tester, _key('player-action-issue')), 1);
       expect(f.motion!.saveFailed, isTrue);
       expect(_eventCount(log, 'training.finished'), 1);
+      expect(TrainingTransitionActivity.instance.active, isFalse);
       await tester.ensureVisible(_key('save-retry'));
       await tester.tap(_key('save-retry'));
       await tester.pumpAndSettle();
@@ -793,6 +795,15 @@ void main() {
       expect(f.popped, isEmpty);
       await tester.ensureVisible(_key('finish'));
       await tester.tap(_key('finish'));
+      await tester.pump();
+      await tester.pump();
+      expect(
+        TrainingTransitionActivity.instance.active,
+        isTrue,
+        reason:
+            'SDK reports exit once; a successful retry must rearm its return window.',
+      );
+      expect(f.completed, isEmpty);
       await tester.pumpAndSettle();
       expect(f.popped, hasLength(1));
       expect(f.completed, hasLength(1));
@@ -800,6 +811,7 @@ void main() {
       expect(_eventCount(log, 'training.started'), 1);
       expect(_eventCount(log, 'training.finished'), 1);
       expect(_eventCount(log, 'training.result.save_failed'), 1);
+      expect(TrainingTransitionActivity.instance.active, isFalse);
       expect(tester.takeException(), isNull);
     },
   );

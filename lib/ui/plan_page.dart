@@ -63,6 +63,13 @@ class _PlanPageState extends State<PlanPage> with WidgetsBindingObserver {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    final first = _plan.items.firstOrNull?.exerciseId;
+    final exercise = first == null
+        ? null
+        : AppServices.of(context).library.tryGet(first);
+    if (exercise != null) {
+      unawaited(TrainingTransitionPoster.precache(context, exercise));
+    }
     _measureAfterLayout();
   }
 
@@ -204,9 +211,9 @@ class _PlanPageState extends State<PlanPage> with WidgetsBindingObserver {
     final launchEpoch = _launchEpoch;
     final source = _trainingSource();
     final first = _plan.items.firstOrNull?.exerciseId;
-    if (first != null) {
-      unawaited(TrainingTransitionPoster.precache(context, s.library[first]));
-    }
+    final posterReady = first == null
+        ? Future<void>.value()
+        : TrainingTransitionPoster.precache(context, s.library[first]);
     // Release the preview first, preserving its route and measured image slot.
     setState(() => _previewOn = false);
     await _coordinator.stop();
@@ -237,7 +244,15 @@ class _PlanPageState extends State<PlanPage> with WidgetsBindingObserver {
       });
       return;
     }
-    s.prefetchPlan(_plan);
+    await posterReady;
+    if (!mounted) return;
+    if (launchEpoch != _launchEpoch) {
+      setState(() {
+        _previewOn = true;
+        _starting = false;
+      });
+      return;
+    }
     final route = TrainingRoute<SessionResult>(
       context: context,
       source: source,

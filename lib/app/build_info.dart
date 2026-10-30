@@ -31,5 +31,5 @@ abstract final class AppBuildInfo {
 
   static const sdkRef =
       'ugk_coach / ugk_trainer / ugk_coach_ui @ c97a79a5f03ba1f46f017b995f7f8d97fb3016a9';
-  static const performanceBase = 'd8d6db76fc631f47afbf3740f67d2d00ebfff2f6';
+  static const performanceBase = 'ccdf1b1729ee6365edb3669aaacae320c23bd49f';
 }

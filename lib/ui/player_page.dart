@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:ugk_trainer/ugk_trainer.dart';
+import 'package:ugk_trainer/engine.dart' as trainer;
+import 'package:ugk_coach/ugk_coach.dart' as coach;
 
 import '../app/services.dart';
-import '../domain/exercise.dart' show equipmentLabel;
+import '../app/gated_posehub_media_preparer.dart';
+import '../domain/exercise.dart' show equipmentLabel, ExerciseLibrary;
 import '../domain/plan.dart';
 import '../domain/session.dart' as session;
 import '../diagnostics/training_log.dart';
 import '../voice/just_audio_output.dart' as diagnostic_voice;
+import '../voice/voice_queue.dart' as app_voice show VoiceSettings;
 import 'action_issue_actions.dart';
 import 'alpha_artwork.dart';
 import 'exercise_video.dart';
@@ -35,6 +39,15 @@ class _PlayerPageState extends State<PlayerPage> {
   String? _visibleActionId;
   TrainingTransitionMotion? _motion;
   bool _sessionFinished = false;
+  TrainingPlan? _cachedPlan;
+  coach.TrainingPlan? _trainerPlan;
+  ExerciseLibrary? _cachedLibrary;
+  Map<String, trainer.Rhythm>? _rhythms;
+  app_voice.VoiceSettings? _cachedVoiceSettings;
+  TrainerVoice? _voice;
+  PoseHubMediaPreparer? _mediaPreparer;
+  TrainingTransitionMotion? _preparerMotion;
+  bool _prefetchStarted = false;
 
   @override
   void didChangeDependencies() {
@@ -55,6 +68,14 @@ class _PlayerPageState extends State<PlayerPage> {
   }
 
   void _startLog(AppServices s, TrainingPlan plan) {
+    if (!_prefetchStarted) {
+      _prefetchStarted = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && (_motion == null || _motion!.canPlay)) {
+          s.prefetchPlan(plan);
+        }
+      });
+    }
     _log.start(
       actionCount: plan.items.length,
       voice: s.store.voice.voice,
@@ -107,6 +128,25 @@ class _PlayerPageState extends State<PlayerPage> {
         : null;
     final theme = SmartFitTrainerTheme.of(context);
     final motion = _motion;
+    if (!identical(_cachedPlan, plan)) {
+      _cachedPlan = plan;
+      _trainerPlan = session.trainerPlan(plan);
+    }
+    if (!identical(_cachedLibrary, s.library)) {
+      _cachedLibrary = s.library;
+      _rhythms = session.trainerRhythms(s.library);
+    }
+    if (!identical(_cachedVoiceSettings, s.store.voice)) {
+      _cachedVoiceSettings = s.store.voice;
+      _voice = s.trainerVoice();
+    }
+    if (_mediaPreparer == null || !identical(_preparerMotion, motion)) {
+      _preparerMotion = motion;
+      final preparer = s.poseHubPreparer;
+      _mediaPreparer = preparer == null || motion == null
+          ? preparer
+          : GatedPoseHubMediaPreparer(preparer, motion.startGate);
+    }
     final returningFromCompletion = motion?.exitingFromCompletion == true;
     final stage = returningFromCompletion ? motion?.mediaRect : null;
     final lastExercise = motion?.exercise;
@@ -128,7 +168,7 @@ class _PlayerPageState extends State<PlayerPage> {
           ),
         ],
         TrainerPlayer(
-          plan: session.trainerPlan(plan),
+          plan: _trainerPlan!,
           startMode: TrainerStartMode.training,
           startGate: _motion?.startGate,
           chromeAnimation: _motion?.chrome,
@@ -136,7 +176,7 @@ class _PlayerPageState extends State<PlayerPage> {
               ? null
               : () => motion.exitStarted(fromCompletion: _sessionFinished),
           beforeExitPop: _motion?.beforeExitPop,
-          rhythms: session.trainerRhythms(s.library),
+          rhythms: _rhythms!,
           strings: TrainerStrings.zh(),
           // ResultStage fades with SDK chrome. Let that real completion view
           // reveal the retained poster beneath its scaffold during exit A.
@@ -145,7 +185,7 @@ class _PlayerPageState extends State<PlayerPage> {
               : theme,
           poseHubActionOf: s.poseHubCatalog?.tryGet,
           poseHubMediaBaseUri: s.poseHubMedia?.mediaBaseUri,
-          poseHubMediaPreparer: s.poseHubPreparer,
+          poseHubMediaPreparer: _mediaPreparer,
           drillOf: (id) {
             final e = s.library.tryGet(id);
             if (e == null) return null;
@@ -233,7 +273,7 @@ class _PlayerPageState extends State<PlayerPage> {
               ),
             );
           },
-          voice: s.trainerVoice(),
+          voice: _voice!,
           onFinished: (result) async {
             _motion?.rememberStage();
             _sessionFinished = true;
@@ -301,7 +341,7 @@ class _IssueMotion extends StatelessWidget {
     if (m == null || m.saveFailed) return child;
     return AnimatedBuilder(
       animation: m.chrome,
-      child: child,
+      child: RepaintBoundary(child: child),
       builder: (_, child) {
         final phase = const Interval(
           60 / 280,
@@ -314,8 +354,8 @@ class _IssueMotion extends StatelessWidget {
                 .transform(phase);
         return IgnorePointer(
           ignoring: m.chrome.value < 1,
-          child: Opacity(
-            opacity: t,
+          child: FadeTransition(
+            opacity: AlwaysStoppedAnimation(t),
             child: Transform.translate(
               offset: Offset(0, m.reduced ? 0 : 16 * (1 - t)),
               child: child,

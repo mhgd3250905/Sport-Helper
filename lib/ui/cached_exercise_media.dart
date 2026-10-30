@@ -12,6 +12,7 @@ import '../app/services.dart';
 import '../domain/exercise.dart';
 import 'guide_cached_poster.dart';
 import 'theme.dart';
+import 'training_poster_image.dart';
 
 typedef CachedMediaStatus = ({
   bool loading,
@@ -181,10 +182,7 @@ class _ExerciseFrameZeroState extends State<ExerciseFrameZero> {
       builder: (context, constraints) => _image(
         candidates,
         0,
-        widget.cacheWidth ??
-            (constraints.maxWidth * MediaQuery.devicePixelRatioOf(context))
-                .round()
-                .clamp(1, 0x7fffffff),
+        widget.cacheWidth ?? TrainingPosterImages.decodeWidth(context),
       ),
     );
   }

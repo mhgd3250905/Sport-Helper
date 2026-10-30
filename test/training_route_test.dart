@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smartfit/ui/theme.dart';
 import 'package:smartfit/ui/training_route.dart';
-import 'package:smartfit/ui/training_entry_placeholder.dart';
+import 'package:smartfit/ui/training_poster_flight.dart';
 
 import 'support.dart';
 
@@ -14,6 +14,19 @@ void expectRect(Rect actual, Rect? expected) {
   expect(actual.top, closeTo(expected.top, 1e-4));
   expect(actual.width, closeTo(expected.width, 1e-4));
   expect(actual.height, closeTo(expected.height, 1e-4));
+}
+
+/// The poster's layout stays fixed in +49. Assert its actual transformed clip
+/// in global paint coordinates, keeping the original +48 geometric contract.
+Rect paintedPosterRect(WidgetTester tester, Finder flight) {
+  final clip = find
+      .descendant(of: flight, matching: find.byType(ClipRRect))
+      .first;
+  final box = tester.renderObject<RenderBox>(clip);
+  return MatrixUtils.transformRect(
+    box.getTransformTo(null),
+    Offset.zero & box.size,
+  );
 }
 
 void main() {
@@ -152,15 +165,17 @@ void main() {
               final poster = find.byKey(
                 const ValueKey('training-morph-poster'),
               );
-              expectRect(tester.getRect(poster), original);
+              expectRect(paintedPosterRect(tester, poster), original);
               await tester.pump(const Duration(milliseconds: 210));
               final t = Curves.easeInOutCubicEmphasized.transform(.5);
               expectRect(
-                tester.getRect(poster),
+                paintedPosterRect(tester, poster),
                 Rect.lerp(original, const Rect.fromLTWH(0, 220, 390, 390), t),
               );
               expect(
-                tester.widget<TrainingTransitionPoster>(poster).radius,
+                tester
+                    .widget<TrainingPosterFlight>(poster)
+                    .radiusAt(motion!.entrance.value),
                 closeTo(20 * (1 - t), 1e-6),
               );
               expect(motion!.chrome.value, 0);
@@ -168,7 +183,7 @@ void main() {
               expect(motion!.chrome.value, 0);
               await tester.pump(const Duration(milliseconds: 140));
               expectRect(
-                tester.getRect(poster),
+                paintedPosterRect(tester, poster),
                 const Rect.fromLTWH(0, 220, 390, 390),
               );
               expect(motion!.chrome.value, closeTo(.5, 1e-6));
@@ -231,7 +246,7 @@ void main() {
             } else {
               await tester.pump(const Duration(milliseconds: 190));
               expectRect(
-                tester.getRect(returning),
+                paintedPosterRect(tester, returning),
                 Rect.lerp(
                   const Rect.fromLTWH(0, 220, 390, 390),
                   original,
@@ -239,7 +254,7 @@ void main() {
                 ),
               );
               await tester.pump(const Duration(milliseconds: 190));
-              expectRect(tester.getRect(returning), original);
+              expectRect(paintedPosterRect(tester, returning), original);
               expect(alpha.value, 1);
               expect(visualDone, isFalse);
               await tester.pump(const Duration(milliseconds: 119));

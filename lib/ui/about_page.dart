@@ -10,6 +10,8 @@ import '../app/training_media_config.dart';
 import '../chat/safety_script.dart' show disclaimerText;
 import '../diagnostics/runtime_log.dart';
 import '../diagnostics/frame_recorder.dart';
+import '../diagnostics/training_transition_timings.dart';
+import 'training_transition_timings_page.dart';
 import 'performance_settings.dart';
 import 'action_issue_settings.dart';
 import 'runtime_log_settings.dart';
@@ -306,6 +308,15 @@ class _AboutPageState extends State<AboutPage> {
                     );
                   },
                 ),
+                if (TrainingTransitionTimings.buildEnabled)
+                  SfSettingsRow(
+                    key: const ValueKey('training-transition-timings-open'),
+                    title: '训练进出帧耗时',
+                    icon: Icons.speed_rounded,
+                    chevron: true,
+                    onTap: () =>
+                        _tool('训练进出帧耗时', const TrainingTransitionTimingsPage()),
+                  ),
                 SfSettingsRow(
                   key: const ValueKey('performance-report-open'),
                   title: '导出性能报告',
