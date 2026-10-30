@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:smartfit/app/build_info.dart';
@@ -12,6 +14,24 @@ PackageInfo _package({String version = '0.1.0', String build = '2039'}) =>
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+
+  test('shown SDK identity agrees with declared and resolved Git pins', () {
+    final declared =
+        RegExp(r'''^\s+ref:\s+["']?([0-9a-f]{40})''', multiLine: true)
+            .allMatches(File('pubspec.yaml').readAsStringSync())
+            .map((match) => match.group(1)!)
+            .toList();
+    final resolved =
+        RegExp(r'''^\s+resolved-ref:\s+["']?([0-9a-f]{40})''', multiLine: true)
+            .allMatches(File('pubspec.lock').readAsStringSync())
+            .map((match) => match.group(1)!)
+            .toList();
+    expect(declared, hasLength(4)); // three SDK packages plus coach override
+    expect(resolved, hasLength(3));
+    expect(declared.toSet(), hasLength(1));
+    expect(resolved.toSet(), declared.toSet());
+    expect(AppBuildInfo.sdkRef.split('@').last.trim(), resolved.first);
+  });
 
   test(
     'reads installed package metadata including Android ABI build offset',
