@@ -271,11 +271,15 @@ void main() {
         find.byType(Navigator).first,
       );
       Future<void> push(Widget page) async {
-        unawaited(
-          navigator.push(MaterialPageRoute<void>(builder: (_) => page)),
+        final route = MaterialPageRoute<void>(builder: (_) => page);
+        unawaited(navigator.push(route));
+        await tester.pump();
+        // The trainer now waits for its actual route to finish before mounting
+        // controls/voice. The themed Material route need not last 350ms.
+        await tester.pump(
+          route.transitionDuration + const Duration(milliseconds: 1),
         );
         await tester.pump();
-        await tester.pump(const Duration(milliseconds: 350));
       }
 
       await push(const LibraryPage());
