@@ -4,10 +4,30 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show PlatformException;
 
+import '../app/training_transition_activity.dart';
 import '../core/storage/local_state_storage.dart';
 import '../app/build_info.dart';
 import 'developer_log_sanitizer.dart';
+import 'runtime_log_storage.dart' show runtimeLogStorageKey;
 import 'session_snapshot_archive.dart';
+
+/// A sendable, storage-free request. The sanitizer contains only Dart values;
+/// its credentials are used for redaction and never added to the JSON envelope.
+String encodeRuntimeLogSnapshot(Map<String, Object?> request) {
+  final snapshot = request['snapshot']! as Map<String, Object?>;
+  final sanitizer = request['sanitizer']! as DeveloperLogSanitizer;
+  return jsonEncode({
+    ...snapshot,
+    'events': sanitizer.sanitize(snapshot['events']),
+  });
+}
+
+Future<String> _encodeRuntimeLogInBackground(Map<String, Object?> request) =>
+    compute(
+      encodeRuntimeLogSnapshot,
+      request,
+      debugLabel: 'runtime-log.encode',
+    );
 
 /// Bounded developer diagnostics; detailed chat/tool data uses an explicit API.
 /// Production releases cannot enable this with the debug logging define.
@@ -20,21 +40,24 @@ class RuntimeLog {
     Iterable<String> secrets = const [],
     SessionSnapshotArchive? snapshotArchive,
     DateTime Function()? clock,
+    Future<String> Function(Map<String, Object?>)? encode,
   }) : _clock = clock ?? DateTime.now,
        _sanitizer = DeveloperLogSanitizer(secrets),
+       _encode = encode ?? _encodeRuntimeLogInBackground,
        _snapshotArchive = snapshotArchive ?? createSessionSnapshotArchive();
 
   static const buildEnabled =
       String.fromEnvironment('FLUTTER_APP_FLAVOR') == 'internal' ||
       (kDebugMode && bool.fromEnvironment('SMARTFIT_RUNTIME_LOGS'));
   static RuntimeLog instance = RuntimeLog(enabled: false);
-  static const storageKey = 'smartfit.runtime-log.v1';
+  static const storageKey = runtimeLogStorageKey;
   final bool enabled;
   final int maxEntries;
   final int maxBytes;
   final LocalStateStorage? storage;
   final DateTime Function() _clock;
   final DeveloperLogSanitizer _sanitizer;
+  final Future<String> Function(Map<String, Object?>) _encode;
   final SessionSnapshotArchive _snapshotArchive;
   final _uptime = Stopwatch()..start();
   final List<Map<String, Object?>> _entries = [];
@@ -46,7 +69,9 @@ class RuntimeLog {
   int _bytes = 0;
   int _revision = 0;
   int _savedRevision = 0;
+  int _redactionEpoch = 0;
   Future<void>? _writing;
+  bool _automaticFlushQueued = false;
   bool persistenceFailed = false;
   bool _writeFailureRecorded = false;
 
@@ -223,7 +248,7 @@ class RuntimeLog {
       'fields': _safeFields(fields),
     });
     _revision++;
-    unawaited(flush());
+    _scheduleFlush();
   }
 
   /// This is never shown in the conversation UI and is disabled with the log.
@@ -245,16 +270,17 @@ class RuntimeLog {
       'data': _sanitizer.sanitize(data),
     });
     _revision++;
-    unawaited(flush());
+    _scheduleFlush();
   }
 
   /// Credentials are only used for redaction, never included in output.
   void protectSecret(String secret) {
     if (secret.isEmpty) return;
     _sanitizer.protect(secret);
+    _redactionEpoch++;
     if (enabled) {
       _revision++;
-      unawaited(flush());
+      _scheduleFlush();
     }
   }
 
@@ -290,19 +316,55 @@ class RuntimeLog {
     }
   }
 
-  Map<String, Object?> _snapshot() => {
-    'schema': 1,
-    'app': 'smartfit',
-    'version': AppBuildInfo.version,
-    'versionName': AppBuildInfo.versionName,
-    'buildNumber': AppBuildInfo.buildNumber,
-    'exportedAt': _clock().toUtc().toIso8601String(),
-    'persistenceFailed': persistenceFailed,
-    'retention': {'maxEntries': maxEntries, 'maxBytes': maxBytes, 'maxDays': 7},
-    'events': _sanitizer.sanitize(_entries),
+  Map<String, Object?> _encodingRequest() => {
+    'sanitizer': _sanitizer,
+    'snapshot': <String, Object?>{
+      'schema': 1,
+      'app': 'smartfit',
+      'version': AppBuildInfo.version,
+      'versionName': AppBuildInfo.versionName,
+      'buildNumber': AppBuildInfo.buildNumber,
+      'exportedAt': _clock().toUtc().toIso8601String(),
+      'persistenceFailed': persistenceFailed,
+      'retention': {
+        'maxEntries': maxEntries,
+        'maxBytes': maxBytes,
+        'maxDays': 7,
+      },
+      // Entry maps are private and immutable after append. Copy the list only;
+      // full redaction and JSON encoding belong to the worker isolate.
+      'events': List<Map<String, Object?>>.of(_entries),
+    },
   };
 
-  String exportJson() => jsonEncode(_snapshot());
+  String exportJson() => encodeRuntimeLogSnapshot(_encodingRequest());
+
+  void _scheduleFlush() {
+    if (!enabled ||
+        storage == null ||
+        _writing != null ||
+        _automaticFlushQueued) {
+      return;
+    }
+    _automaticFlushQueued = true;
+    scheduleMicrotask(() async {
+      try {
+        // Do not occupy _writing while waiting: explicit flush/export can
+        // still request a background write during an active transition.
+        do {
+          await TrainingTransitionActivity.instance.waitUntilIdle();
+        } while (TrainingTransitionActivity.instance.active);
+        await flush();
+      } finally {
+        _automaticFlushQueued = false;
+        // A caller may append in a completion callback after _writing clears
+        // but before this continuation resumes. Do not strand that revision.
+        if (_savedRevision != _revision && !persistenceFailed) {
+          _scheduleFlush();
+        }
+      }
+    });
+  }
 
   /// Coalesces bursts and serializes writes so older snapshots never win.
   /// Failed writes retain the in-memory log and can be retried at export/pause.
@@ -315,7 +377,12 @@ class RuntimeLog {
       try {
         while (_savedRevision != _revision) {
           final revision = _revision;
-          await storage!.write(storageKey, exportJson());
+          final redactionEpoch = _redactionEpoch;
+          final encoded = await _encode(_encodingRequest());
+          // A newly registered credential may have appeared in an old event.
+          // Never publish the worker's now-obsolete redaction result.
+          if (redactionEpoch != _redactionEpoch) continue;
+          await storage!.write(storageKey, encoded);
           _savedRevision = revision;
           persistenceFailed = false;
           _writeFailureRecorded = false;

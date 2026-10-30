@@ -23,6 +23,7 @@ import 'package:ugk_trainer/ugk_trainer.dart'
 import 'core/storage/local_state_storage.dart';
 import 'data/app_store.dart';
 import 'diagnostics/runtime_log.dart';
+import 'diagnostics/runtime_log_storage.dart';
 import 'diagnostics/frame_recorder.dart';
 import 'diagnostics/performance_report.dart';
 import 'diagnostics/performance_routes.dart';
@@ -53,7 +54,7 @@ Future<void> main() async {
   final storage = SharedPreferencesLocalStateStorage();
   final log = RuntimeLog.instance = RuntimeLog(
     enabled: RuntimeLog.buildEnabled,
-    storage: storage,
+    storage: createRuntimeLogStorage(legacy: storage),
     secrets: [const String.fromEnvironment('SMARTFIT_AI_TOKEN')],
   );
   await log.initialize();

@@ -1,5 +1,9 @@
 # 对话式主界面
 
+## 当前 +49 关闭流畅度修复（2026-10-30，待最终验证）
+
+本轮处理左上角关闭返回时的RuntimeLog同步CPU阻塞，不改来源页、计划卡、finished插入、滚动、主动画或SDK业务。版本仍+49/2049，三包66dd不变；定位与实现边界见[关闭专项报告](trainer-transition-plus49-close-fix-2026-10-30.md)。新全量、APK和真机after待最终回执，下方843项和32d87c4等历史交付不因此变为新修复已通过；候选不合并/推送main、不打tag，release/1.0不动。
+
 ## 当前 +49 标准滑动候选（2026-10-30）
 
 本轮代码已接入标准水平滑动：进入300ms easeOutCubic，退出280ms easeInCubic，系统移除动画时0ms；版本0.1.0+49 / internal arm64 2049。SDK三包及coach override统一固定 `66dd98a549c1ff5fedecb626a7c88583090a1440`，SDK补充接口已接完。5个逻辑入口为对话计划卡（收起/展开）、我的计划、图文详情、动作库、推荐，全部进入唯一 `openTraining` 并共用同一Navigator锁。动作库/推荐保留SDK预览与启动语义，媒体由宿主转场门禁承接；App所有浏览器调用均传 `onOpenPractice`，继续复用SDK UI。最近10次帧耗时支持复制和系统分享。

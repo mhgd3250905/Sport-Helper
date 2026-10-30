@@ -129,14 +129,21 @@ void main() {
 
   test('writes serialize, coalesce bursts and keep newest event', () async {
     final storage = _Storage()..gate = Completer<void>();
-    final log = RuntimeLog(enabled: true, storage: storage);
+    final log = RuntimeLog(
+      enabled: true,
+      storage: storage,
+      encode: (request) async => encodeRuntimeLogSnapshot(request),
+    );
     log.record('app.start');
+    final writing = log.flush();
+    await Future<void>.delayed(Duration.zero);
+    expect(storage.writes, 1);
     for (var i = 0; i < 50; i++) {
       log.record('ai.progress', fields: {'step': i});
     }
     expect(storage.writes, 1);
     storage.gate!.complete();
-    await log.flush();
+    await writing;
     expect(storage.writes, 2);
     expect(
       (jsonDecode(storage.value!)['events'] as List).last['fields']['step'],

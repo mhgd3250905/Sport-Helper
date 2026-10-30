@@ -1,5 +1,9 @@
 # 智能健身助手 SmartFit
 
+## 当前 +49 关闭流畅度修复（2026-10-30，待最终验证）
+
+开哥已反馈标准滑动整体效果不错，但左上角关闭返回仍不流畅。真机CPU证据定位到App RuntimeLog；本轮只修日志热路径，保持+49/2049、SDK三包66dd、动画、路由与业务保存。新全量、APK和真机after待独立验证，见[关闭专项报告](docs/trainer-transition-plus49-close-fix-2026-10-30.md)。下方843项、旧APK和32d87c4记录保留原时点事实，不代表新修复已通过；候选不合并、不推送main、不打tag，release/1.0不动。
+
 ## 当前 +49 标准滑动候选（2026-10-30）
 
 本轮代码已接入标准水平滑动：进入300ms easeOutCubic，退出280ms easeInCubic，系统移除动画时0ms；版本0.1.0+49 / internal arm64 2049。SDK三包及coach override统一固定 `66dd98a549c1ff5fedecb626a7c88583090a1440`，SDK补充接口已接完。5个逻辑入口为对话计划卡（收起/展开）、我的计划、图文详情、动作库、推荐，全部进入唯一 `openTraining` 并共用同一Navigator锁。动作库/推荐保留SDK预览与启动语义，媒体由宿主转场门禁承接；App所有浏览器调用均传 `onOpenPractice`，继续复用SDK UI。最近10次帧耗时支持复制和系统分享。
