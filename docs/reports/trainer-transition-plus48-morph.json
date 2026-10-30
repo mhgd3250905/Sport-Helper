@@ -116,5 +116,9 @@
   "releaseBranchChanged": false,
   "sdkSourceChanged": false,
   "docsOnlyFinalReceipt": "E:\\AII-3D\\3D-Sport-AI\\deliveries\\trainer-transition-plus48-morph\\final-closeout.json",
-  "report": "docs/trainer-transition-plus48-morph-2026-10-30.md"
+  "report": "docs/trainer-transition-plus48-morph-2026-10-30.md",
+  "historical": true,
+  "designPhoneConfirmed": true,
+  "performancePhoneFeedback": "visible motion jank",
+  "supersededBy": "trainer-transition-plus49-performance.json"
 }
