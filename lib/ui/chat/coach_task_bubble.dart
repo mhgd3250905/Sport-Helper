@@ -47,6 +47,8 @@ class _CoachTaskBubbleState extends State<CoachTaskBubble>
   late final AnimationController _coreCollapse;
   late final AnimationController _completion;
   late final AnimationController _band;
+  late final AnimationController _check;
+  late final AnimationController _reveal;
   bool? _reduced;
   bool _tickersEnabled = true;
   bool _showingComplete = false;
@@ -94,6 +96,16 @@ class _CoachTaskBubbleState extends State<CoachTaskBubble>
     _band = AnimationController(
       vsync: this,
       duration: SfGenerationTokens.progressBand,
+    );
+    _check = AnimationController(
+      vsync: this,
+      duration: SfGenerationTokens.checkTransition,
+    );
+    _reveal = AnimationController(
+      vsync: this,
+      duration:
+          SfGenerationTokens.silhouetteRevealDelay +
+          SfGenerationTokens.silhouetteFade,
     );
   }
 
@@ -170,16 +182,24 @@ class _CoachTaskBubbleState extends State<CoachTaskBubble>
     if (_motionOff) {
       _completion.stop();
       _completion.value = complete ? 1 : 0;
+      _check.stop();
+      _check.value = complete ? 1 : 0;
     } else if (complete) {
-      if (!_showingComplete) _completion.forward(from: 0);
+      if (!_showingComplete) {
+        _completion.forward(from: 0);
+        _check.forward(from: 0);
+      }
     } else {
       _completion.stop();
       _completion.value = 0;
+      _check.stop();
+      _check.value = 0;
     }
     _showingComplete = complete;
 
-    // The ring keeps rotating during its 240 ms closing sweep only.
-    if (animate || (!_motionOff && complete && _completion.value < 1)) {
+    // Prototype pauses the spin the moment it completes; the ring closes in
+    // place.
+    if (animate) {
       if (!_rotation.isAnimating) _rotation.repeat();
     } else {
       _rotation.stop();
@@ -211,13 +231,18 @@ class _CoachTaskBubbleState extends State<CoachTaskBubble>
     if (_selected.isEmpty) {
       _coreCollapse.stop();
       _coreCollapse.value = 0;
+      _reveal.stop();
+      _reveal.value = 0;
     } else if (animate) {
       if (!_coreCollapse.isAnimating && !_coreCollapse.isCompleted) {
         _coreCollapse.forward();
       }
+      if (!_reveal.isAnimating && !_reveal.isCompleted) _reveal.forward();
     } else {
       _coreCollapse.stop();
       _coreCollapse.value = 1;
+      _reveal.stop();
+      _reveal.value = 1;
     }
     _syncProgress(restart: restartProgress);
   }
@@ -290,6 +315,8 @@ class _CoachTaskBubbleState extends State<CoachTaskBubble>
     _coreCollapse.dispose();
     _completion.dispose();
     _band.dispose();
+    _check.dispose();
+    _reveal.dispose();
     super.dispose();
   }
 
@@ -302,98 +329,153 @@ class _CoachTaskBubbleState extends State<CoachTaskBubble>
         ? '为你准备 · ${scene.label}${goal.label}'
         : '正在想怎么练';
     final staticDetails = _motionOff || _visualComplete || !widget.waiting;
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(
-          maxWidth: SfGenerationTokens.maxWidth,
-        ),
-        child: SizedBox(
-          key: const ValueKey('generation-completion-size'),
-          child: Container(
-            key: const ValueKey('generation-card'),
-            padding: SfGenerationTokens.cardPadding,
-            clipBehavior: Clip.antiAlias,
-            decoration: BoxDecoration(
-              color: SfColors.surface,
-              borderRadius: BorderRadius.circular(
-                SfGenerationTokens.cardRadius,
+    // Isolate the card's endless animations from the chat list's raster.
+    return RepaintBoundary(
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            maxWidth: SfGenerationTokens.maxWidth,
+          ),
+          child: SizedBox(
+            key: const ValueKey('generation-completion-size'),
+            child: Container(
+              key: const ValueKey('generation-card'),
+              padding: SfGenerationTokens.cardPadding,
+              clipBehavior: Clip.antiAlias,
+              decoration: BoxDecoration(
+                color: SfColors.surface,
+                borderRadius: BorderRadius.circular(
+                  SfGenerationTokens.cardRadius,
+                ),
+                boxShadow: SfGenerationTokens.cardShadow,
               ),
-              boxShadow: SfGenerationTokens.cardShadow,
-            ),
-            // A foreground outline does not add half a pixel to the padding.
-            foregroundDecoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(
-                SfGenerationTokens.cardRadius,
+              // A foreground outline does not add half a pixel to the padding.
+              foregroundDecoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(
+                  SfGenerationTokens.cardRadius,
+                ),
+                border: Border.all(
+                  color: SfGenerationTokens.cardEdge,
+                  width: SfGenerationTokens.cardEdgeWidth,
+                ),
               ),
-              border: Border.all(
-                color: SfGenerationTokens.cardEdge,
-                width: SfGenerationTokens.cardEdgeWidth,
-              ),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    _animation(),
-                    const SizedBox(width: SfGenerationTokens.animationGap),
-                    Expanded(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Text(
-                            title,
-                            style: SfGenerationTokens.title,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  // Card-level glow centred on the orb: 320 px radial, clipped
+                  // by the card, painted once (outside the orb's repaint).
+                  Positioned(
+                    left:
+                        SfGenerationTokens.animationSize / 2 -
+                        SfGenerationTokens.glowRadius,
+                    top:
+                        SfGenerationTokens.animationSize / 2 -
+                        SfGenerationTokens.glowRadius,
+                    width: SfGenerationTokens.glowRadius * 2,
+                    height: SfGenerationTokens.glowRadius * 2,
+                    child: IgnorePointer(
+                      child: DecoratedBox(
+                        key: const ValueKey('generation-glow'),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: RadialGradient(
+                            colors: [
+                              SfGenerationTokens.glow,
+                              SfColors.accent.withValues(alpha: 0),
+                            ],
                           ),
-                          const SizedBox(height: SfGenerationTokens.statusGap),
-                          _StatusSentence(
-                            text: _status,
-                            shimmer: _shine,
-                            reduced: staticDetails,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          RepaintBoundary(child: _animation()),
+                          const SizedBox(
+                            width: SfGenerationTokens.animationGap,
+                          ),
+                          Expanded(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Text(
+                                  title,
+                                  style: SfGenerationTokens.title,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(
+                                  height: SfGenerationTokens.statusGap,
+                                ),
+                                RepaintBoundary(
+                                  child: _StatusSentence(
+                                    text: _status,
+                                    shimmer: _shine,
+                                    reduced: staticDetails,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(
+                            width: SfGenerationTokens.animationGap,
+                          ),
+                          // Prototype: 44 px target with margin-right -10 px, so it
+                          // overhangs the card padding and the title keeps 10 px.
+                          SizedBox(
+                            width:
+                                SfGenerationTokens.cancelTouchSize -
+                                SfGenerationTokens.cancelOutset,
+                            height: SfGenerationTokens.cancelTouchSize,
+                            child: OverflowBox(
+                              alignment: Alignment.centerLeft,
+                              minWidth: SfGenerationTokens.cancelTouchSize,
+                              maxWidth: SfGenerationTokens.cancelTouchSize,
+                              child: SizedBox.square(
+                                key: const ValueKey('generation-cancel-target'),
+                                dimension: SfGenerationTokens.cancelTouchSize,
+                                child:
+                                    widget.waiting &&
+                                        !_visualComplete &&
+                                        widget.onCancel != null
+                                    ? _CancelButton(onCancel: widget.onCancel!)
+                                    : null,
+                              ),
+                            ),
                           ),
                         ],
                       ),
-                    ),
-                    const SizedBox(width: SfGenerationTokens.animationGap),
-                    SizedBox.square(
-                      key: const ValueKey('generation-cancel-target'),
-                      dimension: SfGenerationTokens.cancelTouchSize,
-                      child:
-                          widget.waiting &&
-                              !_visualComplete &&
-                              widget.onCancel != null
-                          ? _CancelButton(onCancel: widget.onCancel!)
-                          : null,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: SfGenerationTokens.progressTopGap),
-                _progressBar(),
-                if (chips.isNotEmpty) ...[
-                  const SizedBox(height: SfGenerationTokens.chipsTopGap),
-                  Wrap(
-                    spacing: SfGenerationTokens.chipGap,
-                    runSpacing: SfGenerationTokens.chipGap,
-                    children: [
-                      for (var index = 0; index < chips.length; index++)
-                        _ParameterChip(
-                          key: ValueKey(
-                            'generation-chip-${chips[index].field}-'
-                            '${chips[index].label}-${chips[index].user}',
-                          ),
-                          data: chips[index],
-                          index: index,
-                          reduced: staticDetails,
+                      const SizedBox(height: SfGenerationTokens.progressTopGap),
+                      RepaintBoundary(child: _progressBar()),
+                      if (chips.isNotEmpty) ...[
+                        const SizedBox(height: SfGenerationTokens.chipsTopGap),
+                        Wrap(
+                          spacing: SfGenerationTokens.chipGap,
+                          runSpacing: SfGenerationTokens.chipGap,
+                          children: [
+                            for (var index = 0; index < chips.length; index++)
+                              _ParameterChip(
+                                key: ValueKey(
+                                  'generation-chip-${chips[index].field}-'
+                                  '${chips[index].label}-${chips[index].user}',
+                                ),
+                                data: chips[index],
+                                index: index,
+                                reduced: staticDetails,
+                              ),
+                          ],
                         ),
+                      ],
                     ],
                   ),
                 ],
-              ],
+              ),
             ),
           ),
         ),
@@ -408,30 +490,6 @@ class _CoachTaskBubbleState extends State<CoachTaskBubble>
       clipBehavior: Clip.none,
       alignment: Alignment.center,
       children: [
-        Positioned(
-          left:
-              SfGenerationTokens.animationSize / 2 -
-              SfGenerationTokens.glowRadius,
-          top:
-              SfGenerationTokens.animationSize / 2 -
-              SfGenerationTokens.glowRadius,
-          width: SfGenerationTokens.glowRadius * 2,
-          height: SfGenerationTokens.glowRadius * 2,
-          child: IgnorePointer(
-            child: DecoratedBox(
-              key: const ValueKey('generation-glow'),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  colors: [
-                    SfGenerationTokens.glow,
-                    SfColors.accent.withValues(alpha: 0),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
         Positioned.fill(
           child: DecoratedBox(
             decoration: BoxDecoration(
@@ -475,12 +533,14 @@ class _CoachTaskBubbleState extends State<CoachTaskBubble>
             _coreCollapse,
             _images,
             _completion,
+            _check,
+            _reveal,
           ]),
           builder: (context, _) {
             final selected = _selected;
             final breath = _motionOff
                 ? 1.0
-                : Curves.easeInOutSine.transform(_breath.value);
+                : SfGenerationTokens.sine.transform(_breath.value);
             final collapse = Curves.easeInCubic.transform(_coreCollapse.value);
             final coreScale =
                 (SfGenerationTokens.breathInitialScale +
@@ -534,17 +594,16 @@ class _CoachTaskBubbleState extends State<CoachTaskBubble>
                 if (_visualComplete)
                   Center(
                     child: Opacity(
-                      opacity: _completionDetail,
+                      opacity: _checkOpacity,
                       child: Transform.scale(
                         scale:
                             SfGenerationTokens.checkInitialScale +
                             (1 - SfGenerationTokens.checkInitialScale) *
-                                Curves.easeOutBack.transform(_completion.value),
-                        child: Icon(
-                          Icons.check_rounded,
+                                SfGenerationTokens.back.transform(_check.value),
+                        child: CustomPaint(
                           key: const ValueKey('generation-check'),
-                          size: SfGenerationTokens.checkSize,
-                          color: SfColors.accent,
+                          size: const Size.square(SfGenerationTokens.checkSize),
+                          painter: _CheckPainter(color: SfColors.accent),
                         ),
                       ),
                     ),
@@ -556,6 +615,27 @@ class _CoachTaskBubbleState extends State<CoachTaskBubble>
       ],
     ),
   );
+
+  // Opacity runs 120 ms linear inside the 260 ms scale (prototype .check).
+  double get _checkOpacity =>
+      (_check.value *
+              SfGenerationTokens.checkTransition.inMicroseconds /
+              SfGenerationTokens.checkFade.inMicroseconds)
+          .clamp(0.0, 1.0);
+
+  /// First silhouette: 180 ms wait, then 250 ms fade (linear) and .94 -> 1
+  /// scale (ease-out). Later images use the crossfade below.
+  double get _revealProgress {
+    final elapsed =
+        _reveal.value *
+        (SfGenerationTokens.silhouetteRevealDelay +
+                SfGenerationTokens.silhouetteFade)
+            .inMicroseconds;
+    return ((elapsed -
+                SfGenerationTokens.silhouetteRevealDelay.inMicroseconds) /
+            SfGenerationTokens.silhouetteFade.inMicroseconds)
+        .clamp(0.0, 1.0);
+  }
 
   double get _completionDetail =>
       (_completion.value *
@@ -578,12 +658,25 @@ class _CoachTaskBubbleState extends State<CoachTaskBubble>
       key: const ValueKey('generation-thumbnails'),
       padding: const EdgeInsets.all(SfGenerationTokens.thumbnailInset),
       child: Opacity(
-        opacity: 1 - _completionDetail,
+        opacity: (1 - _completionDetail) * _revealProgress,
         child: ClipOval(
           child: Stack(
             fit: StackFit.expand,
             children: [
-              Opacity(opacity: 1 - blend, child: _thumbnail(selected[current])),
+              Opacity(
+                opacity: 1 - blend,
+                child: Transform.scale(
+                  // Outgoing image eases back to .94 while fading (prototype
+                  // drops .show, reversing both transitions).
+                  scale:
+                      1 -
+                      (1 - SfGenerationTokens.imageInitialScale) *
+                          Curves.easeOutCubic.transform(blend) -
+                      (1 - SfGenerationTokens.imageInitialScale) *
+                          (1 - Curves.easeOutCubic.transform(_revealProgress)),
+                  child: _thumbnail(selected[current]),
+                ),
+              ),
               if (blend > 0)
                 Opacity(
                   opacity: blend,
@@ -666,7 +759,7 @@ class _CoachTaskBubbleState extends State<CoachTaskBubble>
                                     (1 +
                                             SfGenerationTokens
                                                 .progressBandFraction) *
-                                        Curves.easeInOutSine.transform(
+                                        SfGenerationTokens.sine.transform(
                                           _band.value,
                                         )),
                             top: 0,
@@ -824,6 +917,34 @@ class _ArcPainter extends CustomPainter {
       oldDelegate.headAlpha != headAlpha;
 }
 
+/// Prototype check: 20x20 viewBox, path M5 10.5 l3.2 3.2 L15 6.8,
+/// stroke 2.4, round caps and joins. Not a font glyph.
+class _CheckPainter extends CustomPainter {
+  const _CheckPainter({required this.color});
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final unit = size.width / 20;
+    final path = Path()
+      ..moveTo(5 * unit, 10.5 * unit)
+      ..lineTo(8.2 * unit, 13.7 * unit)
+      ..lineTo(15 * unit, 6.8 * unit);
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = color
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = SfGenerationTokens.checkStroke * unit
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round,
+    );
+  }
+
+  @override
+  bool shouldRepaint(_CheckPainter oldDelegate) => oldDelegate.color != color;
+}
+
 class _CancelButton extends StatefulWidget {
   const _CancelButton({required this.onCancel});
   final VoidCallback onCancel;
@@ -936,17 +1057,27 @@ class _StatusSentenceState extends State<_StatusSentence>
                 );
                 if (widget.reduced) return sentence;
                 return ShaderMask(
-                  shaderCallback: (bounds) => LinearGradient(
-                    colors: [
-                      SfColors.muted,
-                      SfColors.muted,
-                      SfGenerationTokens.highlight,
-                      SfColors.muted,
-                      SfColors.muted,
-                    ],
-                    stops: SfGenerationTokens.shimmerStops,
-                    transform: _ShimmerSlide(widget.shimmer.value),
-                  ).createShader(bounds),
+                  shaderCallback: (bounds) {
+                    // CSS: background-size 250%, background-position 100% ->
+                    // -150%. Offset = (W - 2.5W) * p, so the band travels left
+                    // to right and leaves a dark gap between passes.
+                    final width = bounds.width;
+                    const span = SfGenerationTokens.shimmerSpan;
+                    final p = 1 + (-1.5 - 1) * widget.shimmer.value;
+                    final left = (width - span * width) * p;
+                    return LinearGradient(
+                      colors: [
+                        SfColors.muted,
+                        SfColors.muted,
+                        SfGenerationTokens.highlight,
+                        SfColors.muted,
+                        SfColors.muted,
+                      ],
+                      stops: SfGenerationTokens.shimmerStops,
+                    ).createShader(
+                      Rect.fromLTWH(left, 0, span * width, bounds.height),
+                    );
+                  },
                   blendMode: BlendMode.srcIn,
                   child: sentence,
                 );
@@ -1003,15 +1134,6 @@ class _StatusSentenceState extends State<_StatusSentence>
       ),
     );
   }
-}
-
-class _ShimmerSlide extends GradientTransform {
-  const _ShimmerSlide(this.value);
-  final double value;
-
-  @override
-  Matrix4 transform(Rect bounds, {TextDirection? textDirection}) =>
-      Matrix4.translationValues(bounds.width * (1 - 2 * value), 0, 0);
 }
 
 class _ParameterChip extends StatefulWidget {
