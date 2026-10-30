@@ -130,6 +130,7 @@ void main() {
       c.startSafetyCheck();
       expect(await c.started(p), isFalse);
       expect(store.lastPlan, isNull);
+      await c.flushPersistence();
 
       final reloaded = AppStore(mem);
       await reloaded.load();
