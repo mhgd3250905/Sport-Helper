@@ -27,3 +27,27 @@ Flutter 的 Hero 首帧会在 `offstage` 布局期间临时将路由 animation �
 用户已确认本机没有真机，接受远程安装后反馈。因此本轮进出各五次的 UI/Raster 最大帧耗时 **待真机采集**，没有填入桌面、模拟器或合成帧数据。profile 包通过现有性能报告导出实际 FrameTiming，路由自动标记 `trainingRouteEntry` / `trainingRouteExit`，目标为两线程最大值均 ≤16ms，超出须按原始值回报。构建和软件回归不能替代这一验收。
 
 main、release 分支和 SDK 的最后观察由外部保护范围回执记录。候选完成不自动视作真机通过或获准合并。
+
+## 最终软件验证与产物
+
+实现与测试源码 **`c0a0fc0bf26a4955cc1bfe4e7f943e1a487594db`**。全量 **773/773、0 跳过、0 失败**，`flutter analyze --no-pub` **0 问题**；使用实际 SDK 652135f 的官方目录、交付开关和真实匿名 HTTPS 媒体冒烟。严格锁解析通过，非 SDK 依赖没有变化。日志和 `tests-source-binding.json` 保留精确输入与 SHA。
+
+| 模式 | arm64 APK | 字节数 | SHA-256 |
+| --- | --- | ---: | --- |
+| release / 2048 | `E:\AII-3D\3D-Sport-AI\deliveries\trainer-transition-plus48\SmartFit-trainer-transition-0.1.0+48-c0a0fc0-internal-arm64-v8a-release.apk` | 42,602,114 | `c97397beb7c7338350a3a5e79d941d73bba8935fa82512817914cc873767fe8d` |
+| profile / 2048 | `E:\AII-3D\3D-Sport-AI\deliveries\trainer-transition-plus48\SmartFit-trainer-transition-0.1.0+48-c0a0fc0-internal-arm64-v8a-profile.apk` | 53,506,134 | `3503faeea6ed7d364234fec27371793db08955f999d348ed8e40b7e2c6e8938c` |
+
+两包证书 SHA-256 相同：`3761270a4764157f0e389014a9e5b800b05403bfddce0f4f7f8c039f6a53bdc7`；ZIP/ELF 16KB、存储 JNI、无 MP4、保留 1,737 份静态/音频以及原 Noto 字节检查通过。release 比 +47 增加 4,008B，仍低于 45,000,000B。profile 使用独立的引擎与 VM 服务资源，不按 release 体积衡量；其实际 debuggable=true。
+
+profile 首轮编译已成功，外部校验曾误套 release 的四库集合。现按模式精确核对：release 四库；profile 五库，额外 `libvmservice_snapshot.so` 逐字核对固定 Flutter 引擎的官方 Gradle artifact→merged，以及 AGP stripped→APK 来源链。原失败诊断保留在 `profile-gate-r1-c0a0fc0/`，恢复只重做检查和复制，没有重编或改写 APK，前后 SHA 相同。来源回执为 `profile-vmservice-origin.json`。首次全量的旧系统栏固定 350ms 等待失败也保留在 `full-checks-r1-dcd7fcc/`；按实际路由完成等待修正后，773 项全量重跑通过。
+
+本次收束提交 **只更新 README.md/docs/**，APK 和测试的源码始终为上述实现提交，不将后续文档提交改称编译源码。候选分支完整最终 HEAD 由交付目录 `candidate-closeout.json` 记录；两包独立检查分别写入 `validation-release.json` 与 `validation-profile.json`。Git 内精确台账见 [reports/trainer-transition-plus48.json](reports/trainer-transition-plus48.json)。
+
+| 真机采集项 | 要求 | 本轮实际结果 |
+| --- | --- | --- |
+| 进入过渡 | 5 次，UI/Raster 最大值各 ≤16ms | 待远程真机回传，未采样 |
+| 退出过渡 | 5 次，UI/Raster 最大值各 ≤16ms | 待远程真机回传，未采样 |
+
+远程步骤见交付目录 `REMOTE-DEVICE-CHECK.md`：先用 release 核对体验；再用 profile 通过现有“设置→性能报告”保留原始 JSON，分别核对 `trainingRouteEntry` / `trainingRouteExit` 的 `uiBuild.maxUs` 与 `raster.maxUs`（除以 1000 为 ms）。不以 P99 代替最大值，不丢弃第一遍进入或超时帧。
+
+**候选保留未合并、未推送，等待开哥真机明确同意。** main 保持 `d8d6db76fc631f47afbf3740f67d2d00ebfff2f6`，release/1.0 与 SDK 源码不动，没有 tag 或设备操作。软件验证不是手机播放、物理释放时延或保留数据安装的验收。

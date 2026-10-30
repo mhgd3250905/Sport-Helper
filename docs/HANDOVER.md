@@ -4,6 +4,8 @@
 
 本候选为 **0.1.0+48 / internal arm64 2048**，分支 `codex/trainer-transition`，基于 +47 main `d8d6db76fc631f47afbf3740f67d2d00ebfff2f6`。SDK 三包及 override 升级并锁定 `652135f532bac1a06fbf133dc497692d6b44c78a`。进入/退出为 320/260ms，进入结束前不启动训练计时、语音或视频；提前结束保存和回退由新版 SDK 管理。最终源码、测试、构建与真机待验边界见[+48 记录](trainer-transition-plus48-2026-10-30.md)。**等待开哥真机确认后再合入并推送 main**；release/1.0 和 SDK 源码不动，不打 tag。
 
+全量 **773/773、0 跳过/失败**，`flutter analyze` **0 问题**。release **42,602,114B（42.60MB）**、profile **53,506,134B（53.51MB）**，同签名、ZIP/ELF 16KB、存储 JNI、原 Noto 和无 MP4 门禁通过。APK/测试源码固定 `c0a0fc0bf26a4955cc1bfe4e7f943e1a487594db`，其后仅 README/docs 收束；真机 UI/Raster 最大帧耗时待远程采集。
+
 下方 +47 是已合入 main 的基线记录，不代表本候选已经合并。
 
 ## 当前 +47 主线整合（2026-10-30）

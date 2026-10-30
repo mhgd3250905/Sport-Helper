@@ -1,0 +1,146 @@
+{
+  "schema": "smartfit-trainer-transition-plus48-public-ledger@1",
+  "version": "0.1.0+48",
+  "nativeVersionCode": 2048,
+  "branch": "codex/trainer-transition",
+  "baseMain": "d8d6db76fc631f47afbf3740f67d2d00ebfff2f6",
+  "artifactAndTestSource": "c0a0fc0bf26a4955cc1bfe4e7f943e1a487594db",
+  "sourceIdentity": {
+    "algorithm": "smartfit-android-public-inputs-v1",
+    "head": "c0a0fc0bf26a4955cc1bfe4e7f943e1a487594db",
+    "sourceFingerprint": "f2209a1cb4349711f9ec06f8184b83a59e858f90d6a8e1f039a0cfd593b513ac",
+    "inputCount": 2702
+  },
+  "publicInputsIdentity": {
+    "algorithm": "smartfit-android-public-files-v1",
+    "sha256": "e6fbad242a9825516f36246dbce57f0d4a9446d9637231bd2ec46f48723d7ef1",
+    "inputCount": 2702
+  },
+  "sdk": {
+    "ugk_coach": {
+      "version": "0.8.0",
+      "ref": "652135f532bac1a06fbf133dc497692d6b44c78a",
+      "commit": "652135f532bac1a06fbf133dc497692d6b44c78a",
+      "temporary": false
+    },
+    "ugk_coach_ui": {
+      "version": "0.4.0",
+      "ref": "652135f532bac1a06fbf133dc497692d6b44c78a",
+      "commit": "652135f532bac1a06fbf133dc497692d6b44c78a",
+      "temporary": false
+    },
+    "ugk_trainer": {
+      "version": "0.6.0",
+      "ref": "652135f532bac1a06fbf133dc497692d6b44c78a",
+      "commit": "652135f532bac1a06fbf133dc497692d6b44c78a",
+      "temporary": false
+    }
+  },
+  "onlySdkCommitLockDelta": true,
+  "nonSdkDependenciesUnchanged": true,
+  "tests": {
+    "passed": 773,
+    "skipped": 0,
+    "failed": 0
+  },
+  "analysisIssues": 0,
+  "testLogSha256": "b34fd1f43fe676c3c0471d2b18df99f3e61f501af3d67d0e8f26c946254b0f4d",
+  "analyzeLogSha256": "5da320bfae05ab85e3124cc9ac55125287577cd7ff9bf0f07fb50354e44f27e1",
+  "artifacts": {
+    "release": {
+      "apk": "E:\\AII-3D\\3D-Sport-AI\\deliveries\\trainer-transition-plus48\\SmartFit-trainer-transition-0.1.0+48-c0a0fc0-internal-arm64-v8a-release.apk",
+      "bytes": 42602114,
+      "sha256": "c97397beb7c7338350a3a5e79d941d73bba8935fa82512817914cc873767fe8d",
+      "versionCode": 2048,
+      "signerCertificateSha256": "3761270a4764157f0e389014a9e5b800b05403bfddce0f4f7f8c039f6a53bdc7",
+      "sameSigningCertificate": true,
+      "compiledPublicIdentityVerified": true,
+      "nativeElf16KBPassed": true,
+      "zipalign16KBPassed": true,
+      "storageJniPassed": true,
+      "noMp4InZipOrAssetManifest": true,
+      "bundledNotoPreserved": true,
+      "applicationDebuggable": false,
+      "nativeLibraries": [
+        "lib/arm64-v8a/libapp.so",
+        "lib/arm64-v8a/libdartjni.so",
+        "lib/arm64-v8a/libdatastore_shared_counter.so",
+        "lib/arm64-v8a/libflutter.so"
+      ]
+    },
+    "profile": {
+      "apk": "E:\\AII-3D\\3D-Sport-AI\\deliveries\\trainer-transition-plus48\\SmartFit-trainer-transition-0.1.0+48-c0a0fc0-internal-arm64-v8a-profile.apk",
+      "bytes": 53506134,
+      "sha256": "3503faeea6ed7d364234fec27371793db08955f999d348ed8e40b7e2c6e8938c",
+      "versionCode": 2048,
+      "signerCertificateSha256": "3761270a4764157f0e389014a9e5b800b05403bfddce0f4f7f8c039f6a53bdc7",
+      "sameSigningCertificate": true,
+      "compiledPublicIdentityVerified": true,
+      "nativeElf16KBPassed": true,
+      "zipalign16KBPassed": true,
+      "storageJniPassed": true,
+      "noMp4InZipOrAssetManifest": true,
+      "bundledNotoPreserved": true,
+      "applicationDebuggable": true,
+      "nativeLibraries": [
+        "lib/arm64-v8a/libapp.so",
+        "lib/arm64-v8a/libdartjni.so",
+        "lib/arm64-v8a/libdatastore_shared_counter.so",
+        "lib/arm64-v8a/libflutter.so",
+        "lib/arm64-v8a/libvmservice_snapshot.so"
+      ]
+    }
+  },
+  "profileRecoveryWithoutRebuild": {
+    "recoveredWithoutRebuild": true,
+    "originalSource": "c0a0fc0bf26a4955cc1bfe4e7f943e1a487594db",
+    "originalApkBytes": 53506134,
+    "originalApkSha256": "3503faeea6ed7d364234fec27371793db08955f999d348ed8e40b7e2c6e8938c",
+    "failedAttemptDirectory": "E:\\AII-3D\\3D-Sport-AI\\deliveries\\trainer-transition-plus48\\profile-gate-r1-c0a0fc0",
+    "archivedBuildLogSha256": "252d32cb63827a1a2cd4560dc451073b8696f8d9c0591b4f4df3aa92a3148e42",
+    "releaseReceiptSha256": "81abc2fcd87fae572c74b47bfd79ec71d50663c005655af7c8b4f0e9082975c8",
+    "flutterOrGradleInvokedDuringRecovery": false
+  },
+  "transition": {
+    "enterMs": 320,
+    "exitMs": 260,
+    "slideFraction": 0.06,
+    "entryOpacityInterval": [
+      0,
+      0.7
+    ],
+    "reducedMotionDurationsMs": [
+      0,
+      0
+    ],
+    "trainerAndMediaWaitForActualOnstageCompletion": true,
+    "finishedMessageWaitsForRouteOverlayRemoval": true
+  },
+  "physicalAcceptance": {
+    "status": "awaiting_remote_phone_feedback",
+    "localAdbDevices": 0,
+    "requiredEntryRuns": 5,
+    "requiredExitRuns": 5,
+    "entryUiMaxMs": null,
+    "entryRasterMaxMs": null,
+    "exitUiMaxMs": null,
+    "exitRasterMaxMs": null,
+    "maximumPerThreadMs": 16,
+    "measurementsPerformed": false,
+    "userAcceptedRemoteInstallFeedback": true
+  },
+  "publication": {
+    "mergedToMain": false,
+    "mainPushed": false,
+    "tagCreated": false,
+    "waitForKaiPhoneApproval": true,
+    "mainHeldAt": "d8d6db76fc631f47afbf3740f67d2d00ebfff2f6",
+    "closeoutShaReceipt": "candidate-closeout.json"
+  },
+  "evidenceDirectory": "E:\\AII-3D\\3D-Sport-AI\\deliveries\\trainer-transition-plus48",
+  "verificationReceipts": [
+    "validation-release.json",
+    "validation-profile.json"
+  ],
+  "remoteDeviceInstructions": "REMOTE-DEVICE-CHECK.md"
+}
