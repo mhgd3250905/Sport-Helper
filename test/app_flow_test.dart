@@ -63,9 +63,10 @@ AppServices services({VoiceOutput output = const MutedVoiceOutput()}) {
 Future<void> warmTrainingPoster(
   WidgetTester tester,
   AppServices s,
-  TrainingPlan plan,
-) async {
-  final context = tester.element(find.byType(ChatHomePage));
+  TrainingPlan plan, {
+  BuildContext? sourceContext,
+}) async {
+  final context = sourceContext ?? tester.element(find.byType(ChatHomePage));
   var ready = false;
   unawaited(
     TrainingTransitionPoster.precache(

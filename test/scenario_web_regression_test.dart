@@ -10,6 +10,7 @@ import 'package:smartfit/voice/voice_library.dart';
 import 'package:smartfit/voice/voice_queue.dart';
 
 import 'support.dart';
+import 'app_flow_test.dart' show widgetFixtureStateEncoder;
 
 class _MemoryStorage implements LocalStateStorage {
   final _data = <String, String>{};
@@ -51,7 +52,10 @@ void main() {
     final services = AppServices(
       library: loadLibrary(),
       catalog: loadCatalog(),
-      store: AppStore(_MemoryStorage()),
+      store: AppStore(
+        _MemoryStorage(),
+        stateEncoder: widgetFixtureStateEncoder,
+      ),
       voiceLibrary: VoiceLibrary.empty,
       voiceOutput: const MutedVoiceOutput(),
     );

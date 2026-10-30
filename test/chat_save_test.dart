@@ -104,6 +104,7 @@ void main() {
     for (var i = 0; i < 40; i++) {
       await c.send('讲个笑话');
     }
+    await c.flushPersistence();
     expect(store.chatLog.length, AppStore.chatLogLimit);
   });
 

@@ -8,7 +8,8 @@ import 'package:smartfit/ui/player_page.dart';
 import 'package:smartfit/ui/guide_media.dart';
 import 'package:smartfit/ui/training_route.dart';
 
-import 'app_flow_test.dart' show services, tall, showManualChatCard;
+import 'app_flow_test.dart'
+    show services, tall, showManualChatCard, warmTrainingPoster;
 
 void main() {
   testWidgets('appearance changes keep a pushed route and conversation state', (
@@ -56,6 +57,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byType(PlanPage), findsOneWidget);
       final detailElement = tester.element(find.byType(PlanPage));
+      await warmTrainingPoster(tester, s, plan, sourceContext: detailElement);
       await tester.tap(find.byKey(const ValueKey('start')));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 50));

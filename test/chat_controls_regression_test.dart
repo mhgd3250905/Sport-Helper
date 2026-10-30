@@ -13,6 +13,7 @@ import 'package:smartfit/voice/voice_queue.dart';
 import 'package:ugk_coach_ui/ugk_coach_ui.dart';
 
 import 'support.dart';
+import 'app_flow_test.dart' show widgetFixtureStateEncoder;
 
 class _MemoryStorage implements LocalStateStorage {
   @override
@@ -108,7 +109,10 @@ void main() {
       MaterialApp(
         theme: buildTheme(),
         home: SavedPlansPage(
-          store: AppStore(_MemoryStorage()),
+          store: AppStore(
+            _MemoryStorage(),
+            stateEncoder: widgetFixtureStateEncoder,
+          ),
           library: loadLibrary(),
           onShow: (_) {},
           onStart: (_, _) {},
@@ -136,7 +140,10 @@ void main() {
       final services = AppServices(
         library: loadLibrary(),
         catalog: loadCatalog(),
-        store: AppStore(_MemoryStorage()),
+        store: AppStore(
+          _MemoryStorage(),
+          stateEncoder: widgetFixtureStateEncoder,
+        ),
         voiceLibrary: VoiceLibrary.empty,
         voiceOutput: const MutedVoiceOutput(),
       );

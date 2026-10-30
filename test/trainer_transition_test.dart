@@ -20,6 +20,7 @@ import 'package:smartfit/voice/voice_queue.dart';
 import 'package:ugk_trainer/ugk_trainer.dart' as trainer;
 
 import 'support.dart';
+import 'app_flow_test.dart' show widgetFixtureStateEncoder;
 
 const _plan = TrainingPlan(
   id: 'transition-boundary',
@@ -190,8 +191,11 @@ class _Fixture {
   late final services = AppServices(
     library: ExerciseLibrary(loadLibrary().all.map(_packed).toList()),
     catalog: loadCatalog(),
-    store: AppStore(storage, actionIssueEnabled: issueEnabled)
-      ..starfield = false,
+    store: AppStore(
+      storage,
+      actionIssueEnabled: issueEnabled,
+      stateEncoder: widgetFixtureStateEncoder,
+    )..starfield = false,
     voiceLibrary: loadVoices(),
     voiceOutput: voice,
     chatReplyDelay: Duration.zero,

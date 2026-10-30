@@ -19,6 +19,7 @@ import 'package:ugk_coach/ugk_coach.dart' as coach;
 import 'package:ugk_trainer/ugk_trainer.dart' as trainer;
 
 import 'support.dart';
+import 'app_flow_test.dart' show widgetFixtureStateEncoder;
 import 'support/coach_v2_fixtures.dart';
 
 class _Storage implements LocalStateStorage {
@@ -41,7 +42,7 @@ class _Storage implements LocalStateStorage {
 AppServices _services(_Storage storage) => AppServices(
   library: loadLibrary(),
   catalog: loadCatalog(),
-  store: AppStore(storage)
+  store: AppStore(storage, stateEncoder: widgetFixtureStateEncoder)
     ..starfield = false
     ..voice = const VoiceSettings(voice: false, chimes: false),
   voiceLibrary: VoiceLibrary.empty,

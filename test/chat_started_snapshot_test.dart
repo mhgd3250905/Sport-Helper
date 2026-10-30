@@ -12,7 +12,8 @@ import 'package:smartfit/ui/player_page.dart';
 import 'package:smartfit/ui/plan_page.dart';
 import 'package:smartfit/ui/training_route.dart';
 
-import 'app_flow_test.dart' show MemoryStorage, services, tall;
+import 'app_flow_test.dart'
+    show MemoryStorage, services, tall, warmTrainingPoster;
 
 class _ObservedStorage extends MemoryStorage {
   Completer<void>? _nextWrite;
@@ -86,6 +87,12 @@ void main() {
       final modified = s.store.lastPlan!;
       expect(modified.id, isNot(_original.id));
       expect(modified.exerciseIds, {'h-band-pallof'});
+      await warmTrainingPoster(
+        tester,
+        s,
+        modified,
+        sourceContext: tester.element(find.byType(PlanPage)),
+      );
 
       await tester.tap(find.byKey(const ValueKey('start')));
       await tester.pump();
