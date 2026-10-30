@@ -14,7 +14,7 @@ import 'package:smartfit/voice/voice_queue.dart';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
 import 'package:ugk_coach_ui/ugk_coach_ui.dart';
 
-import 'app_flow_test.dart' show MemoryStorage, tall;
+import 'app_flow_test.dart' show MemoryStorage, tall, widgetFixtureStateEncoder;
 import 'support.dart';
 import 'support/coach_v2_fixtures.dart';
 
@@ -23,7 +23,8 @@ late CoachV2Fixtures fixtures;
 AppServices _services() => AppServices(
   library: fixtures.library,
   catalog: loadCatalog(),
-  store: AppStore(MemoryStorage())..starfield = false,
+  store: AppStore(MemoryStorage(), stateEncoder: widgetFixtureStateEncoder)
+    ..starfield = false,
   voiceLibrary: VoiceLibrary.empty,
   voiceOutput: const MutedVoiceOutput(),
   chatReplyDelay: Duration.zero,

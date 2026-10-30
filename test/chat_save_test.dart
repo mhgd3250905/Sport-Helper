@@ -8,7 +8,7 @@ import 'package:smartfit/domain/plan.dart';
 import 'package:smartfit/domain/plan_generator.dart';
 import 'package:smartfit/domain/scenario.dart';
 
-import 'app_flow_test.dart' show MemoryStorage;
+import 'app_flow_test.dart' show MemoryStorage, widgetFixtureStateEncoder;
 import 'support.dart';
 
 void main() {
@@ -138,7 +138,10 @@ void main() {
 
   group('safety talk', () {
     Future<(ChatController, AppStore)> fresh() async {
-      final store = AppStore(MemoryStorage());
+      final store = AppStore(
+        MemoryStorage(),
+        stateEncoder: widgetFixtureStateEncoder,
+      );
       final c = ChatController(
         engine: const AppChatActions(),
         store: store,

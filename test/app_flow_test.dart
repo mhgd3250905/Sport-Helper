@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -19,6 +20,7 @@ import 'package:smartfit/ui/custom_plan_page.dart';
 import 'package:smartfit/ui/library_page.dart';
 import 'package:smartfit/ui/player_page.dart';
 import 'package:smartfit/ui/training_route.dart';
+import 'package:smartfit/ui/training_entry_placeholder.dart';
 import 'package:smartfit/voice/voice_library.dart';
 import 'package:smartfit/voice/voice_queue.dart';
 import 'package:ugk_trainer/ugk_trainer.dart' as trainer;
@@ -33,10 +35,19 @@ class MemoryStorage implements LocalStateStorage {
   Future<void> write(String key, String value) async => data[key] = value;
 }
 
+/// Widget fake clocks cannot await a native Isolate's queued continuation.
+/// The explicit test-runner flag keeps in-memory fixtures in their fake zone;
+/// dedicated serialization tests and unflagged software probes use real workers.
+AppStateEncoder? get widgetFixtureStateEncoder =>
+    const bool.fromEnvironment('SMARTFIT_WIDGET_FAKE_STATE_ENCODER')
+    ? (snapshot) async => jsonEncode(snapshot)
+    : null;
+
 AppServices services({VoiceOutput output = const MutedVoiceOutput()}) {
-  final store = AppStore(MemoryStorage())
-    // A drifting sky never settles: keep it still so pumpAndSettle can.
-    ..starfield = false;
+  final store =
+      AppStore(MemoryStorage(), stateEncoder: widgetFixtureStateEncoder)
+        // A drifting sky never settles: keep it still so pumpAndSettle can.
+        ..starfield = false;
   return AppServices(
     library: loadLibrary(),
     catalog: loadCatalog(),
@@ -45,6 +56,30 @@ AppServices services({VoiceOutput output = const MutedVoiceOutput()}) {
     voiceOutput: output,
     chatReplyDelay: Duration.zero,
   );
+}
+
+/// Native image decoding progresses in real I/O; zero-duration pumps only
+/// deliver its callbacks. This prepares pixels before measuring motion time.
+Future<void> warmTrainingPoster(
+  WidgetTester tester,
+  AppServices s,
+  TrainingPlan plan,
+) async {
+  final context = tester.element(find.byType(ChatHomePage));
+  var ready = false;
+  unawaited(
+    TrainingTransitionPoster.precache(
+      context,
+      s.library[plan.items.first.exerciseId],
+    ).then((_) => ready = true),
+  );
+  for (var i = 0; i < 30 && !ready; i++) {
+    await tester.runAsync(
+      () async => Future<void>.delayed(const Duration(milliseconds: 20)),
+    );
+    await tester.pump();
+  }
+  expect(ready, isTrue, reason: 'the source tap awaits its decoded poster');
 }
 
 class InterruptibleTestOutput extends MutedVoiceOutput
@@ -467,6 +502,7 @@ void main() {
       await showManualChatCard(s);
       await tester.pumpAndSettle();
       final plan = s.chat.currentPlan!;
+      await warmTrainingPoster(tester, s, plan);
       final screen = tester.getRect(find.byType(ChatHomePage));
       await tester.tap(find.byKey(ValueKey('plan-start-${plan.id}')));
       await tester.pump();
