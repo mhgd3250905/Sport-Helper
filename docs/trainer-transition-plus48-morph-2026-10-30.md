@@ -36,7 +36,7 @@ SDK地板强制不透明，前280ms让已挂载的真实SDK保留布局但暂不
 
 SDK pop后独立Navigator OverlayEntry继续380ms缩回，背景在240ms内淡出；到位后真实源图恢复、海报再120ms交叉淡出。来源卡不可见则260ms整层1→.94淡出。visualCompleted包含整个回程尾段，完成记录只在它结束后插一次：240ms上浮12px/淡入且布局高度平滑展开，列表300ms easeOutCubic滚到该记录。
 
-回程期间通过来源route的LocalHistoryEntry接管返回键，避免误退下层页；重复点击/返回/后台会清理overlay。进入取消不完成startGate，不启动或保存会话；后台发生在慢保存期间，晚成功也直接终态，不新建挂起的回程。直接卸载清理Ticker和FrameRecorder。减少动效进入/退出只用150ms交叉淡化，保留原图；有限控制器使用AnimationBehavior.preserve，避免系统再次压缩已选定的150ms。
+回程期间通过来源route的LocalHistoryEntry接管返回键，避免误退下层页；重复点击/返回/后台会清理overlay。进入取消不完成startGate，不启动或保存会话；后台发生在慢保存期间，晚成功也直接终态，不新建挂起的回程。直接卸载清理Ticker和FrameRecorder。减少动效进入/退出只用150ms交叉淡化，保留原图；退出页面淡化与chrome共用同一段150ms，pop后不再追加第二段。减少动效慢保存超过400ms时，可见的宿主层维持24px等待指示，数据仍由SDK保存；失败恢复完整SDK完成页。有限控制器使用AnimationBehavior.preserve，避免系统再次压缩已选定的150ms。
 
 图文页保留其来源route和实际媒体槽，先释放预览再push训练；回程后恢复预览。聊天owner仍执行started的AI恢复/记忆门禁，在visualCompleted后接收一次finished。
 

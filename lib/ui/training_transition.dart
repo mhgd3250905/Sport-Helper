@@ -37,6 +37,8 @@ class TrainingTransitionMotion extends ChangeNotifier {
   bool mirrored = false, entered = false, exiting = false;
   bool saveFailed = false, aborted = false, _disposed = false;
   bool interrupted = false;
+  Timer? _savingDelay;
+  bool showSaving = false;
 
   Future<void> get startGate => _start.future;
   bool get canPlay => entered && !exiting && !saveFailed && !aborted;
@@ -96,6 +98,13 @@ class TrainingTransitionMotion extends ChangeNotifier {
     FrameRecorder.instance.beginScenario(FrameScenario.trainingRouteExit);
     RuntimeLog.instance.record('training.transition.exit.started');
     _exitMotion = _reverse();
+    if (reduced) {
+      _savingDelay = Timer(const Duration(milliseconds: 400), () {
+        if (_disposed || interrupted || saveFailed) return;
+        showSaving = true;
+        notifyListeners();
+      });
+    }
     notifyListeners();
   }
 
@@ -107,11 +116,17 @@ class TrainingTransitionMotion extends ChangeNotifier {
     }
   }
 
-  Future<void> beforeExitPop() => _exitMotion;
+  Future<void> beforeExitPop() {
+    _savingDelay?.cancel();
+    showSaving = false;
+    return _exitMotion;
+  }
 
   void exitSaveFailed() {
     if (_disposed) return;
     saveFailed = true;
+    _savingDelay?.cancel();
+    showSaving = false;
     _exit.stop(canceled: true);
     FrameRecorder.instance.endScenario(FrameScenario.trainingRouteExit);
     notifyListeners();
@@ -129,6 +144,8 @@ class TrainingTransitionMotion extends ChangeNotifier {
   void abort() {
     if (_disposed || aborted) return;
     aborted = true;
+    _savingDelay?.cancel();
+    showSaving = false;
     entrance.stop(canceled: true);
     _exit.stop(canceled: true);
     FrameRecorder.instance
@@ -139,12 +156,15 @@ class TrainingTransitionMotion extends ChangeNotifier {
 
   void finishExitNow() {
     interrupted = true;
+    _savingDelay?.cancel();
+    showSaving = false;
     if (!_disposed) _exit.value = 0;
   }
 
   @override
   void dispose() {
     _disposed = true;
+    _savingDelay?.cancel();
     FrameRecorder.instance.endScenario(FrameScenario.trainingRouteEntry);
     entrance.removeListener(_entryTick);
     chrome.parent = null;
@@ -252,6 +272,12 @@ class _TrainingTransitionHostState extends State<_TrainingTransitionHost>
       return;
     }
     final overlay = widget.route.navigator?.overlay;
+    if (motion.reduced) {
+      // The page and chrome already cross-faded together during exit A.
+      // Adding another post-pop fade would double the specified 150ms.
+      widget.route._finishVisual();
+      return;
+    }
     final exercise = motion.exercise;
     final stage = motion.mediaRect;
     if (overlay == null || exercise == null || stage == null) {
@@ -308,13 +334,37 @@ class _TrainingTransitionHostState extends State<_TrainingTransitionHost>
       motion: motion,
       child: Builder(builder: widget.builder),
     );
-    return AnimatedBuilder(
-      animation: motion.entrance,
+    final view = AnimatedBuilder(
+      animation: Listenable.merge([motion.entrance, motion.chrome, motion]),
       child: child,
       builder: (context, child) {
         final elapsed = motion.entrance.value * (motion.reduced ? 150 : 560);
         if (motion.reduced) {
-          return FadeTransition(opacity: motion.entrance, child: child);
+          final opacity = motion.saveFailed
+              ? 1.0
+              : motion.entered && motion.exiting
+              ? motion.chrome.value
+              : motion.entrance.value;
+          return Stack(
+            fit: StackFit.expand,
+            children: [
+              FadeTransition(
+                opacity: AlwaysStoppedAnimation(opacity),
+                child: child,
+              ),
+              if (motion.showSaving && !motion.saveFailed)
+                Center(
+                  child: SizedBox.square(
+                    key: const ValueKey('training-reduced-saving'),
+                    dimension: 24,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: SmartFitTrainerTheme.of(context).accent,
+                    ),
+                  ),
+                ),
+            ],
+          );
         }
         final stage = _stage;
         final exercise = motion.exercise;
@@ -388,6 +438,24 @@ class _TrainingTransitionHostState extends State<_TrainingTransitionHost>
           ],
         );
       },
+    );
+    return PopScope(
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop && motion.entered && motion.exiting && !motion.saveFailed) {
+          motion.finishExitNow();
+        }
+      },
+      child: Listener(
+        onPointerDown: (_) {
+          if (!motion.entered && !motion.aborted) {
+            motion.abort();
+            if (widget.route.isCurrent) widget.route.navigator?.pop();
+          } else if (motion.exiting && !motion.saveFailed) {
+            motion.finishExitNow();
+          }
+        },
+        child: view,
+      ),
     );
   }
 }

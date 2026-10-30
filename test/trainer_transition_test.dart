@@ -600,17 +600,9 @@ void main() {
       await tester.pump(const Duration(microseconds: 1));
       await tester.pump();
       expect(f.popped, hasLength(1));
-      expect(f.completed, isEmpty);
-      expect(_key('training-return-fallback'), findsOneWidget);
-      final fallback = _key('training-return-fallback');
-      final transform = tester.widget<Transform>(
-        find.descendant(of: fallback, matching: find.byType(Transform)).first,
-      );
-      expect(transform.transform.storage[0], 1);
-      expect(transform.transform.storage[5], 1);
-      await _settleReturn(tester, milliseconds: 150);
       expect(f.completed, hasLength(1));
       expect(_key('training-return-fallback'), findsNothing);
+      expect(_key('training-return-morph'), findsNothing);
       expect(tester.takeException(), isNull);
     },
   );
@@ -686,8 +678,8 @@ void main() {
               .value,
           counter,
         );
-        await f.nav.currentState!.maybePop();
-        await tester.pump();
+        // Repeated-back interruption is covered separately: it deliberately
+        // skips the remaining visual return, while still waiting for this save.
         expect(f.storage.sessionWrites, hasLength(1));
         expect(f.popped, isEmpty);
         gate.complete();
@@ -895,6 +887,82 @@ void main() {
       expect(tester.takeException(), isNull);
     },
   );
+
+  for (final back in [false, true]) {
+    testWidgets(
+      'exit A interruption finishes visuals without bypassing save, back=$back',
+      (tester) async {
+        final f = await _mount(tester, withSource: true);
+        await _enter(tester);
+        final save = Completer<void>();
+        f.storage.gate = save;
+        await _confirmExit(tester);
+        await tester.pump(const Duration(milliseconds: 100));
+        if (back) {
+          await f.nav.currentState!.maybePop();
+        } else {
+          await tester.tapAt(const Offset(195, 400));
+        }
+        await tester.pump();
+        expect(f.motion!.chrome.value, 0);
+        expect(f.motion!.interrupted, isTrue);
+        expect(f.popped, isEmpty);
+        save.complete();
+        await tester.pumpAndSettle();
+        expect(f.completed, hasLength(1));
+        expect(f.storage.sessionWrites, hasLength(1));
+        expect(_key('training-return-morph'), findsNothing);
+        expect(_key('training-return-fallback'), findsNothing);
+        expect(native.live, isEmpty);
+        expect(tester.binding.transientCallbackCount, 0);
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
+
+  for (final slowSave in [false, true]) {
+    testWidgets('reduced exit is one 150ms cross-fade, slowSave=$slowSave', (
+      tester,
+    ) async {
+      final f = await _mount(tester, reduced: true, withSource: true);
+      await tester.pump(const Duration(milliseconds: 150));
+      await tester.pump();
+      final save = slowSave ? Completer<void>() : null;
+      f.storage.gate = save;
+      await _confirmExit(tester);
+      await tester.pump(const Duration(milliseconds: 149));
+      expect(f.motion!.chrome.value, greaterThan(0));
+      expect(find.byType(ExerciseVideo), findsNothing);
+      await tester.pump(const Duration(milliseconds: 1));
+      await tester.pump(const Duration(microseconds: 1));
+      await tester.pump();
+      expect(_key('training-return-morph'), findsNothing);
+      expect(_key('training-return-fallback'), findsNothing);
+      expect(f.sourceOpacity.value, 1);
+      if (save != null) {
+        expect(f.completed, isEmpty);
+        final fade = tester.widget<FadeTransition>(
+          find
+              .ancestor(
+                of: find.byType(PlayerPage),
+                matching: find.byType(FadeTransition),
+              )
+              .first,
+        );
+        expect(fade.opacity.value, 0);
+        await tester.pump(const Duration(milliseconds: 250));
+        expect(_key('training-reduced-saving'), findsOneWidget);
+        save.complete();
+      }
+      await tester.pumpAndSettle();
+      expect(f.completed, hasLength(1));
+      expect(f.storage.sessionWrites, hasLength(1));
+      expect(find.byType(PlayerPage), findsNothing);
+      expect(native.live, isEmpty);
+      expect(tester.binding.transientCallbackCount, 0);
+      expect(tester.takeException(), isNull);
+    });
+  }
 
   testWidgets(
     'background during exit A lets a late save finish without creating a return overlay',

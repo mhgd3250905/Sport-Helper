@@ -189,6 +189,17 @@ void main() {
             nav.currentState!.pop();
             await tester.pump();
             await tester.pump();
+            if (reduced) {
+              expect(visualDone, isTrue);
+              expect(
+                find.byKey(const ValueKey('training-return-poster')),
+                findsNothing,
+              );
+              expect(alpha.value, 1);
+              expect(tester.binding.transientCallbackCount, 0);
+              expect(tester.takeException(), isNull);
+              return;
+            }
             expect(visualDone, isFalse);
             final returning = find.byKey(
               const ValueKey('training-return-poster'),
