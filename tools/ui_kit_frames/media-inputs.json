@@ -1,0 +1,117 @@
+{
+  "schema": "smartfit-ui-kit-capture-images@1",
+  "sourceCatalogSha256": "75881cf91621c967f80732f0219f23e85b35e8bde5d1a51ee75dec5f7c5edd36",
+  "sourceBundledIndexSha256": "e3b706ae21ef75a76d10c959d07d089731a904b344de5ec27a2877b501b69f0f",
+  "images": [
+    {
+      "actionId": "h-reverse-crunch",
+      "role": "cover",
+      "fixture": "media/537576498e6b6561a867c205ef86c58399aff12569fb8282a54a09e804d670a9.webp",
+      "asset": "assets/posehub/images/75881cf91621c967f80732f0219f23e85b35e8bde5d1a51ee75dec5f7c5edd36/537576498e6b6561a867c205ef86c58399aff12569fb8282a54a09e804d670a9.webp",
+      "sourceMediaPath": "media/h-reverse-crunch/h-reverse-crunch.cover.alpha.webp",
+      "bytes": 19498,
+      "sha256": "537576498e6b6561a867c205ef86c58399aff12569fb8282a54a09e804d670a9"
+    },
+    {
+      "actionId": "h-reverse-crunch",
+      "role": "thumbnail",
+      "fixture": "media/a9ea0d31e72d9940f09ca91f091aefb3313c84e0f1d584e28bd3f64051dc62a4.webp",
+      "asset": "assets/posehub/images/75881cf91621c967f80732f0219f23e85b35e8bde5d1a51ee75dec5f7c5edd36/a9ea0d31e72d9940f09ca91f091aefb3313c84e0f1d584e28bd3f64051dc62a4.webp",
+      "sourceMediaPath": "media/h-reverse-crunch/h-reverse-crunch.thumbnail.alpha.webp",
+      "bytes": 4652,
+      "sha256": "a9ea0d31e72d9940f09ca91f091aefb3313c84e0f1d584e28bd3f64051dc62a4"
+    },
+    {
+      "actionId": "h-squat",
+      "role": "cover",
+      "fixture": "media/cd8e52226cc4d00cb6e038430953cc81aea7bba056c955c686367f5e0758f626.webp",
+      "asset": "assets/posehub/images/75881cf91621c967f80732f0219f23e85b35e8bde5d1a51ee75dec5f7c5edd36/cd8e52226cc4d00cb6e038430953cc81aea7bba056c955c686367f5e0758f626.webp",
+      "sourceMediaPath": "media/h-squat/h-squat-r3/h-squat.cover.alpha.webp",
+      "bytes": 16364,
+      "sha256": "cd8e52226cc4d00cb6e038430953cc81aea7bba056c955c686367f5e0758f626"
+    },
+    {
+      "actionId": "h-squat",
+      "role": "thumbnail",
+      "fixture": "media/9161f13ebe729b7c48ca5bb5d69e55477804e9981d2e3feb534ae903672bb0b8.webp",
+      "asset": "assets/posehub/images/75881cf91621c967f80732f0219f23e85b35e8bde5d1a51ee75dec5f7c5edd36/9161f13ebe729b7c48ca5bb5d69e55477804e9981d2e3feb534ae903672bb0b8.webp",
+      "sourceMediaPath": "media/h-squat/h-squat-r3/h-squat.thumbnail.alpha.webp",
+      "bytes": 3600,
+      "sha256": "9161f13ebe729b7c48ca5bb5d69e55477804e9981d2e3feb534ae903672bb0b8"
+    },
+    {
+      "actionId": "h-wall-angel",
+      "role": "cover",
+      "fixture": "media/0b415107cacbbee7c4badd3b98e67c2e981f37ee597f8271d31a53a26249eb7b.webp",
+      "asset": "assets/posehub/images/75881cf91621c967f80732f0219f23e85b35e8bde5d1a51ee75dec5f7c5edd36/0b415107cacbbee7c4badd3b98e67c2e981f37ee597f8271d31a53a26249eb7b.webp",
+      "sourceMediaPath": "media/h-wall-angel/h-wall-angel-complete-alpha-r2/h-wall-angel.cover.alpha.webp",
+      "bytes": 10382,
+      "sha256": "0b415107cacbbee7c4badd3b98e67c2e981f37ee597f8271d31a53a26249eb7b"
+    },
+    {
+      "actionId": "h-wall-angel",
+      "role": "thumbnail",
+      "fixture": "media/d2839774aa4c142b76c4251401a4f8d4e60ca8cdf69654f3499ff36e7937bd27.webp",
+      "asset": "assets/posehub/images/75881cf91621c967f80732f0219f23e85b35e8bde5d1a51ee75dec5f7c5edd36/d2839774aa4c142b76c4251401a4f8d4e60ca8cdf69654f3499ff36e7937bd27.webp",
+      "sourceMediaPath": "media/h-wall-angel/h-wall-angel-complete-alpha-r2/h-wall-angel.thumbnail.alpha.webp",
+      "bytes": 2678,
+      "sha256": "d2839774aa4c142b76c4251401a4f8d4e60ca8cdf69654f3499ff36e7937bd27"
+    },
+    {
+      "actionId": "s-butterfly",
+      "role": "cover",
+      "fixture": "media/635d6606847d5d1efdae82e1ad07c12e556b414f317ee00c67f67ba2c4917b35.webp",
+      "asset": "assets/posehub/images/75881cf91621c967f80732f0219f23e85b35e8bde5d1a51ee75dec5f7c5edd36/635d6606847d5d1efdae82e1ad07c12e556b414f317ee00c67f67ba2c4917b35.webp",
+      "sourceMediaPath": "media/s-butterfly/s-butterfly.cover.alpha.webp",
+      "bytes": 27214,
+      "sha256": "635d6606847d5d1efdae82e1ad07c12e556b414f317ee00c67f67ba2c4917b35"
+    },
+    {
+      "actionId": "s-butterfly",
+      "role": "thumbnail",
+      "fixture": "media/8fa2db79be34b0c27d7c94c112f1b9f0166e74ba98b2f9ca31b4589c721b5949.webp",
+      "asset": "assets/posehub/images/75881cf91621c967f80732f0219f23e85b35e8bde5d1a51ee75dec5f7c5edd36/8fa2db79be34b0c27d7c94c112f1b9f0166e74ba98b2f9ca31b4589c721b5949.webp",
+      "sourceMediaPath": "media/s-butterfly/s-butterfly.thumbnail.alpha.webp",
+      "bytes": 5432,
+      "sha256": "8fa2db79be34b0c27d7c94c112f1b9f0166e74ba98b2f9ca31b4589c721b5949"
+    },
+    {
+      "actionId": "s-kneel-hipflex",
+      "role": "cover",
+      "fixture": "media/363f0c527ba69dcfed0bd156d3a14d482428e7972762a19e64b6b9baa216e39c.webp",
+      "asset": "assets/posehub/images/75881cf91621c967f80732f0219f23e85b35e8bde5d1a51ee75dec5f7c5edd36/363f0c527ba69dcfed0bd156d3a14d482428e7972762a19e64b6b9baa216e39c.webp",
+      "sourceMediaPath": "media/s-kneel-hipflex/s-kneel-hipflex.cover.alpha.webp",
+      "bytes": 16642,
+      "sha256": "363f0c527ba69dcfed0bd156d3a14d482428e7972762a19e64b6b9baa216e39c"
+    },
+    {
+      "actionId": "s-kneel-hipflex",
+      "role": "thumbnail",
+      "fixture": "media/5eea0aae2d8bc4cf0d69f326640d8ba0e7cff2998385d5ef13eaff4a966781a9.webp",
+      "asset": "assets/posehub/images/75881cf91621c967f80732f0219f23e85b35e8bde5d1a51ee75dec5f7c5edd36/5eea0aae2d8bc4cf0d69f326640d8ba0e7cff2998385d5ef13eaff4a966781a9.webp",
+      "sourceMediaPath": "media/s-kneel-hipflex/s-kneel-hipflex.thumbnail.alpha.webp",
+      "bytes": 4012,
+      "sha256": "5eea0aae2d8bc4cf0d69f326640d8ba0e7cff2998385d5ef13eaff4a966781a9"
+    },
+    {
+      "actionId": "w-dead-bug",
+      "role": "cover",
+      "fixture": "media/5301251c968632b7eb5adbf3b4fd2a1f5b003670f6e14ef0d10e6a7636053a7f.webp",
+      "asset": "assets/posehub/images/75881cf91621c967f80732f0219f23e85b35e8bde5d1a51ee75dec5f7c5edd36/5301251c968632b7eb5adbf3b4fd2a1f5b003670f6e14ef0d10e6a7636053a7f.webp",
+      "sourceMediaPath": "media/w-dead-bug/w-dead-bug.cover.alpha.webp",
+      "bytes": 20726,
+      "sha256": "5301251c968632b7eb5adbf3b4fd2a1f5b003670f6e14ef0d10e6a7636053a7f"
+    },
+    {
+      "actionId": "w-dead-bug",
+      "role": "thumbnail",
+      "fixture": "media/af3cccac0dcf3ba208ff76991bf721f4e90a3cc3c2eddc974b9e2342a31ffd87.webp",
+      "asset": "assets/posehub/images/75881cf91621c967f80732f0219f23e85b35e8bde5d1a51ee75dec5f7c5edd36/af3cccac0dcf3ba208ff76991bf721f4e90a3cc3c2eddc974b9e2342a31ffd87.webp",
+      "sourceMediaPath": "media/w-dead-bug/w-dead-bug.thumbnail.alpha.webp",
+      "bytes": 4598,
+      "sha256": "af3cccac0dcf3ba208ff76991bf721f4e90a3cc3c2eddc974b9e2342a31ffd87"
+    }
+  ],
+  "onlyImagesReferencedByFrozenCaptureInputs": true,
+  "productionAssetsModified": false
+}

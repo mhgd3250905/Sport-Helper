@@ -1,5 +1,11 @@
 # 版本管理与台账
 
+## +51 SDK 套件接入第一阶段（2026-10-31，未完成验收）
+
+`codex/coach-ui-kit` 从 `13c0bb4` 创建，源码 `b27ffe0`，版本 `0.1.0+51`，三包/override 锁定 SDK main `caa6817c51b3cb09c46909288d83aa88bdc2dbd4`。SDK 训练路由已接入；按开哥裁决，生成卡/过渡与标签为保留当前剪影/图标暂留 SF 实现，等待兼容接口的新 main pin。全量 857/857、analyze 0，58 对 golden 每帧 0 像素差；正式真实生成的卡片/含准备执行排程为 **384/612/1258 秒**，5 分钟超出 28%，门禁未通过。尚未出本轮 APK/profile、未操作手机；Hark 通过前不出包，不合 main、不动 release/1.0、不打 tag。详见[阶段记录](sdk-ui-kit-plus51-stage1-2026-10-31.md)。
+
+下方记录保留历史时点，本节是功能分支进展，不代表 main 发布或 +51 验收完成。
+
 ## +49 已纳入 main（2026-10-30）
 
 已按开哥明确授权从main `d8d6db76fc631f47afbf3740f67d2d00ebfff2f6` 快进纳入已验收的 `09bc71b69ffe5b51e9691e4b424feecfce7289df`，版本保持0.1.0+49 / internal arm64 2049。SDK三包及coach override锁定 `66dd98a549c1ff5fedecb626a7c88583090a1440`，实时核实为SDK远端main，包含c97a79a5与66dd98a5。在main重新全量测试 **861/861**、0失败/跳过，analyze **0问题**；全新release arm64 **42,655,230B / 42.655MB**，同签名、ZIP/ELF16KB、JNI、无MP4门禁通过。后续只追加README/docs收束，最终main及推送核验见交付目录 `final-main-receipt.json`。release/1.0、guide-lite及其他分支不动，不打tag，不改SDK源码，不再操作手机。 详见[main复验记录](trainer-transition-plus49-main-2026-10-30.md)与[产物台账](reports/trainer-transition-plus49-main.json)。

@@ -1,0 +1,558 @@
+{
+  "targetMinutes": 5,
+  "targetSeconds": 300,
+  "input": "在家徒手5分钟全身训练，初级，没有伤病，没有额外器械。请直接给一张能按计时或自动计次跟练的完整计划。",
+  "syntheticUserInput": true,
+  "modelRequests": true,
+  "deviceOperated": false,
+  "status": "ok",
+  "admittedPlan": true,
+  "plan": {
+    "schemaVersion": 1,
+    "id": "plan-1793426324733-2",
+    "source": "ai",
+    "title": "居家全身徒手训练",
+    "summary": "居家全身徒手训练",
+    "goal": "relax",
+    "scene": "home",
+    "equipment": [
+      "chair",
+      "mat"
+    ],
+    "level": 1,
+    "targetMinutes": 5,
+    "blocks": [
+      {
+        "id": "b1",
+        "name": "warmup",
+        "type": "warmup",
+        "rounds": 1,
+        "restBetweenRoundsSeconds": 0,
+        "items": [
+          {
+            "exerciseId": "h-good-morning",
+            "mode": "reps",
+            "sets": 3,
+            "reps": 12,
+            "perSide": false,
+            "restSeconds": 30
+          }
+        ]
+      },
+      {
+        "id": "b2",
+        "name": "main",
+        "type": "main",
+        "rounds": 1,
+        "restBetweenRoundsSeconds": 0,
+        "items": [
+          {
+            "exerciseId": "h-squat",
+            "mode": "reps",
+            "sets": 1,
+            "reps": 6,
+            "perSide": false,
+            "restSeconds": 30
+          },
+          {
+            "exerciseId": "h-incline-pushup",
+            "mode": "reps",
+            "sets": 1,
+            "reps": 5,
+            "perSide": false,
+            "restSeconds": 30
+          },
+          {
+            "exerciseId": "w-bird-dog",
+            "mode": "reps",
+            "sets": 1,
+            "reps": 5,
+            "perSide": false,
+            "restSeconds": 30
+          }
+        ]
+      },
+      {
+        "id": "b3",
+        "name": "cooldown",
+        "type": "cooldown",
+        "rounds": 1,
+        "restBetweenRoundsSeconds": 0,
+        "items": [
+          {
+            "exerciseId": "h-supine-twist",
+            "mode": "time",
+            "sets": 1,
+            "workSeconds": 20,
+            "perSide": true,
+            "restSeconds": 10
+          }
+        ]
+      }
+    ],
+    "notes": [],
+    "safetyNotes": []
+  },
+  "coachEstimateSeconds": 383.0,
+  "cardSecondsIncludingPrep": 384.0,
+  "cardLabel": "约 6 分钟",
+  "executionSecondsIncludingPrep": 384.0,
+  "executionSecondsExcludingPrep": 374.0,
+  "preparationSeconds": 10.0,
+  "coachToExecutionDifferenceSeconds": 1.0,
+  "withinTenPercent": false,
+  "manualWorkPhases": 0,
+  "engineFullyFinished": true,
+  "engineElapsedSeconds": 384.0,
+  "workPhases": [
+    {
+      "id": "h-good-morning",
+      "seconds": 48.0,
+      "set": 1,
+      "sets": 3,
+      "round": 0,
+      "rounds": 0,
+      "side": null,
+      "selfPaced": false,
+      "reps": 12,
+      "repSeconds": 4.0,
+      "rhythm": {
+        "kind": "rep_updown",
+        "leadSeconds": 0.0,
+        "phases": [
+          {
+            "id": "go",
+            "seconds": 4.0
+          }
+        ],
+        "source": "repSeconds"
+      }
+    },
+    {
+      "id": "h-good-morning",
+      "seconds": 48.0,
+      "set": 2,
+      "sets": 3,
+      "round": 0,
+      "rounds": 0,
+      "side": null,
+      "selfPaced": false,
+      "reps": 12,
+      "repSeconds": 4.0,
+      "rhythm": {
+        "kind": "rep_updown",
+        "leadSeconds": 0.0,
+        "phases": [
+          {
+            "id": "go",
+            "seconds": 4.0
+          }
+        ],
+        "source": "repSeconds"
+      }
+    },
+    {
+      "id": "h-good-morning",
+      "seconds": 48.0,
+      "set": 3,
+      "sets": 3,
+      "round": 0,
+      "rounds": 0,
+      "side": null,
+      "selfPaced": false,
+      "reps": 12,
+      "repSeconds": 4.0,
+      "rhythm": {
+        "kind": "rep_updown",
+        "leadSeconds": 0.0,
+        "phases": [
+          {
+            "id": "go",
+            "seconds": 4.0
+          }
+        ],
+        "source": "repSeconds"
+      }
+    },
+    {
+      "id": "h-squat",
+      "seconds": 25.0,
+      "set": 1,
+      "sets": 1,
+      "round": 0,
+      "rounds": 0,
+      "side": null,
+      "selfPaced": false,
+      "reps": 6,
+      "repSeconds": 4.0,
+      "rhythm": {
+        "kind": "rep_updown",
+        "leadSeconds": 1.0,
+        "phases": [
+          {
+            "id": "go",
+            "seconds": 1.15,
+            "cue": "w.squat_down"
+          },
+          {
+            "id": "hold",
+            "seconds": 0.7
+          },
+          {
+            "id": "back",
+            "seconds": 1.1,
+            "cue": "w.stand_up"
+          },
+          {
+            "id": "rest",
+            "seconds": 1.05
+          }
+        ],
+        "reps": 8
+      }
+    },
+    {
+      "id": "h-incline-pushup",
+      "seconds": 20.0,
+      "set": 1,
+      "sets": 1,
+      "round": 0,
+      "rounds": 0,
+      "side": null,
+      "selfPaced": false,
+      "reps": 5,
+      "repSeconds": 4.0,
+      "rhythm": {
+        "kind": "rep_updown",
+        "leadSeconds": 0.0,
+        "phases": [
+          {
+            "id": "go",
+            "seconds": 4.0
+          }
+        ],
+        "source": "repSeconds"
+      }
+    },
+    {
+      "id": "w-bird-dog",
+      "seconds": 20.0,
+      "set": 1,
+      "sets": 1,
+      "round": 0,
+      "rounds": 0,
+      "side": null,
+      "selfPaced": false,
+      "reps": 5,
+      "repSeconds": 4.0,
+      "rhythm": {
+        "kind": "rep_updown",
+        "leadSeconds": 0.0,
+        "phases": [
+          {
+            "id": "go",
+            "seconds": 4.0
+          }
+        ],
+        "source": "repSeconds"
+      }
+    },
+    {
+      "id": "h-supine-twist",
+      "seconds": 20.0,
+      "set": 1,
+      "sets": 1,
+      "round": 0,
+      "rounds": 0,
+      "side": "right",
+      "selfPaced": false,
+      "reps": null,
+      "repSeconds": null,
+      "rhythm": {
+        "kind": "hold",
+        "leadSeconds": 0.0
+      }
+    },
+    {
+      "id": "h-supine-twist",
+      "seconds": 20.0,
+      "set": 1,
+      "sets": 1,
+      "round": 0,
+      "rounds": 0,
+      "side": "left",
+      "selfPaced": false,
+      "reps": null,
+      "repSeconds": null,
+      "rhythm": {
+        "kind": "hold",
+        "leadSeconds": 0.0
+      }
+    }
+  ],
+  "phaseSchedule": [
+    {
+      "kind": "prep",
+      "seconds": 10.0,
+      "id": "h-good-morning",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 48.0,
+      "id": "h-good-morning",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "rest",
+      "seconds": 30.0,
+      "id": "h-good-morning",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 48.0,
+      "id": "h-good-morning",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "rest",
+      "seconds": 30.0,
+      "id": "h-good-morning",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 48.0,
+      "id": "h-good-morning",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "rest",
+      "seconds": 15.0,
+      "id": "h-squat",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 25.0,
+      "id": "h-squat",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "rest",
+      "seconds": 15.0,
+      "id": "h-incline-pushup",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 20.0,
+      "id": "h-incline-pushup",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "rest",
+      "seconds": 15.0,
+      "id": "w-bird-dog",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 20.0,
+      "id": "w-bird-dog",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "rest",
+      "seconds": 15.0,
+      "id": "h-supine-twist",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 20.0,
+      "id": "h-supine-twist",
+      "round": 0,
+      "side": "right"
+    },
+    {
+      "kind": "switchSide",
+      "seconds": 5.0,
+      "id": "h-supine-twist",
+      "round": 0,
+      "side": "left"
+    },
+    {
+      "kind": "work",
+      "seconds": 20.0,
+      "id": "h-supine-twist",
+      "round": 0,
+      "side": "left"
+    },
+    {
+      "kind": "done",
+      "seconds": 0.0,
+      "id": null,
+      "round": 0,
+      "side": null
+    }
+  ],
+  "passed": false,
+  "elapsedMs": 20659,
+  "transportCalls": [
+    {
+      "roles": [
+        "system",
+        "user",
+        "user"
+      ],
+      "model": "deepseek-flash",
+      "httpAttempts": 1,
+      "tools": [
+        {
+          "name": "start_task",
+          "arguments": "{\"type\": \"plan\"}"
+        }
+      ],
+      "elapsedMs": 3832
+    },
+    {
+      "roles": [
+        "system",
+        "user",
+        "assistant",
+        "tool",
+        "user"
+      ],
+      "model": "deepseek-flash",
+      "httpAttempts": 1,
+      "tools": [
+        {
+          "name": "set_params",
+          "arguments": "{\"fields\": {\"scene\": {\"value\": \"home\", \"source\": \"user\", \"quote\": \"在家徒手\"}, \"minutes\": {\"value\": 5, \"source\": \"user\", \"quote\": \"5分钟\"}, \"goal\": {\"value\": [\"purpose.strength\", \"purpose.core\", \"purpose.stretch\"], \"source\": \"user\", \"quote\": \"全身训练\"}, \"level\": {\"value\": 1, \"source\": \"user\", \"quote\": \"初级\"}, \"limits\": {\"value\": [], \"source\": \"user\", \"quote\": \"没有伤病\"}}}"
+        }
+      ],
+      "elapsedMs": 1805
+    },
+    {
+      "roles": [
+        "system",
+        "user",
+        "assistant",
+        "tool",
+        "assistant",
+        "tool",
+        "user"
+      ],
+      "model": "deepseek-flash",
+      "httpAttempts": 1,
+      "tools": [
+        {
+          "name": "search_actions",
+          "arguments": "{\"tags\": [\"scene.home\", \"purpose.strength\", \"level.1\"], \"limit\": 20}"
+        },
+        {
+          "name": "search_actions",
+          "arguments": "{\"tags\": [\"scene.home\", \"purpose.core\", \"level.1\"], \"limit\": 20}"
+        },
+        {
+          "name": "search_actions",
+          "arguments": "{\"tags\": [\"scene.home\", \"purpose.stretch\", \"level.1\"], \"limit\": 20}"
+        }
+      ],
+      "elapsedMs": 1733
+    },
+    {
+      "roles": [
+        "system",
+        "user",
+        "assistant",
+        "tool",
+        "assistant",
+        "tool",
+        "assistant",
+        "tool",
+        "tool",
+        "tool",
+        "user"
+      ],
+      "model": "deepseek-flash",
+      "httpAttempts": 1,
+      "tools": [
+        {
+          "name": "draft_plan",
+          "arguments": "{\"title\": \"居家全身徒手训练\", \"blocks\": [{\"kind\": \"warmup\", \"items\": [{\"id\": \"h-good-morning\"}]}, {\"kind\": \"main\", \"items\": [{\"id\": \"h-squat\"}, {\"id\": \"h-incline-pushup\"}, {\"id\": \"w-bird-dog\"}]}, {\"kind\": \"cooldown\", \"items\": [{\"id\": \"h-supine-twist\"}]}]}"
+        }
+      ],
+      "elapsedMs": 4949
+    },
+    {
+      "roles": [
+        "system",
+        "user",
+        "assistant",
+        "tool",
+        "assistant",
+        "tool",
+        "assistant",
+        "tool",
+        "tool",
+        "tool",
+        "assistant",
+        "tool",
+        "user"
+      ],
+      "model": "deepseek-flash",
+      "httpAttempts": 1,
+      "tools": [
+        {
+          "name": "draft_plan",
+          "arguments": "{\"blocks\": [{\"items\": [{\"id\": \"h-bilateral-upper-back-hug\"}], \"kind\": \"warmup\"}, {\"items\": [{\"id\": \"h-squat\"}, {\"id\": \"h-incline-pushup\"}, {\"id\": \"w-bird-dog\"}], \"kind\": \"main\"}, {\"items\": [{\"id\": \"h-supine-twist\"}], \"kind\": \"cooldown\"}], \"title\": \"居家全身徒手训练\"}"
+        }
+      ],
+      "elapsedMs": 5261
+    },
+    {
+      "roles": [
+        "system",
+        "user",
+        "assistant",
+        "tool",
+        "assistant",
+        "tool",
+        "assistant",
+        "tool",
+        "tool",
+        "tool",
+        "assistant",
+        "tool",
+        "assistant",
+        "tool",
+        "user"
+      ],
+      "model": "deepseek-flash",
+      "httpAttempts": 1,
+      "tools": [
+        {
+          "name": "show_plan",
+          "arguments": "{\"plan_id\": \"plan-1793426324733-2\", \"note\": \"先开后链和肩背热身，主体练腿、推和核心，最后用扭转放松腰背。全程按自己节奏做，不憋气、不弹震；动作幅度以没有不适为准，顺手就能跟练。\"}"
+        }
+      ],
+      "elapsedMs": 2877
+    }
+  ]
+}

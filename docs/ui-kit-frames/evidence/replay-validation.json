@@ -1,0 +1,20 @@
+{
+  "schema": "smartfit-ui-kit-portable-replay-validation@1",
+  "portableLauncher": "tools/ui_kit_frames/capture_frames.py",
+  "launcherSha256": "dd51a099736493179642f6af408a01612c32727e42ae82fee4eac94dab2eb2b9",
+  "baseCommit": "13c0bb4cc24982be50bbb2471fc83ace6f64e40b",
+  "driverSha256": "81f80b15fbfc34526aca03c18e835c0234553f064c9a46ab4543c5f65ac6f154",
+  "inputsSha256": "a2c6df4c3e5dd8f3acab967ab835b15b0d9c6db3f98c318c0d8fcb705d490711",
+  "strictOfflineLockResolution": true,
+  "pubHostedUrl": "https://pub.dev",
+  "captureTestsPassed": 2,
+  "replayedFrames": 58,
+  "allFramePngBytesIdenticalToPublishedBaseline": true,
+  "emptyAssetDirectoryProvisionedOnlyDeclared12Images": true,
+  "provisioningIdempotent": true,
+  "provisionedImageBytes": 135798,
+  "mediaInputManifestSha256": "e3e1c096dcdeb2426754893b4557058eac69cce07df3597cbd987b3a2eed7aba",
+  "captureLogSha256": "7fd32521dcda76be8ea04582e71ed3e6a1d0f1c7fbe61b8ed834cff5be8bf05e",
+  "lockLogSha256": "9e1614d9bd8e12f7a9b0765708d684dfa37eb7518fe735f79ee59d25974b5885",
+  "noProductionSourceOrGitRefsChanged": true
+}

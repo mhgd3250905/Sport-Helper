@@ -1,0 +1,2809 @@
+diff --git a/lib/ui/chat/chat_home_page.dart b/lib/ui/chat/chat_home_page.dart
+index c83709cce4a3f508fe456bd72af28285def25b94..607fc55658309ed9eff9d9a28257e53d84a22d7e 100644
+--- a/lib/ui/chat/chat_home_page.dart
++++ b/lib/ui/chat/chat_home_page.dart
+@@ -26,8 +26,6 @@ import 'chat_widgets.dart';
+ import 'chat_composer_dock.dart';
+ import 'coach_ui_adapter.dart';
+ import 'cosmos.dart';
+-import 'coach_task_bubble.dart';
+-import 'coach_delivery_transition.dart';
+ import 'plan_card.dart';
+ import 'saved_plans_page.dart';
+ import 'validated_plan_card.dart';
+@@ -470,6 +468,11 @@ class _ChatHomePageState extends State<ChatHomePage>
+     _deliveryKeys.removeWhere((id, _) => !liveDeliveries.contains(id));
+     GlobalKey deliveryKey(String id) =>
+         _deliveryKeys.putIfAbsent(id, GlobalKey.new);
++    final summary = coach.CoachTaskSummary.fromState(
++      _chat.activeSessionState,
++      task: _chat.activeTask,
++    );
++    final library = AppServices.of(context).library;
+     final rows = [
+       for (final m in msgs)
+         CoachChatEntry(
+@@ -501,11 +504,16 @@ class _ChatHomePageState extends State<ChatHomePage>
+             key: deliveryKey(_pendingDeliveryId!),
+             preparing: true,
+             child: CoachTaskBubble(
+-              task: _chat.activeTask,
+-              sessionState: _chat.activeSessionState,
+-              library: AppServices.of(context).library,
++              title: summary.title,
++              status: summary.status,
++              phase: summary.phase,
++              parameters: summary.parameters,
++              picks: summary.picks,
++              complete: summary.complete,
+               waiting: true,
+               onCancel: _chat.cancelRequest,
++              cutoutFor: (id) =>
++                  smartfitTaskCutout(context, library.tryGet(id)),
+             ),
+           ),
+         ),
+diff --git a/lib/ui/chat/coach_delivery_transition.dart b/lib/ui/chat/coach_delivery_transition.dart
+deleted file mode 100644
+index a279ed55ec424c1e1abc4704c42292afb7a12d55..0000000000000000000000000000000000000000
+--- a/lib/ui/chat/coach_delivery_transition.dart
++++ /dev/null
+@@ -1,223 +0,0 @@
+-import 'package:flutter/material.dart';
+-
+-import '../theme/tokens.dart';
+-import '../theme/ui_polish_tokens.dart';
+-import 'coach_task_bubble.dart';
+-
+-/// Keeps the completed preparation visible without delaying conversation data.
+-/// Only this wrapper changes height; the bubble owns its orb/check animation.
+-class CoachDeliveryTransition extends StatefulWidget {
+-  const CoachDeliveryTransition({
+-    super.key,
+-    required this.preparing,
+-    required this.child,
+-    this.successful = false,
+-    this.interrupted = false,
+-  });
+-
+-  final bool preparing;
+-  final Widget child;
+-
+-  /// A delivered, admitted plan or recommendation may show the success check.
+-  final bool successful;
+-
+-  /// A new request immediately reveals a previous request's delivered content.
+-  final bool interrupted;
+-
+-  @override
+-  State<CoachDeliveryTransition> createState() =>
+-      _CoachDeliveryTransitionState();
+-}
+-
+-class _CoachDeliveryTransitionState extends State<CoachDeliveryTransition>
+-    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
+-  Widget? _preparation;
+-  final _preparationTreeKey = GlobalKey();
+-  AnimationController? _sequence;
+-  bool _presentingCompletion = false;
+-  bool _legacyDelivery = false;
+-  bool _skipDelivery = false;
+-  bool _reduced = false;
+-  bool _tickersEnabled = true;
+-  bool _routeCurrent = true;
+-  bool _foreground = true;
+-
+-  static Duration get _beforeCollapse =>
+-      SfGenerationTokens.completionVisual + SfGenerationTokens.completionHold;
+-  static Duration get _total =>
+-      _beforeCollapse + SfGenerationTokens.completionTransition;
+-
+-  bool get _visible => _tickersEnabled && _routeCurrent && _foreground;
+-
+-  @override
+-  void initState() {
+-    super.initState();
+-    WidgetsBinding.instance.addObserver(this);
+-    final lifecycle = WidgetsBinding.instance.lifecycleState;
+-    _foreground = lifecycle == null || lifecycle == AppLifecycleState.resumed;
+-    if (widget.preparing) _preparation = widget.child;
+-  }
+-
+-  @override
+-  void didChangeDependencies() {
+-    super.didChangeDependencies();
+-    _reduced = SfMotion.reduced(context);
+-    _tickersEnabled = TickerMode.valuesOf(context).enabled;
+-    _routeCurrent = ModalRoute.isCurrentOf(context) ?? true;
+-    if (!_visible) _skipDelivery = true;
+-    if (_reduced || !_visible) _finish();
+-  }
+-
+-  @override
+-  void didUpdateWidget(CoachDeliveryTransition oldWidget) {
+-    super.didUpdateWidget(oldWidget);
+-    if (widget.preparing) {
+-      if (!oldWidget.preparing) {
+-        _finish();
+-        _skipDelivery = !_visible;
+-      }
+-      _preparation = widget.child;
+-    } else if (oldWidget.preparing) {
+-      if (!widget.interrupted &&
+-          !_skipDelivery &&
+-          !_reduced &&
+-          _visible &&
+-          _preparation != null) {
+-        if (widget.successful) {
+-          _startCompletion();
+-        } else {
+-          // Failure and ordinary text keep the original 300 ms crossfade.
+-          _legacyDelivery = true;
+-        }
+-      } else {
+-        _finish();
+-      }
+-    } else if (widget.interrupted || (!widget.successful && !_legacyDelivery)) {
+-      _finish();
+-    }
+-  }
+-
+-  void _startCompletion() {
+-    if (_preparation case final CoachTaskBubble bubble) {
+-      _preparation = CoachTaskBubble(
+-        key: bubble.key,
+-        task: bubble.task,
+-        sessionState: bubble.sessionState,
+-        library: bubble.library,
+-        waiting: bubble.waiting,
+-        onCancel: bubble.onCancel,
+-        visualComplete: true,
+-      );
+-    }
+-    _presentingCompletion = true;
+-    _legacyDelivery = false;
+-    // One continuous clock keeps the hold live and needs no delayed callback.
+-    _sequence ??= (AnimationController(
+-      vsync: this,
+-      duration: _total,
+-      animationBehavior: AnimationBehavior.preserve,
+-    )..addListener(_sequenceTick));
+-    _sequence!.forward(from: 0);
+-  }
+-
+-  void _sequenceTick() {
+-    // Flutter reports completed only after the endpoint and clears elapsed on
+-    // that later frame. Value reaches one at 890 ms and covers both cases.
+-    if (_presentingCompletion && (_sequence?.value ?? 0) >= 1 && mounted) {
+-      setState(_finish);
+-    }
+-  }
+-
+-  void _finish() {
+-    _sequence?.stop();
+-    _presentingCompletion = false;
+-    _legacyDelivery = false;
+-    if (!widget.preparing) _preparation = null;
+-  }
+-
+-  @override
+-  void didChangeAppLifecycleState(AppLifecycleState state) {
+-    _foreground = state == AppLifecycleState.resumed;
+-    if (!_foreground) _skipDelivery = true;
+-    if (mounted) {
+-      setState(() {
+-        if (!_foreground) _finish();
+-      });
+-    }
+-  }
+-
+-  @override
+-  void dispose() {
+-    WidgetsBinding.instance.removeObserver(this);
+-    _sequence?.dispose();
+-    super.dispose();
+-  }
+-
+-  @override
+-  Widget build(BuildContext context) {
+-    if (!widget.preparing && !_presentingCompletion && !_legacyDelivery) {
+-      return widget.child;
+-    }
+-    final contents = AnimatedBuilder(
+-      animation: _sequence ?? kAlwaysDismissedAnimation,
+-      child: _preparation ?? widget.child,
+-      builder: (context, child) {
+-        final elapsed = _presentingCompletion
+-            ? _sequence?.lastElapsedDuration ?? Duration.zero
+-            : Duration.zero;
+-        final collapsing = (elapsed - _beforeCollapse).inMicroseconds.clamp(
+-          0,
+-          SfGenerationTokens.completionTransition.inMicroseconds,
+-        );
+-        final height =
+-            1 -
+-            Curves.easeOutCubic.transform(
+-              (collapsing /
+-                      SfGenerationTokens.completionTransition.inMicroseconds)
+-                  .clamp(0.0, 1.0),
+-            );
+-        final opacity =
+-            1 -
+-            Curves.easeInCubic.transform(
+-              (collapsing / SfGenerationTokens.completionFade.inMicroseconds)
+-                  .clamp(0.0, 1.0),
+-            );
+-        return ClipRect(
+-          child: Align(
+-            key: const ValueKey('coach-delivery-collapse'),
+-            alignment: Alignment.topLeft,
+-            widthFactor: 1,
+-            heightFactor: height,
+-            child: Opacity(
+-              key: const ValueKey('coach-delivery-opacity'),
+-              opacity: opacity,
+-              child: IgnorePointer(
+-                ignoring: !widget.preparing,
+-                child: TickerMode(
+-                  enabled:
+-                      _visible && (widget.preparing || _presentingCompletion),
+-                  child: child!,
+-                ),
+-              ),
+-            ),
+-          ),
+-        );
+-      },
+-    );
+-    // Reparent the entire preparation tree, preserving the bubble's State.
+-    // Success bypasses AnimatedSize completely: its clock alone changes height.
+-    final preparation = KeyedSubtree(key: _preparationTreeKey, child: contents);
+-    if (_presentingCompletion || _reduced || !_visible) return preparation;
+-    return AnimatedCrossFade(
+-      key: const ValueKey('coach-delivery-crossfade'),
+-      duration: SfGenerationTokens.completionTransition,
+-      sizeCurve: SfMotion.standard,
+-      alignment: Alignment.topLeft,
+-      firstChild: preparation,
+-      secondChild: widget.preparing ? const SizedBox.shrink() : widget.child,
+-      crossFadeState: _legacyDelivery
+-          ? CrossFadeState.showSecond
+-          : CrossFadeState.showFirst,
+-    );
+-  }
+-}
+diff --git a/lib/ui/chat/coach_task_bubble.dart b/lib/ui/chat/coach_task_bubble.dart
+deleted file mode 100644
+index 4424379b2430744bdfe01e61b7e479ffb7e9233e..0000000000000000000000000000000000000000
+--- a/lib/ui/chat/coach_task_bubble.dart
++++ /dev/null
+@@ -1,1228 +0,0 @@
+-import 'dart:math' as math;
+-
+-import 'package:flutter/foundation.dart' show listEquals;
+-import 'package:flutter/material.dart';
+-import 'package:ugk_coach/ugk_coach.dart' as coach;
+-
+-import '../../domain/exercise.dart';
+-import '../alpha_artwork.dart';
+-import '../theme.dart' show levelZh;
+-import '../theme/media_theme.dart';
+-import '../theme/tokens.dart';
+-import '../theme/ui_polish_tokens.dart';
+-
+-/// Only sourced SDK facts drive this presentation; node stamps stay internal.
+-class CoachTaskBubble extends StatefulWidget {
+-  const CoachTaskBubble({
+-    super.key,
+-    this.task,
+-    this.sessionState,
+-    this.library,
+-    this.waiting = false,
+-    this.visualComplete = false,
+-    this.onCancel,
+-  });
+-
+-  final coach.CoachTaskState? task;
+-  final coach.CoachSessionState? sessionState;
+-  final ExerciseLibrary? library;
+-  final bool waiting;
+-
+-  /// Completes the orb visually while the delivery wrapper retains this card.
+-  /// It does not change the sourced SDK task, phase, or status sentence.
+-  final bool visualComplete;
+-  final VoidCallback? onCancel;
+-
+-  @override
+-  State<CoachTaskBubble> createState() => _CoachTaskBubbleState();
+-}
+-
+-class _CoachTaskBubbleState extends State<CoachTaskBubble>
+-    with TickerProviderStateMixin {
+-  late final AnimationController _rotation;
+-  late final AnimationController _shine;
+-  late final AnimationController _progress;
+-  late final AnimationController _images;
+-  late final AnimationController _breath;
+-  late final AnimationController _coreCollapse;
+-  late final AnimationController _completion;
+-  late final AnimationController _band;
+-  late final AnimationController _check;
+-  late final AnimationController _reveal;
+-  bool? _reduced;
+-  bool _tickersEnabled = true;
+-  bool _showingComplete = false;
+-  int _imageIndex = 0;
+-  double _lastImageValue = 0;
+-  int _progressPhase = 0;
+-  List<double> _progressFrom = List.filled(
+-    SfGenerationTokens.progressSegments,
+-    0,
+-  );
+-
+-  @override
+-  void initState() {
+-    super.initState();
+-    _rotation = AnimationController(
+-      vsync: this,
+-      duration: SfGenerationTokens.rotation,
+-    );
+-    _shine = AnimationController(
+-      vsync: this,
+-      duration: SfGenerationTokens.shimmer,
+-    );
+-    _progress = AnimationController(
+-      vsync: this,
+-      duration: SfGenerationTokens.progressTransition,
+-      value: 1,
+-    );
+-    _images = AnimationController(
+-      vsync: this,
+-      duration:
+-          SfGenerationTokens.silhouetteHold + SfGenerationTokens.silhouetteFade,
+-    )..addListener(_advanceImage);
+-    _breath = AnimationController(
+-      vsync: this,
+-      duration: SfGenerationTokens.breath,
+-    );
+-    _coreCollapse = AnimationController(
+-      vsync: this,
+-      duration: SfGenerationTokens.coreCollapse,
+-    );
+-    _completion = AnimationController(
+-      vsync: this,
+-      duration: SfGenerationTokens.completionVisual,
+-    )..addListener(_completionFrame);
+-    _band = AnimationController(
+-      vsync: this,
+-      duration: SfGenerationTokens.progressBand,
+-    );
+-    _check = AnimationController(
+-      vsync: this,
+-      duration: SfGenerationTokens.checkTransition,
+-    );
+-    _reveal = AnimationController(
+-      vsync: this,
+-      duration:
+-          SfGenerationTokens.silhouetteRevealDelay +
+-          SfGenerationTokens.silhouetteFade,
+-    );
+-  }
+-
+-  coach.CoachTaskState? get _task => widget.task ?? widget.sessionState?.task;
+-  List<String> get _picks => widget.sessionState?.picks ?? const [];
+-  List<Exercise> get _selected => [
+-    for (final id in _picks) ?widget.library?.tryGet(id),
+-  ];
+-  bool get _complete =>
+-      _task?.nodes.any((node) => node.id == 'output' && _done(node)) ?? false;
+-  // SDK output may finish before the reply is admitted. While waiting, only
+-  // the delivery wrapper's successful-reply marker may show the success check.
+-  bool get _visualComplete =>
+-      widget.visualComplete || (_complete && !widget.waiting);
+-  bool get _motionOff => _reduced == true || !_tickersEnabled;
+-
+-  static bool _done(coach.CoachNodeState node) =>
+-      node.status == 'done' || node.status == 'updated';
+-
+-  static int _phase(coach.CoachTaskState? task) {
+-    final nodes = task?.nodes ?? const <coach.CoachNodeState>[];
+-    final node =
+-        nodes.where((node) => node.status == 'current').firstOrNull ??
+-        nodes.where(_done).lastOrNull;
+-    return switch (node?.id) {
+-      'actions' => 1,
+-      'planning' => 2,
+-      'review' => 3,
+-      'output' => SfGenerationTokens.progressSegments,
+-      _ => 0,
+-    };
+-  }
+-
+-  String get _status => switch (_phase(_task)) {
+-    1 when _picks.isNotEmpty => '挑好了 ${_picks.length} 个动作',
+-    2 => '安排顺序和时长',
+-    3 => '最后检查一遍',
+-    4 => '马上就好',
+-    _ => '读懂你的需求',
+-  };
+-
+-  @override
+-  void didChangeDependencies() {
+-    super.didChangeDependencies();
+-    final reduced = SfMotion.reduced(context);
+-    final tickersEnabled = TickerMode.valuesOf(context).enabled;
+-    if (_reduced != reduced || _tickersEnabled != tickersEnabled) {
+-      _reduced = reduced;
+-      _tickersEnabled = tickersEnabled;
+-      _syncMotion(restartProgress: true);
+-    }
+-  }
+-
+-  @override
+-  void didUpdateWidget(CoachTaskBubble oldWidget) {
+-    super.didUpdateWidget(oldWidget);
+-    final oldPicks = oldWidget.sessionState?.picks ?? const <String>[];
+-    if (!listEquals(oldPicks, _picks)) {
+-      _images.stop();
+-      _imageIndex = 0;
+-      _lastImageValue = 0;
+-      _images.value = 0;
+-    }
+-    _syncMotion(
+-      restartProgress:
+-          _phase(oldWidget.task ?? oldWidget.sessionState?.task) !=
+-          _phase(_task),
+-    );
+-  }
+-
+-  void _syncMotion({bool restartProgress = false}) {
+-    final complete = _visualComplete;
+-    final animate = !_motionOff && widget.waiting && !complete;
+-    if (_motionOff) {
+-      _completion.stop();
+-      _completion.value = complete ? 1 : 0;
+-      _check.stop();
+-      _check.value = complete ? 1 : 0;
+-    } else if (complete) {
+-      if (!_showingComplete) {
+-        _completion.forward(from: 0);
+-        _check.forward(from: 0);
+-      }
+-    } else {
+-      _completion.stop();
+-      _completion.value = 0;
+-      _check.stop();
+-      _check.value = 0;
+-    }
+-    _showingComplete = complete;
+-
+-    // Prototype pauses the spin the moment it completes; the ring closes in
+-    // place.
+-    if (animate) {
+-      if (!_rotation.isAnimating) _rotation.repeat();
+-    } else {
+-      _rotation.stop();
+-      if (_reduced == true) _rotation.value = 0;
+-    }
+-    for (final controller in [_shine, _band]) {
+-      if (animate) {
+-        if (!controller.isAnimating) controller.repeat();
+-      } else {
+-        controller.stop();
+-      }
+-    }
+-    if (animate && _selected.length > 1) {
+-      if (!_images.isAnimating) _images.repeat();
+-    } else {
+-      _images.stop();
+-      if (_reduced == true) {
+-        _imageIndex = 0;
+-        _lastImageValue = 0;
+-        _images.value = 0;
+-      }
+-    }
+-    if (animate && _selected.isEmpty) {
+-      if (!_breath.isAnimating) _breath.repeat(reverse: true);
+-    } else {
+-      _breath.stop();
+-      if (_motionOff) _breath.value = 1;
+-    }
+-    if (_selected.isEmpty) {
+-      _coreCollapse.stop();
+-      _coreCollapse.value = 0;
+-      _reveal.stop();
+-      _reveal.value = 0;
+-    } else if (animate) {
+-      if (!_coreCollapse.isAnimating && !_coreCollapse.isCompleted) {
+-        _coreCollapse.forward();
+-      }
+-      if (!_reveal.isAnimating && !_reveal.isCompleted) _reveal.forward();
+-    } else {
+-      _coreCollapse.stop();
+-      _coreCollapse.value = 1;
+-      _reveal.stop();
+-      _reveal.value = 1;
+-    }
+-    _syncProgress(restart: restartProgress);
+-  }
+-
+-  void _completionFrame() {
+-    if (_visualComplete && _completion.value >= 1) {
+-      _rotation.stop();
+-      // Flutter's interpolation reports its completed status after the exact
+-      // endpoint frame. Settle at value 1 so a long next frame cannot rotate
+-      // the already closed ring or keep the completion ticker alive.
+-      if (_completion.isAnimating) _completion.value = 1;
+-    }
+-  }
+-
+-  double _segmentFill(int index) {
+-    final target = index < _progressPhase ? 1.0 : 0.0;
+-    final eased = Curves.easeOutCubic.transform(_progress.value);
+-    return _progressFrom[index] + (target - _progressFrom[index]) * eased;
+-  }
+-
+-  void _syncProgress({required bool restart}) {
+-    final phase = _phase(_task);
+-    final target = [
+-      for (var index = 0; index < SfGenerationTokens.progressSegments; index++)
+-        index < phase ? 1.0 : 0.0,
+-    ];
+-    if (_motionOff || !widget.waiting) {
+-      _progress.stop();
+-      _progressPhase = phase;
+-      _progressFrom = target;
+-      _progress.value = 1;
+-    } else if (restart) {
+-      final from = [
+-        for (
+-          var index = 0;
+-          index < SfGenerationTokens.progressSegments;
+-          index++
+-        )
+-          _segmentFill(index),
+-      ];
+-      _progress.stop();
+-      _progressPhase = phase;
+-      _progressFrom = from;
+-      if (listEquals(from, target)) {
+-        _progress.value = 1;
+-      } else {
+-        _progress.forward(from: 0);
+-      }
+-    }
+-  }
+-
+-  void _advanceImage() {
+-    final count = _selected.length;
+-    if (_images.isAnimating &&
+-        count > 1 &&
+-        _images.value < _lastImageValue &&
+-        mounted) {
+-      setState(() => _imageIndex = (_imageIndex + 1) % count);
+-    }
+-    _lastImageValue = _images.value;
+-  }
+-
+-  @override
+-  void dispose() {
+-    _rotation.dispose();
+-    _shine.dispose();
+-    _progress.dispose();
+-    _images.dispose();
+-    _breath.dispose();
+-    _coreCollapse.dispose();
+-    _completion.dispose();
+-    _band.dispose();
+-    _check.dispose();
+-    _reveal.dispose();
+-    super.dispose();
+-  }
+-
+-  @override
+-  Widget build(BuildContext context) {
+-    final chips = _parameterLabels(widget.sessionState?.params ?? const {});
+-    final scene = chips.where((chip) => chip.field == 'scene').firstOrNull;
+-    final goal = chips.where((chip) => chip.field == 'goal').firstOrNull;
+-    final title = scene != null && goal != null
+-        ? '为你准备 · ${scene.label}${goal.label}'
+-        : '正在想怎么练';
+-    final staticDetails = _motionOff || _visualComplete || !widget.waiting;
+-    // Isolate the card's endless animations from the chat list's raster.
+-    return RepaintBoundary(
+-      child: Align(
+-        alignment: Alignment.centerLeft,
+-        child: ConstrainedBox(
+-          constraints: const BoxConstraints(
+-            maxWidth: SfGenerationTokens.maxWidth,
+-          ),
+-          child: SizedBox(
+-            key: const ValueKey('generation-completion-size'),
+-            child: Container(
+-              key: const ValueKey('generation-card'),
+-              padding: SfGenerationTokens.cardPadding,
+-              clipBehavior: Clip.antiAlias,
+-              decoration: BoxDecoration(
+-                color: SfColors.surface,
+-                borderRadius: BorderRadius.circular(
+-                  SfGenerationTokens.cardRadius,
+-                ),
+-                boxShadow: SfGenerationTokens.cardShadow,
+-              ),
+-              // A foreground outline does not add half a pixel to the padding.
+-              foregroundDecoration: BoxDecoration(
+-                borderRadius: BorderRadius.circular(
+-                  SfGenerationTokens.cardRadius,
+-                ),
+-                border: Border.all(
+-                  color: SfGenerationTokens.cardEdge,
+-                  width: SfGenerationTokens.cardEdgeWidth,
+-                ),
+-              ),
+-              child: Stack(
+-                clipBehavior: Clip.none,
+-                children: [
+-                  // Card-level glow centred on the orb: 320 px radial, clipped
+-                  // by the card, painted once (outside the orb's repaint).
+-                  Positioned(
+-                    left:
+-                        SfGenerationTokens.animationSize / 2 -
+-                        SfGenerationTokens.glowRadius,
+-                    top:
+-                        SfGenerationTokens.animationSize / 2 -
+-                        SfGenerationTokens.glowRadius,
+-                    width: SfGenerationTokens.glowRadius * 2,
+-                    height: SfGenerationTokens.glowRadius * 2,
+-                    child: IgnorePointer(
+-                      child: DecoratedBox(
+-                        key: const ValueKey('generation-glow'),
+-                        decoration: BoxDecoration(
+-                          shape: BoxShape.circle,
+-                          gradient: RadialGradient(
+-                            colors: [
+-                              SfGenerationTokens.glow,
+-                              SfColors.accent.withValues(alpha: 0),
+-                            ],
+-                          ),
+-                        ),
+-                      ),
+-                    ),
+-                  ),
+-                  Column(
+-                    mainAxisSize: MainAxisSize.min,
+-                    crossAxisAlignment: CrossAxisAlignment.start,
+-                    children: [
+-                      Row(
+-                        children: [
+-                          RepaintBoundary(child: _animation()),
+-                          const SizedBox(
+-                            width: SfGenerationTokens.animationGap,
+-                          ),
+-                          Expanded(
+-                            child: Column(
+-                              mainAxisSize: MainAxisSize.min,
+-                              crossAxisAlignment: CrossAxisAlignment.stretch,
+-                              children: [
+-                                Text(
+-                                  title,
+-                                  style: SfGenerationTokens.title,
+-                                  maxLines: 1,
+-                                  overflow: TextOverflow.ellipsis,
+-                                ),
+-                                const SizedBox(
+-                                  height: SfGenerationTokens.statusGap,
+-                                ),
+-                                RepaintBoundary(
+-                                  child: _StatusSentence(
+-                                    text: _status,
+-                                    shimmer: _shine,
+-                                    reduced: staticDetails,
+-                                  ),
+-                                ),
+-                              ],
+-                            ),
+-                          ),
+-                          const SizedBox(
+-                            width: SfGenerationTokens.animationGap,
+-                          ),
+-                          // Prototype: 44 px target with margin-right -10 px, so it
+-                          // overhangs the card padding and the title keeps 10 px.
+-                          SizedBox(
+-                            width:
+-                                SfGenerationTokens.cancelTouchSize -
+-                                SfGenerationTokens.cancelOutset,
+-                            height: SfGenerationTokens.cancelTouchSize,
+-                            child: OverflowBox(
+-                              alignment: Alignment.centerLeft,
+-                              minWidth: SfGenerationTokens.cancelTouchSize,
+-                              maxWidth: SfGenerationTokens.cancelTouchSize,
+-                              child: SizedBox.square(
+-                                key: const ValueKey('generation-cancel-target'),
+-                                dimension: SfGenerationTokens.cancelTouchSize,
+-                                child:
+-                                    widget.waiting &&
+-                                        !_visualComplete &&
+-                                        widget.onCancel != null
+-                                    ? _CancelButton(onCancel: widget.onCancel!)
+-                                    : null,
+-                              ),
+-                            ),
+-                          ),
+-                        ],
+-                      ),
+-                      const SizedBox(height: SfGenerationTokens.progressTopGap),
+-                      RepaintBoundary(child: _progressBar()),
+-                      if (chips.isNotEmpty) ...[
+-                        const SizedBox(height: SfGenerationTokens.chipsTopGap),
+-                        Wrap(
+-                          spacing: SfGenerationTokens.chipGap,
+-                          runSpacing: SfGenerationTokens.chipGap,
+-                          children: [
+-                            for (var index = 0; index < chips.length; index++)
+-                              _ParameterChip(
+-                                key: ValueKey(
+-                                  'generation-chip-${chips[index].field}-'
+-                                  '${chips[index].label}-${chips[index].user}',
+-                                ),
+-                                data: chips[index],
+-                                index: index,
+-                                reduced: staticDetails,
+-                              ),
+-                          ],
+-                        ),
+-                      ],
+-                    ],
+-                  ),
+-                ],
+-              ),
+-            ),
+-          ),
+-        ),
+-      ),
+-    );
+-  }
+-
+-  Widget _animation() => SizedBox.square(
+-    key: const ValueKey('generation-animation'),
+-    dimension: SfGenerationTokens.animationSize,
+-    child: Stack(
+-      clipBehavior: Clip.none,
+-      alignment: Alignment.center,
+-      children: [
+-        Positioned.fill(
+-          child: DecoratedBox(
+-            decoration: BoxDecoration(
+-              shape: BoxShape.circle,
+-              color: SfGenerationTokens.orbFill,
+-            ),
+-          ),
+-        ),
+-        Positioned.fill(
+-          child: RotationTransition(
+-            key: const ValueKey('generation-rotation'),
+-            turns: _rotation,
+-            child: AnimatedBuilder(
+-              animation: _completion,
+-              builder: (context, _) {
+-                final closing = Curves.easeOutCubic.transform(
+-                  _completion.value,
+-                );
+-                return CustomPaint(
+-                  painter: _ArcPainter(
+-                    color: SfColors.accent,
+-                    sweep: _reduced == true
+-                        ? 360
+-                        : SfGenerationTokens.arcSweep +
+-                              (360 - SfGenerationTokens.arcSweep) * closing,
+-                    tailAlpha: _visualComplete
+-                        ? closing
+-                        : _reduced == true
+-                        ? .25
+-                        : 0,
+-                    headAlpha: _reduced == true ? 0 : 1 - _completionDetail,
+-                  ),
+-                );
+-              },
+-            ),
+-          ),
+-        ),
+-        AnimatedBuilder(
+-          animation: Listenable.merge([
+-            _breath,
+-            _coreCollapse,
+-            _images,
+-            _completion,
+-            _check,
+-            _reveal,
+-          ]),
+-          builder: (context, _) {
+-            final selected = _selected;
+-            final breath = _motionOff
+-                ? 1.0
+-                : SfGenerationTokens.sine.transform(_breath.value);
+-            final collapse = Curves.easeInCubic.transform(_coreCollapse.value);
+-            final coreScale =
+-                (SfGenerationTokens.breathInitialScale +
+-                    (1 - SfGenerationTokens.breathInitialScale) * breath) *
+-                (1 - collapse);
+-            final coreOpacity =
+-                (SfGenerationTokens.breathInitialOpacity +
+-                    (1 - SfGenerationTokens.breathInitialOpacity) * breath) *
+-                (1 - collapse) *
+-                (1 - _completionDetail);
+-            return Stack(
+-              alignment: Alignment.center,
+-              fit: StackFit.expand,
+-              children: [
+-                if (selected.isEmpty || collapse < 1)
+-                  Center(
+-                    child: Opacity(
+-                      opacity: coreOpacity,
+-                      child: Transform.scale(
+-                        scale: coreScale,
+-                        child: SizedBox.square(
+-                          dimension: SfGenerationTokens.haloSize,
+-                          child: Stack(
+-                            alignment: Alignment.center,
+-                            children: [
+-                              Container(
+-                                key: const ValueKey('generation-halo'),
+-                                width: SfGenerationTokens.haloSize,
+-                                height: SfGenerationTokens.haloSize,
+-                                decoration: BoxDecoration(
+-                                  shape: BoxShape.circle,
+-                                  color: SfColors.accent.withValues(alpha: .15),
+-                                ),
+-                              ),
+-                              Container(
+-                                key: const ValueKey('generation-core'),
+-                                width: SfGenerationTokens.coreSize,
+-                                height: SfGenerationTokens.coreSize,
+-                                decoration: BoxDecoration(
+-                                  shape: BoxShape.circle,
+-                                  color: SfColors.accent,
+-                                ),
+-                              ),
+-                            ],
+-                          ),
+-                        ),
+-                      ),
+-                    ),
+-                  ),
+-                if (selected.isNotEmpty) _thumbnails(selected),
+-                if (_visualComplete)
+-                  Center(
+-                    child: Opacity(
+-                      opacity: _checkOpacity,
+-                      child: Transform.scale(
+-                        scale:
+-                            SfGenerationTokens.checkInitialScale +
+-                            (1 - SfGenerationTokens.checkInitialScale) *
+-                                SfGenerationTokens.back.transform(_check.value),
+-                        child: CustomPaint(
+-                          key: const ValueKey('generation-check'),
+-                          size: const Size.square(SfGenerationTokens.checkSize),
+-                          painter: _CheckPainter(color: SfColors.accent),
+-                        ),
+-                      ),
+-                    ),
+-                  ),
+-              ],
+-            );
+-          },
+-        ),
+-      ],
+-    ),
+-  );
+-
+-  // Opacity runs 120 ms linear inside the 260 ms scale (prototype .check).
+-  double get _checkOpacity =>
+-      (_check.value *
+-              SfGenerationTokens.checkTransition.inMicroseconds /
+-              SfGenerationTokens.checkFade.inMicroseconds)
+-          .clamp(0.0, 1.0);
+-
+-  /// First silhouette: 180 ms wait, then 250 ms fade (linear) and .94 -> 1
+-  /// scale (ease-out). Later images use the crossfade below.
+-  double get _revealProgress {
+-    final elapsed =
+-        _reveal.value *
+-        (SfGenerationTokens.silhouetteRevealDelay +
+-                SfGenerationTokens.silhouetteFade)
+-            .inMicroseconds;
+-    return ((elapsed -
+-                SfGenerationTokens.silhouetteRevealDelay.inMicroseconds) /
+-            SfGenerationTokens.silhouetteFade.inMicroseconds)
+-        .clamp(0.0, 1.0);
+-  }
+-
+-  double get _completionDetail =>
+-      (_completion.value *
+-              SfGenerationTokens.completionVisual.inMicroseconds /
+-              SfGenerationTokens.completionDetail.inMicroseconds)
+-          .clamp(0.0, 1.0);
+-
+-  Widget _thumbnails(List<Exercise> selected) {
+-    final current = _reduced == true ? 0 : _imageIndex % selected.length;
+-    final next = (current + 1) % selected.length;
+-    final cycle =
+-        SfGenerationTokens.silhouetteHold + SfGenerationTokens.silhouetteFade;
+-    final elapsed = _images.value * cycle.inMicroseconds;
+-    final blend = _reduced == true || selected.length == 1
+-        ? 0.0
+-        : ((elapsed - SfGenerationTokens.silhouetteHold.inMicroseconds) /
+-                  SfGenerationTokens.silhouetteFade.inMicroseconds)
+-              .clamp(0.0, 1.0);
+-    return Padding(
+-      key: const ValueKey('generation-thumbnails'),
+-      padding: const EdgeInsets.all(SfGenerationTokens.thumbnailInset),
+-      child: Opacity(
+-        opacity: (1 - _completionDetail) * _revealProgress,
+-        child: ClipOval(
+-          child: Stack(
+-            fit: StackFit.expand,
+-            children: [
+-              Opacity(
+-                opacity: 1 - blend,
+-                child: Transform.scale(
+-                  // Outgoing image eases back to .94 while fading (prototype
+-                  // drops .show, reversing both transitions).
+-                  scale:
+-                      1 -
+-                      (1 - SfGenerationTokens.imageInitialScale) *
+-                          Curves.easeOutCubic.transform(blend) -
+-                      (1 - SfGenerationTokens.imageInitialScale) *
+-                          (1 - Curves.easeOutCubic.transform(_revealProgress)),
+-                  child: _thumbnail(selected[current]),
+-                ),
+-              ),
+-              if (blend > 0)
+-                Opacity(
+-                  opacity: blend,
+-                  child: Transform.scale(
+-                    scale:
+-                        SfGenerationTokens.imageInitialScale +
+-                        (1 - SfGenerationTokens.imageInitialScale) *
+-                            Curves.easeOutCubic.transform(blend),
+-                    child: _thumbnail(selected[next]),
+-                  ),
+-                ),
+-            ],
+-          ),
+-        ),
+-      ),
+-    );
+-  }
+-
+-  Widget _thumbnail(Exercise exercise) {
+-    final asset =
+-        exercise.media.alphaThumbnail ??
+-        exercise.media.alphaCover ??
+-        sfPoster(exercise);
+-    return SfAlphaAsset(
+-      key: ValueKey('generation-thumbnail-${exercise.id}'),
+-      asset: asset,
+-      fit: BoxFit.contain,
+-      alignment: Alignment.center,
+-      semanticLabel: exercise.name,
+-    );
+-  }
+-
+-  Widget _progressBar() => AnimatedBuilder(
+-    animation: Listenable.merge([_progress, _band]),
+-    builder: (context, _) {
+-      final phase = _phase(_task);
+-      return Row(
+-        children: [
+-          for (
+-            var index = 0;
+-            index < SfGenerationTokens.progressSegments;
+-            index++
+-          ) ...[
+-            if (index > 0)
+-              const SizedBox(width: SfGenerationTokens.progressGap),
+-            Expanded(
+-              child: SizedBox(
+-                height: SfGenerationTokens.progressHeight,
+-                child: ClipRRect(
+-                  key: ValueKey('generation-progress-$index'),
+-                  borderRadius: BorderRadius.circular(
+-                    SfGenerationTokens.progressRadius,
+-                  ),
+-                  child: LayoutBuilder(
+-                    builder: (context, constraints) => Stack(
+-                      fit: StackFit.expand,
+-                      children: [
+-                        ColoredBox(
+-                          color: index == phase
+-                              ? SfColors.accent.withValues(alpha: .30)
+-                              : SfGenerationTokens.progressTrack,
+-                        ),
+-                        Align(
+-                          alignment: Alignment.centerLeft,
+-                          child: FractionallySizedBox(
+-                            key: ValueKey('generation-progress-fill-$index'),
+-                            heightFactor: 1,
+-                            widthFactor: _segmentFill(index),
+-                            child: ColoredBox(color: SfColors.accent),
+-                          ),
+-                        ),
+-                        if (index == phase &&
+-                            !_motionOff &&
+-                            !_visualComplete &&
+-                            widget.waiting)
+-                          Positioned(
+-                            left:
+-                                constraints.maxWidth *
+-                                (-SfGenerationTokens.progressBandFraction +
+-                                    (1 +
+-                                            SfGenerationTokens
+-                                                .progressBandFraction) *
+-                                        SfGenerationTokens.sine.transform(
+-                                          _band.value,
+-                                        )),
+-                            top: 0,
+-                            bottom: 0,
+-                            width:
+-                                constraints.maxWidth *
+-                                SfGenerationTokens.progressBandFraction,
+-                            child: DecoratedBox(
+-                              key: ValueKey('generation-progress-band-$index'),
+-                              decoration: BoxDecoration(
+-                                gradient: LinearGradient(
+-                                  colors: [
+-                                    SfColors.accent.withValues(alpha: 0),
+-                                    SfColors.accent,
+-                                    SfColors.accent.withValues(alpha: 0),
+-                                  ],
+-                                ),
+-                              ),
+-                            ),
+-                          ),
+-                      ],
+-                    ),
+-                  ),
+-                ),
+-              ),
+-            ),
+-          ],
+-        ],
+-      );
+-    },
+-  );
+-}
+-
+-typedef _ChipData = ({String field, String label, bool user});
+-
+-List<_ChipData> _parameterLabels(Map<String, coach.CoachParamValue> params) {
+-  final result = <_ChipData>[];
+-  for (final field in ['scene', 'goal', 'equipment', 'level', 'limits']) {
+-    final param = params[field];
+-    if (param == null) continue;
+-    final value = param.value;
+-    final label = switch (field) {
+-      'scene' => const {
+-        'home': '居家',
+-        'office': '办公室',
+-        'gym': '健身房',
+-        'outdoor': '户外',
+-      }[value],
+-      'goal' =>
+-        value is List
+-            ? [
+-                for (final code in value)
+-                  for (final category in ExerciseCategory.values)
+-                    if (code == 'purpose.${category.name}') category.zh,
+-              ].firstOrNull
+-            : null,
+-      'equipment' => _equipmentLabel(value),
+-      'level' => value is int ? levelZh(value) : null,
+-      'limits' => _limitsLabel(value),
+-      _ => null,
+-    };
+-    if (label != null && label.isNotEmpty) {
+-      result.add((field: field, label: label, user: param.source == 'user'));
+-    }
+-  }
+-  return result;
+-}
+-
+-String? _equipmentLabel(Object? value) {
+-  if (value is! List) return null;
+-  if (value.isEmpty || value.every((code) => code == 'none')) return '徒手';
+-  final code = value.whereType<String>().firstOrNull;
+-  if (code == null) return null;
+-  final id = code.startsWith('equip.')
+-      ? code.substring('equip.'.length).replaceAll('_', '-')
+-      : code;
+-  final translated = equipmentLabel(id).split(RegExp('[（(]')).first.trim();
+-  return translated == id && RegExp(r'[A-Za-z]').hasMatch(translated)
+-      ? null
+-      : translated;
+-}
+-
+-String? _limitsLabel(Object? value) {
+-  if (value is! List) return null;
+-  if (value.isEmpty) return '无伤痛';
+-  const labels = {
+-    'limit.knee': '膝',
+-    'limit.waist': '腰',
+-    'limit.shoulder': '肩',
+-    'limit.wrist': '手腕',
+-    'limit.neck': '颈',
+-    'limit.hip': '髋',
+-    'limit.inner_thigh': '大腿内侧',
+-  };
+-  final known = [for (final code in value) ?labels[code]];
+-  return known.length == value.length ? known.join('、') : '身体限制';
+-}
+-
+-class _ArcPainter extends CustomPainter {
+-  const _ArcPainter({
+-    required this.color,
+-    required this.sweep,
+-    required this.tailAlpha,
+-    required this.headAlpha,
+-  });
+-  final Color color;
+-  final double sweep;
+-  final double tailAlpha;
+-  final double headAlpha;
+-
+-  @override
+-  void paint(Canvas canvas, Size size) {
+-    final bounds = (Offset.zero & size).deflate(
+-      SfGenerationTokens.arcStroke / 2,
+-    );
+-    final radians = sweep * math.pi / 180;
+-    const start = -math.pi / 2;
+-    canvas.drawArc(
+-      bounds,
+-      start,
+-      radians,
+-      false,
+-      Paint()
+-        ..style = PaintingStyle.stroke
+-        ..strokeWidth = SfGenerationTokens.arcStroke
+-        ..shader = SweepGradient(
+-          startAngle: 0,
+-          endAngle: radians,
+-          transform: const GradientRotation(start),
+-          colors: [
+-            color.withValues(alpha: tailAlpha),
+-            color,
+-          ],
+-        ).createShader(bounds),
+-    );
+-    if (headAlpha > 0) {
+-      final angle = start + radians;
+-      canvas.drawCircle(
+-        bounds.center +
+-            Offset(
+-              bounds.width / 2 * math.cos(angle),
+-              bounds.height / 2 * math.sin(angle),
+-            ),
+-        SfGenerationTokens.arcHeadSize / 2,
+-        Paint()..color = color.withValues(alpha: headAlpha),
+-      );
+-    }
+-  }
+-
+-  @override
+-  bool shouldRepaint(_ArcPainter oldDelegate) =>
+-      oldDelegate.color != color ||
+-      oldDelegate.sweep != sweep ||
+-      oldDelegate.tailAlpha != tailAlpha ||
+-      oldDelegate.headAlpha != headAlpha;
+-}
+-
+-/// Prototype check: 20x20 viewBox, path M5 10.5 l3.2 3.2 L15 6.8,
+-/// stroke 2.4, round caps and joins. Not a font glyph.
+-class _CheckPainter extends CustomPainter {
+-  const _CheckPainter({required this.color});
+-  final Color color;
+-
+-  @override
+-  void paint(Canvas canvas, Size size) {
+-    final unit = size.width / 20;
+-    final path = Path()
+-      ..moveTo(5 * unit, 10.5 * unit)
+-      ..lineTo(8.2 * unit, 13.7 * unit)
+-      ..lineTo(15 * unit, 6.8 * unit);
+-    canvas.drawPath(
+-      path,
+-      Paint()
+-        ..color = color
+-        ..style = PaintingStyle.stroke
+-        ..strokeWidth = SfGenerationTokens.checkStroke * unit
+-        ..strokeCap = StrokeCap.round
+-        ..strokeJoin = StrokeJoin.round,
+-    );
+-  }
+-
+-  @override
+-  bool shouldRepaint(_CheckPainter oldDelegate) => oldDelegate.color != color;
+-}
+-
+-class _CancelButton extends StatefulWidget {
+-  const _CancelButton({required this.onCancel});
+-  final VoidCallback onCancel;
+-
+-  @override
+-  State<_CancelButton> createState() => _CancelButtonState();
+-}
+-
+-class _CancelButtonState extends State<_CancelButton> {
+-  bool _pressed = false;
+-
+-  void _press(bool pressed) {
+-    if (_pressed != pressed) setState(() => _pressed = pressed);
+-  }
+-
+-  @override
+-  Widget build(BuildContext context) => Listener(
+-    onPointerDown: (_) => _press(true),
+-    onPointerUp: (_) => _press(false),
+-    onPointerCancel: (_) => _press(false),
+-    child: Opacity(
+-      opacity: _pressed ? .5 : 1,
+-      child: TextButton(
+-        onPressed: widget.onCancel,
+-        style: TextButton.styleFrom(
+-          padding: EdgeInsets.zero,
+-          minimumSize: const Size.square(SfGenerationTokens.cancelTouchSize),
+-          foregroundColor: SfColors.muted,
+-          backgroundColor: Colors.transparent,
+-          side: BorderSide.none,
+-          overlayColor: Colors.transparent,
+-        ),
+-        child: Text('取消', style: SfGenerationTokens.cancel),
+-      ),
+-    ),
+-  );
+-}
+-
+-class _StatusSentence extends StatefulWidget {
+-  const _StatusSentence({
+-    required this.text,
+-    required this.shimmer,
+-    required this.reduced,
+-  });
+-  final String text;
+-  final Animation<double> shimmer;
+-  final bool reduced;
+-
+-  @override
+-  State<_StatusSentence> createState() => _StatusSentenceState();
+-}
+-
+-class _StatusSentenceState extends State<_StatusSentence>
+-    with SingleTickerProviderStateMixin {
+-  late final AnimationController _transition;
+-  String? _previous;
+-
+-  @override
+-  void initState() {
+-    super.initState();
+-    _transition = AnimationController(
+-      vsync: this,
+-      duration:
+-          SfGenerationTokens.statusDelay + SfGenerationTokens.statusTransition,
+-      value: 1,
+-    );
+-  }
+-
+-  @override
+-  void didUpdateWidget(_StatusSentence oldWidget) {
+-    super.didUpdateWidget(oldWidget);
+-    if (widget.reduced) {
+-      _transition.stop();
+-      _transition.value = 1;
+-      _previous = null;
+-    } else if (oldWidget.text != widget.text) {
+-      _previous = oldWidget.text;
+-      _transition.forward(from: 0);
+-    }
+-  }
+-
+-  @override
+-  void dispose() {
+-    _transition.dispose();
+-    super.dispose();
+-  }
+-
+-  @override
+-  Widget build(BuildContext context) {
+-    final style = SfGenerationTokens.status;
+-    final height =
+-        MediaQuery.textScalerOf(context).scale(style.fontSize!) * style.height!;
+-    return Semantics(
+-      label: widget.text,
+-      liveRegion: true,
+-      child: ExcludeSemantics(
+-        child: SizedBox(
+-          key: const ValueKey('generation-status'),
+-          height: height,
+-          child: AnimatedBuilder(
+-            animation: Listenable.merge([_transition, widget.shimmer]),
+-            builder: (context, _) {
+-              Widget text(String value) {
+-                final sentence = Text(
+-                  value,
+-                  style: style,
+-                  maxLines: 1,
+-                  softWrap: false,
+-                  overflow: TextOverflow.clip,
+-                );
+-                if (widget.reduced) return sentence;
+-                return ShaderMask(
+-                  shaderCallback: (bounds) {
+-                    // CSS: background-size 250%, background-position 100% ->
+-                    // -150%. Offset = (W - 2.5W) * p, so the band travels left
+-                    // to right and leaves a dark gap between passes.
+-                    final width = bounds.width;
+-                    const span = SfGenerationTokens.shimmerSpan;
+-                    final p = 1 + (-1.5 - 1) * widget.shimmer.value;
+-                    final left = (width - span * width) * p;
+-                    return LinearGradient(
+-                      colors: [
+-                        SfColors.muted,
+-                        SfColors.muted,
+-                        SfGenerationTokens.highlight,
+-                        SfColors.muted,
+-                        SfColors.muted,
+-                      ],
+-                      stops: SfGenerationTokens.shimmerStops,
+-                    ).createShader(
+-                      Rect.fromLTWH(left, 0, span * width, bounds.height),
+-                    );
+-                  },
+-                  blendMode: BlendMode.srcIn,
+-                  child: sentence,
+-                );
+-              }
+-
+-              if (widget.reduced) return text(widget.text);
+-              final elapsed =
+-                  _transition.value *
+-                  (SfGenerationTokens.statusDelay +
+-                          SfGenerationTokens.statusTransition)
+-                      .inMicroseconds;
+-              final outgoing = Curves.easeInCubic.transform(
+-                (elapsed / SfGenerationTokens.statusExit.inMicroseconds).clamp(
+-                  0.0,
+-                  1.0,
+-                ),
+-              );
+-              final incoming = Curves.easeOutCubic.transform(
+-                ((elapsed - SfGenerationTokens.statusDelay.inMicroseconds) /
+-                        SfGenerationTokens.statusTransition.inMicroseconds)
+-                    .clamp(0.0, 1.0),
+-              );
+-              return ClipRect(
+-                child: Stack(
+-                  alignment: Alignment.centerLeft,
+-                  children: [
+-                    if (outgoing < 1 && _previous != null)
+-                      Opacity(
+-                        opacity: 1 - outgoing,
+-                        child: Transform.translate(
+-                          offset: Offset(
+-                            0,
+-                            -SfGenerationTokens.statusOffset * outgoing,
+-                          ),
+-                          child: text(_previous!),
+-                        ),
+-                      ),
+-                    Opacity(
+-                      opacity: incoming,
+-                      child: Transform.translate(
+-                        offset: Offset(
+-                          0,
+-                          SfGenerationTokens.statusOffset * (1 - incoming),
+-                        ),
+-                        child: text(widget.text),
+-                      ),
+-                    ),
+-                  ],
+-                ),
+-              );
+-            },
+-          ),
+-        ),
+-      ),
+-    );
+-  }
+-}
+-
+-class _ParameterChip extends StatefulWidget {
+-  const _ParameterChip({
+-    super.key,
+-    required this.data,
+-    required this.index,
+-    required this.reduced,
+-  });
+-  final _ChipData data;
+-  final int index;
+-  final bool reduced;
+-
+-  @override
+-  State<_ParameterChip> createState() => _ParameterChipState();
+-}
+-
+-class _ParameterChipState extends State<_ParameterChip>
+-    with SingleTickerProviderStateMixin {
+-  late final AnimationController _appearance;
+-  late final Animation<double> _entry;
+-
+-  @override
+-  void initState() {
+-    super.initState();
+-    final delay = SfGenerationTokens.chipDelay * widget.index;
+-    final duration = delay + SfGenerationTokens.chipTransition;
+-    _appearance = AnimationController(
+-      vsync: this,
+-      duration: duration,
+-      value: widget.reduced ? 1 : 0,
+-    );
+-    _entry = _appearance.drive(
+-      CurveTween(
+-        curve: Interval(
+-          delay.inMicroseconds / duration.inMicroseconds,
+-          1,
+-          curve: Curves.easeOutCubic,
+-        ),
+-      ),
+-    );
+-    if (!widget.reduced) _appearance.forward();
+-  }
+-
+-  @override
+-  void didUpdateWidget(_ParameterChip oldWidget) {
+-    super.didUpdateWidget(oldWidget);
+-    if (widget.reduced) {
+-      _appearance.stop();
+-      _appearance.value = 1;
+-    }
+-  }
+-
+-  @override
+-  void dispose() {
+-    _appearance.dispose();
+-    super.dispose();
+-  }
+-
+-  @override
+-  Widget build(BuildContext context) => FadeTransition(
+-    opacity: _entry,
+-    child: ScaleTransition(
+-      scale: Tween<double>(
+-        begin: SfGenerationTokens.chipInitialScale,
+-        end: 1,
+-      ).animate(_entry),
+-      child: Container(
+-        key: ValueKey('generation-chip-face-${widget.data.field}'),
+-        height: SfGenerationTokens.chipHeight,
+-        padding: SfGenerationTokens.chipPadding,
+-        decoration: BoxDecoration(
+-          color: SfGenerationTokens.chipFill(widget.data.user),
+-          borderRadius: BorderRadius.circular(SfGenerationTokens.chipRadius),
+-        ),
+-        foregroundDecoration: BoxDecoration(
+-          borderRadius: BorderRadius.circular(SfGenerationTokens.chipRadius),
+-          border: widget.data.user
+-              ? null
+-              : Border.all(color: SfGenerationTokens.chipEdge, width: 1),
+-        ),
+-        child: Center(
+-          widthFactor: 1,
+-          child: Text(
+-            widget.data.label,
+-            style: SfGenerationTokens.chipText(widget.data.user),
+-          ),
+-        ),
+-      ),
+-    ),
+-  );
+-}
+diff --git a/lib/ui/chat/coach_ui_adapter.dart b/lib/ui/chat/coach_ui_adapter.dart
+index edd4570f71b31bd2344955a48ac9b4fe5356b459..8ad7dd7ebe9ae822e6fabf6b56da2882b6d6ccf7 100644
+--- a/lib/ui/chat/coach_ui_adapter.dart
++++ b/lib/ui/chat/coach_ui_adapter.dart
+@@ -25,6 +25,18 @@ Widget withSmartfitCoachUi(BuildContext context, Widget child) =>
+     ? child
+     : CoachUiTheme(style: smartfitCoachUiStyle(), child: child);
+ 
++/// Reuses the current library and verified asset bundle; no alternate artwork.
++ImageProvider? smartfitTaskCutout(BuildContext context, Exercise? exercise) {
++  if (exercise == null) return null;
++  final asset =
++      exercise.media.alphaThumbnail ??
++      exercise.media.alphaCover ??
++      sfPoster(exercise);
++  return asset.isEmpty
++      ? null
++      : AssetImage(asset, bundle: DefaultAssetBundle.of(context));
++}
++
+ /// Only this plan card replaces its save copy and adds a host-owned action.
+ /// The SDK continues to own its footer, start button and expansion timeline.
+ Widget withSmartfitPlanSaveUi(
+@@ -213,6 +225,25 @@ CoachUiStyle smartfitCoachUiStyle({bool planDetailsAction = false}) {
+   return CoachUiStyle(
+     colors: CoachUiColors(
+       brightness: p.brightness,
++      taskAccent: p.accent,
++      taskCardSurface: p.surface,
++      taskCardBorder: (p.isDark ? Colors.white : Colors.black).withValues(
++        alpha: p.isDark ? .08 : .06,
++      ),
++      taskGlow: p.accent.withValues(alpha: p.isDark ? .10 : .06),
++      taskText: p.text,
++      taskMuted: p.muted,
++      taskChipSurface: p.accent.withValues(alpha: p.isDark ? .18 : .10),
++      taskOrbFill: p.accent.withValues(alpha: p.isDark ? .14 : .08),
++      taskProgressTrack: (p.isDark ? Colors.white : Colors.black).withValues(
++        alpha: p.isDark ? .10 : .08,
++      ),
++      taskChipBorder: (p.isDark ? Colors.white : Colors.black).withValues(
++        alpha: p.isDark ? .12 : .10,
++      ),
++      taskHalo: p.accent.withValues(alpha: .15),
++      taskShadowNear: Colors.black.withValues(alpha: .04),
++      taskShadowFar: Colors.black.withValues(alpha: .06),
+       text: p.text,
+       muted: p.muted,
+       faint: p.faint,
+diff --git a/test/chat_coach_session_test.dart b/test/chat_coach_session_test.dart
+index 0ebdd1c615786e0a61393e809d782d024ae9debf..aba3bf83a1bd56bf74a329ccdf6b382a6e5f43eb 100644
+--- a/test/chat_coach_session_test.dart
++++ b/test/chat_coach_session_test.dart
+@@ -14,8 +14,6 @@ import 'package:smartfit/domain/scenario.dart';
+ import 'package:smartfit/ui/chat/coach_ui_adapter.dart';
+ import 'package:smartfit/ui/chat/chat_home_page.dart';
+ import 'package:smartfit/ui/chat/chat_widgets.dart';
+-import 'package:smartfit/ui/chat/coach_delivery_transition.dart';
+-import 'package:smartfit/ui/chat/coach_task_bubble.dart';
+ import 'package:smartfit/ui/chat/plan_card.dart';
+ import 'package:smartfit/ui/chat/validated_plan_card.dart';
+ import 'package:smartfit/ui/theme/app_theme.dart';
+diff --git a/test/coach_delivery_transition_v2_test.dart b/test/coach_delivery_transition_v2_test.dart
+deleted file mode 100644
+index 1826495d0981322013ccbae952e2b9200f9241af..0000000000000000000000000000000000000000
+--- a/test/coach_delivery_transition_v2_test.dart
++++ /dev/null
+@@ -1,432 +0,0 @@
+-import 'dart:async';
+-
+-import 'package:flutter/material.dart';
+-import 'package:flutter_test/flutter_test.dart';
+-import 'package:smartfit/ui/chat/coach_delivery_transition.dart';
+-import 'package:smartfit/ui/chat/coach_task_bubble.dart';
+-import 'package:smartfit/ui/theme.dart';
+-import 'package:ugk_coach/ugk_coach.dart' as coach;
+-
+-final _task = coach.CoachTaskState(
+-  type: 'plan',
+-  reused: false,
+-  nodes: [
+-    coach.CoachNodeState(id: 'review', status: 'current', stamp: 'SDK事实'),
+-  ],
+-);
+-
+-class _DeliveryHost extends StatefulWidget {
+-  const _DeliveryHost({super.key, this.reduced = false});
+-  final bool reduced;
+-
+-  @override
+-  State<_DeliveryHost> createState() => _DeliveryHostState();
+-}
+-
+-class _DeliveryHostState extends State<_DeliveryHost> {
+-  final navigator = GlobalKey<NavigatorState>();
+-  final theme = buildTheme(SfPalette.light);
+-  final session = coach.CoachSessionState(task: _task);
+-  coach.CoachTaskState task = _task;
+-  late bool reduced = widget.reduced;
+-  bool preparing = true;
+-  bool successful = true;
+-  bool interrupted = false;
+-  bool tickers = true;
+-  bool cancelled = false;
+-  int epoch = 0;
+-
+-  void deliver({bool success = true}) => setState(() {
+-    successful = success;
+-    preparing = false;
+-  });
+-
+-  void interrupt() => setState(() => interrupted = true);
+-  void cancel() => setState(() => cancelled = true);
+-  void completeSdkOutput() => setState(() {
+-    task = coach.CoachTaskState(
+-      type: 'plan',
+-      reused: false,
+-      nodes: [
+-        coach.CoachNodeState(id: 'output', status: 'done', stamp: 'SDK事实'),
+-      ],
+-    );
+-  });
+-  void reduce() => setState(() => reduced = true);
+-  void mute() => setState(() => tickers = false);
+-  void unmute() => setState(() => tickers = true);
+-  void replaceSession() => setState(() {
+-    epoch++;
+-    preparing = false;
+-  });
+-
+-  @override
+-  Widget build(BuildContext context) => MaterialApp(
+-    navigatorKey: navigator,
+-    theme: theme,
+-    builder: (context, child) => SfPaletteScope(
+-      child: MediaQuery(
+-        data: MediaQuery.of(context).copyWith(disableAnimations: reduced),
+-        child: child!,
+-      ),
+-    ),
+-    home: Scaffold(
+-      body: Align(
+-        alignment: Alignment.topLeft,
+-        child: SizedBox(
+-          width: 300,
+-          child: cancelled
+-              ? const SizedBox(key: ValueKey('cancelled'))
+-              : TickerMode(
+-                  enabled: tickers,
+-                  child: CoachDeliveryTransition(
+-                    key: ValueKey('delivery-$epoch'),
+-                    preparing: preparing,
+-                    successful: successful,
+-                    interrupted: interrupted,
+-                    child: preparing
+-                        ? CoachTaskBubble(
+-                            key: const ValueKey('preparation'),
+-                            task: task,
+-                            sessionState: session,
+-                            waiting: true,
+-                            onCancel: cancel,
+-                          )
+-                        : const SizedBox(
+-                            key: ValueKey('delivered'),
+-                            height: 260,
+-                            child: Text('已写入的计划'),
+-                          ),
+-                  ),
+-                ),
+-        ),
+-      ),
+-    ),
+-  );
+-}
+-
+-Finder _key(String key, {bool offstage = false}) =>
+-    find.byKey(ValueKey(key), skipOffstage: !offstage);
+-
+-Future<_DeliveryHostState> _show(
+-  WidgetTester tester, {
+-  bool reduced = false,
+-}) async {
+-  tester.view.physicalSize = const Size(390, 844);
+-  tester.view.devicePixelRatio = 1;
+-  addTearDown(tester.view.reset);
+-  tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+-  final host = GlobalKey<_DeliveryHostState>();
+-  await tester.pumpWidget(_DeliveryHost(key: host, reduced: reduced));
+-  await tester.pump();
+-  addTearDown(() async {
+-    await tester.pumpWidget(const SizedBox.shrink());
+-    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+-  });
+-  return host.currentState!;
+-}
+-
+-double _heightFactor(WidgetTester tester) =>
+-    tester.widget<Align>(_key('coach-delivery-collapse')).heightFactor!;
+-double _opacity(WidgetTester tester) =>
+-    tester.widget<Opacity>(_key('coach-delivery-opacity')).opacity;
+-
+-void main() {
+-  tearDown(() => SfColors.palette = SfPalette.dark);
+-
+-  testWidgets(
+-    'success retains one bubble and reveals delivery at exactly 890ms',
+-    (tester) async {
+-      final host = await _show(tester);
+-      final bubble = find.byType(CoachTaskBubble);
+-      final originalState = tester.state(bubble);
+-      final before = tester.widget<CoachTaskBubble>(bubble);
+-      final height = tester
+-          .getSize(find.byType(CoachDeliveryTransition))
+-          .height;
+-      host.deliver();
+-      await tester.pump();
+-      final completed = tester.widget<CoachTaskBubble>(bubble);
+-      expect(tester.state(bubble), same(originalState));
+-      expect(completed.visualComplete, isTrue);
+-      expect(completed.waiting, before.waiting);
+-      expect(completed.task, same(before.task));
+-      expect(completed.sessionState, same(before.sessionState));
+-      expect(completed.library, same(before.library));
+-      expect(completed.onCancel, same(before.onCancel));
+-      expect(_key('delivered'), findsNothing);
+-      expect(_heightFactor(tester), 1);
+-      expect(find.byType(AnimatedCrossFade), findsNothing);
+-      expect(find.byType(AnimatedSize), findsNothing);
+-      await tester.pump(const Duration(milliseconds: 239));
+-      expect(_key('delivered'), findsNothing);
+-      await tester.pump(const Duration(milliseconds: 1));
+-      expect(_key('generation-check'), findsOneWidget);
+-      expect(
+-        tester.getSize(_key('generation-cancel-target')),
+-        const Size(44, 44),
+-      );
+-      await tester.pump(const Duration(milliseconds: 350));
+-      expect(_heightFactor(tester), 1);
+-      expect(_opacity(tester), 1);
+-      expect(
+-        tester.getSize(find.byType(CoachDeliveryTransition)).height,
+-        height,
+-      );
+-      await tester.pump(const Duration(milliseconds: 100));
+-      expect(
+-        _heightFactor(tester),
+-        closeTo(1 - Curves.easeOutCubic.transform(1 / 3), .0001),
+-      );
+-      expect(
+-        _opacity(tester),
+-        closeTo(1 - Curves.easeInCubic.transform(.5), .0001),
+-      );
+-      expect(TickerMode.valuesOf(tester.element(bubble)).enabled, isTrue);
+-      await tester.pump(const Duration(milliseconds: 100));
+-      expect(_opacity(tester), 0);
+-      await tester.pump(const Duration(milliseconds: 99));
+-      expect(_key('delivered'), findsNothing);
+-      expect(TickerMode.valuesOf(tester.element(bubble)).enabled, isTrue);
+-      await tester.pump(const Duration(milliseconds: 1));
+-      expect(_key('delivered'), findsOneWidget);
+-      expect(bubble, findsNothing);
+-      expect(originalState.mounted, isFalse);
+-      expect(_key('generation-check'), findsNothing);
+-      await tester.pumpAndSettle();
+-      expect(tester.binding.transientCallbackCount, 0);
+-      expect(tester.takeException(), isNull);
+-    },
+-  );
+-
+-  testWidgets(
+-    'a first frame after 890ms cannot strand a collapsed preparation',
+-    (tester) async {
+-      final host = await _show(tester);
+-      host.deliver();
+-      await tester.pump();
+-      await tester.pump(const Duration(milliseconds: 906));
+-      expect(_key('delivered'), findsOneWidget);
+-      expect(find.byType(CoachTaskBubble), findsNothing);
+-      await tester.pumpAndSettle();
+-      expect(tester.binding.transientCallbackCount, 0);
+-      expect(tester.takeException(), isNull);
+-    },
+-  );
+-
+-  testWidgets(
+-    'failure retains the original 300ms crossfade without a success hold',
+-    (tester) async {
+-      final host = await _show(tester);
+-      host.completeSdkOutput();
+-      await tester.pump();
+-      expect(_key('generation-check'), findsNothing);
+-      final wrapper = find.byType(CoachDeliveryTransition);
+-      final height = tester.getSize(wrapper).height;
+-      host.deliver(success: false);
+-      await tester.pump();
+-      final fade = tester.widget<AnimatedCrossFade>(
+-        _key('coach-delivery-crossfade'),
+-      );
+-      expect(fade.duration, const Duration(milliseconds: 300));
+-      expect(fade.sizeCurve, Curves.easeOutCubic);
+-      expect(fade.crossFadeState, CrossFadeState.showSecond);
+-      expect(_key('delivered'), findsOneWidget);
+-      expect(tester.getSize(wrapper).height, height);
+-      final bubble = find.byType(CoachTaskBubble, skipOffstage: false);
+-      expect(tester.widget<CoachTaskBubble>(bubble).visualComplete, isFalse);
+-      expect(TickerMode.valuesOf(tester.element(bubble)).enabled, isFalse);
+-      expect(_key('generation-check'), findsNothing);
+-      await tester.pump(const Duration(milliseconds: 150));
+-      expect(
+-        tester.getSize(wrapper).height,
+-        closeTo(
+-          height + (260 - height) * Curves.easeOutCubic.transform(.5),
+-          .001,
+-        ),
+-      );
+-      await tester.pump(const Duration(milliseconds: 150));
+-      expect(tester.getSize(wrapper).height, 260);
+-      expect(_key('generation-check'), findsNothing);
+-      await tester.pumpAndSettle();
+-      expect(tester.binding.transientCallbackCount, 0);
+-      expect(tester.takeException(), isNull);
+-    },
+-  );
+-
+-  testWidgets('cancellation removes the preparation entry immediately', (
+-    tester,
+-  ) async {
+-    final host = await _show(tester);
+-    host.completeSdkOutput();
+-    await tester.pump();
+-    expect(_key('generation-check'), findsNothing);
+-    await tester.tap(_key('generation-cancel-target'));
+-    await tester.pump();
+-    expect(_key('cancelled'), findsOneWidget);
+-    expect(_key('delivered'), findsNothing);
+-    expect(find.byType(CoachDeliveryTransition), findsNothing);
+-    expect(find.byType(CoachTaskBubble), findsNothing);
+-    expect(_key('generation-check'), findsNothing);
+-    await tester.pumpAndSettle();
+-    expect(tester.binding.transientCallbackCount, 0);
+-    expect(tester.takeException(), isNull);
+-  });
+-
+-  testWidgets('a new round immediately finishes the previous visual delivery', (
+-    tester,
+-  ) async {
+-    final host = await _show(tester);
+-    final preparationState = tester.state(find.byType(CoachTaskBubble));
+-    host.deliver();
+-    await tester.pump();
+-    await tester.pump(const Duration(milliseconds: 100));
+-    host.interrupt();
+-    await tester.pump();
+-    expect(_key('delivered'), findsOneWidget);
+-    expect(find.byType(CoachTaskBubble), findsNothing);
+-    expect(preparationState.mounted, isFalse);
+-    await tester.pump(const Duration(seconds: 2));
+-    expect(_key('generation-check'), findsNothing);
+-    expect(tester.binding.transientCallbackCount, 0);
+-    expect(tester.takeException(), isNull);
+-  });
+-
+-  testWidgets('TickerMode leave finishes immediately and does not restart', (
+-    tester,
+-  ) async {
+-    final host = await _show(tester);
+-    host.deliver();
+-    await tester.pump();
+-    await tester.pump(const Duration(milliseconds: 100));
+-    host.mute();
+-    await tester.pump();
+-    expect(_key('delivered'), findsOneWidget);
+-    expect(find.byType(CoachTaskBubble), findsNothing);
+-    host.unmute();
+-    await tester.pumpAndSettle();
+-    expect(_key('generation-check'), findsNothing);
+-    expect(tester.binding.transientCallbackCount, 0);
+-    expect(tester.takeException(), isNull);
+-  });
+-
+-  testWidgets('a reply received after leaving does not queue a later check', (
+-    tester,
+-  ) async {
+-    final host = await _show(tester);
+-    host.mute();
+-    await tester.pump();
+-    host.deliver();
+-    await tester.pump();
+-    expect(_key('delivered'), findsOneWidget);
+-    host.unmute();
+-    await tester.pumpAndSettle();
+-    expect(_key('generation-check'), findsNothing);
+-    expect(tester.binding.transientCallbackCount, 0);
+-    expect(tester.takeException(), isNull);
+-  });
+-
+-  testWidgets(
+-    'another route finishes the visual timeline as soon as it covers',
+-    (tester) async {
+-      final host = await _show(tester);
+-      host.deliver();
+-      await tester.pump();
+-      await tester.pump(const Duration(milliseconds: 100));
+-      unawaited(
+-        host.navigator.currentState!.push<void>(
+-          MaterialPageRoute<void>(
+-            builder: (_) => const Scaffold(body: Text('另一页')),
+-          ),
+-        ),
+-      );
+-      await tester.pump();
+-      expect(_key('delivered', offstage: true), findsOneWidget);
+-      expect(find.byType(CoachTaskBubble, skipOffstage: false), findsNothing);
+-      await tester.pumpAndSettle();
+-      host.navigator.currentState!.pop();
+-      await tester.pumpAndSettle();
+-      expect(_key('delivered'), findsOneWidget);
+-      expect(tester.binding.transientCallbackCount, 0);
+-      expect(tester.takeException(), isNull);
+-    },
+-  );
+-
+-  testWidgets('backgrounding finishes the visual delivery without replay', (
+-    tester,
+-  ) async {
+-    final host = await _show(tester);
+-    host.deliver();
+-    await tester.pump();
+-    await tester.pump(const Duration(milliseconds: 100));
+-    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+-    await tester.pump();
+-    expect(_key('delivered'), findsOneWidget);
+-    expect(find.byType(CoachTaskBubble), findsNothing);
+-    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+-    await tester.pumpAndSettle();
+-    expect(_key('generation-check'), findsNothing);
+-    expect(tester.binding.transientCallbackCount, 0);
+-    expect(tester.takeException(), isNull);
+-  });
+-
+-  testWidgets(
+-    'replacing the session tree disposes an in-flight sequence safely',
+-    (tester) async {
+-      final host = await _show(tester);
+-      host.deliver();
+-      await tester.pump();
+-      await tester.pump(const Duration(milliseconds: 650));
+-      host.replaceSession();
+-      await tester.pumpAndSettle();
+-      expect(_key('delivered'), findsOneWidget);
+-      expect(find.byType(CoachTaskBubble), findsNothing);
+-      await tester.pump(const Duration(seconds: 2));
+-      expect(tester.binding.transientCallbackCount, 0);
+-      expect(tester.takeException(), isNull);
+-    },
+-  );
+-
+-  testWidgets('reduced motion starts no visual delivery clock or hold', (
+-    tester,
+-  ) async {
+-    final host = await _show(tester, reduced: true);
+-    await tester.pumpAndSettle();
+-    expect(tester.binding.transientCallbackCount, 0);
+-    host.deliver();
+-    await tester.pump();
+-    expect(_key('delivered'), findsOneWidget);
+-    expect(find.byType(CoachTaskBubble), findsNothing);
+-    expect(tester.binding.transientCallbackCount, 0);
+-    await tester.pump(const Duration(seconds: 2));
+-    expect(_key('generation-check'), findsNothing);
+-    expect(tester.takeException(), isNull);
+-  });
+-
+-  testWidgets(
+-    'enabling reduced motion during completion finishes immediately',
+-    (tester) async {
+-      final host = await _show(tester);
+-      host.deliver();
+-      await tester.pump();
+-      await tester.pump(const Duration(milliseconds: 650));
+-      host.reduce();
+-      await tester.pump();
+-      expect(_key('delivered'), findsOneWidget);
+-      expect(find.byType(CoachTaskBubble), findsNothing);
+-      await tester.pumpAndSettle();
+-      expect(tester.binding.transientCallbackCount, 0);
+-      expect(tester.takeException(), isNull);
+-    },
+-  );
+-
+-  testWidgets('unmounting before any delivery never lazily creates a ticker', (
+-    tester,
+-  ) async {
+-    await _show(tester, reduced: true);
+-    await tester.pumpWidget(const SizedBox.shrink());
+-    await tester.pump(const Duration(seconds: 2));
+-    expect(tester.binding.transientCallbackCount, 0);
+-    expect(tester.takeException(), isNull);
+-  });
+-}
+diff --git a/test/coach_task_bubble_test.dart b/test/coach_task_bubble_test.dart
+deleted file mode 100644
+index 53f5ea14578ffbf1bdc9a4a44b3c5e9fb4033b46..0000000000000000000000000000000000000000
+--- a/test/coach_task_bubble_test.dart
++++ /dev/null
+@@ -1,648 +0,0 @@
+-import 'package:flutter/material.dart';
+-import 'package:flutter_test/flutter_test.dart';
+-import 'package:smartfit/domain/exercise.dart';
+-import 'package:smartfit/ui/chat/coach_task_bubble.dart';
+-import 'package:smartfit/ui/theme.dart';
+-import 'package:ugk_coach/ugk_coach.dart' as coach;
+-
+-import 'support.dart';
+-
+-coach.CoachTaskState _task(String stage, {bool complete = false}) {
+-  const ids = [
+-    'understand',
+-    'parameters',
+-    'actions',
+-    'planning',
+-    'review',
+-    'output',
+-  ];
+-  final current = ids.indexOf(stage);
+-  return coach.CoachTaskState(
+-    type: 'plan',
+-    reused: false,
+-    nodes: [
+-      for (var index = 0; index < ids.length; index++)
+-        coach.CoachNodeState(
+-          id: ids[index],
+-          status: complete || index < current
+-              ? 'done'
+-              : index == current
+-              ? 'current'
+-              : 'pending',
+-          stamp: '教练待办：核对方案、交付卡片（你说的）（默认）',
+-        ),
+-    ],
+-  );
+-}
+-
+-coach.CoachParamValue _param(Object? value, String source) =>
+-    coach.CoachParamValue(value: value, source: source, turn: 1);
+-
+-Map<String, coach.CoachParamValue> _params() => {
+-  'scene': _param('home', 'user'),
+-  'goal': _param(['body.hip', 'purpose.stretch'], 'user'),
+-  'equipment': _param(<String>[], 'default'),
+-  'level': _param(3, 'derived'),
+-  'limits': _param(<String>[], 'default'),
+-};
+-
+-Future<void> _show(
+-  WidgetTester tester, {
+-  coach.CoachTaskState? task,
+-  coach.CoachSessionState? state,
+-  ExerciseLibrary? library,
+-  bool waiting = true,
+-  bool reduced = false,
+-  bool tickers = true,
+-  bool visualComplete = false,
+-  double width = 390,
+-  double textScale = 1,
+-  VoidCallback? onCancel,
+-  SfPalette palette = SfPalette.light,
+-}) async {
+-  tester.view.physicalSize = Size(width, 844);
+-  tester.view.devicePixelRatio = 1;
+-  addTearDown(tester.view.reset);
+-  await tester.pumpWidget(
+-    MaterialApp(
+-      theme: buildTheme(palette),
+-      themeAnimationDuration: Duration.zero,
+-      builder: (context, child) => SfPaletteScope(
+-        child: MediaQuery(
+-          data: MediaQuery.of(context).copyWith(
+-            disableAnimations: reduced,
+-            textScaler: TextScaler.linear(textScale),
+-          ),
+-          child: child!,
+-        ),
+-      ),
+-      home: Scaffold(
+-        body: TickerMode(
+-          enabled: tickers,
+-          child: CoachTaskBubble(
+-            task: task,
+-            sessionState: state,
+-            library: library,
+-            waiting: waiting,
+-            visualComplete: visualComplete,
+-            onCancel: onCancel,
+-          ),
+-        ),
+-      ),
+-    ),
+-  );
+-  await tester.pump();
+-}
+-
+-Finder _face(String field) =>
+-    find.byKey(ValueKey('generation-chip-face-$field'));
+-Finder _fill(int index) =>
+-    find.byKey(ValueKey('generation-progress-fill-$index'));
+-
+-void main() {
+-  tearDown(() => SfColors.palette = SfPalette.dark);
+-
+-  for (final palette in [SfPalette.light, SfPalette.dark]) {
+-    testWidgets(
+-      '${palette.brightness.name} sourced capsules and approved card values',
+-      (tester) async {
+-        var cancelled = false;
+-        await _show(
+-          tester,
+-          state: coach.CoachSessionState(
+-            task: _task('parameters'),
+-            params: _params(),
+-          ),
+-          reduced: true,
+-          onCancel: () => cancelled = true,
+-          palette: palette,
+-        );
+-        expect(find.text('为你准备 · 居家拉伸'), findsOneWidget);
+-        expect(find.text('读懂你的需求'), findsOneWidget);
+-        final card = tester.widget<Container>(
+-          find.byKey(const ValueKey('generation-card')),
+-        );
+-        expect(card.padding, const EdgeInsets.fromLTRB(16, 14, 16, 16));
+-        final decoration = card.decoration! as BoxDecoration;
+-        final outline = card.foregroundDecoration! as BoxDecoration;
+-        final dark = palette.brightness == Brightness.dark;
+-        expect(decoration.color, palette.surface);
+-        expect(decoration.borderRadius, BorderRadius.circular(20));
+-        expect((outline.border! as Border).top.width, .5);
+-        expect(
+-          (outline.border! as Border).top.color,
+-          (dark ? Colors.white : Colors.black).withValues(
+-            alpha: dark ? .08 : .06,
+-          ),
+-        );
+-        if (dark) {
+-          expect(decoration.boxShadow, isEmpty);
+-        } else {
+-          expect(decoration.boxShadow, [
+-            BoxShadow(
+-              color: Colors.black.withValues(alpha: .04),
+-              offset: const Offset(0, 1),
+-              blurRadius: 2,
+-            ),
+-            BoxShadow(
+-              color: Colors.black.withValues(alpha: .06),
+-              offset: const Offset(0, 6),
+-              blurRadius: 20,
+-            ),
+-          ]);
+-        }
+-        expect(
+-          tester.getSize(find.byKey(const ValueKey('generation-animation'))),
+-          const Size(44, 44),
+-        );
+-        expect(
+-          tester.getSize(
+-            find.byKey(const ValueKey('generation-cancel-target')),
+-          ),
+-          const Size(44, 44),
+-        );
+-        for (final field in ['scene', 'goal', 'equipment', 'level', 'limits']) {
+-          expect(tester.getSize(_face(field)).height, 24);
+-          expect(tester.getSize(_face(field)).width, lessThan(130));
+-        }
+-        final scene =
+-            tester.widget<Container>(_face('scene')).decoration!
+-                as BoxDecoration;
+-        expect(scene.color, palette.accent.withValues(alpha: dark ? .18 : .10));
+-        expect(scene.border, isNull);
+-        final inferredContainer = tester.widget<Container>(_face('level'));
+-        final inferred = inferredContainer.decoration! as BoxDecoration;
+-        final inferredOutline =
+-            inferredContainer.foregroundDecoration! as BoxDecoration;
+-        expect(inferred.color, Colors.transparent);
+-        expect((inferredOutline.border! as Border).top.width, 1);
+-        expect(
+-          (inferredOutline.border! as Border).top.color,
+-          (dark ? Colors.white : Colors.black).withValues(
+-            alpha: dark ? .12 : .10,
+-          ),
+-        );
+-        expect(
+-          tester.widget<Text>(find.text('进阶')).style!.color,
+-          palette.muted,
+-        );
+-        for (final internal in ['教练待办', '交付卡片', '核对方案', '（你说的）', '（默认）']) {
+-          expect(find.textContaining(internal), findsNothing);
+-        }
+-        final title = tester.widget<Text>(find.text('为你准备 · 居家拉伸')).style!;
+-        expect(title.fontSize, 15);
+-        expect(title.fontWeight, FontWeight.w600);
+-        expect(title.height, 1.35);
+-        final status = tester.widget<Text>(find.text('读懂你的需求')).style!;
+-        expect(status.fontSize, 13);
+-        expect(status.fontWeight, FontWeight.w500);
+-        expect(status.height, 18 / 13);
+-        expect(tester.widget<Text>(find.text('取消')).style!.fontSize, 13);
+-        await tester.tap(find.text('取消'));
+-        expect(cancelled, isTrue);
+-        expect(tester.takeException(), isNull);
+-      },
+-    );
+-  }
+-
+-  testWidgets('unknown parameters do not invent default tags or leak codes', (
+-    tester,
+-  ) async {
+-    await _show(tester, reduced: true);
+-    expect(find.text('正在想怎么练'), findsOneWidget);
+-    expect(find.text('居家'), findsNothing);
+-    expect(find.text('徒手'), findsNothing);
+-    expect(find.text('无伤痛'), findsNothing);
+-    expect(find.byKey(const ValueKey('generation-dots')), findsNothing);
+-    expect(
+-      tester.getSize(find.byKey(const ValueKey('generation-core'))),
+-      const Size(10, 10),
+-    );
+-    expect(
+-      tester.getSize(find.byKey(const ValueKey('generation-halo'))),
+-      const Size(20, 20),
+-    );
+-    await _show(
+-      tester,
+-      state: coach.CoachSessionState(
+-        params: {
+-          'goal': _param(['purpose.internal_unknown'], 'user'),
+-          'equipment': _param(['equip.internal_unknown'], 'user'),
+-        },
+-      ),
+-      reduced: true,
+-    );
+-    expect(find.textContaining('internal_unknown'), findsNothing);
+-    expect(find.text('正在想怎么练'), findsOneWidget);
+-  });
+-
+-  testWidgets('SDK nodes map to status sentences and four measured segments', (
+-    tester,
+-  ) async {
+-    const stages = [
+-      ('actions', '挑好了 2 个动作', 1),
+-      ('planning', '安排顺序和时长', 2),
+-      ('review', '最后检查一遍', 3),
+-      ('output', '马上就好', 4),
+-    ];
+-    for (final (stage, sentence, completed) in stages) {
+-      await _show(
+-        tester,
+-        state: coach.CoachSessionState(
+-          task: _task(stage),
+-          picks: ['h-catcow-quad', 'h-banana'],
+-        ),
+-        reduced: true,
+-      );
+-      expect(find.text(sentence), findsOneWidget);
+-      for (var index = 0; index < 4; index++) {
+-        final segment = find.byKey(ValueKey('generation-progress-$index'));
+-        expect(tester.getSize(segment).height, 3);
+-        final first = tester.getRect(
+-          find.byKey(const ValueKey('generation-progress-0')),
+-        );
+-        expect(tester.getRect(segment).width, closeTo(first.width, .001));
+-        if (index > 0) {
+-          final previous = tester.getRect(
+-            find.byKey(ValueKey('generation-progress-${index - 1}')),
+-          );
+-          expect(
+-            tester.getRect(segment).left - previous.right,
+-            closeTo(4, .001),
+-          );
+-        }
+-        final fill = tester.widget<FractionallySizedBox>(_fill(index));
+-        expect(fill.widthFactor, index < completed ? 1 : 0);
+-        expect(
+-          tester.widget<ClipRRect>(segment).borderRadius,
+-          BorderRadius.circular(1.5),
+-        );
+-      }
+-    }
+-    expect(tester.takeException(), isNull);
+-  });
+-
+-  testWidgets(
+-    'completed segment fills in 400ms and status uses staggered 160/220ms motion',
+-    (tester) async {
+-      await _show(tester, task: _task('understand'));
+-      await _show(tester, task: _task('actions'));
+-      expect(tester.widget<FractionallySizedBox>(_fill(0)).widthFactor, 0);
+-      expect(tester.widget<FractionallySizedBox>(_fill(1)).widthFactor, 0);
+-      await tester.pump(const Duration(milliseconds: 200));
+-      expect(
+-        tester.widget<FractionallySizedBox>(_fill(0)).widthFactor,
+-        closeTo(Curves.easeOutCubic.transform(.5), .001),
+-      );
+-      await tester.pump(const Duration(milliseconds: 200));
+-      expect(tester.widget<FractionallySizedBox>(_fill(0)).widthFactor, 1);
+-      expect(tester.widget<FractionallySizedBox>(_fill(1)).widthFactor, 0);
+-      await _show(tester, task: _task('planning'));
+-      expect(find.text('读懂你的需求'), findsOneWidget);
+-      expect(find.text('安排顺序和时长'), findsOneWidget);
+-      await tester.pump(const Duration(milliseconds: 80));
+-      final old = find
+-          .ancestor(of: find.text('读懂你的需求'), matching: find.byType(Transform))
+-          .first;
+-      final next = find
+-          .ancestor(of: find.text('安排顺序和时长'), matching: find.byType(Transform))
+-          .first;
+-      expect(
+-        tester.widget<Transform>(old).transform.storage[13],
+-        closeTo(-6 * Curves.easeInCubic.transform(.5), .001),
+-      );
+-      expect(
+-        tester.widget<Transform>(next).transform.storage[13],
+-        closeTo(6 * (1 - Curves.easeOutCubic.transform(20 / 220)), .001),
+-      );
+-      await tester.pump(const Duration(milliseconds: 200));
+-      expect(find.text('读懂你的需求'), findsNothing);
+-      expect(find.text('安排顺序和时长'), findsOneWidget);
+-      await tester.pumpWidget(const SizedBox.shrink());
+-    },
+-  );
+-
+-  testWidgets(
+-    'rotation is linear and stops for reduced motion and TickerMode',
+-    (tester) async {
+-      await _show(tester);
+-      await tester.pump(const Duration(milliseconds: 350));
+-      final rotation = find.byKey(const ValueKey('generation-rotation'));
+-      expect(
+-        tester.widget<RotationTransition>(rotation).turns.value,
+-        closeTo(.25, .001),
+-      );
+-      await _show(tester, tickers: false);
+-      final mutedValue = tester
+-          .widget<RotationTransition>(rotation)
+-          .turns
+-          .value;
+-      await tester.pump(const Duration(milliseconds: 600));
+-      expect(
+-        tester.widget<RotationTransition>(rotation).turns.value,
+-        mutedValue,
+-      );
+-      await _show(tester, reduced: true);
+-      final value = tester.widget<RotationTransition>(rotation).turns.value;
+-      await tester.pump(const Duration(milliseconds: 600));
+-      expect(tester.widget<RotationTransition>(rotation).turns.value, value);
+-      await tester.pumpAndSettle();
+-      expect(tester.binding.hasScheduledFrame, isFalse);
+-      expect(tester.binding.transientCallbackCount, 0);
+-    },
+-  );
+-
+-  testWidgets('trusted picked thumbnails hold 900ms and crossfade for 250ms', (
+-    tester,
+-  ) async {
+-    final library = loadLibrary();
+-    final state = coach.CoachSessionState(
+-      task: _task('actions'),
+-      picks: ['h-catcow-quad', 'h-banana'],
+-    );
+-    await _show(tester, state: state, library: library);
+-    expect(find.byKey(const ValueKey('generation-dots')), findsNothing);
+-    expect(
+-      find.byKey(const ValueKey('generation-thumbnail-h-catcow-quad')),
+-      findsOneWidget,
+-    );
+-    expect(
+-      find.byKey(const ValueKey('generation-thumbnail-h-banana')),
+-      findsNothing,
+-    );
+-    await tester.pump(const Duration(milliseconds: 900));
+-    expect(
+-      find.byKey(const ValueKey('generation-thumbnail-h-banana')),
+-      findsNothing,
+-    );
+-    await tester.pump(const Duration(milliseconds: 125));
+-    for (final id in state.picks) {
+-      final image = find.byKey(ValueKey('generation-thumbnail-$id'));
+-      expect(image, findsOneWidget);
+-      final opacity = find
+-          .ancestor(of: image, matching: find.byType(Opacity))
+-          .first;
+-      expect(tester.widget<Opacity>(opacity).opacity, closeTo(.5, .001));
+-    }
+-    await tester.pump(const Duration(milliseconds: 125));
+-    expect(
+-      find.byKey(const ValueKey('generation-thumbnail-h-catcow-quad')),
+-      findsNothing,
+-    );
+-    expect(
+-      find.byKey(const ValueKey('generation-thumbnail-h-banana')),
+-      findsOneWidget,
+-    );
+-    await _show(
+-      tester,
+-      state: state.copyWith(picks: ['h-catcow-quad']),
+-      library: library,
+-    );
+-    expect(
+-      find.byKey(const ValueKey('generation-thumbnail-h-catcow-quad')),
+-      findsOneWidget,
+-    );
+-    await tester.pumpWidget(const SizedBox.shrink());
+-  });
+-
+-  testWidgets(
+-    'parameter changes use sourced capsules with 60ms stagger and 200ms entrance',
+-    (tester) async {
+-      await _show(tester, reduced: true);
+-      await _show(tester, state: coach.CoachSessionState(params: _params()));
+-      FadeTransition fade(String field) => tester.widget<FadeTransition>(
+-        find
+-            .ancestor(of: _face(field), matching: find.byType(FadeTransition))
+-            .first,
+-      );
+-      expect(fade('scene').opacity.value, 0);
+-      expect(fade('goal').opacity.value, 0);
+-      await tester.pump(const Duration(milliseconds: 60));
+-      expect(
+-        fade('scene').opacity.value,
+-        closeTo(Curves.easeOutCubic.transform(.3), .001),
+-      );
+-      expect(fade('goal').opacity.value, 0);
+-      await tester.pump(const Duration(milliseconds: 200));
+-      expect(fade('scene').opacity.value, 1);
+-      expect(fade('goal').opacity.value, 1);
+-      final source = coach.CoachSessionState(
+-        params: {
+-          ..._params(),
+-          'equipment': _param(['equip.chair', 'equip.wall'], 'user'),
+-        },
+-      );
+-      await _show(tester, state: source, reduced: true);
+-      expect(find.text('椅子'), findsOneWidget);
+-      expect(find.text('墙'), findsNothing);
+-      expect(find.text('徒手'), findsNothing);
+-      expect(
+-        (tester.widget<Container>(_face('equipment')).decoration!
+-                as BoxDecoration)
+-            .border,
+-        isNull,
+-      );
+-      await tester.pumpWidget(const SizedBox.shrink());
+-    },
+-  );
+-
+-  testWidgets(
+-    'completion shows check and reserves cancel space without changing height',
+-    (tester) async {
+-      final state = coach.CoachSessionState(
+-        task: _task('review'),
+-        params: _params(),
+-      );
+-      await _show(tester, state: state, reduced: true, onCancel: () {});
+-      final card = find.byKey(const ValueKey('generation-card'));
+-      final previousHeight = tester.getSize(card).height;
+-      final cancelRect = tester.getRect(
+-        find.byKey(const ValueKey('generation-cancel-target')),
+-      );
+-      expect(find.text('取消'), findsOneWidget);
+-      await _show(
+-        tester,
+-        state: state.copyWith(task: _task('output', complete: true)),
+-        waiting: false,
+-        reduced: true,
+-        onCancel: () {},
+-      );
+-      expect(tester.getSize(card).height, previousHeight);
+-      expect(
+-        tester.getRect(find.byKey(const ValueKey('generation-cancel-target'))),
+-        cancelRect,
+-      );
+-      expect(find.text('取消'), findsNothing);
+-      // Prototype stroke check (2.4 px path), not a font glyph.
+-      expect(
+-        tester.getSize(find.byKey(const ValueKey('generation-check'))),
+-        const Size(20, 20),
+-      );
+-      await tester.pumpAndSettle();
+-      expect(tester.binding.transientCallbackCount, 0);
+-      expect(find.text('马上就好'), findsOneWidget);
+-      expect(tester.takeException(), isNull);
+-    },
+-  );
+-
+-  testWidgets('SDK output done while waiting does not announce reply success', (
+-    tester,
+-  ) async {
+-    final state = coach.CoachSessionState(
+-      task: _task('output', complete: true),
+-    );
+-    await _show(tester, state: state, onCancel: () {});
+-    expect(find.text('马上就好'), findsOneWidget);
+-    expect(find.byKey(const ValueKey('generation-check')), findsNothing);
+-    expect(find.text('取消'), findsOneWidget);
+-    await _show(tester, state: state, visualComplete: true, onCancel: () {});
+-    expect(find.byKey(const ValueKey('generation-check')), findsOneWidget);
+-    expect(find.text('取消'), findsNothing);
+-    await tester.pump(const Duration(milliseconds: 240));
+-    final rotation = find.byKey(const ValueKey('generation-rotation'));
+-    final stopped = tester.widget<RotationTransition>(rotation).turns.value;
+-    await tester.pump(const Duration(milliseconds: 200));
+-    expect(tester.widget<RotationTransition>(rotation).turns.value, stopped);
+-    expect(tester.binding.transientCallbackCount, 0);
+-    await tester.pumpWidget(const SizedBox.shrink());
+-  });
+-
+-  testWidgets('success check preserves the completed segment 400ms fill', (
+-    tester,
+-  ) async {
+-    await _show(tester, task: _task('review'));
+-    await tester.pump(const Duration(milliseconds: 450));
+-    await _show(
+-      tester,
+-      task: _task('output', complete: true),
+-      visualComplete: true,
+-    );
+-    expect(tester.widget<FractionallySizedBox>(_fill(3)).widthFactor, 0);
+-    await tester.pump(const Duration(milliseconds: 200));
+-    expect(
+-      tester.widget<FractionallySizedBox>(_fill(3)).widthFactor,
+-      closeTo(Curves.easeOutCubic.transform(.5), .001),
+-    );
+-    await tester.pump(const Duration(milliseconds: 40));
+-    expect(find.byKey(const ValueKey('generation-check')), findsOneWidget);
+-    final rotation = find.byKey(const ValueKey('generation-rotation'));
+-    final turn = tester.widget<RotationTransition>(rotation).turns.value;
+-    await tester.pump(const Duration(milliseconds: 160));
+-    expect(tester.widget<FractionallySizedBox>(_fill(3)).widthFactor, 1);
+-    expect(tester.widget<RotationTransition>(rotation).turns.value, turn);
+-    await tester.pumpWidget(const SizedBox.shrink());
+-  });
+-
+-  testWidgets(
+-    'switching to reduced motion stops all in-flight tickers and pins first image',
+-    (tester) async {
+-      final state = coach.CoachSessionState(
+-        task: _task('actions'),
+-        params: _params(),
+-        picks: ['h-catcow-quad', 'h-banana'],
+-      );
+-      final library = loadLibrary();
+-      await _show(tester);
+-      await _show(tester, state: state, library: library);
+-      await tester.pump(const Duration(milliseconds: 75));
+-      await _show(
+-        tester,
+-        state: state.copyWith(task: _task('planning')),
+-        library: library,
+-        reduced: true,
+-      );
+-      await tester.pump();
+-      expect(find.text('挑好了 2 个动作'), findsNothing);
+-      expect(find.text('安排顺序和时长'), findsOneWidget);
+-      expect(find.byType(ShaderMask), findsNothing);
+-      expect(
+-        find.byKey(const ValueKey('generation-progress-band-2')),
+-        findsNothing,
+-      );
+-      expect(
+-        find.byKey(const ValueKey('generation-thumbnail-h-catcow-quad')),
+-        findsOneWidget,
+-      );
+-      expect(
+-        find.byKey(const ValueKey('generation-thumbnail-h-banana')),
+-        findsNothing,
+-      );
+-      expect(tester.binding.transientCallbackCount, 0);
+-      await tester.pump(const Duration(seconds: 2));
+-      expect(tester.binding.transientCallbackCount, 0);
+-      expect(tester.binding.hasScheduledFrame, isFalse);
+-    },
+-  );
+-
+-  testWidgets(
+-    'visual completion closes the ring at 240ms and settles the check at 260ms',
+-    (tester) async {
+-      await _show(tester, task: _task('review'), onCancel: () {});
+-      final card = find.byKey(const ValueKey('generation-card'));
+-      final height = tester.getSize(card).height;
+-      await _show(
+-        tester,
+-        task: _task('review'),
+-        visualComplete: true,
+-        onCancel: () {},
+-      );
+-      expect(find.byKey(const ValueKey('generation-check')), findsOneWidget);
+-      expect(find.text('取消'), findsNothing);
+-      expect(tester.getSize(card).height, height);
+-      // Prototype .check: 260 ms back-out scale; ring closes at 240 ms.
+-      await tester.pump(const Duration(milliseconds: 260));
+-      final rotation = find.byKey(const ValueKey('generation-rotation'));
+-      final turn = tester.widget<RotationTransition>(rotation).turns.value;
+-      final check = find.byKey(const ValueKey('generation-check'));
+-      final opacity = find
+-          .ancestor(of: check, matching: find.byType(Opacity))
+-          .first;
+-      final scale = find
+-          .ancestor(of: check, matching: find.byType(Transform))
+-          .first;
+-      expect(tester.widget<Opacity>(opacity).opacity, 1);
+-      expect(
+-        tester.widget<Transform>(scale).transform.storage[0],
+-        closeTo(1, .001),
+-      );
+-      await tester.pump(const Duration(milliseconds: 350));
+-      expect(tester.widget<RotationTransition>(rotation).turns.value, turn);
+-      expect(tester.binding.transientCallbackCount, 0);
+-      expect(tester.takeException(), isNull);
+-    },
+-  );
+-
+-  for (final scale in [1.0, 1.5]) {
+-    testWidgets('320px Chinese title stays within one line at ${scale}x', (
+-      tester,
+-    ) async {
+-      await _show(
+-        tester,
+-        state: coach.CoachSessionState(
+-          task: _task('planning'),
+-          params: {..._params(), 'scene': _param('office', 'user')},
+-        ),
+-        reduced: true,
+-        width: 320,
+-        textScale: scale,
+-        onCancel: () {},
+-      );
+-      final title = find.text('为你准备 · 办公室拉伸');
+-      expect(title, findsOneWidget);
+-      expect(tester.widget<Text>(title).maxLines, 1);
+-      expect(tester.widget<Text>(title).overflow, TextOverflow.ellipsis);
+-      final rect = tester.getRect(title);
+-      final cancel = tester.getRect(
+-        find.byKey(const ValueKey('generation-cancel-target')),
+-      );
+-      expect(rect.right, lessThanOrEqualTo(cancel.left));
+-      expect(rect.left, greaterThanOrEqualTo(72));
+-      expect(
+-        tester.getRect(find.byKey(const ValueKey('generation-card'))).right,
+-        lessThanOrEqualTo(320),
+-      );
+-      expect(tester.takeException(), isNull);
+-      expect(tester.binding.transientCallbackCount, 0);
+-    });
+-  }
+-}
+diff --git a/test/pr4_integration_test.dart b/test/pr4_integration_test.dart
+index 59c2607d874c69254b314a5b0a28c6c68eaf1dd2..f2a4d271d74d2218a29fcb5f99c97225a9df9f8d 100644
+--- a/test/pr4_integration_test.dart
++++ b/test/pr4_integration_test.dart
+@@ -9,7 +9,7 @@ import 'package:smartfit/core/storage/local_state_storage.dart';
+ import 'package:smartfit/data/app_store.dart';
+ import 'package:smartfit/ui/chat/chat_home_page.dart';
+ import 'package:smartfit/ui/chat/chat_widgets.dart';
+-import 'package:smartfit/ui/chat/coach_task_bubble.dart';
++import 'package:ugk_coach_ui/ugk_coach_ui.dart' show CoachTaskBubble;
+ import 'package:smartfit/ui/theme/app_theme.dart';
+ import 'package:ugk_coach/ugk_coach.dart' as coach;
+ import 'package:ugk_trainer/ugk_trainer.dart';
+diff --git a/test/ui_polish_composer_test.dart b/test/ui_polish_composer_test.dart
+index 4eb6ac939b774d29e37f68b6ae5546d173a877b1..5516a8caeeccebe85a585562cd67264f54bdc72e 100644
+--- a/test/ui_polish_composer_test.dart
++++ b/test/ui_polish_composer_test.dart
+@@ -9,13 +9,13 @@ import 'package:smartfit/chat/chat_models.dart';
+ import 'package:smartfit/domain/scenario.dart';
+ import 'package:smartfit/ui/chat/chat_home_page.dart';
+ import 'package:smartfit/ui/chat/chat_widgets.dart';
+-import 'package:smartfit/ui/chat/coach_delivery_transition.dart';
+-import 'package:smartfit/ui/chat/coach_task_bubble.dart';
+ import 'package:smartfit/ui/chat/plan_card.dart';
+ import 'package:smartfit/ui/theme/tokens.dart';
+ import 'package:smartfit/ui/theme/ui_polish_tokens.dart';
+ import 'package:smartfit/ui/theme/app_theme.dart';
+ import 'package:ugk_coach/ugk_coach.dart' as coach;
++import 'package:ugk_coach_ui/ugk_coach_ui.dart'
++    show CoachDeliveryTransition, CoachTaskBubble;
+ 
+ import 'app_flow_test.dart' show services;
+ 
+@@ -81,46 +81,6 @@ void main() {
+     });
+   }
+ 
+-  testWidgets('preparation holds 590ms then collapses 300ms before delivery', (
+-    tester,
+-  ) async {
+-    Widget host(bool preparing) => MaterialApp(
+-      home: Scaffold(
+-        body: Align(
+-          alignment: Alignment.topLeft,
+-          child: CoachDeliveryTransition(
+-            preparing: preparing,
+-            successful: true,
+-            child: SizedBox(
+-              key: ValueKey(preparing ? 'preparing' : 'delivered'),
+-              width: 240,
+-              height: preparing ? 120 : 300,
+-            ),
+-          ),
+-        ),
+-      ),
+-    );
+-    await tester.pumpWidget(host(true));
+-    final transition = find.byType(CoachDeliveryTransition);
+-    expect(tester.getSize(transition).height, 120);
+-    await tester.pumpWidget(host(false));
+-    await tester.pump(const Duration(milliseconds: 590));
+-    expect(tester.getSize(transition).height, 120);
+-    expect(find.byKey(const ValueKey('preparing')), findsOneWidget);
+-    expect(find.byKey(const ValueKey('delivered')), findsNothing);
+-    await tester.pump(const Duration(milliseconds: 150));
+-    expect(
+-      tester.getSize(transition).height,
+-      closeTo(120 * (1 - Curves.easeOutCubic.transform(.5)), .001),
+-    );
+-    expect(find.byKey(const ValueKey('delivered')), findsNothing);
+-    await tester.pump(const Duration(milliseconds: 149));
+-    expect(find.byKey(const ValueKey('delivered')), findsNothing);
+-    await tester.pump(const Duration(milliseconds: 1));
+-    expect(tester.getSize(transition).height, 300);
+-    expect(find.byKey(const ValueKey('preparing')), findsNothing);
+-  });
+-
+   testWidgets(
+     'chat keeps the preparation entry alive when a plan is delivered',
+     (tester) async {
+diff --git a/test/ui_polish_task_scope_test.dart b/test/ui_polish_task_scope_test.dart
+index 5dfa53a4006ebf49f58394191cace7982513e647..97247424edbe1f602234d4129128d4876b5705a2 100644
+--- a/test/ui_polish_task_scope_test.dart
++++ b/test/ui_polish_task_scope_test.dart
+@@ -5,9 +5,10 @@ import 'package:flutter_test/flutter_test.dart';
+ import 'package:smartfit/chat/ai_chat_engine.dart';
+ import 'package:smartfit/chat/app_chat_actions.dart';
+ import 'package:smartfit/chat/chat_controller.dart';
+-import 'package:smartfit/ui/chat/coach_task_bubble.dart';
++import 'package:smartfit/ui/chat/coach_ui_adapter.dart';
+ import 'package:smartfit/ui/theme/app_theme.dart';
+ import 'package:ugk_coach/ugk_coach.dart' as coach;
++import 'package:ugk_coach_ui/ugk_coach_ui.dart' show CoachTaskBubble;
+ 
+ import 'app_flow_test.dart' show services, tall;
+ import 'support/coach_v2_fixtures.dart';
+@@ -73,15 +74,28 @@ void main() {
+           home: Scaffold(
+             body: ListenableBuilder(
+               listenable: chat,
+-              builder: (context, _) => chat.typing
+-                  ? CoachTaskBubble(
+-                      task: chat.activeTask,
+-                      sessionState: chat.activeSessionState,
+-                      library: fixture.library,
+-                      waiting: true,
+-                      onCancel: chat.cancelRequest,
+-                    )
+-                  : const SizedBox.shrink(),
++              builder: (context, _) {
++                final summary = coach.CoachTaskSummary.fromState(
++                  chat.activeSessionState,
++                  task: chat.activeTask,
++                );
++                return chat.typing
++                    ? CoachTaskBubble(
++                        title: summary.title,
++                        status: summary.status,
++                        phase: summary.phase,
++                        parameters: summary.parameters,
++                        picks: summary.picks,
++                        complete: summary.complete,
++                        waiting: true,
++                        onCancel: chat.cancelRequest,
++                        cutoutFor: (id) => smartfitTaskCutout(
++                          context,
++                          fixture.library.tryGet(id),
++                        ),
++                      )
++                    : const SizedBox.shrink();
++              },
+             ),
+           ),
+         ),
+@@ -100,8 +114,10 @@ void main() {
+       final bubble = tester.widget<CoachTaskBubble>(
+         find.byType(CoachTaskBubble),
+       );
+-      expect(bubble.task, isNull);
+-      expect(bubble.sessionState, isNull);
++      expect(bubble.phase, 0);
++      expect(bubble.complete, isFalse);
++      expect(bubble.parameters, isEmpty);
++      expect(bubble.picks, isEmpty);
+       expect(find.text('正在想怎么练'), findsOneWidget);
+       expect(find.text('读懂你的需求'), findsOneWidget);
+       expect(find.text('马上就好'), findsNothing);

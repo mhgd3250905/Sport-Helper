@@ -1,0 +1,325 @@
+{
+  "schema": "smartfit-ui-kit-same-driver-frames@1",
+  "variant": "new",
+  "source": "b27ffe06b7ed0338d379b0474f458679eb282e2f",
+  "publicInputsSha256": "1f86d9cdd7d5f50c52552c458e6bfd8489ea5f5d0631d9b02fe175611752ab54",
+  "driverSha256": "81f80b15fbfc34526aca03c18e835c0234553f064c9a46ab4543c5f65ac6f154",
+  "adapterSha256": "c959e5dc56f64ed514890b8beb64cdc3bc43dd40546d37d15e17f404ddaeb4ae",
+  "focusImplementation": "host-local",
+  "inputsSha256": "a2c6df4c3e5dd8f3acab967ab835b15b0d9c6db3f98c318c0d8fcb705d490711",
+  "logicalSize": {
+    "width": 412,
+    "height": 915
+  },
+  "dpr": 2.625,
+  "physicalSizeRounding": "ceil in RenderRepaintBoundary.toImage",
+  "theme": "light",
+  "fonts": [
+    {
+      "family": "MaterialIcons",
+      "asset": "fonts/MaterialIcons-Regular.otf",
+      "bytes": 1645184,
+      "sha256": "d9865b671a09d683d13a863089d8825e0f61a37696ce5d7d448bc8023aa62453"
+    },
+    {
+      "family": "NotoSansSC",
+      "asset": "assets/fonts/NotoSansSC.ttf",
+      "bytes": 4110060,
+      "sha256": "93c0808b4374c84021581cd80ad5d5cae67303d91411d81211e77126d1e5b5ca"
+    },
+    {
+      "family": "packages/cupertino_icons/CupertinoIcons",
+      "asset": "packages/cupertino_icons/assets/CupertinoIcons.ttf",
+      "bytes": 257628,
+      "sha256": "67c44fe9183b002e79dde7f6977e2988661c9a3e4a3c5fce968787efdbed823c"
+    }
+  ],
+  "frames": [
+    {
+      "frame": "light/waiting-0ms.png",
+      "bytes": 102190,
+      "sha256": "5887b40ec83a093624348c56a2b8038bc4c203bcc8c2dad5c75ecd2abbfe310e",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 0
+    },
+    {
+      "frame": "light/waiting-400ms.png",
+      "bytes": 117458,
+      "sha256": "a88a2f8a42df29bcb565c85bf974c70f36da75addd657f2b16503047cd2730e7",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 400000
+    },
+    {
+      "frame": "light/waiting-800ms.png",
+      "bytes": 116373,
+      "sha256": "22f738777661f74064436245601cc1fe896760d5f4545976604104246557b603",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 800000
+    },
+    {
+      "frame": "light/waiting-1200ms.png",
+      "bytes": 116516,
+      "sha256": "ab7f48cebe186f25d24b0af1dcfd18fe4f2a64d73d206ba68c00a6e846bd50b6",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 1200000
+    },
+    {
+      "frame": "light/waiting-1600ms.png",
+      "bytes": 116850,
+      "sha256": "ec1b220265d748d13e09cbf48e414cc5d912568c2b9c271b9c85ac05b4354339",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 1600000
+    },
+    {
+      "frame": "light/parameters-before.png",
+      "bytes": 116850,
+      "sha256": "ec1b220265d748d13e09cbf48e414cc5d912568c2b9c271b9c85ac05b4354339",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 1600000
+    },
+    {
+      "frame": "light/parameters-after.png",
+      "bytes": 117911,
+      "sha256": "3a1be631f6eabc82f97aba149da98a67589212a490f63592bf26b8546cce6bc6",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 1860000
+    },
+    {
+      "frame": "light/complete.png",
+      "bytes": 110000,
+      "sha256": "77451f76a14dd6ce07e274fe6f85fc202f684924933bfb9183e7bd99bd886fec",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 260000
+    },
+    {
+      "frame": "light/failure.png",
+      "bytes": 32615,
+      "sha256": "475da3713c666184cba20c7a32dd3177cd3e943745b68d01075b1ced03a235a0",
+      "width": 1082,
+      "height": 2402
+    },
+    {
+      "frame": "light/cancelled.png",
+      "bytes": 15675,
+      "sha256": "ab1d442a4940cee25701c72cec605adfc26e70b6eeb8e70d9410783ffa0555b1",
+      "width": 1082,
+      "height": 2402
+    },
+    {
+      "frame": "light/delivery-0pct.png",
+      "bytes": 112924,
+      "sha256": "3199b8f5aae6f71ba5b464221a2652d72a2bbc68e30b038b58a081a2b71c01dc",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 0,
+      "fraction": 0.0
+    },
+    {
+      "frame": "light/delivery-25pct.png",
+      "bytes": 111783,
+      "sha256": "7eb7753754d822c2aa0436dea0b2c63d1021bf8f31432b38f292dfcba77185ef",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 222500,
+      "fraction": 0.25
+    },
+    {
+      "frame": "light/delivery-50pct.png",
+      "bytes": 111778,
+      "sha256": "1c1940df69d1f7a195f54a85efc2d38ae0ef8fefc834a7b729dcdac6204b988e",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 445000,
+      "fraction": 0.5
+    },
+    {
+      "frame": "light/delivery-75pct.png",
+      "bytes": 58376,
+      "sha256": "450b115a41f59bc23505218c201a1d77bc42214cdfb396daf3c62d9a76c48b73",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 667500,
+      "fraction": 0.75
+    },
+    {
+      "frame": "light/delivery-100pct.png",
+      "bytes": 45717,
+      "sha256": "0114d0dfdd79cd0beecfa089fa5f5ce9883f7ca657261ddbc7fdc4108e935c9d",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 890000,
+      "fraction": 1.0
+    },
+    {
+      "frame": "light/focus-appearing.png",
+      "bytes": 26425,
+      "sha256": "0b8f42468e8386dfd291e4f420685aaaa342ac96a52438496ad06ce683742e55",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 90000,
+      "fraction": 0.5
+    },
+    {
+      "frame": "light/focus-held.png",
+      "bytes": 26575,
+      "sha256": "24c4af58265e79085b6bb8962e83896c84e23aa2d5969f3cf153f3cbc07b90c9",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 180000,
+      "fraction": 1.0
+    },
+    {
+      "frame": "light/focus-clearing.png",
+      "bytes": 26648,
+      "sha256": "6e940024a65f212bb3b42a065cfa2f7a830eb71aeaa551956f1d00376fb7ae76",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 60000,
+      "fraction": 0.5
+    },
+    {
+      "frame": "light/focus-cleared.png",
+      "bytes": 15675,
+      "sha256": "ab1d442a4940cee25701c72cec605adfc26e70b6eeb8e70d9410783ffa0555b1",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 120000,
+      "fraction": 1.0
+    },
+    {
+      "frame": "light/training-entry-0pct.png",
+      "bytes": 119774,
+      "sha256": "8a59ebda9498ead677103586670d9e41241ce7026999c3c6a080f58516527e86",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 0,
+      "fraction": 0.0,
+      "routeValue": 0.0,
+      "routeStatus": "forward"
+    },
+    {
+      "frame": "light/training-entry-25pct.png",
+      "bytes": 276379,
+      "sha256": "18866496dedfd0ed1de89e892645faad3346b02490e90d7ce4cf498991a5010f",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 75000,
+      "fraction": 0.25,
+      "routeValue": 0.25,
+      "routeStatus": "forward"
+    },
+    {
+      "frame": "light/training-entry-50pct.png",
+      "bytes": 236829,
+      "sha256": "75f10d2332d0ae128e15611d6641a43476d78d601d53e45acd2ae3a82bdec56a",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 150000,
+      "fraction": 0.5,
+      "routeValue": 0.5,
+      "routeStatus": "forward"
+    },
+    {
+      "frame": "light/training-entry-75pct.png",
+      "bytes": 241172,
+      "sha256": "4738066caa4036ac3ef978e94280b16c971ab1d1282afba20d2ccf5f7ee682ff",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 225000,
+      "fraction": 0.75,
+      "routeValue": 0.75,
+      "routeStatus": "forward"
+    },
+    {
+      "frame": "light/training-entry-100pct.png",
+      "bytes": 242808,
+      "sha256": "fb13b317814289cb8b2a092007cdc154fd91f717fd73c2c1c40e1942ac2e88dc",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 300000,
+      "fraction": 1.0,
+      "routeValue": 1.0,
+      "routeStatus": "forward"
+    },
+    {
+      "frame": "light/training-exit-0pct.png",
+      "bytes": 242808,
+      "sha256": "bf607e58912d66dba990c45a35be4d31c191d9f485f2e1c040c57d3084f7cbea",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 0,
+      "fraction": 0.0,
+      "routeValue": 1.0,
+      "routeStatus": "reverse"
+    },
+    {
+      "frame": "light/training-exit-25pct.png",
+      "bytes": 240461,
+      "sha256": "2cfaa449b2430a05d0daeda2ea425dde99e6488d82ecabb0dd7ec30782e76dbb",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 70000,
+      "fraction": 0.25,
+      "routeValue": 0.75,
+      "routeStatus": "reverse"
+    },
+    {
+      "frame": "light/training-exit-50pct.png",
+      "bytes": 239865,
+      "sha256": "21a094c8efbd3e0f34d47217ea27a3c51a051260500fc3ada2a8453f68693e5c",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 140000,
+      "fraction": 0.5,
+      "routeValue": 0.5,
+      "routeStatus": "reverse"
+    },
+    {
+      "frame": "light/training-exit-75pct.png",
+      "bytes": 288172,
+      "sha256": "bc5fd7cc32c8bf5aa98b35f10a47fbcbff04981d7b4f3b6220c848a6fb1b888a",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 210000,
+      "fraction": 0.75,
+      "routeValue": 0.2500000000000001,
+      "routeStatus": "reverse"
+    },
+    {
+      "frame": "light/training-exit-100pct.png",
+      "bytes": 119774,
+      "sha256": "8a59ebda9498ead677103586670d9e41241ce7026999c3c6a080f58516527e86",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 280000,
+      "fraction": 1.0,
+      "routeValue": 0.0,
+      "routeStatus": "reverse"
+    }
+  ],
+  "isPhoneScreenshot": false,
+  "isPerformanceMeasurement": false,
+  "container": {
+    "left": 20,
+    "top": 64,
+    "right": 20,
+    "bottom": 20
+  },
+  "media": "production PoseHubAssetBundle + verified bundled image loader",
+  "routeExitTrigger": "production public control.beginExit; no copied animation",
+  "focusSampleTimesMs": {
+    "appearing": 90,
+    "held": 180,
+    "clearing": 60,
+    "cleared": 120
+  },
+  "deliveryDurationUs": 890000
+}

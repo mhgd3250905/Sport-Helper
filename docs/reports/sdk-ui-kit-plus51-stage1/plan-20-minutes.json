@@ -1,0 +1,1096 @@
+{
+  "targetMinutes": 20,
+  "targetSeconds": 1200,
+  "input": "在家徒手20分钟全身训练，初级，没有伤病，没有额外器械。请直接给一张能按计时或自动计次跟练的完整计划。",
+  "syntheticUserInput": true,
+  "modelRequests": true,
+  "deviceOperated": false,
+  "status": "ok",
+  "admittedPlan": true,
+  "plan": {
+    "schemaVersion": 1,
+    "id": "plan-1793426354991-2",
+    "source": "ai",
+    "title": "居家徒手全身训练",
+    "summary": "居家徒手全身训练",
+    "goal": "strength",
+    "scene": "home",
+    "equipment": [
+      "mat",
+      "wall",
+      "chair"
+    ],
+    "level": 1,
+    "targetMinutes": 20,
+    "blocks": [
+      {
+        "id": "b1",
+        "name": "warmup",
+        "type": "warmup",
+        "rounds": 1,
+        "restBetweenRoundsSeconds": 0,
+        "items": [
+          {
+            "exerciseId": "n-pelvis-circle",
+            "mode": "reps",
+            "sets": 1,
+            "reps": 4,
+            "perSide": false,
+            "restSeconds": 15
+          },
+          {
+            "exerciseId": "h-catcow-quad",
+            "mode": "time",
+            "sets": 1,
+            "workSeconds": 40,
+            "perSide": false,
+            "restSeconds": 10
+          },
+          {
+            "exerciseId": "h-wall-angel",
+            "mode": "reps",
+            "sets": 2,
+            "reps": 10,
+            "perSide": false,
+            "restSeconds": 10
+          }
+        ]
+      },
+      {
+        "id": "b2",
+        "name": "main",
+        "type": "main",
+        "rounds": 1,
+        "restBetweenRoundsSeconds": 0,
+        "items": [
+          {
+            "exerciseId": "h-squat",
+            "mode": "reps",
+            "sets": 1,
+            "reps": 12,
+            "perSide": false,
+            "restSeconds": 30
+          },
+          {
+            "exerciseId": "h-incline-pushup",
+            "mode": "reps",
+            "sets": 3,
+            "reps": 10,
+            "perSide": false,
+            "restSeconds": 30
+          },
+          {
+            "exerciseId": "w-bird-dog",
+            "mode": "reps",
+            "sets": 2,
+            "reps": 10,
+            "perSide": false,
+            "restSeconds": 30
+          },
+          {
+            "exerciseId": "h-chair-kickback",
+            "mode": "reps",
+            "sets": 1,
+            "reps": 12,
+            "perSide": true,
+            "restSeconds": 30
+          },
+          {
+            "exerciseId": "w-dead-bug",
+            "mode": "reps",
+            "sets": 3,
+            "reps": 10,
+            "perSide": false,
+            "restSeconds": 30
+          },
+          {
+            "exerciseId": "h-forearm-plank",
+            "mode": "time",
+            "sets": 3,
+            "workSeconds": 30,
+            "perSide": false,
+            "restSeconds": 30
+          }
+        ]
+      },
+      {
+        "id": "b3",
+        "name": "cooldown",
+        "type": "cooldown",
+        "rounds": 1,
+        "restBetweenRoundsSeconds": 0,
+        "items": [
+          {
+            "exerciseId": "h-cobra",
+            "mode": "time",
+            "sets": 1,
+            "workSeconds": 30,
+            "perSide": false,
+            "restSeconds": 10
+          },
+          {
+            "exerciseId": "n-thomas-test",
+            "mode": "time",
+            "sets": 1,
+            "workSeconds": 30,
+            "perSide": true,
+            "restSeconds": 10
+          },
+          {
+            "exerciseId": "h-supine-twist",
+            "mode": "time",
+            "sets": 1,
+            "workSeconds": 40,
+            "perSide": true,
+            "restSeconds": 10
+          }
+        ]
+      }
+    ],
+    "notes": [],
+    "safetyNotes": []
+  },
+  "coachEstimateSeconds": 1256.0,
+  "cardSecondsIncludingPrep": 1258.0,
+  "cardLabel": "约 21 分钟",
+  "executionSecondsIncludingPrep": 1258.0,
+  "executionSecondsExcludingPrep": 1248.0,
+  "preparationSeconds": 10.0,
+  "coachToExecutionDifferenceSeconds": 2.0,
+  "withinTenPercent": true,
+  "manualWorkPhases": 0,
+  "engineFullyFinished": true,
+  "engineElapsedSeconds": 1258.0,
+  "workPhases": [
+    {
+      "id": "n-pelvis-circle",
+      "seconds": 33.0,
+      "set": 1,
+      "sets": 1,
+      "round": 0,
+      "rounds": 0,
+      "side": null,
+      "selfPaced": false,
+      "reps": 4,
+      "repSeconds": 8.0,
+      "rhythm": {
+        "kind": "rep_cycle",
+        "leadSeconds": 1.0,
+        "phases": [
+          {
+            "id": "go",
+            "seconds": 3.6,
+            "cue": "w.pelvis_one_way"
+          },
+          {
+            "id": "rest",
+            "seconds": 0.4
+          },
+          {
+            "id": "back",
+            "seconds": 3.6,
+            "cue": "w.pelvis_other_way"
+          },
+          {
+            "id": "rest",
+            "seconds": 0.4
+          }
+        ],
+        "reps": 4
+      }
+    },
+    {
+      "id": "h-catcow-quad",
+      "seconds": 40.0,
+      "set": 1,
+      "sets": 1,
+      "round": 0,
+      "rounds": 0,
+      "side": null,
+      "selfPaced": false,
+      "reps": null,
+      "repSeconds": null,
+      "rhythm": {
+        "kind": "hold",
+        "leadSeconds": 0.0
+      }
+    },
+    {
+      "id": "h-wall-angel",
+      "seconds": 40.0,
+      "set": 1,
+      "sets": 2,
+      "round": 0,
+      "rounds": 0,
+      "side": null,
+      "selfPaced": false,
+      "reps": 10,
+      "repSeconds": 4.0,
+      "rhythm": {
+        "kind": "rep_updown",
+        "leadSeconds": 0.0,
+        "phases": [
+          {
+            "id": "go",
+            "seconds": 4.0
+          }
+        ],
+        "source": "repSeconds"
+      }
+    },
+    {
+      "id": "h-wall-angel",
+      "seconds": 40.0,
+      "set": 2,
+      "sets": 2,
+      "round": 0,
+      "rounds": 0,
+      "side": null,
+      "selfPaced": false,
+      "reps": 10,
+      "repSeconds": 4.0,
+      "rhythm": {
+        "kind": "rep_updown",
+        "leadSeconds": 0.0,
+        "phases": [
+          {
+            "id": "go",
+            "seconds": 4.0
+          }
+        ],
+        "source": "repSeconds"
+      }
+    },
+    {
+      "id": "h-squat",
+      "seconds": 49.0,
+      "set": 1,
+      "sets": 1,
+      "round": 0,
+      "rounds": 0,
+      "side": null,
+      "selfPaced": false,
+      "reps": 12,
+      "repSeconds": 4.0,
+      "rhythm": {
+        "kind": "rep_updown",
+        "leadSeconds": 1.0,
+        "phases": [
+          {
+            "id": "go",
+            "seconds": 1.15,
+            "cue": "w.squat_down"
+          },
+          {
+            "id": "hold",
+            "seconds": 0.7
+          },
+          {
+            "id": "back",
+            "seconds": 1.1,
+            "cue": "w.stand_up"
+          },
+          {
+            "id": "rest",
+            "seconds": 1.05
+          }
+        ],
+        "reps": 8
+      }
+    },
+    {
+      "id": "h-incline-pushup",
+      "seconds": 40.0,
+      "set": 1,
+      "sets": 3,
+      "round": 0,
+      "rounds": 0,
+      "side": null,
+      "selfPaced": false,
+      "reps": 10,
+      "repSeconds": 4.0,
+      "rhythm": {
+        "kind": "rep_updown",
+        "leadSeconds": 0.0,
+        "phases": [
+          {
+            "id": "go",
+            "seconds": 4.0
+          }
+        ],
+        "source": "repSeconds"
+      }
+    },
+    {
+      "id": "h-incline-pushup",
+      "seconds": 40.0,
+      "set": 2,
+      "sets": 3,
+      "round": 0,
+      "rounds": 0,
+      "side": null,
+      "selfPaced": false,
+      "reps": 10,
+      "repSeconds": 4.0,
+      "rhythm": {
+        "kind": "rep_updown",
+        "leadSeconds": 0.0,
+        "phases": [
+          {
+            "id": "go",
+            "seconds": 4.0
+          }
+        ],
+        "source": "repSeconds"
+      }
+    },
+    {
+      "id": "h-incline-pushup",
+      "seconds": 40.0,
+      "set": 3,
+      "sets": 3,
+      "round": 0,
+      "rounds": 0,
+      "side": null,
+      "selfPaced": false,
+      "reps": 10,
+      "repSeconds": 4.0,
+      "rhythm": {
+        "kind": "rep_updown",
+        "leadSeconds": 0.0,
+        "phases": [
+          {
+            "id": "go",
+            "seconds": 4.0
+          }
+        ],
+        "source": "repSeconds"
+      }
+    },
+    {
+      "id": "w-bird-dog",
+      "seconds": 40.0,
+      "set": 1,
+      "sets": 2,
+      "round": 0,
+      "rounds": 0,
+      "side": null,
+      "selfPaced": false,
+      "reps": 10,
+      "repSeconds": 4.0,
+      "rhythm": {
+        "kind": "rep_updown",
+        "leadSeconds": 0.0,
+        "phases": [
+          {
+            "id": "go",
+            "seconds": 4.0
+          }
+        ],
+        "source": "repSeconds"
+      }
+    },
+    {
+      "id": "w-bird-dog",
+      "seconds": 40.0,
+      "set": 2,
+      "sets": 2,
+      "round": 0,
+      "rounds": 0,
+      "side": null,
+      "selfPaced": false,
+      "reps": 10,
+      "repSeconds": 4.0,
+      "rhythm": {
+        "kind": "rep_updown",
+        "leadSeconds": 0.0,
+        "phases": [
+          {
+            "id": "go",
+            "seconds": 4.0
+          }
+        ],
+        "source": "repSeconds"
+      }
+    },
+    {
+      "id": "h-chair-kickback",
+      "seconds": 48.0,
+      "set": 1,
+      "sets": 1,
+      "round": 0,
+      "rounds": 0,
+      "side": "right",
+      "selfPaced": false,
+      "reps": 12,
+      "repSeconds": 4.0,
+      "rhythm": {
+        "kind": "rep_updown",
+        "leadSeconds": 0.0,
+        "phases": [
+          {
+            "id": "go",
+            "seconds": 4.0
+          }
+        ],
+        "source": "repSeconds"
+      }
+    },
+    {
+      "id": "h-chair-kickback",
+      "seconds": 48.0,
+      "set": 1,
+      "sets": 1,
+      "round": 0,
+      "rounds": 0,
+      "side": "left",
+      "selfPaced": false,
+      "reps": 12,
+      "repSeconds": 4.0,
+      "rhythm": {
+        "kind": "rep_updown",
+        "leadSeconds": 0.0,
+        "phases": [
+          {
+            "id": "go",
+            "seconds": 4.0
+          }
+        ],
+        "source": "repSeconds"
+      }
+    },
+    {
+      "id": "w-dead-bug",
+      "seconds": 30.0,
+      "set": 1,
+      "sets": 3,
+      "round": 0,
+      "rounds": 0,
+      "side": null,
+      "selfPaced": false,
+      "reps": 10,
+      "repSeconds": 3.0,
+      "rhythm": {
+        "kind": "rep_updown",
+        "leadSeconds": 0.0,
+        "phases": [
+          {
+            "id": "go",
+            "seconds": 3.0
+          }
+        ],
+        "source": "repSeconds"
+      }
+    },
+    {
+      "id": "w-dead-bug",
+      "seconds": 30.0,
+      "set": 2,
+      "sets": 3,
+      "round": 0,
+      "rounds": 0,
+      "side": null,
+      "selfPaced": false,
+      "reps": 10,
+      "repSeconds": 3.0,
+      "rhythm": {
+        "kind": "rep_updown",
+        "leadSeconds": 0.0,
+        "phases": [
+          {
+            "id": "go",
+            "seconds": 3.0
+          }
+        ],
+        "source": "repSeconds"
+      }
+    },
+    {
+      "id": "w-dead-bug",
+      "seconds": 30.0,
+      "set": 3,
+      "sets": 3,
+      "round": 0,
+      "rounds": 0,
+      "side": null,
+      "selfPaced": false,
+      "reps": 10,
+      "repSeconds": 3.0,
+      "rhythm": {
+        "kind": "rep_updown",
+        "leadSeconds": 0.0,
+        "phases": [
+          {
+            "id": "go",
+            "seconds": 3.0
+          }
+        ],
+        "source": "repSeconds"
+      }
+    },
+    {
+      "id": "h-forearm-plank",
+      "seconds": 30.0,
+      "set": 1,
+      "sets": 3,
+      "round": 0,
+      "rounds": 0,
+      "side": null,
+      "selfPaced": false,
+      "reps": null,
+      "repSeconds": null,
+      "rhythm": {
+        "kind": "hold",
+        "leadSeconds": 0.0
+      }
+    },
+    {
+      "id": "h-forearm-plank",
+      "seconds": 30.0,
+      "set": 2,
+      "sets": 3,
+      "round": 0,
+      "rounds": 0,
+      "side": null,
+      "selfPaced": false,
+      "reps": null,
+      "repSeconds": null,
+      "rhythm": {
+        "kind": "hold",
+        "leadSeconds": 0.0
+      }
+    },
+    {
+      "id": "h-forearm-plank",
+      "seconds": 30.0,
+      "set": 3,
+      "sets": 3,
+      "round": 0,
+      "rounds": 0,
+      "side": null,
+      "selfPaced": false,
+      "reps": null,
+      "repSeconds": null,
+      "rhythm": {
+        "kind": "hold",
+        "leadSeconds": 0.0
+      }
+    },
+    {
+      "id": "h-cobra",
+      "seconds": 30.0,
+      "set": 1,
+      "sets": 1,
+      "round": 0,
+      "rounds": 0,
+      "side": null,
+      "selfPaced": false,
+      "reps": null,
+      "repSeconds": null,
+      "rhythm": {
+        "kind": "hold",
+        "leadSeconds": 0.0
+      }
+    },
+    {
+      "id": "n-thomas-test",
+      "seconds": 30.0,
+      "set": 1,
+      "sets": 1,
+      "round": 0,
+      "rounds": 0,
+      "side": "right",
+      "selfPaced": false,
+      "reps": null,
+      "repSeconds": null,
+      "rhythm": {
+        "kind": "hold",
+        "leadSeconds": 0.0
+      }
+    },
+    {
+      "id": "n-thomas-test",
+      "seconds": 30.0,
+      "set": 1,
+      "sets": 1,
+      "round": 0,
+      "rounds": 0,
+      "side": "left",
+      "selfPaced": false,
+      "reps": null,
+      "repSeconds": null,
+      "rhythm": {
+        "kind": "hold",
+        "leadSeconds": 0.0
+      }
+    },
+    {
+      "id": "h-supine-twist",
+      "seconds": 40.0,
+      "set": 1,
+      "sets": 1,
+      "round": 0,
+      "rounds": 0,
+      "side": "right",
+      "selfPaced": false,
+      "reps": null,
+      "repSeconds": null,
+      "rhythm": {
+        "kind": "hold",
+        "leadSeconds": 0.0
+      }
+    },
+    {
+      "id": "h-supine-twist",
+      "seconds": 40.0,
+      "set": 1,
+      "sets": 1,
+      "round": 0,
+      "rounds": 0,
+      "side": "left",
+      "selfPaced": false,
+      "reps": null,
+      "repSeconds": null,
+      "rhythm": {
+        "kind": "hold",
+        "leadSeconds": 0.0
+      }
+    }
+  ],
+  "phaseSchedule": [
+    {
+      "kind": "prep",
+      "seconds": 10.0,
+      "id": "n-pelvis-circle",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 33.0,
+      "id": "n-pelvis-circle",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "rest",
+      "seconds": 15.0,
+      "id": "h-catcow-quad",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 40.0,
+      "id": "h-catcow-quad",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "rest",
+      "seconds": 15.0,
+      "id": "h-wall-angel",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 40.0,
+      "id": "h-wall-angel",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "rest",
+      "seconds": 10.0,
+      "id": "h-wall-angel",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 40.0,
+      "id": "h-wall-angel",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "rest",
+      "seconds": 15.0,
+      "id": "h-squat",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 49.0,
+      "id": "h-squat",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "rest",
+      "seconds": 15.0,
+      "id": "h-incline-pushup",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 40.0,
+      "id": "h-incline-pushup",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "rest",
+      "seconds": 30.0,
+      "id": "h-incline-pushup",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 40.0,
+      "id": "h-incline-pushup",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "rest",
+      "seconds": 30.0,
+      "id": "h-incline-pushup",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 40.0,
+      "id": "h-incline-pushup",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "rest",
+      "seconds": 15.0,
+      "id": "w-bird-dog",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 40.0,
+      "id": "w-bird-dog",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "rest",
+      "seconds": 30.0,
+      "id": "w-bird-dog",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 40.0,
+      "id": "w-bird-dog",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "rest",
+      "seconds": 15.0,
+      "id": "h-chair-kickback",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 48.0,
+      "id": "h-chair-kickback",
+      "round": 0,
+      "side": "right"
+    },
+    {
+      "kind": "switchSide",
+      "seconds": 5.0,
+      "id": "h-chair-kickback",
+      "round": 0,
+      "side": "left"
+    },
+    {
+      "kind": "work",
+      "seconds": 48.0,
+      "id": "h-chair-kickback",
+      "round": 0,
+      "side": "left"
+    },
+    {
+      "kind": "rest",
+      "seconds": 15.0,
+      "id": "w-dead-bug",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 30.0,
+      "id": "w-dead-bug",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "rest",
+      "seconds": 30.0,
+      "id": "w-dead-bug",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 30.0,
+      "id": "w-dead-bug",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "rest",
+      "seconds": 30.0,
+      "id": "w-dead-bug",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 30.0,
+      "id": "w-dead-bug",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "rest",
+      "seconds": 15.0,
+      "id": "h-forearm-plank",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 30.0,
+      "id": "h-forearm-plank",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "rest",
+      "seconds": 30.0,
+      "id": "h-forearm-plank",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 30.0,
+      "id": "h-forearm-plank",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "rest",
+      "seconds": 30.0,
+      "id": "h-forearm-plank",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 30.0,
+      "id": "h-forearm-plank",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "rest",
+      "seconds": 15.0,
+      "id": "h-cobra",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 30.0,
+      "id": "h-cobra",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "rest",
+      "seconds": 15.0,
+      "id": "n-thomas-test",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 30.0,
+      "id": "n-thomas-test",
+      "round": 0,
+      "side": "right"
+    },
+    {
+      "kind": "switchSide",
+      "seconds": 5.0,
+      "id": "n-thomas-test",
+      "round": 0,
+      "side": "left"
+    },
+    {
+      "kind": "work",
+      "seconds": 30.0,
+      "id": "n-thomas-test",
+      "round": 0,
+      "side": "left"
+    },
+    {
+      "kind": "rest",
+      "seconds": 15.0,
+      "id": "h-supine-twist",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 40.0,
+      "id": "h-supine-twist",
+      "round": 0,
+      "side": "right"
+    },
+    {
+      "kind": "switchSide",
+      "seconds": 5.0,
+      "id": "h-supine-twist",
+      "round": 0,
+      "side": "left"
+    },
+    {
+      "kind": "work",
+      "seconds": 40.0,
+      "id": "h-supine-twist",
+      "round": 0,
+      "side": "left"
+    },
+    {
+      "kind": "done",
+      "seconds": 0.0,
+      "id": null,
+      "round": 0,
+      "side": null
+    }
+  ],
+  "passed": true,
+  "elapsedMs": 10868,
+  "transportCalls": [
+    {
+      "roles": [
+        "system",
+        "user",
+        "user"
+      ],
+      "model": "deepseek-flash",
+      "httpAttempts": 1,
+      "tools": [
+        {
+          "name": "start_task",
+          "arguments": "{\"type\": \"plan\"}"
+        },
+        {
+          "name": "set_params",
+          "arguments": "{\"fields\": {\"scene\": {\"value\": \"home\", \"source\": \"user\", \"quote\": \"在家\"}, \"minutes\": {\"value\": 20, \"source\": \"user\", \"quote\": \"20分钟\"}, \"level\": {\"value\": 1, \"source\": \"user\", \"quote\": \"初级\"}, \"goal\": {\"value\": [\"purpose.strength\", \"purpose.core\"], \"source\": \"user\", \"quote\": \"全身训练\"}, \"limits\": {\"value\": [], \"source\": \"user\", \"quote\": \"没有伤病\"}, \"equipment\": {\"value\": [], \"source\": \"user\", \"quote\": \"没有额外器械\"}}}"
+        }
+      ],
+      "elapsedMs": 2181
+    },
+    {
+      "roles": [
+        "system",
+        "user",
+        "assistant",
+        "tool",
+        "tool",
+        "user"
+      ],
+      "model": "deepseek-flash",
+      "httpAttempts": 1,
+      "tools": [
+        {
+          "name": "search_actions",
+          "arguments": "{\"tags\": [\"scene.home\", \"purpose.strength\", \"level.1\"], \"limit\": 20}"
+        },
+        {
+          "name": "search_actions",
+          "arguments": "{\"tags\": [\"scene.home\", \"purpose.core\", \"level.1\"], \"limit\": 20}"
+        },
+        {
+          "name": "search_actions",
+          "arguments": "{\"tags\": [\"scene.home\", \"purpose.mobility\", \"level.1\"], \"limit\": 15}"
+        },
+        {
+          "name": "search_actions",
+          "arguments": "{\"tags\": [\"scene.home\", \"purpose.stretch\", \"level.1\"], \"limit\": 20}"
+        }
+      ],
+      "elapsedMs": 1772
+    },
+    {
+      "roles": [
+        "system",
+        "user",
+        "assistant",
+        "tool",
+        "tool",
+        "assistant",
+        "tool",
+        "tool",
+        "tool",
+        "tool",
+        "user"
+      ],
+      "model": "deepseek-flash",
+      "httpAttempts": 1,
+      "tools": [
+        {
+          "name": "draft_plan",
+          "arguments": "{\"title\": \"居家徒手全身训练\", \"blocks\": [{\"kind\": \"warmup\", \"items\": [{\"id\": \"n-pelvis-circle\"}, {\"id\": \"h-catcow-quad\"}, {\"id\": \"h-wall-angel\"}]}, {\"kind\": \"main\", \"items\": [{\"id\": \"h-squat\"}, {\"id\": \"h-incline-pushup\"}, {\"id\": \"w-bird-dog\"}, {\"id\": \"h-chair-kickback\"}, {\"id\": \"w-dead-bug\"}, {\"id\": \"h-forearm-plank\"}]}, {\"kind\": \"cooldown\", \"items\": [{\"id\": \"h-cobra\"}, {\"id\": \"n-thomas-test\"}, {\"id\": \"h-supine-twist\"}]}]}"
+        }
+      ],
+      "elapsedMs": 4966
+    },
+    {
+      "roles": [
+        "system",
+        "user",
+        "assistant",
+        "tool",
+        "tool",
+        "assistant",
+        "tool",
+        "tool",
+        "tool",
+        "tool",
+        "assistant",
+        "tool",
+        "user"
+      ],
+      "model": "deepseek-flash",
+      "httpAttempts": 1,
+      "tools": [
+        {
+          "name": "show_plan",
+          "arguments": "{\"plan_id\": \"plan-1793426354991-2\", \"note\": \"热身打开髋肩，主体按下肢-推-背-臀-核心交替排，避免同一部位连着累；收尾拉伸刚练过的胸、臀和腰背。全程不憋气、不弹震，按卡片计时跟练即可。\"}"
+        }
+      ],
+      "elapsedMs": 1886
+    }
+  ]
+}

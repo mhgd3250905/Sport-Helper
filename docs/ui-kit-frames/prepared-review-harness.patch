@@ -1,0 +1,53 @@
+diff --git a/test_screens/ui_polish_review_test.dart b/test_screens/ui_polish_review_test.dart
+index 16d1286..4a11970 100644
+--- a/test_screens/ui_polish_review_test.dart
++++ b/test_screens/ui_polish_review_test.dart
+@@ -19,7 +19,6 @@ import 'package:smartfit/domain/exercise.dart';
+ import 'package:smartfit/domain/plan.dart';
+ import 'package:smartfit/ui/alpha_artwork.dart';
+ import 'package:smartfit/ui/chat/chat_home_page.dart';
+-import 'package:smartfit/ui/chat/coach_task_bubble.dart';
+ import 'package:smartfit/ui/chat/coach_ui_adapter.dart';
+ import 'package:smartfit/ui/chat/plan_card.dart';
+ import 'package:smartfit/ui/chat/saved_plans_page.dart';
+@@ -346,18 +345,28 @@ void main() {
+       await _shot(tester, '00-card-surfaces-$theme');
+       tester.view.physicalSize = const Size(1170, 2532);
+ 
+-      // 1: Same SDK progress snapshot, presented by App generation widget.
+-      final generation =
+-          Function.apply(CoachTaskBubble.new, [], {
+-                #task: _task(),
+-                #waiting: true,
+-                #onCancel: () {},
+-                if (Platform.environment['SF_SCREENSHOT_AFTER'] == '1') ...{
+-                  #sessionState: _session(),
+-                  #library: fixture.library,
+-                },
+-              })
+-              as Widget;
++      // 1: Same progress snapshot, through the SDK summary and component.
++      final summary = coach.CoachTaskSummary.fromState(
++        _session(),
++        task: _task(),
++      );
++      final generation = Builder(
++        builder: (context) => withSmartfitCoachUi(
++          context,
++          CoachTaskBubble(
++            title: summary.title,
++            status: summary.status,
++            phase: summary.phase,
++            parameters: summary.parameters,
++            picks: summary.picks,
++            complete: summary.complete,
++            waiting: true,
++            onCancel: () {},
++            cutoutFor: (id) =>
++                smartfitTaskCutout(context, fixture.library.tryGet(id)),
++          ),
++        ),
++      );
+       await show(
+         Scaffold(
+           body: Padding(padding: const EdgeInsets.all(16), child: generation),

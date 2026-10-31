@@ -1,0 +1,42 @@
+{
+  "sdk": "caa6817c51b3cb09c46909288d83aa88bdc2dbd4",
+  "baseUrl": "https://ai.uuugk.win/v1",
+  "model": "deepseek-flash",
+  "sameAppCatalogAndExecution": true,
+  "catalogLoader": "PoseHubActionLibrary.load -> AppTestCatalog.fromSdk -> AppTestContent.build",
+  "fixedLeadPreserved": true,
+  "evidenceScope": "real model generation and SDK execution-clock replay; no device session",
+  "allPassed": false,
+  "cases": [
+    {
+      "targetMinutes": 5,
+      "coachEstimateSeconds": 383.0,
+      "cardSecondsIncludingPrep": 384.0,
+      "cardLabel": "约 6 分钟",
+      "executionSecondsIncludingPrep": 384.0,
+      "manualWorkPhases": 0,
+      "withinTenPercent": false,
+      "passed": false
+    },
+    {
+      "targetMinutes": 10,
+      "coachEstimateSeconds": 611.0,
+      "cardSecondsIncludingPrep": 612.0,
+      "cardLabel": "约 10 分钟",
+      "executionSecondsIncludingPrep": 612.0,
+      "manualWorkPhases": 0,
+      "withinTenPercent": true,
+      "passed": true
+    },
+    {
+      "targetMinutes": 20,
+      "coachEstimateSeconds": 1256.0,
+      "cardSecondsIncludingPrep": 1258.0,
+      "cardLabel": "约 21 分钟",
+      "executionSecondsIncludingPrep": 1258.0,
+      "manualWorkPhases": 0,
+      "withinTenPercent": true,
+      "passed": true
+    }
+  ]
+}

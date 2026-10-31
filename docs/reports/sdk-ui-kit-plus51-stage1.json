@@ -1,0 +1,79 @@
+{
+  "schema": "smartfit-plus51-stage1@1",
+  "source": "b27ffe06b7ed0338d379b0474f458679eb282e2f",
+  "base": "13c0bb4cc24982be50bbb2471fc83ace6f64e40b",
+  "branch": "codex/coach-ui-kit",
+  "version": "0.1.0+51",
+  "sdk": "caa6817c51b3cb09c46909288d83aa88bdc2dbd4",
+  "softwarePassed": true,
+  "tests": 857,
+  "analysisIssues": 0,
+  "framePairs": 58,
+  "differentPixelsPerFrame": 0,
+  "harkAccepted": false,
+  "migrationComplete": false,
+  "pendingSdkMainPin": true,
+  "runtimeComponents": {
+    "route": "SDK TrainerSlideRoute",
+    "bubble": "host retained",
+    "delivery": "host retained",
+    "focus": "host retained"
+  },
+  "liveGeneration": {
+    "sdk": "caa6817c51b3cb09c46909288d83aa88bdc2dbd4",
+    "baseUrl": "https://ai.uuugk.win/v1",
+    "model": "deepseek-flash",
+    "sameAppCatalogAndExecution": true,
+    "catalogLoader": "PoseHubActionLibrary.load -> AppTestCatalog.fromSdk -> AppTestContent.build",
+    "fixedLeadPreserved": true,
+    "evidenceScope": "real model generation and SDK execution-clock replay; no device session",
+    "allPassed": false,
+    "cases": [
+      {
+        "targetMinutes": 5,
+        "coachEstimateSeconds": 383.0,
+        "cardSecondsIncludingPrep": 384.0,
+        "cardLabel": "约 6 分钟",
+        "executionSecondsIncludingPrep": 384.0,
+        "manualWorkPhases": 0,
+        "withinTenPercent": false,
+        "passed": false
+      },
+      {
+        "targetMinutes": 10,
+        "coachEstimateSeconds": 611.0,
+        "cardSecondsIncludingPrep": 612.0,
+        "cardLabel": "约 10 分钟",
+        "executionSecondsIncludingPrep": 612.0,
+        "manualWorkPhases": 0,
+        "withinTenPercent": true,
+        "passed": true
+      },
+      {
+        "targetMinutes": 20,
+        "coachEstimateSeconds": 1256.0,
+        "cardSecondsIncludingPrep": 1258.0,
+        "cardLabel": "约 21 分钟",
+        "executionSecondsIncludingPrep": 1258.0,
+        "manualWorkPhases": 0,
+        "withinTenPercent": true,
+        "passed": true
+      }
+    ]
+  },
+  "durationGatePassed": false,
+  "apkBuilt": false,
+  "profileCaptured": false,
+  "deviceOperated": false,
+  "mergedMain": false,
+  "releaseBranchChanged": false,
+  "tagCreated": false,
+  "evidenceSha256": {
+    "software-gates.json": "4546bf0a6b50986300e1fc7bb4e1b79785a86dfc076987065b24d09d744574a9",
+    "live-source-binding.json": "4958d0117426bfba834e8d3327a43ceef7e7c57b1dc79a5a1b8a671e9a8c6d84",
+    "live-summary.json": "ad71592a28d57d74c357df60306a72ceb600dfba14f6dd27619973ae6cf2a87a",
+    "plan-5-minutes.json": "9dfbba68e3b8ed2127d1fefe9bc679bacb64fc795b107d2453dd82e318667af6",
+    "plan-10-minutes.json": "aaa36c66c19a1fc899889542973e064c060a0bb0d89e13f4060afbe774a1ab59",
+    "plan-20-minutes.json": "da5b4585e99a0d407d65635306a64944b7ae75a53818984808412d7de68cd4dc"
+  }
+}
