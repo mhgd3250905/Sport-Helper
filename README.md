@@ -1,5 +1,9 @@
 # 智能健身助手 SmartFit
 
+## +50 main 本地升版与新包（2026-10-31）
+
+已先快进同步远端 main 13c0bb4（PR #6 已合入 6ef2e3a），再补本地 **0.1.0+50 / 2050**。本轮打包/测试源 `4ef76006d47e06cdeacdcdc77a647436284ab98f`；生成卡实现及四个 RepaintBoundary 原样保留，SDK/lock 不变。main 重新全量 **861/861、0 失败/跳过**，fatal-infos 分析 **0 问题**；新 release **42,657,546B / 42.658MB**，签名/16KB/JNI/资源门禁及独立复验通过。本轮未操作手机；旧 profile 图仅作相同实现的历史证据。本地版本及台账尚未推送，不打 tag，不动 release/1.0 或 SDK。详见[本轮记录](docs/task-bubble-fidelity-plus50-main-2026-10-31.md)与[产物台账](docs/reports/task-bubble-fidelity-plus50-main.json)。下方 +49 和旧候选叙述保留原时点事实。
+
 ## +49 已纳入 main（2026-10-30）
 
 已按开哥明确授权从main `d8d6db76fc631f47afbf3740f67d2d00ebfff2f6` 快进纳入已验收的 `09bc71b69ffe5b51e9691e4b424feecfce7289df`，版本保持0.1.0+49 / internal arm64 2049。SDK三包及coach override锁定 `66dd98a549c1ff5fedecb626a7c88583090a1440`，实时核实为SDK远端main，包含c97a79a5与66dd98a5。在main重新全量测试 **861/861**、0失败/跳过，analyze **0问题**；全新release arm64 **42,655,230B / 42.655MB**，同签名、ZIP/ELF16KB、JNI、无MP4门禁通过。后续只追加README/docs收束，最终main及推送核验见交付目录 `final-main-receipt.json`。release/1.0、guide-lite及其他分支不动，不打tag，不改SDK源码，不再操作手机。 详见[main复验记录](docs/trainer-transition-plus49-main-2026-10-30.md)与[产物台账](docs/reports/trainer-transition-plus49-main.json)。
