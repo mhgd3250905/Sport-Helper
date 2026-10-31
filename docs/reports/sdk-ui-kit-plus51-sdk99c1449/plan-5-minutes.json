@@ -1,0 +1,271 @@
+{
+  "targetMinutes": 5,
+  "targetSeconds": 300,
+  "input": "在家徒手5分钟全身训练，初级，没有伤病，没有额外器械。请直接给一张能按计时或自动计次跟练的完整计划。",
+  "syntheticUserInput": true,
+  "modelRequests": true,
+  "deviceOperated": false,
+  "caseGenerationAttempt": 1,
+  "sdkTransportMaxRetries": 0,
+  "sendReturned": true,
+  "persistenceFlushed": true,
+  "turnStartedAtUtc": "2026-10-31T07:39:04.690755Z",
+  "userTurnElapsedMs": 11461,
+  "userTurnElapsedMicroseconds": 11461647,
+  "fullTurnElapsedMs": 11463,
+  "fullTurnElapsedMicroseconds": 11463324,
+  "turnFinishedAtUtc": "2026-10-31T07:39:16.154100Z",
+  "status": "ok",
+  "admittedPlan": false,
+  "passed": false,
+  "messages": [
+    {
+      "id": "m1793432344690755-0",
+      "role": "assistant",
+      "at": "2026-10-31T15:39:04.690755",
+      "text": "下午好\n说说今天想怎么练？",
+      "greeting": true
+    },
+    {
+      "id": "m1793432344691746-1",
+      "role": "user",
+      "at": "2026-10-31T15:39:04.691746",
+      "text": "在家徒手5分钟全身训练，初级，没有伤病，没有额外器械。请直接给一张能按计时或自动计次跟练的完整计划。",
+      "aiVisible": true
+    },
+    {
+      "id": "m1793432356150413-2",
+      "role": "assistant",
+      "at": "2026-10-31T15:39:16.150413",
+      "question": {
+        "question": "当前动作在允许剂量范围内无法同时满足5.0 分钟。你希望调整时长、剂量，还是动作选择？",
+        "mode": "text"
+      },
+      "conversationMessageId": "coach-1793432356149085-1",
+      "coachTask": {
+        "type": "plan",
+        "nodes": [
+          {
+            "id": "understand",
+            "status": "done",
+            "stamp": "准备训练计划",
+            "doneAtTurn": 1
+          },
+          {
+            "id": "parameters",
+            "status": "done",
+            "stamp": "居家（你说的） · 力量（你说的） · 徒手（可用椅子/凳子/瑜伽垫/墙）（你说的） · 5 分钟（你说的） · 初学（你说的） · 无伤痛（默认）",
+            "doneAtTurn": 1
+          },
+          {
+            "id": "actions",
+            "status": "done",
+            "stamp": "选了 5 个动作",
+            "doneAtTurn": 1
+          },
+          {
+            "id": "planning",
+            "status": "current",
+            "stamp": null,
+            "doneAtTurn": null
+          },
+          {
+            "id": "review",
+            "status": "pending",
+            "stamp": null,
+            "doneAtTurn": null
+          },
+          {
+            "id": "output",
+            "status": "pending",
+            "stamp": null,
+            "doneAtTurn": null
+          }
+        ],
+        "reused": false
+      },
+      "aiVisible": true
+    }
+  ],
+  "elapsedMs": 11463,
+  "caseElapsedMicroseconds": 11463464,
+  "transportCalls": [
+    {
+      "callIndex": 1,
+      "outcome": "response",
+      "startedAtUtc": "2026-10-31T07:39:04.784582Z",
+      "roles": [
+        "system",
+        "user",
+        "user"
+      ],
+      "model": "deepseek-flash",
+      "httpAttempts": 1,
+      "sdkLatencyMs": 3373,
+      "sdkLatencyMicroseconds": 3373976,
+      "tokens": {
+        "inputTokens": 3601,
+        "outputTokens": 332,
+        "totalTokens": 3933,
+        "cachedInputTokens": 3456,
+        "reasoningOutputTokens": 151,
+        "sdkNormalized": {
+          "promptTokens": 3601,
+          "completionTokens": 332,
+          "reasoningTokens": 151,
+          "cachedTokens": 3456,
+          "totalTokens": 3933
+        }
+      },
+      "finishReason": "tool_calls",
+      "tools": [
+        {
+          "name": "start_task",
+          "arguments": "{\"type\": \"plan\"}"
+        },
+        {
+          "name": "set_params",
+          "arguments": "{\"fields\": {\"scene\": {\"value\": \"home\", \"source\": \"user\", \"quote\": \"在家徒手\"}, \"minutes\": {\"value\": 5, \"source\": \"user\", \"quote\": \"5分钟全身训练\"}, \"goal\": {\"value\": [\"purpose.strength\"], \"source\": \"user\", \"quote\": \"全身训练\"}, \"level\": {\"value\": 1, \"source\": \"user\", \"quote\": \"初级\"}, \"equipment\": {\"value\": [], \"source\": \"user\", \"quote\": \"没有额外器械\"}}}"
+        }
+      ],
+      "finishedAtUtc": "2026-10-31T07:39:08.159810Z",
+      "elapsedMs": 3374,
+      "elapsedMicroseconds": 3374830,
+      "wireHttpAttemptTimingsMs": null
+    },
+    {
+      "callIndex": 2,
+      "outcome": "response",
+      "startedAtUtc": "2026-10-31T07:39:08.187140Z",
+      "roles": [
+        "system",
+        "user",
+        "assistant",
+        "tool",
+        "tool",
+        "user"
+      ],
+      "model": "deepseek-flash",
+      "httpAttempts": 1,
+      "sdkLatencyMs": 1811,
+      "sdkLatencyMicroseconds": 1811234,
+      "tokens": {
+        "inputTokens": 7515,
+        "outputTokens": 166,
+        "totalTokens": 7681,
+        "cachedInputTokens": 3584,
+        "reasoningOutputTokens": 37,
+        "sdkNormalized": {
+          "promptTokens": 7515,
+          "completionTokens": 166,
+          "reasoningTokens": 37,
+          "cachedTokens": 3584,
+          "totalTokens": 7681
+        }
+      },
+      "finishReason": "tool_calls",
+      "tools": [
+        {
+          "name": "search_actions",
+          "arguments": "{\"tags\": [\"scene.home\", \"purpose.strength\", \"level.1\"], \"limit\": 20}"
+        },
+        {
+          "name": "search_actions",
+          "arguments": "{\"tags\": [\"scene.home\", \"purpose.stretch\", \"level.1\"], \"limit\": 12}"
+        }
+      ],
+      "finishedAtUtc": "2026-10-31T07:39:09.998177Z",
+      "elapsedMs": 1811,
+      "elapsedMicroseconds": 1811294,
+      "wireHttpAttemptTimingsMs": null
+    },
+    {
+      "callIndex": 3,
+      "outcome": "response",
+      "startedAtUtc": "2026-10-31T07:39:10.009919Z",
+      "roles": [
+        "system",
+        "user",
+        "assistant",
+        "tool",
+        "tool",
+        "assistant",
+        "tool",
+        "tool",
+        "user"
+      ],
+      "model": "deepseek-flash",
+      "httpAttempts": 1,
+      "sdkLatencyMs": 6120,
+      "sdkLatencyMicroseconds": 6120702,
+      "tokens": {
+        "inputTokens": 11755,
+        "outputTokens": 883,
+        "totalTokens": 12638,
+        "cachedInputTokens": 7040,
+        "reasoningOutputTokens": 726,
+        "sdkNormalized": {
+          "promptTokens": 11755,
+          "completionTokens": 883,
+          "reasoningTokens": 726,
+          "cachedTokens": 7040,
+          "totalTokens": 12638
+        }
+      },
+      "finishReason": "tool_calls",
+      "tools": [
+        {
+          "name": "draft_plan",
+          "arguments": "{\"title\": \"居家全身徒手循环\", \"blocks\": [{\"kind\": \"warmup\", \"items\": [{\"id\": \"h-chair-sit-to-stand\"}]}, {\"kind\": \"main\", \"items\": [{\"id\": \"h-squat\"}, {\"id\": \"h-incline-pushup\"}, {\"id\": \"h-good-morning\"}]}, {\"kind\": \"cooldown\", \"items\": [{\"id\": \"h-doorframe-forearms-pec-native-r3\"}]}]}"
+        }
+      ],
+      "finishedAtUtc": "2026-10-31T07:39:16.131700Z",
+      "elapsedMs": 6120,
+      "elapsedMicroseconds": 6120755,
+      "wireHttpAttemptTimingsMs": null
+    }
+  ],
+  "llmCallCount": 3,
+  "successfulLlmCallCount": 3,
+  "failedLlmCallCount": 0,
+  "unfinishedLlmCallCount": 0,
+  "httpAttemptCount": 3,
+  "knownHttpAttemptSubtotal": 3,
+  "unknownHttpAttemptCallCount": 0,
+  "callElapsedMsSum": 11305,
+  "knownCallElapsedMsSubtotal": 11305,
+  "tokens": {
+    "inputTokens": 22871,
+    "outputTokens": 1381,
+    "totalTokens": 24252,
+    "cachedInputTokens": 14080,
+    "reasoningOutputTokens": 914
+  },
+  "tokenCoverage": {
+    "inputTokens": {
+      "observedCalls": 3,
+      "unknownCalls": 0,
+      "knownSubtotal": 22871
+    },
+    "outputTokens": {
+      "observedCalls": 3,
+      "unknownCalls": 0,
+      "knownSubtotal": 1381
+    },
+    "totalTokens": {
+      "observedCalls": 3,
+      "unknownCalls": 0,
+      "knownSubtotal": 24252
+    },
+    "cachedInputTokens": {
+      "observedCalls": 3,
+      "unknownCalls": 0,
+      "knownSubtotal": 14080
+    },
+    "reasoningOutputTokens": {
+      "observedCalls": 3,
+      "unknownCalls": 0,
+      "knownSubtotal": 914
+    }
+  }
+}

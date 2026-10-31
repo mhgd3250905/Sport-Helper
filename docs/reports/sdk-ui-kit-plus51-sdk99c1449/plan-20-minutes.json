@@ -1,0 +1,1390 @@
+{
+  "targetMinutes": 20,
+  "targetSeconds": 1200,
+  "input": "在家徒手20分钟全身训练，初级，没有伤病，没有额外器械。请直接给一张能按计时或自动计次跟练的完整计划。",
+  "syntheticUserInput": true,
+  "modelRequests": true,
+  "deviceOperated": false,
+  "caseGenerationAttempt": 1,
+  "sdkTransportMaxRetries": 0,
+  "sendReturned": true,
+  "persistenceFlushed": true,
+  "turnStartedAtUtc": "2026-10-31T07:39:32.533963Z",
+  "userTurnElapsedMs": 14622,
+  "userTurnElapsedMicroseconds": 14622710,
+  "fullTurnElapsedMs": 14624,
+  "fullTurnElapsedMicroseconds": 14624996,
+  "turnFinishedAtUtc": "2026-10-31T07:39:47.159488Z",
+  "status": "ok",
+  "admittedPlan": true,
+  "plan": {
+    "schemaVersion": 1,
+    "id": "plan-1793432385089-2",
+    "source": "ai",
+    "title": "居家徒手全身基础训练",
+    "summary": "居家徒手全身基础训练",
+    "goal": "core",
+    "scene": "home",
+    "equipment": [
+      "mat",
+      "wall",
+      "chair"
+    ],
+    "level": 1,
+    "targetMinutes": 20,
+    "blocks": [
+      {
+        "id": "b1",
+        "name": "warmup",
+        "type": "warmup",
+        "rounds": 1,
+        "restBetweenRoundsSeconds": 0,
+        "items": [
+          {
+            "exerciseId": "h-catcow-quad",
+            "mode": "time",
+            "sets": 1,
+            "workSeconds": 40,
+            "perSide": false,
+            "restSeconds": 10
+          },
+          {
+            "exerciseId": "h-wall-angel",
+            "mode": "reps",
+            "sets": 2,
+            "reps": 10,
+            "perSide": false,
+            "restSeconds": 10
+          },
+          {
+            "exerciseId": "h-hip-gate",
+            "mode": "reps",
+            "sets": 1,
+            "reps": 6,
+            "perSide": true,
+            "restSeconds": 10
+          }
+        ]
+      },
+      {
+        "id": "b2",
+        "name": "main",
+        "type": "main",
+        "rounds": 1,
+        "restBetweenRoundsSeconds": 0,
+        "items": [
+          {
+            "exerciseId": "h-squat",
+            "mode": "reps",
+            "sets": 1,
+            "reps": 12,
+            "perSide": false,
+            "restSeconds": 30
+          },
+          {
+            "exerciseId": "h-incline-pushup",
+            "mode": "reps",
+            "sets": 3,
+            "reps": 10,
+            "perSide": false,
+            "restSeconds": 30
+          },
+          {
+            "exerciseId": "h-good-morning",
+            "mode": "reps",
+            "sets": 2,
+            "reps": 12,
+            "perSide": false,
+            "restSeconds": 30
+          },
+          {
+            "exerciseId": "w-bird-dog",
+            "mode": "reps",
+            "sets": 2,
+            "reps": 10,
+            "perSide": false,
+            "restSeconds": 30
+          },
+          {
+            "exerciseId": "w-dead-bug",
+            "mode": "reps",
+            "sets": 3,
+            "reps": 10,
+            "perSide": false,
+            "restSeconds": 30
+          },
+          {
+            "exerciseId": "h-short-side-plank",
+            "mode": "time",
+            "sets": 3,
+            "workSeconds": 15,
+            "perSide": true,
+            "restSeconds": 30
+          }
+        ]
+      },
+      {
+        "id": "b3",
+        "name": "cooldown",
+        "type": "cooldown",
+        "rounds": 1,
+        "restBetweenRoundsSeconds": 0,
+        "items": [
+          {
+            "exerciseId": "h-chair-lat",
+            "mode": "time",
+            "sets": 1,
+            "workSeconds": 30,
+            "perSide": false,
+            "restSeconds": 10
+          },
+          {
+            "exerciseId": "h-cobra",
+            "mode": "time",
+            "sets": 1,
+            "workSeconds": 30,
+            "perSide": false,
+            "restSeconds": 10
+          },
+          {
+            "exerciseId": "h-knee-hug",
+            "mode": "reps",
+            "sets": 1,
+            "reps": 6,
+            "perSide": false,
+            "restSeconds": 15
+          }
+        ]
+      }
+    ],
+    "notes": [],
+    "safetyNotes": []
+  },
+  "coachEstimateSeconds": 1221.0,
+  "cardSecondsIncludingPrep": 1225.0,
+  "cardLabel": "约 20 分钟",
+  "executionSecondsIncludingPrep": 1225.0,
+  "executionSecondsExcludingPrep": 1215.0,
+  "preparationSeconds": 10.0,
+  "coachToExecutionDifferenceSeconds": 4.0,
+  "withinTenPercent": true,
+  "manualWorkPhases": 0,
+  "engineFullyFinished": true,
+  "engineElapsedSeconds": 1225.0,
+  "workPhases": [
+    {
+      "id": "h-catcow-quad",
+      "seconds": 40.0,
+      "set": 1,
+      "sets": 1,
+      "round": 0,
+      "rounds": 0,
+      "side": null,
+      "selfPaced": false,
+      "reps": null,
+      "repSeconds": null,
+      "rhythm": {
+        "kind": "hold",
+        "leadSeconds": 0.0
+      }
+    },
+    {
+      "id": "h-wall-angel",
+      "seconds": 40.0,
+      "set": 1,
+      "sets": 2,
+      "round": 0,
+      "rounds": 0,
+      "side": null,
+      "selfPaced": false,
+      "reps": 10,
+      "repSeconds": 4.0,
+      "rhythm": {
+        "kind": "rep_updown",
+        "leadSeconds": 0.0,
+        "phases": [
+          {
+            "id": "go",
+            "seconds": 4.0
+          }
+        ],
+        "source": "repSeconds"
+      }
+    },
+    {
+      "id": "h-wall-angel",
+      "seconds": 40.0,
+      "set": 2,
+      "sets": 2,
+      "round": 0,
+      "rounds": 0,
+      "side": null,
+      "selfPaced": false,
+      "reps": 10,
+      "repSeconds": 4.0,
+      "rhythm": {
+        "kind": "rep_updown",
+        "leadSeconds": 0.0,
+        "phases": [
+          {
+            "id": "go",
+            "seconds": 4.0
+          }
+        ],
+        "source": "repSeconds"
+      }
+    },
+    {
+      "id": "h-hip-gate",
+      "seconds": 25.0,
+      "set": 1,
+      "sets": 1,
+      "round": 0,
+      "rounds": 0,
+      "side": "right",
+      "selfPaced": false,
+      "reps": 6,
+      "repSeconds": 4.0,
+      "rhythm": {
+        "kind": "rep_alternate",
+        "leadSeconds": 1.0,
+        "phases": [
+          {
+            "id": "go",
+            "seconds": 0.5,
+            "cue": [
+              "w.gate_open",
+              "w.gate_close"
+            ]
+          },
+          {
+            "id": "hold",
+            "seconds": 1.35
+          },
+          {
+            "id": "back",
+            "seconds": 1.25,
+            "cue": "w.lower"
+          },
+          {
+            "id": "rest",
+            "seconds": 0.9
+          }
+        ],
+        "reps": 6
+      }
+    },
+    {
+      "id": "h-hip-gate",
+      "seconds": 25.0,
+      "set": 1,
+      "sets": 1,
+      "round": 0,
+      "rounds": 0,
+      "side": "left",
+      "selfPaced": false,
+      "reps": 6,
+      "repSeconds": 4.0,
+      "rhythm": {
+        "kind": "rep_alternate",
+        "leadSeconds": 1.0,
+        "phases": [
+          {
+            "id": "go",
+            "seconds": 0.5,
+            "cue": [
+              "w.gate_open",
+              "w.gate_close"
+            ]
+          },
+          {
+            "id": "hold",
+            "seconds": 1.35
+          },
+          {
+            "id": "back",
+            "seconds": 1.25,
+            "cue": "w.lower"
+          },
+          {
+            "id": "rest",
+            "seconds": 0.9
+          }
+        ],
+        "reps": 6
+      }
+    },
+    {
+      "id": "h-squat",
+      "seconds": 49.0,
+      "set": 1,
+      "sets": 1,
+      "round": 0,
+      "rounds": 0,
+      "side": null,
+      "selfPaced": false,
+      "reps": 12,
+      "repSeconds": 4.0,
+      "rhythm": {
+        "kind": "rep_updown",
+        "leadSeconds": 1.0,
+        "phases": [
+          {
+            "id": "go",
+            "seconds": 1.15,
+            "cue": "w.squat_down"
+          },
+          {
+            "id": "hold",
+            "seconds": 0.7
+          },
+          {
+            "id": "back",
+            "seconds": 1.1,
+            "cue": "w.stand_up"
+          },
+          {
+            "id": "rest",
+            "seconds": 1.05
+          }
+        ],
+        "reps": 8
+      }
+    },
+    {
+      "id": "h-incline-pushup",
+      "seconds": 40.0,
+      "set": 1,
+      "sets": 3,
+      "round": 0,
+      "rounds": 0,
+      "side": null,
+      "selfPaced": false,
+      "reps": 10,
+      "repSeconds": 4.0,
+      "rhythm": {
+        "kind": "rep_updown",
+        "leadSeconds": 0.0,
+        "phases": [
+          {
+            "id": "go",
+            "seconds": 4.0
+          }
+        ],
+        "source": "repSeconds"
+      }
+    },
+    {
+      "id": "h-incline-pushup",
+      "seconds": 40.0,
+      "set": 2,
+      "sets": 3,
+      "round": 0,
+      "rounds": 0,
+      "side": null,
+      "selfPaced": false,
+      "reps": 10,
+      "repSeconds": 4.0,
+      "rhythm": {
+        "kind": "rep_updown",
+        "leadSeconds": 0.0,
+        "phases": [
+          {
+            "id": "go",
+            "seconds": 4.0
+          }
+        ],
+        "source": "repSeconds"
+      }
+    },
+    {
+      "id": "h-incline-pushup",
+      "seconds": 40.0,
+      "set": 3,
+      "sets": 3,
+      "round": 0,
+      "rounds": 0,
+      "side": null,
+      "selfPaced": false,
+      "reps": 10,
+      "repSeconds": 4.0,
+      "rhythm": {
+        "kind": "rep_updown",
+        "leadSeconds": 0.0,
+        "phases": [
+          {
+            "id": "go",
+            "seconds": 4.0
+          }
+        ],
+        "source": "repSeconds"
+      }
+    },
+    {
+      "id": "h-good-morning",
+      "seconds": 48.0,
+      "set": 1,
+      "sets": 2,
+      "round": 0,
+      "rounds": 0,
+      "side": null,
+      "selfPaced": false,
+      "reps": 12,
+      "repSeconds": 4.0,
+      "rhythm": {
+        "kind": "rep_updown",
+        "leadSeconds": 0.0,
+        "phases": [
+          {
+            "id": "go",
+            "seconds": 4.0
+          }
+        ],
+        "source": "repSeconds"
+      }
+    },
+    {
+      "id": "h-good-morning",
+      "seconds": 48.0,
+      "set": 2,
+      "sets": 2,
+      "round": 0,
+      "rounds": 0,
+      "side": null,
+      "selfPaced": false,
+      "reps": 12,
+      "repSeconds": 4.0,
+      "rhythm": {
+        "kind": "rep_updown",
+        "leadSeconds": 0.0,
+        "phases": [
+          {
+            "id": "go",
+            "seconds": 4.0
+          }
+        ],
+        "source": "repSeconds"
+      }
+    },
+    {
+      "id": "w-bird-dog",
+      "seconds": 40.0,
+      "set": 1,
+      "sets": 2,
+      "round": 0,
+      "rounds": 0,
+      "side": null,
+      "selfPaced": false,
+      "reps": 10,
+      "repSeconds": 4.0,
+      "rhythm": {
+        "kind": "rep_updown",
+        "leadSeconds": 0.0,
+        "phases": [
+          {
+            "id": "go",
+            "seconds": 4.0
+          }
+        ],
+        "source": "repSeconds"
+      }
+    },
+    {
+      "id": "w-bird-dog",
+      "seconds": 40.0,
+      "set": 2,
+      "sets": 2,
+      "round": 0,
+      "rounds": 0,
+      "side": null,
+      "selfPaced": false,
+      "reps": 10,
+      "repSeconds": 4.0,
+      "rhythm": {
+        "kind": "rep_updown",
+        "leadSeconds": 0.0,
+        "phases": [
+          {
+            "id": "go",
+            "seconds": 4.0
+          }
+        ],
+        "source": "repSeconds"
+      }
+    },
+    {
+      "id": "w-dead-bug",
+      "seconds": 30.0,
+      "set": 1,
+      "sets": 3,
+      "round": 0,
+      "rounds": 0,
+      "side": null,
+      "selfPaced": false,
+      "reps": 10,
+      "repSeconds": 3.0,
+      "rhythm": {
+        "kind": "rep_updown",
+        "leadSeconds": 0.0,
+        "phases": [
+          {
+            "id": "go",
+            "seconds": 3.0
+          }
+        ],
+        "source": "repSeconds"
+      }
+    },
+    {
+      "id": "w-dead-bug",
+      "seconds": 30.0,
+      "set": 2,
+      "sets": 3,
+      "round": 0,
+      "rounds": 0,
+      "side": null,
+      "selfPaced": false,
+      "reps": 10,
+      "repSeconds": 3.0,
+      "rhythm": {
+        "kind": "rep_updown",
+        "leadSeconds": 0.0,
+        "phases": [
+          {
+            "id": "go",
+            "seconds": 3.0
+          }
+        ],
+        "source": "repSeconds"
+      }
+    },
+    {
+      "id": "w-dead-bug",
+      "seconds": 30.0,
+      "set": 3,
+      "sets": 3,
+      "round": 0,
+      "rounds": 0,
+      "side": null,
+      "selfPaced": false,
+      "reps": 10,
+      "repSeconds": 3.0,
+      "rhythm": {
+        "kind": "rep_updown",
+        "leadSeconds": 0.0,
+        "phases": [
+          {
+            "id": "go",
+            "seconds": 3.0
+          }
+        ],
+        "source": "repSeconds"
+      }
+    },
+    {
+      "id": "h-short-side-plank",
+      "seconds": 15.0,
+      "set": 1,
+      "sets": 3,
+      "round": 0,
+      "rounds": 0,
+      "side": "right",
+      "selfPaced": false,
+      "reps": null,
+      "repSeconds": null,
+      "rhythm": {
+        "kind": "hold",
+        "leadSeconds": 0.0
+      }
+    },
+    {
+      "id": "h-short-side-plank",
+      "seconds": 15.0,
+      "set": 1,
+      "sets": 3,
+      "round": 0,
+      "rounds": 0,
+      "side": "left",
+      "selfPaced": false,
+      "reps": null,
+      "repSeconds": null,
+      "rhythm": {
+        "kind": "hold",
+        "leadSeconds": 0.0
+      }
+    },
+    {
+      "id": "h-short-side-plank",
+      "seconds": 15.0,
+      "set": 2,
+      "sets": 3,
+      "round": 0,
+      "rounds": 0,
+      "side": "right",
+      "selfPaced": false,
+      "reps": null,
+      "repSeconds": null,
+      "rhythm": {
+        "kind": "hold",
+        "leadSeconds": 0.0
+      }
+    },
+    {
+      "id": "h-short-side-plank",
+      "seconds": 15.0,
+      "set": 2,
+      "sets": 3,
+      "round": 0,
+      "rounds": 0,
+      "side": "left",
+      "selfPaced": false,
+      "reps": null,
+      "repSeconds": null,
+      "rhythm": {
+        "kind": "hold",
+        "leadSeconds": 0.0
+      }
+    },
+    {
+      "id": "h-short-side-plank",
+      "seconds": 15.0,
+      "set": 3,
+      "sets": 3,
+      "round": 0,
+      "rounds": 0,
+      "side": "right",
+      "selfPaced": false,
+      "reps": null,
+      "repSeconds": null,
+      "rhythm": {
+        "kind": "hold",
+        "leadSeconds": 0.0
+      }
+    },
+    {
+      "id": "h-short-side-plank",
+      "seconds": 15.0,
+      "set": 3,
+      "sets": 3,
+      "round": 0,
+      "rounds": 0,
+      "side": "left",
+      "selfPaced": false,
+      "reps": null,
+      "repSeconds": null,
+      "rhythm": {
+        "kind": "hold",
+        "leadSeconds": 0.0
+      }
+    },
+    {
+      "id": "h-chair-lat",
+      "seconds": 30.0,
+      "set": 1,
+      "sets": 1,
+      "round": 0,
+      "rounds": 0,
+      "side": null,
+      "selfPaced": false,
+      "reps": null,
+      "repSeconds": null,
+      "rhythm": {
+        "kind": "hold",
+        "leadSeconds": 0.0
+      }
+    },
+    {
+      "id": "h-cobra",
+      "seconds": 30.0,
+      "set": 1,
+      "sets": 1,
+      "round": 0,
+      "rounds": 0,
+      "side": null,
+      "selfPaced": false,
+      "reps": null,
+      "repSeconds": null,
+      "rhythm": {
+        "kind": "hold",
+        "leadSeconds": 0.0
+      }
+    },
+    {
+      "id": "h-knee-hug",
+      "seconds": 25.0,
+      "set": 1,
+      "sets": 1,
+      "round": 0,
+      "rounds": 0,
+      "side": null,
+      "selfPaced": false,
+      "reps": 6,
+      "repSeconds": 4.0,
+      "rhythm": {
+        "kind": "rep_breath",
+        "leadSeconds": 1.0,
+        "phases": [
+          {
+            "id": "go",
+            "seconds": 1.4,
+            "cue": "w.exhale_hug"
+          },
+          {
+            "id": "hold",
+            "seconds": 1.0
+          },
+          {
+            "id": "back",
+            "seconds": 0.85,
+            "cue": "w.inhale_release"
+          },
+          {
+            "id": "rest",
+            "seconds": 0.75
+          }
+        ],
+        "reps": 6
+      }
+    }
+  ],
+  "phaseSchedule": [
+    {
+      "kind": "prep",
+      "seconds": 10.0,
+      "id": "h-catcow-quad",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 40.0,
+      "id": "h-catcow-quad",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "rest",
+      "seconds": 15.0,
+      "id": "h-wall-angel",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 40.0,
+      "id": "h-wall-angel",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "rest",
+      "seconds": 10.0,
+      "id": "h-wall-angel",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 40.0,
+      "id": "h-wall-angel",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "rest",
+      "seconds": 15.0,
+      "id": "h-hip-gate",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 25.0,
+      "id": "h-hip-gate",
+      "round": 0,
+      "side": "right"
+    },
+    {
+      "kind": "switchSide",
+      "seconds": 5.0,
+      "id": "h-hip-gate",
+      "round": 0,
+      "side": "left"
+    },
+    {
+      "kind": "work",
+      "seconds": 25.0,
+      "id": "h-hip-gate",
+      "round": 0,
+      "side": "left"
+    },
+    {
+      "kind": "rest",
+      "seconds": 15.0,
+      "id": "h-squat",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 49.0,
+      "id": "h-squat",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "rest",
+      "seconds": 15.0,
+      "id": "h-incline-pushup",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 40.0,
+      "id": "h-incline-pushup",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "rest",
+      "seconds": 30.0,
+      "id": "h-incline-pushup",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 40.0,
+      "id": "h-incline-pushup",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "rest",
+      "seconds": 30.0,
+      "id": "h-incline-pushup",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 40.0,
+      "id": "h-incline-pushup",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "rest",
+      "seconds": 15.0,
+      "id": "h-good-morning",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 48.0,
+      "id": "h-good-morning",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "rest",
+      "seconds": 30.0,
+      "id": "h-good-morning",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 48.0,
+      "id": "h-good-morning",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "rest",
+      "seconds": 15.0,
+      "id": "w-bird-dog",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 40.0,
+      "id": "w-bird-dog",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "rest",
+      "seconds": 30.0,
+      "id": "w-bird-dog",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 40.0,
+      "id": "w-bird-dog",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "rest",
+      "seconds": 15.0,
+      "id": "w-dead-bug",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 30.0,
+      "id": "w-dead-bug",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "rest",
+      "seconds": 30.0,
+      "id": "w-dead-bug",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 30.0,
+      "id": "w-dead-bug",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "rest",
+      "seconds": 30.0,
+      "id": "w-dead-bug",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 30.0,
+      "id": "w-dead-bug",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "rest",
+      "seconds": 15.0,
+      "id": "h-short-side-plank",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 15.0,
+      "id": "h-short-side-plank",
+      "round": 0,
+      "side": "right"
+    },
+    {
+      "kind": "switchSide",
+      "seconds": 5.0,
+      "id": "h-short-side-plank",
+      "round": 0,
+      "side": "left"
+    },
+    {
+      "kind": "work",
+      "seconds": 15.0,
+      "id": "h-short-side-plank",
+      "round": 0,
+      "side": "left"
+    },
+    {
+      "kind": "rest",
+      "seconds": 30.0,
+      "id": "h-short-side-plank",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 15.0,
+      "id": "h-short-side-plank",
+      "round": 0,
+      "side": "right"
+    },
+    {
+      "kind": "switchSide",
+      "seconds": 5.0,
+      "id": "h-short-side-plank",
+      "round": 0,
+      "side": "left"
+    },
+    {
+      "kind": "work",
+      "seconds": 15.0,
+      "id": "h-short-side-plank",
+      "round": 0,
+      "side": "left"
+    },
+    {
+      "kind": "rest",
+      "seconds": 30.0,
+      "id": "h-short-side-plank",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 15.0,
+      "id": "h-short-side-plank",
+      "round": 0,
+      "side": "right"
+    },
+    {
+      "kind": "switchSide",
+      "seconds": 5.0,
+      "id": "h-short-side-plank",
+      "round": 0,
+      "side": "left"
+    },
+    {
+      "kind": "work",
+      "seconds": 15.0,
+      "id": "h-short-side-plank",
+      "round": 0,
+      "side": "left"
+    },
+    {
+      "kind": "rest",
+      "seconds": 15.0,
+      "id": "h-chair-lat",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 30.0,
+      "id": "h-chair-lat",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "rest",
+      "seconds": 15.0,
+      "id": "h-cobra",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 30.0,
+      "id": "h-cobra",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "rest",
+      "seconds": 15.0,
+      "id": "h-knee-hug",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 25.0,
+      "id": "h-knee-hug",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "done",
+      "seconds": 0.0,
+      "id": null,
+      "round": 0,
+      "side": null
+    }
+  ],
+  "passed": true,
+  "elapsedMs": 14625,
+  "caseElapsedMicroseconds": 14625628,
+  "transportCalls": [
+    {
+      "callIndex": 1,
+      "outcome": "response",
+      "startedAtUtc": "2026-10-31T07:39:32.571603Z",
+      "roles": [
+        "system",
+        "user",
+        "user"
+      ],
+      "model": "deepseek-flash",
+      "httpAttempts": 1,
+      "sdkLatencyMs": 2667,
+      "sdkLatencyMicroseconds": 2667953,
+      "tokens": {
+        "inputTokens": 3601,
+        "outputTokens": 79,
+        "totalTokens": 3680,
+        "cachedInputTokens": 3456,
+        "reasoningOutputTokens": 41,
+        "sdkNormalized": {
+          "promptTokens": 3601,
+          "completionTokens": 79,
+          "reasoningTokens": 41,
+          "cachedTokens": 3456,
+          "totalTokens": 3680
+        }
+      },
+      "finishReason": "tool_calls",
+      "tools": [
+        {
+          "name": "start_task",
+          "arguments": "{\"type\": \"plan\"}"
+        }
+      ],
+      "finishedAtUtc": "2026-10-31T07:39:35.240168Z",
+      "elapsedMs": 2668,
+      "elapsedMicroseconds": 2668002,
+      "wireHttpAttemptTimingsMs": null
+    },
+    {
+      "callIndex": 2,
+      "outcome": "response",
+      "startedAtUtc": "2026-10-31T07:39:35.241872Z",
+      "roles": [
+        "system",
+        "user",
+        "assistant",
+        "tool",
+        "user"
+      ],
+      "model": "deepseek-flash",
+      "httpAttempts": 1,
+      "sdkLatencyMs": 2993,
+      "sdkLatencyMicroseconds": 2993283,
+      "tokens": {
+        "inputTokens": 6897,
+        "outputTokens": 235,
+        "totalTokens": 7132,
+        "cachedInputTokens": 3584,
+        "reasoningOutputTokens": 95,
+        "sdkNormalized": {
+          "promptTokens": 6897,
+          "completionTokens": 235,
+          "reasoningTokens": 95,
+          "cachedTokens": 3584,
+          "totalTokens": 7132
+        }
+      },
+      "finishReason": "tool_calls",
+      "tools": [
+        {
+          "name": "set_params",
+          "arguments": "{\"fields\": {\"scene\": {\"value\": \"home\", \"source\": \"user\", \"quote\": \"在家\"}, \"minutes\": {\"value\": 20, \"source\": \"user\", \"quote\": \"徒手20分钟全身训练\"}, \"level\": {\"value\": 1, \"source\": \"user\", \"quote\": \"初级\"}, \"goal\": {\"value\": [\"purpose.strength\", \"purpose.core\", \"body.core\"], \"source\": \"user\", \"quote\": \"全身训练\"}}}"
+        }
+      ],
+      "finishedAtUtc": "2026-10-31T07:39:38.235568Z",
+      "elapsedMs": 2993,
+      "elapsedMicroseconds": 2993324,
+      "wireHttpAttemptTimingsMs": null
+    },
+    {
+      "callIndex": 3,
+      "outcome": "response",
+      "startedAtUtc": "2026-10-31T07:39:38.238569Z",
+      "roles": [
+        "system",
+        "user",
+        "assistant",
+        "tool",
+        "assistant",
+        "tool",
+        "user"
+      ],
+      "model": "deepseek-flash",
+      "httpAttempts": 1,
+      "sdkLatencyMs": 1913,
+      "sdkLatencyMicroseconds": 1913639,
+      "tokens": {
+        "inputTokens": 7511,
+        "outputTokens": 275,
+        "totalTokens": 7786,
+        "cachedInputTokens": 6528,
+        "reasoningOutputTokens": 29,
+        "sdkNormalized": {
+          "promptTokens": 7511,
+          "completionTokens": 275,
+          "reasoningTokens": 29,
+          "cachedTokens": 6528,
+          "totalTokens": 7786
+        }
+      },
+      "finishReason": "tool_calls",
+      "tools": [
+        {
+          "name": "search_actions",
+          "arguments": "{\"tags\": [\"scene.home\", \"purpose.strength\", \"level.1\"], \"limit\": 20}"
+        },
+        {
+          "name": "search_actions",
+          "arguments": "{\"tags\": [\"scene.home\", \"purpose.core\", \"level.1\"], \"limit\": 15}"
+        },
+        {
+          "name": "search_actions",
+          "arguments": "{\"tags\": [\"scene.home\", \"purpose.mobility\", \"level.1\"], \"limit\": 12}"
+        },
+        {
+          "name": "search_actions",
+          "arguments": "{\"tags\": [\"scene.home\", \"purpose.stretch\", \"level.1\"], \"limit\": 12}"
+        }
+      ],
+      "finishedAtUtc": "2026-10-31T07:39:40.152118Z",
+      "elapsedMs": 1913,
+      "elapsedMicroseconds": 1913685,
+      "wireHttpAttemptTimingsMs": null
+    },
+    {
+      "callIndex": 4,
+      "outcome": "response",
+      "startedAtUtc": "2026-10-31T07:39:40.159083Z",
+      "roles": [
+        "system",
+        "user",
+        "assistant",
+        "tool",
+        "assistant",
+        "tool",
+        "assistant",
+        "tool",
+        "tool",
+        "tool",
+        "tool",
+        "user"
+      ],
+      "model": "deepseek-flash",
+      "httpAttempts": 1,
+      "sdkLatencyMs": 4928,
+      "sdkLatencyMicroseconds": 4928584,
+      "tokens": {
+        "inputTokens": 14522,
+        "outputTokens": 556,
+        "totalTokens": 15078,
+        "cachedInputTokens": 7040,
+        "reasoningOutputTokens": 337,
+        "sdkNormalized": {
+          "promptTokens": 14522,
+          "completionTokens": 556,
+          "reasoningTokens": 337,
+          "cachedTokens": 7040,
+          "totalTokens": 15078
+        }
+      },
+      "finishReason": "tool_calls",
+      "tools": [
+        {
+          "name": "draft_plan",
+          "arguments": "{\"title\": \"居家徒手全身基础训练\", \"blocks\": [{\"kind\": \"warmup\", \"items\": [{\"id\": \"h-catcow-quad\"}, {\"id\": \"h-wall-angel\"}, {\"id\": \"h-hip-gate\"}]}, {\"kind\": \"main\", \"items\": [{\"id\": \"h-squat\"}, {\"id\": \"h-incline-pushup\"}, {\"id\": \"h-good-morning\"}, {\"id\": \"w-bird-dog\"}, {\"id\": \"w-dead-bug\"}, {\"id\": \"h-short-side-plank\"}]}, {\"kind\": \"cooldown\", \"items\": [{\"id\": \"h-chair-lat\"}, {\"id\": \"h-cobra\"}, {\"id\": \"h-knee-hug\"}]}]}"
+        }
+      ],
+      "finishedAtUtc": "2026-10-31T07:39:45.088386Z",
+      "elapsedMs": 4928,
+      "elapsedMicroseconds": 4928631,
+      "wireHttpAttemptTimingsMs": null
+    },
+    {
+      "callIndex": 5,
+      "outcome": "response",
+      "startedAtUtc": "2026-10-31T07:39:45.095387Z",
+      "roles": [
+        "system",
+        "user",
+        "assistant",
+        "tool",
+        "assistant",
+        "tool",
+        "assistant",
+        "tool",
+        "tool",
+        "tool",
+        "tool",
+        "assistant",
+        "tool",
+        "user"
+      ],
+      "model": "deepseek-flash",
+      "httpAttempts": 1,
+      "sdkLatencyMs": 2057,
+      "sdkLatencyMicroseconds": 2057341,
+      "tokens": {
+        "inputTokens": 15576,
+        "outputTokens": 119,
+        "totalTokens": 15695,
+        "cachedInputTokens": 13056,
+        "reasoningOutputTokens": null,
+        "sdkNormalized": {
+          "promptTokens": 15576,
+          "completionTokens": 119,
+          "reasoningTokens": 0,
+          "cachedTokens": 13056,
+          "totalTokens": 15695
+        }
+      },
+      "finishReason": "tool_calls",
+      "tools": [
+        {
+          "name": "show_plan",
+          "arguments": "{\"plan_id\": \"plan-1793432385089-2\", \"note\": \"热身先把髋、肩、脊柱打开；主体按下肢—推—后链—核心交替，兼顾前后侧；收尾放松背、腹和髋。全程呼吸顺畅不憋气，动作放慢不弹震，有牵扯感即可，疼就停。\"}"
+        }
+      ],
+      "finishedAtUtc": "2026-10-31T07:39:47.152833Z",
+      "elapsedMs": 2057,
+      "elapsedMicroseconds": 2057389,
+      "wireHttpAttemptTimingsMs": null
+    }
+  ],
+  "llmCallCount": 5,
+  "successfulLlmCallCount": 5,
+  "failedLlmCallCount": 0,
+  "unfinishedLlmCallCount": 0,
+  "httpAttemptCount": 5,
+  "knownHttpAttemptSubtotal": 5,
+  "unknownHttpAttemptCallCount": 0,
+  "callElapsedMsSum": 14559,
+  "knownCallElapsedMsSubtotal": 14559,
+  "tokens": {
+    "inputTokens": 48107,
+    "outputTokens": 1264,
+    "totalTokens": 49371,
+    "cachedInputTokens": 33664,
+    "reasoningOutputTokens": null
+  },
+  "tokenCoverage": {
+    "inputTokens": {
+      "observedCalls": 5,
+      "unknownCalls": 0,
+      "knownSubtotal": 48107
+    },
+    "outputTokens": {
+      "observedCalls": 5,
+      "unknownCalls": 0,
+      "knownSubtotal": 1264
+    },
+    "totalTokens": {
+      "observedCalls": 5,
+      "unknownCalls": 0,
+      "knownSubtotal": 49371
+    },
+    "cachedInputTokens": {
+      "observedCalls": 5,
+      "unknownCalls": 0,
+      "knownSubtotal": 33664
+    },
+    "reasoningOutputTokens": {
+      "observedCalls": 4,
+      "unknownCalls": 1,
+      "knownSubtotal": 502
+    }
+  }
+}

@@ -1,0 +1,325 @@
+{
+  "schema": "smartfit-ui-kit-same-driver-frames@1",
+  "variant": "new",
+  "source": "d0a88871befcf0fab8c0aca1e97046ea3c635016",
+  "publicInputsSha256": "4f4a63176c383d0e0f365c2bcb7ea87cf3c60e2b707321a059c277c1b56bb972",
+  "driverSha256": "81f80b15fbfc34526aca03c18e835c0234553f064c9a46ab4543c5f65ac6f154",
+  "adapterSha256": "c959e5dc56f64ed514890b8beb64cdc3bc43dd40546d37d15e17f404ddaeb4ae",
+  "focusImplementation": "host-local",
+  "inputsSha256": "a2c6df4c3e5dd8f3acab967ab835b15b0d9c6db3f98c318c0d8fcb705d490711",
+  "logicalSize": {
+    "width": 412,
+    "height": 915
+  },
+  "dpr": 2.625,
+  "physicalSizeRounding": "ceil in RenderRepaintBoundary.toImage",
+  "theme": "dark",
+  "fonts": [
+    {
+      "family": "MaterialIcons",
+      "asset": "fonts/MaterialIcons-Regular.otf",
+      "bytes": 1645184,
+      "sha256": "d9865b671a09d683d13a863089d8825e0f61a37696ce5d7d448bc8023aa62453"
+    },
+    {
+      "family": "NotoSansSC",
+      "asset": "assets/fonts/NotoSansSC.ttf",
+      "bytes": 4110060,
+      "sha256": "93c0808b4374c84021581cd80ad5d5cae67303d91411d81211e77126d1e5b5ca"
+    },
+    {
+      "family": "packages/cupertino_icons/CupertinoIcons",
+      "asset": "packages/cupertino_icons/assets/CupertinoIcons.ttf",
+      "bytes": 257628,
+      "sha256": "67c44fe9183b002e79dde7f6977e2988661c9a3e4a3c5fce968787efdbed823c"
+    }
+  ],
+  "frames": [
+    {
+      "frame": "dark/waiting-0ms.png",
+      "bytes": 115994,
+      "sha256": "1ad69342b1c6eca09c1553afe5a4773d5ee1afe56396989ca7b7e22ecef348db",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 0
+    },
+    {
+      "frame": "dark/waiting-400ms.png",
+      "bytes": 130158,
+      "sha256": "32ebc97187a28712f4d3826d23eed6ec48684219decd38077f483582309f942d",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 400000
+    },
+    {
+      "frame": "dark/waiting-800ms.png",
+      "bytes": 129532,
+      "sha256": "37886b49b7dc1eb805b1ed15ed96e054fe537dad17501287b76a49c2621b0a84",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 800000
+    },
+    {
+      "frame": "dark/waiting-1200ms.png",
+      "bytes": 129083,
+      "sha256": "0f4ef0b35589cd1dc86ca6dfc4216d1bb1e259c7a67b8979fddf58558a1d8b79",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 1200000
+    },
+    {
+      "frame": "dark/waiting-1600ms.png",
+      "bytes": 129893,
+      "sha256": "05ed361fffe8baf65c593b8e89d8aec70ecd397ef4ee25d6c0a1cdbed724db03",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 1600000
+    },
+    {
+      "frame": "dark/parameters-before.png",
+      "bytes": 129893,
+      "sha256": "05ed361fffe8baf65c593b8e89d8aec70ecd397ef4ee25d6c0a1cdbed724db03",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 1600000
+    },
+    {
+      "frame": "dark/parameters-after.png",
+      "bytes": 130146,
+      "sha256": "dd23fcc4d53b4f787aa28a1ddb5453907f2269dcdf5b872e9dcfc84de7006221",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 1860000
+    },
+    {
+      "frame": "dark/complete.png",
+      "bytes": 120083,
+      "sha256": "488360240f7ab7b6df3a8a6b9b5b0ba0c658f592786b395ca6aa782ede64c5db",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 260000
+    },
+    {
+      "frame": "dark/failure.png",
+      "bytes": 32994,
+      "sha256": "87a9c53945b4979c2c61b81ac10be63367345470edd00b85ee382d3da15f843f",
+      "width": 1082,
+      "height": 2402
+    },
+    {
+      "frame": "dark/cancelled.png",
+      "bytes": 15672,
+      "sha256": "d1f3c69f8376551b513120aa20fdd1a8c254ed7b8ced92dbc7bd85ab5b1bdeac",
+      "width": 1082,
+      "height": 2402
+    },
+    {
+      "frame": "dark/delivery-0pct.png",
+      "bytes": 126030,
+      "sha256": "e4e2864cba727abcbdc9302fe3e46640512371cb820092248b5d63ce7b3dd240",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 0,
+      "fraction": 0.0
+    },
+    {
+      "frame": "dark/delivery-25pct.png",
+      "bytes": 123950,
+      "sha256": "bb2f8cc62a2f603aebf6670da26f355fab538052f305f62bbfbe00b8b5cb5910",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 222500,
+      "fraction": 0.25
+    },
+    {
+      "frame": "dark/delivery-50pct.png",
+      "bytes": 123905,
+      "sha256": "5f3442382c9ef4b40516a41e0561f637f8b3ba8477f4f09ee59f6257c812e05a",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 445000,
+      "fraction": 0.5
+    },
+    {
+      "frame": "dark/delivery-75pct.png",
+      "bytes": 61662,
+      "sha256": "a732c78cb72ded2bb5d55511b8ef20550596d50fe83de4b6e055ca6f5aa2b4b9",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 667500,
+      "fraction": 0.75
+    },
+    {
+      "frame": "dark/delivery-100pct.png",
+      "bytes": 46737,
+      "sha256": "889e10d370c226fa3559642ef94153e1f2fe3480d7fcc5f99b00817cc99acda2",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 890000,
+      "fraction": 1.0
+    },
+    {
+      "frame": "dark/focus-appearing.png",
+      "bytes": 26606,
+      "sha256": "745675d55ac55baea2fa2c8f9f6ad4f4046da5ee0e3ce3a3ffbb63da9e1eca16",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 90000,
+      "fraction": 0.5
+    },
+    {
+      "frame": "dark/focus-held.png",
+      "bytes": 26806,
+      "sha256": "df5dcb1aac3cbafd2a8ad32665de368396732c813778948be82a4f7688495395",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 180000,
+      "fraction": 1.0
+    },
+    {
+      "frame": "dark/focus-clearing.png",
+      "bytes": 26719,
+      "sha256": "ae30f29bf33293200e0e9f50c75c8901ee3574683b360bbd2301afd2edc996f8",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 60000,
+      "fraction": 0.5
+    },
+    {
+      "frame": "dark/focus-cleared.png",
+      "bytes": 15672,
+      "sha256": "d1f3c69f8376551b513120aa20fdd1a8c254ed7b8ced92dbc7bd85ab5b1bdeac",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 120000,
+      "fraction": 1.0
+    },
+    {
+      "frame": "dark/training-entry-0pct.png",
+      "bytes": 112230,
+      "sha256": "5dcd24e9805270b9c1f8bada5614514a4da901616ceb1892fb45690868a611f5",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 0,
+      "fraction": 0.0,
+      "routeValue": 0.0,
+      "routeStatus": "forward"
+    },
+    {
+      "frame": "dark/training-entry-25pct.png",
+      "bytes": 260092,
+      "sha256": "a5fc3e18cba54a1b66862add2f96b2256c4811d2f408f27f7e4c3e2f75b13ca0",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 75000,
+      "fraction": 0.25,
+      "routeValue": 0.25,
+      "routeStatus": "forward"
+    },
+    {
+      "frame": "dark/training-entry-50pct.png",
+      "bytes": 220255,
+      "sha256": "e9edd5fae229dd13f2a3548118a4d98cb71792dbb3642baaa9cb298e32465f32",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 150000,
+      "fraction": 0.5,
+      "routeValue": 0.5,
+      "routeStatus": "forward"
+    },
+    {
+      "frame": "dark/training-entry-75pct.png",
+      "bytes": 223206,
+      "sha256": "2edb1848c02e1d00c966d778a105bf1c5c9c6a9d8a0447fa9fe0796fec514998",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 225000,
+      "fraction": 0.75,
+      "routeValue": 0.75,
+      "routeStatus": "forward"
+    },
+    {
+      "frame": "dark/training-entry-100pct.png",
+      "bytes": 224438,
+      "sha256": "3a9f39d1c6f6d154fce1be6adfa67bafb1795cc974ea1c3ca68ff8aadc0c93ae",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 300000,
+      "fraction": 1.0,
+      "routeValue": 1.0,
+      "routeStatus": "forward"
+    },
+    {
+      "frame": "dark/training-exit-0pct.png",
+      "bytes": 224439,
+      "sha256": "1d4b3e65fbd6b1bb59b4d8c1f7796b2713d5565103b18a75406ade1dcd21fd13",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 0,
+      "fraction": 0.0,
+      "routeValue": 1.0,
+      "routeStatus": "reverse"
+    },
+    {
+      "frame": "dark/training-exit-25pct.png",
+      "bytes": 222260,
+      "sha256": "db9fbb881a9c665a76f7fdcaeec122742d9dc9c5ed4908f10394e3e7e57306dd",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 70000,
+      "fraction": 0.25,
+      "routeValue": 0.75,
+      "routeStatus": "reverse"
+    },
+    {
+      "frame": "dark/training-exit-50pct.png",
+      "bytes": 223079,
+      "sha256": "94baf5bf54c7c32d9d26e93418431e3fe87e26f94b3a1259b455d0c0f2ffdb27",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 140000,
+      "fraction": 0.5,
+      "routeValue": 0.5,
+      "routeStatus": "reverse"
+    },
+    {
+      "frame": "dark/training-exit-75pct.png",
+      "bytes": 271242,
+      "sha256": "19c748b769e5e0b9d09001cd6bc15ab9901d15ca3998ee6b2e85261571684365",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 210000,
+      "fraction": 0.75,
+      "routeValue": 0.2500000000000001,
+      "routeStatus": "reverse"
+    },
+    {
+      "frame": "dark/training-exit-100pct.png",
+      "bytes": 112230,
+      "sha256": "5dcd24e9805270b9c1f8bada5614514a4da901616ceb1892fb45690868a611f5",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 280000,
+      "fraction": 1.0,
+      "routeValue": 0.0,
+      "routeStatus": "reverse"
+    }
+  ],
+  "isPhoneScreenshot": false,
+  "isPerformanceMeasurement": false,
+  "container": {
+    "left": 20,
+    "top": 64,
+    "right": 20,
+    "bottom": 20
+  },
+  "media": "production PoseHubAssetBundle + verified bundled image loader",
+  "routeExitTrigger": "production public control.beginExit; no copied animation",
+  "focusSampleTimesMs": {
+    "appearing": 90,
+    "held": 180,
+    "clearing": 60,
+    "cleared": 120
+  },
+  "deliveryDurationUs": 890000
+}

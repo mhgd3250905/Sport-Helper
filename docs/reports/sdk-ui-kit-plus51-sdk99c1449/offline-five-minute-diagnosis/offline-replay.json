@@ -1,0 +1,2584 @@
+{
+  "evidenceKind": "offline public-protocol replay of captured tool calls; no new model sampling",
+  "networkDisabled": true,
+  "realModelRequests": 0,
+  "tokensConsumedByReplay": 0,
+  "sourceCapture": "E:\\AII-3D\\3D-Sport-AI\\deliveries\\sdk-kit-plus51-sdk99c1449-20261031/live-durations-99c1449/plan-5-minutes.json",
+  "sourceCaptureSha256": "6382e8d3f47d3b44ac994ed450f7fb89f43c9badb67fee5b180d186824270e76",
+  "sdk": "99c14495685f160019e10340ea6f0de6418a65b9",
+  "appHead": "d0a88871befcf0fab8c0aca1e97046ea3c635016",
+  "sameOriginalUserInput": "在家徒手5分钟全身训练，初级，没有伤病，没有额外器械。请直接给一张能按计时或自动计次跟练的完整计划。",
+  "preservedToolArgumentsAndOrder": true,
+  "toolIdsRegeneratedUniquely": true,
+  "replayedCallCount": 3,
+  "status": "ok",
+  "question": {
+    "question": "当前动作在允许剂量范围内无法同时满足5.0 分钟。你希望调整时长、剂量，还是动作选择？",
+    "mode": "text"
+  },
+  "issues": [],
+  "admittedPlan": false,
+  "sessionState": {
+    "userTurns": [
+      {
+        "turn": 1,
+        "text": "在家徒手5分钟全身训练，初级，没有伤病，没有额外器械。请直接给一张能按计时或自动计次跟练的完整计划。"
+      }
+    ],
+    "task": {
+      "type": "plan",
+      "nodes": [
+        {
+          "id": "understand",
+          "status": "done",
+          "stamp": "准备训练计划",
+          "doneAtTurn": 1
+        },
+        {
+          "id": "parameters",
+          "status": "done",
+          "stamp": "居家（你说的） · 力量（你说的） · 徒手（可用椅子/凳子/瑜伽垫/墙）（你说的） · 5 分钟（你说的） · 初学（你说的） · 无伤痛（默认）",
+          "doneAtTurn": 1
+        },
+        {
+          "id": "actions",
+          "status": "done",
+          "stamp": "选了 5 个动作",
+          "doneAtTurn": 1
+        },
+        {
+          "id": "planning",
+          "status": "current",
+          "stamp": null,
+          "doneAtTurn": null
+        },
+        {
+          "id": "review",
+          "status": "pending",
+          "stamp": null,
+          "doneAtTurn": null
+        },
+        {
+          "id": "output",
+          "status": "pending",
+          "stamp": null,
+          "doneAtTurn": null
+        }
+      ],
+      "reused": false
+    },
+    "params": {
+      "scene": {
+        "value": "home",
+        "source": "user",
+        "quote": "在家徒手",
+        "turn": 1
+      },
+      "minutes": {
+        "value": 5,
+        "source": "user",
+        "quote": "5分钟全身训练",
+        "turn": 1
+      },
+      "goal": {
+        "value": [
+          "purpose.strength"
+        ],
+        "source": "user",
+        "quote": "全身训练",
+        "turn": 1
+      },
+      "level": {
+        "value": 1,
+        "source": "user",
+        "quote": "初级",
+        "turn": 1
+      },
+      "equipment": {
+        "value": [],
+        "source": "user",
+        "quote": "没有额外器械",
+        "turn": 1
+      },
+      "limits": {
+        "value": [],
+        "source": "default",
+        "turn": 1
+      }
+    },
+    "seenActionIds": [
+      "deltoids-A",
+      "h-calf-raise",
+      "h-chair-kickback",
+      "h-chair-sit-to-stand",
+      "h-donkey-kick",
+      "h-good-morning",
+      "h-incline-pushup",
+      "h-kneeling-pushup",
+      "h-reverse-clam",
+      "h-side-er",
+      "h-side-leg-raise",
+      "h-squat",
+      "h-superman",
+      "h-tabletop",
+      "h-tib-raise",
+      "n-prone-hip-ext",
+      "o-chair-knee-extension",
+      "o-seated-calf-raise",
+      "rotator-cuff-A",
+      "scapular-A",
+      "h-adductor-rock",
+      "h-banana",
+      "h-bilateral-upper-back-hug",
+      "h-chair-lat",
+      "h-chair-tspine",
+      "h-cobra",
+      "h-doorframe-forearms-pec-native-r3",
+      "h-knee-hug",
+      "h-overhead-triceps-stretch",
+      "h-seated-reachback",
+      "h-sleeper-stretch",
+      "h-standing-wrist-extensor-stretch"
+    ],
+    "picks": [
+      "h-chair-sit-to-stand",
+      "h-squat",
+      "h-incline-pushup",
+      "h-good-morning",
+      "h-doorframe-forearms-pec-native-r3"
+    ],
+    "plans": {
+      "plan-1793432846892-1": []
+    },
+    "activePlanId": "plan-1793432846892-1",
+    "completedContextLedger": {
+      "turns": [
+        {
+          "turn": 1,
+          "userText": "在家徒手5分钟全身训练，初级，没有伤病，没有额外器械。请直接给一张能按计时或自动计次跟练的完整计划。",
+          "finalDeliveryText": "当前动作在允许剂量范围内无法同时满足5.0 分钟。你希望调整时长、剂量，还是动作选择？",
+          "deliveries": [],
+          "askQuestions": [
+            {
+              "question": "当前动作在允许剂量范围内无法同时满足5.0 分钟。你希望调整时长、剂量，还是动作选择？",
+              "mode": "text"
+            }
+          ],
+          "params": {
+            "scene": {
+              "value": "home",
+              "source": "user",
+              "quote": "在家徒手",
+              "turn": 1
+            },
+            "minutes": {
+              "value": 5,
+              "source": "user",
+              "quote": "5分钟全身训练",
+              "turn": 1
+            },
+            "goal": {
+              "value": [
+                "purpose.strength"
+              ],
+              "source": "user",
+              "quote": "全身训练",
+              "turn": 1
+            },
+            "level": {
+              "value": 1,
+              "source": "user",
+              "quote": "初级",
+              "turn": 1
+            },
+            "equipment": {
+              "value": [],
+              "source": "user",
+              "quote": "没有额外器械",
+              "turn": 1
+            },
+            "limits": {
+              "value": [],
+              "source": "default",
+              "turn": 1
+            }
+          },
+          "task": {
+            "type": "plan",
+            "nodes": [
+              {
+                "id": "understand",
+                "status": "done",
+                "stamp": "准备训练计划",
+                "doneAtTurn": 1
+              },
+              {
+                "id": "parameters",
+                "status": "done",
+                "stamp": "居家（你说的） · 力量（你说的） · 徒手（可用椅子/凳子/瑜伽垫/墙）（你说的） · 5 分钟（你说的） · 初学（你说的） · 无伤痛（默认）",
+                "doneAtTurn": 1
+              },
+              {
+                "id": "actions",
+                "status": "done",
+                "stamp": "选了 5 个动作",
+                "doneAtTurn": 1
+              },
+              {
+                "id": "planning",
+                "status": "current",
+                "stamp": null,
+                "doneAtTurn": null
+              },
+              {
+                "id": "review",
+                "status": "pending",
+                "stamp": null,
+                "doneAtTurn": null
+              },
+              {
+                "id": "output",
+                "status": "pending",
+                "stamp": null,
+                "doneAtTurn": null
+              }
+            ],
+            "reused": false
+          },
+          "picks": [
+            "h-chair-sit-to-stand",
+            "h-squat",
+            "h-incline-pushup",
+            "h-good-morning",
+            "h-doorframe-forearms-pec-native-r3"
+          ],
+          "candidates": [
+            [
+              "deltoids-A",
+              "直臂侧平板支撑",
+              "body.deltoids",
+              "seconds",
+              1
+            ],
+            [
+              "h-calf-raise",
+              "扶墙提踵",
+              "body.calves",
+              "reps",
+              1
+            ],
+            [
+              "h-chair-kickback",
+              "扶椅站姿后踢腿",
+              "body.glute_max",
+              "reps",
+              1
+            ],
+            [
+              "h-chair-sit-to-stand",
+              "普通椅双脚坐站",
+              "body.quadriceps",
+              "reps",
+              1
+            ],
+            [
+              "h-donkey-kick",
+              "四足屈膝后踢",
+              "body.glute_max",
+              "reps",
+              1
+            ],
+            [
+              "h-good-morning",
+              "徒手早安式",
+              "body.hamstrings",
+              "reps",
+              1
+            ],
+            [
+              "h-incline-pushup",
+              "扶凳上斜俯卧撑",
+              "body.chest",
+              "reps",
+              1
+            ],
+            [
+              "h-kneeling-pushup",
+              "跪姿俯卧撑",
+              "body.chest",
+              "reps",
+              1
+            ],
+            [
+              "h-reverse-clam",
+              "侧卧反向蚌式",
+              "body.hip_abductors",
+              "reps",
+              1
+            ],
+            [
+              "h-side-er",
+              "侧卧肩外旋",
+              "body.rotator_cuff",
+              "reps",
+              1
+            ],
+            [
+              "h-side-leg-raise",
+              "站姿侧抬腿",
+              "body.hip_abductors",
+              "reps",
+              1
+            ],
+            [
+              "h-squat",
+              "徒手深蹲",
+              "body.quadriceps",
+              "reps",
+              1
+            ],
+            [
+              "h-superman",
+              "俯卧超人式",
+              "body.erectors",
+              "reps",
+              1
+            ],
+            [
+              "h-tabletop",
+              "桌面式后撑抬髋",
+              "body.chest",
+              "reps",
+              1
+            ],
+            [
+              "h-tib-raise",
+              "靠墙勾脚尖",
+              "body.tibialis",
+              "reps",
+              1
+            ],
+            [
+              "n-prone-hip-ext",
+              "俯卧屈膝抬腿",
+              "body.glute_max",
+              "reps",
+              1
+            ],
+            [
+              "o-chair-knee-extension",
+              "坐椅徒手伸膝",
+              "body.quadriceps",
+              "reps",
+              1
+            ],
+            [
+              "o-seated-calf-raise",
+              "坐椅提踵",
+              "body.calves",
+              "reps",
+              1
+            ],
+            [
+              "rotator-cuff-A",
+              "俯撑交替触肩",
+              "body.rotator_cuff",
+              "reps",
+              1
+            ],
+            [
+              "scapular-A",
+              "俯卧 Y-T-W 举",
+              "body.scapular",
+              "reps",
+              1
+            ],
+            [
+              "h-adductor-rock",
+              "四足单腿侧伸后摇",
+              "body.inner_thigh",
+              "reps",
+              1
+            ],
+            [
+              "h-banana",
+              "仰卧香蕉式侧伸",
+              "body.obliques",
+              "seconds",
+              1
+            ],
+            [
+              "h-bilateral-upper-back-hug",
+              "双臂前抱上背拉伸",
+              "body.scapular",
+              "seconds",
+              1
+            ],
+            [
+              "h-chair-lat",
+              "扶椅背阔肌拉伸",
+              "body.lats",
+              "seconds",
+              1
+            ],
+            [
+              "h-chair-tspine",
+              "跪姿椅面胸椎伸展",
+              "body.lats",
+              "seconds",
+              1
+            ],
+            [
+              "h-cobra",
+              "眼镜蛇式",
+              "body.abs",
+              "seconds",
+              1
+            ],
+            [
+              "h-doorframe-forearms-pec-native-r3",
+              "门框双前臂胸肌拉伸",
+              "body.chest",
+              "seconds",
+              1
+            ],
+            [
+              "h-knee-hug",
+              "仰卧抱膝",
+              "body.erectors",
+              "reps",
+              1
+            ],
+            [
+              "h-overhead-triceps-stretch",
+              "站姿过头肱三头肌拉伸",
+              "body.triceps",
+              "seconds",
+              1
+            ],
+            [
+              "h-seated-reachback",
+              "坐姿后撑滑臀",
+              "body.chest",
+              "seconds",
+              1
+            ],
+            [
+              "h-sleeper-stretch",
+              "侧卧睡姿肩内旋拉伸",
+              "body.rotator_cuff",
+              "seconds",
+              1
+            ],
+            [
+              "h-standing-wrist-extensor-stretch",
+              "站姿主动腕伸肌拉伸",
+              "body.forearms",
+              "seconds",
+              1
+            ]
+          ],
+          "loadedSkillNames": [
+            "ask",
+            "action-library",
+            "plan-training"
+          ],
+          "seenActionIds": [
+            "deltoids-A",
+            "h-calf-raise",
+            "h-chair-kickback",
+            "h-chair-sit-to-stand",
+            "h-donkey-kick",
+            "h-good-morning",
+            "h-incline-pushup",
+            "h-kneeling-pushup",
+            "h-reverse-clam",
+            "h-side-er",
+            "h-side-leg-raise",
+            "h-squat",
+            "h-superman",
+            "h-tabletop",
+            "h-tib-raise",
+            "n-prone-hip-ext",
+            "o-chair-knee-extension",
+            "o-seated-calf-raise",
+            "rotator-cuff-A",
+            "scapular-A",
+            "h-adductor-rock",
+            "h-banana",
+            "h-bilateral-upper-back-hug",
+            "h-chair-lat",
+            "h-chair-tspine",
+            "h-cobra",
+            "h-doorframe-forearms-pec-native-r3",
+            "h-knee-hug",
+            "h-overhead-triceps-stretch",
+            "h-seated-reachback",
+            "h-sleeper-stretch",
+            "h-standing-wrist-extensor-stretch"
+          ],
+          "outcome": "awaiting_user"
+        }
+      ]
+    }
+  },
+  "draftToolCall": {
+    "callIndex": 3,
+    "id": "offline-recorded-3-1",
+    "name": "draft_plan",
+    "arguments": "{\"title\": \"居家全身徒手循环\", \"blocks\": [{\"kind\": \"warmup\", \"items\": [{\"id\": \"h-chair-sit-to-stand\"}]}, {\"kind\": \"main\", \"items\": [{\"id\": \"h-squat\"}, {\"id\": \"h-incline-pushup\"}, {\"id\": \"h-good-morning\"}]}, {\"kind\": \"cooldown\", \"items\": [{\"id\": \"h-doorframe-forearms-pec-native-r3\"}]}]}"
+  },
+  "draftReceipts": [
+    {
+      "toolCallId": "offline-recorded-3-1",
+      "receipt": {
+        "ok": true,
+        "status": "infeasible",
+        "needsUserChoice": true,
+        "feasibility": {
+          "status": "infeasible",
+          "reason": "minimum_exceeds_target",
+          "targetSec": 300.0,
+          "toleranceRatio": 0.1,
+          "boundBasis": "catalogue/profile ranges including segment work, rest and rounds; confirmed dose locked",
+          "minEstimatedSec": 336.0,
+          "maxEstimatedSec": 14044.0,
+          "fix": "请说明已确认条件的冲突，询问用户愿意调整时长还是剂量；不要反复提交同一条件。"
+        },
+        "asked": true,
+        "awaitingUser": true,
+        "notes": [
+          "已根据结构化不可行原因暂停询问取舍，未要求模型继续试算。"
+        ]
+      }
+    }
+  ],
+  "selectedDefinitions": [
+    {
+      "id": "h-chair-sit-to-stand",
+      "name": "普通椅双脚坐站",
+      "unilateral": false,
+      "defaultDose": {
+        "mode": "reps",
+        "sets": 3,
+        "reps": 12,
+        "restSeconds": 30
+      },
+      "catalogueDoseRange": {
+        "sets": [
+          3,
+          3
+        ],
+        "reps": [
+          12,
+          12
+        ],
+        "restSeconds": [
+          30,
+          30
+        ]
+      },
+      "effectiveRanges": {
+        "sets": [
+          3,
+          3
+        ],
+        "work": [
+          12,
+          12
+        ],
+        "restSeconds": [
+          30,
+          30
+        ],
+        "rounds": [
+          1,
+          6
+        ],
+        "restBetweenRoundsSeconds": [
+          0,
+          300
+        ]
+      },
+      "planningRepSeconds": 3.0,
+      "executionRhythm": {
+        "kind": "self_paced"
+      },
+      "rawDrill": {
+        "id": "h-chair-sit-to-stand",
+        "nameZh": "普通椅双脚坐站",
+        "muscleGroups": [
+          "quadriceps",
+          "glute-max"
+        ],
+        "equipment": [
+          "chair"
+        ],
+        "rhythm": {
+          "fps": 30,
+          "frames": 240,
+          "durationSeconds": 8,
+          "coverFrame": 99,
+          "policy": "unchanged-frozen-source-motion",
+          "execution": null,
+          "executionStatus": "unknown-unreviewed",
+          "executionSource": {
+            "path": "catalog/catalog.json",
+            "actionId": "h-chair-sit-to-stand",
+            "sha256": "40610dbb71b58886ebe001409ae15161761747b4f776e74a252e7b1f8df6e983"
+          },
+          "videoLoopIsTrainingDose": false
+        },
+        "source": {
+          "branch": "codex/action-library-v2-production",
+          "commit": "960b486f2e2d64f431ab24299a94dfe925e0562b",
+          "spec": {
+            "path": "drill-anim/specs/h-chair-sit-to-stand.js",
+            "sha256": "32298d1f62af5fa3de00b2c0d737c83a716e568a96b6cb644ac45d13872a3fe7"
+          },
+          "mediaSet": "pr14-first-pass",
+          "model": {
+            "format": "pose-hub-production-model",
+            "formatVersion": 1,
+            "modelProfile": "training-human-v2plus",
+            "modelVersion": "1.0.0-rc2",
+            "alignClavicles": false,
+            "v2plus": {
+              "outfit": "compression",
+              "torso": "base",
+              "limbs": "base",
+              "hands": "base",
+              "skin": "realistic"
+            },
+            "head": "original-v2",
+            "adoption": "User selected the updated original appearance on 2026-10-21; local integration awaiting main approval. Colour skins remain optional.",
+            "id": "training-human-v2plus",
+            "version": "1.0.0-rc2",
+            "manifestSha256": "ec2bc815ded157dbc7673e283ed9b6bb1baa710a39ce3a02f88453e8d7fb0a1d"
+          }
+        },
+        "revision": "h-chair-sit-to-stand",
+        "state": "ready-test-unreviewed",
+        "reviewed": false,
+        "releaseEligible": false,
+        "family": "h-chair-sit-to-stand",
+        "muscleGroupsZh": "股四头肌、臀大肌",
+        "equipmentZh": "椅子/凳子",
+        "trainingDefinitionComplete": true,
+        "trainingSemantics": {
+          "status": "complete-unreviewed",
+          "reviewed": false,
+          "releaseEligible": false,
+          "batchId": "app-test-pack-r1-semantics-r1",
+          "definitionComplete": true,
+          "missingRequiredFields": [],
+          "unknownFields": [],
+          "evidence": [
+            {
+              "path": "drill-anim/specs/h-chair-sit-to-stand.js",
+              "sha256": "59cf7085d6bff0c962840d6915b8ea99a590df329f36ec5bc0541fa9f299c302",
+              "lfSha256": "32298d1f62af5fa3de00b2c0d737c83a716e568a96b6cb644ac45d13872a3fe7",
+              "fields": [
+                "purpose",
+                "category",
+                "muscles",
+                "position",
+                "unilateral",
+                "equipment",
+                "cues",
+                "countingSemantics",
+                "demonstratedSide",
+                "defaultDose.mode"
+              ],
+              "note": "实际读取精确source.spec；相同双脚负重屈伸髋膝起立；本动作有稳定椅面限定坐下终点，手臂前伸但不借手支撑。沿用3组12次30秒，难度1；坐下站起再坐回计1次。",
+              "bytes": 2821,
+              "root": "repository"
+            },
+            {
+              "path": "drill-anim/lib/home-anim.mjs",
+              "sha256": "374b9ffe422c19280e2f58d10654208b2955e899a325a5630cfb5705148af74d",
+              "lfSha256": "1798c9e55c28b32391b7ef32aa358427b4743ee1959f86ec488a95fe88a05557",
+              "fields": [
+                "pose interpretation",
+                "equipment geometry"
+              ],
+              "note": "实际读取import/require依赖，按覆盖关系解释动作与道具；手型/坐标/采样工具不提供训练剂量。",
+              "bytes": 3691,
+              "root": "repository"
+            },
+            {
+              "path": "drill-anim/lib/ss-geo.mjs",
+              "sha256": "c0dddf673d83a88c678d56e8793b55306878633581663bd35ca6ae4fa44447f4",
+              "lfSha256": "45ca774079e3a85ecc4f924a3220d4baa721f0435e16f6e6e21ffa19e17e8603",
+              "fields": [
+                "pose interpretation",
+                "equipment geometry"
+              ],
+              "note": "实际读取import/require依赖，按覆盖关系解释动作与道具；手型/坐标/采样工具不提供训练剂量。",
+              "bytes": 3700,
+              "root": "repository"
+            },
+            {
+              "path": "F:\\PoseHub-v2-production\\app-test-pack-r1-source\\work\\semantics-revision-r1\\batch-1-input.json",
+              "sha256": "4ab5f40a10d6457cfe2b2271bb47f6ff6cbd47a4254a9f537698e7b51b97607d",
+              "lfSha256": "b8e802259d569f87482d750332c65504dc6927ad51a5c8a8186977f5719c4313",
+              "fields": [
+                "input identity for batch scope",
+                "retained semantic draft"
+              ],
+              "note": "仅作为本批原始草稿和身份/值对照，非训练事实权威；旧docs未读取、未用于新增事实。自身spec未提供的旧剂量范围已移除，保留数值另分清own-spec/analogue/editorial basis。",
+              "bytes": 201106,
+              "root": "semantic-revision-work"
+            },
+            {
+              "path": "F:\\PoseHub-v2-production\\app-test-pack-r1-source\\work\\semantics-revision-r1\\complete-142-samples.json",
+              "sha256": "2360586e1fbf33568f455617d81c5afbaee23805509fed777393bc1965b8bb9d",
+              "lfSha256": "31066b9641ed682f5dea2e210f9c04760100b801869dea238ef7dd3168210599",
+              "fields": [
+                "defaultDose",
+                "level"
+              ],
+              "note": "只使用完整142样本中精确ID h-squat；原值记录在analogues.fields。",
+              "bytes": 420844,
+              "root": "semantic-revision-work"
+            },
+            {
+              "path": "catalog/taxonomy.json",
+              "sha256": "3da41109246bbd7a05328bd88b4cf9ddc6152f6139f7158dfb63d8d6e3ab8065",
+              "lfSha256": "3da41109246bbd7a05328bd88b4cf9ddc6152f6139f7158dfb63d8d6e3ab8065",
+              "fields": [
+                "category",
+                "position",
+                "equipment",
+                "scenes",
+                "muscleGroups"
+              ],
+              "note": "约束现有ID；已发现的未登记上斜方肌映射明确留缺口。home器械场景保留本动作与142样本的显式home场景，不把taxonomy默认配备当成禁止持有小器械。",
+              "bytes": 3573,
+              "root": "repository"
+            }
+          ],
+          "analogueDefaults": [
+            {
+              "actionId": "h-squat",
+              "fields": {
+                "defaultDose": {
+                  "mode": "reps",
+                  "sets": 3,
+                  "reps": 12,
+                  "restSeconds": 30
+                },
+                "level": 1
+              },
+              "reason": "相同双脚负重屈伸髋膝起立；本动作有稳定椅面限定坐下终点，手臂前伸但不借手支撑。沿用3组12次30秒，难度1；坐下站起再坐回计1次。",
+              "values": {
+                "defaultDose": {
+                  "mode": "reps",
+                  "sets": 3,
+                  "reps": 12,
+                  "restSeconds": 30
+                },
+                "level": 1
+              },
+              "catalogSha256": "c5f090aa06e2743904a3f0c1f9193c87955242b1aa7f054a14a9f6e7c824be54"
+            }
+          ],
+          "fieldBasis": {
+            "purpose": {
+              "kind": "own-spec",
+              "note": "已核对精确source.spec及实际import覆盖链中的姿态/支点/工作侧/运动轨迹/道具；保留输入对应取值，仍为未审动作语义。"
+            },
+            "category": {
+              "kind": "own-spec",
+              "note": "已核对精确source.spec及实际import覆盖链中的姿态/支点/工作侧/运动轨迹/道具；保留输入对应取值，仍为未审动作语义。"
+            },
+            "muscles": {
+              "kind": "retained",
+              "note": "保留输入中已有语义值；本轮按本动作精确source.spec及import链核对，保留未审身份。"
+            },
+            "muscleGroups": {
+              "kind": "retained",
+              "note": "保留输入中已有语义值；本轮按本动作精确source.spec及import链核对，保留未审身份。"
+            },
+            "position": {
+              "kind": "own-spec",
+              "note": "已核对精确source.spec及实际import覆盖链中的姿态/支点/工作侧/运动轨迹/道具；保留输入对应取值，仍为未审动作语义。"
+            },
+            "unilateral": {
+              "kind": "own-spec",
+              "note": "已核对精确source.spec及实际import覆盖链中的姿态/支点/工作侧/运动轨迹/道具；保留输入对应取值，仍为未审动作语义。"
+            },
+            "level": {
+              "kind": "editorial-inference",
+              "note": "Editorial inference，未审核；依据自身支撑/平衡/负重控制，与完整142样本比较：相同双脚负重屈伸髋膝起立；本动作有稳定椅面限定坐下终点，手臂前伸但不借手支撑。沿用3组12次30秒，难度1；坐下站起再坐回计1次。"
+            },
+            "scenes": {
+              "kind": "retained",
+              "note": "保留输入中已有语义值；本轮按本动作精确source.spec及import链核对，保留未审身份。"
+            },
+            "equipment": {
+              "kind": "own-spec",
+              "note": "已核对精确source.spec及实际import覆盖链中的姿态/支点/工作侧/运动轨迹/道具；保留输入对应取值，仍为未审动作语义。"
+            },
+            "equipmentZh": {
+              "kind": "own-spec",
+              "note": "已核对精确source.spec及实际import覆盖链中的姿态/支点/工作侧/运动轨迹/道具；保留输入对应取值，仍为未审动作语义。"
+            },
+            "defaultDose": {
+              "kind": "editorial-inference",
+              "note": "混合来源，详见defaultDose各叶字段；单侧动作的sets/reps/seconds均每侧，片内循环不是训练量。"
+            },
+            "doseRange": {
+              "kind": "editorial-inference",
+              "note": "只补完整结构的固定点：每个新增区间均为[本次默认值,本次默认值]，表示测试默认建议，不声称有可调训练范围证据；输入已确证reps尝试范围保留，且默认值落在其范围内。"
+            },
+            "cues": {
+              "kind": "own-spec",
+              "note": "已核对精确source.spec及实际import覆盖链中的姿态/支点/工作侧/运动轨迹/道具；保留输入对应取值，仍为未审动作语义。"
+            },
+            "primaryCue": {
+              "kind": "own-spec",
+              "note": "已核对精确source.spec及实际import覆盖链中的姿态/支点/工作侧/运动轨迹/道具；保留输入对应取值，仍为未审动作语义。"
+            },
+            "commonErrors": {
+              "kind": "own-spec",
+              "note": "已核对精确source.spec及实际import覆盖链中的姿态/支点/工作侧/运动轨迹/道具；保留输入对应取值，仍为未审动作语义。"
+            },
+            "cautions": {
+              "kind": "retained",
+              "note": "保留输入中已有语义值；本轮按本动作精确source.spec及import链核对，保留未审身份。"
+            },
+            "cautionNotes": {
+              "kind": "own-spec",
+              "note": "二次审读：按自身精确spec的注释、支点、轨迹和实际props重新表述；没有引入旧制作说明、疾病适用性或未见本spec的麻木/康复/徒手基础要求。"
+            },
+            "contraindications": {
+              "kind": "retained",
+              "note": "保留输入中已有语义值；本轮按本动作精确source.spec及import链核对，保留未审身份。"
+            },
+            "countingSemantics": {
+              "kind": "retained",
+              "note": "保留输入中已有语义值；本轮按本动作精确source.spec及import链核对，保留未审身份。"
+            },
+            "demonstratedSide": {
+              "kind": "own-spec",
+              "note": "已核对精确source.spec及实际import覆盖链中的姿态/支点/工作侧/运动轨迹/道具；保留输入对应取值，仍为未审动作语义。"
+            },
+            "defaultDose.mode": {
+              "kind": "own-spec",
+              "note": "由该动作是重复往返还是持续保持确定；静态保持使用time，不从动画秒数取训练量。"
+            },
+            "defaultDose.sets": {
+              "kind": "analogue-default",
+              "note": "完整142样本 h-squat 原值 sets=3；相同双脚负重屈伸髋膝起立；本动作有稳定椅面限定坐下终点，手臂前伸但不借手支撑。沿用3组12次30秒，难度1；坐下站起再坐回计1次。"
+            },
+            "defaultDose.reps": {
+              "kind": "analogue-default",
+              "note": "完整142样本 h-squat 原值 reps=12；相同双脚负重屈伸髋膝起立；本动作有稳定椅面限定坐下终点，手臂前伸但不借手支撑。沿用3组12次30秒，难度1；坐下站起再坐回计1次。"
+            },
+            "defaultDose.restSeconds": {
+              "kind": "analogue-default",
+              "note": "完整142样本 h-squat 原值 restSeconds=30；相同双脚负重屈伸髋膝起立；本动作有稳定椅面限定坐下终点，手臂前伸但不借手支撑。沿用3组12次30秒，难度1；坐下站起再坐回计1次。"
+            },
+            "doseRange.sets": {
+              "kind": "editorial-inference",
+              "note": "固定点 [3, 3] 仅表达本次未审默认值，不是假定可调整上限/下限。"
+            },
+            "doseRange.reps": {
+              "kind": "editorial-inference",
+              "note": "固定点 [12, 12] 仅表达本次未审默认值，不是假定可调整上限/下限。"
+            },
+            "doseRange.restSeconds": {
+              "kind": "editorial-inference",
+              "note": "固定点 [30, 30] 仅表达本次未审默认值，不是假定可调整上限/下限。"
+            }
+          },
+          "reviewNotes": [
+            "全部为测试用未审草稿：reviewed=false、releaseEligible=false；定义齐全不等于已审核、可发布或对个体适用。",
+            "只按source.spec.path/sourceRevision读取实际动作源；revision/mediaRevision中的alpha包装名不是新spec名。",
+            "默认量是起步编辑建议；重量/弹力等级未统一规定，不能由渲染尺寸或力学示意推出实际负荷。",
+            "二次审读：contraindications/alternative为空不代表无禁忌或无需替代；doseRange已按固定点补结构，不以旧docs剂量作来源。"
+          ],
+          "videoLoopIsTrainingDose": false
+        },
+        "purpose": "练习普通椅双脚坐站中的受控髋膝伸屈与离座、触座转换。",
+        "category": "strength",
+        "muscles": [
+          "股四头肌",
+          "臀大肌"
+        ],
+        "position": "standing",
+        "unilateral": false,
+        "level": 1,
+        "scenes": [
+          "home",
+          "office"
+        ],
+        "defaultDose": {
+          "mode": "reps",
+          "sets": 3,
+          "reps": 12,
+          "restSeconds": 30
+        },
+        "doseRange": {
+          "sets": [
+            3,
+            3
+          ],
+          "reps": [
+            12,
+            12
+          ],
+          "restSeconds": [
+            30,
+            30
+          ]
+        },
+        "cues": {
+          "zh": [
+            "双脚全程踩稳，手臂前伸作平衡，不撑椅推起。",
+            "从髋前倾后站起，再控制坐回椅面并把躯干恢复直立。"
+          ]
+        },
+        "primaryCue": 0,
+        "commonErrors": [
+          {
+            "zh": "后倒撞向椅面，或用双手撑座代替双腿完成起立。"
+          }
+        ],
+        "cautions": [],
+        "contraindications": [],
+        "countingSemantics": "从坐稳开始，完整站起再控制坐回并坐稳计1次；坐姿和站姿是同一次转换的两个阶段，不按视频循环数生成训练组数。",
+        "demonstratedSide": "both",
+        "cautionNotes": {
+          "zh": [
+            "使用稳固无轮普通椅，现实练习椅子靠墙；双脚保持踩地，手臂只向前平衡。"
+          ]
+        },
+        "files": {
+          "video": {
+            "path": "media/h-chair-sit-to-stand/h-chair-sit-to-stand.rgb-alpha.mp4",
+            "bytes": 1354567,
+            "sha256": "1749a9b9d6679c4c98ad588960e0ad2e49e13565a694b8358bb0be3c6713cb9d",
+            "width": 720,
+            "height": 1440,
+            "codec": "h264",
+            "pixelFormat": "yuv420p",
+            "assetName": "h-chair-sit-to-stand.rgb-alpha.mp4",
+            "downloadUrl": "https://media.uuugk.win/pack/r1-v3/media/h-chair-sit-to-stand/h-chair-sit-to-stand.rgb-alpha.mp4"
+          },
+          "cover": {
+            "path": "media/h-chair-sit-to-stand/h-chair-sit-to-stand.cover.alpha.webp",
+            "bytes": 36736,
+            "sha256": "ac57139d0ef0b7a6fa50f95ec4e7c3a7d9e15062115242371d7d2bdda4131c9a",
+            "width": 640,
+            "height": 640,
+            "alpha": true,
+            "assetName": "h-chair-sit-to-stand.cover.alpha.webp",
+            "downloadUrl": "https://media.uuugk.win/pack/r1-v3/media/h-chair-sit-to-stand/h-chair-sit-to-stand.cover.alpha.webp"
+          },
+          "thumbnail": {
+            "path": "media/h-chair-sit-to-stand/h-chair-sit-to-stand-still-margin-r1/h-chair-sit-to-stand.thumbnail.alpha.webp",
+            "bytes": 8036,
+            "sha256": "abf84329e78ec8f029e99fb9304c4f8f9850d3e963b805dbdc688a591569e5c2",
+            "width": 192,
+            "height": 192,
+            "alpha": true,
+            "assetName": "h-chair-sit-to-stand.thumbnail.alpha.webp",
+            "downloadUrl": "https://media.uuugk.win/pack/r1-v3/media/h-chair-sit-to-stand/h-chair-sit-to-stand-still-margin-r1/h-chair-sit-to-stand.thumbnail.alpha.webp"
+          }
+        },
+        "qa": {
+          "report": {
+            "path": "qa/h-chair-sit-to-stand/decode-check.json",
+            "bytes": 1384,
+            "sha256": "d12629465fc45d352353b8207f9ad93ebf55f91aa58bd258d0f4d2cdef941726"
+          },
+          "metrics": {
+            "framesDecoded": 240,
+            "alphaMae": 0.1130049029063786,
+            "semiTransparentAlphaMae": 1.2858358289191059,
+            "visibleShadowAlphaMae": 1.0810818843583865,
+            "visibleShadowSamples": 3936576,
+            "transparentAlphaLeakMax": 37,
+            "compositeRgbMae": {
+              "white": 0.36745981224279833,
+              "dark": 0.32603759698645407,
+              "cyan": 0.34596786051097395
+            },
+            "semiTransparentCompositeRgbMae": {
+              "white": 1.7583515351817993,
+              "dark": 1.2081296946981328,
+              "cyan": 1.4935988023140534
+            },
+            "sampleFrames": [
+              {
+                "frame": 0,
+                "semiTransparentPixels": 36119,
+                "visibleShadowPixels": 17308,
+                "alphaMae": 0.08414737654320988
+              },
+              {
+                "frame": 99,
+                "semiTransparentPixels": 38596,
+                "visibleShadowPixels": 16648,
+                "alphaMae": 0.09227623456790124
+              },
+              {
+                "frame": 239,
+                "semiTransparentPixels": 36119,
+                "visibleShadowPixels": 17308,
+                "alphaMae": 0.09536844135802469
+              }
+            ],
+            "framingPassed": true,
+            "framing": {
+              "sourceFramesChecked": 240,
+              "sourceEdgeFrames": {
+                "body": [],
+                "shadow": []
+              },
+              "sourceShadowComplete": true,
+              "sourceBodyComplete": true,
+              "framingPassed": true
+            },
+            "decodedBoundaryBandPixels": 12,
+            "decodedBoundaryAlphaMax": 0,
+            "decodeProtocol": "Decode tagged BT.709 limited-range video to full-range RGB; bottom red is straight alpha.",
+            "passed": true
+          }
+        },
+        "mediaRevision": "h-chair-sit-to-stand-still-margin-r1",
+        "thumbnailDerivation": {
+          "format": "pose-hub-thumbnail-derivation@1",
+          "at": "2026-10-26T01:04:15.147173+00:00",
+          "previousRow": {
+            "path": "history/h-chair-sit-to-stand/thumbnail-62dc51d172ffbb5e566cce71640f88ead760d1ca7f1c55015a78439f4d401d65.json",
+            "bytes": 5560,
+            "sha256": "c779bd55f322b9750cd5d93bf888ccc0e120ad5d96d64739afff7646c57bd75e"
+          },
+          "previousThumbnail": {
+            "path": "media/h-chair-sit-to-stand/h-chair-sit-to-stand.thumbnail.alpha.webp",
+            "bytes": 20534,
+            "sha256": "30b5f035f2623ae646a342a331c9df75c5cef4cddaffc9a608a698808faf051d",
+            "width": 240,
+            "height": 240,
+            "alpha": true
+          },
+          "thumbnail": {
+            "path": "media/h-chair-sit-to-stand/h-chair-sit-to-stand-still-margin-r1/h-chair-sit-to-stand.thumbnail.alpha.webp",
+            "bytes": 19832,
+            "sha256": "6cb385c1767659d3b060fbae7b6d6b4a52300eab9c98faed4251fce1cb2f1a1e",
+            "width": 240,
+            "height": 240,
+            "alpha": true
+          },
+          "mediaRevision": "h-chair-sit-to-stand-still-margin-r1",
+          "recipe": {
+            "format": "pose-hub-thumbnail-transparent-inset@1",
+            "method": "Complete720-cover premultiplied Lanczos232 centered on transparent240",
+            "minimumFraction": 0.04,
+            "newMarginPixels": 13,
+            "oldMarginPixels": 9,
+            "requiredMarginPixels": 10,
+            "sourceCover": {
+              "alpha": true,
+              "bytes": 95452,
+              "height": 720,
+              "path": "media/h-chair-sit-to-stand/h-chair-sit-to-stand.cover.alpha.webp",
+              "sha256": "106ce7ce094c916ed6dd77e136c5a8eb24dd627911b8052df5e3faed35be6b76",
+              "width": 720
+            },
+            "videoAndCoverReencoded": false
+          },
+          "alphaMarginQa": {
+            "alphaBounds": [
+              24,
+              13,
+              216,
+              227
+            ],
+            "marginsPixels": [
+              24,
+              13,
+              24,
+              13
+            ],
+            "requiredPixels": 10,
+            "rule": "any nonzero alpha; ceil(dimension * 0.04)",
+            "passed": true
+          }
+        },
+        "availableForApp": true,
+        "availableForTraining": false,
+        "name": {
+          "zh": "普通椅双脚坐站"
+        }
+      }
+    },
+    {
+      "id": "h-squat",
+      "name": "徒手深蹲",
+      "unilateral": false,
+      "defaultDose": {
+        "mode": "reps",
+        "sets": 3,
+        "reps": 12,
+        "restSeconds": 30
+      },
+      "catalogueDoseRange": {
+        "sets": [
+          1,
+          4
+        ],
+        "reps": [
+          6,
+          18
+        ],
+        "restSeconds": [
+          0,
+          60
+        ]
+      },
+      "effectiveRanges": {
+        "sets": [
+          1,
+          4
+        ],
+        "work": [
+          6,
+          18
+        ],
+        "restSeconds": [
+          0,
+          60
+        ],
+        "rounds": [
+          1,
+          6
+        ],
+        "restBetweenRoundsSeconds": [
+          0,
+          300
+        ]
+      },
+      "planningRepSeconds": 4.0,
+      "executionRhythm": {
+        "kind": "rep_updown",
+        "leadSeconds": 1.0,
+        "phases": [
+          {
+            "id": "go",
+            "seconds": 1.15,
+            "cue": "w.squat_down"
+          },
+          {
+            "id": "hold",
+            "seconds": 0.7
+          },
+          {
+            "id": "back",
+            "seconds": 1.1,
+            "cue": "w.stand_up"
+          },
+          {
+            "id": "rest",
+            "seconds": 1.05
+          }
+        ],
+        "reps": 8
+      },
+      "rawDrill": {
+        "id": "h-squat",
+        "name": {
+          "zh": "徒手深蹲",
+          "en": "Bodyweight Squat"
+        },
+        "purpose": "练大腿前侧和臀部",
+        "category": "strength",
+        "muscles": [
+          "股四头肌",
+          "臀大肌"
+        ],
+        "muscleGroups": [
+          "quadriceps",
+          "glute-max"
+        ],
+        "equipment": [],
+        "position": "standing",
+        "unilateral": false,
+        "level": 1,
+        "scenes": [
+          "home",
+          "office"
+        ],
+        "defaultDose": {
+          "mode": "reps",
+          "sets": 3,
+          "reps": 12,
+          "restSeconds": 30
+        },
+        "doseRange": {
+          "sets": [
+            1,
+            4
+          ],
+          "reps": [
+            6,
+            18
+          ],
+          "restSeconds": [
+            0,
+            60
+          ]
+        },
+        "rhythm": {
+          "kind": "rep_updown",
+          "leadSeconds": 1.0,
+          "phases": [
+            {
+              "id": "go",
+              "seconds": 1.15,
+              "cue": "w.squat_down"
+            },
+            {
+              "id": "hold",
+              "seconds": 0.7
+            },
+            {
+              "id": "back",
+              "seconds": 1.1,
+              "cue": "w.stand_up"
+            },
+            {
+              "id": "rest",
+              "seconds": 1.05
+            }
+          ],
+          "reps": 8,
+          "source": "hiplab"
+        },
+        "cues": {
+          "zh": [
+            "脚略宽于髋，脚尖微外",
+            "臀部向后下坐，膝盖和脚尖同向"
+          ]
+        },
+        "primaryCue": 1,
+        "cautions": [
+          "膝"
+        ],
+        "contraindications": [],
+        "alternative": null,
+        "apps": [
+          "hiplab",
+          "smartfit"
+        ],
+        "tags": [
+          "hip",
+          "hip:flexion",
+          "office"
+        ],
+        "assets": {
+          "spec": {
+            "status": "ok",
+            "path": "drill-anim/specs/h-squat.js",
+            "sha256": "349e5313795134d9554245b07c13ca94c6f9102a4d41c2ed8ae61cd782e1e58d",
+            "revisionOf": null,
+            "modelProfile": "training-human-v2"
+          },
+          "releases": [
+            "0.1.0",
+            "0.2.0"
+          ],
+          "cover": {
+            "status": "ok",
+            "sources": [
+              {
+                "app": "smartfit",
+                "path": "assets/packs/h-squat/cover.jpg",
+                "width": 540,
+                "height": 540,
+                "coverSeconds": 0
+              },
+              {
+                "app": "hiplab",
+                "variant": "dark",
+                "path": "assets/drill_media/hip-h-squat.jpg"
+              },
+              {
+                "app": "hiplab",
+                "variant": "light",
+                "path": "assets/drill_media/light/hip-h-squat.jpg"
+              },
+              {
+                "app": "pose-hub",
+                "release": "0.1.0",
+                "variant": "dark",
+                "path": "h-squat/h-squat.dark.poster.1080.jpg",
+                "width": 1080,
+                "height": 1080,
+                "sha256": "ed4f1553e7ccaff9c796fe056b3a543d177ffb35a23663b86139b2420492f6f7",
+                "bytes": 19276
+              },
+              {
+                "app": "pose-hub",
+                "release": "0.2.0",
+                "variant": "dark",
+                "path": "h-squat/h-squat.dark.poster.540.jpg",
+                "width": 540,
+                "height": 540,
+                "sha256": "f3eb854276c25172eaa056ebfdbb1da42319f91554186d978b0bbf691e5a05f1",
+                "bytes": 7697
+              }
+            ]
+          },
+          "video": {
+            "status": "ok",
+            "sources": [
+              {
+                "app": "smartfit",
+                "path": "assets/packs/h-squat/demo.mp4",
+                "width": 720,
+                "height": 720,
+                "loopSeconds": 8.0,
+                "repSeconds": 4.0
+              },
+              {
+                "app": "hiplab",
+                "variant": "dark",
+                "path": "assets/drill_media/hip-h-squat.mp4",
+                "loopSeconds": 8.0,
+                "release": "0.2.0"
+              },
+              {
+                "app": "hiplab",
+                "variant": "light",
+                "path": "assets/drill_media/light/hip-h-squat.mp4",
+                "loopSeconds": 8.0,
+                "release": "0.2.0"
+              },
+              {
+                "app": "pose-hub",
+                "release": "0.1.0",
+                "variant": "dark",
+                "path": "h-squat/h-squat.dark.1080.mp4",
+                "width": 1080,
+                "height": 1080,
+                "sha256": "2f1678a504a15f01dc07d1c8b39527863e26496b18898161910f7060b714dc86",
+                "bytes": 654323
+              },
+              {
+                "app": "pose-hub",
+                "release": "0.2.0",
+                "variant": "dark",
+                "path": "h-squat/h-squat.dark.1080.mp4",
+                "width": 1080,
+                "height": 1080,
+                "sha256": "488bf4e35fb265342f657aab6a8d40fb61283720b99acb37edfa5360011c2898",
+                "bytes": 693325
+              }
+            ]
+          },
+          "voice": {
+            "status": "ok",
+            "languages": [
+              "en",
+              "zh"
+            ],
+            "lines": [
+              {
+                "id": "name",
+                "role": "name",
+                "text": {
+                  "zh": "徒手深蹲"
+                },
+                "ms": {
+                  "zh": 975
+                }
+              },
+              {
+                "id": "intro",
+                "role": "intro",
+                "text": {
+                  "zh": "徒手深蹲，练大腿前侧和臀部"
+                },
+                "ms": {
+                  "zh": 2833
+                }
+              },
+              {
+                "id": "cue1",
+                "role": "cue",
+                "text": {
+                  "zh": "脚略宽于髋，脚尖微外"
+                },
+                "ms": {
+                  "zh": 2183
+                }
+              },
+              {
+                "id": "cue2",
+                "role": "cue",
+                "text": {
+                  "zh": "臀部向后下坐，膝盖和脚尖同向"
+                },
+                "ms": {
+                  "zh": 2972
+                }
+              },
+              {
+                "id": "rest",
+                "role": "rest",
+                "text": {
+                  "zh": "放松一下。下一组记住，臀部向后下坐，膝盖和脚尖同向"
+                },
+                "ms": {
+                  "zh": 5457
+                }
+              },
+              {
+                "id": "finish",
+                "role": "finish",
+                "text": {
+                  "zh": "徒手深蹲，完成"
+                },
+                "ms": {
+                  "zh": 1718
+                }
+              }
+            ],
+            "audio": [
+              {
+                "app": "smartfit",
+                "pathPattern": "assets/packs/h-squat/voice/{lang}/{line}.m4a",
+                "languages": [
+                  "zh"
+                ]
+              },
+              {
+                "app": "hiplab",
+                "pathPattern": "assets/voice/{lang}/{line}.m4a",
+                "languages": [
+                  "en",
+                  "zh"
+                ],
+                "keys": [
+                  "drill.h-squat",
+                  "point.h-squat"
+                ]
+              }
+            ]
+          },
+          "drillPack": {
+            "app": "smartfit",
+            "path": "assets/packs/h-squat/pack.json",
+            "version": "1.0.0"
+          }
+        },
+        "completeness": {
+          "complete": true,
+          "missing": []
+        },
+        "review": {
+          "status": "auto",
+          "notes": []
+        }
+      }
+    },
+    {
+      "id": "h-incline-pushup",
+      "name": "扶凳上斜俯卧撑",
+      "unilateral": false,
+      "defaultDose": {
+        "mode": "reps",
+        "sets": 3,
+        "reps": 10,
+        "restSeconds": 30
+      },
+      "catalogueDoseRange": {
+        "sets": [
+          1,
+          4
+        ],
+        "reps": [
+          5,
+          15
+        ],
+        "restSeconds": [
+          0,
+          60
+        ]
+      },
+      "effectiveRanges": {
+        "sets": [
+          1,
+          4
+        ],
+        "work": [
+          5,
+          15
+        ],
+        "restSeconds": [
+          0,
+          60
+        ],
+        "rounds": [
+          1,
+          6
+        ],
+        "restBetweenRoundsSeconds": [
+          0,
+          300
+        ]
+      },
+      "planningRepSeconds": 4.0,
+      "executionRhythm": {
+        "kind": "rep_updown",
+        "leadSeconds": 0.0,
+        "phases": [
+          {
+            "id": "go",
+            "seconds": 4.0
+          }
+        ],
+        "source": "repSeconds"
+      },
+      "rawDrill": {
+        "id": "h-incline-pushup",
+        "name": {
+          "zh": "扶凳上斜俯卧撑",
+          "en": "Incline Push-Up (Stool)"
+        },
+        "purpose": "练胸部和手臂后侧",
+        "category": "strength",
+        "muscles": [
+          "胸大肌",
+          "肱三头肌"
+        ],
+        "muscleGroups": [
+          "chest",
+          "triceps"
+        ],
+        "equipment": [
+          "chair"
+        ],
+        "position": "standing",
+        "unilateral": false,
+        "level": 1,
+        "scenes": [
+          "home",
+          "office"
+        ],
+        "defaultDose": {
+          "mode": "reps",
+          "sets": 3,
+          "reps": 10,
+          "restSeconds": 30
+        },
+        "doseRange": {
+          "sets": [
+            1,
+            4
+          ],
+          "reps": [
+            5,
+            15
+          ],
+          "restSeconds": [
+            0,
+            60
+          ]
+        },
+        "rhythm": {
+          "kind": "rep_updown",
+          "leadSeconds": 0.0,
+          "phases": [
+            {
+              "id": "go",
+              "seconds": 4.0
+            }
+          ],
+          "source": "repSeconds"
+        },
+        "cues": {
+          "zh": [
+            "双手撑稳凳面，身体成一条直线，胸口贴近再推起"
+          ]
+        },
+        "primaryCue": 0,
+        "cautions": [
+          "手腕",
+          "肩"
+        ],
+        "contraindications": [],
+        "alternative": null,
+        "apps": [
+          "smartfit"
+        ],
+        "tags": [
+          "office"
+        ],
+        "assets": {
+          "spec": {
+            "status": "ok",
+            "path": "drill-anim/specs/h-incline-pushup.js",
+            "sha256": "e88d1d1bc15b06f21b834c1d14f62bcf7222db4cb677765ead45e515a4cb8434",
+            "revisionOf": null,
+            "modelProfile": "training-human-v2"
+          },
+          "releases": [],
+          "cover": {
+            "status": "ok",
+            "sources": [
+              {
+                "app": "smartfit",
+                "path": "assets/packs/h-incline-pushup/cover.jpg",
+                "width": 540,
+                "height": 540,
+                "coverSeconds": 1.0
+              }
+            ]
+          },
+          "video": {
+            "status": "ok",
+            "sources": [
+              {
+                "app": "smartfit",
+                "path": "assets/packs/h-incline-pushup/demo.mp4",
+                "width": 720,
+                "height": 720,
+                "loopSeconds": 8.0,
+                "repSeconds": 4.0
+              }
+            ]
+          },
+          "voice": {
+            "status": "ok",
+            "languages": [
+              "zh"
+            ],
+            "lines": [
+              {
+                "id": "name",
+                "role": "name",
+                "text": {
+                  "zh": "扶凳上斜俯卧撑"
+                },
+                "ms": {
+                  "zh": 1533
+                }
+              },
+              {
+                "id": "intro",
+                "role": "intro",
+                "text": {
+                  "zh": "扶凳上斜俯卧撑，练胸部和手臂后侧"
+                },
+                "ms": {
+                  "zh": 3483
+                }
+              },
+              {
+                "id": "cue1",
+                "role": "cue",
+                "text": {
+                  "zh": "双手撑稳凳面，身体成一条直线，胸口贴近再推起"
+                },
+                "ms": {
+                  "zh": 4598
+                }
+              },
+              {
+                "id": "rest",
+                "role": "rest",
+                "text": {
+                  "zh": "放松一下。下一组记住，双手撑稳凳面，身体成一条直线，胸口贴近再推起"
+                },
+                "ms": {
+                  "zh": 7105
+                }
+              },
+              {
+                "id": "finish",
+                "role": "finish",
+                "text": {
+                  "zh": "扶凳上斜俯卧撑，完成"
+                },
+                "ms": {
+                  "zh": 2252
+                }
+              }
+            ],
+            "audio": [
+              {
+                "app": "smartfit",
+                "pathPattern": "assets/packs/h-incline-pushup/voice/{lang}/{line}.m4a",
+                "languages": [
+                  "zh"
+                ]
+              }
+            ]
+          },
+          "drillPack": {
+            "app": "smartfit",
+            "path": "assets/packs/h-incline-pushup/pack.json",
+            "version": "1.0.0"
+          }
+        },
+        "completeness": {
+          "complete": false,
+          "missing": [
+            "voice.en",
+            "release"
+          ]
+        },
+        "review": {
+          "status": "auto",
+          "notes": []
+        }
+      }
+    },
+    {
+      "id": "h-good-morning",
+      "name": "徒手早安式",
+      "unilateral": false,
+      "defaultDose": {
+        "mode": "reps",
+        "sets": 3,
+        "reps": 12,
+        "restSeconds": 30
+      },
+      "catalogueDoseRange": {
+        "sets": [
+          1,
+          4
+        ],
+        "reps": [
+          6,
+          18
+        ],
+        "restSeconds": [
+          0,
+          60
+        ]
+      },
+      "effectiveRanges": {
+        "sets": [
+          1,
+          4
+        ],
+        "work": [
+          6,
+          18
+        ],
+        "restSeconds": [
+          0,
+          60
+        ],
+        "rounds": [
+          1,
+          6
+        ],
+        "restBetweenRoundsSeconds": [
+          0,
+          300
+        ]
+      },
+      "planningRepSeconds": 4.0,
+      "executionRhythm": {
+        "kind": "rep_updown",
+        "leadSeconds": 0.0,
+        "phases": [
+          {
+            "id": "go",
+            "seconds": 4.0
+          }
+        ],
+        "source": "repSeconds"
+      },
+      "rawDrill": {
+        "id": "h-good-morning",
+        "name": {
+          "zh": "徒手早安式",
+          "en": "Bodyweight Good Morning"
+        },
+        "purpose": "练大腿后侧和下背",
+        "category": "strength",
+        "muscles": [
+          "腘绳肌",
+          "竖脊肌"
+        ],
+        "muscleGroups": [
+          "hamstrings",
+          "erectors"
+        ],
+        "equipment": [],
+        "position": "standing",
+        "unilateral": false,
+        "level": 1,
+        "scenes": [
+          "home",
+          "office"
+        ],
+        "defaultDose": {
+          "mode": "reps",
+          "sets": 3,
+          "reps": 12,
+          "restSeconds": 30
+        },
+        "doseRange": {
+          "sets": [
+            1,
+            4
+          ],
+          "reps": [
+            6,
+            18
+          ],
+          "restSeconds": [
+            0,
+            60
+          ]
+        },
+        "rhythm": {
+          "kind": "rep_updown",
+          "leadSeconds": 0.0,
+          "phases": [
+            {
+              "id": "go",
+              "seconds": 4.0
+            }
+          ],
+          "source": "repSeconds"
+        },
+        "cues": {
+          "zh": [
+            "微屈膝，臀部向后推",
+            "背挺直，臀部向后推，感到大腿后侧拉紧再起身"
+          ]
+        },
+        "primaryCue": 1,
+        "cautions": [
+          "腰"
+        ],
+        "contraindications": [],
+        "alternative": null,
+        "apps": [
+          "smartfit"
+        ],
+        "tags": [
+          "office"
+        ],
+        "assets": {
+          "spec": {
+            "status": "ok",
+            "path": "drill-anim/specs/h-good-morning.js",
+            "sha256": "0ad243f0cee339a6ca0fdd9a8fe9d8d36f869eb35e78641e43aa67c6cfbe16bf",
+            "revisionOf": null,
+            "modelProfile": "training-human-v2"
+          },
+          "releases": [],
+          "cover": {
+            "status": "ok",
+            "sources": [
+              {
+                "app": "smartfit",
+                "path": "assets/packs/h-good-morning/cover.jpg",
+                "width": 540,
+                "height": 540,
+                "coverSeconds": 1.0
+              }
+            ]
+          },
+          "video": {
+            "status": "ok",
+            "sources": [
+              {
+                "app": "smartfit",
+                "path": "assets/packs/h-good-morning/demo.mp4",
+                "width": 720,
+                "height": 720,
+                "loopSeconds": 8.0,
+                "repSeconds": 4.0
+              }
+            ]
+          },
+          "voice": {
+            "status": "ok",
+            "languages": [
+              "zh"
+            ],
+            "lines": [
+              {
+                "id": "name",
+                "role": "name",
+                "text": {
+                  "zh": "徒手早安式"
+                },
+                "ms": {
+                  "zh": 1161
+                }
+              },
+              {
+                "id": "intro",
+                "role": "intro",
+                "text": {
+                  "zh": "徒手早安式，练大腿后侧和下背"
+                },
+                "ms": {
+                  "zh": 2972
+                }
+              },
+              {
+                "id": "cue1",
+                "role": "cue",
+                "text": {
+                  "zh": "微屈膝，臀部向后推"
+                },
+                "ms": {
+                  "zh": 2067
+                }
+              },
+              {
+                "id": "cue2",
+                "role": "cue",
+                "text": {
+                  "zh": "背挺直，臀部向后推，感到大腿后侧拉紧再起身"
+                },
+                "ms": {
+                  "zh": 4435
+                }
+              },
+              {
+                "id": "rest",
+                "role": "rest",
+                "text": {
+                  "zh": "放松一下。下一组记住，背挺直，臀部向后推，感到大腿后侧拉紧再起身"
+                },
+                "ms": {
+                  "zh": 6896
+                }
+              },
+              {
+                "id": "finish",
+                "role": "finish",
+                "text": {
+                  "zh": "徒手早安式，完成"
+                },
+                "ms": {
+                  "zh": 1834
+                }
+              }
+            ],
+            "audio": [
+              {
+                "app": "smartfit",
+                "pathPattern": "assets/packs/h-good-morning/voice/{lang}/{line}.m4a",
+                "languages": [
+                  "zh"
+                ]
+              }
+            ]
+          },
+          "drillPack": {
+            "app": "smartfit",
+            "path": "assets/packs/h-good-morning/pack.json",
+            "version": "1.0.0"
+          }
+        },
+        "completeness": {
+          "complete": false,
+          "missing": [
+            "voice.en",
+            "release"
+          ]
+        },
+        "review": {
+          "status": "auto",
+          "notes": []
+        }
+      }
+    },
+    {
+      "id": "h-doorframe-forearms-pec-native-r3",
+      "name": "门框双前臂胸肌拉伸",
+      "unilateral": false,
+      "defaultDose": {
+        "mode": "time",
+        "sets": 1,
+        "seconds": 30,
+        "restSeconds": 10
+      },
+      "catalogueDoseRange": {
+        "sets": [
+          1,
+          1
+        ],
+        "seconds": [
+          30,
+          30
+        ],
+        "restSeconds": [
+          10,
+          10
+        ]
+      },
+      "effectiveRanges": {
+        "sets": [
+          1,
+          1
+        ],
+        "work": [
+          30,
+          30
+        ],
+        "restSeconds": [
+          10,
+          10
+        ],
+        "rounds": [
+          1,
+          6
+        ],
+        "restBetweenRoundsSeconds": [
+          0,
+          300
+        ]
+      },
+      "planningRepSeconds": 3.0,
+      "executionRhythm": {
+        "kind": "hold",
+        "leadSeconds": 0.0
+      },
+      "rawDrill": {
+        "id": "h-doorframe-forearms-pec-native-r3",
+        "family": "h-doorframe-forearms-pec",
+        "nameZh": "门框双前臂胸肌拉伸",
+        "muscleGroups": [
+          "chest"
+        ],
+        "equipment": [
+          "wall"
+        ],
+        "semanticMetadata": {
+          "sourceFps": 15,
+          "durationSeconds": 8,
+          "sourceFrames": 120,
+          "kind": "dynamic",
+          "modelProfile": "training-human-v2plus-hands-native",
+          "modelVersion": "1.0.0-r3",
+          "modelEntry": "drill-anim/models/native-open-r1/loader.mjs",
+          "attemptsUsed": 3,
+          "attemptLimit": 3,
+          "sourceQaStatus": "sparse-action-checks-passed-pending-full-gpu",
+          "fullGpuComplete": false,
+          "relatedExistingMechanism": null,
+          "scopeNote": "Specific oblique doorframe illustration; proximal/middle/distal distributed contact, not uniformly flush or load certified."
+        },
+        "rhythm": {
+          "sourceFps": 15,
+          "durationSeconds": 8,
+          "sourceFrames": 120,
+          "trackNames": [
+            "k0",
+            "k1",
+            "k2",
+            "k3",
+            "stretch"
+          ],
+          "tracksSha256": "6aec8511c20b9f213f7ab05b6330ecc01c8180f4dbac24eb5aee62d6e6bfcfc0",
+          "policy": "preserve-latest-spec-motion-no-time-stretch",
+          "semantics": null,
+          "execution": null,
+          "executionStatus": "unknown-unreviewed",
+          "executionSource": {
+            "path": "catalog/catalog.json",
+            "actionId": "h-doorframe-forearms-pec-native-r3",
+            "sha256": "40610dbb71b58886ebe001409ae15161761747b4f776e74a252e7b1f8df6e983"
+          },
+          "videoLoopIsTrainingDose": false
+        },
+        "revision": "h-doorframe-forearms-pec-native-r3-complete-alpha-r2",
+        "source": {
+          "branch": "codex/app-test-pack-r1",
+          "commit": "89c9c4f420b227068cea6997cee55e13e1541c7f",
+          "spec": {
+            "path": "drill-anim/specs/h-doorframe-forearms-pec-native-r3.js",
+            "bytes": 2384,
+            "sha256": "f9508b5847ccc3649077b80271d4d8c52b16d6d45a0c80c883238e541cdeceac"
+          },
+          "selectionFamily": "h-doorframe-forearms-pec",
+          "modelProfile": "training-human-v2plus-hands-native"
+        },
+        "state": "ready-test-unreviewed",
+        "existingEvidence": {
+          "kind": "sparse-source-check-only",
+          "fullGpu": "pending"
+        },
+        "reviewed": false,
+        "releaseEligible": false,
+        "muscleGroupsZh": "胸大肌",
+        "equipmentZh": "适合双前臂接触的稳固门框",
+        "trainingDefinitionComplete": true,
+        "trainingSemantics": {
+          "status": "complete-unreviewed",
+          "reviewed": false,
+          "releaseEligible": false,
+          "batchId": "app-test-pack-r1-semantics-r1",
+          "definitionComplete": true,
+          "missingRequiredFields": [],
+          "unknownFields": [
+            {
+              "field": "cautions",
+              "reason": "未建立经审核的结构化身体部位筛选标签；空数组不表示没有注意事项，动作条件见cautionNotes。"
+            },
+            {
+              "field": "contraindications",
+              "reason": "未建立经审核的结构化禁忌清单；空数组不表示没有禁忌，不从动画推定疾病适用性。"
+            }
+          ],
+          "evidence": [
+            {
+              "path": "drill-anim/specs/h-doorframe-forearms-pec-native-r3.js",
+              "sha256": "f9508b5847ccc3649077b80271d4d8c52b16d6d45a0c80c883238e541cdeceac",
+              "hashMode": "raw-file-bytes",
+              "fields": [
+                "purpose",
+                "category",
+                "muscles",
+                "muscleGroups",
+                "position",
+                "unilateral",
+                "equipment",
+                "equipmentZh",
+                "defaultDose.mode",
+                "cues.zh",
+                "countingSemantics",
+                "demonstratedSide",
+                "commonErrors",
+                "cautionNotes"
+              ],
+              "note": "双手腕/前臂目标固定；staggered双脚固定，root随R小幅向开口前进；双侧chest高亮，wall panels是两侧门柱和横梁示意。",
+              "bytes": 2384,
+              "root": "repository"
+            },
+            {
+              "path": "drill-anim/lib/home-anim.mjs",
+              "sha256": "374b9ffe422c19280e2f58d10654208b2955e899a325a5630cfb5705148af74d",
+              "hashMode": "raw-file-bytes",
+              "fields": [
+                "pose-supports",
+                "motion-path",
+                "demonstratedSide"
+              ],
+              "note": "实际读取的直接或递归动画依赖；只核对运动和支点，纯数学采样时序不作为训练剂量。",
+              "bytes": 3691,
+              "root": "repository"
+            },
+            {
+              "path": "drill-anim/lib/ss-geo.mjs",
+              "sha256": "c0dddf673d83a88c678d56e8793b55306878633581663bd35ca6ae4fa44447f4",
+              "hashMode": "raw-file-bytes",
+              "fields": [
+                "pose-supports",
+                "motion-path",
+                "demonstratedSide"
+              ],
+              "note": "实际读取的直接或递归动画依赖；只核对运动和支点，纯数学采样时序不作为训练剂量。",
+              "bytes": 3700,
+              "root": "repository"
+            },
+            {
+              "path": "catalog/taxonomy.json",
+              "sha256": "3da41109246bbd7a05328bd88b4cf9ddc6152f6139f7158dfb63d8d6e3ab8065",
+              "hashMode": "raw-file-bytes",
+              "fields": [
+                "category",
+                "position",
+                "scenes",
+                "equipment",
+                "muscleGroups"
+              ],
+              "note": "仅规范现有枚举；不作为动作肌群或训练机制的独立事实来源。",
+              "bytes": 3573,
+              "root": "repository"
+            },
+            {
+              "path": "F:/PoseHub-v2-production/app-test-pack-r1-source/work/semantics-revision-r1/complete-142-samples.json",
+              "sha256": "2360586e1fbf33568f455617d81c5afbaee23805509fed777393bc1965b8bb9d",
+              "hashMode": "raw-file-bytes",
+              "fields": [
+                "defaultDose.sets",
+                "defaultDose.seconds",
+                "defaultDose.restSeconds"
+              ],
+              "note": "142完整动作样本；仅使用analogues列出的精确actionId与对应剂量字段。",
+              "bytes": 420844,
+              "root": "semantic-revision-work"
+            }
+          ],
+          "analogueDefaults": [
+            {
+              "actionId": "h-chair-lat",
+              "fields": [
+                "defaultDose.sets",
+                "defaultDose.seconds",
+                "defaultDose.restSeconds"
+              ],
+              "reason": "同属有固定外部支撑的上肢静态拉伸；借1组30秒和10秒休息，不借其器械或肌群。门框接触条件特殊，仅支持默认单点范围。",
+              "values": {
+                "defaultDose.sets": 1,
+                "defaultDose.seconds": 30,
+                "defaultDose.restSeconds": 10
+              },
+              "catalogSha256": "c5f090aa06e2743904a3f0c1f9193c87955242b1aa7f054a14a9f6e7c824be54"
+            }
+          ],
+          "fieldBasis": {
+            "purpose": {
+              "kind": "editorial-inference",
+              "note": "双手腕/前臂目标固定；staggered双脚固定，root随R小幅向开口前进；双侧chest高亮，wall panels是两侧门柱和横梁示意。 由本动作自身运动、支撑与器械归纳该字段；不转移其他动作机制。"
+            },
+            "category": {
+              "kind": "editorial-inference",
+              "note": "双手腕/前臂目标固定；staggered双脚固定，root随R小幅向开口前进；双侧chest高亮，wall panels是两侧门柱和横梁示意。 由本动作自身运动、支撑与器械归纳该字段；不转移其他动作机制。"
+            },
+            "muscles": {
+              "kind": "editorial-inference",
+              "note": "双手腕/前臂目标固定；staggered双脚固定，root随R小幅向开口前进；双侧chest高亮，wall panels是两侧门柱和横梁示意。 由本动作自身运动、支撑与器械归纳该字段；不转移其他动作机制。"
+            },
+            "muscleGroups": {
+              "kind": "editorial-inference",
+              "note": "双手腕/前臂目标固定；staggered双脚固定，root随R小幅向开口前进；双侧chest高亮，wall panels是两侧门柱和横梁示意。 由本动作自身运动、支撑与器械归纳该字段；不转移其他动作机制。"
+            },
+            "position": {
+              "kind": "own-spec",
+              "note": "双手腕/前臂目标固定；staggered双脚固定，root随R小幅向开口前进；双侧chest高亮，wall panels是两侧门柱和横梁示意。"
+            },
+            "unilateral": {
+              "kind": "own-spec",
+              "note": "双手腕/前臂目标固定；staggered双脚固定，root随R小幅向开口前进；双侧chest高亮，wall panels是两侧门柱和横梁示意。"
+            },
+            "level": {
+              "kind": "editorial-inference",
+              "note": "站姿前后脚稳定、双前臂有外部接触支撑，仅小幅胸部前移，不需单腿平衡或额外负重，建议1级。"
+            },
+            "scenes": {
+              "kind": "editorial-inference",
+              "note": "按本动作自身的地面/站立体位和所需器械选择；带哑铃的home以自备器械为条件，地面动作不标office。"
+            },
+            "equipment": {
+              "kind": "own-spec",
+              "note": "双手腕/前臂目标固定；staggered双脚固定，root随R小幅向开口前进；双侧chest高亮，wall panels是两侧门柱和横梁示意。"
+            },
+            "equipmentZh": {
+              "kind": "own-spec",
+              "note": "双手腕/前臂目标固定；staggered双脚固定，root随R小幅向开口前进；双侧chest高亮，wall panels是两侧门柱和横梁示意。"
+            },
+            "defaultDose": {
+              "kind": "editorial-inference",
+              "note": "mode由自身动作决定，数字来源逐子字段记录；不以8/10秒母片、时序平台或循环次数作为训练剂量。"
+            },
+            "doseRange": {
+              "kind": "editorial-inference",
+              "note": "完整列出sets、reps或seconds、restSeconds范围；逐子字段记录样本或默认单点来源。"
+            },
+            "cues": {
+              "kind": "editorial-inference",
+              "note": "双手腕/前臂目标固定；staggered双脚固定，root随R小幅向开口前进；双侧chest高亮，wall panels是两侧门柱和横梁示意。 由本动作自身运动、支撑与器械归纳该字段；不转移其他动作机制。"
+            },
+            "primaryCue": {
+              "kind": "editorial-inference",
+              "note": "选择第一条支撑/起始姿势提示作为主提示，供内容审阅。"
+            },
+            "commonErrors": {
+              "kind": "editorial-inference",
+              "note": "根据自身spec明确的支点、关节轨迹和反向偏离，改写为用户可理解的常见错误；不夹带模型/制作诊断。"
+            },
+            "cautions": {
+              "kind": "retained",
+              "note": "保留空数组，不表示无注意事项或禁忌；不从动画推定医学筛选标签。"
+            },
+            "cautionNotes": {
+              "kind": "own-spec",
+              "note": "由自身spec器械、支撑与动作边界改写可操作注意事项。"
+            },
+            "contraindications": {
+              "kind": "retained",
+              "note": "保留空数组，不表示无注意事项或禁忌；不从动画推定医学筛选标签。"
+            },
+            "countingSemantics": {
+              "kind": "editorial-inference",
+              "note": "由自身轨迹确定单位，明示本次未审口径：双前臂保持门框接触、进入舒适胸肌拉伸位后计时。默认双侧同时保持30秒、1组，退出后休息10秒；进出动作不计重复。"
+            },
+            "demonstratedSide": {
+              "kind": "own-spec",
+              "note": "双手腕/前臂目标固定；staggered双脚固定，root随R小幅向开口前进；双侧chest高亮，wall panels是两侧门柱和横梁示意。"
+            },
+            "defaultDose.mode": {
+              "kind": "own-spec",
+              "note": "双手腕/前臂目标固定；staggered双脚固定，root随R小幅向开口前进；双侧chest高亮，wall panels是两侧门柱和横梁示意。"
+            },
+            "cues.zh": {
+              "kind": "own-spec",
+              "note": "双手腕/前臂目标固定；staggered双脚固定，root随R小幅向开口前进；双侧chest高亮，wall panels是两侧门柱和横梁示意。"
+            },
+            "defaultDose.sets": {
+              "kind": "analogue-default",
+              "note": "142样本 h-chair-lat 的defaultDose.sets=1；同属有固定外部支撑的上肢静态拉伸；借1组30秒和10秒休息，不借其器械或肌群。门框接触条件特殊，仅支持默认单点范围。"
+            },
+            "defaultDose.seconds": {
+              "kind": "analogue-default",
+              "note": "142样本 h-chair-lat 的defaultDose.seconds=30；同属有固定外部支撑的上肢静态拉伸；借1组30秒和10秒休息，不借其器械或肌群。门框接触条件特殊，仅支持默认单点范围。"
+            },
+            "defaultDose.restSeconds": {
+              "kind": "analogue-default",
+              "note": "142样本 h-chair-lat 的defaultDose.restSeconds=10；同属有固定外部支撑的上肢静态拉伸；借1组30秒和10秒休息，不借其器械或肌群。门框接触条件特殊，仅支持默认单点范围。"
+            },
+            "doseRange.sets": {
+              "kind": "editorial-inference",
+              "note": "[1,1]是已提默认数值的单点闭区间；本稿只支持该默认，不声称存在更宽训练范围。"
+            },
+            "doseRange.seconds": {
+              "kind": "editorial-inference",
+              "note": "[30,30]是已提默认数值的单点闭区间；本稿只支持该默认，不声称存在更宽训练范围。"
+            },
+            "doseRange.restSeconds": {
+              "kind": "editorial-inference",
+              "note": "[10,10]是已提默认数值的单点闭区间；本稿只支持该默认，不声称存在更宽训练范围。"
+            }
+          },
+          "reviewNotes": [
+            "仅为未审训练语义草稿；reviewed:false、releaseEligible:false。动作语义只依据自身精确spec及动画依赖；142样本只作默认剂量和难度规范参照。",
+            "wall是门框面板渲染类型，保留现有wall枚举并在equipmentZh明确门框；不宣称任意直角门框都适用。"
+          ],
+          "videoLoopIsTrainingDose": false
+        },
+        "purpose": "借双前臂门框接触与小幅胸部前移，进行双侧胸肌舒适拉伸。",
+        "category": "stretch",
+        "muscles": [
+          "胸大肌"
+        ],
+        "position": "standing",
+        "unilateral": false,
+        "level": 1,
+        "scenes": [
+          "home",
+          "office",
+          "gym"
+        ],
+        "defaultDose": {
+          "mode": "time",
+          "sets": 1,
+          "seconds": 30,
+          "restSeconds": 10
+        },
+        "doseRange": {
+          "sets": [
+            1,
+            1
+          ],
+          "seconds": [
+            30,
+            30
+          ],
+          "restSeconds": [
+            10,
+            10
+          ]
+        },
+        "cues": {
+          "zh": [
+            "前后站稳，双前臂轻靠适合接触的稳固门框。",
+            "胸部轻柔向前移至舒适拉伸位，保持呼吸，不强压肩部。"
+          ]
+        },
+        "primaryCue": 0,
+        "commonErrors": [
+          {
+            "zh": "前臂离开支撑面，或用力前冲、强压肩部。"
+          }
+        ],
+        "cautions": [],
+        "contraindications": [],
+        "countingSemantics": "双前臂保持门框接触、进入舒适胸肌拉伸位后计时。默认双侧同时保持30秒、1组，退出后休息10秒；进出动作不计重复。",
+        "demonstratedSide": "both",
+        "cautionNotes": {
+          "zh": [
+            "门框形状须允许双前臂舒适接触；不用手臂强推门框增加幅度。"
+          ]
+        },
+        "sourceRevision": "h-doorframe-forearms-pec-native-r3",
+        "mediaRevision": "h-doorframe-forearms-pec-native-r3-complete-alpha-r2-still-margin-r1",
+        "repairReason": "Technical complete person/equipment/cast-shadow framing and transparent margins; frozen source motion unchanged",
+        "files": {
+          "video": {
+            "path": "media/h-doorframe-forearms-pec-native-r3/h-doorframe-forearms-pec-native-r3-complete-alpha-r2/h-doorframe-forearms-pec-native-r3.rgb-alpha.mp4",
+            "bytes": 227376,
+            "sha256": "3a54e62aac2fd47b898ff1c4fabf3ea1c85d61e31e36610a6f7dc6df9a8e4947",
+            "width": 720,
+            "height": 1440,
+            "codec": "h264",
+            "pixelFormat": "yuv420p",
+            "assetName": "h-doorframe-forearms-pec-native-r3.rgb-alpha.mp4",
+            "downloadUrl": "https://media.uuugk.win/pack/r1-v3/media/h-doorframe-forearms-pec-native-r3/h-doorframe-forearms-pec-native-r3-complete-alpha-r2/h-doorframe-forearms-pec-native-r3.rgb-alpha.mp4"
+          },
+          "cover": {
+            "path": "media/h-doorframe-forearms-pec-native-r3/h-doorframe-forearms-pec-native-r3-complete-alpha-r2/h-doorframe-forearms-pec-native-r3.cover.alpha.webp",
+            "bytes": 24568,
+            "sha256": "3f9d5266606fb448095023e1d69f14aff8f30e0d9dc1aa823248630096cb1a25",
+            "width": 640,
+            "height": 640,
+            "alpha": true,
+            "assetName": "h-doorframe-forearms-pec-native-r3.cover.alpha.webp",
+            "downloadUrl": "https://media.uuugk.win/pack/r1-v3/media/h-doorframe-forearms-pec-native-r3/h-doorframe-forearms-pec-native-r3-complete-alpha-r2/h-doorframe-forearms-pec-native-r3.cover.alpha.webp"
+          },
+          "thumbnail": {
+            "path": "media/h-doorframe-forearms-pec-native-r3/h-doorframe-forearms-pec-native-r3-complete-alpha-r2-still-margin-r1/h-doorframe-forearms-pec-native-r3.thumbnail.alpha.webp",
+            "bytes": 5768,
+            "sha256": "848352706315a913d86befa9c6d491157d3d453df2f92573eab832685a0df627",
+            "width": 192,
+            "height": 192,
+            "alpha": true,
+            "assetName": "h-doorframe-forearms-pec-native-r3.thumbnail.alpha.webp",
+            "downloadUrl": "https://media.uuugk.win/pack/r1-v3/media/h-doorframe-forearms-pec-native-r3/h-doorframe-forearms-pec-native-r3-complete-alpha-r2-still-margin-r1/h-doorframe-forearms-pec-native-r3.thumbnail.alpha.webp"
+          }
+        },
+        "qa": {
+          "report": {
+            "path": "qa/h-doorframe-forearms-pec-native-r3/h-doorframe-forearms-pec-native-r3-complete-alpha-r2/decode-check.json",
+            "bytes": 1699,
+            "sha256": "f164cd981a956760a389f7902dcd50346b9b0125e6cb36e34a7c2db47783eaf0"
+          },
+          "metrics": {
+            "framesDecoded": 240,
+            "alphaMae": 0.09911004211676955,
+            "semiTransparentAlphaMae": 0.9929967003013125,
+            "visibleShadowAlphaMae": 0.98343115767929,
+            "visibleShadowSamples": 6865537,
+            "transparentAlphaLeakMax": 29,
+            "compositeRgbMae": {
+              "white": 0.1798408618398491,
+              "dark": 0.12894709951560357,
+              "cyan": 0.1581593390989369
+            },
+            "semiTransparentCompositeRgbMae": {
+              "white": 1.1479001421210173,
+              "dark": 0.559538638903445,
+              "cyan": 0.9095159238560846
+            },
+            "sampleFrames": [
+              {
+                "frame": 0,
+                "semiTransparentPixels": 44854,
+                "visibleShadowPixels": 28676,
+                "alphaMae": 0.0942457561728395
+              },
+              {
+                "frame": 90,
+                "semiTransparentPixels": 44725,
+                "visibleShadowPixels": 28552,
+                "alphaMae": 0.09495949074074074
+              },
+              {
+                "frame": 239,
+                "semiTransparentPixels": 44854,
+                "visibleShadowPixels": 28676,
+                "alphaMae": 0.09820601851851851
+              }
+            ],
+            "framingPassed": true,
+            "framing": {
+              "sourceFramesChecked": 240,
+              "sourceEdgeFrames": {
+                "body": [],
+                "shadow": []
+              },
+              "sourceShadowComplete": true,
+              "sourceBodyComplete": true,
+              "framingPassed": true
+            },
+            "decodedBoundaryBandPixels": 12,
+            "decodedBoundaryAlphaMax": 0,
+            "decodeProtocol": "Decode tagged BT.709 limited-range video to full-range RGB; bottom red is straight alpha.",
+            "passed": true,
+            "referenceCache": {
+              "format": "pose-hub-alpha-reference-cache@1",
+              "bytes": 622080000,
+              "sha256": "7233f57122f9033868a3d99d8b151510c37484785c575aa754314dd55125129c",
+              "frames": 240,
+              "readVerified": true,
+              "reference": "exact pre-pack RGBA and visible-shadow mask generated during this encode"
+            }
+          }
+        },
+        "thumbnailDerivation": {
+          "format": "pose-hub-thumbnail-derivation@1",
+          "at": "2026-10-26T01:04:15.197841+00:00",
+          "previousRow": {
+            "path": "history/h-doorframe-forearms-pec-native-r3/thumbnail-99a2ee182f50aed35c39966c5ec606dabcbd990a0273bbc83e3a81bdd5ff69aa.json",
+            "bytes": 5612,
+            "sha256": "28e19c091a8009b6123a0bc5319c3024cf3ec91c0c4f7ef9463752eba7608a2b"
+          },
+          "previousThumbnail": {
+            "path": "media/h-doorframe-forearms-pec-native-r3/h-doorframe-forearms-pec-native-r3-complete-alpha-r2/h-doorframe-forearms-pec-native-r3.thumbnail.alpha.webp",
+            "bytes": 10948,
+            "sha256": "cb9a62012eb59bfde996170a820f42dbc66cc5022a9269a50fbb43f4e82d0f37",
+            "width": 240,
+            "height": 240,
+            "alpha": true
+          },
+          "thumbnail": {
+            "path": "media/h-doorframe-forearms-pec-native-r3/h-doorframe-forearms-pec-native-r3-complete-alpha-r2-still-margin-r1/h-doorframe-forearms-pec-native-r3.thumbnail.alpha.webp",
+            "bytes": 10580,
+            "sha256": "0448a1ae64e0bb1992b35a2b0dda8bc7200a7bec538c31a568aa2a8af4593737",
+            "width": 240,
+            "height": 240,
+            "alpha": true
+          },
+          "mediaRevision": "h-doorframe-forearms-pec-native-r3-complete-alpha-r2-still-margin-r1",
+          "recipe": {
+            "format": "pose-hub-thumbnail-transparent-inset@1",
+            "method": "Complete720-cover premultiplied Lanczos232 centered on transparent240",
+            "minimumFraction": 0.04,
+            "newMarginPixels": 13,
+            "oldMarginPixels": 9,
+            "requiredMarginPixels": 10,
+            "sourceCover": {
+              "alpha": true,
+              "bytes": 48370,
+              "height": 720,
+              "path": "media/h-doorframe-forearms-pec-native-r3/h-doorframe-forearms-pec-native-r3-complete-alpha-r2/h-doorframe-forearms-pec-native-r3.cover.alpha.webp",
+              "sha256": "c2063ca2f908db167e177a5d8807c13038df03a7d5e27dd9c30700a2a3543d6a",
+              "width": 720
+            },
+            "videoAndCoverReencoded": false
+          },
+          "alphaMarginQa": {
+            "alphaBounds": [
+              75,
+              13,
+              165,
+              227
+            ],
+            "marginsPixels": [
+              75,
+              13,
+              75,
+              13
+            ],
+            "requiredPixels": 10,
+            "rule": "any nonzero alpha; ceil(dimension * 0.04)",
+            "passed": true
+          }
+        },
+        "availableForApp": true,
+        "availableForTraining": false,
+        "name": {
+          "zh": "门框双前臂胸肌拉伸"
+        }
+      }
+    }
+  ]
+}

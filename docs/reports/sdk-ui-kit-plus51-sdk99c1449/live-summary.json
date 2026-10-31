@@ -1,0 +1,251 @@
+{
+  "schema": "smartfit-plus51-real-duration-probe@2",
+  "sdk": "99c14495685f160019e10340ea6f0de6418a65b9",
+  "probeStartedAtUtc": "2026-10-31T07:39:04.417319Z",
+  "probeFinishedAtUtc": "2026-10-31T07:39:47.525455Z",
+  "probeElapsedMs": 43107,
+  "caseGenerationCount": 3,
+  "outerCaseRetries": 0,
+  "llmCallCount": 14,
+  "successfulLlmCallCount": 14,
+  "failedLlmCallCount": 0,
+  "unfinishedLlmCallCount": 0,
+  "httpAttemptCount": 14,
+  "knownHttpAttemptSubtotal": 14,
+  "unknownHttpAttemptCallCount": 0,
+  "callElapsedMsSum": 42127,
+  "knownCallElapsedMsSubtotal": 42127,
+  "tokens": {
+    "inputTokens": 127959,
+    "outputTokens": 4596,
+    "totalTokens": 132555,
+    "cachedInputTokens": 89216,
+    "reasoningOutputTokens": null
+  },
+  "tokenCoverage": {
+    "inputTokens": {
+      "observedCalls": 14,
+      "unknownCalls": 0,
+      "knownSubtotal": 127959
+    },
+    "outputTokens": {
+      "observedCalls": 14,
+      "unknownCalls": 0,
+      "knownSubtotal": 4596
+    },
+    "totalTokens": {
+      "observedCalls": 14,
+      "unknownCalls": 0,
+      "knownSubtotal": 132555
+    },
+    "cachedInputTokens": {
+      "observedCalls": 14,
+      "unknownCalls": 0,
+      "knownSubtotal": 89216
+    },
+    "reasoningOutputTokens": {
+      "observedCalls": 12,
+      "unknownCalls": 2,
+      "knownSubtotal": 2266
+    }
+  },
+  "metricsSemantics": {
+    "httpAttempts": "SDK-reported LlmResponse/LlmException.httpAttempts, not a wire-level observer; App transport retries remain unchanged",
+    "tokens": "SDK-normalized usage; zero is null because provider field presence is not exposed; original normalized values remain in each call.tokens.sdkNormalized",
+    "totalTokens": "Exact SDK input plus output sum when both are known; cache and reasoning are already included, never added again",
+    "tokenCoverage": "A complete aggregate is null when any call is unknown; knownSubtotal and observedCalls retain available values without estimating missing calls",
+    "userTurnElapsedMs": "Await chat.send only, including SDK step retries",
+    "fullTurnElapsedMs": "Await chat.send and chat.flushPersistence",
+    "elapsedMs": "Entire case through duration validation and execution-clock replay, before writing its evidence file",
+    "wireHttpAttemptTimingsMs": "Unavailable from SDK public API; null, never inferred from LLM latency"
+  },
+  "baseUrl": "https://ai.uuugk.win/v1",
+  "model": "deepseek-flash",
+  "sameAppCatalogAndExecution": true,
+  "catalogLoader": "PoseHubActionLibrary.load -> AppTestCatalog.fromSdk -> AppTestContent.build",
+  "fixedLeadPreserved": true,
+  "evidenceScope": "real model generation and SDK execution-clock replay; no device session",
+  "allPassed": false,
+  "cases": [
+    {
+      "targetMinutes": 5,
+      "coachEstimateSeconds": null,
+      "cardSecondsIncludingPrep": null,
+      "cardLabel": null,
+      "executionSecondsIncludingPrep": null,
+      "manualWorkPhases": null,
+      "withinTenPercent": null,
+      "passed": false,
+      "llmCallCount": 3,
+      "successfulLlmCallCount": 3,
+      "failedLlmCallCount": 0,
+      "unfinishedLlmCallCount": 0,
+      "httpAttemptCount": 3,
+      "knownHttpAttemptSubtotal": 3,
+      "unknownHttpAttemptCallCount": 0,
+      "userTurnElapsedMs": 11461,
+      "fullTurnElapsedMs": 11463,
+      "elapsedMs": 11463,
+      "callElapsedMsSum": 11305,
+      "knownCallElapsedMsSubtotal": 11305,
+      "caseGenerationAttempt": 1,
+      "sdkTransportMaxRetries": 0,
+      "sendReturned": true,
+      "persistenceFlushed": true,
+      "tokens": {
+        "inputTokens": 22871,
+        "outputTokens": 1381,
+        "totalTokens": 24252,
+        "cachedInputTokens": 14080,
+        "reasoningOutputTokens": 914
+      },
+      "tokenCoverage": {
+        "inputTokens": {
+          "observedCalls": 3,
+          "unknownCalls": 0,
+          "knownSubtotal": 22871
+        },
+        "outputTokens": {
+          "observedCalls": 3,
+          "unknownCalls": 0,
+          "knownSubtotal": 1381
+        },
+        "totalTokens": {
+          "observedCalls": 3,
+          "unknownCalls": 0,
+          "knownSubtotal": 24252
+        },
+        "cachedInputTokens": {
+          "observedCalls": 3,
+          "unknownCalls": 0,
+          "knownSubtotal": 14080
+        },
+        "reasoningOutputTokens": {
+          "observedCalls": 3,
+          "unknownCalls": 0,
+          "knownSubtotal": 914
+        }
+      }
+    },
+    {
+      "targetMinutes": 10,
+      "coachEstimateSeconds": 574.0,
+      "cardSecondsIncludingPrep": 578.0,
+      "cardLabel": "约 10 分钟",
+      "executionSecondsIncludingPrep": 578.0,
+      "manualWorkPhases": 0,
+      "withinTenPercent": true,
+      "passed": true,
+      "llmCallCount": 6,
+      "successfulLlmCallCount": 6,
+      "failedLlmCallCount": 0,
+      "unfinishedLlmCallCount": 0,
+      "httpAttemptCount": 6,
+      "knownHttpAttemptSubtotal": 6,
+      "unknownHttpAttemptCallCount": 0,
+      "userTurnElapsedMs": 16353,
+      "fullTurnElapsedMs": 16355,
+      "elapsedMs": 16359,
+      "callElapsedMsSum": 16263,
+      "knownCallElapsedMsSubtotal": 16263,
+      "caseGenerationAttempt": 1,
+      "sdkTransportMaxRetries": 0,
+      "sendReturned": true,
+      "persistenceFlushed": true,
+      "tokens": {
+        "inputTokens": 56981,
+        "outputTokens": 1951,
+        "totalTokens": 58932,
+        "cachedInputTokens": 41472,
+        "reasoningOutputTokens": null
+      },
+      "tokenCoverage": {
+        "inputTokens": {
+          "observedCalls": 6,
+          "unknownCalls": 0,
+          "knownSubtotal": 56981
+        },
+        "outputTokens": {
+          "observedCalls": 6,
+          "unknownCalls": 0,
+          "knownSubtotal": 1951
+        },
+        "totalTokens": {
+          "observedCalls": 6,
+          "unknownCalls": 0,
+          "knownSubtotal": 58932
+        },
+        "cachedInputTokens": {
+          "observedCalls": 6,
+          "unknownCalls": 0,
+          "knownSubtotal": 41472
+        },
+        "reasoningOutputTokens": {
+          "observedCalls": 5,
+          "unknownCalls": 1,
+          "knownSubtotal": 850
+        }
+      }
+    },
+    {
+      "targetMinutes": 20,
+      "coachEstimateSeconds": 1221.0,
+      "cardSecondsIncludingPrep": 1225.0,
+      "cardLabel": "约 20 分钟",
+      "executionSecondsIncludingPrep": 1225.0,
+      "manualWorkPhases": 0,
+      "withinTenPercent": true,
+      "passed": true,
+      "llmCallCount": 5,
+      "successfulLlmCallCount": 5,
+      "failedLlmCallCount": 0,
+      "unfinishedLlmCallCount": 0,
+      "httpAttemptCount": 5,
+      "knownHttpAttemptSubtotal": 5,
+      "unknownHttpAttemptCallCount": 0,
+      "userTurnElapsedMs": 14622,
+      "fullTurnElapsedMs": 14624,
+      "elapsedMs": 14625,
+      "callElapsedMsSum": 14559,
+      "knownCallElapsedMsSubtotal": 14559,
+      "caseGenerationAttempt": 1,
+      "sdkTransportMaxRetries": 0,
+      "sendReturned": true,
+      "persistenceFlushed": true,
+      "tokens": {
+        "inputTokens": 48107,
+        "outputTokens": 1264,
+        "totalTokens": 49371,
+        "cachedInputTokens": 33664,
+        "reasoningOutputTokens": null
+      },
+      "tokenCoverage": {
+        "inputTokens": {
+          "observedCalls": 5,
+          "unknownCalls": 0,
+          "knownSubtotal": 48107
+        },
+        "outputTokens": {
+          "observedCalls": 5,
+          "unknownCalls": 0,
+          "knownSubtotal": 1264
+        },
+        "totalTokens": {
+          "observedCalls": 5,
+          "unknownCalls": 0,
+          "knownSubtotal": 49371
+        },
+        "cachedInputTokens": {
+          "observedCalls": 5,
+          "unknownCalls": 0,
+          "knownSubtotal": 33664
+        },
+        "reasoningOutputTokens": {
+          "observedCalls": 4,
+          "unknownCalls": 1,
+          "knownSubtotal": 502
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,80 @@
+{
+  "schema": "smartfit-ui-kit-sdk99c1449-capture@1",
+  "baseSourceCommit": "13c0bb4cc24982be50bbb2471fc83ace6f64e40b",
+  "baseFrames": "../base",
+  "baseImmutableSourceReceipt": "../source-bindings.json",
+  "baseImmutableSourceReceiptSha256": "de179ade9c043b7d7148ac6b86a265de34d93d414cd195bc1fe61be429310765",
+  "baseRuntimeSdkCommit": "66dd98a549c1ff5fedecb626a7c88583090a1440",
+  "newSourceCommit": "d0a88871befcf0fab8c0aca1e97046ea3c635016",
+  "newRuntimeSdkCommit": "99c14495685f160019e10340ea6f0de6418a65b9",
+  "appVersion": "0.1.0+51",
+  "captureTestsPassed": 2,
+  "newFrames": 58,
+  "newPngBytes": 7481387,
+  "sharedCaptureContract": {
+    "driverSha256": "81f80b15fbfc34526aca03c18e835c0234553f064c9a46ab4543c5f65ac6f154",
+    "adapterSha256": "c959e5dc56f64ed514890b8beb64cdc3bc43dd40546d37d15e17f404ddaeb4ae",
+    "inputsSha256": "a2c6df4c3e5dd8f3acab967ab835b15b0d9c6db3f98c318c0d8fcb705d490711",
+    "logicalSize": {
+      "width": 412,
+      "height": 915
+    },
+    "dpr": 2.625,
+    "fonts": [
+      {
+        "family": "MaterialIcons",
+        "asset": "fonts/MaterialIcons-Regular.otf",
+        "bytes": 1645184,
+        "sha256": "d9865b671a09d683d13a863089d8825e0f61a37696ce5d7d448bc8023aa62453"
+      },
+      {
+        "family": "NotoSansSC",
+        "asset": "assets/fonts/NotoSansSC.ttf",
+        "bytes": 4110060,
+        "sha256": "93c0808b4374c84021581cd80ad5d5cae67303d91411d81211e77126d1e5b5ca"
+      },
+      {
+        "family": "packages/cupertino_icons/CupertinoIcons",
+        "asset": "packages/cupertino_icons/assets/CupertinoIcons.ttf",
+        "bytes": 257628,
+        "sha256": "67c44fe9183b002e79dde7f6977e2988661c9a3e4a3c5fce968787efdbed823c"
+      }
+    ],
+    "container": {
+      "left": 20,
+      "top": 64,
+      "right": 20,
+      "bottom": 20
+    },
+    "focusSampleTimesMs": {
+      "appearing": 90,
+      "held": 180,
+      "clearing": 60,
+      "cleared": 120
+    },
+    "deliveryDurationUs": 890000
+  },
+  "compiledPublicInputsSha256": "4f4a63176c383d0e0f365c2bcb7ea87cf3c60e2b707321a059c277c1b56bb972",
+  "compiledInputFileHashes": "receipts/run.json#publicInputs",
+  "captureRunReceiptSha256": "42eb6fc2f0d475d20fb8eea8fc9dcc1d3f06813623f944290cdb2f73d08464d5",
+  "captureLogSha256": "abd8e504360270343128a3f60e61224085c96776518372b5d35e988dd889d1e7",
+  "strictLockLogSha256": "df7019a222e71a4b02899452fc101f271ce89d4250309e5da55eb0bce2de54cb",
+  "strictOfflineLockResolution": true,
+  "headAndCompiledInputsUnchangedDuringCapture": true,
+  "pixelDifferences": "pixel-diff.json",
+  "pixelDiffSha256": "11cd804e24a8a742c19037e99cb55b9b97cccd4ff7b5584222e2570572711fa8",
+  "all58FramePairsPixelIdentical": true,
+  "activeComponents": {
+    "taskBubble": "retained SF widget",
+    "deliveryTransition": "retained SF widget",
+    "planFocusLabel": "retained SF widget",
+    "trainingRoute": "SDK TrainerSlideRoute with host diagnostics"
+  },
+  "fullUiKitMigrationCompleted": false,
+  "uiKitSlotsPendingNewApprovedMainPin": true,
+  "priorRoundOutputsOverwritten": false,
+  "phoneScreenshot": false,
+  "performanceMeasurement": false,
+  "harkAcceptance": "pending",
+  "apkOrProfileBuild": false
+}

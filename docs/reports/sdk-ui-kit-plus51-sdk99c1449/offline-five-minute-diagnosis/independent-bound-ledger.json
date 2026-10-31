@@ -1,0 +1,230 @@
+{
+  "schema": "smartfit-five-minute-offline-bound-ledger@1",
+  "evidenceKind": "independent arithmetic from offline replay definitions and unchanged PlanDuration constants; not a new plan or model sample",
+  "sourceReplaySha256": "312ca666768f01090727e96cabb094bfa4ed7d95894c08c92ffe58746ee74f83",
+  "hasUserDoseLock": false,
+  "targetSeconds": 300,
+  "upperTenPercentSeconds": 330,
+  "sdkDraftReceipt": {
+    "ok": true,
+    "status": "infeasible",
+    "needsUserChoice": true,
+    "feasibility": {
+      "status": "infeasible",
+      "reason": "minimum_exceeds_target",
+      "targetSec": 300.0,
+      "toleranceRatio": 0.1,
+      "boundBasis": "catalogue/profile ranges including segment work, rest and rounds; confirmed dose locked",
+      "minEstimatedSec": 336.0,
+      "maxEstimatedSec": 14044.0,
+      "fix": "请说明已确认条件的冲突，询问用户愿意调整时长还是剂量；不要反复提交同一条件。"
+    },
+    "asked": true,
+    "awaitingUser": true,
+    "notes": [
+      "已根据结构化不可行原因暂停询问取舍，未要求模型继续试算。"
+    ]
+  },
+  "bounds": [
+    {
+      "bound": "minimum",
+      "blocks": [
+        {
+          "kind": "warmup",
+          "rounds": 1,
+          "items": [
+            {
+              "id": "h-chair-sit-to-stand",
+              "mode": "reps",
+              "sets": 3,
+              "workRepsOrSecondsPerSide": 12,
+              "repSeconds": 3.0,
+              "sides": 1,
+              "restSeconds": 30,
+              "workIncludingSideSwitchSeconds": 108.0,
+              "betweenSetRestSeconds": 60,
+              "oneOccurrenceSeconds": 168.0
+            }
+          ],
+          "itemOccurrenceTotalSeconds": 168.0,
+          "inRoundTransitionsSeconds": 0,
+          "roundRestSeconds": 0,
+          "blockSeconds": 168.0
+        },
+        {
+          "kind": "main",
+          "rounds": 1,
+          "items": [
+            {
+              "id": "h-squat",
+              "mode": "reps",
+              "sets": 1,
+              "workRepsOrSecondsPerSide": 6,
+              "repSeconds": 4.0,
+              "sides": 1,
+              "restSeconds": 0,
+              "workIncludingSideSwitchSeconds": 24.0,
+              "betweenSetRestSeconds": 0,
+              "oneOccurrenceSeconds": 24.0
+            },
+            {
+              "id": "h-incline-pushup",
+              "mode": "reps",
+              "sets": 1,
+              "workRepsOrSecondsPerSide": 5,
+              "repSeconds": 4.0,
+              "sides": 1,
+              "restSeconds": 0,
+              "workIncludingSideSwitchSeconds": 20.0,
+              "betweenSetRestSeconds": 0,
+              "oneOccurrenceSeconds": 20.0
+            },
+            {
+              "id": "h-good-morning",
+              "mode": "reps",
+              "sets": 1,
+              "workRepsOrSecondsPerSide": 6,
+              "repSeconds": 4.0,
+              "sides": 1,
+              "restSeconds": 0,
+              "workIncludingSideSwitchSeconds": 24.0,
+              "betweenSetRestSeconds": 0,
+              "oneOccurrenceSeconds": 24.0
+            }
+          ],
+          "itemOccurrenceTotalSeconds": 68.0,
+          "inRoundTransitionsSeconds": 30,
+          "roundRestSeconds": 0,
+          "blockSeconds": 98.0
+        },
+        {
+          "kind": "cooldown",
+          "rounds": 1,
+          "items": [
+            {
+              "id": "h-doorframe-forearms-pec-native-r3",
+              "mode": "time",
+              "sets": 1,
+              "workRepsOrSecondsPerSide": 30,
+              "repSeconds": null,
+              "sides": 1,
+              "restSeconds": 10,
+              "workIncludingSideSwitchSeconds": 30,
+              "betweenSetRestSeconds": 0,
+              "oneOccurrenceSeconds": 30
+            }
+          ],
+          "itemOccurrenceTotalSeconds": 30,
+          "inRoundTransitionsSeconds": 0,
+          "roundRestSeconds": 0,
+          "blockSeconds": 30
+        }
+      ],
+      "preparationSeconds": 10,
+      "betweenBlockTransitionsSeconds": 30,
+      "totalSeconds": 336.0
+    },
+    {
+      "bound": "maximum",
+      "blocks": [
+        {
+          "kind": "warmup",
+          "rounds": 6,
+          "items": [
+            {
+              "id": "h-chair-sit-to-stand",
+              "mode": "reps",
+              "sets": 3,
+              "workRepsOrSecondsPerSide": 12,
+              "repSeconds": 3.0,
+              "sides": 1,
+              "restSeconds": 30,
+              "workIncludingSideSwitchSeconds": 108.0,
+              "betweenSetRestSeconds": 60,
+              "oneOccurrenceSeconds": 168.0
+            }
+          ],
+          "itemOccurrenceTotalSeconds": 168.0,
+          "inRoundTransitionsSeconds": 0,
+          "roundRestSeconds": 1500,
+          "blockSeconds": 2508.0
+        },
+        {
+          "kind": "main",
+          "rounds": 6,
+          "items": [
+            {
+              "id": "h-squat",
+              "mode": "reps",
+              "sets": 4,
+              "workRepsOrSecondsPerSide": 18,
+              "repSeconds": 4.0,
+              "sides": 1,
+              "restSeconds": 60,
+              "workIncludingSideSwitchSeconds": 288.0,
+              "betweenSetRestSeconds": 180,
+              "oneOccurrenceSeconds": 468.0
+            },
+            {
+              "id": "h-incline-pushup",
+              "mode": "reps",
+              "sets": 4,
+              "workRepsOrSecondsPerSide": 15,
+              "repSeconds": 4.0,
+              "sides": 1,
+              "restSeconds": 60,
+              "workIncludingSideSwitchSeconds": 240.0,
+              "betweenSetRestSeconds": 180,
+              "oneOccurrenceSeconds": 420.0
+            },
+            {
+              "id": "h-good-morning",
+              "mode": "reps",
+              "sets": 4,
+              "workRepsOrSecondsPerSide": 18,
+              "repSeconds": 4.0,
+              "sides": 1,
+              "restSeconds": 60,
+              "workIncludingSideSwitchSeconds": 288.0,
+              "betweenSetRestSeconds": 180,
+              "oneOccurrenceSeconds": 468.0
+            }
+          ],
+          "itemOccurrenceTotalSeconds": 1356.0,
+          "inRoundTransitionsSeconds": 30,
+          "roundRestSeconds": 1500,
+          "blockSeconds": 9816.0
+        },
+        {
+          "kind": "cooldown",
+          "rounds": 6,
+          "items": [
+            {
+              "id": "h-doorframe-forearms-pec-native-r3",
+              "mode": "time",
+              "sets": 1,
+              "workRepsOrSecondsPerSide": 30,
+              "repSeconds": null,
+              "sides": 1,
+              "restSeconds": 10,
+              "workIncludingSideSwitchSeconds": 30,
+              "betweenSetRestSeconds": 0,
+              "oneOccurrenceSeconds": 30
+            }
+          ],
+          "itemOccurrenceTotalSeconds": 30,
+          "inRoundTransitionsSeconds": 0,
+          "roundRestSeconds": 1500,
+          "blockSeconds": 1680
+        }
+      ],
+      "preparationSeconds": 10,
+      "betweenBlockTransitionsSeconds": 30,
+      "totalSeconds": 14044.0
+    }
+  ],
+  "manualExecutionIds": [
+    "h-chair-sit-to-stand"
+  ],
+  "physicalDurationNotClaimed": true
+}

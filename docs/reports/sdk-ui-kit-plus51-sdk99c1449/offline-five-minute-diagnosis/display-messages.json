@@ -1,0 +1,69 @@
+[
+  {
+    "id": "m1793432846786769-0",
+    "role": "assistant",
+    "at": "2026-10-31T15:47:26.787769",
+    "text": "下午好\n说说今天想怎么练？",
+    "greeting": true
+  },
+  {
+    "id": "m1793432846789271-1",
+    "role": "user",
+    "at": "2026-10-31T15:47:26.789271",
+    "text": "在家徒手5分钟全身训练，初级，没有伤病，没有额外器械。请直接给一张能按计时或自动计次跟练的完整计划。",
+    "aiVisible": true
+  },
+  {
+    "id": "m1793432846958743-2",
+    "role": "assistant",
+    "at": "2026-10-31T15:47:26.958743",
+    "question": {
+      "question": "当前动作在允许剂量范围内无法同时满足5.0 分钟。你希望调整时长、剂量，还是动作选择？",
+      "mode": "text"
+    },
+    "conversationMessageId": "coach-1793432846957030-1",
+    "coachTask": {
+      "type": "plan",
+      "nodes": [
+        {
+          "id": "understand",
+          "status": "done",
+          "stamp": "准备训练计划",
+          "doneAtTurn": 1
+        },
+        {
+          "id": "parameters",
+          "status": "done",
+          "stamp": "居家（你说的） · 力量（你说的） · 徒手（可用椅子/凳子/瑜伽垫/墙）（你说的） · 5 分钟（你说的） · 初学（你说的） · 无伤痛（默认）",
+          "doneAtTurn": 1
+        },
+        {
+          "id": "actions",
+          "status": "done",
+          "stamp": "选了 5 个动作",
+          "doneAtTurn": 1
+        },
+        {
+          "id": "planning",
+          "status": "current",
+          "stamp": null,
+          "doneAtTurn": null
+        },
+        {
+          "id": "review",
+          "status": "pending",
+          "stamp": null,
+          "doneAtTurn": null
+        },
+        {
+          "id": "output",
+          "status": "pending",
+          "stamp": null,
+          "doneAtTurn": null
+        }
+      ],
+      "reused": false
+    },
+    "aiVisible": true
+  }
+]

@@ -1,0 +1,37 @@
+{
+  "schema": "smartfit-offline-replay-provenance@1",
+  "recordedAtUtc": "2026-10-31T07:50:48.391415+00:00",
+  "sdk": "99c14495685f160019e10340ea6f0de6418a65b9",
+  "appHeadAtReplay": "d0a88871befcf0fab8c0aca1e97046ea3c635016",
+  "sourceCaptureSha256": "6382e8d3f47d3b44ac994ed450f7fb89f43c9badb67fee5b180d186824270e76",
+  "sameQuestionAsHistoricalCapture": true,
+  "noUserDoseLock": true,
+  "noRulesDoseTargetOrSelectionChanged": true,
+  "realModelRequests": 0,
+  "deviceActions": false,
+  "files": {
+    "diagnosis.md": "b077d4a5734434503ab60e3698f23de21d8ac53ac7d6451ed5c59e1115b4be08",
+    "display-messages.json": "b017b1ac960a0551ce1346a9edd9dc1466b820bd07c3ee081045ca2e7f4bf454",
+    "fake_replay_test.dart": "7645f01268ea906e355b72f787cd18e514b6434ad38f5a0b9b938d378afe1b17",
+    "formal-profile.json": "22ed02cff44e1446e4dd92eb0b9dc0934b36078fdd89849ba45b3437c61c2906",
+    "history.json": "fc500565e06dbee89c5b644d38cc127e91529042b3fc9a39c037897c4e5edb90",
+    "independent-bound-ledger.json": "057af8c4334d4ef2bf6f0ca3b9a0e1344adea3cc5817a02444ea91a50aac6519",
+    "offline-replay-test-r1.log": "42e62e0907d6fc3c8c358ecacba7ab412abd366a9e2dc090fdc6ddd03258b8e8",
+    "offline-replay-test-r2.log": "114a63d4893cbe35c171c0942194579ec1d243a03fad401e0fe700b25e0cd377",
+    "offline-replay.json": "312ca666768f01090727e96cabb094bfa4ed7d95894c08c92ffe58746ee74f83",
+    "replayed-tool-calls.json": "5c83c270beaf07e7e00b9c4d00d3471ebee6640c0b5c113338131096c416a88d",
+    "requests-and-pre-call-states.json": "9875e8d7d59342fa5778ba3322e6a40d5a37f66277fb795d6ddbd07612f4829e",
+    "tool-receipts.json": "d484420666bbf474160360f2bf5b3384be4b9f4e5ba2d0d2357d5ac6a5e2ee4a"
+  },
+  "appPublicInputs": {
+    "lib/app/app_test_content.dart": "47c769d3c8bd38951c8af5ba74596bcdbf3af524d37b3ad60c75f942c23684da",
+    "lib/app/app_test_catalog.dart": "6b3317d3271a221d2a1941829556d92f0402331343cabf66e3b512489d27184e",
+    "lib/chat/ai_chat_engine.dart": "2ea7a8b7be112632438ae87ad715ccbedf2858a16d9291ae0e2a6ef9d2e0edcd",
+    "lib/chat/chat_controller.dart": "5a67fab2c64bbb7f4386ae73ce975a867e1d352560aae9f3070d75e8b9d1578e",
+    "lib/domain/session.dart": "4dfd8f45e9755717b2af106932b00ff7550eafb62121296956b8c4368fea13f7",
+    "assets/coach/smartfit.json": "095c117187bd08f7fb6c6c4d4f6d7b4084d90378cf10dfb3867ca344b8a24620",
+    "pubspec.yaml": "a7ae288a59ccfe792777bddf81bc92e02473ea5a90f87a250c24030d368c16ee",
+    "pubspec.lock": "ca15bad42e0d0fe783401706e4c59882529670e2c51f55cd5d50e3e12f3fd79f"
+  },
+  "trackedRuntimeDiff": []
+}

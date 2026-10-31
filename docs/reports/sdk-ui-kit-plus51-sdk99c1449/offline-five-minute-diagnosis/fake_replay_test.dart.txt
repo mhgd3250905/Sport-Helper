@@ -1,0 +1,235 @@
+// Offline diagnostic only: replays captured tool calls, never a real model.
+import 'dart:convert';
+import 'dart:io';
+import 'dart:math' as math;
+
+import 'package:crypto/crypto.dart';
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter_test/flutter_test.dart';
+import 'package:smartfit/app/app_test_catalog.dart';
+import 'package:smartfit/app/app_test_content.dart';
+import 'package:smartfit/chat/ai_chat_engine.dart';
+import 'package:smartfit/chat/app_chat_actions.dart';
+import 'package:smartfit/chat/chat_controller.dart';
+import 'package:smartfit/core/storage/local_state_storage.dart';
+import 'package:smartfit/data/app_store.dart';
+import 'package:smartfit/domain/exercise.dart';
+import 'package:ugk_coach/ugk_coach.dart' as coach;
+import 'package:ugk_trainer/ugk_trainer.dart' show PoseHubActionLibrary;
+
+const _sdk = '99c14495685f160019e10340ea6f0de6418a65b9';
+const _base = r'E:\AII-3D\3D-Sport-AI\deliveries\sdk-kit-plus51-sdk99c1449-20261031';
+const _out = '$_base/offline-five-minute-diagnosis-99c1449';
+const _capture = '$_base/live-durations-99c1449/plan-5-minutes.json';
+
+class _OfflineOnly extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) =>
+      throw StateError('Network disabled for offline recorded-tool replay.');
+}
+
+class _Memory implements LocalStateStorage {
+  final values = <String, String>{};
+  @override
+  Future<String?> read(String key) async => values[key];
+  @override
+  Future<void> write(String key, String value) async => values[key] = value;
+}
+
+class _RecordedClient implements coach.LlmClient {
+  _RecordedClient(List<Object> script)
+      : inner = coach.FakeLlmClient(script, latency: Duration.zero);
+  final coach.FakeLlmClient inner;
+  final requests = <Map<String, Object?>>[];
+  Map<String, Object?> Function()? snapshot;
+  @override
+  String get model => 'offline-captured-tool-replay';
+  @override
+  coach.Pricing? get pricing => null;
+  @override
+  Future<coach.LlmResponse> complete(
+    coach.LlmRequest request, {
+    coach.CancelToken? cancel,
+  }) async {
+    requests.add({
+      'callIndex': requests.length + 1,
+      'stateBeforeCall': snapshot?.call(),
+      'messages': request.messages.map((message) => message.toJson()).toList(),
+    });
+    return inner.complete(request, cancel: cancel);
+  }
+}
+
+void _write(String name, Object? value) {
+  final file = File('$_out/$name');
+  if (file.existsSync()) throw StateError('Preserve existing $name.');
+  file.writeAsStringSync('${const JsonEncoder.withIndent('  ').convert(value)}\n');
+}
+
+List<int> _range(coach.IntRange? catalogue, coach.IntRange profile) => [
+      math.max(catalogue?.min ?? profile.min, profile.min),
+      math.min(catalogue?.max ?? profile.max, profile.max),
+    ];
+
+void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+  test('replay original five-minute three-call tool protocol offline', () async {
+    final previousHttp = HttpOverrides.current;
+    HttpOverrides.global = _OfflineOnly();
+    addTearDown(() => HttpOverrides.global = previousHttp);
+    final captureBytes = File(_capture).readAsBytesSync();
+    final captured = jsonDecode(utf8.decode(captureBytes)) as Map<String, dynamic>;
+    final calls = (captured['transportCalls'] as List).cast<Map>();
+    expect(calls.length, 3);
+    final script = <Object>[];
+    final rewritten = <Map<String, Object?>>[];
+    for (var index = 0; index < calls.length; index++) {
+      final tools = (calls[index]['tools'] as List).cast<Map>();
+      final toolCalls = <coach.LlmToolCall>[];
+      for (var ti = 0; ti < tools.length; ti++) {
+        final id = 'offline-recorded-${index + 1}-${ti + 1}';
+        final tool = tools[ti];
+        toolCalls.add(coach.LlmToolCall(
+          id: id,
+          name: tool['name'] as String,
+          arguments: tool['arguments'] as String,
+        ));
+        rewritten.add({
+          'callIndex': index + 1,
+          'id': id,
+          'name': tool['name'],
+          'arguments': tool['arguments'],
+        });
+      }
+      script.add(coach.LlmResponse(
+        content: '',
+        toolCalls: toolCalls,
+        model: 'offline-captured-tool-replay',
+        finishReason: 'tool_calls',
+      ));
+    }
+    final sdk = await PoseHubActionLibrary.load();
+    final fixture = AppTestContent.build(
+      catalog: AppTestCatalog.fromSdk(sdk),
+      legacyLibrary: ExerciseLibrary([]),
+    );
+    final profile = coach.CoachProfile.fromJson(
+      jsonDecode(await rootBundle.loadString('assets/coach/smartfit.json')),
+    );
+    final store = AppStore(_Memory());
+    await store.load();
+    await store.acceptSafety(blocked: false);
+    final client = _RecordedClient(script);
+    final engine = AiChatEngine(
+      local: const AppChatActions(),
+      catalog: fixture.coachCatalog,
+      profile: profile,
+      client: client,
+      enableUserMemory: false,
+    );
+    client.snapshot = () => engine.agent.sessionState.toJson();
+    final chat = ChatController(
+      engine: engine,
+      store: store,
+      replyDelay: Duration.zero,
+    )..start();
+    try {
+      await chat.send(captured['input'] as String);
+      await chat.flushPersistence();
+      final history = engine.agent.history.map((message) => message.toJson()).toList();
+      final receipts = <Map<String, Object?>>[];
+      for (final message in engine.agent.history) {
+        if (message.role.name != 'tool') continue;
+        Object? content;
+        try {
+          content = jsonDecode(message.content);
+        } on FormatException {
+          content = message.content;
+        }
+        receipts.add({'toolCallId': message.toolCallId, 'receipt': content});
+      }
+      final draftCall = rewritten.singleWhere((tool) => tool['name'] == 'draft_plan');
+      final draft = jsonDecode(draftCall['arguments'] as String) as Map;
+      final ids = <String>[
+        for (final block in draft['blocks'] as List)
+          for (final item in (block as Map)['items'] as List)
+            (item as Map)['id'] as String,
+      ];
+      final selected = <Map<String, Object?>>[];
+      for (final id in ids) {
+        final drill = fixture.coachCatalog[id]!;
+        final rhythm = fixture.rhythms[id];
+        selected.add({
+          'id': id,
+          'name': drill.name.of('zh'),
+          'unilateral': drill.unilateral,
+          'defaultDose': drill.defaultDose.toJson(),
+          'catalogueDoseRange': drill.doseRange.toJson(),
+          'effectiveRanges': {
+            'sets': _range(drill.doseRange.sets, profile.limits.sets),
+            'work': _range(
+              drill.defaultDose.mode == coach.DoseMode.reps
+                  ? drill.doseRange.reps
+                  : drill.doseRange.seconds,
+              drill.defaultDose.mode == coach.DoseMode.reps
+                  ? profile.limits.reps
+                  : profile.limits.workSeconds,
+            ),
+            'restSeconds': _range(drill.doseRange.restSeconds, profile.limits.restSeconds),
+            'rounds': [profile.limits.rounds.min, profile.limits.rounds.max],
+            'restBetweenRoundsSeconds': [
+              profile.limits.restBetweenRoundsSeconds.min,
+              profile.limits.restBetweenRoundsSeconds.max,
+            ],
+          },
+          'planningRepSeconds': const coach.PlanDuration().repSeconds(drill),
+          'executionRhythm': rhythm?.toJson(),
+          'rawDrill': drill.raw,
+        });
+      }
+      final state = engine.agent.sessionState.toJson();
+      final record = <String, Object?>{
+        'evidenceKind': 'offline public-protocol replay of captured tool calls; no new model sampling',
+        'networkDisabled': true,
+        'realModelRequests': 0,
+        'tokensConsumedByReplay': 0,
+        'sourceCapture': _capture,
+        'sourceCaptureSha256': sha256.convert(captureBytes).toString(),
+        'sdk': _sdk,
+        'appHead': Process.runSync('git', ['rev-parse', 'HEAD']).stdout.toString().trim(),
+        'sameOriginalUserInput': captured['input'],
+        'preservedToolArgumentsAndOrder': true,
+        'toolIdsRegeneratedUniquely': true,
+        'replayedCallCount': client.requests.length,
+        'status': engine.lastResult?.status.name,
+        'question': engine.lastResult?.question?.toJson(),
+        'issues': engine.lastResult?.issues.map((issue) => issue.toJson()).toList(),
+        'admittedPlan': engine.lastResult?.plan != null,
+        'sessionState': state,
+        'draftToolCall': draftCall,
+        'draftReceipts': receipts.where((row) => row['toolCallId'] == draftCall['id']).toList(),
+        'selectedDefinitions': selected,
+      };
+      _write('offline-replay.json', record);
+      _write('tool-receipts.json', receipts);
+      _write('history.json', history);
+      _write('requests-and-pre-call-states.json', client.requests);
+      _write('formal-profile.json', profile.toJson());
+      _write('replayed-tool-calls.json', rewritten);
+      _write('display-messages.json', chat.messages.map((message) => message.toJson()).toList());
+      expect(client.requests.length, 3);
+      expect(engine.lastResult?.plan, isNull);
+      expect(engine.lastResult?.question, isNotNull);
+      expect(record['draftReceipts'], isNotEmpty);
+      stdout.writeln('OFFLINE_REPLAY ${jsonEncode({
+        'calls': client.requests.length,
+        'admittedPlan': record['admittedPlan'],
+        'draftReceipts': record['draftReceipts'],
+      })}');
+    } finally {
+      chat.dispose();
+      engine.dispose();
+      store.dispose();
+    }
+  });
+}

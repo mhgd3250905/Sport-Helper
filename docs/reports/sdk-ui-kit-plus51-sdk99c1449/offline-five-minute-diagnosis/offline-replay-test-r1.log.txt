@@ -1,0 +1,15 @@
+Flutter assets will be downloaded from https://storage.googleapis.com. Make sure you trust this source!
+00:00 +0: loading E:/AII-3D/3D-Sport-AI/deliveries/sdk-kit-plus51-sdk99c1449-20261031/offline-five-minute-diagnosis-99c1449/fake_replay_test.dart
+../deliveries/sdk-kit-plus51-sdk99c1449-20261031/offline-five-minute-diagnosis-99c1449/fake_replay_test.dart:77:40: Error: Getter not found: 'global'.
+    final previousHttp = HttpOverrides.global;
+                                       ^^^^^^
+00:00 +0 -1: loading E:/AII-3D/3D-Sport-AI/deliveries/sdk-kit-plus51-sdk99c1449-20261031/offline-five-minute-diagnosis-99c1449/fake_replay_test.dart [E]
+  Failed to load "E:/AII-3D/3D-Sport-AI/deliveries/sdk-kit-plus51-sdk99c1449-20261031/offline-five-minute-diagnosis-99c1449/fake_replay_test.dart":
+  Compilation failed for testPath=E:/AII-3D/3D-Sport-AI/deliveries/sdk-kit-plus51-sdk99c1449-20261031/offline-five-minute-diagnosis-99c1449/fake_replay_test.dart: ../deliveries/sdk-kit-plus51-sdk99c1449-20261031/offline-five-minute-diagnosis-99c1449/fake_replay_test.dart:77:40: Error: Getter not found: 'global'.
+      final previousHttp = HttpOverrides.global;
+                                         ^^^^^^
+  .
+00:00 +0 -1: Some tests failed.
+
+Failing tests:
+  E:/AII-3D/3D-Sport-AI/deliveries/sdk-kit-plus51-sdk99c1449-20261031/offline-five-minute-diagnosis-99c1449/fake_replay_test.dart: loading E:/AII-3D/3D-Sport-AI/deliveries/sdk-kit-plus51-sdk99c1449-20261031/offline-five-minute-diagnosis-99c1449/fake_replay_test.dart

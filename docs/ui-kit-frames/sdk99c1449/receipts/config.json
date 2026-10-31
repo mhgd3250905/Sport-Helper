@@ -1,0 +1,12 @@
+{
+  "variant": "new",
+  "source": "d0a88871befcf0fab8c0aca1e97046ea3c635016",
+  "inputs": "E:/AII-3D/3D-Sport-AI/Sport-Helper-coach-ui-kit/tools/ui_kit_frames/inputs.json",
+  "output": "E:/AII-3D/3D-Sport-AI/Sport-Helper-coach-ui-kit/docs/ui-kit-frames/sdk99c1449/new",
+  "mediaCache": "E:/AII-3D/3D-Sport-AI/deliveries/sdk-kit-plus51-sdk99c1449-20261031/golden-capture-source-d0a8887/image-cache",
+  "publicInputsSha256": "4f4a63176c383d0e0f365c2bcb7ea87cf3c60e2b707321a059c277c1b56bb972",
+  "driverSha256": "81f80b15fbfc34526aca03c18e835c0234553f064c9a46ab4543c5f65ac6f154",
+  "adapterSha256": "c959e5dc56f64ed514890b8beb64cdc3bc43dd40546d37d15e17f404ddaeb4ae",
+  "mediaFixtureManifestSha256": "e3e1c096dcdeb2426754893b4557058eac69cce07df3597cbd987b3a2eed7aba",
+  "focusImplementation": "host-local"
+}

@@ -1,0 +1,23 @@
+{
+  "sdk": "99c14495685f160019e10340ea6f0de6418a65b9",
+  "appHeadAtRun": "d0a88871befcf0fab8c0aca1e97046ea3c635016",
+  "workingTreeInputs": {
+    "pubspec.yaml": "a7ae288a59ccfe792777bddf81bc92e02473ea5a90f87a250c24030d368c16ee",
+    "pubspec.lock": "ca15bad42e0d0fe783401706e4c59882529670e2c51f55cd5d50e3e12f3fd79f",
+    "assets/coach/smartfit.json": "095c117187bd08f7fb6c6c4d4f6d7b4084d90378cf10dfb3867ca344b8a24620",
+    "lib/app/app_test_catalog.dart": "6b3317d3271a221d2a1941829556d92f0402331343cabf66e3b512489d27184e",
+    "lib/app/app_test_content.dart": "47c769d3c8bd38951c8af5ba74596bcdbf3af524d37b3ad60c75f942c23684da",
+    "lib/domain/exercise.dart": "45329e2c2e77150b00882edaad3f2ec035ed55f91ec10e76d9879292373fa56e",
+    "lib/domain/plan.dart": "d641e7a7f350ae7ae811a45d0596f9948c8a36cb328037bbd6dbca011e0ca595",
+    "lib/domain/session.dart": "4dfd8f45e9755717b2af106932b00ff7550eafb62121296956b8c4368fea13f7",
+    "lib/ui/plan_presentation.dart": "e705637404aa7af9f1e713cda54be891f6865d74353b710af9bf508241e0336d",
+    "lib/chat/ai_chat_engine.dart": "2ea7a8b7be112632438ae87ad715ccbedf2858a16d9291ae0e2a6ef9d2e0edcd",
+    "lib/chat/ai_coach_config.dart": "f4ec7bc56eabce08eae4c256ea56bcd87ee89eee85365f6a5663883d3bdb471f",
+    "lib/chat/chat_controller.dart": "5a67fab2c64bbb7f4386ae73ce975a867e1d352560aae9f3070d75e8b9d1578e",
+    "test/support/coach_v2_fixtures.dart": "8e7f5d82d8a5e7fa872f0dbde932834a0b7b81fb41b5e81ee0687fe854471bda",
+    "tools/coach/plus51_duration_probe.dart": "f0bc58e160605a5c13fb23e92782d769ea9212ec16d7f25543f7b99637d850ee"
+  },
+  "exitCode": 1,
+  "deviceOperated": false,
+  "localAuthRedacted": true
+}

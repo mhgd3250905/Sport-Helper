@@ -1,0 +1,946 @@
+{
+  "targetMinutes": 10,
+  "targetSeconds": 600,
+  "input": "在家徒手10分钟全身训练，初级，没有伤病，没有额外器械。请直接给一张能按计时或自动计次跟练的完整计划。",
+  "syntheticUserInput": true,
+  "modelRequests": true,
+  "deviceOperated": false,
+  "caseGenerationAttempt": 1,
+  "sdkTransportMaxRetries": 0,
+  "sendReturned": true,
+  "persistenceFlushed": true,
+  "turnStartedAtUtc": "2026-10-31T07:39:16.165426Z",
+  "userTurnElapsedMs": 16353,
+  "userTurnElapsedMicroseconds": 16353765,
+  "fullTurnElapsedMs": 16355,
+  "fullTurnElapsedMicroseconds": 16355860,
+  "turnFinishedAtUtc": "2026-10-31T07:39:32.521813Z",
+  "status": "ok",
+  "admittedPlan": true,
+  "plan": {
+    "schemaVersion": 1,
+    "id": "plan-1793432370483-2",
+    "source": "ai",
+    "title": "居家徒手全身训练",
+    "summary": "居家徒手全身训练",
+    "goal": "mobility",
+    "scene": "home",
+    "equipment": [
+      "chair",
+      "mat"
+    ],
+    "level": 1,
+    "targetMinutes": 10,
+    "blocks": [
+      {
+        "id": "b1",
+        "name": "warmup",
+        "type": "warmup",
+        "rounds": 1,
+        "restBetweenRoundsSeconds": 0,
+        "items": [
+          {
+            "exerciseId": "h-hip-gate",
+            "mode": "reps",
+            "sets": 1,
+            "reps": 6,
+            "perSide": true,
+            "restSeconds": 10
+          },
+          {
+            "exerciseId": "h-catcow-quad",
+            "mode": "time",
+            "sets": 1,
+            "workSeconds": 40,
+            "perSide": false,
+            "restSeconds": 10
+          }
+        ]
+      },
+      {
+        "id": "b2",
+        "name": "main",
+        "type": "main",
+        "rounds": 1,
+        "restBetweenRoundsSeconds": 0,
+        "items": [
+          {
+            "exerciseId": "h-squat",
+            "mode": "reps",
+            "sets": 1,
+            "reps": 12,
+            "perSide": false,
+            "restSeconds": 30
+          },
+          {
+            "exerciseId": "h-incline-pushup",
+            "mode": "reps",
+            "sets": 2,
+            "reps": 10,
+            "perSide": false,
+            "restSeconds": 30
+          },
+          {
+            "exerciseId": "h-good-morning",
+            "mode": "reps",
+            "sets": 1,
+            "reps": 12,
+            "perSide": false,
+            "restSeconds": 30
+          },
+          {
+            "exerciseId": "w-dead-bug",
+            "mode": "reps",
+            "sets": 2,
+            "reps": 10,
+            "perSide": false,
+            "restSeconds": 30
+          }
+        ]
+      },
+      {
+        "id": "b3",
+        "name": "cooldown",
+        "type": "cooldown",
+        "rounds": 1,
+        "restBetweenRoundsSeconds": 0,
+        "items": [
+          {
+            "exerciseId": "h-cobra",
+            "mode": "time",
+            "sets": 1,
+            "workSeconds": 30,
+            "perSide": false,
+            "restSeconds": 10
+          },
+          {
+            "exerciseId": "h-butterfly-active",
+            "mode": "reps",
+            "sets": 1,
+            "reps": 10,
+            "perSide": false,
+            "restSeconds": 10
+          }
+        ]
+      }
+    ],
+    "notes": [],
+    "safetyNotes": []
+  },
+  "coachEstimateSeconds": 574.0,
+  "cardSecondsIncludingPrep": 578.0,
+  "cardLabel": "约 10 分钟",
+  "executionSecondsIncludingPrep": 578.0,
+  "executionSecondsExcludingPrep": 568.0,
+  "preparationSeconds": 10.0,
+  "coachToExecutionDifferenceSeconds": 4.0,
+  "withinTenPercent": true,
+  "manualWorkPhases": 0,
+  "engineFullyFinished": true,
+  "engineElapsedSeconds": 578.0,
+  "workPhases": [
+    {
+      "id": "h-hip-gate",
+      "seconds": 25.0,
+      "set": 1,
+      "sets": 1,
+      "round": 0,
+      "rounds": 0,
+      "side": "right",
+      "selfPaced": false,
+      "reps": 6,
+      "repSeconds": 4.0,
+      "rhythm": {
+        "kind": "rep_alternate",
+        "leadSeconds": 1.0,
+        "phases": [
+          {
+            "id": "go",
+            "seconds": 0.5,
+            "cue": [
+              "w.gate_open",
+              "w.gate_close"
+            ]
+          },
+          {
+            "id": "hold",
+            "seconds": 1.35
+          },
+          {
+            "id": "back",
+            "seconds": 1.25,
+            "cue": "w.lower"
+          },
+          {
+            "id": "rest",
+            "seconds": 0.9
+          }
+        ],
+        "reps": 6
+      }
+    },
+    {
+      "id": "h-hip-gate",
+      "seconds": 25.0,
+      "set": 1,
+      "sets": 1,
+      "round": 0,
+      "rounds": 0,
+      "side": "left",
+      "selfPaced": false,
+      "reps": 6,
+      "repSeconds": 4.0,
+      "rhythm": {
+        "kind": "rep_alternate",
+        "leadSeconds": 1.0,
+        "phases": [
+          {
+            "id": "go",
+            "seconds": 0.5,
+            "cue": [
+              "w.gate_open",
+              "w.gate_close"
+            ]
+          },
+          {
+            "id": "hold",
+            "seconds": 1.35
+          },
+          {
+            "id": "back",
+            "seconds": 1.25,
+            "cue": "w.lower"
+          },
+          {
+            "id": "rest",
+            "seconds": 0.9
+          }
+        ],
+        "reps": 6
+      }
+    },
+    {
+      "id": "h-catcow-quad",
+      "seconds": 40.0,
+      "set": 1,
+      "sets": 1,
+      "round": 0,
+      "rounds": 0,
+      "side": null,
+      "selfPaced": false,
+      "reps": null,
+      "repSeconds": null,
+      "rhythm": {
+        "kind": "hold",
+        "leadSeconds": 0.0
+      }
+    },
+    {
+      "id": "h-squat",
+      "seconds": 49.0,
+      "set": 1,
+      "sets": 1,
+      "round": 0,
+      "rounds": 0,
+      "side": null,
+      "selfPaced": false,
+      "reps": 12,
+      "repSeconds": 4.0,
+      "rhythm": {
+        "kind": "rep_updown",
+        "leadSeconds": 1.0,
+        "phases": [
+          {
+            "id": "go",
+            "seconds": 1.15,
+            "cue": "w.squat_down"
+          },
+          {
+            "id": "hold",
+            "seconds": 0.7
+          },
+          {
+            "id": "back",
+            "seconds": 1.1,
+            "cue": "w.stand_up"
+          },
+          {
+            "id": "rest",
+            "seconds": 1.05
+          }
+        ],
+        "reps": 8
+      }
+    },
+    {
+      "id": "h-incline-pushup",
+      "seconds": 40.0,
+      "set": 1,
+      "sets": 2,
+      "round": 0,
+      "rounds": 0,
+      "side": null,
+      "selfPaced": false,
+      "reps": 10,
+      "repSeconds": 4.0,
+      "rhythm": {
+        "kind": "rep_updown",
+        "leadSeconds": 0.0,
+        "phases": [
+          {
+            "id": "go",
+            "seconds": 4.0
+          }
+        ],
+        "source": "repSeconds"
+      }
+    },
+    {
+      "id": "h-incline-pushup",
+      "seconds": 40.0,
+      "set": 2,
+      "sets": 2,
+      "round": 0,
+      "rounds": 0,
+      "side": null,
+      "selfPaced": false,
+      "reps": 10,
+      "repSeconds": 4.0,
+      "rhythm": {
+        "kind": "rep_updown",
+        "leadSeconds": 0.0,
+        "phases": [
+          {
+            "id": "go",
+            "seconds": 4.0
+          }
+        ],
+        "source": "repSeconds"
+      }
+    },
+    {
+      "id": "h-good-morning",
+      "seconds": 48.0,
+      "set": 1,
+      "sets": 1,
+      "round": 0,
+      "rounds": 0,
+      "side": null,
+      "selfPaced": false,
+      "reps": 12,
+      "repSeconds": 4.0,
+      "rhythm": {
+        "kind": "rep_updown",
+        "leadSeconds": 0.0,
+        "phases": [
+          {
+            "id": "go",
+            "seconds": 4.0
+          }
+        ],
+        "source": "repSeconds"
+      }
+    },
+    {
+      "id": "w-dead-bug",
+      "seconds": 30.0,
+      "set": 1,
+      "sets": 2,
+      "round": 0,
+      "rounds": 0,
+      "side": null,
+      "selfPaced": false,
+      "reps": 10,
+      "repSeconds": 3.0,
+      "rhythm": {
+        "kind": "rep_updown",
+        "leadSeconds": 0.0,
+        "phases": [
+          {
+            "id": "go",
+            "seconds": 3.0
+          }
+        ],
+        "source": "repSeconds"
+      }
+    },
+    {
+      "id": "w-dead-bug",
+      "seconds": 30.0,
+      "set": 2,
+      "sets": 2,
+      "round": 0,
+      "rounds": 0,
+      "side": null,
+      "selfPaced": false,
+      "reps": 10,
+      "repSeconds": 3.0,
+      "rhythm": {
+        "kind": "rep_updown",
+        "leadSeconds": 0.0,
+        "phases": [
+          {
+            "id": "go",
+            "seconds": 3.0
+          }
+        ],
+        "source": "repSeconds"
+      }
+    },
+    {
+      "id": "h-cobra",
+      "seconds": 30.0,
+      "set": 1,
+      "sets": 1,
+      "round": 0,
+      "rounds": 0,
+      "side": null,
+      "selfPaced": false,
+      "reps": null,
+      "repSeconds": null,
+      "rhythm": {
+        "kind": "hold",
+        "leadSeconds": 0.0
+      }
+    },
+    {
+      "id": "h-butterfly-active",
+      "seconds": 41.0,
+      "set": 1,
+      "sets": 1,
+      "round": 0,
+      "rounds": 0,
+      "side": null,
+      "selfPaced": false,
+      "reps": 10,
+      "repSeconds": 4.0,
+      "rhythm": {
+        "kind": "rep_updown",
+        "leadSeconds": 1.0,
+        "phases": [
+          {
+            "id": "go",
+            "seconds": 1.4,
+            "cue": "w.open"
+          },
+          {
+            "id": "hold",
+            "seconds": 0.95
+          },
+          {
+            "id": "back",
+            "seconds": 0.95,
+            "cue": "w.close"
+          },
+          {
+            "id": "rest",
+            "seconds": 0.7
+          }
+        ],
+        "reps": 6
+      }
+    }
+  ],
+  "phaseSchedule": [
+    {
+      "kind": "prep",
+      "seconds": 10.0,
+      "id": "h-hip-gate",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 25.0,
+      "id": "h-hip-gate",
+      "round": 0,
+      "side": "right"
+    },
+    {
+      "kind": "switchSide",
+      "seconds": 5.0,
+      "id": "h-hip-gate",
+      "round": 0,
+      "side": "left"
+    },
+    {
+      "kind": "work",
+      "seconds": 25.0,
+      "id": "h-hip-gate",
+      "round": 0,
+      "side": "left"
+    },
+    {
+      "kind": "rest",
+      "seconds": 15.0,
+      "id": "h-catcow-quad",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 40.0,
+      "id": "h-catcow-quad",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "rest",
+      "seconds": 15.0,
+      "id": "h-squat",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 49.0,
+      "id": "h-squat",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "rest",
+      "seconds": 15.0,
+      "id": "h-incline-pushup",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 40.0,
+      "id": "h-incline-pushup",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "rest",
+      "seconds": 30.0,
+      "id": "h-incline-pushup",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 40.0,
+      "id": "h-incline-pushup",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "rest",
+      "seconds": 15.0,
+      "id": "h-good-morning",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 48.0,
+      "id": "h-good-morning",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "rest",
+      "seconds": 15.0,
+      "id": "w-dead-bug",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 30.0,
+      "id": "w-dead-bug",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "rest",
+      "seconds": 30.0,
+      "id": "w-dead-bug",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 30.0,
+      "id": "w-dead-bug",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "rest",
+      "seconds": 15.0,
+      "id": "h-cobra",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 30.0,
+      "id": "h-cobra",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "rest",
+      "seconds": 15.0,
+      "id": "h-butterfly-active",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "work",
+      "seconds": 41.0,
+      "id": "h-butterfly-active",
+      "round": 0,
+      "side": null
+    },
+    {
+      "kind": "done",
+      "seconds": 0.0,
+      "id": null,
+      "round": 0,
+      "side": null
+    }
+  ],
+  "passed": true,
+  "elapsedMs": 16359,
+  "caseElapsedMicroseconds": 16359902,
+  "transportCalls": [
+    {
+      "callIndex": 1,
+      "outcome": "response",
+      "startedAtUtc": "2026-10-31T07:39:16.207216Z",
+      "roles": [
+        "system",
+        "user",
+        "user"
+      ],
+      "model": "deepseek-flash",
+      "httpAttempts": 1,
+      "sdkLatencyMs": 2156,
+      "sdkLatencyMicroseconds": 2156242,
+      "tokens": {
+        "inputTokens": 3601,
+        "outputTokens": 234,
+        "totalTokens": 3835,
+        "cachedInputTokens": 3456,
+        "reasoningOutputTokens": 34,
+        "sdkNormalized": {
+          "promptTokens": 3601,
+          "completionTokens": 234,
+          "reasoningTokens": 34,
+          "cachedTokens": 3456,
+          "totalTokens": 3835
+        }
+      },
+      "finishReason": "tool_calls",
+      "tools": [
+        {
+          "name": "start_task",
+          "arguments": "{\"type\": \"plan\"}"
+        },
+        {
+          "name": "set_params",
+          "arguments": "{\"fields\": {\"scene\": {\"value\": \"home\", \"source\": \"user\", \"quote\": \"在家\"}, \"minutes\": {\"value\": 10, \"source\": \"user\", \"quote\": \"10分钟\"}, \"level\": {\"value\": 1, \"source\": \"user\", \"quote\": \"初级\"}, \"equipment\": {\"value\": [], \"source\": \"user\"}, \"limits\": {\"value\": [], \"source\": \"user\", \"quote\": \"没有伤病\"}, \"goal\": {\"value\": [\"purpose.strength\", \"purpose.core\", \"purpose.mobility\"], \"source\": \"user\", \"quote\": \"全身训练\"}}}"
+        }
+      ],
+      "finishedAtUtc": "2026-10-31T07:39:18.363695Z",
+      "elapsedMs": 2156,
+      "elapsedMicroseconds": 2156290,
+      "wireHttpAttemptTimingsMs": null
+    },
+    {
+      "callIndex": 2,
+      "outcome": "response",
+      "startedAtUtc": "2026-10-31T07:39:18.366672Z",
+      "roles": [
+        "system",
+        "user",
+        "assistant",
+        "tool",
+        "tool",
+        "user"
+      ],
+      "model": "deepseek-flash",
+      "httpAttempts": 1,
+      "sdkLatencyMs": 1907,
+      "sdkLatencyMicroseconds": 1907053,
+      "tokens": {
+        "inputTokens": 7111,
+        "outputTokens": 241,
+        "totalTokens": 7352,
+        "cachedInputTokens": 3584,
+        "reasoningOutputTokens": 60,
+        "sdkNormalized": {
+          "promptTokens": 7111,
+          "completionTokens": 241,
+          "reasoningTokens": 60,
+          "cachedTokens": 3584,
+          "totalTokens": 7352
+        }
+      },
+      "finishReason": "tool_calls",
+      "tools": [
+        {
+          "name": "set_params",
+          "arguments": "{\"fields\": {\"equipment\": {\"value\": [], \"source\": \"user\", \"quote\": \"没有额外器械\"}, \"scene\": {\"value\": \"home\", \"source\": \"user\", \"quote\": \"在家\"}, \"minutes\": {\"value\": 10, \"source\": \"user\", \"quote\": \"10分钟\"}, \"level\": {\"value\": 1, \"source\": \"user\", \"quote\": \"初级\"}, \"limits\": {\"value\": [], \"source\": \"user\", \"quote\": \"没有伤病\"}, \"goal\": {\"value\": [\"purpose.strength\", \"purpose.core\", \"purpose.mobility\"], \"source\": \"user\", \"quote\": \"全身训练\"}}}}"
+        }
+      ],
+      "finishedAtUtc": "2026-10-31T07:39:20.274052Z",
+      "elapsedMs": 1907,
+      "elapsedMicroseconds": 1907132,
+      "wireHttpAttemptTimingsMs": null
+    },
+    {
+      "callIndex": 3,
+      "outcome": "response",
+      "startedAtUtc": "2026-10-31T07:39:20.275691Z",
+      "roles": [
+        "system",
+        "user",
+        "assistant",
+        "tool",
+        "tool",
+        "assistant",
+        "tool",
+        "user"
+      ],
+      "model": "deepseek-flash",
+      "httpAttempts": 1,
+      "sdkLatencyMs": 2101,
+      "sdkLatencyMicroseconds": 2101952,
+      "tokens": {
+        "inputTokens": 7405,
+        "outputTokens": 186,
+        "totalTokens": 7591,
+        "cachedInputTokens": 6784,
+        "reasoningOutputTokens": 6,
+        "sdkNormalized": {
+          "promptTokens": 7405,
+          "completionTokens": 186,
+          "reasoningTokens": 6,
+          "cachedTokens": 6784,
+          "totalTokens": 7591
+        }
+      },
+      "finishReason": "tool_calls",
+      "tools": [
+        {
+          "name": "set_params",
+          "arguments": "{\"fields\": {\"scene\": {\"value\": \"home\", \"source\": \"user\", \"quote\": \"在家\"}, \"minutes\": {\"value\": 10, \"source\": \"user\", \"quote\": \"10分钟\"}, \"level\": {\"value\": 1, \"source\": \"user\", \"quote\": \"初级\"}, \"equipment\": {\"value\": [], \"source\": \"user\", \"quote\": \"没有额外器械\"}, \"limits\": {\"value\": [], \"source\": \"user\", \"quote\": \"没有伤病\"}, \"goal\": {\"value\": [\"purpose.strength\", \"purpose.core\", \"purpose.mobility\"], \"source\": \"user\", \"quote\": \"全身训练\"}}}"
+        }
+      ],
+      "finishedAtUtc": "2026-10-31T07:39:22.378132Z",
+      "elapsedMs": 2102,
+      "elapsedMicroseconds": 2102002,
+      "wireHttpAttemptTimingsMs": null
+    },
+    {
+      "callIndex": 4,
+      "outcome": "response",
+      "startedAtUtc": "2026-10-31T07:39:22.381512Z",
+      "roles": [
+        "system",
+        "user",
+        "assistant",
+        "tool",
+        "tool",
+        "assistant",
+        "tool",
+        "assistant",
+        "tool",
+        "user"
+      ],
+      "model": "deepseek-flash",
+      "httpAttempts": 1,
+      "sdkLatencyMs": 2014,
+      "sdkLatencyMicroseconds": 2014736,
+      "tokens": {
+        "inputTokens": 7994,
+        "outputTokens": 276,
+        "totalTokens": 8270,
+        "cachedInputTokens": 7040,
+        "reasoningOutputTokens": 30,
+        "sdkNormalized": {
+          "promptTokens": 7994,
+          "completionTokens": 276,
+          "reasoningTokens": 30,
+          "cachedTokens": 7040,
+          "totalTokens": 8270
+        }
+      },
+      "finishReason": "tool_calls",
+      "tools": [
+        {
+          "name": "search_actions",
+          "arguments": "{\"tags\": [\"scene.home\", \"purpose.mobility\", \"level.1\"], \"limit\": 10}"
+        },
+        {
+          "name": "search_actions",
+          "arguments": "{\"tags\": [\"scene.home\", \"purpose.strength\", \"level.1\"], \"limit\": 20}"
+        },
+        {
+          "name": "search_actions",
+          "arguments": "{\"tags\": [\"scene.home\", \"purpose.core\", \"level.1\"], \"limit\": 10}"
+        },
+        {
+          "name": "search_actions",
+          "arguments": "{\"tags\": [\"scene.home\", \"purpose.stretch\", \"level.1\"], \"limit\": 10}"
+        }
+      ],
+      "finishedAtUtc": "2026-10-31T07:39:24.396239Z",
+      "elapsedMs": 2014,
+      "elapsedMicroseconds": 2014781,
+      "wireHttpAttemptTimingsMs": null
+    },
+    {
+      "callIndex": 5,
+      "outcome": "response",
+      "startedAtUtc": "2026-10-31T07:39:24.403975Z",
+      "roles": [
+        "system",
+        "user",
+        "assistant",
+        "tool",
+        "tool",
+        "assistant",
+        "tool",
+        "assistant",
+        "tool",
+        "assistant",
+        "tool",
+        "tool",
+        "tool",
+        "tool",
+        "user"
+      ],
+      "model": "deepseek-flash",
+      "httpAttempts": 1,
+      "sdkLatencyMs": 6077,
+      "sdkLatencyMicroseconds": 6077959,
+      "tokens": {
+        "inputTokens": 14700,
+        "outputTokens": 899,
+        "totalTokens": 15599,
+        "cachedInputTokens": 7424,
+        "reasoningOutputTokens": 720,
+        "sdkNormalized": {
+          "promptTokens": 14700,
+          "completionTokens": 899,
+          "reasoningTokens": 720,
+          "cachedTokens": 7424,
+          "totalTokens": 15599
+        }
+      },
+      "finishReason": "tool_calls",
+      "tools": [
+        {
+          "name": "draft_plan",
+          "arguments": "{\"title\": \"居家徒手全身训练\", \"blocks\": [{\"kind\": \"warmup\", \"items\": [{\"id\": \"h-hip-gate\"}, {\"id\": \"h-catcow-quad\"}]}, {\"kind\": \"main\", \"items\": [{\"id\": \"h-squat\"}, {\"id\": \"h-incline-pushup\"}, {\"id\": \"h-good-morning\"}, {\"id\": \"w-dead-bug\"}]}, {\"kind\": \"cooldown\", \"items\": [{\"id\": \"h-cobra\"}, {\"id\": \"h-butterfly-active\"}]}]}"
+        }
+      ],
+      "finishedAtUtc": "2026-10-31T07:39:30.482516Z",
+      "elapsedMs": 6078,
+      "elapsedMicroseconds": 6078003,
+      "wireHttpAttemptTimingsMs": null
+    },
+    {
+      "callIndex": 6,
+      "outcome": "response",
+      "startedAtUtc": "2026-10-31T07:39:30.500133Z",
+      "roles": [
+        "system",
+        "user",
+        "assistant",
+        "tool",
+        "tool",
+        "assistant",
+        "tool",
+        "assistant",
+        "tool",
+        "assistant",
+        "tool",
+        "tool",
+        "tool",
+        "tool",
+        "assistant",
+        "tool",
+        "user"
+      ],
+      "model": "deepseek-flash",
+      "httpAttempts": 1,
+      "sdkLatencyMs": 2006,
+      "sdkLatencyMicroseconds": 2006170,
+      "tokens": {
+        "inputTokens": 16170,
+        "outputTokens": 115,
+        "totalTokens": 16285,
+        "cachedInputTokens": 13184,
+        "reasoningOutputTokens": null,
+        "sdkNormalized": {
+          "promptTokens": 16170,
+          "completionTokens": 115,
+          "reasoningTokens": 0,
+          "cachedTokens": 13184,
+          "totalTokens": 16285
+        }
+      },
+      "finishReason": "tool_calls",
+      "tools": [
+        {
+          "name": "show_plan",
+          "arguments": "{\"plan_id\": \"plan-1793432370483-2\", \"note\": \"先活动髋和脊柱进入状态，主体按蹲—推—髋铰链—核心的顺序练全身，最后用伸展收尾。全程呼吸顺畅不憋气，动作放慢不弹震，有牵扯感即可，出现疼痛就停。\"}"
+        }
+      ],
+      "finishedAtUtc": "2026-10-31T07:39:32.506482Z",
+      "elapsedMs": 2006,
+      "elapsedMicroseconds": 2006222,
+      "wireHttpAttemptTimingsMs": null
+    }
+  ],
+  "llmCallCount": 6,
+  "successfulLlmCallCount": 6,
+  "failedLlmCallCount": 0,
+  "unfinishedLlmCallCount": 0,
+  "httpAttemptCount": 6,
+  "knownHttpAttemptSubtotal": 6,
+  "unknownHttpAttemptCallCount": 0,
+  "callElapsedMsSum": 16263,
+  "knownCallElapsedMsSubtotal": 16263,
+  "tokens": {
+    "inputTokens": 56981,
+    "outputTokens": 1951,
+    "totalTokens": 58932,
+    "cachedInputTokens": 41472,
+    "reasoningOutputTokens": null
+  },
+  "tokenCoverage": {
+    "inputTokens": {
+      "observedCalls": 6,
+      "unknownCalls": 0,
+      "knownSubtotal": 56981
+    },
+    "outputTokens": {
+      "observedCalls": 6,
+      "unknownCalls": 0,
+      "knownSubtotal": 1951
+    },
+    "totalTokens": {
+      "observedCalls": 6,
+      "unknownCalls": 0,
+      "knownSubtotal": 58932
+    },
+    "cachedInputTokens": {
+      "observedCalls": 6,
+      "unknownCalls": 0,
+      "knownSubtotal": 41472
+    },
+    "reasoningOutputTokens": {
+      "observedCalls": 5,
+      "unknownCalls": 1,
+      "knownSubtotal": 850
+    }
+  }
+}
