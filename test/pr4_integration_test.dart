@@ -9,7 +9,7 @@ import 'package:smartfit/core/storage/local_state_storage.dart';
 import 'package:smartfit/data/app_store.dart';
 import 'package:smartfit/ui/chat/chat_home_page.dart';
 import 'package:smartfit/ui/chat/chat_widgets.dart';
-import 'package:smartfit/ui/chat/coach_task_bubble.dart';
+import 'package:ugk_coach_ui/ugk_coach_ui.dart' show CoachTaskBubble;
 import 'package:smartfit/ui/theme/app_theme.dart';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
 import 'package:ugk_trainer/ugk_trainer.dart';

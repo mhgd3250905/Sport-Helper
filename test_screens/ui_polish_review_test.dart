@@ -19,7 +19,6 @@ import 'package:smartfit/domain/exercise.dart';
 import 'package:smartfit/domain/plan.dart';
 import 'package:smartfit/ui/alpha_artwork.dart';
 import 'package:smartfit/ui/chat/chat_home_page.dart';
-import 'package:smartfit/ui/chat/coach_task_bubble.dart';
 import 'package:smartfit/ui/chat/coach_ui_adapter.dart';
 import 'package:smartfit/ui/chat/plan_card.dart';
 import 'package:smartfit/ui/chat/saved_plans_page.dart';
@@ -29,7 +28,7 @@ import 'package:smartfit/ui/theme.dart';
 import 'package:smartfit/voice/voice_library.dart';
 import 'package:smartfit/voice/voice_queue.dart';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
-import 'package:ugk_coach_ui/ugk_coach_ui.dart' hide CoachTaskBubble;
+import 'package:ugk_coach_ui/ugk_coach_ui.dart';
 import 'package:ugk_trainer/ugk_trainer.dart' show PoseHubActionLibrary;
 
 import '../test/app_flow_test.dart' show MemoryStorage;
@@ -346,21 +345,32 @@ void main() {
       await _shot(tester, '00-card-surfaces-$theme');
       tester.view.physicalSize = const Size(1170, 2532);
 
-      // 1: Same SDK progress snapshot, presented by App generation widget.
-      final generation =
-          Function.apply(CoachTaskBubble.new, [], {
-                #task: _task(),
-                #waiting: true,
-                #onCancel: () {},
-                if (Platform.environment['SF_SCREENSHOT_AFTER'] == '1') ...{
-                  #sessionState: _session(),
-                  #library: fixture.library,
-                },
-              })
-              as Widget;
+      // 1: Same progress snapshot, presented by the SDK generation widget.
+      final taskSummary = coach.CoachTaskSummary.fromState(
+        Platform.environment['SF_SCREENSHOT_AFTER'] == '1' ? _session() : null,
+        task: _task(),
+      );
+      final generation = CoachTaskBubble(
+        title: taskSummary.title,
+        status: taskSummary.status,
+        phase: taskSummary.phase,
+        parameters: taskSummary.parameters,
+        picks: taskSummary.picks
+            .where(fixture.library.contains)
+            .toList(growable: false),
+        complete: taskSummary.complete,
+        waiting: true,
+        onCancel: () {},
+        cutoutBuilder: smartfitTaskCutouts(fixture.library),
+      );
       await show(
         Scaffold(
-          body: Padding(padding: const EdgeInsets.all(16), child: generation),
+          body: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Builder(
+              builder: (context) => withSmartfitCoachUi(context, generation),
+            ),
+          ),
         ),
       );
       await _shot(tester, '01-generation-$theme');

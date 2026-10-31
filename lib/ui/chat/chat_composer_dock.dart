@@ -2,13 +2,14 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:ugk_coach_ui/ugk_coach_ui.dart' show PlanFocusLabel;
 
 import '../../app/training_transition_activity.dart';
 import '../theme/measure_size.dart';
 import '../theme/tokens.dart';
 import '../theme/ui_polish_tokens.dart';
 import 'chat_widgets.dart';
-import 'plan_focus_label.dart';
+import 'coach_ui_adapter.dart';
 
 /// Owns the one menu timeline. Keyboard and menu occupy the same bottom slot,
 /// so swapping them never adds their heights together.
@@ -473,10 +474,15 @@ class _ChatComposerDockState extends State<ChatComposerDock>
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: PlanFocusLabel(
-                    title: widget.planFocusTitle,
-                    onClear: widget.onClearPlanFocus,
-                    bottomGap: 8,
+                  child: withSmartfitCoachUi(
+                    context,
+                    PlanFocusLabel(
+                      title: widget.planFocusTitle,
+                      onClear: widget.onClearPlanFocus,
+                      bottomGap: 8,
+                      iconBuilder: smartfitPlanFocusIcon,
+                      clearIconBuilder: smartfitPlanFocusClearIcon,
+                    ),
                   ),
                 ),
               ),

@@ -5,9 +5,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:smartfit/chat/ai_chat_engine.dart';
 import 'package:smartfit/chat/app_chat_actions.dart';
 import 'package:smartfit/chat/chat_controller.dart';
-import 'package:smartfit/ui/chat/coach_task_bubble.dart';
+import 'package:smartfit/ui/chat/coach_ui_adapter.dart';
 import 'package:smartfit/ui/theme/app_theme.dart';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
+import 'package:ugk_coach_ui/ugk_coach_ui.dart' show CoachTaskBubble;
 
 import 'app_flow_test.dart' show services, tall;
 import 'support/coach_v2_fixtures.dart';
@@ -73,15 +74,27 @@ void main() {
           home: Scaffold(
             body: ListenableBuilder(
               listenable: chat,
-              builder: (context, _) => chat.typing
-                  ? CoachTaskBubble(
-                      task: chat.activeTask,
-                      sessionState: chat.activeSessionState,
-                      library: fixture.library,
-                      waiting: true,
-                      onCancel: chat.cancelRequest,
-                    )
-                  : const SizedBox.shrink(),
+              builder: (context, _) {
+                final summary = coach.CoachTaskSummary.fromState(
+                  chat.activeSessionState,
+                  task: chat.activeTask,
+                );
+                return chat.typing
+                    ? CoachTaskBubble(
+                        title: summary.title,
+                        status: summary.status,
+                        phase: summary.phase,
+                        parameters: summary.parameters,
+                        picks: summary.picks
+                            .where(fixture.library.contains)
+                            .toList(),
+                        complete: summary.complete,
+                        waiting: true,
+                        onCancel: chat.cancelRequest,
+                        cutoutBuilder: smartfitTaskCutouts(fixture.library),
+                      )
+                    : const SizedBox.shrink();
+              },
             ),
           ),
         ),
@@ -100,8 +113,10 @@ void main() {
       final bubble = tester.widget<CoachTaskBubble>(
         find.byType(CoachTaskBubble),
       );
-      expect(bubble.task, isNull);
-      expect(bubble.sessionState, isNull);
+      expect(bubble.phase, 0);
+      expect(bubble.complete, isFalse);
+      expect(bubble.parameters, isEmpty);
+      expect(bubble.picks, isEmpty);
       expect(find.text('正在想怎么练'), findsOneWidget);
       expect(find.text('读懂你的需求'), findsOneWidget);
       expect(find.text('马上就好'), findsNothing);

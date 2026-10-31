@@ -4,8 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:ugk_trainer/ugk_trainer.dart' show SessionResult;
 import 'package:ugk_coach/ugk_coach.dart' as coach;
-import 'package:ugk_coach_ui/ugk_coach_ui.dart'
-    hide CoachTaskBubble, CoachDeliveryTransition;
+import 'package:ugk_coach_ui/ugk_coach_ui.dart';
 
 import '../../app/services.dart';
 import '../../chat/chat_controller.dart';
@@ -27,8 +26,6 @@ import 'chat_widgets.dart';
 import 'chat_composer_dock.dart';
 import 'coach_ui_adapter.dart';
 import 'cosmos.dart';
-import 'coach_task_bubble.dart';
-import 'coach_delivery_transition.dart';
 import 'plan_card.dart';
 import 'saved_plans_page.dart';
 import 'validated_plan_card.dart';
@@ -471,6 +468,12 @@ class _ChatHomePageState extends State<ChatHomePage>
     _deliveryKeys.removeWhere((id, _) => !liveDeliveries.contains(id));
     GlobalKey deliveryKey(String id) =>
         _deliveryKeys.putIfAbsent(id, GlobalKey.new);
+    final summary = coach.CoachTaskSummary.fromState(
+      _chat.activeSessionState,
+      task: _chat.activeTask,
+    );
+    final library = AppServices.of(context).library;
+    final picks = summary.picks.where(library.contains).toList(growable: false);
     final rows = [
       for (final m in msgs)
         CoachChatEntry(
@@ -502,11 +505,15 @@ class _ChatHomePageState extends State<ChatHomePage>
             key: deliveryKey(_pendingDeliveryId!),
             preparing: true,
             child: CoachTaskBubble(
-              task: _chat.activeTask,
-              sessionState: _chat.activeSessionState,
-              library: AppServices.of(context).library,
+              title: summary.title,
+              status: summary.status,
+              phase: summary.phase,
+              parameters: summary.parameters,
+              picks: picks,
+              complete: summary.complete,
               waiting: true,
               onCancel: _chat.cancelRequest,
+              cutoutBuilder: smartfitTaskCutouts(library),
             ),
           ),
         ),

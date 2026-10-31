@@ -3,6 +3,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:crypto/crypto.dart' show sha256;
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smartfit/app/app_test_catalog.dart';
@@ -30,7 +31,14 @@ class _Memory implements LocalStateStorage {
 
 class _LiveHttp extends HttpOverrides {}
 
-const _sdk = '99c14495685f160019e10340ea6f0de6418a65b9';
+const _sdk = '700d0100f1cb42ef122e774a6ee0076d1916b5e5';
+const _requestedCases = [
+  (id: '5m-01', minutes: 5),
+  (id: '5m-02', minutes: 5),
+  (id: '5m-03', minutes: 5),
+  (id: '10m-01', minutes: 10),
+  (id: '20m-01', minutes: 20),
+];
 const _tokenFields = [
   'inputTokens',
   'outputTokens',
@@ -107,6 +115,76 @@ Map<String, Object?> _callMetrics(List<Map<String, Object?>> calls) {
   };
 }
 
+Map<String, Object?> _requestJson(coach.LlmRequest request) => {
+  'messages': [for (final message in request.messages) message.toJson()],
+  'maxTokens': request.maxTokens,
+  'temperature': request.temperature,
+  'jsonMode': request.jsonMode,
+  'tools': [for (final tool in request.tools) tool.toJson()],
+  'toolChoice': request.toolChoice,
+};
+
+Map<String, Object?> _toolJson(coach.LlmToolCall tool) => {
+  'id': tool.id,
+  'name': tool.name,
+  'arguments': tool.arguments,
+};
+
+Map<String, Object?>? _turnResultJson(coach.CoachTurnResult? result) =>
+    result == null
+    ? null
+    : {
+        'turnId': result.turnId,
+        'status': result.status.name,
+        'text': result.text,
+        'plan': result.plan?.plan.toJson(),
+        'planVersion': result.plan?.version,
+        'actions': result.actions == null
+            ? null
+            : [
+                for (final action in result.actions!.items)
+                  {'id': action.id, 'note': action.note},
+              ],
+        'question': result.question?.toJson(),
+        'warnings': [for (final issue in result.warnings) issue.toJson()],
+        'issues': [for (final issue in result.issues) issue.toJson()],
+        'submissions': result.submissions,
+        'resubmits': result.resubmits,
+        'fallbackReason': result.fallbackReason?.name,
+        'leaked': result.leaked,
+        'errorType': result.error?.runtimeType.toString(),
+        'isPlanningFailure': result.isPlanningFailure,
+        'steps': result.steps,
+        'reads': result.reads,
+        'usage': _tokens(result.usage),
+        'records': [
+          for (final entry in result.records)
+            {
+              ...entry.toJson()..remove('errorMessage'),
+              if (entry.errorMessage != null)
+                'errorMessageSha256': sha256
+                    .convert(utf8.encode(entry.errorMessage!))
+                    .toString(),
+            },
+        ],
+      };
+
+Map<String, Object?> _eventJson(coach.AgentEvent event) => {
+  'atUtc': DateTime.now().toUtc().toIso8601String(),
+  'turnId': event.turnId,
+  'kind': event.kind.name,
+  'step': event.step,
+  'path': event.path,
+  'status': event.status?.name,
+  'attempt': event.attempt,
+  'maxAttempts': event.maxAttempts,
+  'reason': event.reason?.name,
+  'delayMs': event.delay?.inMilliseconds,
+  'question': event.question?.toJson(),
+  'node': event.node?.toJson(),
+  'task': event.task?.toJson(),
+};
+
 class _Observed implements coach.LlmClient {
   _Observed(this.inner);
   final coach.OpenAiCompatibleClient inner;
@@ -126,6 +204,7 @@ class _Observed implements coach.LlmClient {
       'outcome': 'inFlight',
       'startedAtUtc': DateTime.now().toUtc().toIso8601String(),
       'roles': request.messages.map((message) => message.role.name).toList(),
+      'request': _requestJson(request),
     };
     calls.add(call);
     try {
@@ -138,9 +217,14 @@ class _Observed implements coach.LlmClient {
         'sdkLatencyMicroseconds': response.latency.inMicroseconds,
         'tokens': _tokens(response.usage),
         'finishReason': response.finishReason,
-        'tools': response.toolCalls
-            .map((tool) => {'name': tool.name, 'arguments': tool.arguments})
-            .toList(),
+        'response': {
+          'content': response.content,
+          'reasoning': response.reasoning,
+          'toolCalls': [for (final tool in response.toolCalls) _toolJson(tool)],
+          'model': response.model,
+          'finishReason': response.finishReason,
+        },
+        'tools': response.toolCalls.map(_toolJson).toList(),
       });
       return response;
     } on coach.LlmException catch (error) {
@@ -186,15 +270,24 @@ void _write(File file, Object value) {
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   test(
-    'three real generated durations: 5, 10 and 20 minutes',
+    'five independent real sessions: 5, 5, 5, 10 and 20 minutes',
     () async {
       const config = AiCoachConfig.fromEnvironment();
       const output = String.fromEnvironment('SMARTFIT_LIVE_OUTPUT');
-      expect(config.enabled, isTrue);
-      expect(config.endpoint, AiCoachConfig.baseUrl);
-      expect(output, isNotEmpty);
+      if (!config.enabled ||
+          config.endpoint != AiCoachConfig.baseUrl ||
+          output.isEmpty) {
+        throw StateError(
+          'Explicit live configuration and evidence path required.',
+        );
+      }
       final root = Directory(output)..createSync(recursive: true);
-      expect(File('${root.path}/summary.json').existsSync(), isFalse);
+      if (File('${root.path}/summary.json').existsSync() ||
+          _requestedCases.any(
+            (entry) => File('${root.path}/plan-${entry.id}.json').existsSync(),
+          )) {
+        throw StateError('Preserve existing run; never resample or overwrite.');
+      }
       final probeStartedAt = DateTime.now().toUtc();
       final probeWatch = Stopwatch()..start();
       HttpOverrides.global = _LiveHttp();
@@ -206,11 +299,17 @@ void main() {
         jsonDecode(await rootBundle.loadString('assets/coach/smartfit.json')),
       );
       final cases = <Map<String, Object?>>[];
-      for (final minutes in [5, 10, 20]) {
+      final agentInstances = Set<Object>.identity();
+      final storageInstances = Set<Object>.identity();
+      for (final entry in _requestedCases) {
+        final minutes = entry.minutes;
         final input =
             '在家徒手$minutes分钟全身训练，初级，没有伤病，没有额外器械。'
             '请直接给一张能按计时或自动计次跟练的完整计划。';
-        final store = AppStore(_Memory());
+        final storage = _Memory();
+        final storageInitiallyEmpty = storage.values.isEmpty;
+        final storageInstanceIsNew = storageInstances.add(storage);
+        final store = AppStore(storage);
         await store.load();
         await store.acceptSafety(blocked: false);
         final client = _Observed(
@@ -223,13 +322,30 @@ void main() {
           client: client,
           enableUserMemory: false,
         );
+        final agentInstanceIsNew = agentInstances.add(engine.agent);
+        final events = <Map<String, Object?>>[];
+        final eventSubscription = engine.events.listen(
+          (event) => events.add(_eventJson(event)),
+        );
         final chat = ChatController(
           engine: engine,
           store: store,
           replyDelay: Duration.zero,
         )..start();
+        final priorHistory = [
+          for (final message in engine.agent.history) message.toJson(),
+        ];
+        final priorState = engine.agent.sessionState.toJson();
+        final emptyPriorConversation =
+            priorHistory.isEmpty &&
+            engine.agent.turnCount == 0 &&
+            engine.agent.sessionState.userTurns.isEmpty &&
+            chat.messages.every((message) => message.greeting);
         final watch = Stopwatch()..start();
         final record = <String, Object?>{
+          'caseId': entry.id,
+          'caseOrdinal': cases.length + 1,
+          'caseFile': 'plan-${entry.id}.json',
           'targetMinutes': minutes,
           'targetSeconds': minutes * 60,
           'input': input,
@@ -240,6 +356,24 @@ void main() {
           'sdkTransportMaxRetries': client.inner.config.maxRetries,
           'sendReturned': false,
           'persistenceFlushed': false,
+          'sdkSessionId': null,
+          'sdkSessionIdAvailability':
+              'CoachAgent/CoachSessionState expose no session identifier; caseId is a host evidence ID, never an invented SDK sessionId.',
+          'freshStorageInitiallyEmpty': storageInitiallyEmpty,
+          'newStorageInstance': storageInstanceIsNew,
+          'newAgentInstance': agentInstanceIsNew,
+          'emptyPriorConversation': emptyPriorConversation,
+          'independentSessionVerified':
+              storageInitiallyEmpty &&
+              storageInstanceIsNew &&
+              agentInstanceIsNew &&
+              emptyPriorConversation,
+          'priorSdkHistory': priorHistory,
+          'priorSdkSessionState': priorState,
+          'priorChatMessages': [
+            for (final message in chat.messages) message.toJson(),
+          ],
+          'clarificationAnsweredByProbe': false,
         };
         try {
           final turnWatch = Stopwatch()..start();
@@ -324,6 +458,22 @@ void main() {
               'coachToExecutionDifferenceSeconds': seconds - coachSeconds,
               'withinTenPercent': within,
               'manualWorkPhases': manual.length,
+              'executionDurationKind': manual.isEmpty ? '自动排程' : '估算',
+              'manualStagesCountedAsFailure': false,
+              'automaticClockReplayPerformed': manual.isEmpty,
+              'estimatedWorkPhases': [
+                for (final phase in manual)
+                  {
+                    'id': phase.exerciseId,
+                    'reps': phase.reps,
+                    'estimatedSeconds': phase.seconds,
+                    'estimatePerRepSeconds':
+                        phase.reps == null || phase.reps! <= 0
+                        ? null
+                        : phase.seconds / phase.reps!,
+                    'requiresUserCompletion': true,
+                  },
+              ],
               'engineFullyFinished': clock.done && !clock.endedEarly,
               'engineElapsedSeconds': elapsed,
               'workPhases': work,
@@ -340,10 +490,10 @@ void main() {
               'passed':
                   engine.lastResult?.plan != null &&
                   engine.lastResult?.status == coach.TurnStatus.ok &&
+                  engine.lastResult?.question == null &&
                   plan.targetMinutes == minutes &&
                   within &&
-                  manual.isEmpty &&
-                  clock.done,
+                  (manual.isNotEmpty || (clock.done && !clock.endedEarly)),
             });
           } else {
             record['passed'] = false;
@@ -351,10 +501,11 @@ void main() {
                 .map((message) => message.toJson())
                 .toList();
           }
-        } on Object catch (error) {
+        } on Object catch (error, stack) {
           record.addAll({
             'passed': false,
             'errorType': error.runtimeType.toString(),
+            'errorStackTrace': stack.toString(),
           });
         } finally {
           watch.stop();
@@ -362,11 +513,55 @@ void main() {
           record['caseElapsedMicroseconds'] = watch.elapsedMicroseconds;
           record['transportCalls'] = client.calls;
           record.addAll(_callMetrics(client.calls));
-          _write(File('${root.path}/plan-$minutes-minutes.json'), record);
+          record['sdkTurnResult'] = _turnResultJson(engine.lastResult);
+          record['clarification'] = engine.lastResult?.question?.toJson();
+          record['acceptedClarification'] = engine.lastResult?.question != null;
+          record['messages'] = [
+            for (final message in chat.messages) message.toJson(),
+          ];
+          record['sdkHistory'] = [
+            for (final message in engine.agent.history) message.toJson(),
+          ];
+          record['sdkSessionState'] = engine.agent.sessionState.toJson();
+          record['agentEvents'] = events;
+          record['recoveryAnalysis'] = {
+            'pendingOfflineAnalysis': true,
+            'durationFitFailureTriggerCount': null,
+            'redraftAfterDurationFailureCount': null,
+            'blockedAskUserCount': null,
+            'otherInfeasibleRecoveryCount': null,
+            'deduplicationRequired':
+                'Scope toolCallId to case and response/assistant batch occurrence; repeated request history is not another execution. IDs can be reused across responses.',
+            'receiptSources':
+                'Actual request.messages role=tool plus final sdkHistory only. Terminal receipts missing from public history remain unavailable; sdkTurnResult/records are separate evidence, not invented tool receipts.',
+            'durationFailureClassification':
+                'Only real receipt.code duration_fit_failed; ask_user with that code is a blocked attempt, not another fit failure or delivered clarification. Skip receipts do not prove draft execution.',
+          };
+          final userTurnMs = record['userTurnElapsedMs'] as int?;
+          final fullTurnMs = record['fullTurnElapsedMs'] as int?;
+          record['userTurnOver20000Ms'] = userTurnMs == null
+              ? null
+              : userTurnMs > 20000;
+          record['fullTurnOver20000Ms'] = fullTurnMs == null
+              ? null
+              : fullTurnMs > 20000;
+          record['llmCallsOver8'] = client.calls.length > 8;
+          record['abnormal'] =
+              fullTurnMs == null ||
+              fullTurnMs > 20000 ||
+              client.calls.length > 8;
+          record['abnormalReasons'] = [
+            if (fullTurnMs == null) 'full_turn_time_unavailable',
+            if (fullTurnMs != null && fullTurnMs > 20000)
+              'full_turn_over_20000_ms',
+            if (client.calls.length > 8) 'llm_calls_over_8',
+          ];
+          _write(File('${root.path}/plan-${entry.id}.json'), record);
           cases.add(record);
           stdout.writeln(
-            'DURATION_CASE ${jsonEncode({'minutes': minutes, 'passed': record['passed'], 'coach': record['coachEstimateSeconds'], 'card': record['cardSecondsIncludingPrep'], 'execution': record['executionSecondsIncludingPrep'], 'manualPhases': record['manualWorkPhases'], 'llmCalls': record['llmCallCount'], 'httpAttempts': record['httpAttemptCount'], 'fullTurnMs': record['fullTurnElapsedMs'], 'tokens': record['tokens']})}',
+            'DURATION_CASE ${jsonEncode({'caseId': entry.id, 'minutes': minutes, 'passed': record['passed'], 'abnormal': record['abnormal'], 'coach': record['coachEstimateSeconds'], 'card': record['cardSecondsIncludingPrep'], 'execution': record['executionSecondsIncludingPrep'], 'manualPhases': record['manualWorkPhases'], 'llmCalls': record['llmCallCount'], 'httpAttempts': record['httpAttemptCount'], 'fullTurnMs': record['fullTurnElapsedMs'], 'tokens': record['tokens']})}',
           );
+          await eventSubscription.cancel();
           chat.dispose();
           engine.dispose();
           client.inner.close();
@@ -379,13 +574,28 @@ void main() {
           ...(record['transportCalls']! as List<Map<String, Object?>>),
       ];
       _write(File('${root.path}/summary.json'), {
-        'schema': 'smartfit-plus51-real-duration-probe@2',
+        'schema': 'smartfit-plus51-real-duration-probe@4',
         'sdk': _sdk,
         'probeStartedAtUtc': probeStartedAt.toIso8601String(),
         'probeFinishedAtUtc': DateTime.now().toUtc().toIso8601String(),
         'probeElapsedMs': probeWatch.elapsedMilliseconds,
         'caseGenerationCount': cases.length,
+        'requestedCases': [
+          for (final entry in _requestedCases)
+            {'caseId': entry.id, 'minutes': entry.minutes},
+        ],
         'outerCaseRetries': 0,
+        'manualStagesCountedAsFailure': false,
+        'allIndependentSessions': cases.every(
+          (record) => record['independentSessionVerified'] == true,
+        ),
+        'allPerformanceThresholdsMet': cases.every(
+          (record) => record['abnormal'] == false,
+        ),
+        'abnormalCaseIds': [
+          for (final record in cases)
+            if (record['abnormal'] == true) record['caseId'],
+        ],
         ..._callMetrics(allCalls),
         'metricsSemantics': {
           'httpAttempts':
@@ -403,6 +613,14 @@ void main() {
               'Entire case through duration validation and execution-clock replay, before writing its evidence file',
           'wireHttpAttemptTimingsMs':
               'Unavailable from SDK public API; null, never inferred from LLM latency',
+          'rawProtocol':
+              'Public LlmRequest messages/tools and LlmResponse content/reasoning/toolCalls, actual chat messages, sdkTurnResult and public final agent history; private auth headers/configuration are never serialized.',
+          'recoveryCounts':
+              'Pending exact offline parsing of raw tool receipts by scoped toolCallId; keyword occurrences are not execution counts. Successful terminal TurnResult/records can establish accepted delivery without inventing missing receipts.',
+          'abnormal':
+              'Primary: fullTurnElapsedMs > 20000 or LLM calls > 8; userTurn > 20000 is also recorded separately. Duration correctness passed is independent of these flags.',
+          'manualExecution':
+              'Per user instruction, self-paced work phases are labeled 估算 and do not fail duration acceptance. Their scheduled seconds are estimates; automatic natural completion is not claimed.',
         },
         'baseUrl': config.endpoint,
         'model': config.modelName,
@@ -417,14 +635,26 @@ void main() {
             .map(
               (record) => {
                 for (final key in [
+                  'caseId',
+                  'caseOrdinal',
+                  'caseFile',
                   'targetMinutes',
                   'coachEstimateSeconds',
                   'cardSecondsIncludingPrep',
                   'cardLabel',
                   'executionSecondsIncludingPrep',
                   'manualWorkPhases',
+                  'executionDurationKind',
+                  'automaticClockReplayPerformed',
                   'withinTenPercent',
                   'passed',
+                  'independentSessionVerified',
+                  'acceptedClarification',
+                  'userTurnOver20000Ms',
+                  'fullTurnOver20000Ms',
+                  'llmCallsOver8',
+                  'abnormal',
+                  'abnormalReasons',
                   'llmCallCount',
                   'successfulLlmCallCount',
                   'failedLlmCallCount',
@@ -449,6 +679,11 @@ void main() {
             )
             .toList(),
       });
+      expect(cases, hasLength(_requestedCases.length));
+      expect(
+        cases.every((record) => record['independentSessionVerified'] == true),
+        isTrue,
+      );
       expect(
         cases.every((record) => record['passed'] == true),
         isTrue,
@@ -456,6 +691,6 @@ void main() {
             'Every original model result must pass; no target changes or cherry-picking.',
       );
     },
-    timeout: const Timeout(Duration(minutes: 25)),
+    timeout: const Timeout(Duration(minutes: 45)),
   );
 }

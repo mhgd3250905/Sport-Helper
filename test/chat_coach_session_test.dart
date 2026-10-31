@@ -14,16 +14,13 @@ import 'package:smartfit/domain/scenario.dart';
 import 'package:smartfit/ui/chat/coach_ui_adapter.dart';
 import 'package:smartfit/ui/chat/chat_home_page.dart';
 import 'package:smartfit/ui/chat/chat_widgets.dart';
-import 'package:smartfit/ui/chat/coach_delivery_transition.dart';
-import 'package:smartfit/ui/chat/coach_task_bubble.dart';
 import 'package:smartfit/ui/chat/plan_card.dart';
 import 'package:smartfit/ui/chat/validated_plan_card.dart';
 import 'package:smartfit/ui/theme/app_theme.dart';
 import 'package:smartfit/ui/theme/polish_card.dart';
 import 'package:smartfit/ui/theme/widgets.dart';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
-import 'package:ugk_coach_ui/ugk_coach_ui.dart'
-    hide CoachTaskBubble, CoachDeliveryTransition;
+import 'package:ugk_coach_ui/ugk_coach_ui.dart';
 
 import 'app_flow_test.dart' show services, tall;
 import 'support.dart';

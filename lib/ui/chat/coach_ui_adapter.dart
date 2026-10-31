@@ -37,6 +37,42 @@ ImageProvider? smartfitTaskCutout(BuildContext context, Exercise? exercise) {
       : AssetImage(asset, bundle: DefaultAssetBundle.of(context));
 }
 
+/// Keeps the original asset renderer, crop metadata and action-name semantics.
+/// Widgets stay stable during the SDK's animation ticks; no new I/O or layers.
+CoachTaskCutoutBuilder smartfitTaskCutouts(ExerciseLibrary library) {
+  final cache = <(String, String, Size, Brightness), Widget>{};
+  return (_, id, size, brightness) {
+    final exercise = library[id];
+    final asset =
+        exercise.media.alphaThumbnail ??
+        exercise.media.alphaCover ??
+        sfPoster(exercise);
+    return cache.putIfAbsent(
+      (asset, exercise.name, size, brightness),
+      () => ClipOval(
+        child: SizedBox.fromSize(
+          size: size,
+          child: SfAlphaAsset(
+            asset: asset,
+            fit: BoxFit.contain,
+            alignment: Alignment.center,
+            semanticLabel: exercise.name,
+          ),
+        ),
+      ),
+    );
+  };
+}
+
+Widget smartfitPlanFocusIcon(BuildContext context, double size, Color color) =>
+    SfIcon(SfGlyph.bookmark, size: size, color: color);
+
+Widget smartfitPlanFocusClearIcon(
+  BuildContext context,
+  double size,
+  Color color,
+) => SfIcon(SfGlyph.close, size: size, color: color);
+
 /// Only this plan card replaces its save copy and adds a host-owned action.
 /// The SDK continues to own its footer, start button and expansion timeline.
 Widget withSmartfitPlanSaveUi(

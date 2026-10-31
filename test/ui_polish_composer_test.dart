@@ -9,13 +9,13 @@ import 'package:smartfit/chat/chat_models.dart';
 import 'package:smartfit/domain/scenario.dart';
 import 'package:smartfit/ui/chat/chat_home_page.dart';
 import 'package:smartfit/ui/chat/chat_widgets.dart';
-import 'package:smartfit/ui/chat/coach_delivery_transition.dart';
-import 'package:smartfit/ui/chat/coach_task_bubble.dart';
 import 'package:smartfit/ui/chat/plan_card.dart';
 import 'package:smartfit/ui/theme/tokens.dart';
 import 'package:smartfit/ui/theme/ui_polish_tokens.dart';
 import 'package:smartfit/ui/theme/app_theme.dart';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
+import 'package:ugk_coach_ui/ugk_coach_ui.dart'
+    show CoachDeliveryTransition, CoachTaskBubble;
 
 import 'app_flow_test.dart' show services;
 
@@ -80,46 +80,6 @@ void main() {
       checkBounds();
     });
   }
-
-  testWidgets('preparation holds 590ms then collapses 300ms before delivery', (
-    tester,
-  ) async {
-    Widget host(bool preparing) => MaterialApp(
-      home: Scaffold(
-        body: Align(
-          alignment: Alignment.topLeft,
-          child: CoachDeliveryTransition(
-            preparing: preparing,
-            successful: true,
-            child: SizedBox(
-              key: ValueKey(preparing ? 'preparing' : 'delivered'),
-              width: 240,
-              height: preparing ? 120 : 300,
-            ),
-          ),
-        ),
-      ),
-    );
-    await tester.pumpWidget(host(true));
-    final transition = find.byType(CoachDeliveryTransition);
-    expect(tester.getSize(transition).height, 120);
-    await tester.pumpWidget(host(false));
-    await tester.pump(const Duration(milliseconds: 590));
-    expect(tester.getSize(transition).height, 120);
-    expect(find.byKey(const ValueKey('preparing')), findsOneWidget);
-    expect(find.byKey(const ValueKey('delivered')), findsNothing);
-    await tester.pump(const Duration(milliseconds: 150));
-    expect(
-      tester.getSize(transition).height,
-      closeTo(120 * (1 - Curves.easeOutCubic.transform(.5)), .001),
-    );
-    expect(find.byKey(const ValueKey('delivered')), findsNothing);
-    await tester.pump(const Duration(milliseconds: 149));
-    expect(find.byKey(const ValueKey('delivered')), findsNothing);
-    await tester.pump(const Duration(milliseconds: 1));
-    expect(tester.getSize(transition).height, 300);
-    expect(find.byKey(const ValueKey('preparing')), findsNothing);
-  });
 
   testWidgets(
     'chat keeps the preparation entry alive when a plan is delivered',
