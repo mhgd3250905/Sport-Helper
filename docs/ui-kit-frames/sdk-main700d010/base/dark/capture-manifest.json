@@ -1,0 +1,1848 @@
+{
+  "schema": "smartfit-ui-kit-slots-frames@2",
+  "variant": "base",
+  "source": "13c0bb4cc24982be50bbb2471fc83ace6f64e40b",
+  "publicInputsSha256": "a8049f8f163e0f0a711839554e15767cece62a8ad6f32997422d06004f99981c",
+  "driverSha256": "a4b94ee1f946f026b70e1104eaad286e938756b4caff0e9bc3a4dc62bb2f7feb",
+  "adapterSha256": "c959e5dc56f64ed514890b8beb64cdc3bc43dd40546d37d15e17f404ddaeb4ae",
+  "focusImplementation": "host-local",
+  "inputsSha256": "d11d6afe55fba10de8a8e81105b8f3f5ded338a86577c9e1436816ee6fe39e18",
+  "logicalSize": {
+    "width": 412,
+    "height": 915
+  },
+  "dpr": 2.625,
+  "physicalSizeRounding": "ceil in RenderRepaintBoundary.toImage",
+  "theme": "dark",
+  "fonts": [
+    {
+      "family": "MaterialIcons",
+      "asset": "fonts/MaterialIcons-Regular.otf",
+      "bytes": 1645184,
+      "sha256": "d9865b671a09d683d13a863089d8825e0f61a37696ce5d7d448bc8023aa62453"
+    },
+    {
+      "family": "NotoSansSC",
+      "asset": "assets/fonts/NotoSansSC.ttf",
+      "bytes": 4110060,
+      "sha256": "93c0808b4374c84021581cd80ad5d5cae67303d91411d81211e77126d1e5b5ca"
+    },
+    {
+      "family": "packages/cupertino_icons/CupertinoIcons",
+      "asset": "packages/cupertino_icons/assets/CupertinoIcons.ttf",
+      "bytes": 257628,
+      "sha256": "67c44fe9183b002e79dde7f6977e2988661c9a3e4a3c5fce968787efdbed823c"
+    }
+  ],
+  "frames": [
+    {
+      "frame": "dark/waiting-0ms.png",
+      "bytes": 115994,
+      "sha256": "1ad69342b1c6eca09c1553afe5a4773d5ee1afe56396989ca7b7e22ecef348db",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 0,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": 4,
+        "libraryKind": "current-posehub",
+        "imageSemantics": [],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 0
+      },
+      "historicalOriginalFrameSha256": "1ad69342b1c6eca09c1553afe5a4773d5ee1afe56396989ca7b7e22ecef348db",
+      "historicalOriginalFrameByteIdentical": true
+    },
+    {
+      "frame": "dark/waiting-400ms.png",
+      "bytes": 130158,
+      "sha256": "32ebc97187a28712f4d3826d23eed6ec48684219decd38077f483582309f942d",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 400000,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": 4,
+        "libraryKind": "current-posehub",
+        "imageSemantics": [
+          {
+            "actionId": "h-squat",
+            "label": "徒手深蹲",
+            "isImage": true,
+            "rect": [
+              0.0,
+              0.0,
+              32.0,
+              32.0
+            ]
+          }
+        ],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 0
+      },
+      "historicalOriginalFrameSha256": "32ebc97187a28712f4d3826d23eed6ec48684219decd38077f483582309f942d",
+      "historicalOriginalFrameByteIdentical": true
+    },
+    {
+      "frame": "dark/waiting-800ms.png",
+      "bytes": 129532,
+      "sha256": "37886b49b7dc1eb805b1ed15ed96e054fe537dad17501287b76a49c2621b0a84",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 800000,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": 4,
+        "libraryKind": "current-posehub",
+        "imageSemantics": [
+          {
+            "actionId": "h-squat",
+            "label": "徒手深蹲",
+            "isImage": true,
+            "rect": [
+              0.0,
+              0.0,
+              32.0,
+              32.0
+            ]
+          }
+        ],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 0
+      },
+      "historicalOriginalFrameSha256": "37886b49b7dc1eb805b1ed15ed96e054fe537dad17501287b76a49c2621b0a84",
+      "historicalOriginalFrameByteIdentical": true
+    },
+    {
+      "frame": "dark/waiting-1200ms.png",
+      "bytes": 129083,
+      "sha256": "0f4ef0b35589cd1dc86ca6dfc4216d1bb1e259c7a67b8979fddf58558a1d8b79",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 1200000,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": 4,
+        "libraryKind": "current-posehub",
+        "imageSemantics": [
+          {
+            "actionId": "h-wall-angel",
+            "label": "靠墙天使",
+            "isImage": true,
+            "rect": [
+              0.0,
+              0.0,
+              32.0,
+              32.0
+            ]
+          }
+        ],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 0
+      },
+      "historicalOriginalFrameSha256": "0f4ef0b35589cd1dc86ca6dfc4216d1bb1e259c7a67b8979fddf58558a1d8b79",
+      "historicalOriginalFrameByteIdentical": true
+    },
+    {
+      "frame": "dark/waiting-1600ms.png",
+      "bytes": 129893,
+      "sha256": "05ed361fffe8baf65c593b8e89d8aec70ecd397ef4ee25d6c0a1cdbed724db03",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 1600000,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": 4,
+        "libraryKind": "current-posehub",
+        "imageSemantics": [
+          {
+            "actionId": "h-wall-angel",
+            "label": "靠墙天使",
+            "isImage": true,
+            "rect": [
+              0.0,
+              0.0,
+              32.0,
+              32.0
+            ]
+          }
+        ],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 0
+      },
+      "historicalOriginalFrameSha256": "05ed361fffe8baf65c593b8e89d8aec70ecd397ef4ee25d6c0a1cdbed724db03",
+      "historicalOriginalFrameByteIdentical": true
+    },
+    {
+      "frame": "dark/parameters-before.png",
+      "bytes": 129893,
+      "sha256": "05ed361fffe8baf65c593b8e89d8aec70ecd397ef4ee25d6c0a1cdbed724db03",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 1600000,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": 4,
+        "libraryKind": "current-posehub",
+        "imageSemantics": [
+          {
+            "actionId": "h-wall-angel",
+            "label": "靠墙天使",
+            "isImage": true,
+            "rect": [
+              0.0,
+              0.0,
+              32.0,
+              32.0
+            ]
+          }
+        ],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 0
+      },
+      "historicalOriginalFrameSha256": "05ed361fffe8baf65c593b8e89d8aec70ecd397ef4ee25d6c0a1cdbed724db03",
+      "historicalOriginalFrameByteIdentical": true
+    },
+    {
+      "frame": "dark/parameters-after.png",
+      "bytes": 130146,
+      "sha256": "dd23fcc4d53b4f787aa28a1ddb5453907f2269dcdf5b872e9dcfc84de7006221",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 1860000,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": 4,
+        "libraryKind": "current-posehub",
+        "imageSemantics": [
+          {
+            "actionId": "h-wall-angel",
+            "label": "靠墙天使",
+            "isImage": true,
+            "rect": [
+              0.0,
+              0.0,
+              32.0,
+              32.0
+            ]
+          }
+        ],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 0
+      },
+      "historicalOriginalFrameSha256": "dd23fcc4d53b4f787aa28a1ddb5453907f2269dcdf5b872e9dcfc84de7006221",
+      "historicalOriginalFrameByteIdentical": true
+    },
+    {
+      "frame": "dark/complete.png",
+      "bytes": 120083,
+      "sha256": "488360240f7ab7b6df3a8a6b9b5b0ba0c658f592786b395ca6aa782ede64c5db",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 260000,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": 4,
+        "libraryKind": "current-posehub",
+        "imageSemantics": [
+          {
+            "actionId": "h-wall-angel",
+            "label": "靠墙天使",
+            "isImage": true,
+            "rect": [
+              0.0,
+              0.0,
+              32.0,
+              32.0
+            ]
+          }
+        ],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 0
+      },
+      "historicalOriginalFrameSha256": "488360240f7ab7b6df3a8a6b9b5b0ba0c658f592786b395ca6aa782ede64c5db",
+      "historicalOriginalFrameByteIdentical": true
+    },
+    {
+      "frame": "dark/failure.png",
+      "bytes": 32994,
+      "sha256": "87a9c53945b4979c2c61b81ac10be63367345470edd00b85ee382d3da15f843f",
+      "width": 1082,
+      "height": 2402,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": null,
+        "libraryKind": "current-posehub",
+        "imageSemantics": [],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 0
+      },
+      "historicalOriginalFrameSha256": "87a9c53945b4979c2c61b81ac10be63367345470edd00b85ee382d3da15f843f",
+      "historicalOriginalFrameByteIdentical": true
+    },
+    {
+      "frame": "dark/cancelled.png",
+      "bytes": 15672,
+      "sha256": "d1f3c69f8376551b513120aa20fdd1a8c254ed7b8ced92dbc7bd85ab5b1bdeac",
+      "width": 1082,
+      "height": 2402,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": null,
+        "libraryKind": "current-posehub",
+        "imageSemantics": [],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 0
+      },
+      "historicalOriginalFrameSha256": "d1f3c69f8376551b513120aa20fdd1a8c254ed7b8ced92dbc7bd85ab5b1bdeac",
+      "historicalOriginalFrameByteIdentical": true
+    },
+    {
+      "frame": "dark/delivery-0pct.png",
+      "bytes": 126030,
+      "sha256": "e4e2864cba727abcbdc9302fe3e46640512371cb820092248b5d63ce7b3dd240",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 0,
+      "fraction": 0.0,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": 4,
+        "libraryKind": "current-posehub",
+        "imageSemantics": [
+          {
+            "actionId": "h-squat",
+            "label": "徒手深蹲",
+            "isImage": true,
+            "rect": [
+              0.0,
+              0.0,
+              32.0,
+              32.0
+            ]
+          }
+        ],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 0
+      },
+      "historicalOriginalFrameSha256": "e4e2864cba727abcbdc9302fe3e46640512371cb820092248b5d63ce7b3dd240",
+      "historicalOriginalFrameByteIdentical": true
+    },
+    {
+      "frame": "dark/delivery-25pct.png",
+      "bytes": 123950,
+      "sha256": "bb2f8cc62a2f603aebf6670da26f355fab538052f305f62bbfbe00b8b5cb5910",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 222500,
+      "fraction": 0.25,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": 4,
+        "libraryKind": "current-posehub",
+        "imageSemantics": [
+          {
+            "actionId": "h-squat",
+            "label": "徒手深蹲",
+            "isImage": true,
+            "rect": [
+              0.0,
+              0.0,
+              32.0,
+              32.0
+            ]
+          }
+        ],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 0
+      },
+      "historicalOriginalFrameSha256": "bb2f8cc62a2f603aebf6670da26f355fab538052f305f62bbfbe00b8b5cb5910",
+      "historicalOriginalFrameByteIdentical": true
+    },
+    {
+      "frame": "dark/delivery-50pct.png",
+      "bytes": 123905,
+      "sha256": "5f3442382c9ef4b40516a41e0561f637f8b3ba8477f4f09ee59f6257c812e05a",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 445000,
+      "fraction": 0.5,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": 4,
+        "libraryKind": "current-posehub",
+        "imageSemantics": [
+          {
+            "actionId": "h-squat",
+            "label": "徒手深蹲",
+            "isImage": true,
+            "rect": [
+              0.0,
+              0.0,
+              32.0,
+              32.0
+            ]
+          }
+        ],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 0
+      },
+      "historicalOriginalFrameSha256": "5f3442382c9ef4b40516a41e0561f637f8b3ba8477f4f09ee59f6257c812e05a",
+      "historicalOriginalFrameByteIdentical": true
+    },
+    {
+      "frame": "dark/delivery-75pct.png",
+      "bytes": 61662,
+      "sha256": "a732c78cb72ded2bb5d55511b8ef20550596d50fe83de4b6e055ca6f5aa2b4b9",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 667500,
+      "fraction": 0.75,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": 4,
+        "libraryKind": "current-posehub",
+        "imageSemantics": [
+          {
+            "actionId": "h-squat",
+            "label": "徒手深蹲",
+            "isImage": true,
+            "rect": [
+              0.0,
+              0.0,
+              32.0,
+              32.0
+            ]
+          }
+        ],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 0
+      },
+      "historicalOriginalFrameSha256": "a732c78cb72ded2bb5d55511b8ef20550596d50fe83de4b6e055ca6f5aa2b4b9",
+      "historicalOriginalFrameByteIdentical": true
+    },
+    {
+      "frame": "dark/delivery-100pct.png",
+      "bytes": 46737,
+      "sha256": "889e10d370c226fa3559642ef94153e1f2fe3480d7fcc5f99b00817cc99acda2",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 890000,
+      "fraction": 1.0,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": null,
+        "libraryKind": "current-posehub",
+        "imageSemantics": [],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 0
+      },
+      "historicalOriginalFrameSha256": "889e10d370c226fa3559642ef94153e1f2fe3480d7fcc5f99b00817cc99acda2",
+      "historicalOriginalFrameByteIdentical": true
+    },
+    {
+      "frame": "dark/focus-appearing.png",
+      "bytes": 26606,
+      "sha256": "745675d55ac55baea2fa2c8f9f6ad4f4046da5ee0e3ce3a3ffbb63da9e1eca16",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 90000,
+      "fraction": 0.5,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": null,
+        "libraryKind": "current-posehub",
+        "imageSemantics": [],
+        "focusClearSemantics": {
+          "label": "取消讨论计划",
+          "isButton": true,
+          "hasTap": true,
+          "rect": [
+            0.0,
+            0.0,
+            28.0,
+            28.0
+          ]
+        },
+        "legacyCropPainterCount": 0
+      },
+      "historicalOriginalFrameSha256": "745675d55ac55baea2fa2c8f9f6ad4f4046da5ee0e3ce3a3ffbb63da9e1eca16",
+      "historicalOriginalFrameByteIdentical": true
+    },
+    {
+      "frame": "dark/focus-held.png",
+      "bytes": 26806,
+      "sha256": "df5dcb1aac3cbafd2a8ad32665de368396732c813778948be82a4f7688495395",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 180000,
+      "fraction": 1.0,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": null,
+        "libraryKind": "current-posehub",
+        "imageSemantics": [],
+        "focusClearSemantics": {
+          "label": "取消讨论计划",
+          "isButton": true,
+          "hasTap": true,
+          "rect": [
+            0.0,
+            0.0,
+            28.0,
+            28.0
+          ]
+        },
+        "legacyCropPainterCount": 0
+      },
+      "historicalOriginalFrameSha256": "df5dcb1aac3cbafd2a8ad32665de368396732c813778948be82a4f7688495395",
+      "historicalOriginalFrameByteIdentical": true
+    },
+    {
+      "frame": "dark/focus-clearing.png",
+      "bytes": 26719,
+      "sha256": "ae30f29bf33293200e0e9f50c75c8901ee3574683b360bbd2301afd2edc996f8",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 60000,
+      "fraction": 0.5,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": null,
+        "libraryKind": "current-posehub",
+        "imageSemantics": [],
+        "focusClearSemantics": {
+          "label": "取消讨论计划",
+          "isButton": true,
+          "hasTap": false,
+          "rect": [
+            0.0,
+            0.0,
+            28.0,
+            28.0
+          ]
+        },
+        "legacyCropPainterCount": 0
+      },
+      "historicalOriginalFrameSha256": "ae30f29bf33293200e0e9f50c75c8901ee3574683b360bbd2301afd2edc996f8",
+      "historicalOriginalFrameByteIdentical": true
+    },
+    {
+      "frame": "dark/focus-cleared.png",
+      "bytes": 15672,
+      "sha256": "d1f3c69f8376551b513120aa20fdd1a8c254ed7b8ced92dbc7bd85ab5b1bdeac",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 120000,
+      "fraction": 1.0,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": null,
+        "libraryKind": "current-posehub",
+        "imageSemantics": [],
+        "focusClearSemantics": {
+          "label": "取消讨论计划",
+          "isButton": true,
+          "hasTap": false,
+          "rect": [
+            0.0,
+            0.0,
+            28.0,
+            28.0
+          ]
+        },
+        "legacyCropPainterCount": 0
+      },
+      "historicalOriginalFrameSha256": "d1f3c69f8376551b513120aa20fdd1a8c254ed7b8ced92dbc7bd85ab5b1bdeac",
+      "historicalOriginalFrameByteIdentical": true
+    },
+    {
+      "frame": "dark/training-entry-0pct.png",
+      "bytes": 112230,
+      "sha256": "5dcd24e9805270b9c1f8bada5614514a4da901616ceb1892fb45690868a611f5",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 0,
+      "fraction": 0.0,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": null,
+        "libraryKind": "current-posehub",
+        "imageSemantics": [],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 0
+      },
+      "historicalOriginalFrameSha256": "5dcd24e9805270b9c1f8bada5614514a4da901616ceb1892fb45690868a611f5",
+      "historicalOriginalFrameByteIdentical": true,
+      "routeValue": 0.0,
+      "routeStatus": "forward"
+    },
+    {
+      "frame": "dark/training-entry-25pct.png",
+      "bytes": 260092,
+      "sha256": "a5fc3e18cba54a1b66862add2f96b2256c4811d2f408f27f7e4c3e2f75b13ca0",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 75000,
+      "fraction": 0.25,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": null,
+        "libraryKind": "current-posehub",
+        "imageSemantics": [],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 0
+      },
+      "historicalOriginalFrameSha256": "a5fc3e18cba54a1b66862add2f96b2256c4811d2f408f27f7e4c3e2f75b13ca0",
+      "historicalOriginalFrameByteIdentical": true,
+      "routeValue": 0.25,
+      "routeStatus": "forward"
+    },
+    {
+      "frame": "dark/training-entry-50pct.png",
+      "bytes": 220255,
+      "sha256": "e9edd5fae229dd13f2a3548118a4d98cb71792dbb3642baaa9cb298e32465f32",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 150000,
+      "fraction": 0.5,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": null,
+        "libraryKind": "current-posehub",
+        "imageSemantics": [],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 0
+      },
+      "historicalOriginalFrameSha256": "e9edd5fae229dd13f2a3548118a4d98cb71792dbb3642baaa9cb298e32465f32",
+      "historicalOriginalFrameByteIdentical": true,
+      "routeValue": 0.5,
+      "routeStatus": "forward"
+    },
+    {
+      "frame": "dark/training-entry-75pct.png",
+      "bytes": 223206,
+      "sha256": "2edb1848c02e1d00c966d778a105bf1c5c9c6a9d8a0447fa9fe0796fec514998",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 225000,
+      "fraction": 0.75,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": null,
+        "libraryKind": "current-posehub",
+        "imageSemantics": [],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 0
+      },
+      "historicalOriginalFrameSha256": "2edb1848c02e1d00c966d778a105bf1c5c9c6a9d8a0447fa9fe0796fec514998",
+      "historicalOriginalFrameByteIdentical": true,
+      "routeValue": 0.75,
+      "routeStatus": "forward"
+    },
+    {
+      "frame": "dark/training-entry-100pct.png",
+      "bytes": 224438,
+      "sha256": "3a9f39d1c6f6d154fce1be6adfa67bafb1795cc974ea1c3ca68ff8aadc0c93ae",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 300000,
+      "fraction": 1.0,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": null,
+        "libraryKind": "current-posehub",
+        "imageSemantics": [],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 0
+      },
+      "historicalOriginalFrameSha256": "3a9f39d1c6f6d154fce1be6adfa67bafb1795cc974ea1c3ca68ff8aadc0c93ae",
+      "historicalOriginalFrameByteIdentical": true,
+      "routeValue": 1.0,
+      "routeStatus": "forward"
+    },
+    {
+      "frame": "dark/training-exit-0pct.png",
+      "bytes": 224439,
+      "sha256": "1d4b3e65fbd6b1bb59b4d8c1f7796b2713d5565103b18a75406ade1dcd21fd13",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 0,
+      "fraction": 0.0,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": null,
+        "libraryKind": "current-posehub",
+        "imageSemantics": [],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 0
+      },
+      "historicalOriginalFrameSha256": "1d4b3e65fbd6b1bb59b4d8c1f7796b2713d5565103b18a75406ade1dcd21fd13",
+      "historicalOriginalFrameByteIdentical": true,
+      "routeValue": 1.0,
+      "routeStatus": "reverse"
+    },
+    {
+      "frame": "dark/training-exit-25pct.png",
+      "bytes": 222260,
+      "sha256": "db9fbb881a9c665a76f7fdcaeec122742d9dc9c5ed4908f10394e3e7e57306dd",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 70000,
+      "fraction": 0.25,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": null,
+        "libraryKind": "current-posehub",
+        "imageSemantics": [],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 0
+      },
+      "historicalOriginalFrameSha256": "db9fbb881a9c665a76f7fdcaeec122742d9dc9c5ed4908f10394e3e7e57306dd",
+      "historicalOriginalFrameByteIdentical": true,
+      "routeValue": 0.75,
+      "routeStatus": "reverse"
+    },
+    {
+      "frame": "dark/training-exit-50pct.png",
+      "bytes": 223079,
+      "sha256": "94baf5bf54c7c32d9d26e93418431e3fe87e26f94b3a1259b455d0c0f2ffdb27",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 140000,
+      "fraction": 0.5,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": null,
+        "libraryKind": "current-posehub",
+        "imageSemantics": [],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 0
+      },
+      "historicalOriginalFrameSha256": "94baf5bf54c7c32d9d26e93418431e3fe87e26f94b3a1259b455d0c0f2ffdb27",
+      "historicalOriginalFrameByteIdentical": true,
+      "routeValue": 0.5,
+      "routeStatus": "reverse"
+    },
+    {
+      "frame": "dark/training-exit-75pct.png",
+      "bytes": 271242,
+      "sha256": "19c748b769e5e0b9d09001cd6bc15ab9901d15ca3998ee6b2e85261571684365",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 210000,
+      "fraction": 0.75,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": null,
+        "libraryKind": "current-posehub",
+        "imageSemantics": [],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 0
+      },
+      "historicalOriginalFrameSha256": "19c748b769e5e0b9d09001cd6bc15ab9901d15ca3998ee6b2e85261571684365",
+      "historicalOriginalFrameByteIdentical": true,
+      "routeValue": 0.2500000000000001,
+      "routeStatus": "reverse"
+    },
+    {
+      "frame": "dark/training-exit-100pct.png",
+      "bytes": 112230,
+      "sha256": "5dcd24e9805270b9c1f8bada5614514a4da901616ceb1892fb45690868a611f5",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 280000,
+      "fraction": 1.0,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": null,
+        "libraryKind": "current-posehub",
+        "imageSemantics": [],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 0
+      },
+      "historicalOriginalFrameSha256": "5dcd24e9805270b9c1f8bada5614514a4da901616ceb1892fb45690868a611f5",
+      "historicalOriginalFrameByteIdentical": true,
+      "routeValue": 0.0,
+      "routeStatus": "reverse"
+    },
+    {
+      "frame": "dark/posehub-reveal-179ms.png",
+      "bytes": 120970,
+      "sha256": "db04c90acfe975cc3ee66d6845b5a10c15c911fd71e629660bc2079df1b18ab6",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 179000,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": 4,
+        "libraryKind": "current-posehub",
+        "imageSemantics": [],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 0
+      },
+      "expectedImageSemantics": []
+    },
+    {
+      "frame": "dark/posehub-reveal-180ms.png",
+      "bytes": 121141,
+      "sha256": "85944c2b0aa1c228249280bf24aa429e7193b017b82d779c326c0d25f469e761",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 180000,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": 4,
+        "libraryKind": "current-posehub",
+        "imageSemantics": [],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 0
+      },
+      "expectedImageSemantics": []
+    },
+    {
+      "frame": "dark/posehub-reveal-181ms.png",
+      "bytes": 121340,
+      "sha256": "10c2966898dcadfd26d1813a9382ee19be275081d9c23b056a9f6f8f0fd72971",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 181000,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": 4,
+        "libraryKind": "current-posehub",
+        "imageSemantics": [
+          {
+            "actionId": "h-squat",
+            "label": "徒手深蹲",
+            "isImage": true,
+            "rect": [
+              0.0,
+              0.0,
+              32.0,
+              32.0
+            ]
+          }
+        ],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 0
+      },
+      "expectedImageSemantics": []
+    },
+    {
+      "frame": "dark/posehub-reveal-305ms.png",
+      "bytes": 129788,
+      "sha256": "2b2f9f283591e6fe2a0860702423322b16a89484331e8bc076659ecb6957351c",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 305000,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": 4,
+        "libraryKind": "current-posehub",
+        "imageSemantics": [
+          {
+            "actionId": "h-squat",
+            "label": "徒手深蹲",
+            "isImage": true,
+            "rect": [
+              0.0,
+              0.0,
+              32.0,
+              32.0
+            ]
+          }
+        ],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 0
+      },
+      "expectedImageSemantics": []
+    },
+    {
+      "frame": "dark/posehub-reveal-429ms.png",
+      "bytes": 129772,
+      "sha256": "0967f847226016a6c4e06dd97df704255afd93dd89982b2268395bbcfc3ba73a",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 429000,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": 4,
+        "libraryKind": "current-posehub",
+        "imageSemantics": [
+          {
+            "actionId": "h-squat",
+            "label": "徒手深蹲",
+            "isImage": true,
+            "rect": [
+              0.0,
+              0.0,
+              32.0,
+              32.0
+            ]
+          }
+        ],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 0
+      },
+      "expectedImageSemantics": []
+    },
+    {
+      "frame": "dark/posehub-reveal-430ms.png",
+      "bytes": 129729,
+      "sha256": "e83f632eabc3f4f425782fdcad0a2cf0b261ad9d2d2eddf131d1356780bbdb2c",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 430000,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": 4,
+        "libraryKind": "current-posehub",
+        "imageSemantics": [
+          {
+            "actionId": "h-squat",
+            "label": "徒手深蹲",
+            "isImage": true,
+            "rect": [
+              0.0,
+              0.0,
+              32.0,
+              32.0
+            ]
+          }
+        ],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 0
+      },
+      "expectedImageSemantics": [
+        "h-squat"
+      ]
+    },
+    {
+      "frame": "dark/posehub-reveal-431ms.png",
+      "bytes": 129938,
+      "sha256": "463ce1777be22a3f92999c06934b985024f396ceb8980dbc26510d61316a18bb",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 431000,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": 4,
+        "libraryKind": "current-posehub",
+        "imageSemantics": [
+          {
+            "actionId": "h-squat",
+            "label": "徒手深蹲",
+            "isImage": true,
+            "rect": [
+              0.0,
+              0.0,
+              32.0,
+              32.0
+            ]
+          }
+        ],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 0
+      },
+      "expectedImageSemantics": []
+    },
+    {
+      "frame": "dark/posehub-crossfade-899ms.png",
+      "bytes": 128916,
+      "sha256": "a6448c4094c9fa030d686e00ab61290a116fa81e2f4197037873b29d134326c6",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 899000,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": 4,
+        "libraryKind": "current-posehub",
+        "imageSemantics": [
+          {
+            "actionId": "h-squat",
+            "label": "徒手深蹲",
+            "isImage": true,
+            "rect": [
+              0.0,
+              0.0,
+              32.0,
+              32.0
+            ]
+          }
+        ],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 0
+      },
+      "expectedImageSemantics": []
+    },
+    {
+      "frame": "dark/posehub-crossfade-900ms.png",
+      "bytes": 128955,
+      "sha256": "4c2e0bc5f7506ef89e016a48ccaacd305763d296365b18336ccd47d264c34542",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 900000,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": 4,
+        "libraryKind": "current-posehub",
+        "imageSemantics": [
+          {
+            "actionId": "h-squat",
+            "label": "徒手深蹲",
+            "isImage": true,
+            "rect": [
+              0.0,
+              0.0,
+              32.0,
+              32.0
+            ]
+          }
+        ],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 0
+      },
+      "expectedImageSemantics": []
+    },
+    {
+      "frame": "dark/posehub-crossfade-901ms.png",
+      "bytes": 129154,
+      "sha256": "17a904410896604afe8c9bac790413a39783c36933c5421afe3b5ce04cd58365",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 901000,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": 4,
+        "libraryKind": "current-posehub",
+        "imageSemantics": [
+          {
+            "actionId": "h-squat",
+            "label": "徒手深蹲",
+            "isImage": true,
+            "rect": [
+              0.0,
+              0.0,
+              32.0,
+              32.0
+            ]
+          },
+          {
+            "actionId": "h-wall-angel",
+            "label": "靠墙天使",
+            "isImage": true,
+            "rect": [
+              0.0,
+              0.0,
+              32.0,
+              32.0
+            ]
+          }
+        ],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 0
+      },
+      "expectedImageSemantics": []
+    },
+    {
+      "frame": "dark/posehub-crossfade-1025ms.png",
+      "bytes": 129180,
+      "sha256": "9b9b0591655bc95c14180b97429745697bdb5eee60d4c11d7df0d32eb1494da0",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 1025000,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": 4,
+        "libraryKind": "current-posehub",
+        "imageSemantics": [
+          {
+            "actionId": "h-squat",
+            "label": "徒手深蹲",
+            "isImage": true,
+            "rect": [
+              0.0,
+              0.0,
+              32.0,
+              32.0
+            ]
+          },
+          {
+            "actionId": "h-wall-angel",
+            "label": "靠墙天使",
+            "isImage": true,
+            "rect": [
+              0.0,
+              0.0,
+              32.0,
+              32.0
+            ]
+          }
+        ],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 0
+      },
+      "expectedImageSemantics": [
+        "h-squat",
+        "h-wall-angel"
+      ]
+    },
+    {
+      "frame": "dark/posehub-crossfade-1149ms.png",
+      "bytes": 128927,
+      "sha256": "36718c91bea526d1e904edade77f21ceab3bbda9cc38ad3c49712f4670ea4fea",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 1149000,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": 4,
+        "libraryKind": "current-posehub",
+        "imageSemantics": [
+          {
+            "actionId": "h-squat",
+            "label": "徒手深蹲",
+            "isImage": true,
+            "rect": [
+              0.0,
+              0.0,
+              32.0,
+              32.0
+            ]
+          },
+          {
+            "actionId": "h-wall-angel",
+            "label": "靠墙天使",
+            "isImage": true,
+            "rect": [
+              0.0,
+              0.0,
+              32.0,
+              32.0
+            ]
+          }
+        ],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 0
+      },
+      "expectedImageSemantics": []
+    },
+    {
+      "frame": "dark/posehub-crossfade-1150ms.png",
+      "bytes": 128867,
+      "sha256": "aa9dd8957fb96c6b013feb0e1a3c8912bd904c9756b15226f7f74b408a071c27",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 1150000,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": 4,
+        "libraryKind": "current-posehub",
+        "imageSemantics": [
+          {
+            "actionId": "h-wall-angel",
+            "label": "靠墙天使",
+            "isImage": true,
+            "rect": [
+              0.0,
+              0.0,
+              32.0,
+              32.0
+            ]
+          }
+        ],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 0
+      },
+      "expectedImageSemantics": []
+    },
+    {
+      "frame": "dark/posehub-crossfade-1151ms.png",
+      "bytes": 128962,
+      "sha256": "76445e69f598b8e75efb423b253c36df31f16c584b0ca2ad75690b6234355576",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 1151000,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": 4,
+        "libraryKind": "current-posehub",
+        "imageSemantics": [
+          {
+            "actionId": "h-wall-angel",
+            "label": "靠墙天使",
+            "isImage": true,
+            "rect": [
+              0.0,
+              0.0,
+              32.0,
+              32.0
+            ]
+          }
+        ],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 0
+      },
+      "expectedImageSemantics": []
+    },
+    {
+      "frame": "dark/legacy-reveal-179ms.png",
+      "bytes": 120641,
+      "sha256": "a6096654cdaf6fceaf12c8d71d2da4afdbad074933ac321358fd4ce7454bb753",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 179000,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": 4,
+        "libraryKind": "historical-legacy-alpha",
+        "imageSemantics": [],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 1
+      },
+      "expectedImageSemantics": []
+    },
+    {
+      "frame": "dark/legacy-reveal-180ms.png",
+      "bytes": 120849,
+      "sha256": "2d4dce4174e7d4866bd97f37c81976d48e9ced1228584027f624e3423c1d7cca",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 180000,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": 4,
+        "libraryKind": "historical-legacy-alpha",
+        "imageSemantics": [],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 1
+      },
+      "expectedImageSemantics": []
+    },
+    {
+      "frame": "dark/legacy-reveal-181ms.png",
+      "bytes": 121024,
+      "sha256": "38178e48b60ed0742752ab8a86c124b171c8d011b6c70b8a8b35eef11310266e",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 181000,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": 4,
+        "libraryKind": "historical-legacy-alpha",
+        "imageSemantics": [
+          {
+            "actionId": "h-squat",
+            "label": "徒手深蹲",
+            "isImage": true,
+            "rect": [
+              0.0,
+              0.0,
+              32.0,
+              32.0
+            ]
+          }
+        ],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 1
+      },
+      "expectedImageSemantics": []
+    },
+    {
+      "frame": "dark/legacy-reveal-305ms.png",
+      "bytes": 131432,
+      "sha256": "73db5cb81df0c22c7c8ca17b431de3a981004bd1a6b622667007a8687e8ed1a7",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 305000,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": 4,
+        "libraryKind": "historical-legacy-alpha",
+        "imageSemantics": [
+          {
+            "actionId": "h-squat",
+            "label": "徒手深蹲",
+            "isImage": true,
+            "rect": [
+              0.0,
+              0.0,
+              32.0,
+              32.0
+            ]
+          }
+        ],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 1
+      },
+      "expectedImageSemantics": []
+    },
+    {
+      "frame": "dark/legacy-reveal-429ms.png",
+      "bytes": 131625,
+      "sha256": "705d38f1d51a83c033bead2cb1006630f4d7744d542a5684107813a474aac4d2",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 429000,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": 4,
+        "libraryKind": "historical-legacy-alpha",
+        "imageSemantics": [
+          {
+            "actionId": "h-squat",
+            "label": "徒手深蹲",
+            "isImage": true,
+            "rect": [
+              0.0,
+              0.0,
+              32.0,
+              32.0
+            ]
+          }
+        ],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 1
+      },
+      "expectedImageSemantics": []
+    },
+    {
+      "frame": "dark/legacy-reveal-430ms.png",
+      "bytes": 131620,
+      "sha256": "29adf55c6e6988f14ef32710824a474fac8b58619ac7ee6be6acd4bfaf59b1f7",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 430000,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": 4,
+        "libraryKind": "historical-legacy-alpha",
+        "imageSemantics": [
+          {
+            "actionId": "h-squat",
+            "label": "徒手深蹲",
+            "isImage": true,
+            "rect": [
+              0.0,
+              0.0,
+              32.0,
+              32.0
+            ]
+          }
+        ],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 1
+      },
+      "expectedImageSemantics": [
+        "h-squat"
+      ]
+    },
+    {
+      "frame": "dark/legacy-reveal-431ms.png",
+      "bytes": 131727,
+      "sha256": "2f94d816f50df8cd03a2783a88fa54d12a539c809126e542794b552c85a4be60",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 431000,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": 4,
+        "libraryKind": "historical-legacy-alpha",
+        "imageSemantics": [
+          {
+            "actionId": "h-squat",
+            "label": "徒手深蹲",
+            "isImage": true,
+            "rect": [
+              0.0,
+              0.0,
+              32.0,
+              32.0
+            ]
+          }
+        ],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 1
+      },
+      "expectedImageSemantics": []
+    },
+    {
+      "frame": "dark/legacy-crossfade-899ms.png",
+      "bytes": 130956,
+      "sha256": "6f3162cd025783cd21c961aae1fd98d195bc595ecbe5f26591e407fa8c2efa82",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 899000,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": 4,
+        "libraryKind": "historical-legacy-alpha",
+        "imageSemantics": [
+          {
+            "actionId": "h-squat",
+            "label": "徒手深蹲",
+            "isImage": true,
+            "rect": [
+              0.0,
+              0.0,
+              32.0,
+              32.0
+            ]
+          }
+        ],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 1
+      },
+      "expectedImageSemantics": []
+    },
+    {
+      "frame": "dark/legacy-crossfade-900ms.png",
+      "bytes": 130961,
+      "sha256": "97ca468e4a5ee81a3c491c69862eb5d42255729b3ae14e45a386eb2277e020a6",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 900000,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": 4,
+        "libraryKind": "historical-legacy-alpha",
+        "imageSemantics": [
+          {
+            "actionId": "h-squat",
+            "label": "徒手深蹲",
+            "isImage": true,
+            "rect": [
+              0.0,
+              0.0,
+              32.0,
+              32.0
+            ]
+          }
+        ],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 1
+      },
+      "expectedImageSemantics": []
+    },
+    {
+      "frame": "dark/legacy-crossfade-901ms.png",
+      "bytes": 131142,
+      "sha256": "2f571f1d7a90c520134605a0a6cb7fba4ec73b13d3aa913160011dd585efa3a6",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 901000,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": 4,
+        "libraryKind": "historical-legacy-alpha",
+        "imageSemantics": [
+          {
+            "actionId": "h-squat",
+            "label": "徒手深蹲",
+            "isImage": true,
+            "rect": [
+              0.0,
+              0.0,
+              32.0,
+              32.0
+            ]
+          },
+          {
+            "actionId": "w-bird-dog",
+            "label": "鸟狗式",
+            "isImage": true,
+            "rect": [
+              0.0,
+              0.0,
+              32.0,
+              32.0
+            ]
+          }
+        ],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 2
+      },
+      "expectedImageSemantics": []
+    },
+    {
+      "frame": "dark/legacy-crossfade-1025ms.png",
+      "bytes": 130729,
+      "sha256": "4e805b6b258c0f971886f1ac45a5946dc8f1f68f878c8a295b6d609f8de6e916",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 1025000,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": 4,
+        "libraryKind": "historical-legacy-alpha",
+        "imageSemantics": [
+          {
+            "actionId": "h-squat",
+            "label": "徒手深蹲",
+            "isImage": true,
+            "rect": [
+              0.0,
+              0.0,
+              32.0,
+              32.0
+            ]
+          },
+          {
+            "actionId": "w-bird-dog",
+            "label": "鸟狗式",
+            "isImage": true,
+            "rect": [
+              0.0,
+              0.0,
+              32.0,
+              32.0
+            ]
+          }
+        ],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 2
+      },
+      "expectedImageSemantics": [
+        "h-squat",
+        "w-bird-dog"
+      ]
+    },
+    {
+      "frame": "dark/legacy-crossfade-1149ms.png",
+      "bytes": 128651,
+      "sha256": "5ec4e34b93a44c394f1058f5f1cf5a5e64d14ea51455fa3ba3845ec4b813863e",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 1149000,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": 4,
+        "libraryKind": "historical-legacy-alpha",
+        "imageSemantics": [
+          {
+            "actionId": "h-squat",
+            "label": "徒手深蹲",
+            "isImage": true,
+            "rect": [
+              0.0,
+              0.0,
+              32.0,
+              32.0
+            ]
+          },
+          {
+            "actionId": "w-bird-dog",
+            "label": "鸟狗式",
+            "isImage": true,
+            "rect": [
+              0.0,
+              0.0,
+              32.0,
+              32.0
+            ]
+          }
+        ],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 2
+      },
+      "expectedImageSemantics": []
+    },
+    {
+      "frame": "dark/legacy-crossfade-1150ms.png",
+      "bytes": 128596,
+      "sha256": "eff7d804da3de3ca7eee7d48f1abb2e60952996a2b8d762de9094873cd179661",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 1150000,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": 4,
+        "libraryKind": "historical-legacy-alpha",
+        "imageSemantics": [
+          {
+            "actionId": "w-bird-dog",
+            "label": "鸟狗式",
+            "isImage": true,
+            "rect": [
+              0.0,
+              0.0,
+              32.0,
+              32.0
+            ]
+          }
+        ],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 1
+      },
+      "expectedImageSemantics": []
+    },
+    {
+      "frame": "dark/legacy-crossfade-1151ms.png",
+      "bytes": 128640,
+      "sha256": "e8371b5a84a179d7008b392f6762343b44279ae5738b375aa2bcd0ee527032e8",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 1151000,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": 4,
+        "libraryKind": "historical-legacy-alpha",
+        "imageSemantics": [
+          {
+            "actionId": "w-bird-dog",
+            "label": "鸟狗式",
+            "isImage": true,
+            "rect": [
+              0.0,
+              0.0,
+              32.0,
+              32.0
+            ]
+          }
+        ],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 1
+      },
+      "expectedImageSemantics": []
+    },
+    {
+      "frame": "dark/focus-enter-0ms.png",
+      "bytes": 15672,
+      "sha256": "d1f3c69f8376551b513120aa20fdd1a8c254ed7b8ced92dbc7bd85ab5b1bdeac",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 0,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": null,
+        "libraryKind": "current-posehub",
+        "imageSemantics": [],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 0
+      }
+    },
+    {
+      "frame": "dark/focus-enter-1ms.png",
+      "bytes": 19982,
+      "sha256": "454dddc8a82e3df96fa11b8f5098b1030342ba5c039eced7a4764e57e5f4e743",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 1000,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": null,
+        "libraryKind": "current-posehub",
+        "imageSemantics": [],
+        "focusClearSemantics": {
+          "label": "取消讨论计划",
+          "isButton": true,
+          "hasTap": true,
+          "rect": [
+            0.0,
+            0.0,
+            28.0,
+            28.0
+          ]
+        },
+        "legacyCropPainterCount": 0
+      }
+    },
+    {
+      "frame": "dark/focus-enter-179ms.png",
+      "bytes": 26806,
+      "sha256": "df5dcb1aac3cbafd2a8ad32665de368396732c813778948be82a4f7688495395",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 179000,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": null,
+        "libraryKind": "current-posehub",
+        "imageSemantics": [],
+        "focusClearSemantics": {
+          "label": "取消讨论计划",
+          "isButton": true,
+          "hasTap": true,
+          "rect": [
+            0.0,
+            0.0,
+            28.0,
+            28.0
+          ]
+        },
+        "legacyCropPainterCount": 0
+      }
+    },
+    {
+      "frame": "dark/focus-enter-181ms.png",
+      "bytes": 26806,
+      "sha256": "df5dcb1aac3cbafd2a8ad32665de368396732c813778948be82a4f7688495395",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 181000,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": null,
+        "libraryKind": "current-posehub",
+        "imageSemantics": [],
+        "focusClearSemantics": {
+          "label": "取消讨论计划",
+          "isButton": true,
+          "hasTap": true,
+          "rect": [
+            0.0,
+            0.0,
+            28.0,
+            28.0
+          ]
+        },
+        "legacyCropPainterCount": 0
+      }
+    },
+    {
+      "frame": "dark/focus-exit-0ms.png",
+      "bytes": 26806,
+      "sha256": "df5dcb1aac3cbafd2a8ad32665de368396732c813778948be82a4f7688495395",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 0,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": null,
+        "libraryKind": "current-posehub",
+        "imageSemantics": [],
+        "focusClearSemantics": {
+          "label": "取消讨论计划",
+          "isButton": true,
+          "hasTap": false,
+          "rect": [
+            0.0,
+            0.0,
+            28.0,
+            28.0
+          ]
+        },
+        "legacyCropPainterCount": 0
+      }
+    },
+    {
+      "frame": "dark/focus-exit-1ms.png",
+      "bytes": 26828,
+      "sha256": "5005b89d14d905604693790c2f2608ce59b1e88026c0c0d63dd5045ce05c9e95",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 1000,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": null,
+        "libraryKind": "current-posehub",
+        "imageSemantics": [],
+        "focusClearSemantics": {
+          "label": "取消讨论计划",
+          "isButton": true,
+          "hasTap": false,
+          "rect": [
+            0.0,
+            0.0,
+            28.0,
+            28.0
+          ]
+        },
+        "legacyCropPainterCount": 0
+      }
+    },
+    {
+      "frame": "dark/focus-exit-119ms.png",
+      "bytes": 15672,
+      "sha256": "d1f3c69f8376551b513120aa20fdd1a8c254ed7b8ced92dbc7bd85ab5b1bdeac",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 119000,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": null,
+        "libraryKind": "current-posehub",
+        "imageSemantics": [],
+        "focusClearSemantics": {
+          "label": "取消讨论计划",
+          "isButton": true,
+          "hasTap": false,
+          "rect": [
+            0.0,
+            0.0,
+            28.0,
+            28.0
+          ]
+        },
+        "legacyCropPainterCount": 0
+      }
+    },
+    {
+      "frame": "dark/focus-exit-121ms.png",
+      "bytes": 15672,
+      "sha256": "d1f3c69f8376551b513120aa20fdd1a8c254ed7b8ced92dbc7bd85ab5b1bdeac",
+      "width": 1082,
+      "height": 2402,
+      "elapsedUs": 121000,
+      "runtime": {
+        "bubbleRepaintBoundaryCount": null,
+        "libraryKind": "current-posehub",
+        "imageSemantics": [],
+        "focusClearSemantics": null,
+        "legacyCropPainterCount": 0
+      }
+    }
+  ],
+  "capturePlan": {
+    "framePairs": 130,
+    "framesPerTheme": 65,
+    "originalFramePairs": 58,
+    "firstRevealMs": [
+      179,
+      180,
+      181,
+      305,
+      429,
+      430,
+      431
+    ],
+    "crossfadeMs": [
+      899,
+      900,
+      901,
+      1025,
+      1149,
+      1150,
+      1151
+    ],
+    "focusEnterMs": [
+      0,
+      1,
+      179,
+      181
+    ],
+    "focusExitMs": [
+      0,
+      1,
+      119,
+      121
+    ],
+    "sourceTiming": {
+      "firstRevealDelayMs": 180,
+      "revealAndCrossfadeMs": 250,
+      "silhouetteHoldMs": 900,
+      "cycleMs": 1150,
+      "focusEnterMs": 180,
+      "focusExitMs": 120
+    }
+  },
+  "originalCaptureInputSha256": "a2c6df4c3e5dd8f3acab967ab835b15b0d9c6db3f98c318c0d8fcb705d490711",
+  "historicalOriginalFrameCount": 29,
+  "historicalOriginalFramesByteIdentical": true,
+  "bubbleRepaintBoundaryCounts": [
+    4
+  ],
+  "legacyAlpha": {
+    "schema": "smartfit-ui-kit-legacy-alpha-fixture@1",
+    "provenance": {
+      "apk": "E:/AII-3D/3D-Sport-AI/Sport-Helper/.buildlog/install/SmartFit-alpha-0.1.0+31-5efb3e0-internal-arm64-v8a-release.apk",
+      "apkBytes": 184649140,
+      "apkSha256": "8eb0b91813a02c311f9db27983787fb479f8ddf5b3e8b0661f78ff67dcb01e73",
+      "sourceCommit": "5efb3e0ba8dfe418f4b5ea0ce87e9e04f9b3e594",
+      "indexZipEntry": "assets/flutter_assets/assets/app_test_pack/app-test-pack-r1/index.json",
+      "indexSha256": "3ddf096feeee206a0edc5766e34896da5eea540254e3c272ac0f490d8add9f33",
+      "boundsZipEntry": "assets/flutter_assets/assets/app_test_pack/app-test-pack-r1/alpha-bounds.json",
+      "boundsSha256": "13703221b906bb367751aa1585925a99bcb050eafbe5fecf052d4d96fdc76b8a",
+      "originalBytesAndBoundsPreserved": true,
+      "syntheticPixelsOrBounds": false
+    },
+    "images": [
+      {
+        "actionId": "h-squat",
+        "asset": "assets/app_test_pack/app-test-pack-r1/objects/4637392bf045983d955ff58e47d8775f5f24d67bdefb21fde95d4a1612f3e905.webp",
+        "fixture": "4637392bf045983d955ff58e47d8775f5f24d67bdefb21fde95d4a1612f3e905.webp",
+        "bytes": 14066,
+        "sha256": "4637392bf045983d955ff58e47d8775f5f24d67bdefb21fde95d4a1612f3e905",
+        "width": 240,
+        "height": 240,
+        "bounds": [
+          53,
+          76,
+          240,
+          240
+        ],
+        "role": "alphaThumbnail"
+      },
+      {
+        "actionId": "w-bird-dog",
+        "asset": "assets/app_test_pack/app-test-pack-r1/objects/7919cb216c0dc7a27a02821b5a8a035a0d19bbcd50aafbfe1cfef0c3bb95f7d1.webp",
+        "fixture": "7919cb216c0dc7a27a02821b5a8a035a0d19bbcd50aafbfe1cfef0c3bb95f7d1.webp",
+        "bytes": 13814,
+        "sha256": "7919cb216c0dc7a27a02821b5a8a035a0d19bbcd50aafbfe1cfef0c3bb95f7d1",
+        "width": 240,
+        "height": 240,
+        "bounds": [
+          14,
+          74,
+          239,
+          165
+        ],
+        "role": "alphaThumbnail"
+      }
+    ]
+  },
+  "isPhoneScreenshot": false,
+  "isPerformanceMeasurement": false,
+  "container": {
+    "left": 20,
+    "top": 64,
+    "right": 20,
+    "bottom": 20
+  },
+  "media": "production PoseHubAssetBundle + verified bundled images; genuine historical legacy alpha bytes, index and bounds served by immutable test AssetBundle",
+  "routeExitTrigger": "production public control.beginExit; no copied animation",
+  "focusSampleTimesMs": {
+    "appearing": 90,
+    "held": 180,
+    "clearing": 60,
+    "cleared": 120
+  },
+  "deliveryDurationUs": 890000
+}

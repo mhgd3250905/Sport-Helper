@@ -1,0 +1,14 @@
+{
+  "variant": "new",
+  "source": "de0bd432ec85f055206792b921964630739fd137",
+  "inputs": "E:/AII-3D/3D-Sport-AI/Sport-Helper-coach-ui-kit/tools/ui_kit_frames/inputs-slots.json",
+  "output": "E:/AII-3D/3D-Sport-AI/deliveries/sdk-kit-plus51-main700d010-20261031/frames/new",
+  "mediaCache": "E:/AII-3D/3D-Sport-AI/deliveries/sdk-kit-plus51-main700d010-20261031/frames/new-receipts/image-cache",
+  "publicInputsSha256": "3edf47e1306cb183f84b51d03775af0f0b9dc38bbbcb035e677669677e525f8f",
+  "driverSha256": "a4b94ee1f946f026b70e1104eaad286e938756b4caff0e9bc3a4dc62bb2f7feb",
+  "adapterSha256": "f742515585f03c5ddc7f607ace874510ae13cfae2eaf11207c533856d57695f6",
+  "mediaFixtureManifestSha256": "e3e1c096dcdeb2426754893b4557058eac69cce07df3597cbd987b3a2eed7aba",
+  "focusImplementation": "SDK",
+  "legacyFixtureRoot": "E:/AII-3D/3D-Sport-AI/Sport-Helper-coach-ui-kit/tools/ui_kit_frames/legacy-alpha",
+  "historicalBase": "E:/AII-3D/3D-Sport-AI/Sport-Helper-coach-ui-kit/docs/ui-kit-frames/base"
+}
