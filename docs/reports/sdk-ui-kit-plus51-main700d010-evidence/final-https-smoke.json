@@ -1,0 +1,80 @@
+{
+  "format": "smartfit-posehub-v3-r2-download-smoke@1",
+  "status": "passed",
+  "recordedAtUtc": "2026-10-31T15:06:50.862580Z",
+  "catalogSha256": "75881cf91621c967f80732f0219f23e85b35e8bde5d1a51ee75dec5f7c5edd36",
+  "packVersion": "r1-v3",
+  "allActions": 219,
+  "aiActions": 211,
+  "pendingActions": 8,
+  "selection": "median video bytes; ID breaks ties",
+  "selectedIndex": 109,
+  "selectedActionId": "serratus-C",
+  "videoBytes": 749713,
+  "videoSha256": "fa13905f326619b4dbf61d56baf5fd7e604e85f66a4afcab5f2829b2086ee473",
+  "transport": "anonymous official R2 HTTPS; default TLS validation",
+  "bundledFileLoaderUsed": false,
+  "syntheticMedia": false,
+  "devicePlaybackVerified": false,
+  "apkBuilt": false,
+  "zipRead": false,
+  "initialPrepareMilliseconds": 5012,
+  "verifiedCacheFiles": [
+    {
+      "path": "media/serratus-C/serratus-C-complete-alpha-r2/serratus-C.rgb-alpha.mp4",
+      "bytes": 749713,
+      "sha256": "fa13905f326619b4dbf61d56baf5fd7e604e85f66a4afcab5f2829b2086ee473"
+    },
+    {
+      "path": "media/serratus-C/serratus-C-complete-alpha-r2/serratus-C.cover.alpha.webp",
+      "bytes": 25054,
+      "sha256": "8809d2971689f5a2aa75dd7916d6f4e48588941c8c7d5d5d6c6a379fe99bca8e"
+    },
+    {
+      "path": "media/serratus-C/serratus-C-complete-alpha-r2-still-margin-r1/serratus-C.thumbnail.alpha.webp",
+      "bytes": 5162,
+      "sha256": "d116b432ae6395591437625c819d3494a47ff8447c7d6a062f4853fb8b4ce787"
+    }
+  ],
+  "initialHttpRequests": 3,
+  "verifiedNetworkPayloadBytes": 779929,
+  "repeatCachePrepareMilliseconds": 11,
+  "repeatAdditionalHttpRequests": 0,
+  "offlineReopenPrepareMilliseconds": 32,
+  "offlineAdditionalHttpRequests": 0,
+  "offlineNetworkExplicitlyBlocked": true,
+  "requests": [
+    {
+      "method": "GET",
+      "url": "https://media.uuugk.win/pack/r1-v3/media/serratus-C/serratus-C-complete-alpha-r2/serratus-C.cover.alpha.webp",
+      "anonymous": true,
+      "statusCode": 200,
+      "contentLength": 25054,
+      "contentType": "image/webp",
+      "cacheControl": "public, max-age=31536000, immutable",
+      "headersElapsedMilliseconds": 2318
+    },
+    {
+      "method": "GET",
+      "url": "https://media.uuugk.win/pack/r1-v3/media/serratus-C/serratus-C-complete-alpha-r2-still-margin-r1/serratus-C.thumbnail.alpha.webp",
+      "anonymous": true,
+      "statusCode": 200,
+      "contentLength": 5162,
+      "contentType": "image/webp",
+      "cacheControl": "public, max-age=31536000, immutable",
+      "headersElapsedMilliseconds": 1041
+    },
+    {
+      "method": "GET",
+      "url": "https://media.uuugk.win/pack/r1-v3/media/serratus-C/serratus-C-complete-alpha-r2/serratus-C.rgb-alpha.mp4",
+      "anonymous": true,
+      "statusCode": 200,
+      "contentLength": 749713,
+      "contentType": "video/mp4",
+      "cacheControl": "public, max-age=31536000, immutable",
+      "headersElapsedMilliseconds": 869
+    }
+  ],
+  "failedHttpAttempts": 0,
+  "temporaryCacheCleaned": true
+}

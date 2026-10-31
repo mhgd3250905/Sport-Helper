@@ -1,0 +1,2 @@
+# Raw CLI receipts retain original bytes, including terminal progress padding.
+*.log binary

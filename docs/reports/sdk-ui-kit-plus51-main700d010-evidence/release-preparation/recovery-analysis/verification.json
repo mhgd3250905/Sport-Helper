@@ -1,0 +1,375 @@
+{
+  "schema": "smartfit-sdk700-offline-analysis-reconciliation@1",
+  "source": "7548ee00955f3811fb9c18139503bb7f04abc11a",
+  "sdk": "700d0100f1cb42ef122e774a6ee0076d1916b5e5",
+  "rawInputSha256Unchanged": {
+    "plan-5m-01.json": true,
+    "plan-5m-02.json": true,
+    "plan-5m-03.json": true,
+    "plan-10m-01.json": true,
+    "plan-20m-01.json": true,
+    "summary.json": true,
+    "live-duration-source-binding.json": true
+  },
+  "analysisSummarySha256": "b2b9097d1aeed7916b63fbfc0a6f4efea3341aa79b8d91a2c0fc2f44edd89796",
+  "sourceBindingSha256": "ce354677fdbad5bfc75004efe0c6f60ba1bce149f830de982ed4f4deb96c7947",
+  "allStrongChecksPass": true,
+  "allRecoveryCountsExact": true,
+  "allCapturedCallsMatchSdkUsageRecords": true,
+  "caseCount": 5,
+  "llmCalls": 24,
+  "httpAttempts": 24,
+  "tokens": {
+    "inputTokens": 254462,
+    "outputTokens": 8058,
+    "totalTokens": 262520,
+    "cachedInputTokens": 178816,
+    "reasoningOutputTokens": null
+  },
+  "tokenCoverage": {
+    "inputTokens": {
+      "observedCalls": 24,
+      "unknownCalls": 0,
+      "knownSubtotal": 254462
+    },
+    "outputTokens": {
+      "observedCalls": 24,
+      "unknownCalls": 0,
+      "knownSubtotal": 8058
+    },
+    "totalTokens": {
+      "observedCalls": 24,
+      "unknownCalls": 0,
+      "knownSubtotal": 262520
+    },
+    "cachedInputTokens": {
+      "observedCalls": 24,
+      "unknownCalls": 0,
+      "knownSubtotal": 178816
+    },
+    "reasoningOutputTokens": {
+      "observedCalls": 21,
+      "unknownCalls": 3,
+      "knownSubtotal": 4324
+    }
+  },
+  "casesById": {
+    "5m-01": {
+      "allUsageRecordsMatchCapturedCalls": true,
+      "normalizedUsageSubtotal": {
+        "promptTokens": 71550,
+        "completionTokens": 1733,
+        "cachedTokens": 54272,
+        "reasoningTokens": 875
+      },
+      "tokenCoverage": {
+        "inputTokens": {
+          "observedCalls": 6,
+          "unknownCalls": 0,
+          "knownSubtotal": 71550
+        },
+        "outputTokens": {
+          "observedCalls": 6,
+          "unknownCalls": 0,
+          "knownSubtotal": 1733
+        },
+        "totalTokens": {
+          "observedCalls": 6,
+          "unknownCalls": 0,
+          "knownSubtotal": 73283
+        },
+        "cachedInputTokens": {
+          "observedCalls": 6,
+          "unknownCalls": 0,
+          "knownSubtotal": 54272
+        },
+        "reasoningOutputTokens": {
+          "observedCalls": 5,
+          "unknownCalls": 1,
+          "knownSubtotal": 875
+        }
+      },
+      "calls": 6,
+      "fullTurnElapsedMs": 16376,
+      "scheduledSeconds": {
+        "coachEstimateSeconds": 286.0,
+        "cardSecondsIncludingPrep": 287.0,
+        "executionSecondsIncludingPrep": 287.0
+      },
+      "allThreeScheduledEstimatesWithinTolerance": {
+        "coachEstimateSeconds": true,
+        "cardSecondsIncludingPrep": true,
+        "executionSecondsIncludingPrep": true
+      },
+      "manualStagesAcceptedAsEstimates": true,
+      "manualWorkPhases": 1,
+      "executionDurationKind": "估算",
+      "automaticExecutionEvidenceEstablished": false,
+      "otherIssueCodes": [
+        "missing_parameters"
+      ],
+      "allDraftRequests": 2,
+      "allDraftKnownExecutions": 2
+    },
+    "5m-02": {
+      "allUsageRecordsMatchCapturedCalls": true,
+      "normalizedUsageSubtotal": {
+        "promptTokens": 47708,
+        "completionTokens": 1375,
+        "cachedTokens": 33792,
+        "reasoningTokens": 679
+      },
+      "tokenCoverage": {
+        "inputTokens": {
+          "observedCalls": 5,
+          "unknownCalls": 0,
+          "knownSubtotal": 47708
+        },
+        "outputTokens": {
+          "observedCalls": 5,
+          "unknownCalls": 0,
+          "knownSubtotal": 1375
+        },
+        "totalTokens": {
+          "observedCalls": 5,
+          "unknownCalls": 0,
+          "knownSubtotal": 49083
+        },
+        "cachedInputTokens": {
+          "observedCalls": 5,
+          "unknownCalls": 0,
+          "knownSubtotal": 33792
+        },
+        "reasoningOutputTokens": {
+          "observedCalls": 4,
+          "unknownCalls": 1,
+          "knownSubtotal": 679
+        }
+      },
+      "calls": 5,
+      "fullTurnElapsedMs": 15125,
+      "scheduledSeconds": {
+        "coachEstimateSeconds": 314.0,
+        "cardSecondsIncludingPrep": 317.0,
+        "executionSecondsIncludingPrep": 317.0
+      },
+      "allThreeScheduledEstimatesWithinTolerance": {
+        "coachEstimateSeconds": true,
+        "cardSecondsIncludingPrep": true,
+        "executionSecondsIncludingPrep": true
+      },
+      "manualStagesAcceptedAsEstimates": true,
+      "manualWorkPhases": 0,
+      "executionDurationKind": "自动排程",
+      "automaticExecutionEvidenceEstablished": true,
+      "otherIssueCodes": [],
+      "allDraftRequests": 1,
+      "allDraftKnownExecutions": 1
+    },
+    "5m-03": {
+      "allUsageRecordsMatchCapturedCalls": true,
+      "normalizedUsageSubtotal": {
+        "promptTokens": 49508,
+        "completionTokens": 1346,
+        "cachedTokens": 34816,
+        "reasoningTokens": 657
+      },
+      "tokenCoverage": {
+        "inputTokens": {
+          "observedCalls": 5,
+          "unknownCalls": 0,
+          "knownSubtotal": 49508
+        },
+        "outputTokens": {
+          "observedCalls": 5,
+          "unknownCalls": 0,
+          "knownSubtotal": 1346
+        },
+        "totalTokens": {
+          "observedCalls": 5,
+          "unknownCalls": 0,
+          "knownSubtotal": 50854
+        },
+        "cachedInputTokens": {
+          "observedCalls": 5,
+          "unknownCalls": 0,
+          "knownSubtotal": 34816
+        },
+        "reasoningOutputTokens": {
+          "observedCalls": 4,
+          "unknownCalls": 1,
+          "knownSubtotal": 657
+        }
+      },
+      "calls": 5,
+      "fullTurnElapsedMs": 16723,
+      "scheduledSeconds": {
+        "coachEstimateSeconds": 307.0,
+        "cardSecondsIncludingPrep": 309.0,
+        "executionSecondsIncludingPrep": 309.0
+      },
+      "allThreeScheduledEstimatesWithinTolerance": {
+        "coachEstimateSeconds": true,
+        "cardSecondsIncludingPrep": true,
+        "executionSecondsIncludingPrep": true
+      },
+      "manualStagesAcceptedAsEstimates": true,
+      "manualWorkPhases": 0,
+      "executionDurationKind": "自动排程",
+      "automaticExecutionEvidenceEstablished": true,
+      "otherIssueCodes": [],
+      "allDraftRequests": 1,
+      "allDraftKnownExecutions": 1
+    },
+    "10m-01": {
+      "allUsageRecordsMatchCapturedCalls": true,
+      "normalizedUsageSubtotal": {
+        "promptTokens": 43026,
+        "completionTokens": 1753,
+        "cachedTokens": 28416,
+        "reasoningTokens": 1041
+      },
+      "tokenCoverage": {
+        "inputTokens": {
+          "observedCalls": 4,
+          "unknownCalls": 0,
+          "knownSubtotal": 43026
+        },
+        "outputTokens": {
+          "observedCalls": 4,
+          "unknownCalls": 0,
+          "knownSubtotal": 1753
+        },
+        "totalTokens": {
+          "observedCalls": 4,
+          "unknownCalls": 0,
+          "knownSubtotal": 44779
+        },
+        "cachedInputTokens": {
+          "observedCalls": 4,
+          "unknownCalls": 0,
+          "knownSubtotal": 28416
+        },
+        "reasoningOutputTokens": {
+          "observedCalls": 4,
+          "unknownCalls": 0,
+          "knownSubtotal": 1041
+        }
+      },
+      "calls": 4,
+      "fullTurnElapsedMs": 15457,
+      "scheduledSeconds": {
+        "coachEstimateSeconds": 625.0,
+        "cardSecondsIncludingPrep": 629.0,
+        "executionSecondsIncludingPrep": 629.0
+      },
+      "allThreeScheduledEstimatesWithinTolerance": {
+        "coachEstimateSeconds": true,
+        "cardSecondsIncludingPrep": true,
+        "executionSecondsIncludingPrep": true
+      },
+      "manualStagesAcceptedAsEstimates": true,
+      "manualWorkPhases": 0,
+      "executionDurationKind": "自动排程",
+      "automaticExecutionEvidenceEstablished": true,
+      "otherIssueCodes": [],
+      "allDraftRequests": 1,
+      "allDraftKnownExecutions": 1
+    },
+    "20m-01": {
+      "allUsageRecordsMatchCapturedCalls": true,
+      "normalizedUsageSubtotal": {
+        "promptTokens": 42670,
+        "completionTokens": 1851,
+        "cachedTokens": 27520,
+        "reasoningTokens": 1072
+      },
+      "tokenCoverage": {
+        "inputTokens": {
+          "observedCalls": 4,
+          "unknownCalls": 0,
+          "knownSubtotal": 42670
+        },
+        "outputTokens": {
+          "observedCalls": 4,
+          "unknownCalls": 0,
+          "knownSubtotal": 1851
+        },
+        "totalTokens": {
+          "observedCalls": 4,
+          "unknownCalls": 0,
+          "knownSubtotal": 44521
+        },
+        "cachedInputTokens": {
+          "observedCalls": 4,
+          "unknownCalls": 0,
+          "knownSubtotal": 27520
+        },
+        "reasoningOutputTokens": {
+          "observedCalls": 4,
+          "unknownCalls": 0,
+          "knownSubtotal": 1072
+        }
+      },
+      "calls": 4,
+      "fullTurnElapsedMs": 15102,
+      "scheduledSeconds": {
+        "coachEstimateSeconds": 1241.0,
+        "cardSecondsIncludingPrep": 1242.0,
+        "executionSecondsIncludingPrep": 1242.0
+      },
+      "allThreeScheduledEstimatesWithinTolerance": {
+        "coachEstimateSeconds": true,
+        "cardSecondsIncludingPrep": true,
+        "executionSecondsIncludingPrep": true
+      },
+      "manualStagesAcceptedAsEstimates": true,
+      "manualWorkPhases": 0,
+      "executionDurationKind": "自动排程",
+      "automaticExecutionEvidenceEstablished": true,
+      "otherIssueCodes": [],
+      "allDraftRequests": 1,
+      "allDraftKnownExecutions": 1
+    }
+  },
+  "firstCaseNonDurationRepair": {
+    "code": "missing_parameters",
+    "missing": [
+      "goal"
+    ],
+    "failedToolKey": "5m-01:response-3:tool-call_00_iGyRl7yjlNKPoxLenI3S1134",
+    "receiptSources": [
+      {
+        "file": "plan-5m-01.json",
+        "sourceType": "actual_llm_request",
+        "requestCallIndex": 4,
+        "messagesJsonPointer": "/transportCalls/3/request/messages",
+        "assistantJsonPointer": "/transportCalls/3/request/messages/9",
+        "receiptJsonPointer": "/transportCalls/3/request/messages/10"
+      },
+      {
+        "file": "plan-5m-01.json",
+        "sourceType": "actual_llm_request",
+        "requestCallIndex": 5,
+        "messagesJsonPointer": "/transportCalls/4/request/messages",
+        "assistantJsonPointer": "/transportCalls/4/request/messages/9",
+        "receiptJsonPointer": "/transportCalls/4/request/messages/10"
+      },
+      {
+        "file": "plan-5m-01.json",
+        "sourceType": "actual_llm_request",
+        "requestCallIndex": 6,
+        "messagesJsonPointer": "/transportCalls/5/request/messages",
+        "assistantJsonPointer": "/transportCalls/5/request/messages/9",
+        "receiptJsonPointer": "/transportCalls/5/request/messages/10"
+      }
+    ],
+    "followup": "response4 set_params supplies goal; response5 draft_plan succeeds; response6 show_plan delivers",
+    "durationRecoveryTriggered": false,
+    "draftRequestsAndExecutionsTotal": 2,
+    "draftRequestsAndExecutionsAfterDurationFailure": 0
+  },
+  "manualAcceptancePolicy": "Self-paced phases are accepted estimates under the current explicit user instruction; no actual automatic completion is inferred.",
+  "modelRequestsPerformedByAnalysis": false,
+  "rawModified": false
+}

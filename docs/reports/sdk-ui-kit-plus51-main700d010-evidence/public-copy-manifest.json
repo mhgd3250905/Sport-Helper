@@ -1,0 +1,183 @@
+{
+  "schema": "smartfit-plus51-public-copy-manifest@1",
+  "recordedAtUtc": "2026-10-31T16:02:29.829239+00:00",
+  "source": "de0bd432ec85f055206792b921964630739fd137",
+  "sdk": "700d0100f1cb42ef122e774a6ee0076d1916b5e5",
+  "files": [
+    {
+      "source": "E:\\AII-3D\\3D-Sport-AI\\deliveries\\sdk-kit-plus51-main700d010-20261031\\final-software-gates.json",
+      "sourceRelativeToDelivery": "final-software-gates.json",
+      "destination": "docs/reports/sdk-ui-kit-plus51-main700d010-evidence/final-software-gates.json",
+      "bytes": 381562,
+      "sha256": "e5520fff929a0eb734f50729d1213cfb6da46a2da0e92f1df5ca07b46043a31b",
+      "classification": "synthetic_model_or_software_evidence"
+    },
+    {
+      "source": "E:\\AII-3D\\3D-Sport-AI\\deliveries\\sdk-kit-plus51-main700d010-20261031\\final-strict-lock.log",
+      "sourceRelativeToDelivery": "final-strict-lock.log",
+      "destination": "docs/reports/sdk-ui-kit-plus51-main700d010-evidence/final-strict-lock.log",
+      "bytes": 656,
+      "sha256": "342244e9283f2831d140ba6b9be0cdfd9f5e4590a90995d122748a55cf60c354",
+      "classification": "synthetic_model_or_software_evidence"
+    },
+    {
+      "source": "E:\\AII-3D\\3D-Sport-AI\\deliveries\\sdk-kit-plus51-main700d010-20261031\\final-flutter-analyze.log",
+      "sourceRelativeToDelivery": "final-flutter-analyze.log",
+      "destination": "docs/reports/sdk-ui-kit-plus51-main700d010-evidence/final-flutter-analyze.log",
+      "bytes": 200,
+      "sha256": "81a884b01b0df3b388c8b43851cb6d796d86946f0cefad7cd1f7c4b5f4c085aa",
+      "classification": "synthetic_model_or_software_evidence"
+    },
+    {
+      "source": "E:\\AII-3D\\3D-Sport-AI\\deliveries\\sdk-kit-plus51-main700d010-20261031\\final-https-smoke.json",
+      "sourceRelativeToDelivery": "final-https-smoke.json",
+      "destination": "docs/reports/sdk-ui-kit-plus51-main700d010-evidence/final-https-smoke.json",
+      "bytes": 2946,
+      "sha256": "5988fed648b39bb2b31b8eaa7922126c7bb3a97178269985a1e3d428a402679d",
+      "classification": "synthetic_model_or_software_evidence"
+    },
+    {
+      "source": "E:\\AII-3D\\3D-Sport-AI\\deliveries\\sdk-kit-plus51-main700d010-20261031\\live-duration-source-binding.json",
+      "sourceRelativeToDelivery": "live-duration-source-binding.json",
+      "destination": "docs/reports/sdk-ui-kit-plus51-main700d010-evidence/live-duration-source-binding.json",
+      "bytes": 1647,
+      "sha256": "ce354677fdbad5bfc75004efe0c6f60ba1bce149f830de982ed4f4deb96c7947",
+      "classification": "synthetic_model_or_software_evidence"
+    },
+    {
+      "source": "E:\\AII-3D\\3D-Sport-AI\\deliveries\\sdk-kit-plus51-main700d010-20261031\\live-durations-700d010\\summary.json",
+      "sourceRelativeToDelivery": "live-durations-700d010/summary.json",
+      "destination": "docs/reports/sdk-ui-kit-plus51-main700d010-evidence/live-durations-700d010/summary.json",
+      "bytes": 14560,
+      "sha256": "2114ce11ac4e18c50ad10b72cb7d22a934d35e68f40eb1528d5ae3d30b62a1df",
+      "classification": "synthetic_model_or_software_evidence"
+    },
+    {
+      "source": "E:\\AII-3D\\3D-Sport-AI\\deliveries\\sdk-kit-plus51-main700d010-20261031\\live-durations-700d010\\plan-5m-01.json",
+      "sourceRelativeToDelivery": "live-durations-700d010/plan-5m-01.json",
+      "destination": "docs/reports/sdk-ui-kit-plus51-main700d010-evidence/live-durations-700d010/plan-5m-01.json",
+      "bytes": 453966,
+      "sha256": "16d80a2e75efc14c87d08df742e0a7e7e2e4f3905738176db6af0925fce6cd14",
+      "classification": "synthetic_model_or_software_evidence"
+    },
+    {
+      "source": "E:\\AII-3D\\3D-Sport-AI\\deliveries\\sdk-kit-plus51-main700d010-20261031\\live-durations-700d010\\plan-5m-02.json",
+      "sourceRelativeToDelivery": "live-durations-700d010/plan-5m-02.json",
+      "destination": "docs/reports/sdk-ui-kit-plus51-main700d010-evidence/live-durations-700d010/plan-5m-02.json",
+      "bytes": 349753,
+      "sha256": "72c68ab7857bc9677676937a6dab198499f7ea42623c2da143d83d12282e67c2",
+      "classification": "synthetic_model_or_software_evidence"
+    },
+    {
+      "source": "E:\\AII-3D\\3D-Sport-AI\\deliveries\\sdk-kit-plus51-main700d010-20261031\\live-durations-700d010\\plan-5m-03.json",
+      "sourceRelativeToDelivery": "live-durations-700d010/plan-5m-03.json",
+      "destination": "docs/reports/sdk-ui-kit-plus51-main700d010-evidence/live-durations-700d010/plan-5m-03.json",
+      "bytes": 355296,
+      "sha256": "a7971262cb1aafd8cf3b2c2870d4727dbae8772c58e855c36237e307a8718bd4",
+      "classification": "synthetic_model_or_software_evidence"
+    },
+    {
+      "source": "E:\\AII-3D\\3D-Sport-AI\\deliveries\\sdk-kit-plus51-main700d010-20261031\\live-durations-700d010\\plan-10m-01.json",
+      "sourceRelativeToDelivery": "live-durations-700d010/plan-10m-01.json",
+      "destination": "docs/reports/sdk-ui-kit-plus51-main700d010-evidence/live-durations-700d010/plan-10m-01.json",
+      "bytes": 319113,
+      "sha256": "7177ff62df9b2b5071bfd136a8a2f7316203d1c3f413c3c2cad67dc83cf7cd3a",
+      "classification": "synthetic_model_or_software_evidence"
+    },
+    {
+      "source": "E:\\AII-3D\\3D-Sport-AI\\deliveries\\sdk-kit-plus51-main700d010-20261031\\live-durations-700d010\\plan-20m-01.json",
+      "sourceRelativeToDelivery": "live-durations-700d010/plan-20m-01.json",
+      "destination": "docs/reports/sdk-ui-kit-plus51-main700d010-evidence/live-durations-700d010/plan-20m-01.json",
+      "bytes": 330401,
+      "sha256": "3a31cb8d00998ddb1a6f0c8dee8151883d93fb7ed88ce46afea8bc3ba7dcc31f",
+      "classification": "synthetic_model_or_software_evidence"
+    },
+    {
+      "source": "E:\\AII-3D\\3D-Sport-AI\\deliveries\\sdk-kit-plus51-main700d010-20261031\\release-preparation\\recovery-analysis\\summary.json",
+      "sourceRelativeToDelivery": "release-preparation/recovery-analysis/summary.json",
+      "destination": "docs/reports/sdk-ui-kit-plus51-main700d010-evidence/release-preparation/recovery-analysis/summary.json",
+      "bytes": 1628551,
+      "sha256": "b2b9097d1aeed7916b63fbfc0a6f4efea3341aa79b8d91a2c0fc2f44edd89796",
+      "classification": "synthetic_model_or_software_evidence"
+    },
+    {
+      "source": "E:\\AII-3D\\3D-Sport-AI\\deliveries\\sdk-kit-plus51-main700d010-20261031\\release-preparation\\recovery-analysis\\verification.json",
+      "sourceRelativeToDelivery": "release-preparation/recovery-analysis/verification.json",
+      "destination": "docs/reports/sdk-ui-kit-plus51-main700d010-evidence/release-preparation/recovery-analysis/verification.json",
+      "bytes": 11342,
+      "sha256": "a6f119086d565bca178ec1b8c6106dd508434ea7b2b3fec63e67c2773934bd9c",
+      "classification": "synthetic_model_or_software_evidence"
+    },
+    {
+      "source": "E:\\AII-3D\\3D-Sport-AI\\deliveries\\sdk-kit-plus51-main700d010-20261031\\release-preparation\\recovery-analysis\\details.md",
+      "sourceRelativeToDelivery": "release-preparation/recovery-analysis/details.md",
+      "destination": "docs/reports/sdk-ui-kit-plus51-main700d010-evidence/release-preparation/recovery-analysis/details.md",
+      "bytes": 4229,
+      "sha256": "96ee236aba3449c1231690468d93fdbf2692c4566b6224ed99dd9b1930860b60",
+      "classification": "synthetic_model_or_software_evidence"
+    },
+    {
+      "source": "E:\\AII-3D\\3D-Sport-AI\\deliveries\\sdk-kit-plus51-main700d010-20261031\\release-preparation\\recovery-analysis\\first-case-parameter-repair.md",
+      "sourceRelativeToDelivery": "release-preparation/recovery-analysis/first-case-parameter-repair.md",
+      "destination": "docs/reports/sdk-ui-kit-plus51-main700d010-evidence/release-preparation/recovery-analysis/first-case-parameter-repair.md",
+      "bytes": 2055,
+      "sha256": "650db381648203b0d643dc25d58e6e46869ee2026715946c47a34300f94d6891",
+      "classification": "synthetic_model_or_software_evidence"
+    },
+    {
+      "source": "E:\\AII-3D\\3D-Sport-AI\\deliveries\\sdk-kit-plus51-main700d010-20261031\\release-preparation\\recovery-analysis\\case-5m-01.json",
+      "sourceRelativeToDelivery": "release-preparation/recovery-analysis/case-5m-01.json",
+      "destination": "docs/reports/sdk-ui-kit-plus51-main700d010-evidence/release-preparation/recovery-analysis/case-5m-01.json",
+      "bytes": 410276,
+      "sha256": "7d705b8a554c86df89669dc6a2234e71dbc45ba1190e824dd1610a8a71ecf151",
+      "classification": "synthetic_model_or_software_evidence"
+    },
+    {
+      "source": "E:\\AII-3D\\3D-Sport-AI\\deliveries\\sdk-kit-plus51-main700d010-20261031\\release-preparation\\recovery-analysis\\case-5m-02.json",
+      "sourceRelativeToDelivery": "release-preparation/recovery-analysis/case-5m-02.json",
+      "destination": "docs/reports/sdk-ui-kit-plus51-main700d010-evidence/release-preparation/recovery-analysis/case-5m-02.json",
+      "bytes": 244054,
+      "sha256": "b3eb47880096cc4dcb02dfee5698f4519aac6f6d9f4ad4594d601b32c5372e22",
+      "classification": "synthetic_model_or_software_evidence"
+    },
+    {
+      "source": "E:\\AII-3D\\3D-Sport-AI\\deliveries\\sdk-kit-plus51-main700d010-20261031\\release-preparation\\recovery-analysis\\case-5m-03.json",
+      "sourceRelativeToDelivery": "release-preparation/recovery-analysis/case-5m-03.json",
+      "destination": "docs/reports/sdk-ui-kit-plus51-main700d010-evidence/release-preparation/recovery-analysis/case-5m-03.json",
+      "bytes": 274384,
+      "sha256": "f138b4057686cb1e84ae59e27d159f83608714eb48626cc8fb87775a38040750",
+      "classification": "synthetic_model_or_software_evidence"
+    },
+    {
+      "source": "E:\\AII-3D\\3D-Sport-AI\\deliveries\\sdk-kit-plus51-main700d010-20261031\\release-preparation\\recovery-analysis\\case-10m-01.json",
+      "sourceRelativeToDelivery": "release-preparation/recovery-analysis/case-10m-01.json",
+      "destination": "docs/reports/sdk-ui-kit-plus51-main700d010-evidence/release-preparation/recovery-analysis/case-10m-01.json",
+      "bytes": 255982,
+      "sha256": "65d5245598b52f59dfc782f69b3147f07211bfac87492e53145a42cdfea113ed",
+      "classification": "synthetic_model_or_software_evidence"
+    },
+    {
+      "source": "E:\\AII-3D\\3D-Sport-AI\\deliveries\\sdk-kit-plus51-main700d010-20261031\\release-preparation\\recovery-analysis\\case-20m-01.json",
+      "sourceRelativeToDelivery": "release-preparation/recovery-analysis/case-20m-01.json",
+      "destination": "docs/reports/sdk-ui-kit-plus51-main700d010-evidence/release-preparation/recovery-analysis/case-20m-01.json",
+      "bytes": 264571,
+      "sha256": "0ea9b1e4a38a8de38e7dd4a37f1404764baaf9b4874114b350ce2b685cbf33b6",
+      "classification": "synthetic_model_or_software_evidence"
+    }
+  ],
+  "excluded": [
+    "all APK files",
+    "native phone screenshots and videos",
+    "device serials",
+    "private keys and auth values",
+    "VM service URIs/origins/discovery receipts",
+    "raw full-test log (conservative Bearer-pattern screen; original hash retained in software gate)",
+    "image caches and archived failed attempts"
+  ],
+  "existingSoftwareFrames": "docs/ui-kit-frames/sdk-main700d010 (already archived in docs C; not recopied or rewritten)",
+  "generatedSanitizedSummaries": [
+    "docs/reports/sdk-ui-kit-plus51-main700d010.json",
+    "docs/reports/sdk-ui-kit-plus51-main700d010-evidence/source-A-B-proof.json"
+  ],
+  "noOriginalEvidenceModified": true
+}

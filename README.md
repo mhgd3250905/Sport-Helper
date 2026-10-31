@@ -1,5 +1,18 @@
 # 智能健身助手 SmartFit
 
+<!-- sdk-main700d010-current:start -->
+## +51 SDK main700d010 当前状态（2026-11-01）
+
+**用户已反馈真机验收通过，并要求停止测试。** 已停止测量，换装同源 +51 release。13 帧非零的量化事实和原记录保留，0 像素目标仍未达，Hark 独立回执未记录；不合 main、不动 release/1.0、不打 tag，不自行改参数。
+
+当前三包 pin `700d0100f1cb42ef122e774a6ee0076d1916b5e5`，运行接入已切 SDK 生成卡 / 交付过渡 / focus，版本 `0.1.0+51`。源码 B `de0bd432ec85f055206792b921964630739fd137`，实际模型运行 A `7548ee00955f3811fb9c18139503bb7f04abc11a`；A→B 仅 11 个帧工具文件，14 项模型输入 SHA 不变。SF 全量 **822/822、0 skip**，analyze --fatal-infos **0 issue**。
+
+浅深 130 对帧：117 对零差，13 对共 299 像素，单帧最多 81 / 通道最大 59；原 58 对与新增 focus 边界全 0。SDK 4 个 RepaintBoundary 保留。5 次独立真实生成全部交付无反问、排程 ±10%；24 LLM / 24 HTTP，input 254462 / output 8058。首 case 手动 10 reps 估算 30 秒按授权不失败；missing goal 参数修复单列，duration recovery=0，未覆盖失败恢复分支。
+
+包回执：release: artifact_verified; profile: artifact_verified。原生 profile：stopped_by_user_after_reported_acceptance；用户反馈通过按明确消息记录，不再补测等待态 overlay 或完整视频。原生手机内容不入仓。详见 [本轮总报告](docs/sdk-ui-kit-plus51-main700d010-2026-10-31.md)。以下旧 pin / 暂缓迁移 / 旧验收条件均为历史记录，以本节和报告界定当前状态。
+<!-- sdk-main700d010-current:end -->
+
+
 ## +51 SDK99复验（2026-10-31）
 
 `codex/coach-ui-kit` 源码 `d0a8887`，版本保持 `0.1.0+51`，三包/override钉SDK main `99c14495685f160019e10340ea6f0de6418a65b9`。全量 **857/857、0跳过**，严格分析0，58对帧每帧0像素差。真实生成门禁尚未全部通过，原始失败保留；调用数、耗时和输入/输出tokens已逐档记录。标签/剪影及生成卡/过渡按裁决保留SF实现，等slots合入后的新pin；未出包/采overlay，未合main、不动release/1.0、不打tag。详见[本轮记录](docs/sdk-ui-kit-plus51-sdk99c1449-2026-10-31.md)。
