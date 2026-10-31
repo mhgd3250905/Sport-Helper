@@ -66,6 +66,10 @@ def main():
     parser.add_argument('--pub-hosted-url', default='https://pub.dev')
     parser.add_argument('--adapter', type=Path)
     parser.add_argument('--inputs', type=Path, default=ROOT / 'inputs.json')
+    parser.add_argument('--driver', type=Path, default=ROOT / 'capture_test.dart')
+    parser.add_argument('--tools-subdir', type=Path, default=Path('tools/ui_kit_frames'))
+    parser.add_argument('--legacy-fixture-root', type=Path)
+    parser.add_argument('--historical-base', type=Path)
     args = parser.parse_args()
     checkout = args.checkout.resolve(strict=True)
     assert Path(git(checkout, 'rev-parse', '--show-toplevel')).resolve() == checkout
@@ -77,12 +81,14 @@ def main():
     assert not output.exists(), 'Use a fresh PNG directory; preserve prior frames.'
     assert not evidence.is_relative_to(output) and not output.is_relative_to(evidence)
     evidence.mkdir(parents=True)
-    driver = ROOT / 'capture_test.dart'
+    driver = args.driver.resolve(strict=True)
     adapter = args.adapter or (ROOT / ('capture_adapter_base.dart.template'
         if args.variant == 'base' else 'capture_adapter.dart'))
     assert driver.exists() and adapter.exists() and args.inputs.exists()
-    tools = checkout / 'tools/ui_kit_frames'
-    copy_identical_or_new(driver, tools / 'capture_test.dart')
+    assert not args.tools_subdir.is_absolute() and '..' not in args.tools_subdir.parts
+    tools = checkout / args.tools_subdir
+    assert tools.resolve().is_relative_to(checkout)
+    copy_identical_or_new(driver, tools / driver.name)
     copy_identical_or_new(adapter, tools / 'capture_adapter.dart')
     image_manifest_sha = provision_images(checkout)
     source_sha, source_files = inputs_identity(checkout)
@@ -102,6 +108,10 @@ def main():
               'publicInputsSha256': source_sha, 'driverSha256': sha(driver),
               'adapterSha256': sha(adapter), 'mediaFixtureManifestSha256': image_manifest_sha,
               'focusImplementation': 'SDK' if 'sdk.PlanFocusLabel(' in adapter.read_text(encoding='utf-8') else 'host-local'}
+    if args.legacy_fixture_root:
+        config['legacyFixtureRoot'] = args.legacy_fixture_root.resolve(strict=True).as_posix()
+    if args.historical_base:
+        config['historicalBase'] = args.historical_base.resolve(strict=True).as_posix()
     config_file = evidence / 'config.json'
     with config_file.open('x', encoding='utf-8', newline='\n') as stream:
         json.dump(config, stream, indent=2)
@@ -110,7 +120,7 @@ def main():
         '--reporter', 'expanded', '--dart-define=SMARTFIT_ALPHA_CARDS=true',
         '--dart-define=SMARTFIT_POSEHUB_PACK=true', '--dart-define=UGK_INTERNAL_MEDIA_PREVIEW=true',
         f'--dart-define=SMARTFIT_UI_KIT_CAPTURE_CONFIG={config_file.as_posix()}',
-        'tools/ui_kit_frames/capture_test.dart']
+        (args.tools_subdir / driver.name).as_posix()]
     with (evidence / 'capture.log').open('x', encoding='utf-8', newline='\n') as log:
         result = subprocess.run(command, cwd=checkout, env=env, stdout=log,
                                 stderr=subprocess.STDOUT, **flags)

@@ -1,0 +1,49 @@
+{
+  "schema": "smartfit-ui-kit-legacy-alpha-fixture@1",
+  "provenance": {
+    "apk": "E:/AII-3D/3D-Sport-AI/Sport-Helper/.buildlog/install/SmartFit-alpha-0.1.0+31-5efb3e0-internal-arm64-v8a-release.apk",
+    "apkBytes": 184649140,
+    "apkSha256": "8eb0b91813a02c311f9db27983787fb479f8ddf5b3e8b0661f78ff67dcb01e73",
+    "sourceCommit": "5efb3e0ba8dfe418f4b5ea0ce87e9e04f9b3e594",
+    "indexZipEntry": "assets/flutter_assets/assets/app_test_pack/app-test-pack-r1/index.json",
+    "indexSha256": "3ddf096feeee206a0edc5766e34896da5eea540254e3c272ac0f490d8add9f33",
+    "boundsZipEntry": "assets/flutter_assets/assets/app_test_pack/app-test-pack-r1/alpha-bounds.json",
+    "boundsSha256": "13703221b906bb367751aa1585925a99bcb050eafbe5fecf052d4d96fdc76b8a",
+    "originalBytesAndBoundsPreserved": true,
+    "syntheticPixelsOrBounds": false
+  },
+  "images": [
+    {
+      "actionId": "h-squat",
+      "asset": "assets/app_test_pack/app-test-pack-r1/objects/4637392bf045983d955ff58e47d8775f5f24d67bdefb21fde95d4a1612f3e905.webp",
+      "fixture": "4637392bf045983d955ff58e47d8775f5f24d67bdefb21fde95d4a1612f3e905.webp",
+      "bytes": 14066,
+      "sha256": "4637392bf045983d955ff58e47d8775f5f24d67bdefb21fde95d4a1612f3e905",
+      "width": 240,
+      "height": 240,
+      "bounds": [
+        53,
+        76,
+        240,
+        240
+      ],
+      "role": "alphaThumbnail"
+    },
+    {
+      "actionId": "w-bird-dog",
+      "asset": "assets/app_test_pack/app-test-pack-r1/objects/7919cb216c0dc7a27a02821b5a8a035a0d19bbcd50aafbfe1cfef0c3bb95f7d1.webp",
+      "fixture": "7919cb216c0dc7a27a02821b5a8a035a0d19bbcd50aafbfe1cfef0c3bb95f7d1.webp",
+      "bytes": 13814,
+      "sha256": "7919cb216c0dc7a27a02821b5a8a035a0d19bbcd50aafbfe1cfef0c3bb95f7d1",
+      "width": 240,
+      "height": 240,
+      "bounds": [
+        14,
+        74,
+        239,
+        165
+      ],
+      "role": "alphaThumbnail"
+    }
+  ]
+}

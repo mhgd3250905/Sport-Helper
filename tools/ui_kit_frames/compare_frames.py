@@ -40,6 +40,13 @@ def main():
         for field in ('inputsSha256', 'driverSha256', 'logicalSize', 'dpr', 'fonts', 'container',
                       'focusSampleTimesMs', 'deliveryDurationUs'):
             assert base[field] == new[field], f'Capture contract differs: {theme}/{field}'
+        for field in ('capturePlan', 'originalCaptureInputSha256', 'legacyAlpha'):
+            if field in base or field in new:
+                assert base.get(field) == new.get(field), f'Capture contract differs: {theme}/{field}'
+        if 'capturePlan' in base:
+            assert base['historicalOriginalFrameCount'] == 29
+            assert base['historicalOriginalFramesByteIdentical'] is True
+            assert base['bubbleRepaintBoundaryCounts'] == new['bubbleRepaintBoundaryCounts'] == [4]
         base_frames = {item['frame']: item for item in base['frames']}
         new_frames = {item['frame']: item for item in new['frames']}
         assert base_frames.keys() == new_frames.keys(), f'Frame set differs: {theme}'
@@ -48,6 +55,15 @@ def main():
                          'new': {k: new[k] for k in (
             'source', 'publicInputsSha256', 'driverSha256', 'adapterSha256', 'inputsSha256')}})
         for frame in base_frames:
+            for field in ('elapsedUs', 'fraction', 'expectedImageSemantics'):
+                assert base_frames[frame].get(field) == new_frames[frame].get(field), f'Timeline differs: {frame}/{field}'
+            a_runtime, b_runtime = base_frames[frame].get('runtime'), new_frames[frame].get('runtime')
+            semantics = None if a_runtime is None or b_runtime is None else {
+                'imageSemanticsEqual': a_runtime['imageSemantics'] == b_runtime['imageSemantics'],
+                'focusClearSemanticsEqual': a_runtime['focusClearSemantics'] == b_runtime['focusClearSemantics'],
+                'base': a_runtime,
+                'new': b_runtime,
+            }
             a = np.asarray(Image.open(args.base / frame).convert('RGBA'), dtype=np.int16)
             b = np.asarray(Image.open(args.new / frame).convert('RGBA'), dtype=np.int16)
             assert a.shape == b.shape
@@ -71,7 +87,8 @@ def main():
                 'changedOutsideOnePixelEdges': outside_edges,
                 'smallEdgeDifferenceCandidate': bool(count and delta.max() <= 2 and outside_edges == 0),
                 'bbox': box, 'baseSha256': base_frames[frame]['sha256'],
-                'newSha256': new_frames[frame]['sha256']})
+                'newSha256': new_frames[frame]['sha256'], 'runtimeComparison': semantics})
+    semantic_rows = [row['runtimeComparison'] for row in rows if row['runtimeComparison'] is not None]
     summary = {'frames': len(rows), 'exactFrames': sum(row['differentPixels'] == 0 for row in rows),
         'differentFrames': sum(row['differentPixels'] > 0 for row in rows),
         'totalDifferentPixels': sum(row['differentPixels'] for row in rows),
@@ -81,6 +98,12 @@ def main():
         'allDifferencesSmallAndOnEdges': all(row['differentPixels'] == 0 or row['smallEdgeDifferenceCandidate'] for row in rows),
         'harkAcceptance': 'pending; not inferred by pixel statistics',
         'newFocusUsesSdk': new_focus_is_sdk,
+        'semanticComparedFrames': len(semantic_rows),
+        'semanticDifferentFrames': sum(not row['imageSemanticsEqual'] or not row['focusClearSemanticsEqual'] for row in semantic_rows),
+        'allComparedSemanticsIdentical': all(row['imageSemanticsEqual'] and row['focusClearSemanticsEqual'] for row in semantic_rows) if semantic_rows else None,
+        'baseBubbleRepaintBoundaryCounts': sorted({row['base']['bubbleRepaintBoundaryCount'] for row in semantic_rows if row['base']['bubbleRepaintBoundaryCount'] is not None}),
+        'newBubbleRepaintBoundaryCounts': sorted({row['new']['bubbleRepaintBoundaryCount'] for row in semantic_rows if row['new']['bubbleRepaintBoundaryCount'] is not None}),
+        'legacyCropPainterCountDifferentFrames': sum(row['base']['legacyCropPainterCount'] != row['new']['legacyCropPainterCount'] for row in semantic_rows),
         'aaCandidateRule': 'Each changed pixel channel delta <=2/255 and every change lies on a 3x3 local contrast edge; descriptive only.',
         'noAnimationParametersChangedByCapture': True}
     args.output.parent.mkdir(parents=True, exist_ok=True)
@@ -93,11 +116,14 @@ def main():
     lines = ['# UI kit frame pixel differences', '',
         'Logical 412 x 915, DPR 2.625, same capture driver, inputs, fonts and rendering runtime.', '',
         f"Exact frames: {summary['exactFrames']} / {summary['frames']}; total changed pixels: {summary['totalDifferentPixels']}.", '',
+        f"Semantic comparisons: {summary['semanticComparedFrames']}; differing frames: {summary['semanticDifferentFrames']}. Actual bubble RepaintBoundary counts: base {summary['baseBubbleRepaintBoundaryCounts']}, new {summary['newBubbleRepaintBoundaryCounts']}.", '',
         'AA candidates are descriptive statistics. Hark visual review remains pending.', '',
-        '| Frame | Different pixels | Delta >8 | Maximum channel delta | Outside edges |',
-        '| --- | ---: | ---: | ---: | ---: |']
+        '| Frame | Different pixels | Delta >8 | Maximum channel delta | Outside edges | Semantics identical |',
+        '| --- | ---: | ---: | ---: | ---: | --- |']
     for row in rows:
-        lines.append(f"| {row['frame']} | {row['differentPixels']} | {row['pixelsDeltaAbove8']} | {row['maxChannelDelta']} | {row['changedOutsideOnePixelEdges']} |")
+        runtime = row['runtimeComparison']
+        equal = 'unrecorded' if runtime is None else str(runtime['imageSemanticsEqual'] and runtime['focusClearSemanticsEqual']).lower()
+        lines.append(f"| {row['frame']} | {row['differentPixels']} | {row['pixelsDeltaAbove8']} | {row['maxChannelDelta']} | {row['changedOutsideOnePixelEdges']} | {equal} |")
     with md_path.open('x', encoding='utf-8', newline='\n') as stream:
         stream.write('\n'.join(lines) + '\n')
     print(json.dumps(summary))
