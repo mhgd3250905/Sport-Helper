@@ -2,8 +2,8 @@
   "diagnosis.md": {
     "publishedPath": "diagnosis.md",
     "sourceSha256": "b077d4a5734434503ab60e3698f23de21d8ac53ac7d6451ed5c59e1115b4be08",
-    "publishedSha256": "b077d4a5734434503ab60e3698f23de21d8ac53ac7d6451ed5c59e1115b4be08",
-    "normalization": "byte-identical"
+    "publishedSha256": "df9e38cb2b60b4595376062a36dca3a51204a9c13a68ab9f8b29db111d14f940",
+    "normalization": "Git text CRLF to LF; same content; original source bytes retained separately"
   },
   "diagnostic-provenance.json": {
     "publishedPath": "diagnostic-provenance.json",
@@ -44,14 +44,14 @@
   "offline-replay-test-r1.log": {
     "publishedPath": "offline-replay-test-r1.log.txt",
     "sourceSha256": "42e62e0907d6fc3c8c358ecacba7ab412abd366a9e2dc090fdc6ddd03258b8e8",
-    "publishedSha256": "42e62e0907d6fc3c8c358ecacba7ab412abd366a9e2dc090fdc6ddd03258b8e8",
-    "normalization": "byte-identical"
+    "publishedSha256": "28c4788eaeaa83d057fc70213268ce930ea052589d677af08830611e1cd98964",
+    "normalization": "Git text CRLF to LF; same content; original source bytes retained separately"
   },
   "offline-replay-test-r2.log": {
     "publishedPath": "offline-replay-test-r2.log.txt",
     "sourceSha256": "114a63d4893cbe35c171c0942194579ec1d243a03fad401e0fe700b25e0cd377",
-    "publishedSha256": "114a63d4893cbe35c171c0942194579ec1d243a03fad401e0fe700b25e0cd377",
-    "normalization": "byte-identical"
+    "publishedSha256": "3d62ec19c3d012e3a0126c5f9babd96918c716876b07cff7b9148375c355a1ca",
+    "normalization": "Git text CRLF to LF; same content; original source bytes retained separately"
   },
   "offline-replay.json": {
     "publishedPath": "offline-replay.json",
