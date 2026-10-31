@@ -83,6 +83,24 @@ abstract final class SfGenerationTokens {
   static const checkInitialScale = .6;
   static const maxWidth = 400.0;
 
+  // Prototype curves, copied verbatim from its CSS variables. Flutter's
+  // Curves.easeInOutSine/easeOutBack are different cubics, so do not swap.
+  static const sine = Cubic(.37, 0, .63, 1);
+  static const back = Cubic(.34, 1.56, .64, 1);
+  static const checkTransition = Duration(milliseconds: 260);
+  static const checkFade = Duration(milliseconds: 120);
+  static const checkStroke = 2.4;
+
+  /// First silhouette waits for the core collapse, then fades in.
+  static const silhouetteRevealDelay = coreCollapse;
+
+  /// The shimmer gradient is 2.5x the sentence width and travels from
+  /// background-position 100% to -150% (left to right).
+  static const shimmerSpan = 2.5;
+
+  /// The cancel target overhangs the card's right padding by 10 px.
+  static const cancelOutset = 10.0;
+
   static Color get cardEdge => (SfColors.isDark ? Colors.white : Colors.black)
       .withValues(alpha: SfColors.isDark ? .08 : .06);
   static List<BoxShadow> get cardShadow => SfColors.isDark

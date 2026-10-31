@@ -473,11 +473,11 @@ void main() {
         cancelRect,
       );
       expect(find.text('取消'), findsNothing);
-      final check = tester.widget<Icon>(
-        find.byKey(const ValueKey('generation-check')),
+      // Prototype stroke check (2.4 px path), not a font glyph.
+      expect(
+        tester.getSize(find.byKey(const ValueKey('generation-check'))),
+        const Size(20, 20),
       );
-      expect(check.icon, Icons.check_rounded);
-      expect(check.size, 20);
       await tester.pumpAndSettle();
       expect(tester.binding.transientCallbackCount, 0);
       expect(find.text('马上就好'), findsOneWidget);
@@ -575,7 +575,7 @@ void main() {
   );
 
   testWidgets(
-    'visual completion closes the ring and settles the check at 240ms',
+    'visual completion closes the ring at 240ms and settles the check at 260ms',
     (tester) async {
       await _show(tester, task: _task('review'), onCancel: () {});
       final card = find.byKey(const ValueKey('generation-card'));
@@ -589,7 +589,8 @@ void main() {
       expect(find.byKey(const ValueKey('generation-check')), findsOneWidget);
       expect(find.text('取消'), findsNothing);
       expect(tester.getSize(card).height, height);
-      await tester.pump(const Duration(milliseconds: 240));
+      // Prototype .check: 260 ms back-out scale; ring closes at 240 ms.
+      await tester.pump(const Duration(milliseconds: 260));
       final rotation = find.byKey(const ValueKey('generation-rotation'));
       final turn = tester.widget<RotationTransition>(rotation).turns.value;
       final check = find.byKey(const ValueKey('generation-check'));
