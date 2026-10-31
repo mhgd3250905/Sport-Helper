@@ -29,7 +29,7 @@ import 'package:smartfit/ui/theme.dart';
 import 'package:smartfit/voice/voice_library.dart';
 import 'package:smartfit/voice/voice_queue.dart';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
-import 'package:ugk_coach_ui/ugk_coach_ui.dart';
+import 'package:ugk_coach_ui/ugk_coach_ui.dart' hide CoachTaskBubble;
 import 'package:ugk_trainer/ugk_trainer.dart' show PoseHubActionLibrary;
 
 import '../test/app_flow_test.dart' show MemoryStorage;

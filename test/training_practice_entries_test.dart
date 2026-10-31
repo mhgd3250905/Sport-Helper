@@ -253,6 +253,7 @@ void main() {
           )!;
           final route =
               ModalRoute.of(tester.element(_practice))! as TrainingRoute;
+          expect(route, isA<TrainerSlideRoute>());
           expect(
             route.sourceEntry,
             entry == _Entry.actionLibrary ? 'action_library' : 'recommendation',

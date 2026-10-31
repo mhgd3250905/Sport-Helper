@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:ugk_trainer/ugk_trainer.dart' show SessionResult;
 import 'package:ugk_coach/ugk_coach.dart' as coach;
-import 'package:ugk_coach_ui/ugk_coach_ui.dart';
+import 'package:ugk_coach_ui/ugk_coach_ui.dart'
+    hide CoachTaskBubble, CoachDeliveryTransition;
 
 import '../../app/services.dart';
 import '../../chat/chat_controller.dart';

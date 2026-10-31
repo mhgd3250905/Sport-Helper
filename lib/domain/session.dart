@@ -35,6 +35,10 @@ class SessionBuilder {
       _builder.phases(trainerPlan(plan));
   double planSeconds(TrainingPlan plan) =>
       _builder.planSeconds(trainerPlan(plan));
+
+  /// The complete executable schedule, including its preparation phase.
+  double totalSeconds(TrainingPlan plan) =>
+      phases(plan).fold(0.0, (seconds, phase) => seconds + phase.seconds);
   int occurrenceCount(TrainingPlan plan) =>
       _builder.occurrenceCount(trainerPlan(plan));
 }

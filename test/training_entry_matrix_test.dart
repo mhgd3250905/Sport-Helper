@@ -17,7 +17,7 @@ import 'package:smartfit/ui/training_route.dart';
 import 'package:smartfit/voice/voice_queue.dart';
 import 'package:ugk_coach_ui/ugk_coach_ui.dart' show CoachPlanExpanded;
 import 'package:ugk_trainer/ugk_trainer.dart'
-    show TrainerCountdownDigits, TrainerPlayer;
+    show TrainerCountdownDigits, TrainerPlayer, TrainerSlideRoute;
 
 import 'app_flow_test.dart'
     show services, showManualChatCard, warmTrainingPoster;
@@ -215,6 +215,7 @@ void main() {
           expect(navigation.trainingPushes, 1);
           final route =
               ModalRoute.of(tester.element(_player))! as TrainingRoute;
+          expect(route, isA<TrainerSlideRoute>());
           final control = TrainingRouteScope.maybeOf(tester.element(_player))!;
           var gateOpened = false;
           unawaited(control.startGate.then((_) => gateOpened = true));

@@ -5,7 +5,7 @@ import 'theme.dart' show minutesZh;
 
 /// Cards and articles describe the time the same executable plan takes.
 String planDurationLabel(TrainingPlan plan, ExerciseLibrary library) =>
-    minutesZh(SessionBuilder(library).planSeconds(plan));
+    minutesZh(SessionBuilder(library).totalSeconds(plan));
 
 /// Keep authored Chinese names, while localizing protocol section names.
 /// Unknown protocol values fall back to the block's known semantic type.

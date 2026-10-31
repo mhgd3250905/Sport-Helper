@@ -25,6 +25,18 @@ Widget withSmartfitCoachUi(BuildContext context, Widget child) =>
     ? child
     : CoachUiTheme(style: smartfitCoachUiStyle(), child: child);
 
+/// Reuses the current library and verified asset bundle; no alternate artwork.
+ImageProvider? smartfitTaskCutout(BuildContext context, Exercise? exercise) {
+  if (exercise == null) return null;
+  final asset =
+      exercise.media.alphaThumbnail ??
+      exercise.media.alphaCover ??
+      sfPoster(exercise);
+  return asset.isEmpty
+      ? null
+      : AssetImage(asset, bundle: DefaultAssetBundle.of(context));
+}
+
 /// Only this plan card replaces its save copy and adds a host-owned action.
 /// The SDK continues to own its footer, start button and expansion timeline.
 Widget withSmartfitPlanSaveUi(
@@ -213,6 +225,25 @@ CoachUiStyle smartfitCoachUiStyle({bool planDetailsAction = false}) {
   return CoachUiStyle(
     colors: CoachUiColors(
       brightness: p.brightness,
+      taskAccent: p.accent,
+      taskCardSurface: p.surface,
+      taskCardBorder: (p.isDark ? Colors.white : Colors.black).withValues(
+        alpha: p.isDark ? .08 : .06,
+      ),
+      taskGlow: p.accent.withValues(alpha: p.isDark ? .10 : .06),
+      taskText: p.text,
+      taskMuted: p.muted,
+      taskChipSurface: p.accent.withValues(alpha: p.isDark ? .18 : .10),
+      taskOrbFill: p.accent.withValues(alpha: p.isDark ? .14 : .08),
+      taskProgressTrack: (p.isDark ? Colors.white : Colors.black).withValues(
+        alpha: p.isDark ? .10 : .08,
+      ),
+      taskChipBorder: (p.isDark ? Colors.white : Colors.black).withValues(
+        alpha: p.isDark ? .12 : .10,
+      ),
+      taskHalo: p.accent.withValues(alpha: .15),
+      taskShadowNear: Colors.black.withValues(alpha: .04),
+      taskShadowFar: Colors.black.withValues(alpha: .06),
       text: p.text,
       muted: p.muted,
       faint: p.faint,

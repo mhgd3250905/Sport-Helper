@@ -1,0 +1,125 @@
+{
+  "schema": "smartfit-ui-kit-golden-inputs@1",
+  "logicalSize": {
+    "width": 412,
+    "height": 915
+  },
+  "dpr": 2.625,
+  "params": {
+    "scene": {
+      "value": "home",
+      "source": "user"
+    },
+    "goal": {
+      "value": [
+        "body.hip",
+        "purpose.stretch"
+      ],
+      "source": "user"
+    },
+    "equipment": {
+      "value": [],
+      "source": "default"
+    },
+    "level": {
+      "value": 1,
+      "source": "default"
+    },
+    "limits": {
+      "value": [],
+      "source": "default"
+    }
+  },
+  "picks": [
+    "h-squat",
+    "h-wall-angel",
+    "w-dead-bug"
+  ],
+  "plan": {
+    "schemaVersion": 1,
+    "id": "ext:saved-1793278048881673",
+    "source": "ai",
+    "title": "5分钟徒手全身计划",
+    "summary": "只读复现用的已保存计划，非模型本轮生成。",
+    "goal": "relax",
+    "scene": "home",
+    "equipment": [
+      "wall",
+      "mat"
+    ],
+    "level": 1,
+    "targetMinutes": 5,
+    "blocks": [
+      {
+        "id": "main",
+        "name": "主训练",
+        "type": "main",
+        "rounds": 1,
+        "restBetweenRoundsSeconds": 0,
+        "items": [
+          {
+            "exerciseId": "h-squat",
+            "mode": "reps",
+            "sets": 1,
+            "reps": 9,
+            "perSide": false,
+            "restSeconds": 15
+          },
+          {
+            "exerciseId": "h-wall-angel",
+            "mode": "reps",
+            "sets": 1,
+            "reps": 10,
+            "perSide": false,
+            "restSeconds": 15
+          },
+          {
+            "exerciseId": "w-dead-bug",
+            "mode": "reps",
+            "sets": 1,
+            "reps": 10,
+            "perSide": false,
+            "restSeconds": 30
+          },
+          {
+            "exerciseId": "h-reverse-crunch",
+            "mode": "reps",
+            "sets": 1,
+            "reps": 12,
+            "perSide": false,
+            "restSeconds": 15
+          },
+          {
+            "exerciseId": "s-butterfly",
+            "mode": "time",
+            "sets": 1,
+            "workSeconds": 40,
+            "perSide": false,
+            "restSeconds": 15
+          },
+          {
+            "exerciseId": "s-kneel-hipflex",
+            "mode": "time",
+            "sets": 1,
+            "workSeconds": 30,
+            "perSide": true,
+            "restSeconds": 15
+          }
+        ]
+      }
+    ],
+    "notes": [],
+    "safetyNotes": []
+  },
+  "planSource": {
+    "path": "E:/AII-3D/3D-Pose-SDK/packages/ugk_trainer/test/fixtures/smartfit/five-minute/plan-v3.json",
+    "sha256": "67d833cd2fdbdb9559cf13428f2ca27bfccfc1b7d6e4ec927c333fc8ccbeb994",
+    "immutableCapturedPlan": true,
+    "newModelGeneration": false
+  },
+  "notes": [
+    "The original captured plan is used only for stable visual comparison.",
+    "Actual 5/10/20-minute generation is independently validated by the root task.",
+    "The cleared focus frame is an extra endpoint beyond the three requested focus states."
+  ]
+}
