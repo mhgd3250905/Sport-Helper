@@ -1,0 +1,145 @@
+Flutter assets will be downloaded from https://storage.googleapis.com. Make sure you trust this source!
+00:00 +0: loading E:/AII-3D/3D-Sport-AI/Sport-Helper-ui-kit-slots-base-13c0bb4/tools/ui_kit_slots_frames_v2/capture_slots_test.dart
+00:00 +0: ui kit same-driver frames light
+Shell: CAPTURE_STAGE light fonts
+Shell: CAPTURE_STAGE light content
+Shell: CAPTURE_STAGE light mount-blank
+Shell: CAPTURE_STAGE light precache
+Shell: CAPTURE_STAGE light ready
+Shell: CAPTURE_FRAME light/waiting-0ms
+Shell: CAPTURE_FRAME light/waiting-400ms
+Shell: CAPTURE_FRAME light/waiting-800ms
+Shell: CAPTURE_FRAME light/waiting-1200ms
+Shell: CAPTURE_FRAME light/waiting-1600ms
+Shell: CAPTURE_FRAME light/parameters-before
+Shell: CAPTURE_FRAME light/parameters-after
+Shell: CAPTURE_FRAME light/complete
+Shell: CAPTURE_FRAME light/failure
+Shell: CAPTURE_FRAME light/cancelled
+Shell: CAPTURE_FRAME light/delivery-0pct
+Shell: CAPTURE_FRAME light/delivery-25pct
+Shell: CAPTURE_FRAME light/delivery-50pct
+Shell: CAPTURE_FRAME light/delivery-75pct
+Shell: CAPTURE_FRAME light/delivery-100pct
+Shell: CAPTURE_FRAME light/focus-appearing
+Shell: CAPTURE_FRAME light/focus-held
+Shell: CAPTURE_FRAME light/focus-clearing
+Shell: CAPTURE_FRAME light/focus-cleared
+Shell: CAPTURE_FRAME light/training-entry-0pct
+Shell: CAPTURE_FRAME light/training-entry-25pct
+Shell: CAPTURE_FRAME light/training-entry-50pct
+Shell: CAPTURE_FRAME light/training-entry-75pct
+Shell: CAPTURE_FRAME light/training-entry-100pct
+Shell: CAPTURE_FRAME light/training-exit-0pct
+Shell: CAPTURE_FRAME light/training-exit-25pct
+Shell: CAPTURE_FRAME light/training-exit-50pct
+Shell: CAPTURE_FRAME light/training-exit-75pct
+Shell: CAPTURE_FRAME light/training-exit-100pct
+Shell: CAPTURE_FRAME light/posehub-reveal-179ms
+Shell: CAPTURE_FRAME light/posehub-reveal-180ms
+Shell: CAPTURE_FRAME light/posehub-reveal-181ms
+Shell: CAPTURE_FRAME light/posehub-reveal-305ms
+Shell: CAPTURE_FRAME light/posehub-reveal-429ms
+Shell: CAPTURE_FRAME light/posehub-reveal-430ms
+Shell: CAPTURE_FRAME light/posehub-reveal-431ms
+Shell: CAPTURE_FRAME light/posehub-crossfade-899ms
+Shell: CAPTURE_FRAME light/posehub-crossfade-900ms
+Shell: CAPTURE_FRAME light/posehub-crossfade-901ms
+Shell: CAPTURE_FRAME light/posehub-crossfade-1025ms
+Shell: CAPTURE_FRAME light/posehub-crossfade-1149ms
+Shell: CAPTURE_FRAME light/posehub-crossfade-1150ms
+Shell: CAPTURE_FRAME light/posehub-crossfade-1151ms
+Shell: CAPTURE_FRAME light/legacy-reveal-179ms
+Shell: CAPTURE_FRAME light/legacy-reveal-180ms
+Shell: CAPTURE_FRAME light/legacy-reveal-181ms
+Shell: CAPTURE_FRAME light/legacy-reveal-305ms
+Shell: CAPTURE_FRAME light/legacy-reveal-429ms
+Shell: CAPTURE_FRAME light/legacy-reveal-430ms
+Shell: CAPTURE_FRAME light/legacy-reveal-431ms
+Shell: CAPTURE_FRAME light/legacy-crossfade-899ms
+Shell: CAPTURE_FRAME light/legacy-crossfade-900ms
+Shell: CAPTURE_FRAME light/legacy-crossfade-901ms
+Shell: CAPTURE_FRAME light/legacy-crossfade-1025ms
+Shell: CAPTURE_FRAME light/legacy-crossfade-1149ms
+Shell: CAPTURE_FRAME light/legacy-crossfade-1150ms
+Shell: CAPTURE_FRAME light/legacy-crossfade-1151ms
+Shell: CAPTURE_FRAME light/focus-enter-0ms
+Shell: CAPTURE_FRAME light/focus-enter-1ms
+Shell: CAPTURE_FRAME light/focus-enter-179ms
+Shell: CAPTURE_FRAME light/focus-enter-181ms
+Shell: CAPTURE_FRAME light/focus-exit-0ms
+Shell: CAPTURE_FRAME light/focus-exit-1ms
+Shell: CAPTURE_FRAME light/focus-exit-119ms
+Shell: CAPTURE_FRAME light/focus-exit-121ms
+00:09 +1: ui kit same-driver frames dark
+Shell: CAPTURE_STAGE dark fonts
+Shell: CAPTURE_STAGE dark content
+Shell: CAPTURE_STAGE dark mount-blank
+Shell: CAPTURE_STAGE dark precache
+Shell: CAPTURE_STAGE dark ready
+Shell: CAPTURE_FRAME dark/waiting-0ms
+Shell: CAPTURE_FRAME dark/waiting-400ms
+Shell: CAPTURE_FRAME dark/waiting-800ms
+Shell: CAPTURE_FRAME dark/waiting-1200ms
+Shell: CAPTURE_FRAME dark/waiting-1600ms
+Shell: CAPTURE_FRAME dark/parameters-before
+Shell: CAPTURE_FRAME dark/parameters-after
+Shell: CAPTURE_FRAME dark/complete
+Shell: CAPTURE_FRAME dark/failure
+Shell: CAPTURE_FRAME dark/cancelled
+Shell: CAPTURE_FRAME dark/delivery-0pct
+Shell: CAPTURE_FRAME dark/delivery-25pct
+Shell: CAPTURE_FRAME dark/delivery-50pct
+Shell: CAPTURE_FRAME dark/delivery-75pct
+Shell: CAPTURE_FRAME dark/delivery-100pct
+Shell: CAPTURE_FRAME dark/focus-appearing
+Shell: CAPTURE_FRAME dark/focus-held
+Shell: CAPTURE_FRAME dark/focus-clearing
+Shell: CAPTURE_FRAME dark/focus-cleared
+Shell: CAPTURE_FRAME dark/training-entry-0pct
+Shell: CAPTURE_FRAME dark/training-entry-25pct
+Shell: CAPTURE_FRAME dark/training-entry-50pct
+Shell: CAPTURE_FRAME dark/training-entry-75pct
+Shell: CAPTURE_FRAME dark/training-entry-100pct
+Shell: CAPTURE_FRAME dark/training-exit-0pct
+Shell: CAPTURE_FRAME dark/training-exit-25pct
+Shell: CAPTURE_FRAME dark/training-exit-50pct
+Shell: CAPTURE_FRAME dark/training-exit-75pct
+Shell: CAPTURE_FRAME dark/training-exit-100pct
+Shell: CAPTURE_FRAME dark/posehub-reveal-179ms
+Shell: CAPTURE_FRAME dark/posehub-reveal-180ms
+Shell: CAPTURE_FRAME dark/posehub-reveal-181ms
+Shell: CAPTURE_FRAME dark/posehub-reveal-305ms
+Shell: CAPTURE_FRAME dark/posehub-reveal-429ms
+Shell: CAPTURE_FRAME dark/posehub-reveal-430ms
+Shell: CAPTURE_FRAME dark/posehub-reveal-431ms
+Shell: CAPTURE_FRAME dark/posehub-crossfade-899ms
+Shell: CAPTURE_FRAME dark/posehub-crossfade-900ms
+Shell: CAPTURE_FRAME dark/posehub-crossfade-901ms
+Shell: CAPTURE_FRAME dark/posehub-crossfade-1025ms
+Shell: CAPTURE_FRAME dark/posehub-crossfade-1149ms
+Shell: CAPTURE_FRAME dark/posehub-crossfade-1150ms
+Shell: CAPTURE_FRAME dark/posehub-crossfade-1151ms
+Shell: CAPTURE_FRAME dark/legacy-reveal-179ms
+Shell: CAPTURE_FRAME dark/legacy-reveal-180ms
+Shell: CAPTURE_FRAME dark/legacy-reveal-181ms
+Shell: CAPTURE_FRAME dark/legacy-reveal-305ms
+Shell: CAPTURE_FRAME dark/legacy-reveal-429ms
+Shell: CAPTURE_FRAME dark/legacy-reveal-430ms
+Shell: CAPTURE_FRAME dark/legacy-reveal-431ms
+Shell: CAPTURE_FRAME dark/legacy-crossfade-899ms
+Shell: CAPTURE_FRAME dark/legacy-crossfade-900ms
+Shell: CAPTURE_FRAME dark/legacy-crossfade-901ms
+Shell: CAPTURE_FRAME dark/legacy-crossfade-1025ms
+Shell: CAPTURE_FRAME dark/legacy-crossfade-1149ms
+Shell: CAPTURE_FRAME dark/legacy-crossfade-1150ms
+Shell: CAPTURE_FRAME dark/legacy-crossfade-1151ms
+Shell: CAPTURE_FRAME dark/focus-enter-0ms
+Shell: CAPTURE_FRAME dark/focus-enter-1ms
+Shell: CAPTURE_FRAME dark/focus-enter-179ms
+Shell: CAPTURE_FRAME dark/focus-enter-181ms
+Shell: CAPTURE_FRAME dark/focus-exit-0ms
+Shell: CAPTURE_FRAME dark/focus-exit-1ms
+Shell: CAPTURE_FRAME dark/focus-exit-119ms
+Shell: CAPTURE_FRAME dark/focus-exit-121ms
+00:17 +2: All tests passed!
