@@ -1,0 +1,358 @@
+{
+  "schema": "smartfit-coach-chat-sdk-a13e3b-closeout@1",
+  "date": "2026-11-01",
+  "branch": "codex/coach-chat-sdk",
+  "source": "90a5e9b76b94c2a8a5eb3162e88d8a90a6fc7140",
+  "continuedFrom": "083cdad2bb10908342c4dac4b91629e028e7233c",
+  "sdk": {
+    "ugk_coach": "a13e3b674359c93c941f7f59d1edf09a6d609487",
+    "ugk_coach_ui": "a13e3b674359c93c941f7f59d1edf09a6d609487",
+    "ugk_trainer": "a13e3b674359c93c941f7f59d1edf09a6d609487",
+    "ugk_coach_chat": "a13e3b674359c93c941f7f59d1edf09a6d609487",
+    "ugk_trainer_runtime": "a13e3b674359c93c941f7f59d1edf09a6d609487"
+  },
+  "version": "0.1.0+52",
+  "versionCode": 2052,
+  "hostAdapters": [
+    "requestCompose()",
+    "CoachChatUserInput.rawText, deduplicated by messageId",
+    "CoachChatBindings.beforeNewConversation(snapshot)"
+  ],
+  "sdkPatched": false,
+  "appConversationLogicReimplemented": false,
+  "nonSdkDependenciesUnchanged": true,
+  "originalSevenAssertionsUnchanged": true,
+  "originalSevenRegressionsPassed": true,
+  "tests": {
+    "passed": 674,
+    "failed": 0,
+    "skipped": 0,
+    "analysisIssues": 0
+  },
+  "frames": {
+    "baseline": "3eb2a9e88ef4d28e02f4cf306c1716d61baa7f10",
+    "frames": 22,
+    "zeroRgbaFrames": 22,
+    "byteIdenticalPngFrames": 22,
+    "viewport": [
+      390,
+      844
+    ],
+    "dpr": 1,
+    "insets": [
+      24,
+      24
+    ],
+    "waitingRepaintBoundariesPerTheme": 4,
+    "originalDriverAndInputsUnchanged": true
+  },
+  "live": {
+    "schema": "smartfit-live-protocol-analysis@2",
+    "source": "90a5e9b76b94c2a8a5eb3162e88d8a90a6fc7140",
+    "sdk": "a13e3b674359c93c941f7f59d1edf09a6d609487",
+    "oneFreshSession": true,
+    "outerGenerationAttempts": 1,
+    "outerRetries": 0,
+    "originalThreeInputsExactUnicode": true,
+    "timingEvidenceKind": "production SessionBuilder phase duration sums including preparation; no device wall-clock training measurement",
+    "deviceWallClockTrainingMeasured": false,
+    "turns": [
+      {
+        "turn": 1,
+        "passed": true,
+        "status": "ok",
+        "hasQuestion": false,
+        "elapsedMs": 11329,
+        "anomalyOver20s": false,
+        "anomalyOver8Calls": false,
+        "llmCalls": 3,
+        "httpAttempts": 3,
+        "inputTokens": 30006,
+        "outputTokens": 1297,
+        "timing": {
+          "targetSeconds": 300,
+          "cardSeconds": 306.0,
+          "executionIncludingPrepSeconds": 306.0,
+          "catalogEstimateSeconds": 304.0,
+          "isEstimate": false,
+          "manualWorkPhases": []
+        },
+        "actionCount": 0,
+        "toolRequestCounts": {
+          "start_task": 1,
+          "set_params": 1,
+          "search_actions": 1,
+          "draft_plan": 1,
+          "show_plan": 1
+        },
+        "durationFitFailedCount": 0,
+        "draftRequests": 1,
+        "redraftRequests": 0,
+        "failedToolResults": []
+      },
+      {
+        "turn": 2,
+        "passed": true,
+        "status": "ok",
+        "hasQuestion": false,
+        "elapsedMs": 6714,
+        "anomalyOver20s": false,
+        "anomalyOver8Calls": false,
+        "llmCalls": 2,
+        "httpAttempts": 2,
+        "inputTokens": 17360,
+        "outputTokens": 754,
+        "timing": null,
+        "actionCount": 4,
+        "toolRequestCounts": {
+          "start_task": 1,
+          "set_params": 1,
+          "search_actions": 1,
+          "show_actions": 1
+        },
+        "durationFitFailedCount": 0,
+        "draftRequests": 0,
+        "redraftRequests": 0,
+        "failedToolResults": []
+      },
+      {
+        "turn": 3,
+        "passed": true,
+        "status": "ok",
+        "hasQuestion": false,
+        "elapsedMs": 21821,
+        "anomalyOver20s": true,
+        "anomalyOver8Calls": false,
+        "llmCalls": 5,
+        "httpAttempts": 5,
+        "inputTokens": 65479,
+        "outputTokens": 2968,
+        "timing": {
+          "targetSeconds": 180,
+          "cardSeconds": 187.0,
+          "executionIncludingPrepSeconds": 187.0,
+          "catalogEstimateSeconds": 186.0,
+          "isEstimate": false,
+          "manualWorkPhases": []
+        },
+        "actionCount": 0,
+        "toolRequestCounts": {
+          "start_task": 1,
+          "set_params": 1,
+          "search_actions": 2,
+          "draft_plan": 2,
+          "show_plan": 1
+        },
+        "durationFitFailedCount": 0,
+        "draftRequests": 2,
+        "redraftRequests": 1,
+        "failedToolResults": [
+          {
+            "turn": 3,
+            "name": "draft_plan",
+            "toolCallId": "call_00_g4dtHPXrSvRXWO9ZBbFl1076",
+            "code": "incompatible_action"
+          }
+        ]
+      }
+    ],
+    "total": {
+      "llmCalls": 10,
+      "httpAttempts": 10,
+      "usage": {
+        "promptTokens": {
+          "sdkNormalizedTotal": 112845,
+          "callsWithPositiveValue": 10
+        },
+        "completionTokens": {
+          "sdkNormalizedTotal": 5019,
+          "callsWithPositiveValue": 10
+        },
+        "cachedTokens": {
+          "sdkNormalizedTotal": 85120,
+          "callsWithPositiveValue": 10
+        },
+        "reasoningTokens": {
+          "sdkNormalizedTotal": 3359,
+          "callsWithPositiveValue": 8
+        }
+      }
+    },
+    "elapsedMs": 39942,
+    "uniqueToolRequests": 16,
+    "uniqueFailedToolResults": 1,
+    "toolResultVariantCounts": {
+      "call_00_8sEOWc0t04WSKJguSBu42694": 1,
+      "call_01_X0jwLWWkEbi6Wj4qxOv19175": 1,
+      "call_02_PXir9fFaSkCzzgZLU2UQ0293": 1,
+      "call_00_bUFVTsbLyWIOy03SObCU2439": 1,
+      "call_00_OlTozZ0FbZpa3G1ynD8H5425": 1,
+      "call_01_oMgBwr49KDloRRmNg9M14348": 1,
+      "call_02_QZJAStGwzGfIRVvi2Ygc0186": 1,
+      "call_00_eb0KcXN2G6lGWEvANIp11206": 1,
+      "call_00_nC5DgS9dB6f49cyIS8ji4346": 1,
+      "call_01_9IwZdYsMNHC3HYT17FEQ1366": 1,
+      "call_02_ZqixNUw2E5FPZHlpUWCS4660": 1,
+      "call_00_g4dtHPXrSvRXWO9ZBbFl1076": 1,
+      "call_00_AgmSByniqgNXnyb92XKp3528": 1,
+      "call_00_rmrt7eeVZKvAOmmcpMpB2856": 1
+    },
+    "toolResultAccounting": "Unique actual tool_call_id with top-level ok=false only, history repetitions counted once; terminal delivery verified in turn snapshots.",
+    "rawCalls": [
+      {
+        "call": 1,
+        "turn": 1,
+        "toolNames": [
+          "start_task",
+          "set_params",
+          "search_actions"
+        ],
+        "rawSha256": "9f6ae408da72d2d7bfe01be5a5b44a218f12e4cfa71965810f99e110dee1d2b1"
+      },
+      {
+        "call": 2,
+        "turn": 1,
+        "toolNames": [
+          "draft_plan"
+        ],
+        "rawSha256": "52826479375b2577a9d00a3fff6054437082b5036aa386adca3b48b199e3a996"
+      },
+      {
+        "call": 3,
+        "turn": 1,
+        "toolNames": [
+          "show_plan"
+        ],
+        "rawSha256": "94662169d15d8bf4ac99167bafe362791f9c4db797246aa9598526f8777a7174"
+      },
+      {
+        "call": 4,
+        "turn": 2,
+        "toolNames": [
+          "start_task",
+          "set_params",
+          "search_actions"
+        ],
+        "rawSha256": "c69d8b03ef19766ac08b783020317acea285cebe7fde962c52b5535cb0136766"
+      },
+      {
+        "call": 5,
+        "turn": 2,
+        "toolNames": [
+          "show_actions"
+        ],
+        "rawSha256": "9fd0da6f99c37cf18a1364dd5899c411ff8f4d9719bd45bc82cd632b6626dd78"
+      },
+      {
+        "call": 6,
+        "turn": 3,
+        "toolNames": [
+          "start_task",
+          "set_params",
+          "search_actions"
+        ],
+        "rawSha256": "10eee09fb3f02bf7095815c23e13eb64b6dbb3d3b8938ddad4040a28f256b4cc"
+      },
+      {
+        "call": 7,
+        "turn": 3,
+        "toolNames": [
+          "draft_plan"
+        ],
+        "rawSha256": "30c2bac343b4b80dc9c34b5abf8e131fab19032e9ca979624e11e53b3f95f6b0"
+      },
+      {
+        "call": 8,
+        "turn": 3,
+        "toolNames": [
+          "search_actions"
+        ],
+        "rawSha256": "84de870a40946e1ac714696af99326f7790b4eafcba48d6bd7f8eb08b9b59ea1"
+      },
+      {
+        "call": 9,
+        "turn": 3,
+        "toolNames": [
+          "draft_plan"
+        ],
+        "rawSha256": "1ee72f41013a113a3b0c4a7e3a2380ae3047a4fd0044fe5051b74fe1130477a8"
+      },
+      {
+        "call": 10,
+        "turn": 3,
+        "toolNames": [
+          "show_plan"
+        ],
+        "rawSha256": "5e88e6b84138668121b16824b59211d47c22859f279b0842ca5a2fa4a05bbb21"
+      }
+    ],
+    "previousRawRecordsVerifiedUnchanged": 18,
+    "summarySha256": "ca1f99b18aade86d9ab6c3edab04fd495fb736c592ba3a6a83f85f6a80686788",
+    "rawRecordSha256": {
+      "call-01.json": "9f6ae408da72d2d7bfe01be5a5b44a218f12e4cfa71965810f99e110dee1d2b1",
+      "call-02.json": "52826479375b2577a9d00a3fff6054437082b5036aa386adca3b48b199e3a996",
+      "call-03.json": "94662169d15d8bf4ac99167bafe362791f9c4db797246aa9598526f8777a7174",
+      "call-04.json": "c69d8b03ef19766ac08b783020317acea285cebe7fde962c52b5535cb0136766",
+      "call-05.json": "9fd0da6f99c37cf18a1364dd5899c411ff8f4d9719bd45bc82cd632b6626dd78",
+      "call-06.json": "10eee09fb3f02bf7095815c23e13eb64b6dbb3d3b8938ddad4040a28f256b4cc",
+      "call-07.json": "30c2bac343b4b80dc9c34b5abf8e131fab19032e9ca979624e11e53b3f95f6b0",
+      "call-08.json": "84de870a40946e1ac714696af99326f7790b4eafcba48d6bd7f8eb08b9b59ea1",
+      "call-09.json": "1ee72f41013a113a3b0c4a7e3a2380ae3047a4fd0044fe5051b74fe1130477a8",
+      "call-10.json": "5e88e6b84138668121b16824b59211d47c22859f279b0842ca5a2fa4a05bbb21",
+      "events.json": "3e9e9420ccf978d2675377fbdb3dd4bb7c587cced2084734854d717427e99a3d",
+      "initial-snapshot.json": "af6ae84cbd70bba6a24458974e7255cdbde924a3d6256899d83262109c2821ed",
+      "storage.json": "8bc8d2f6ab25987d14e47b4d4af52576981d8b57bf65ed3ef3c4370983b540fd",
+      "summary.json": "ca1f99b18aade86d9ab6c3edab04fd495fb736c592ba3a6a83f85f6a80686788",
+      "turn-1.json": "20bf6d52fe69fe87b6363db245e6594c64e1582de97bc2d2cfec5440cca7a0bd",
+      "turn-2.json": "35d41bd38e31a3d89ceab8a30e588c425e70ca6816ac98e352a5a513c562c110",
+      "turn-3.json": "63e4e8ca579b98abd74fe395601af07e27c3bf6e4fe45069dae4e8234b060d9f"
+    },
+    "passed": true
+  },
+  "apk": {
+    "path": "E:\\AII-3D\\3D-Sport-AI\\deliveries\\coach-chat-sdk-plus52-a13e3b-20261101\\release-preparation\\SmartFit-coach-chat-sdk-0.1.0+52-90a5e9b-internal-arm64-v8a-release.apk",
+    "bytes": 42826116,
+    "sha256": "42a5ce1f683b7b625cfc503889632631ea6f5704083fa8f13426fedb9753fd13",
+    "sameSigningCertificate": true,
+    "nativeElf16KBPassed": true,
+    "zipalign16KBPassed": true,
+    "storageJniPassed": true
+  },
+  "phoneInstall": {
+    "model": "2602BRT18C",
+    "packageName": "com.ugk.smartfit.internal",
+    "fromVersionCode": 2051,
+    "toVersionCode": 2052,
+    "attemptCount": 1,
+    "installSucceeded": true,
+    "installMode": "adb install -r",
+    "actualInstalledApkSha256": "42a5ce1f683b7b625cfc503889632631ea6f5704083fa8f13426fedb9753fd13",
+    "privateAppDataRead": false,
+    "appLaunchedByAgent": false,
+    "restoreVerified": false,
+    "automatedRestoreCanceledByUser": true,
+    "acceptance": "pending user manual tests; no device performance or playback acceptance inferred"
+  },
+  "protectedBranches": {
+    "mainMerged": false,
+    "releaseTouched": false,
+    "tagCreated": false,
+    "onlyFeaturePushAuthorized": true
+  },
+  "evidenceSha256": {
+    "final-software-gates.json": "3a0d3fccc24771910778bcdd3cd01d1aebbeb987f40a0b9b836464a95594be3f",
+    "release-preparation/seven-regressions-full-pass-source90a5e9b.json": "b311d81122f33843b283db0accb708daee4d4032940ab7fa25360ec0311ac05c",
+    "frames/pixel-diff.md": "9568bc30b30ef57edaba1f27d41290bfd95c0df16d1b186a0d2feab3cef6275a",
+    "frames/source-bindings.json": "35c69627d6c0f5a2c1727eb2b47d9035895d6c4792785638d6b197356055c796",
+    "frames/artifact-integrity.json": "9574ec0bed93b7e86083ae8749a21e4acae4ee65916f7214e6c3fb08c63292e9",
+    "live-chat/summary.json": "ca1f99b18aade86d9ab6c3edab04fd495fb736c592ba3a6a83f85f6a80686788",
+    "live-source-binding.json": "6a536a773e2c91b13e2395927da7d479740bb0bd95ab66c12bda3d4ca14d7e54",
+    "live-protocol-analysis.json": "b68a6839e791ca2398e12c2ec440bb874a33876f47e5a8b34d97d2c619f326b1",
+    "release-preparation/release-apk.json": "df3509a7adaa2545bee16e5f6609f9abf38bf9f5385c7b23a2a230962f56a727",
+    "release-preparation/release-package-metadata.json": "8d9c1be63d1d02ed7be3fd7f252ba41227ea2a1c71aec2d7fa4010db4f322f15",
+    "phone-install-only/install-only-receipt.json": "2552b5085f6b399cba15c28769ac18c9cc69ffab724b16eaa2607e657387b626",
+    "independent-sdk-ports-review.json": "ffce32205700017e8d32e2aa273d9264670f3cc6e8edc5a45753679395fdd9c9",
+    "device-upgrade/canceled-by-user.json": "ceea69f994c24901e2a700e678925ce497664b61d22a6024e9eba6eb2f15a72f"
+  },
+  "pushEvidence": "External final-push-receipt.json records actual remote final docs HEAD after this report commit."
+}
