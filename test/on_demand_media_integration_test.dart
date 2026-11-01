@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smartfit/app/services.dart';
-import 'package:smartfit/domain/session.dart' show trainerPlan;
 import 'package:ugk_coach/ugk_coach.dart' as coach;
 import 'package:smartfit/app/training_media_config.dart';
 import 'package:smartfit/core/storage/local_state_storage.dart';
@@ -48,6 +47,7 @@ Future<trainer.TrainingMediaRepository> _repository({
   trainer.TrainingMediaNetworkProbe? probe,
   void Function(Directory directory)? onCacheDirectory,
   bool syntheticBuiltinVideoKeys = false,
+  bool registerDisposal = true,
 }) async {
   final directory = await Directory.systemTemp.createTemp(
     'smartfit-media-app-',
@@ -83,7 +83,7 @@ Future<trainer.TrainingMediaRepository> _repository({
     networkProbe: probe ?? () async => trainer.TrainingMediaNetwork.offline,
     bundledAssetKeys: bundled,
   );
-  addTearDown(media.dispose);
+  if (registerDisposal) addTearDown(media.dispose);
   return media;
 }
 
@@ -512,6 +512,7 @@ void main() {
     final media = (await tester.runAsync(
       () => _repository(
         syntheticBuiltinVideoKeys: true,
+        registerDisposal: false, // AppServices owns this repository.
         probe: () async {
           probes++;
           return holdFromProbe == null || probes < holdFromProbe
@@ -529,26 +530,17 @@ void main() {
     final services = AppServices(
       library: content.$1,
       catalog: TemplateCatalog([_template('n-pelvis-circle')]),
-      coachCatalog: const coach.DrillPackAdapter().build(
-        version: 'prefetch-fixture',
-        packs: {
-          for (final pack in loadPacksSync().exercises) pack.id: pack.json,
-        },
-      ),
-      coachProfile: coach.CoachProfile.fromJson(
-        jsonDecode(File('assets/coach/smartfit.json').readAsStringSync()),
-      ),
       store: AppStore(_Storage())..starfield = false,
       voiceLibrary: content.$3,
       voiceOutput: output,
       media: media,
       chatReplyDelay: Duration.zero,
     );
-    addTearDown(services.chat.dispose);
+    addTearDown(services.dispose);
     await services.store.acceptSafety(blocked: false);
-    services.chat.start();
+    late TrainingPlan plan;
     await tester.runAsync(() async {
-      final manualPlan = TrainingPlan(
+      plan = TrainingPlan(
         id: 'manual-pending-media',
         source: 'template',
         title: '灵活练习',
@@ -560,26 +552,21 @@ void main() {
         targetMinutes: 5,
         blocks: _template('n-pelvis-circle').blocks,
       );
-      expect((await services.chat.start()).ok, isTrue);
-      expect(await services.chat.started(trainerPlan(manualPlan)), isTrue);
+      // This fixture exercises the host media port, not SDK duration admission.
+      // Its original 30-second work / five-minute target stays unchanged.
+      services.prefetchPlan(plan);
       for (var i = 0; i < 100 && probes < holdAfter; i++) {
         await Future<void>.delayed(const Duration(milliseconds: 5));
       }
     });
-    final plan = services.chat.currentPlan;
-    expect(plan, isNotNull);
-    expect(plan!.items.single.exerciseId, 'n-pelvis-circle');
+    expect(plan.items.single.exerciseId, 'n-pelvis-circle');
     expect(probes, greaterThanOrEqualTo(holdAfter));
     expect(
       downloadPolicy.isCompleted,
       isFalse,
       reason: 'The plan is available while background prefetch is pending.',
     );
-    await _open(
-      tester,
-      services,
-      PlayerPage(plan: TrainingPlan.fromJson(plan.toJson())),
-    );
+    await _open(tester, services, PlayerPage(plan: plan));
     expect(find.text('正在加载动作视频'), findsNothing);
     expect(
       find.byKey(const ValueKey('exercise-frame-zero-n-pelvis-circle')),

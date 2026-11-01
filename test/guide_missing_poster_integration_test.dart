@@ -14,7 +14,7 @@ import 'package:smartfit/ui/theme.dart';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
 import 'package:ugk_trainer/ugk_trainer.dart';
 
-import 'app_flow_test.dart' show services;
+import 'support/legacy_media_services.dart' show legacyMediaServices;
 import 'posehub_ui_support.dart';
 import 'support/widget_test_timeout.dart';
 
@@ -446,7 +446,7 @@ void main() {
   _androidTest(
     'legacy missing covers extract the local asset without a player',
     (tester) async {
-      final app = services();
+      final app = legacyMediaServices();
       final exercise = app.library['h-catcow-quad'];
       await show(tester, app, exercise);
       expect(calls, hasLength(1));
@@ -475,7 +475,7 @@ void main() {
       (tester) async {
         final fixture = await tester.runAsync(() => legacyRepository(hit: hit));
         final (repository, cached) = fixture!;
-        final base = services();
+        final base = legacyMediaServices();
         final app = AppServices(
           library: base.library,
           catalog: base.catalog,

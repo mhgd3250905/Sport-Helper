@@ -8,7 +8,12 @@ import 'package:smartfit/ui/theme.dart';
 import 'package:smartfit/ui/training_route.dart';
 
 import 'app_flow_test.dart'
-    show services, showManualChatCard, warmTrainingPoster, chatScroll;
+    show
+        services,
+        showManualChatCard,
+        warmTrainingPoster,
+        chatScroll,
+        pumpOperation;
 import 'support/widget_test_timeout.dart';
 
 Finder _key(String value, {bool offstage = false}) =>
@@ -24,102 +29,119 @@ void main() {
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
         final app = services();
-        addTearDown(() async {
-          await tester.pumpWidget(const SizedBox.shrink());
-          await tester.pump();
-          await app.dispose();
+        addTearDown(() {
+          app.chat.dispose();
           SfColors.palette = SfPalette.dark;
         });
-        await app.store.acceptSafety(blocked: false);
-        app.chat.start();
-        final plan = await showManualChatCard(
-          app,
-          template: 'office-relax',
-          tester: tester,
-        );
-        await tester.pumpWidget(
-          AppScope(
-            services: app,
-            child: MaterialApp(
-              theme: buildTheme(palette),
-              builder: (_, child) => SfPaletteScope(child: child!),
-              home: const ChatHomePage(),
+        try {
+          await app.store.acceptSafety(blocked: false);
+          await app.chat.start();
+          final plan = await showManualChatCard(
+            app,
+            template: 'office-relax',
+            tester: tester,
+          );
+          await tester.pumpWidget(
+            AppScope(
+              services: app,
+              child: MaterialApp(
+                theme: buildTheme(palette),
+                builder: (_, child) => SfPaletteScope(child: child!),
+                home: const ChatHomePage(),
+              ),
             ),
-          ),
-        );
-        await tester.pumpAndSettle();
-        await tester.tap(_key('chat-input'));
-        tester.view.viewInsets = const FakeViewPadding(bottom: 360);
-        await tester.pumpAndSettle();
-        final source = tester.element(find.byType(ChatHomePage));
-        final input = tester.widget<TextField>(_key('chat-input'));
-        double extent() => tester
-            .getSize(_key('chat-composer-dock-boundary', offstage: true))
-            .height;
-        expect(input.focusNode!.hasFocus, isTrue);
-        final start = _key('plan-start-${plan.id}');
-        await tester.ensureVisible(start);
-        await tester.pumpAndSettle();
-        await warmTrainingPoster(tester, app, plan, sourceContext: source);
-        final viewport = _key('chat-messages-boundary', offstage: true);
-        final viewportBefore = tester.getRect(viewport);
-        final card = _key('plan-clip-${plan.id}', offstage: true);
-        final cardBefore = tester.getRect(card);
-        final scroll = chatScroll(tester);
-        final offsetBefore = scroll.offset;
-        final extentBefore = extent();
-        expect(extentBefore, greaterThan(360));
-        await tester.tap(start);
-        final player = find.byType(PlayerPage, skipOffstage: false);
-        for (var i = 0; i < 12 && player.evaluate().isEmpty; i++) {
+          );
+          await tester.pumpAndSettle();
+          await tester.tap(_key('chat-input'));
+          tester.view.viewInsets = const FakeViewPadding(bottom: 360);
+          await tester.pumpAndSettle();
+          final source = tester.element(find.byType(ChatHomePage));
+          final input = tester.widget<TextField>(_key('chat-input'));
+          double extent() => tester
+              .getSize(_key('chat-composer-dock-boundary', offstage: true))
+              .height;
+          expect(input.focusNode!.hasFocus, isTrue);
+          final start = _key('plan-start-${plan.id}');
+          await tester.ensureVisible(start);
+          await tester.pumpAndSettle();
+          await warmTrainingPoster(tester, app, plan, sourceContext: source);
+          final viewport = _key('chat-messages-boundary', offstage: true);
+          final viewportBefore = tester.getRect(viewport);
+          final card = _key('plan-clip-${plan.id}', offstage: true);
+          final cardBefore = tester.getRect(card);
+          final scroll = chatScroll(tester);
+          final offsetBefore = scroll.offset;
+          final extentBefore = extent();
+          expect(extentBefore, greaterThan(360));
+          await tester.tap(start);
+          final player = find.byType(PlayerPage, skipOffstage: false);
+          for (var i = 0; i < 12 && player.evaluate().isEmpty; i++) {
+            await tester.pump();
+          }
           await tester.pump();
+          expect(player, findsOneWidget);
+          final control = TrainingRouteScope.maybeOf(tester.element(player))!;
+          expect(control.entered, isFalse);
+          expect(input.focusNode!.hasFocus, isFalse);
+          expect(extent(), extentBefore);
+          expect(tester.getRect(viewport), viewportBefore);
+          expect(tester.getRect(card), cardBefore);
+          await tester.pump(const Duration(milliseconds: 150));
+          tester.view.viewInsets = const FakeViewPadding();
+          tester.view.viewPadding = const FakeViewPadding(bottom: 24);
+          await tester.pump();
+          expect(control.entered, isFalse);
+          expect(extent(), extentBefore);
+          expect(tester.getRect(viewport), viewportBefore);
+          expect(tester.getRect(card), cardBefore);
+          expect(scroll.offset, offsetBefore);
+          expect(find.byType(ExerciseVideo, skipOffstage: false), findsNothing);
+          await tester.pump(const Duration(milliseconds: 149));
+          expect(extent(), extentBefore);
+          expect(tester.getRect(viewport), viewportBefore);
+          expect(scroll.offset, offsetBefore);
+          await tester.pump(const Duration(milliseconds: 1));
+          await tester.pump(const Duration(microseconds: 1));
+          await tester.pump();
+          expect(control.entered, isTrue);
+          expect(extent(), lessThan(extentBefore - 300));
+          final normalExtent = extent();
+          await tester.tap(_key('close'));
+          await tester.pumpAndSettle();
+          await tester.tap(_key('close-confirm'));
+          await tester.pump();
+          await tester.pump(const Duration(milliseconds: 280));
+          await tester.pump(const Duration(microseconds: 1));
+          await tester.pumpAndSettle();
+          expect(find.byType(PlayerPage), findsNothing);
+          expect(tester.element(find.byType(ChatHomePage)), same(source));
+          expect(extent(), normalExtent);
+          final returned = scroll.position;
+          // Once IME metrics are released, a larger viewport can make the old
+          // offset unreachable. Entry frames above must still preserve it.
+          expect(
+            returned.pixels,
+            offsetBefore.clamp(
+              returned.minScrollExtent,
+              returned.maxScrollExtent,
+            ),
+          );
+          // The guard must not suppress ordinary keyboard behavior after return.
+          await tester.tap(_key('chat-input'));
+          tester.view.viewInsets = const FakeViewPadding(bottom: 240);
+          await tester.pumpAndSettle();
+          expect(input.focusNode!.hasFocus, isTrue);
+          expect(extent(), greaterThan(normalExtent + 200));
+          expect(tester.takeException(), isNull);
+        } finally {
+          await tester.pumpWidget(const SizedBox.shrink());
+          await tester.pump();
+          await pumpOperation(
+            tester,
+            app.dispose(),
+            label: 'IME transition cleanup',
+          );
         }
-        await tester.pump();
-        expect(player, findsOneWidget);
-        final control = TrainingRouteScope.maybeOf(tester.element(player))!;
-        expect(control.entered, isFalse);
-        expect(input.focusNode!.hasFocus, isFalse);
-        expect(extent(), extentBefore);
-        expect(tester.getRect(viewport), viewportBefore);
-        expect(tester.getRect(card), cardBefore);
-        await tester.pump(const Duration(milliseconds: 150));
-        tester.view.viewInsets = const FakeViewPadding();
-        tester.view.viewPadding = const FakeViewPadding(bottom: 24);
-        await tester.pump();
-        expect(control.entered, isFalse);
-        expect(extent(), extentBefore);
-        expect(tester.getRect(viewport), viewportBefore);
-        expect(tester.getRect(card), cardBefore);
-        expect(scroll.offset, offsetBefore);
-        expect(find.byType(ExerciseVideo, skipOffstage: false), findsNothing);
-        await tester.pump(const Duration(milliseconds: 149));
-        expect(extent(), extentBefore);
-        expect(tester.getRect(viewport), viewportBefore);
-        expect(scroll.offset, offsetBefore);
-        await tester.pump(const Duration(milliseconds: 1));
-        await tester.pump(const Duration(microseconds: 1));
-        await tester.pump();
-        expect(control.entered, isTrue);
-        expect(extent(), lessThan(extentBefore - 300));
-        final normalExtent = extent();
-        await tester.tap(_key('close'));
-        await tester.pumpAndSettle();
-        await tester.tap(_key('close-confirm'));
-        await tester.pump();
-        await tester.pump(const Duration(milliseconds: 280));
-        await tester.pump(const Duration(microseconds: 1));
-        await tester.pumpAndSettle();
-        expect(find.byType(PlayerPage), findsNothing);
-        expect(tester.element(find.byType(ChatHomePage)), same(source));
-        expect(extent(), normalExtent);
-        expect(scroll.offset, offsetBefore);
-        // The guard must not suppress ordinary keyboard behavior after return.
-        await tester.tap(_key('chat-input'));
-        tester.view.viewInsets = const FakeViewPadding(bottom: 240);
-        await tester.pumpAndSettle();
-        expect(input.focusNode!.hasFocus, isTrue);
-        expect(extent(), greaterThan(normalExtent + 200));
-        expect(tester.takeException(), isNull);
       },
     );
   }

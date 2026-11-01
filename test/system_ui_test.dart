@@ -295,7 +295,14 @@ void main() {
       await push(const LibraryPage());
       expectBars(Brightness.light);
       expect(
-        tester.getTopLeft(find.byKey(const ValueKey('back'))).dy,
+        tester
+            .getTopLeft(
+              find.descendant(
+                of: find.byType(LibraryPage),
+                matching: find.byType(BackButton),
+              ),
+            )
+            .dy,
         greaterThanOrEqualTo(32),
       );
       navigator.pop();

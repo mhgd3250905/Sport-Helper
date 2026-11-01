@@ -8,8 +8,13 @@ import 'package:smartfit/ui/exercise_video.dart';
 import 'package:smartfit/ui/theme.dart';
 import 'package:ugk_trainer/ugk_trainer.dart' as trainer;
 
-import 'app_flow_test.dart'
-    show MemoryStorage, services, tall, showManualChatCard;
+import 'support/legacy_media_services.dart'
+    show
+        LegacyMediaStorage,
+        legacyMediaServices,
+        legacyMediaTall,
+        showLegacyMediaChatCard,
+        closeLegacyMediaServices;
 import 'support.dart';
 import 'support/widget_test_timeout.dart';
 
@@ -268,10 +273,10 @@ void main() {
 
   group('switching', () {
     test('a new install follows the system; a stored choice is kept', () async {
-      final fresh = AppStore(MemoryStorage());
+      final fresh = AppStore(LegacyMediaStorage());
       await fresh.load();
       expect(fresh.appearance, 'system');
-      final storage = MemoryStorage();
+      final storage = LegacyMediaStorage();
       final first = AppStore(storage);
       await first.load();
       await first.setAppearance('dark');
@@ -283,52 +288,61 @@ void main() {
     testWidgets(
       'follow-system tracks the platform and keeps the bundled plan covers',
       (tester) async {
-        tall(tester);
-        final s = services();
-        await s.store.acceptSafety(blocked: false);
-        s.chat.start();
-        await showManualChatCard(s, tester: tester);
-        // Hero and strip previews switch to each theme's bundled stills.
-        final items = s.chat.currentPlan!.items.toList();
-        final hero = s.library[items.first.exerciseId];
-        final first = s.library[items[1].exerciseId];
-        expect(s.store.appearance, 'system');
+        legacyMediaTall(tester);
+        final s = legacyMediaServices();
+        try {
+          await s.store.acceptSafety(blocked: false);
+          s.chat.start();
+          await showLegacyMediaChatCard(s, tester: tester);
+          // Hero and strip previews switch to each theme's bundled stills.
+          final items = s.chat.currentPlan!.items.toList();
+          final hero = s.library[items.first.exerciseId];
+          final first = s.library[items[1].exerciseId];
+          expect(s.store.appearance, 'system');
 
-        tester.platformDispatcher.platformBrightnessTestValue = Brightness.dark;
-        addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
-        await s.chat.start();
-        await tester.pumpWidget(SmartFitApp(services: s));
-        await tester.pumpAndSettle();
-        expect(SfColors.isDark, isTrue);
-        expect(_assetsIn(tester), contains(first.media.poster));
-        expect(_assetsIn(tester), contains(hero.media.poster));
-        expect(
-          _assetsIn(tester).where((path) => path.startsWith('assets/cutouts/')),
-          isEmpty,
-        );
+          tester.platformDispatcher.platformBrightnessTestValue =
+              Brightness.dark;
+          addTearDown(
+            tester.platformDispatcher.clearPlatformBrightnessTestValue,
+          );
+          await s.chat.start();
+          await tester.pumpWidget(SmartFitApp(services: s));
+          await tester.pumpAndSettle();
+          expect(SfColors.isDark, isTrue);
+          expect(_assetsIn(tester), contains(first.media.poster));
+          expect(_assetsIn(tester), contains(hero.media.poster));
+          expect(
+            _assetsIn(
+              tester,
+            ).where((path) => path.startsWith('assets/cutouts/')),
+            isEmpty,
+          );
 
-        tester.platformDispatcher.platformBrightnessTestValue =
-            Brightness.light;
-        await tester.pumpAndSettle();
-        expect(SfColors.isDark, isFalse);
-        expect(_assetsIn(tester), contains(first.media.lightPoster));
-        expect(_assetsIn(tester), contains(hero.media.lightPoster));
+          tester.platformDispatcher.platformBrightnessTestValue =
+              Brightness.light;
+          await tester.pumpAndSettle();
+          expect(SfColors.isDark, isFalse);
+          expect(_assetsIn(tester), contains(first.media.lightPoster));
+          expect(_assetsIn(tester), contains(hero.media.lightPoster));
 
-        // Settings changes override the system without a prose command.
-        await s.store.setAppearance('dark');
-        await tester.pumpAndSettle();
-        expect(s.store.appearance, 'dark');
-        expect(SfColors.isDark, isTrue);
-        expect(_assetsIn(tester), contains(first.media.poster));
+          // Settings changes override the system without a prose command.
+          await s.store.setAppearance('dark');
+          await tester.pumpAndSettle();
+          expect(s.store.appearance, 'dark');
+          expect(SfColors.isDark, isTrue);
+          expect(_assetsIn(tester), contains(first.media.poster));
 
-        final messages = s.chat.messages.length;
-        await s.store.setAppearance('light');
-        await tester.pumpAndSettle();
-        expect(s.store.appearance, 'light');
-        expect(SfColors.isDark, isFalse);
-        expect(_assetsIn(tester), contains(first.media.lightPoster));
-        expect(s.chat.messages.length, messages);
-        await tester.pumpWidget(const SizedBox());
+          final messages = s.chat.messages.length;
+          await s.store.setAppearance('light');
+          await tester.pumpAndSettle();
+          expect(s.store.appearance, 'light');
+          expect(SfColors.isDark, isFalse);
+          expect(_assetsIn(tester), contains(first.media.lightPoster));
+          expect(s.chat.messages.length, messages);
+        } finally {
+          await tester.pumpWidget(const SizedBox());
+          await closeLegacyMediaServices(tester, s);
+        }
       },
     );
   });

@@ -159,10 +159,9 @@ void tall(WidgetTester tester) {
   addTearDown(tester.view.reset);
 }
 
-// Navigation fixtures use an admitted plan from the real public protocol.
-// Legacy TemplatePlanGenerator compatibility is checked separately, unchanged.
-Future<TrainingPlan> showManualChatCard(
-  AppServices services, {
+// Generate in an isolated store so safety tests can prepare a valid plan without
+// recording a start or adding a card to the controller under test.
+Future<coach.TrainingPlan> generateNavigationPlan({
   String template = 'core',
   WidgetTester? tester,
 }) async {
@@ -199,9 +198,17 @@ Future<TrainingPlan> showManualChatCard(
     return plan;
   }
 
-  final plan = tester == null
-      ? await create()
-      : (await tester.runAsync(create))!;
+  return tester == null ? await create() : (await tester.runAsync(create))!;
+}
+
+// Navigation fixtures use an admitted plan from the real public protocol.
+// Legacy TemplatePlanGenerator compatibility is checked separately, unchanged.
+Future<TrainingPlan> showManualChatCard(
+  AppServices services, {
+  String template = 'core',
+  WidgetTester? tester,
+}) async {
+  final plan = await generateNavigationPlan(template: template, tester: tester);
   expect((await services.chat.start()).ok, isTrue);
   final started = await services.chat.started(plan);
   expect(

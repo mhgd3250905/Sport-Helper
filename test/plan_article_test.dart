@@ -15,7 +15,8 @@ import 'package:smartfit/ui/training_route.dart';
 import 'package:ugk_trainer/ugk_trainer.dart'
     show PackedAlphaPlatform, PackedAlphaUriPlatform, UgkPackedAlphaVideo;
 
-import 'app_flow_test.dart' show services, warmTrainingPoster;
+import 'support/legacy_media_services.dart'
+    show legacyMediaServices, warmLegacyTrainingPoster;
 import 'support/widget_test_timeout.dart';
 
 const _plan = TrainingPlan(
@@ -120,7 +121,7 @@ Future<AppServices> _show(
   tester.view.physicalSize = Size(width, height);
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
-  var s = services();
+  var s = legacyMediaServices();
   if (transform != null) {
     s = AppServices(
       library: ExerciseLibrary(s.library.all.map(transform).toList()),
@@ -431,7 +432,12 @@ void main() {
       scroll.jumpTo(36);
       await tester.pump();
       final offset = scroll.offset;
-      await warmTrainingPoster(tester, app, _plan, sourceContext: article);
+      await warmLegacyTrainingPoster(
+        tester,
+        app,
+        _plan,
+        sourceContext: article,
+      );
       await tester.tap(_key('start'));
       // Preview retirement precedes the one shared opaque slide route.
       final player = find.byType(PlayerPage, skipOffstage: false);

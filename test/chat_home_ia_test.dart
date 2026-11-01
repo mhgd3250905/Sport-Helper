@@ -164,15 +164,11 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('panel-library')));
     await tester.pumpAndSettle();
     expect(find.byType(LibraryPage), findsOneWidget);
-    await tester.ensureVisible(find.byKey(const ValueKey('cat-stretch')));
-    await tester.tap(find.byKey(const ValueKey('cat-stretch')));
+    final stretch = find.byKey(const ValueKey('posehub-类型-拉伸放松'));
+    await tester.ensureVisible(stretch);
+    await tester.tap(stretch);
     await tester.pumpAndSettle();
-    expect(
-      tester
-          .widget<SfChoiceChip>(find.byKey(const ValueKey('cat-stretch')))
-          .selected,
-      isTrue,
-    );
+    expect(tester.widget<ChoiceChip>(stretch).selected, isTrue);
     await tester.tap(find.byTooltip('返回').first);
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('chat-panel-toggle')));

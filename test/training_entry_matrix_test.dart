@@ -18,7 +18,12 @@ import 'package:ugk_trainer/ugk_trainer.dart'
     show TrainerCountdownDigits, TrainerPlayer;
 
 import 'app_flow_test.dart'
-    show services, showManualChatCard, warmTrainingPoster, chatScroll;
+    show
+        services,
+        showManualChatCard,
+        warmTrainingPoster,
+        chatScroll,
+        pumpOperation;
 import 'support/widget_test_timeout.dart';
 
 enum _Entry { chatCollapsed, chatExpanded, savedPlan, guide }
@@ -129,197 +134,211 @@ void main() {
           final output = _VoiceProbe();
           final app = services(output: output);
           final navigation = _NavigationProbe();
-          addTearDown(() async {
-            await tester.pumpWidget(const SizedBox.shrink());
-            await tester.pump();
-            await app.dispose();
+          addTearDown(() {
+            app.chat.dispose();
             SfColors.palette = SfPalette.dark;
           });
-          await app.store.acceptSafety(blocked: false);
-          app.chat.start();
-          final plan = await showManualChatCard(
-            app,
-            template: 'office-relax',
-            tester: tester,
-          );
-          SavedPlan? saved;
-          if (entry == _Entry.savedPlan) {
-            saved = await app.store.savePlan(plan, name: '已保存的舒展');
-          }
-          await tester.pumpWidget(
-            AppScope(
-              services: app,
-              child: MaterialApp(
-                theme: buildTheme(palette),
-                navigatorObservers: [navigation],
-                builder: (_, child) => SfPaletteScope(child: child!),
-                home: const ChatHomePage(),
-              ),
-            ),
-          );
-          await tester.pumpAndSettle();
-          late Finder start;
-          late VoidCallback repeatStart;
-          if (entry == _Entry.savedPlan) {
-            await tester.tap(_key('chat-panel-toggle'));
-            await tester.pumpAndSettle();
-            await tester.tap(_key('panel-plans'));
-            await tester.pumpAndSettle();
-            await tester.tap(_key('saved-expanded-${saved!.id}'));
-            await tester.pumpAndSettle();
-            start = _key('plan-start-${plan.id}');
-            final source = tester.element(find.byType(SavedPlansPage));
-            final page = tester.widget<SavedPlansPage>(
-              find.byType(SavedPlansPage),
+          try {
+            await app.store.acceptSafety(blocked: false);
+            await app.chat.start();
+            final plan = await showManualChatCard(
+              app,
+              template: 'office-relax',
+              tester: tester,
             );
-            repeatStart = () => page.onStart(saved!, source);
-          } else if (entry == _Entry.guide) {
-            await tester.ensureVisible(_key('plan-open-${plan.id}'));
-            await tester.tap(_key('plan-open-${plan.id}'));
-            await tester.pumpAndSettle();
-            start = _key('start');
-            repeatStart = () => unawaited(
-              app.chat.startTraining(
-                tester.element(find.byType(CoachChatPlanDetailsPage)),
-                app.chat.messages.lastWhere((row) => row.plan?.id == plan.id),
-                sourceEntry: 'guide',
-              ),
-            );
-          } else {
-            if (entry == _Entry.chatExpanded) {
-              await tester.tap(_key('plan-expand-${plan.id}'));
-              await tester.pumpAndSettle();
+            SavedPlan? saved;
+            if (entry == _Entry.savedPlan) {
+              saved = await app.store.savePlan(plan, name: '已保存的舒展');
             }
-            start = _key('plan-start-${plan.id}');
-            repeatStart = () => unawaited(
-              app.chat.startTraining(
-                tester.element(find.byType(ChatHomePage)),
-                app.chat.messages.lastWhere((row) => row.plan?.id == plan.id),
+            await tester.pumpWidget(
+              AppScope(
+                services: app,
+                child: MaterialApp(
+                  theme: buildTheme(palette),
+                  navigatorObservers: [navigation],
+                  builder: (_, child) => SfPaletteScope(child: child!),
+                  home: const ChatHomePage(),
+                ),
               ),
             );
-          }
-          await tester.ensureVisible(start);
-          await tester.pumpAndSettle();
-          final source = tester.element(_sourcePage(entry));
-          final scroll = _sourceScroll(tester, entry);
-          final offset = scroll.offset;
-          final sourceBrightness = Theme.of(source).brightness;
-          final expanded = entry == _Entry.savedPlan
-              ? tester
-                    .widget<CoachPlanExpanded>(
-                      _key('saved-expanded-${saved!.id}'),
-                    )
-                    .expanded
-              : entry == _Entry.chatExpanded;
-          final sourceCard = switch (entry) {
-            _Entry.chatCollapsed ||
-            _Entry.chatExpanded => _key('plan-clip-${plan.id}'),
-            _Entry.savedPlan => _key('saved-expanded-${saved!.id}'),
-            _Entry.guide => _key('plan-introduction'),
-          };
-          final sourceCardState = sourceCard.evaluate().single;
-          await warmTrainingPoster(tester, app, plan, sourceContext: source);
-          await tester.tap(start);
-          for (var i = 0; i < 12 && _player.evaluate().isEmpty; i++) {
+            await tester.pumpAndSettle();
+            late Finder start;
+            late VoidCallback repeatStart;
+            if (entry == _Entry.savedPlan) {
+              await tester.tap(_key('chat-panel-toggle'));
+              await tester.pumpAndSettle();
+              await tester.tap(_key('panel-plans'));
+              await tester.pumpAndSettle();
+              await tester.tap(_key('saved-expanded-${saved!.id}'));
+              await tester.pumpAndSettle();
+              start = _key('plan-start-${plan.id}');
+              final source = tester.element(find.byType(SavedPlansPage));
+              final page = tester.widget<SavedPlansPage>(
+                find.byType(SavedPlansPage),
+              );
+              repeatStart = () => page.onStart(saved!, source);
+            } else if (entry == _Entry.guide) {
+              await tester.ensureVisible(_key('plan-open-${plan.id}'));
+              await tester.tap(_key('plan-open-${plan.id}'));
+              await tester.pumpAndSettle();
+              start = _key('start');
+              repeatStart = () => unawaited(
+                app.chat.startTraining(
+                  tester.element(find.byType(CoachChatPlanDetailsPage)),
+                  app.chat.messages.lastWhere((row) => row.plan?.id == plan.id),
+                  sourceEntry: 'guide',
+                ),
+              );
+            } else {
+              if (entry == _Entry.chatExpanded) {
+                await tester.tap(_key('plan-expand-${plan.id}'));
+                await tester.pumpAndSettle();
+              }
+              start = _key('plan-start-${plan.id}');
+              repeatStart = () => unawaited(
+                app.chat.startTraining(
+                  tester.element(find.byType(ChatHomePage)),
+                  app.chat.messages.lastWhere((row) => row.plan?.id == plan.id),
+                ),
+              );
+            }
+            await tester.ensureVisible(start);
+            await tester.pumpAndSettle();
+            final source = tester.element(_sourcePage(entry));
+            final scroll = _sourceScroll(tester, entry);
+            final offset = scroll.offset;
+            final sourceBrightness = Theme.of(source).brightness;
+            final expanded = entry == _Entry.savedPlan
+                ? tester
+                      .widget<CoachPlanExpanded>(
+                        _key('saved-expanded-${saved!.id}'),
+                      )
+                      .expanded
+                : entry == _Entry.chatExpanded;
+            final sourceCard = switch (entry) {
+              _Entry.chatCollapsed ||
+              _Entry.chatExpanded => _key('plan-clip-${plan.id}'),
+              _Entry.savedPlan => _key('saved-expanded-${saved!.id}'),
+              _Entry.guide => _key('plan-introduction'),
+            };
+            final sourceCardState = sourceCard.evaluate().single;
+            await warmTrainingPoster(tester, app, plan, sourceContext: source);
+            await tester.tap(start);
+            for (var i = 0; i < 12 && _player.evaluate().isEmpty; i++) {
+              await tester.pump();
+            }
             await tester.pump();
-          }
-          await tester.pump();
-          expect(navigation.trainingPushes, 1);
-          final route =
-              ModalRoute.of(tester.element(_player))! as TrainingRoute;
-          final control = TrainingRouteScope.maybeOf(tester.element(_player))!;
-          var gateOpened = false;
-          unawaited(control.startGate.then((_) => gateOpened = true));
-          final counter = tester
-              .widget<TrainerCountdownDigits>(
-                find.byType(TrainerCountdownDigits, skipOffstage: false),
-              )
-              .value;
-          final slide = tester.widget<SlideTransition>(_key('training-slide'));
-          expect(slide.position.value, const Offset(1, 0));
-          expect(route.opaque, isTrue);
-          expect(route.sourceEntry, switch (entry) {
-            _Entry.chatCollapsed || _Entry.chatExpanded => 'chat',
-            _Entry.savedPlan => 'saved_plan',
-            _Entry.guide => 'guide',
-          });
-          _expectCompleteFrame(tester, gated: true);
-          expect(control.entered, isFalse);
-          expect(gateOpened, isFalse);
-          expect(output.begins, 0);
-          repeatStart();
-          repeatStart();
-          await tester.pump();
-          expect(navigation.trainingPushes, 1);
-          expect(scroll.offset, offset);
-          await tester.pump(const Duration(milliseconds: 150));
-          _expectCompleteFrame(tester, gated: true);
-          expect(
-            slide.position.value.dx,
-            closeTo(1 - Curves.easeOutCubic.transform(.5), .0001),
-          );
-          expect(control.entered, isFalse);
-          expect(gateOpened, isFalse);
-          expect(output.begins, 0);
-          expect(
-            tester
+            expect(navigation.trainingPushes, 1);
+            final route =
+                ModalRoute.of(tester.element(_player))! as TrainingRoute;
+            final control = TrainingRouteScope.maybeOf(
+              tester.element(_player),
+            )!;
+            var gateOpened = false;
+            unawaited(control.startGate.then((_) => gateOpened = true));
+            final counter = tester
                 .widget<TrainerCountdownDigits>(
                   find.byType(TrainerCountdownDigits, skipOffstage: false),
                 )
-                .value,
-            counter,
-          );
-          expect(scroll.offset, offset);
-          expect(tester.element(_sourcePage(entry)), same(source));
-          repeatStart();
-          await tester.pump(const Duration(milliseconds: 150));
-          // The full page is already painted at 300ms; the engine may dispatch
-          // completed just after this exact floating-point boundary.
-          _expectCompleteFrame(tester, gated: true);
-          await tester.pump(const Duration(microseconds: 1));
-          await tester.pump();
-          _expectCompleteFrame(tester, gated: false);
-          expect(control.entered, isTrue);
-          expect(gateOpened, isTrue);
-          expect(output.begins, 1);
-          expect(navigation.trainingPushes, 1);
-          expect(slide.position.value, Offset.zero);
-          expect(scroll.offset, offset);
-          await tester.tap(_key('close'));
-          await tester.pumpAndSettle();
-          await tester.tap(_key('close-confirm'));
-          await tester.pump();
-          await tester.pump(const Duration(milliseconds: 279));
-          expect(_player, findsOneWidget);
-          expect(scroll.offset, offset);
-          await tester.pump(const Duration(milliseconds: 1));
-          await tester.pump(const Duration(microseconds: 1));
-          await tester.pump();
-          await tester.pump();
-          expect(find.byType(PlayerPage), findsNothing);
-          expect(tester.element(_sourcePage(entry)), same(source));
-          expect(sourceCard.evaluate().single, same(sourceCardState));
-          expect(Theme.of(source).brightness, sourceBrightness);
-          expect(scroll.offset, offset);
-          if (entry == _Entry.savedPlan) {
+                .value;
+            final slide = tester.widget<SlideTransition>(
+              _key('training-slide'),
+            );
+            expect(slide.position.value, const Offset(1, 0));
+            expect(route.opaque, isTrue);
+            expect(route.sourceEntry, switch (entry) {
+              _Entry.chatCollapsed || _Entry.chatExpanded => 'chat',
+              _Entry.savedPlan => 'saved_plan',
+              _Entry.guide => 'guide',
+            });
+            _expectCompleteFrame(tester, gated: true);
+            expect(control.entered, isFalse);
+            expect(gateOpened, isFalse);
+            expect(output.begins, 0);
+            repeatStart();
+            repeatStart();
+            await tester.pump();
+            expect(navigation.trainingPushes, 1);
+            expect(scroll.offset, offset);
+            await tester.pump(const Duration(milliseconds: 150));
+            _expectCompleteFrame(tester, gated: true);
+            expect(
+              slide.position.value.dx,
+              closeTo(1 - Curves.easeOutCubic.transform(.5), .0001),
+            );
+            expect(control.entered, isFalse);
+            expect(gateOpened, isFalse);
+            expect(output.begins, 0);
             expect(
               tester
-                  .widget<CoachPlanExpanded>(
-                    _key('saved-expanded-${saved!.id}'),
+                  .widget<TrainerCountdownDigits>(
+                    find.byType(TrainerCountdownDigits, skipOffstage: false),
                   )
-                  .expanded,
-              expanded,
+                  .value,
+              counter,
             );
-          } else if (entry == _Entry.chatExpanded) {
-            expect(_key('plan-save-${plan.id}').hitTestable(), findsOneWidget);
-          } else if (entry == _Entry.chatCollapsed) {
-            expect(_key('plan-save-${plan.id}').hitTestable(), findsNothing);
+            expect(scroll.offset, offset);
+            expect(tester.element(_sourcePage(entry)), same(source));
+            repeatStart();
+            await tester.pump(const Duration(milliseconds: 150));
+            // The full page is already painted at 300ms; the engine may dispatch
+            // completed just after this exact floating-point boundary.
+            _expectCompleteFrame(tester, gated: true);
+            await tester.pump(const Duration(microseconds: 1));
+            await tester.pump();
+            _expectCompleteFrame(tester, gated: false);
+            expect(control.entered, isTrue);
+            expect(gateOpened, isTrue);
+            expect(output.begins, 1);
+            expect(navigation.trainingPushes, 1);
+            expect(slide.position.value, Offset.zero);
+            expect(scroll.offset, offset);
+            await tester.tap(_key('close'));
+            await tester.pumpAndSettle();
+            await tester.tap(_key('close-confirm'));
+            await tester.pump();
+            await tester.pump(const Duration(milliseconds: 279));
+            expect(_player, findsOneWidget);
+            expect(scroll.offset, offset);
+            await tester.pump(const Duration(milliseconds: 1));
+            await tester.pump(const Duration(microseconds: 1));
+            await tester.pump();
+            await tester.pump();
+            expect(find.byType(PlayerPage), findsNothing);
+            expect(tester.element(_sourcePage(entry)), same(source));
+            expect(sourceCard.evaluate().single, same(sourceCardState));
+            expect(Theme.of(source).brightness, sourceBrightness);
+            expect(scroll.offset, offset);
+            if (entry == _Entry.savedPlan) {
+              expect(
+                tester
+                    .widget<CoachPlanExpanded>(
+                      _key('saved-expanded-${saved!.id}'),
+                    )
+                    .expanded,
+                expanded,
+              );
+            } else if (entry == _Entry.chatExpanded) {
+              expect(
+                _key('plan-save-${plan.id}').hitTestable(),
+                findsOneWidget,
+              );
+            } else if (entry == _Entry.chatCollapsed) {
+              expect(_key('plan-save-${plan.id}').hitTestable(), findsNothing);
+            }
+            expect(navigation.trainingPushes, 1);
+            expect(app.store.history, hasLength(1));
+            await tester.pumpAndSettle();
+            expect(tester.takeException(), isNull);
+          } finally {
+            await tester.pumpWidget(const SizedBox.shrink());
+            await tester.pump();
+            await pumpOperation(
+              tester,
+              app.dispose(),
+              label: 'Training entry cleanup',
+            );
           }
-          expect(navigation.trainingPushes, 1);
-          expect(app.store.history, hasLength(1));
-          await tester.pumpAndSettle();
-          expect(tester.takeException(), isNull);
-          await tester.pumpWidget(const SizedBox.shrink());
         },
       );
     }

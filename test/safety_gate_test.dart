@@ -11,8 +11,7 @@ import 'package:smartfit/ui/plan_page.dart';
 import 'package:smartfit/ui/player_page.dart';
 
 import 'app_flow_test.dart'
-    show MemoryStorage, services, tall, showManualChatCard;
-import 'package:smartfit/domain/session.dart' show trainerPlan;
+    show MemoryStorage, services, tall, generateNavigationPlan;
 import 'package:ugk_coach/ugk_coach.dart' as coach;
 import 'support/chat_sdk_support.dart';
 import 'support/coach_v2_fixtures.dart';
@@ -63,8 +62,9 @@ void main() {
       await s.chat.start();
       await tester.pumpWidget(SmartFitApp(services: s));
       await tester.pumpAndSettle();
-      final p = await showManualChatCard(s, tester: tester);
-      final saved = await s.chat.save(trainerPlan(p));
+      final p = await generateNavigationPlan(tester: tester);
+      expect(s.store.lastPlan, isNull);
+      final saved = await s.chat.save(p);
       await s.chat.showSaved(saved);
       s.chat.startSafetyCheck();
       await tester.pumpAndSettle();
@@ -120,11 +120,12 @@ void main() {
       await store.acceptSafety(blocked: false);
       final c = services(persistedStore: store).chat;
       expect((await c.start()).ok, isTrue);
-      final p = await showManualChatCard(services(persistedStore: store));
-      final saved = await c.save(trainerPlan(p));
+      final p = await generateNavigationPlan();
+      expect(store.lastPlan, isNull);
+      final saved = await c.save(p);
       await c.showSaved(saved);
       await c.startSafetyCheck();
-      expect(await c.started(trainerPlan(p)), isFalse);
+      expect(await c.started(p), isFalse);
       expect(store.lastPlan, isNull);
 
       final reloaded = AppStore(mem);
