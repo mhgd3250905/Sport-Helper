@@ -188,7 +188,8 @@ void main() {
         legacyLibrary: ExerciseLibrary([_legacy(id: sdk.allActions.first.id)]),
       );
       expect(content.library.length, 211);
-      expect(content.coachCatalog, same(ai));
+      expect(content.coachCatalog, isNot(same(ai)));
+      expect(catalog.toCoachCatalog(), same(ai));
       expect(content.library.all.map((exercise) => exercise.id), ai.ids);
       expect(content.rhythms.keys, ai.ids);
       for (final exercise in content.library.all) {
@@ -240,7 +241,7 @@ void main() {
         catalog: catalog,
         legacyLibrary: ExerciseLibrary([]),
       );
-      final oldRhythms = trainer.rhythmsFromCatalog(content.coachCatalog);
+      final oldRhythms = trainer.rhythmsFromCatalog(catalog.toCoachCatalog()!);
       final unknown = sdk.semanticCompleteActions.where((action) {
         final rhythm = catalog.entries[action.id]!.training!.rhythm;
         return rhythm != null &&

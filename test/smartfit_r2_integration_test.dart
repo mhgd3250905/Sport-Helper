@@ -7,7 +7,7 @@ import 'package:smartfit/ui/theme/app_theme.dart';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
 import 'package:ugk_coach_ui/ugk_coach_ui.dart';
 
-import 'app_flow_test.dart' show MemoryStorage, tall;
+import 'app_flow_test.dart' show MemoryStorage, tall, pumpOperation;
 import 'support/coach_v2_fixtures.dart';
 import 'support/chat_sdk_support.dart';
 import 'package:ugk_coach_chat/ugk_coach_chat.dart';
@@ -26,7 +26,7 @@ Future<CoachChatController> _mount(
   await app.store.acceptSafety(blocked: false);
   final chat = fakeHostChat(app, client);
   expect((await chat.start()).ok, isTrue);
-  addTearDown(chat.close);
+  addTearDown(chat.dispose);
   await tester.pumpWidget(
     AppScope(
       services: app,
@@ -73,5 +73,11 @@ void main() {
     expect(chat.messages.where((m) => m.isPlan), isEmpty);
     expect(find.textContaining('预设方案'), findsNothing);
     expect(find.textContaining('当前模板未通过安全检查'), findsNothing);
+    await tester.pumpWidget(const SizedBox.shrink());
+    await pumpOperation(
+      tester,
+      chat.close(),
+      label: 'Close offline SDK conversation',
+    );
   });
 }

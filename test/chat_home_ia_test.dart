@@ -12,7 +12,8 @@ import 'package:smartfit/ui/theme.dart';
 
 import 'package:ugk_coach/ugk_coach.dart' as coach;
 
-import 'app_flow_test.dart' show services, tall, showManualChatCard;
+import 'app_flow_test.dart'
+    show services, tall, showManualChatCard, pumpOperation;
 import 'support/coach_v2_fixtures.dart';
 import 'support/chat_sdk_support.dart';
 
@@ -110,7 +111,7 @@ void main() {
           ]),
       ], latency: Duration.zero);
       final chat = fakeHostChat(sdkChatServices(s.store, fixture), client);
-      addTearDown(chat.close);
+      addTearDown(chat.dispose);
       await chat.start();
       await tester.pumpWidget(
         AppScope(
@@ -138,6 +139,12 @@ void main() {
         '有哪些拉伸动作',
         '设置',
       ]);
+      await tester.pumpWidget(const SizedBox.shrink());
+      await pumpOperation(
+        tester,
+        chat.close(),
+        label: 'Close SDK conversation',
+      );
     },
   );
 
