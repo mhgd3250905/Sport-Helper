@@ -61,7 +61,47 @@ AppServices services({
   );
 }
 
-/// Drain real asset decode before exercising a finite route on the fake clock.
+/// Keep FakeAsync microtasks and real asset I/O progressing without an unbounded await.
+Future<T> pumpOperation<T>(
+  WidgetTester tester,
+  Future<T> operation, {
+  required String label,
+}) async {
+  var completed = false;
+  T? value;
+  Object? error;
+  StackTrace? stack;
+  unawaited(
+    operation.then<void>(
+      (result) {
+        value = result;
+        completed = true;
+      },
+      onError: (Object failure, StackTrace trace) {
+        error = failure;
+        stack = trace;
+        completed = true;
+      },
+    ),
+  );
+  for (var attempt = 0; !completed && attempt < 250; attempt++) {
+    await tester.pump();
+    if (!completed) {
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 10)),
+      );
+    }
+  }
+  expect(
+    completed,
+    isTrue,
+    reason: '$label did not complete while pumping both zones',
+  );
+  if (error != null) Error.throwWithStackTrace(error!, stack!);
+  return value as T;
+}
+
+/// Decode the real training poster before exercising a finite route.
 Future<void> warmTrainingPoster(
   WidgetTester tester,
   AppServices services,
@@ -73,11 +113,13 @@ Future<void> warmTrainingPoster(
       : TrainingPlan.fromJson((plan as coach.TrainingPlan).toJson());
   if (domainPlan.items.isEmpty) return;
   final context = sourceContext ?? tester.element(find.byType(Scaffold).first);
-  await tester.runAsync(
-    () => TrainingPosterImages.precache(
+  await pumpOperation(
+    tester,
+    TrainingPosterImages.precache(
       context,
       services.library[domainPlan.items.first.exerciseId],
     ),
+    label: 'Training poster decode',
   );
   await tester.pump();
 }
@@ -160,8 +202,9 @@ Future<TrainingPlan> showManualChatCard(
       ? await create()
       : (await tester.runAsync(create))!;
   expect((await services.chat.start()).ok, isTrue);
+  final started = await services.chat.started(plan);
   expect(
-    await services.chat.started(plan),
+    started,
     isTrue,
     reason: 'The navigation fixture must pass the production training gate',
   );
@@ -426,7 +469,7 @@ void main() {
   ) async {
     tall(tester);
     final s = services();
-    await tester.runAsync(s.chat.start);
+    await s.chat.start();
     await tester.pumpWidget(SmartFitApp(services: s));
     await tester.pumpAndSettle();
 
@@ -549,7 +592,7 @@ void main() {
       );
       final s = services();
       await s.store.acceptSafety(blocked: false);
-      await tester.runAsync(s.chat.start);
+      await s.chat.start();
       await tester.pumpWidget(SmartFitApp(services: s));
       await tester.pumpAndSettle();
       await showManualChatCard(s, tester: tester);
@@ -591,7 +634,7 @@ void main() {
       tall(tester);
       final s = services();
       await s.store.acceptSafety(blocked: false);
-      await tester.runAsync(s.chat.start);
+      await s.chat.start();
       await tester.pumpWidget(SmartFitApp(services: s));
       await tester.pumpAndSettle();
       await showManualChatCard(s, tester: tester);
@@ -662,7 +705,7 @@ void main() {
     (tester) async {
       tall(tester);
       final s = services();
-      await tester.runAsync(s.chat.start);
+      await s.chat.start();
       await tester.pumpWidget(SmartFitApp(services: s));
       await tester.pumpAndSettle();
       await answerSafety(tester, ['否', '是']);
@@ -690,7 +733,7 @@ void main() {
   testWidgets('typing during the safety talk waits for it', (tester) async {
     tall(tester);
     final s = services();
-    await tester.runAsync(s.chat.start);
+    await s.chat.start();
     await tester.pumpWidget(SmartFitApp(services: s));
     await tester.pumpAndSettle();
     await say(tester, '在家 10 分钟拉伸');
@@ -712,7 +755,7 @@ void main() {
       tall(tester);
       final s = services();
       await s.store.acceptSafety(blocked: false);
-      await tester.runAsync(s.chat.start);
+      await s.chat.start();
       await tester.pumpWidget(SmartFitApp(services: s));
       await tester.pumpAndSettle();
 

@@ -12,7 +12,7 @@ void main() {
     tall(tester);
     final s = services();
     await s.store.acceptSafety(blocked: false);
-    await tester.runAsync(s.chat.start);
+    await s.chat.start();
     await tester.pumpWidget(SmartFitApp(services: s));
     await tester.pumpAndSettle();
     final input = find.byKey(const ValueKey('chat-input'));
@@ -42,7 +42,7 @@ void main() {
       tall(tester);
       final s = services();
       await s.store.acceptSafety(blocked: false);
-      await tester.runAsync(s.chat.start);
+      await s.chat.start();
       await tester.pumpWidget(SmartFitApp(services: s));
       await tester.pumpAndSettle();
       final input = find.byKey(const ValueKey('chat-input'));

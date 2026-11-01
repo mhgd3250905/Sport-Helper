@@ -23,7 +23,7 @@ void main() {
     final plan = s.chat.currentPlan!;
     await s.chat.save(plan);
     final messages = s.chat.messages.length;
-    await tester.runAsync(s.chat.start);
+    await s.chat.start();
     await tester.pumpWidget(SmartFitApp(services: s));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('chat-panel-toggle')));
@@ -51,7 +51,7 @@ void main() {
       s.chat.start();
       await showManualChatCard(s, template: 'office-relax', tester: tester);
       final plan = s.chat.currentPlan!;
-      await tester.runAsync(s.chat.start);
+      await s.chat.start();
       await tester.pumpWidget(SmartFitApp(services: s));
       await tester.pumpAndSettle();
       final chatElement = tester.element(find.byType(ChatHomePage));
@@ -132,7 +132,31 @@ void main() {
         find.byType(CachedExerciseMedia),
       );
       expect(restoredPreview, isNotEmpty);
-      expect(restoredPreview.every((media) => !media.paused), isTrue);
+      // The SDK serializes preview playback. Re-enabled means the retained
+      // article accepts playback again, rather than every surface playing.
+      final previewControl = find
+          .byWidgetPredicate(
+            (widget) =>
+                widget is GestureDetector &&
+                widget.key is ValueKey<String> &&
+                (widget.key as ValueKey<String>).value.startsWith(
+                  'guide-media-control-',
+                ),
+          )
+          .first;
+      await tester.ensureVisible(previewControl);
+      await tester.pump();
+      await tester.tap(previewControl);
+      await tester.pump();
+      expect(
+        find.descendant(
+          of: previewControl,
+          matching: find.byKey(const ValueKey('pause')),
+        ),
+        findsOneWidget,
+        reason:
+            'The retained source accepts preview playback after training returns',
+      );
       expect(s.store.history, hasLength(1));
       expect(s.chat.messages.last.text, contains('这次先到这儿'));
       Navigator.of(tester.element(find.byType(CoachChatPlanDetailsPage))).pop();

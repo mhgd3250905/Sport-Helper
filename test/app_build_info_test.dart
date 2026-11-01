@@ -26,11 +26,16 @@ void main() {
             .allMatches(File('pubspec.lock').readAsStringSync())
             .map((match) => match.group(1)!)
             .toList();
-    expect(declared, hasLength(4)); // three SDK packages plus coach override
-    expect(resolved, hasLength(3));
-    expect(declared.toSet(), hasLength(1));
+    const expectedSdk = 'b025ee88bd1a6d69564ce96a473302739c981c3b';
+    expect(declared, hasLength(6)); // five SDK packages plus coach override
+    expect(resolved, hasLength(5));
+    expect(declared.toSet(), {expectedSdk});
     expect(resolved.toSet(), declared.toSet());
-    expect(AppBuildInfo.sdkRef.split('@').last.trim(), resolved.first);
+    expect(
+      AppBuildInfo.sdkRef,
+      'ugk_coach / ugk_trainer / ugk_coach_ui / ugk_coach_chat / '
+      'ugk_trainer_runtime @ $expectedSdk',
+    );
   });
 
   test(

@@ -49,7 +49,7 @@ void main() {
       expect(s.chat.suggestions, contains('在家 20 分钟练核心'));
       expect(s.chat.suggestions, isNot(contains('上次那个')));
       expect(s.store.history.single.title, '核心激活');
-      await tester.runAsync(s.chat.start);
+      await s.chat.start();
       await tester.pumpWidget(SmartFitApp(services: s));
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const ValueKey('chat-panel-toggle')));
@@ -66,7 +66,7 @@ void main() {
     tall(tester);
     final s = services();
     await s.store.acceptSafety(blocked: false);
-    await tester.runAsync(s.chat.start);
+    await s.chat.start();
     await tester.pumpWidget(SmartFitApp(services: s));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('chat-panel-toggle')));
@@ -111,7 +111,7 @@ void main() {
       ], latency: Duration.zero);
       final chat = fakeHostChat(sdkChatServices(s.store, fixture), client);
       addTearDown(chat.close);
-      await tester.runAsync(chat.start);
+      await chat.start();
       await tester.pumpWidget(
         AppScope(
           services: s,
@@ -147,7 +147,7 @@ void main() {
     tall(tester);
     final s = services();
     await s.store.acceptSafety(blocked: false);
-    await tester.runAsync(s.chat.start);
+    await s.chat.start();
     await tester.pumpWidget(SmartFitApp(services: s));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('chat-panel-toggle')));
@@ -179,7 +179,7 @@ void main() {
     tall(tester);
     final s = services();
     await s.store.acceptSafety(blocked: false);
-    await tester.runAsync(s.chat.start);
+    await s.chat.start();
     await tester.pumpWidget(SmartFitApp(services: s));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('chat-panel-toggle')));
@@ -202,7 +202,7 @@ void main() {
   ) async {
     tall(tester);
     final s = services();
-    await tester.runAsync(s.chat.start);
+    await s.chat.start();
     await tester.pumpWidget(SmartFitApp(services: s));
     await tester.pumpAndSettle();
     await tester.tap(find.text('我已了解').hitTestable());

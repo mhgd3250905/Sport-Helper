@@ -255,7 +255,7 @@ void main() {
       final s = services();
       await s.store.acceptSafety(blocked: false);
       await s.store.setAppearance('light');
-      await tester.runAsync(s.chat.start);
+      await s.chat.start();
       await tester.pumpWidget(SmartFitApp(services: s));
       await tester.pumpAndSettle();
 

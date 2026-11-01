@@ -23,7 +23,7 @@ void main() {
     (tester) async {
       tall(tester);
       final s = services();
-      await tester.runAsync(s.chat.start);
+      await s.chat.start();
       await tester.pumpWidget(SmartFitApp(services: s));
       await tester.pumpAndSettle();
       // The form opens from the chat now (「自己选条件」→ @custom); the page
@@ -58,7 +58,7 @@ void main() {
       tall(tester);
       final s = services();
       await s.store.acceptSafety(blocked: false);
-      await tester.runAsync(s.chat.start);
+      await s.chat.start();
       await tester.pumpWidget(SmartFitApp(services: s));
       await tester.pumpAndSettle();
       final p = await showManualChatCard(s, tester: tester);

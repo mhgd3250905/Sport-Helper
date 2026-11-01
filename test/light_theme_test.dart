@@ -294,7 +294,7 @@ void main() {
 
         tester.platformDispatcher.platformBrightnessTestValue = Brightness.dark;
         addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
-        await tester.runAsync(s.chat.start);
+        await s.chat.start();
         await tester.pumpWidget(SmartFitApp(services: s));
         await tester.pumpAndSettle();
         expect(SfColors.isDark, isTrue);

@@ -51,7 +51,7 @@ void main() {
       tester: tester,
     );
     final saved = await app.store.savePlan(plan);
-    await tester.runAsync(app.chat.start);
+    await app.chat.start();
     await tester.pumpWidget(SmartFitApp(services: app));
     await tester.pumpAndSettle();
     Future<void> openPlans() async {
