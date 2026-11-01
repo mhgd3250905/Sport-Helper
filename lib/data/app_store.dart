@@ -108,6 +108,10 @@ class AppStore extends ChangeNotifier {
   /// Opaque SDK snapshot; the App never edits or derives session facts.
   String? coachSessionJson;
   final List<Map<String, dynamic>> coachDisplayMessages = [];
+  final Map<String, Map<String, Object?>> _chatEnvelopes = {};
+
+  Map<String, Object?>? chatEnvelope(String namespace) =>
+      _chatEnvelopes[namespace];
 
   /// Drifting star dust behind the chat (off = static sky).
   bool starfield = true;
@@ -188,6 +192,16 @@ class AppStore extends ChangeNotifier {
           for (final row in j['coachDisplay'] as List? ?? const [])
             if (row is Map) Map<String, dynamic>.from(row),
         ]);
+      _chatEnvelopes
+        ..clear()
+        ..addAll({
+          for (final entry
+              in (j['coachChatEnvelopes'] as Map? ?? const {}).entries)
+            if (entry.key is String && entry.value is Map)
+              entry.key as String: Map<String, Object?>.from(
+                entry.value as Map,
+              ),
+        });
       history
         ..clear()
         ..addAll([
@@ -220,6 +234,8 @@ class AppStore extends ChangeNotifier {
   String _encodeState({
     Iterable<HistoryEntry>? updatedHistory,
     Iterable<SessionResult>? updatedSessions,
+    Iterable<SavedPlan>? updatedSavedPlans,
+    Map<String, Map<String, Object?>>? updatedChatEnvelopes,
   }) => jsonEncode({
     'safetyAccepted': safetyAccepted,
     'safetyBlocked': safetyBlocked,
@@ -235,12 +251,13 @@ class AppStore extends ChangeNotifier {
     'aiMemoryEnabled': aiMemoryEnabled,
     'mediaWifiOnly': mediaWifiOnly,
     'appearance': appearance,
-    'savedPlans': [for (final p in savedPlans) p.toJson()],
+    'savedPlans': [for (final p in updatedSavedPlans ?? savedPlans) p.toJson()],
+    if ((updatedChatEnvelopes ?? _chatEnvelopes).isNotEmpty)
+      'coachChatEnvelopes': updatedChatEnvelopes ?? _chatEnvelopes,
     'coachSessionJson': ?coachSessionJson,
-    if (coachSessionJson != null) 'coachDisplay': coachDisplayMessages,
-    'chat': chatLog.length > chatLogLimit
-        ? chatLog.sublist(chatLog.length - chatLogLimit)
-        : chatLog,
+    if (coachSessionJson != null || coachDisplayMessages.isNotEmpty)
+      'coachDisplay': coachDisplayMessages,
+    'chat': chatLog,
   });
 
   Future<void> _save({bool notify = true}) async {
@@ -251,6 +268,138 @@ class AppStore extends ChangeNotifier {
       // Storage unavailable (tests): keep the in-memory state.
     }
   }
+
+  /// Serialized independently of legacy display keys. Commit memory only once
+  /// the same App state write has succeeded; errors reach SDK persistence.
+  Future<void> writeChatEnvelope(
+    String namespace,
+    Map<String, Object?> envelope,
+  ) => _enqueueWrite(() async {
+    final next = {..._chatEnvelopes, namespace: envelope};
+    await _storage.write(key, _encodeState(updatedChatEnvelopes: next));
+    _chatEnvelopes[namespace] = envelope;
+  });
+
+  Future<void> writeCoachPreferences({
+    required bool safetyAccepted,
+    required bool safetyBlocked,
+    required String appearance,
+    required bool voice,
+    required bool chimes,
+    required bool enableUserMemory,
+    required bool starfield,
+  }) async {
+    this.safetyAccepted = safetyAccepted;
+    this.safetyBlocked = safetyBlocked;
+    if (appearances.contains(appearance)) this.appearance = appearance;
+    this.voice = this.voice.copyWith(voice: voice, chimes: chimes);
+    aiMemoryEnabled = enableUserMemory;
+    this.starfield = starfield;
+    notifyListeners();
+    await _enqueueWrite(() => _storage.write(key, _encodeState()));
+  }
+
+  Future<void> _planWrites = Future.value();
+  Future<T> _enqueuePlanWrite<T>(Future<T> Function() operation) {
+    final pending = _planWrites.then((_) => operation());
+    _planWrites = pending.then<void>(
+      (_) {},
+      onError: (Object _, StackTrace _) {},
+    );
+    return pending;
+  }
+
+  /// An opaque per-record CAS token, independent of the SDK editing version.
+  /// Deriving it from the complete stored record needs no legacy-data rewrite.
+  static String savedPlanStorageRevision(SavedPlan saved) =>
+      jsonEncode(saved.toJson());
+
+  Future<SavedPlanWriteResult> writeSavedPlan(
+    TrainingPlan plan, {
+    required SavedPlanWriteMode mode,
+    required String name,
+    int? sdkVersion,
+    String? externalId,
+    Object? expectedStorageRevision,
+  }) => _enqueuePlanWrite(() async {
+    try {
+      late SavedPlanWriteResult result;
+      await _enqueueWrite(() async {
+        final next = [...savedPlans];
+        late SavedPlan saved;
+        if (mode == SavedPlanWriteMode.update) {
+          if (expectedStorageRevision == null) {
+            result = const SavedPlanWriteResult.failure(
+              SavedPlanWriteStatus.readOnly,
+            );
+            return;
+          }
+          final index = next.indexWhere((saved) => saved.id == externalId);
+          if (index < 0) {
+            result = const SavedPlanWriteResult.failure(
+              SavedPlanWriteStatus.deleted,
+            );
+            return;
+          }
+          final previous = next[index];
+          if (expectedStorageRevision != savedPlanStorageRevision(previous)) {
+            result = const SavedPlanWriteResult.failure(
+              SavedPlanWriteStatus.conflict,
+            );
+            return;
+          }
+          saved = SavedPlan(
+            id: previous.id,
+            name: previous.name,
+            plan: plan,
+            savedAt: previous.savedAt,
+            lastUsedAt: previous.lastUsedAt,
+            sdkVersion: sdkVersion,
+          );
+          next[index] = saved;
+        } else {
+          final original = name.trim().isEmpty ? '我的计划' : name.trim();
+          final base = mode == SavedPlanWriteMode.copy
+              ? '$original 新版'
+              : original;
+          var uniqueName = base;
+          for (
+            var index = 2;
+            next.any((row) => row.name == uniqueName);
+            index++
+          ) {
+            uniqueName = '$base $index';
+          }
+          final at = DateTime.now();
+          final baseId = 'saved-${at.microsecondsSinceEpoch}';
+          var id = baseId;
+          for (var index = 2; next.any((row) => row.id == id); index++) {
+            id = '$baseId-$index';
+          }
+          saved = SavedPlan(
+            id: id,
+            name: uniqueName,
+            plan: plan,
+            savedAt: at,
+            sdkVersion: sdkVersion,
+          );
+          next.insert(0, saved);
+        }
+        await _storage.write(key, _encodeState(updatedSavedPlans: next));
+        savedPlans
+          ..clear()
+          ..addAll(next);
+        result = SavedPlanWriteResult.saved(saved);
+        notifyListeners();
+      });
+      return result;
+    } on Object catch (error) {
+      return SavedPlanWriteResult.failure(
+        SavedPlanWriteStatus.failed,
+        error: error,
+      );
+    }
+  });
 
   /// TrainerPlayer's onFinished callback. Commit only after durable storage
   /// succeeds; failures reach ResultSaver so its completion page can retry.
@@ -370,10 +519,26 @@ class AppStore extends ChangeNotifier {
     DateTime? now,
     int? sdkVersion,
     bool forceNew = false,
+  }) => _enqueuePlanWrite(
+    () => _savePlan(
+      p,
+      name: name,
+      now: now,
+      sdkVersion: sdkVersion,
+      forceNew: forceNew,
+    ),
+  );
+
+  Future<SavedPlan> _savePlan(
+    TrainingPlan p, {
+    String? name,
+    DateTime? now,
+    int? sdkVersion,
+    bool forceNew = false,
   }) async {
     final existing = savedFor(p);
     if (!forceNew && existing != null) {
-      return (await updateSavedPlan(existing.id, p, sdkVersion: sdkVersion))!;
+      return (await _updateSavedPlan(existing.id, p, sdkVersion: sdkVersion))!;
     }
     final originalName = (name ?? (forceNew ? existing?.name : null) ?? p.title)
         .trim();
@@ -404,6 +569,14 @@ class AppStore extends ChangeNotifier {
   /// Replaces only this saved record's plan snapshot and SDK version. A deleted
   /// record returns null so callers can offer an ordinary save instead.
   Future<SavedPlan?> updateSavedPlan(
+    String savedId,
+    TrainingPlan p, {
+    int? sdkVersion,
+  }) => _enqueuePlanWrite(
+    () => _updateSavedPlan(savedId, p, sdkVersion: sdkVersion),
+  );
+
+  Future<SavedPlan?> _updateSavedPlan(
     String savedId,
     TrainingPlan p, {
     int? sdkVersion,
@@ -439,20 +612,29 @@ class AppStore extends ChangeNotifier {
     if (plan.avoid.isNotEmpty) 'avoid': plan.avoid.toList()..sort(),
   };
 
-  Future<void> renamePlan(String id, String name) {
+  Future<void> renamePlan(String id, String name) =>
+      _enqueuePlanWrite(() => _renamePlan(id, name));
+
+  Future<void> _renamePlan(String id, String name) {
     final i = savedPlans.indexWhere((s) => s.id == id);
     if (i < 0 || name.trim().isEmpty) return Future.value();
     savedPlans[i] = savedPlans[i].copyWith(name: name.trim());
     return _save();
   }
 
-  Future<void> deletePlan(String id) {
+  Future<void> deletePlan(String id) =>
+      _enqueuePlanWrite(() => _deletePlan(id));
+
+  Future<void> _deletePlan(String id) {
     savedPlans.removeWhere((s) => s.id == id);
     return _save();
   }
 
   /// A saved plan was started: it becomes the "上次那个" candidate.
-  Future<void> touchPlan(String id, {DateTime? now}) {
+  Future<void> touchPlan(String id, {DateTime? now}) =>
+      _enqueuePlanWrite(() => _touchPlan(id, now: now));
+
+  Future<void> _touchPlan(String id, {DateTime? now}) {
     final i = savedPlans.indexWhere((s) => s.id == id);
     if (i < 0) return Future.value();
     savedPlans[i] = savedPlans[i].copyWith(lastUsedAt: now ?? DateTime.now());

@@ -1,0 +1,53 @@
+{
+  "schema": "smartfit-chat-capture-media@1",
+  "sourceCommit": "3eb2a9e88ef4d28e02f4cf306c1716d61baa7f10",
+  "sourceImageIndex": {
+    "bytes": 160952,
+    "sha256": "e3b706ae21ef75a76d10c959d07d089731a904b344de5ec27a2877b501b69f0f"
+  },
+  "catalogSha256": "75881cf91621c967f80732f0219f23e85b35e8bde5d1a51ee75dec5f7c5edd36",
+  "images": [
+    {
+      "catalogMediaKey": "media/s-butterfly/s-butterfly.cover.alpha.webp",
+      "asset": "assets/posehub/images/75881cf91621c967f80732f0219f23e85b35e8bde5d1a51ee75dec5f7c5edd36/635d6606847d5d1efdae82e1ad07c12e556b414f317ee00c67f67ba2c4917b35.webp",
+      "bytes": 27214,
+      "sha256": "635d6606847d5d1efdae82e1ad07c12e556b414f317ee00c67f67ba2c4917b35",
+      "fixture": "media/635d6606847d5d1efdae82e1ad07c12e556b414f317ee00c67f67ba2c4917b35.webp"
+    },
+    {
+      "catalogMediaKey": "media/s-butterfly/s-butterfly.thumbnail.alpha.webp",
+      "asset": "assets/posehub/images/75881cf91621c967f80732f0219f23e85b35e8bde5d1a51ee75dec5f7c5edd36/8fa2db79be34b0c27d7c94c112f1b9f0166e74ba98b2f9ca31b4589c721b5949.webp",
+      "bytes": 5432,
+      "sha256": "8fa2db79be34b0c27d7c94c112f1b9f0166e74ba98b2f9ca31b4589c721b5949",
+      "fixture": "media/8fa2db79be34b0c27d7c94c112f1b9f0166e74ba98b2f9ca31b4589c721b5949.webp"
+    },
+    {
+      "catalogMediaKey": "media/s-frog/s-frog.cover.alpha.webp",
+      "asset": "assets/posehub/images/75881cf91621c967f80732f0219f23e85b35e8bde5d1a51ee75dec5f7c5edd36/ad5130f49917613d4424b172630f30aef38c087c6542e48a62fd8614770e3f3d.webp",
+      "bytes": 18166,
+      "sha256": "ad5130f49917613d4424b172630f30aef38c087c6542e48a62fd8614770e3f3d",
+      "fixture": "media/ad5130f49917613d4424b172630f30aef38c087c6542e48a62fd8614770e3f3d.webp"
+    },
+    {
+      "catalogMediaKey": "media/s-frog/s-frog.thumbnail.alpha.webp",
+      "asset": "assets/posehub/images/75881cf91621c967f80732f0219f23e85b35e8bde5d1a51ee75dec5f7c5edd36/642ca1e353a896458270333b1c18033e33904136e5524ae11f20493c2c377f4f.webp",
+      "bytes": 3880,
+      "sha256": "642ca1e353a896458270333b1c18033e33904136e5524ae11f20493c2c377f4f",
+      "fixture": "media/642ca1e353a896458270333b1c18033e33904136e5524ae11f20493c2c377f4f.webp"
+    },
+    {
+      "catalogMediaKey": "media/s-kneel-hipflex/s-kneel-hipflex.cover.alpha.webp",
+      "asset": "assets/posehub/images/75881cf91621c967f80732f0219f23e85b35e8bde5d1a51ee75dec5f7c5edd36/363f0c527ba69dcfed0bd156d3a14d482428e7972762a19e64b6b9baa216e39c.webp",
+      "bytes": 16642,
+      "sha256": "363f0c527ba69dcfed0bd156d3a14d482428e7972762a19e64b6b9baa216e39c",
+      "fixture": "media/363f0c527ba69dcfed0bd156d3a14d482428e7972762a19e64b6b9baa216e39c.webp"
+    },
+    {
+      "catalogMediaKey": "media/s-kneel-hipflex/s-kneel-hipflex.thumbnail.alpha.webp",
+      "asset": "assets/posehub/images/75881cf91621c967f80732f0219f23e85b35e8bde5d1a51ee75dec5f7c5edd36/5eea0aae2d8bc4cf0d69f326640d8ba0e7cff2998385d5ef13eaff4a966781a9.webp",
+      "bytes": 4012,
+      "sha256": "5eea0aae2d8bc4cf0d69f326640d8ba0e7cff2998385d5ef13eaff4a966781a9",
+      "fixture": "media/5eea0aae2d8bc4cf0d69f326640d8ba0e7cff2998385d5ef13eaff4a966781a9.webp"
+    }
+  ]
+}

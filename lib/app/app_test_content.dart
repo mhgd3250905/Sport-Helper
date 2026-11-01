@@ -31,7 +31,7 @@ class AppTestContent {
     required ExerciseLibrary legacyLibrary,
     AppTestEquipmentResolver resolveEquipment = _knownEquipment,
   }) {
-    final coachCatalog =
+    final sourceCatalog =
         catalog.toCoachCatalog() ??
         coach.Catalog.fromJson({
           'format': coach.catalogFormat,
@@ -40,13 +40,21 @@ class AppTestContent {
           'drills': <Object?>[],
         });
     final rhythms = trainer.rhythmsFromCatalog(
-      coachCatalog,
+      sourceCatalog,
       overrides: {
         for (final entry in catalog.entries.values)
           if (entry.training case final training?)
             entry.id: ?_executionRhythm(training),
       },
     );
+    for (final entry in catalog.entries.values) {
+      final rhythm = rhythms[entry.id];
+      if (entry.training?.holdSeconds case final hold?
+          when rhythm != null && rhythm.counted) {
+        rhythms[entry.id] = rhythm.withHold(hold);
+      }
+    }
+    final coachCatalog = _planningCadence(sourceCatalog, catalog, rhythms);
     final exercises = <Exercise>[];
     final unknown = <String, List<String>>{};
     for (final entry in catalog.entries.values) {
@@ -64,11 +72,7 @@ class AppTestContent {
         }
       }
       if (unmapped.isNotEmpty) unknown[entry.id] = List.unmodifiable(unmapped);
-      var rhythm = rhythms[entry.id]!;
-      if (training.holdSeconds case final hold? when rhythm.counted) {
-        rhythm = rhythm.withHold(hold);
-        rhythms[entry.id] = rhythm;
-      }
+      final rhythm = rhythms[entry.id]!;
       final sdkCover = catalog.isSdkBound
           ? _sdkImageAsset(entry.id, 'cover')
           : null;
@@ -139,6 +143,76 @@ class AppTestContent {
       unmappedEquipment: Map.unmodifiable(unknown),
     );
   }
+}
+
+/// Planning gets the same per-rep cycle as execution, without changing verified
+/// source bytes or flattening execution phases, voice cues or one-off lead.
+/// PlanDuration does not read ordinary-rep lead; cards use the complete schedule.
+coach.Catalog _planningCadence(
+  coach.Catalog source,
+  AppTestCatalog catalog,
+  Map<String, trainer.Rhythm> rhythms,
+) {
+  var changed = false;
+  final drills = <Map<String, Object?>>[];
+  for (final drill in source.drills) {
+    final rhythm = rhythms[drill.id];
+    if (drill.defaultDose.mode != coach.DoseMode.reps ||
+        rhythm == null ||
+        !rhythm.counted) {
+      drills.add(drill.raw);
+      continue;
+    }
+    final seconds = rhythm.cycleFor();
+    if (!seconds.isFinite || seconds <= 0) {
+      drills.add(drill.raw);
+      continue;
+    }
+    final assets = Map<String, Object?>.from(
+      drill.raw['assets'] as Map? ?? const {},
+    );
+    final video = Map<String, Object?>.from(
+      assets['video'] as Map? ?? const {},
+    );
+    final sources = List<Object?>.from(video['sources'] as List? ?? const []);
+    final first = sources.indexWhere(
+      (value) => coach.AssetSource.tryParse(value) != null,
+    );
+    if (first >= 0) {
+      sources[first] = {
+        ...Map<String, Object?>.from(sources[first] as Map),
+        'repSeconds': seconds,
+      };
+    } else {
+      final file = catalog.entries[drill.id]?.mediaFiles['video'];
+      if (file is! Map || file['path'] is! String) {
+        // A missing source is not permission to invent a playable asset.
+        drills.add(drill.raw);
+        continue;
+      }
+      final projected = <String, Object?>{
+        ...Map<String, Object?>.from(file),
+        'app': 'pose-hub',
+        'repSeconds': seconds,
+      };
+      if (coach.AssetSource.tryParse(projected) == null) {
+        drills.add(drill.raw);
+        continue;
+      }
+      sources.insert(0, projected);
+    }
+    changed = true;
+    drills.add({
+      ...drill.raw,
+      'assets': {
+        ...assets,
+        'video': {...video, 'sources': sources},
+      },
+    });
+  }
+  return changed
+      ? coach.Catalog.fromJson({...source.raw, 'drills': drills})
+      : source;
 }
 
 String _sdkImageAsset(String id, String role) =>

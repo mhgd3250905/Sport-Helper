@@ -6,7 +6,7 @@ import 'package:smartfit/data/app_store.dart';
 import 'package:smartfit/domain/exercise.dart';
 import 'package:smartfit/domain/plan.dart';
 import 'package:smartfit/packs/drill_pack.dart';
-import 'package:smartfit/ui/chat/cosmos.dart';
+import 'package:ugk_coach_chat/ugk_coach_chat.dart';
 import 'package:smartfit/ui/exercise_video.dart';
 import 'package:smartfit/ui/player_page.dart';
 import 'package:smartfit/ui/theme/app_theme.dart';
@@ -344,7 +344,7 @@ void main() {
           media.posterFor(light: !palette.isDark),
           palette.isDark ? source.poster : source.lightPoster ?? source.poster,
         );
-        expect(find.byType(CosmosBackground), findsNothing);
+        expect(find.byType(CoachChatPage), findsNothing);
         final video = tester.widget<ExerciseVideo>(find.byType(ExerciseVideo));
         expect(
           video.exercise.media.video,

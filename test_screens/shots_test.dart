@@ -20,20 +20,26 @@ import 'package:smartfit/voice/voice_queue.dart';
 
 import '../test/app_flow_test.dart' show MemoryStorage;
 import '../test/support.dart';
+import '../test/support/coach_v2_fixtures.dart';
 
 Future<void> _loadFonts() async {
-  final cjk = Platform.environment['SF_CJK_FONT'] ?? 'assets/fonts/NotoSansSC.ttf';
-  final root = Platform.environment['FLUTTER_ROOT'] ?? '/workspace/tools/flutter';
+  final cjk =
+      Platform.environment['SF_CJK_FONT'] ?? 'assets/fonts/NotoSansSC.ttf';
+  final root =
+      Platform.environment['FLUTTER_ROOT'] ?? '/workspace/tools/flutter';
   final mat = '$root/bin/cache/artifacts/material_fonts';
   Future<void> load(String family, List<String> files) async {
     final l = FontLoader(family);
     for (final f in files) {
       if (File(f).existsSync()) {
-        l.addFont(Future.value(ByteData.sublistView(File(f).readAsBytesSync())));
+        l.addFont(
+          Future.value(ByteData.sublistView(File(f).readAsBytesSync())),
+        );
       }
     }
     await l.load();
   }
+
   await load('NotoSansSC', [cjk]);
   await load('MaterialIcons', ['$mat/MaterialIcons-Regular.otf']);
 }
@@ -55,7 +61,9 @@ Future<void> _settleImages(WidgetTester tester) async {
 Future<void> _shot(WidgetTester tester, String name) async {
   await _settleImages(tester);
   final out = Platform.environment['SF_SCREENSHOT_DIR'];
-  final target = out == null ? Uri.parse('../docs/screenshots/$name.png') : Uri.file('$out/$name.png');
+  final target = out == null
+      ? Uri.parse('../docs/screenshots/$name.png')
+      : Uri.file('$out/$name.png');
   await expectLater(find.byType(MaterialApp), matchesGoldenFile(target));
 }
 
@@ -66,10 +74,18 @@ void main() {
     tester.view.devicePixelRatio = 3;
     addTearDown(tester.view.reset);
     final store = AppStore(MemoryStorage())..starfield = false;
+    final chatFixture = CoachV2Fixtures.loadSync();
     final s = AppServices(
-      library: loadLibrary(), catalog: loadCatalog(), store: store,
-      voiceLibrary: VoiceLibrary.empty, voiceOutput: const MutedVoiceOutput(),
-      chatReplyDelay: Duration.zero);
+      coachCatalog: chatFixture.catalog,
+      coachProfile: chatFixture.profile,
+      poseHubCatalog: chatFixture.poseHub,
+      library: chatFixture.library,
+      catalog: loadCatalog(),
+      store: store,
+      voiceLibrary: VoiceLibrary.empty,
+      voiceOutput: const MutedVoiceOutput(),
+      chatReplyDelay: Duration.zero,
+    );
     // The chat home opens with the safety talk (chat-*.png come from the
     // web harness, test_screens/web_shots_main.dart).
     await tester.pumpWidget(SmartFitApp(services: s, fontFamily: 'NotoSansSC'));
@@ -84,14 +100,20 @@ void main() {
     );
     await tester.pumpWidget(app(const CustomPlanPage()));
     await tester.pumpAndSettle();
-    await tester.enterText(find.byKey(const ValueKey('prompt')), '家里有哑铃，想练 25 分钟全身力量');
+    await tester.enterText(
+      find.byKey(const ValueKey('prompt')),
+      '家里有哑铃，想练 25 分钟全身力量',
+    );
     await tester.tap(find.text('力量塑形'));
     await tester.tap(find.text('哑铃'));
     await tester.pumpAndSettle();
     await _shot(tester, '02-home');
 
-    await tester.scrollUntilVisible(find.byKey(const ValueKey('generate')), 300,
-        scrollable: find.byType(Scrollable).first);
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('generate')),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('generate')));
     await tester.pumpAndSettle();

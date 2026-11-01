@@ -9,8 +9,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:smartfit/app/services.dart';
 import 'package:smartfit/data/app_store.dart';
 import 'package:smartfit/main.dart';
-import 'package:smartfit/ui/chat/chat_widgets.dart';
-import 'package:smartfit/ui/chat/plan_card.dart';
+import 'package:ugk_coach_ui/ugk_coach_ui.dart';
 import 'package:smartfit/ui/theme/solid_surface.dart';
 import 'package:smartfit/ui/theme/tokens.dart';
 import 'package:smartfit/voice/voice_library.dart';
@@ -18,6 +17,7 @@ import 'package:smartfit/voice/voice_queue.dart';
 
 import '../test/app_flow_test.dart' show MemoryStorage;
 import '../test/support.dart';
+import '../test/support/coach_v2_fixtures.dart';
 
 Future<void> _loadFonts() async {
   final root = Platform.environment['FLUTTER_ROOT']!;
@@ -97,8 +97,12 @@ void main() {
       final store = AppStore(MemoryStorage())..starfield = false;
       await store.acceptSafety(blocked: false);
       await store.setAppearance(theme);
+      final chatFixture = CoachV2Fixtures.loadSync();
       final services = AppServices(
-        library: loadLibrary(),
+        coachCatalog: chatFixture.catalog,
+        coachProfile: chatFixture.profile,
+        poseHubCatalog: chatFixture.poseHub,
+        library: chatFixture.library,
         catalog: loadCatalog(),
         store: store,
         voiceLibrary: VoiceLibrary.empty,
@@ -107,7 +111,7 @@ void main() {
       );
       await tester.pumpWidget(SmartFitApp(services: services));
       await tester.pumpAndSettle();
-      expect(find.byType(GreetingBlock), findsOneWidget);
+      expect(find.textContaining('说说今天想怎么练'), findsOneWidget);
       _assertOpaqueSurfaces(tester);
       final palette = SfColors.palette;
       expect(
@@ -123,7 +127,7 @@ void main() {
       await tester.pump();
       await tester.tap(find.byKey(const ValueKey('chat-send')));
       await tester.pumpAndSettle();
-      expect(find.byType(PlanCard), findsOneWidget);
+      expect(find.byType(CoachPlanCard), findsOneWidget);
       expect(services.chat.currentPlan, isNotNull);
       _assertOpaqueSurfaces(tester);
       await _shot(tester, 'conversation-$theme');

@@ -11,10 +11,7 @@ import 'package:smartfit/domain/plan.dart';
 import 'package:smartfit/domain/scenario.dart';
 import 'package:smartfit/ui/chat/chat_home_page.dart';
 import 'package:smartfit/ui/exercise_video.dart';
-import 'package:smartfit/ui/chat/chat_widgets.dart';
-import 'package:smartfit/ui/chat/cosmos.dart';
-import 'package:smartfit/ui/chat/plan_card.dart';
-import 'package:smartfit/ui/chat/chat_timeline.dart';
+import 'package:ugk_coach_chat/ugk_coach_chat.dart';
 import 'package:smartfit/ui/custom_plan_page.dart';
 import 'package:smartfit/ui/library_page.dart';
 import 'package:smartfit/ui/player_page.dart';
@@ -24,8 +21,13 @@ import 'package:smartfit/ui/chat/saved_plans_page.dart';
 import 'package:smartfit/voice/voice_library.dart';
 import 'package:smartfit/voice/voice_queue.dart';
 import 'package:ugk_trainer/ugk_trainer.dart' as trainer;
+import 'package:ugk_coach/ugk_coach.dart' as coach;
 
 import 'support.dart';
+import 'support/coach_v2_fixtures.dart';
+import 'support/chat_sdk_support.dart';
+import 'package:smartfit/app/coach_chat.dart';
+import 'package:ugk_coach_ui/ugk_coach_ui.dart' show CoachOptionPill;
 
 class MemoryStorage implements LocalStateStorage {
   final data = <String, String>{};
@@ -35,14 +37,24 @@ class MemoryStorage implements LocalStateStorage {
   Future<void> write(String key, String value) async => data[key] = value;
 }
 
-AppServices services({VoiceOutput output = const MutedVoiceOutput()}) {
-  final store = AppStore(MemoryStorage())
+CoachV2Fixtures? _navigationFixture;
+
+AppServices services({
+  VoiceOutput output = const MutedVoiceOutput(),
+  AppStore? persistedStore,
+  ExerciseLibrary? exerciseLibrary,
+}) {
+  final fixture = _navigationFixture ??= CoachV2Fixtures.loadSync();
+  final store = (persistedStore ?? AppStore(MemoryStorage()))
     // A drifting sky never settles: keep it still so pumpAndSettle can.
     ..starfield = false;
   return AppServices(
-    library: loadLibrary(),
+    library: exerciseLibrary ?? fixture.library,
     catalog: loadCatalog(),
     store: store,
+    coachCatalog: fixture.catalog,
+    coachProfile: fixture.profile,
+    poseHubCatalog: fixture.poseHub,
     voiceLibrary: VoiceLibrary.empty,
     voiceOutput: output,
     chatReplyDelay: Duration.zero,
@@ -53,15 +65,18 @@ AppServices services({VoiceOutput output = const MutedVoiceOutput()}) {
 Future<void> warmTrainingPoster(
   WidgetTester tester,
   AppServices services,
-  TrainingPlan plan, {
+  Object plan, {
   BuildContext? sourceContext,
 }) async {
-  if (plan.items.isEmpty) return;
+  final domainPlan = plan is TrainingPlan
+      ? plan
+      : TrainingPlan.fromJson((plan as coach.TrainingPlan).toJson());
+  if (domainPlan.items.isEmpty) return;
   final context = sourceContext ?? tester.element(find.byType(Scaffold).first);
   await tester.runAsync(
     () => TrainingPosterImages.precache(
       context,
-      services.library[plan.items.first.exerciseId],
+      services.library[domainPlan.items.first.exerciseId],
     ),
   );
   await tester.pump();
@@ -101,18 +116,56 @@ void tall(WidgetTester tester) {
   addTearDown(tester.view.reset);
 }
 
-// Product navigation tests use an explicit manually composed plan fixture;
-// natural-language plan generation is exercised by the SDK integration tests.
+// Navigation fixtures use an admitted plan from the real public protocol.
+// Legacy TemplatePlanGenerator compatibility is checked separately, unchanged.
 Future<TrainingPlan> showManualChatCard(
   AppServices services, {
   String template = 'core',
+  WidgetTester? tester,
 }) async {
-  final result = await services.generator.generate(
-    ScenarioRequest(templateId: template),
+  Future<coach.TrainingPlan> create() async {
+    final fixture = _navigationFixture ??= CoachV2Fixtures.loadSync();
+    final client = coach.FakeLlmClient(
+      fixture.planTurn(prefix: 'navigation-$template'),
+      latency: Duration.zero,
+    );
+    final fixtureStore = AppStore(MemoryStorage())..safetyAccepted = true;
+    final generator = createSmartfitChat(
+      sdkChatServices(fixtureStore, fixture),
+      gateway: CoachGatewayBinding.shared(client),
+    );
+    expect((await generator.start()).ok, isTrue);
+    try {
+      await generator.send('在家徒手10分钟拉伸').timeout(const Duration(seconds: 5));
+    } on TimeoutException {
+      generator.cancelRequest();
+      await generator.close();
+      fail(
+        'Offline navigation fixture did not finish in 5 seconds; '
+        'calls=${client.requests.length}; result=${generator.lastResult?.issues}',
+      );
+    }
+    expect(
+      generator.lastResult?.status,
+      coach.TurnStatus.ok,
+      reason: '${generator.lastResult?.issues}',
+    );
+    final plan = generator.currentPlan!;
+    await generator.close();
+    fixtureStore.dispose();
+    return plan;
+  }
+
+  final plan = tester == null
+      ? await create()
+      : (await tester.runAsync(create))!;
+  expect((await services.chat.start()).ok, isTrue);
+  expect(
+    await services.chat.started(plan),
+    isTrue,
+    reason: 'The navigation fixture must pass the production training gate',
   );
-  final plan = result.plan!;
-  await services.chat.started(plan);
-  return plan;
+  return TrainingPlan.fromJson(plan.toJson());
 }
 
 // Paused Morph Pulse breathing intentionally keeps scheduling frames behind
@@ -137,6 +190,21 @@ Future<void> _closeDiscomfort(WidgetTester tester) async {
   }
   fail('Discomfort sheet did not finish its finite closing transition.');
 }
+
+ScrollController chatScroll(WidgetTester tester) => tester
+    .widget<ListView>(
+      find
+          .descendant(
+            of: find.byKey(
+              const ValueKey('chat-messages-boundary'),
+              skipOffstage: false,
+            ),
+            matching: find.byType(ListView, skipOffstage: false),
+            skipOffstage: false,
+          )
+          .first,
+    )
+    .controller!;
 
 void main() {
   testWidgets(
@@ -248,7 +316,7 @@ void main() {
           ? trainer.TrainerTheme.light
           : trainer.TrainerTheme.dark;
       expect(player.theme.background, defaults.background);
-      expect(find.byType(CosmosBackground), findsNothing);
+      expect(find.byType(CoachChatPage), findsNothing);
       expect(
         tester.widget<ExerciseVideo>(find.byType(ExerciseVideo)).paused,
         isFalse,
@@ -327,9 +395,14 @@ void main() {
 
   /// The safety question buttons that are still open (older answered ones
   /// stay on screen, locked).
-  Finder openOption(String label) => find.byWidgetPredicate(
-    (w) => w is OptionPill && w.label == label && w.enabled,
-  );
+  Finder openOption(String label) => find
+      .byWidgetPredicate(
+        (widget) =>
+            widget is CoachOptionPill &&
+            widget.label == label &&
+            widget.enabled,
+      )
+      .hitTestable();
 
   Future<void> answerSafety(WidgetTester tester, List<String> answers) async {
     expect(find.textContaining('开始之前'), findsOneWidget);
@@ -353,6 +426,7 @@ void main() {
   ) async {
     tall(tester);
     final s = services();
+    await tester.runAsync(s.chat.start);
     await tester.pumpWidget(SmartFitApp(services: s));
     await tester.pumpAndSettle();
 
@@ -364,12 +438,19 @@ void main() {
     expect(find.textContaining('都没问题'), findsOneWidget);
 
     // An explicit manual-plan fixture supplies the card.
-    await showManualChatCard(s, template: 'office-relax');
+    await showManualChatCard(s, template: 'office-relax', tester: tester);
     await tester.pumpAndSettle();
-    expect(find.byType(PlanCard), findsOneWidget);
-    expect(find.text('工位肩颈腰放松'), findsOneWidget);
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget.key is ValueKey<String> &&
+            (widget.key as ValueKey<String>).value.startsWith('plan-clip-'),
+      ),
+      findsOneWidget,
+    );
+    expect(find.text(s.chat.currentPlan!.title), findsWidgets);
     final plan = s.chat.currentPlan!;
-    expect(plan.templateId, 'office-relax');
+    expect(plan.source, 'ai');
 
     // Save from the card.
     await tester.tap(find.byKey(ValueKey('plan-expand-${plan.id}')));
@@ -421,11 +502,12 @@ void main() {
     await tester.pump(const Duration(milliseconds: 200));
     await tester.tap(find.byKey(const ValueKey('close')));
     await tester.pumpAndSettle();
-    final card = find.byType(PlanCard, skipOffstage: false);
+    final card = find.byKey(
+      ValueKey('plan-clip-${plan.id}'),
+      skipOffstage: false,
+    );
     final cardBeforeReceipt = tester.getRect(card);
-    final scroll = tester
-        .widget<ChatTimeline>(find.byType(ChatTimeline, skipOffstage: false))
-        .controller;
+    final scroll = chatScroll(tester);
     final offsetBeforeReceipt = scroll.offset;
     final messagesBeforeReceipt = s.chat.messages.length;
     await tester.tap(find.text('结束'));
@@ -444,7 +526,7 @@ void main() {
     expect(tester.getRect(card), cardBeforeReceipt);
     expect(scroll.offset, offsetBeforeReceipt);
     expect(
-      find.byType(TrainingFinishedEntry, skipOffstage: false),
+      find.byKey(const ValueKey('training-finished-size'), skipOffstage: false),
       findsOneWidget,
     );
     await tester.pumpAndSettle();
@@ -452,7 +534,7 @@ void main() {
     expect(s.store.history, hasLength(1));
     expect(find.byType(ChatHomePage), findsOneWidget);
     expect(tester.element(find.byType(ChatHomePage)), same(chatElement));
-    expect(s.chat.messages.last.isUser, isFalse);
+    expect(s.chat.messages.last.role.name, 'assistant');
     expect(s.chat.messages.last.isPlan, isFalse);
   });
 
@@ -467,9 +549,10 @@ void main() {
       );
       final s = services();
       await s.store.acceptSafety(blocked: false);
+      await tester.runAsync(s.chat.start);
       await tester.pumpWidget(SmartFitApp(services: s));
       await tester.pumpAndSettle();
-      await showManualChatCard(s);
+      await showManualChatCard(s, tester: tester);
       await tester.pumpAndSettle();
       final plan = s.chat.currentPlan!;
       final screen = tester.getRect(find.byType(ChatHomePage));
@@ -508,9 +591,10 @@ void main() {
       tall(tester);
       final s = services();
       await s.store.acceptSafety(blocked: false);
+      await tester.runAsync(s.chat.start);
       await tester.pumpWidget(SmartFitApp(services: s));
       await tester.pumpAndSettle();
-      await showManualChatCard(s);
+      await showManualChatCard(s, tester: tester);
       await tester.pumpAndSettle();
       await tester.tap(
         find.byKey(ValueKey('plan-expand-${s.chat.currentPlan!.id}')),
@@ -578,6 +662,7 @@ void main() {
     (tester) async {
       tall(tester);
       final s = services();
+      await tester.runAsync(s.chat.start);
       await tester.pumpWidget(SmartFitApp(services: s));
       await tester.pumpAndSettle();
       await answerSafety(tester, ['否', '是']);
@@ -586,7 +671,14 @@ void main() {
       expect(find.textContaining('医生的康复安排'), findsOneWidget);
 
       await say(tester, '在家 10 分钟拉伸');
-      expect(find.byType(PlanCard), findsNothing);
+      expect(
+        find.byWidgetPredicate(
+          (widget) =>
+              widget.key is ValueKey<String> &&
+              (widget.key as ValueKey<String>).value.startsWith('plan-clip-'),
+        ),
+        findsNothing,
+      );
       expect(find.textContaining('先不生成训练计划'), findsWidgets);
 
       await tester.tap(openOption('浏览动作库').first);
@@ -598,10 +690,18 @@ void main() {
   testWidgets('typing during the safety talk waits for it', (tester) async {
     tall(tester);
     final s = services();
+    await tester.runAsync(s.chat.start);
     await tester.pumpWidget(SmartFitApp(services: s));
     await tester.pumpAndSettle();
     await say(tester, '在家 10 分钟拉伸');
-    expect(find.byType(PlanCard), findsNothing);
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget.key is ValueKey<String> &&
+            (widget.key as ValueKey<String>).value.startsWith('plan-clip-'),
+      ),
+      findsNothing,
+    );
     expect(find.textContaining('先把上面的安全确认做完'), findsOneWidget);
     expect(s.store.safetyAccepted, isFalse);
   });
@@ -612,10 +712,11 @@ void main() {
       tall(tester);
       final s = services();
       await s.store.acceptSafety(blocked: false);
+      await tester.runAsync(s.chat.start);
       await tester.pumpWidget(SmartFitApp(services: s));
       await tester.pumpAndSettle();
 
-      await showManualChatCard(s);
+      await showManualChatCard(s, tester: tester);
       await tester.pumpAndSettle();
       final plan = s.chat.currentPlan!;
       await tester.tap(find.byKey(ValueKey('plan-expand-${plan.id}')));

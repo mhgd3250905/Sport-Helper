@@ -1,118 +1,72 @@
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:smartfit/chat/ai_chat_engine.dart';
-import 'package:smartfit/chat/app_chat_actions.dart';
-import 'package:smartfit/chat/chat_controller.dart';
-import 'package:smartfit/chat/chat_models.dart';
+import 'package:smartfit/app/coach_chat.dart';
 import 'package:smartfit/data/app_store.dart';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
 
 import 'app_flow_test.dart' show MemoryStorage;
+import 'support/chat_sdk_support.dart';
 import 'support/coach_v2_fixtures.dart';
 
 void main() {
   late CoachV2Fixtures fixture;
-  setUpAll(() async => fixture = await CoachV2Fixtures.load());
-
-  AiChatEngine engine(List<Object> script) => AiChatEngine(
-    local: const AppChatActions(),
-    catalog: fixture.catalog,
-    profile: fixture.profile,
-    client: coach.FakeLlmClient(script, latency: Duration.zero),
-  );
-
-  Future<Map<String, dynamic>> legacyCard() async {
-    final first = engine(fixture.planTurn());
-    addTearDown(first.dispose);
-    final reply = await first.reply('在家徒手10分钟拉伸', const ChatState());
-    final card = reply.messages.single;
-    expect(card.validatedPlan, isNotNull);
-    return {
-      ...ChatMessage(
-        id: 'old-card',
-        role: ChatRole.assistant,
-        at: DateTime(2026),
-        text: card.text,
-        plan: card.plan,
-        validatedPlan: card.validatedPlan,
-        request: card.request,
-        aiVisible: true,
-      ).toJson(),
-      'planState': first.agent.planStateFor(card.validatedPlan!).toJson(),
+  late Map<String, Object?> originalCard;
+  setUpAll(() async {
+    fixture = await CoachV2Fixtures.load();
+    final store = AppStore(MemoryStorage());
+    await store.acceptSafety(blocked: false);
+    final chat = fakeHostChat(
+      sdkChatServices(store, fixture),
+      coach.FakeLlmClient(fixture.planTurn(), latency: Duration.zero),
+    );
+    expect((await chat.start()).ok, isTrue);
+    await chat.send('在家徒手10分钟拉伸');
+    final card = chat.messages.lastWhere((row) => row.plan != null);
+    originalCard = {
+      ...card.toJson(),
+      'planState': chat.agent.planStateFor(card.validatedPlan!).toJson(),
     };
-  }
+    await chat.close();
+    store.dispose();
+  });
 
-  for (final snapshot in ['valid', 'missing', 'corrupt', 'mismatched']) {
+  for (final variant in ['valid', 'missing', 'corrupt', 'mismatched']) {
     test(
-      'pre-v2 $snapshot history uses SDK recovery without App card state',
+      'pre-v2 $variant planState is imported through the SDK, leaving old bytes intact',
       () async {
-        final raw = await legacyCard();
-        if (snapshot == 'missing') raw.remove('planState');
-        if (snapshot == 'corrupt') raw['planState'] = {'context': 'damaged'};
-        if (snapshot == 'mismatched') {
-          raw['planState'] = {
-            ...raw['planState'] as Map,
-            'planId': 'another-plan',
-          };
+        final raw = Map<String, Object?>.from(
+          jsonDecode(jsonEncode(originalCard)) as Map,
+        );
+        if (variant == 'missing') raw.remove('planState');
+        if (variant == 'corrupt') raw['planState'] = {'context': 'damaged'};
+        if (variant == 'mismatched') {
+          raw['planState'] = {...raw['planState'] as Map, 'planId': 'other'};
         }
-        final storage = MemoryStorage();
-        final store = AppStore(storage);
-        await store.acceptSafety(blocked: false);
-        await store.setChatLog([
-          jsonDecode(jsonEncode(raw)) as Map<String, dynamic>,
-        ]);
-        final next = engine([]);
-        final chat = ChatController(
-          engine: next,
-          store: store,
-          replyDelay: Duration.zero,
+        final disk = MemoryStorage();
+        disk.data[AppStore.key] = jsonEncode({
+          'safetyAccepted': true,
+          'chat': [raw],
+        });
+        final store = AppStore(disk);
+        await store.load();
+        final client = coach.FakeLlmClient([], latency: Duration.zero);
+        final chat = fakeHostChat(sdkChatServices(store, fixture), client);
+        addTearDown(() async {
+          await chat.close();
+          store.dispose();
+        });
+        expect((await chat.start()).ok, isTrue);
+        final restored = chat.messages.singleWhere(
+          (row) => row.id == raw['id'],
         );
-        addTearDown(chat.dispose);
-        chat.start();
-        final restored = chat.messages.firstWhere((m) => m.id == 'old-card');
         expect(restored.validatedPlan, isNotNull);
-        expect(restored.validatedPlan!.plan.id, (raw['plan'] as Map)['id']);
-        expect(next.agent.sessionState.lastDeliveredPlanId, restored.plan!.id);
-        expect(
-          restored.toJson().containsKey('planState'),
-          isFalse,
-          reason:
-              'Old planState is not read or maintained by App; SDK restores legacy history.',
-        );
+        expect(restored.plan!.toJson(), raw['plan']);
+        expect(restored.toJson().containsKey('planState'), isFalse);
+        expect(store.chatLog.single, raw);
+        expect(store.chatEnvelope(smartfitCoachChatNamespace), isNotNull);
+        expect(client.requests, isEmpty);
       },
     );
   }
-
-  test('presentation task snapshots round-trip without App planning state', () {
-    final task = coach.CoachTaskState.fromJson({
-      'type': 'recommend',
-      'reused': false,
-      'nodes': [
-        {
-          'id': 'understand',
-          'status': 'done',
-          'stamp': '要推荐动作',
-          'doneAtTurn': 1,
-        },
-      ],
-    });
-    final message = ChatMessage(
-      id: 'task',
-      role: ChatRole.assistant,
-      at: DateTime(2026),
-      text: '按你的目标挑选。',
-      coachTask: task,
-    );
-    final restored = ChatMessage.fromJson(
-      jsonDecode(jsonEncode(message.toJson())),
-    );
-    expect(restored.coachTask!.toJson(), task.toJson());
-    expect(restored.text, message.text);
-    final corrupt = {
-      ...message.toJson(),
-      'coachTask': {'nodes': 'bad'},
-    };
-    expect(ChatMessage.fromJson(corrupt).coachTask, isNull);
-  });
 }

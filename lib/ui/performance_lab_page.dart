@@ -69,7 +69,7 @@ class _PerformanceLabPageState extends State<PerformanceLabPage> {
       }
       final original = AppServices.of(context);
       final fixture = PerformanceFixture.create(
-        library: original.library,
+        services: original,
         scenario: scenario,
         starfield: original.store.starfield,
         appearance: original.store.appearance,

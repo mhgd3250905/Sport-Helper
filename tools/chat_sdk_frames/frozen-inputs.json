@@ -1,0 +1,101 @@
+{
+  "schema": "smartfit-sdk-chat-frozen-baseline@1",
+  "baselineSourceCommit": "3eb2a9e88ef4d28e02f4cf306c1716d61baa7f10",
+  "sdkReferencePin": "b025ee88bd1a6d69564ce96a473302739c981c3b",
+  "baselineRuntimeSdk": "700d0100f1cb42ef122e774a6ee0076d1916b5e5",
+  "notoSansSc": {
+    "bytes": 4110060,
+    "sha256": "93c0808b4374c84021581cd80ad5d5cae67303d91411d81211e77126d1e5b5ca"
+  },
+  "inputsSha256": "cc0910f0b32cf4c9af6b835b1f88a071af7aad371b9bba418edfa0ea8890b464",
+  "inputs": {
+    "light-empty.json": {
+      "bytes": 728,
+      "sha256": "5e53d9d66c767e704ab1f6b8e9bfa99f8cd6a904dc7e7ebf6676b3a67fe8e135"
+    },
+    "light-waiting-250ms.json": {
+      "bytes": 1361,
+      "sha256": "372d2c8446ca9b07f4cc65aa18c9095ff7fa5ddf72f5e9ec4679d8ab0b33e843"
+    },
+    "light-plan-collapsed.json": {
+      "bytes": 13266,
+      "sha256": "46a0fea3c0eb8dfbf906f7951177d9c47d2cbf2a35f3456baeefc2471da5d551"
+    },
+    "light-plan-expand-280ms.json": {
+      "bytes": 13269,
+      "sha256": "942dae29eecaecec9fc05480fce4988e0dc8a117c8d65c0aeea14cfca3601d9d"
+    },
+    "light-plan-expanded.json": {
+      "bytes": 13265,
+      "sha256": "35310387daa8be5dad5251b935fed4b798272d7c86ff44dc6f1b66b9af184ad9"
+    },
+    "light-recommendations.json": {
+      "bytes": 17091,
+      "sha256": "ae96509d18411a448e241530034888848338b8b985af7b1f44b3f3d527f32e0f"
+    },
+    "light-focused-saved-plan.json": {
+      "bytes": 18645,
+      "sha256": "b5c36aa61f4ce195c192850cf83f955bfa7d25c7d84251b5228d11fea16db808"
+    },
+    "light-training-enter-150ms.json": {
+      "bytes": 18647,
+      "sha256": "991d6f65e9c18179a2e9ec8193ad7a229d90af595e504d51ff23f452927405e8"
+    },
+    "light-training-enter-300ms.json": {
+      "bytes": 18647,
+      "sha256": "915ccc5cc83579ad01899e25d055d4021d823243ffd014766b98bbe1c5550ba2"
+    },
+    "light-training-exit-140ms.json": {
+      "bytes": 18646,
+      "sha256": "c678986dd8432fa645c1748199165b2db6e9b79cf6d3bbd68319e45993342768"
+    },
+    "light-training-return.json": {
+      "bytes": 18642,
+      "sha256": "67fffdc5461e929a0415e239de71bb4a3c182a292f8debcbfb9a36a494eed1ec"
+    },
+    "dark-empty.json": {
+      "bytes": 727,
+      "sha256": "1982a21a83fa38e62b5aaf9f084aabcfdb5bf9ddb9752df3b92595860f01f30e"
+    },
+    "dark-waiting-250ms.json": {
+      "bytes": 1360,
+      "sha256": "2da763cdc17fafae3cffd38e88f90bf0c50cef2f11e805f9eb93eb00f2d54859"
+    },
+    "dark-plan-collapsed.json": {
+      "bytes": 13265,
+      "sha256": "b6f33b2e3934373df7ec32feee634f9fc27cb9ee80a79e0f61d5137251e732ee"
+    },
+    "dark-plan-expand-280ms.json": {
+      "bytes": 13268,
+      "sha256": "d522ab8485b705e2087428f3839a419e8840cd210d5a3e568f3cea5a9c0afc9d"
+    },
+    "dark-plan-expanded.json": {
+      "bytes": 13264,
+      "sha256": "a238631d0f5ab1bcf763bf34cd1213e98d5c1672b7d1a2cccc84757cad56918f"
+    },
+    "dark-recommendations.json": {
+      "bytes": 17090,
+      "sha256": "50fb8bd0c2d3082987ae7b5679350b7830c93354b2c334a9870f73fdb32a4f46"
+    },
+    "dark-focused-saved-plan.json": {
+      "bytes": 18644,
+      "sha256": "a23c2fe53779943064cbc63793fa382f041ef93d692c711570720b00aef4edeb"
+    },
+    "dark-training-enter-150ms.json": {
+      "bytes": 18646,
+      "sha256": "e2b5bbe23146f186f6871e74bded6c9b09a4c2a7ec1597db8f5b63cc2b92ff00"
+    },
+    "dark-training-enter-300ms.json": {
+      "bytes": 18646,
+      "sha256": "7303a6d6069bf79a366729029165d3c322a15a2caa1e26d4fc7fe98ce0cea41b"
+    },
+    "dark-training-exit-140ms.json": {
+      "bytes": 18645,
+      "sha256": "f020e8b93ef90438331e16ee495d0f25c4d2e313ba4fb17878c3c9973db4e5e6"
+    },
+    "dark-training-return.json": {
+      "bytes": 18641,
+      "sha256": "f143dd470d51204e88d75300b8737a7a20ca3464215aca234c3b4078cf507f06"
+    }
+  }
+}

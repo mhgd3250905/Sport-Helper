@@ -1,5 +1,19 @@
 import 'plan.dart';
 
+enum SavedPlanWriteMode { create, copy, update }
+
+enum SavedPlanWriteStatus { saved, conflict, deleted, readOnly, failed }
+
+class SavedPlanWriteResult {
+  const SavedPlanWriteResult.saved(SavedPlan this.saved)
+    : status = SavedPlanWriteStatus.saved,
+      error = null;
+  const SavedPlanWriteResult.failure(this.status, {this.error}) : saved = null;
+  final SavedPlanWriteStatus status;
+  final SavedPlan? saved;
+  final Object? error;
+}
+
 /// A plan the user kept from the chat ("保存") to start again later.
 class SavedPlan {
   const SavedPlan({

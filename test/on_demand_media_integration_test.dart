@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smartfit/app/services.dart';
+import 'package:smartfit/domain/session.dart' show trainerPlan;
+import 'package:ugk_coach/ugk_coach.dart' as coach;
 import 'package:smartfit/app/training_media_config.dart';
 import 'package:smartfit/core/storage/local_state_storage.dart';
 import 'package:smartfit/data/app_store.dart';
@@ -19,7 +21,6 @@ import 'package:smartfit/ui/player_page.dart';
 import 'package:smartfit/ui/theme.dart';
 import 'package:smartfit/ui/training_media_settings.dart';
 import 'package:smartfit/voice/voice_queue.dart';
-import 'package:ugk_coach/ugk_coach.dart' as coach;
 import 'package:ugk_trainer/ugk_trainer.dart' as trainer;
 
 import 'support.dart';
@@ -526,6 +527,15 @@ void main() {
     final services = AppServices(
       library: content.$1,
       catalog: TemplateCatalog([_template('n-pelvis-circle')]),
+      coachCatalog: const coach.DrillPackAdapter().build(
+        version: 'prefetch-fixture',
+        packs: {
+          for (final pack in loadPacksSync().exercises) pack.id: pack.json,
+        },
+      ),
+      coachProfile: coach.CoachProfile.fromJson(
+        jsonDecode(File('assets/coach/smartfit.json').readAsStringSync()),
+      ),
       store: AppStore(_Storage())..starfield = false,
       voiceLibrary: content.$3,
       voiceOutput: output,
@@ -548,7 +558,8 @@ void main() {
         targetMinutes: 5,
         blocks: _template('n-pelvis-circle').blocks,
       );
-      expect(await services.chat.started(manualPlan), isTrue);
+      expect((await services.chat.start()).ok, isTrue);
+      expect(await services.chat.started(trainerPlan(manualPlan)), isTrue);
       for (var i = 0; i < 100 && probes < holdAfter; i++) {
         await Future<void>.delayed(const Duration(milliseconds: 5));
       }
@@ -562,7 +573,11 @@ void main() {
       isFalse,
       reason: 'The plan is available while background prefetch is pending.',
     );
-    await _open(tester, services, PlayerPage(plan: plan));
+    await _open(
+      tester,
+      services,
+      PlayerPage(plan: TrainingPlan.fromJson(plan.toJson())),
+    );
     expect(find.text('正在加载动作视频'), findsNothing);
     expect(
       find.byKey(const ValueKey('exercise-frame-zero-n-pelvis-circle')),

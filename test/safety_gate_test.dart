@@ -3,9 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smartfit/app/services.dart';
-import 'package:smartfit/chat/chat_controller.dart';
-import 'package:smartfit/chat/chat_models.dart';
-import 'package:smartfit/chat/app_chat_actions.dart';
 import 'package:smartfit/data/app_store.dart';
 import 'package:smartfit/domain/scenario.dart';
 import 'package:smartfit/main.dart';
@@ -13,7 +10,12 @@ import 'package:smartfit/ui/custom_plan_page.dart';
 import 'package:smartfit/ui/plan_page.dart';
 import 'package:smartfit/ui/player_page.dart';
 
-import 'app_flow_test.dart' show MemoryStorage, services, tall;
+import 'app_flow_test.dart'
+    show MemoryStorage, services, tall, showManualChatCard;
+import 'package:smartfit/domain/session.dart' show trainerPlan;
+import 'package:ugk_coach/ugk_coach.dart' as coach;
+import 'support/chat_sdk_support.dart';
+import 'support/coach_v2_fixtures.dart';
 
 void main() {
   testWidgets(
@@ -21,6 +23,7 @@ void main() {
     (tester) async {
       tall(tester);
       final s = services();
+      await tester.runAsync(s.chat.start);
       await tester.pumpWidget(SmartFitApp(services: s));
       await tester.pumpAndSettle();
       // The form opens from the chat now (「自己选条件」→ @custom); the page
@@ -55,13 +58,11 @@ void main() {
       tall(tester);
       final s = services();
       await s.store.acceptSafety(blocked: false);
+      await tester.runAsync(s.chat.start);
       await tester.pumpWidget(SmartFitApp(services: s));
       await tester.pumpAndSettle();
-      final generated = await s.generator.generate(
-        const ScenarioRequest(templateId: 'office-relax'),
-      );
-      final p = generated.plan!;
-      final saved = await s.chat.save(p);
+      final p = await showManualChatCard(s, tester: tester);
+      final saved = await s.chat.save(trainerPlan(p));
       await s.chat.showSaved(saved);
       s.chat.startSafetyCheck();
       await tester.pumpAndSettle();
@@ -113,80 +114,61 @@ void main() {
     'rechecking revokes prior acceptance across a restart and cannot remember a started plan',
     () async {
       final mem = MemoryStorage();
-      final s = services();
       final store = AppStore(mem);
       await store.acceptSafety(blocked: false);
-      final c = ChatController(
-        engine: const AppChatActions(),
-        store: store,
-        replyDelay: Duration.zero,
-      )..start();
-      final generated = await s.generator.generate(
-        const ScenarioRequest(templateId: 'office-relax'),
-      );
-      final p = generated.plan!;
-      final saved = await c.save(p);
+      final c = services(persistedStore: store).chat;
+      expect((await c.start()).ok, isTrue);
+      final p = await showManualChatCard(services(persistedStore: store));
+      final saved = await c.save(trainerPlan(p));
       await c.showSaved(saved);
-      c.startSafetyCheck();
-      expect(await c.started(p), isFalse);
+      await c.startSafetyCheck();
+      expect(await c.started(trainerPlan(p)), isFalse);
       expect(store.lastPlan, isNull);
 
       final reloaded = AppStore(mem);
       await reloaded.load();
       expect(reloaded.safetyAccepted, isFalse);
       expect(reloaded.trainingAllowed, isFalse);
-      final afterRestart = ChatController(
-        engine: c.engine,
-        store: reloaded,
-        replyDelay: Duration.zero,
-      )..start();
+      final afterRestart = services(persistedStore: reloaded).chat;
+      expect((await afterRestart.start()).ok, isTrue);
       expect(afterRestart.inSafetyCheck, isTrue);
       expect(afterRestart.messages.last.text, contains('开始之前'));
-      c.dispose();
-      afterRestart.dispose();
+      await c.close();
+      await afterRestart.close();
     },
   );
 
   test(
-    'a reply already in flight cannot append a plan after a safety recheck',
+    'a real SDK reply in flight cannot append a card after the host safety recheck',
     () async {
-      final s = services();
-      await s.store.acceptSafety(blocked: false);
-      final generated = await s.generator.generate(
-        const ScenarioRequest(templateId: 'office-relax'),
-      );
-      final engine = _DeferredEngine();
-      final c = ChatController(
-        engine: engine,
-        store: s.store,
-        replyDelay: Duration.zero,
-      )..start();
-      final pending = c.send('在办公室午休 10 分钟，肩颈很僵');
-      expect(c.typing, isTrue);
-
-      c.startSafetyCheck();
-      expect(c.typing, isFalse);
-      await c.choose(c.messages.last, 0); // acknowledge
-      await c.choose(c.messages.last, 1); // first safety question: 是
-      expect(s.store.safetyBlocked, isTrue);
-      engine.result.complete(
-        ChatReply(
-          messages: [BotMessage('', plan: generated.plan)],
-          state: ChatState(plan: generated.plan),
-        ),
-      );
+      final fixture = await CoachV2Fixtures.load();
+      final app = sdkChatServices(AppStore(MemoryStorage()), fixture);
+      await app.store.acceptSafety(blocked: false);
+      final entered = Completer<void>();
+      final reply = Completer<Object>();
+      final client = coach.FakeLlmClient([
+        (coach.LlmRequest request) {
+          entered.complete();
+          return reply.future;
+        },
+      ], latency: Duration.zero);
+      final chat = fakeHostChat(app, client);
+      expect((await chat.start()).ok, isTrue);
+      final pending = chat.send('在家徒手10分钟拉伸');
+      await entered.future;
+      expect(chat.typing, isTrue);
+      await chat.startSafetyCheck();
+      expect(chat.typing, isFalse);
+      await chat.choose(chat.messages.last, 0);
+      await chat.choose(chat.messages.last, 1);
+      expect(app.store.safetyBlocked, isTrue);
+      reply.complete(fixture.planTurn().first);
       await pending;
-      expect(c.messages.where((m) => m.isPlan), isEmpty);
-      expect(c.currentPlan, isNull);
-      c.dispose();
+      expect(chat.messages.where((row) => row.isPlan), isEmpty);
+      expect(chat.currentPlan, isNull);
+      expect(app.store.lastPlan, isNull);
+      await chat.close();
+      app.store.dispose();
     },
   );
-}
-
-class _DeferredEngine implements ChatEngine {
-  final result = Completer<ChatReply>();
-  @override
-  String get id => 'deferred-test';
-  @override
-  Future<ChatReply> reply(String text, ChatState state) => result.future;
 }

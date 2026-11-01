@@ -190,6 +190,32 @@ class _ExerciseFrameZeroState extends State<ExerciseFrameZero> {
   }
 }
 
+/// Retires this exact host surface before the SDK starts the next preview.
+class CachedExerciseMediaHandle {
+  final _surface = GlobalKey<_CachedExerciseMediaState>();
+  Future<void>? _retirement;
+  Key get key => _surface;
+  Future<void> retire() =>
+      _surface.currentState?.retire() ?? _retirement ?? Future.value();
+
+  Future<void> _track(Future<void> retiring) {
+    final previous = _retirement;
+    final pending = Future.wait<void>([?previous, retiring]).then<void>((_) {});
+    _retirement = pending;
+    void clear() {
+      if (identical(_retirement, pending)) _retirement = null;
+    }
+
+    unawaited(
+      pending.then<void>(
+        (_) => clear(),
+        onError: (Object _, StackTrace _) => clear(),
+      ),
+    );
+    return pending;
+  }
+}
+
 /// Owns only media presentation. Training clocks, speech and records remain in
 /// TrainerPlayer. The surface uses exported SDK widgets and controllers only.
 class CachedExerciseMedia extends StatefulWidget {
@@ -208,6 +234,7 @@ class CachedExerciseMedia extends StatefulWidget {
     this.extractMissingPoster = false,
     this.stageColor,
     this.retainWhenCovered = false,
+    this.retirementHandle,
   });
   final Exercise exercise;
   final bool playing, paused, mirrored, waitForLoopOnMiss;
@@ -224,6 +251,7 @@ class CachedExerciseMedia extends StatefulWidget {
   /// subtree must not discard its last video frame. PlayerPage separately
   /// unmounts media for route transitions; app backgrounding still retires it.
   final bool retainWhenCovered;
+  final CachedExerciseMediaHandle? retirementHandle;
 
   @override
   State<CachedExerciseMedia> createState() => _CachedExerciseMediaState();
@@ -593,7 +621,15 @@ class _CachedExerciseMediaState extends State<CachedExerciseMedia>
     await retire(keepFailure: true);
   }
 
-  Future<void> retire({bool repaint = true, bool keepFailure = false}) async {
+  Future<void> retire({bool repaint = true, bool keepFailure = false}) {
+    final retiring = _retire(repaint: repaint, keepFailure: keepFailure);
+    return widget.retirementHandle?._track(retiring) ?? retiring;
+  }
+
+  Future<void> _retire({
+    required bool repaint,
+    required bool keepFailure,
+  }) async {
     ++_epoch;
     _probeTimer?.cancel();
     _probeTimer = null;

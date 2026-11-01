@@ -1,5 +1,9 @@
-import '../chat/chat_controller.dart';
-import '../chat/chat_models.dart';
+import 'package:ugk_coach/ugk_coach.dart' as coach;
+import 'package:ugk_coach_chat/ugk_coach_chat.dart';
+
+import '../app/coach_chat.dart';
+import '../app/services.dart';
+import '../domain/session.dart' show trainerPlan;
 import '../core/storage/local_state_storage.dart';
 import '../data/app_store.dart';
 import '../domain/exercise.dart';
@@ -21,10 +25,10 @@ class PerformanceFixture {
 
   final String id;
   final AppStore store;
-  final ChatController controller;
+  final CoachChatController controller;
 
   factory PerformanceFixture.create({
-    required ExerciseLibrary library,
+    required AppServices services,
     required FrameScenario scenario,
     bool starfield = true,
     String appearance = 'system',
@@ -33,6 +37,7 @@ class PerformanceFixture {
         scenario != FrameScenario.planCardScroll) {
       throw ArgumentError.value(scenario, 'scenario');
     }
+    final library = services.library;
     final plans = scenario == FrameScenario.planCardScroll;
     if (plans && exerciseIds.any((id) => !library.contains(id))) {
       throw StateError('固定测试动作不可用，无法生成可对照的测试会话。');
@@ -55,16 +60,27 @@ class PerformanceFixture {
             text: hasPlan
                 ? '这是一组固定测试计划。保持相同动作、顺序和封面，用于比较计划卡滑动。'
                 : _messages[index % _messages.length],
-            plan: hasPlan ? plan : null,
-            request: hasPlan ? requestForPlan(plan!) : null,
+            plan: hasPlan ? trainerPlan(plan!) : null,
+            request: hasPlan ? requestForPlan(trainerPlan(plan!)) : null,
           ).toJson(),
         ),
       );
     }
-    final controller = ChatController(
-      engine: const _OfflineFixtureEngine(),
+    final isolated = AppServices(
+      library: library,
+      catalog: services.catalog,
       store: store,
-      replyDelay: Duration.zero,
+      voiceLibrary: services.voiceLibrary,
+      voiceOutput: services.voiceOutput,
+      coachCatalog: services.coachCatalog,
+      coachProfile: services.coachProfile,
+      poseHubCatalog: services.poseHubCatalog,
+      testCatalog: services.testCatalog,
+      chatReplyDelay: Duration.zero,
+    );
+    final controller = createSmartfitChat(
+      isolated,
+      gateway: CoachGatewayBinding.shared(const _OfflineFixtureClient()),
       clock: () => referenceTime.add(const Duration(minutes: 30)),
     )..start();
     return PerformanceFixture._(id: id, store: store, controller: controller);
@@ -129,13 +145,15 @@ class _MemoryFixtureStorage implements LocalStateStorage {
   Future<void> write(String key, String value) async => _values[key] = value;
 }
 
-class _OfflineFixtureEngine implements ChatEngine {
-  const _OfflineFixtureEngine();
-
+class _OfflineFixtureClient implements coach.LlmClient {
+  const _OfflineFixtureClient();
   @override
-  String get id => 'offline_performance_fixture';
-
+  String get model => 'offline_performance_fixture';
   @override
-  Future<ChatReply> reply(String text, ChatState state) async =>
-      ChatReply(messages: const [], state: state);
+  coach.Pricing? get pricing => null;
+  @override
+  Future<coach.LlmResponse> complete(
+    coach.LlmRequest request, {
+    coach.CancelToken? cancel,
+  }) async => throw StateError('The fixed performance fixture is offline.');
 }

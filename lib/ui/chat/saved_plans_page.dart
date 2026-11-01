@@ -32,6 +32,7 @@ class SavedPlansPage extends StatefulWidget {
     required this.onShow,
     required this.onStart,
     this.onCompose,
+    this.onDetails,
   });
 
   final AppStore store;
@@ -39,6 +40,7 @@ class SavedPlansPage extends StatefulWidget {
   final void Function(SavedPlan) onShow;
   final void Function(SavedPlan, BuildContext sourceContext) onStart;
   final VoidCallback? onCompose;
+  final Future<void> Function(SavedPlan, BuildContext)? onDetails;
 
   @override
   State<SavedPlansPage> createState() => _SavedPlansPageState();
@@ -204,6 +206,10 @@ class _SavedPlansPageState extends State<SavedPlansPage> {
 
   void _details(SavedPlan saved) {
     _cancelReveal();
+    if (widget.onDetails case final onDetails?) {
+      unawaited(onDetails(saved, context));
+      return;
+    }
     // A saved name is presentation only; the original plan ID/doses are intact.
     final displayPlan = TrainingPlan.fromJson({
       ...saved.plan.toJson(),

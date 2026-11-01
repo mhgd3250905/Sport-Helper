@@ -1,0 +1,365 @@
+{
+  "schema": "smartfit-legacy-display@1",
+  "templateId": "office-relax",
+  "baselineSfSource": "3eb2a9e88ef4d28e02f4cf306c1716d61baa7f10",
+  "baselineSdk": "700d0100f1cb42ef122e774a6ee0076d1916b5e5",
+  "origin": "Original SF TemplatePlanGenerator plan, unchanged ID/dose/target; original 3eb restore verified offline",
+  "originalPlan": {
+    "schemaVersion": 1,
+    "id": "plan-1793524646693",
+    "source": "template",
+    "templateId": "office-relax",
+    "title": "工位肩颈腰放松",
+    "summary": "坐着站着都能做，不用换衣服，缓解久坐僵硬。",
+    "goal": "relax",
+    "scene": "home",
+    "equipment": [
+      "chair",
+      "wall",
+      "mat",
+      "block"
+    ],
+    "level": 1,
+    "targetMinutes": 10,
+    "blocks": [
+      {
+        "id": "b1",
+        "name": "唤醒",
+        "type": "warmup",
+        "rounds": 1,
+        "restBetweenRoundsSeconds": 0,
+        "items": [
+          {
+            "exerciseId": "n-pelvis-circle",
+            "mode": "time",
+            "sets": 1,
+            "workSeconds": 30,
+            "perSide": false,
+            "restSeconds": 10
+          },
+          {
+            "exerciseId": "o-seated-catcow",
+            "mode": "time",
+            "sets": 1,
+            "workSeconds": 40,
+            "perSide": false,
+            "restSeconds": 10
+          }
+        ]
+      },
+      {
+        "id": "b2",
+        "name": "拉伸放松",
+        "type": "main",
+        "rounds": 1,
+        "restBetweenRoundsSeconds": 0,
+        "items": [
+          {
+            "exerciseId": "o-seated-twist",
+            "mode": "time",
+            "sets": 2,
+            "workSeconds": 30,
+            "perSide": false,
+            "restSeconds": 10
+          },
+          {
+            "exerciseId": "h-chair-lat",
+            "mode": "time",
+            "sets": 2,
+            "workSeconds": 25,
+            "perSide": false,
+            "restSeconds": 10
+          },
+          {
+            "exerciseId": "o-stand-sidebend",
+            "mode": "time",
+            "sets": 2,
+            "workSeconds": 20,
+            "perSide": true,
+            "restSeconds": 10
+          },
+          {
+            "exerciseId": "o-stand-quad",
+            "mode": "time",
+            "sets": 2,
+            "workSeconds": 20,
+            "perSide": true,
+            "restSeconds": 10
+          },
+          {
+            "exerciseId": "o-seated-fig4",
+            "mode": "time",
+            "sets": 2,
+            "workSeconds": 20,
+            "perSide": true,
+            "restSeconds": 10
+          },
+          {
+            "exerciseId": "o-stand-lunge",
+            "mode": "time",
+            "sets": 2,
+            "workSeconds": 20,
+            "perSide": true,
+            "restSeconds": 10
+          }
+        ]
+      }
+    ],
+    "notes": [
+      "按你选的 10 分钟调整了组数/轮数（约 12 分钟）"
+    ],
+    "safetyNotes": [
+      "动作过程中出现关节刺痛、麻木或头晕，请立即停止。",
+      "本计划为通用健身建议，不能替代医生或康复治疗师的意见。"
+    ]
+  },
+  "originalSavedPlan": {
+    "id": "saved-1793524883868914",
+    "name": "工位肩颈腰放松",
+    "plan": {
+      "schemaVersion": 1,
+      "id": "plan-1793524646693",
+      "source": "template",
+      "templateId": "office-relax",
+      "title": "工位肩颈腰放松",
+      "summary": "坐着站着都能做，不用换衣服，缓解久坐僵硬。",
+      "goal": "relax",
+      "scene": "home",
+      "equipment": [
+        "chair",
+        "wall",
+        "mat",
+        "block"
+      ],
+      "level": 1,
+      "targetMinutes": 10,
+      "blocks": [
+        {
+          "id": "b1",
+          "name": "唤醒",
+          "type": "warmup",
+          "rounds": 1,
+          "restBetweenRoundsSeconds": 0,
+          "items": [
+            {
+              "exerciseId": "n-pelvis-circle",
+              "mode": "time",
+              "sets": 1,
+              "workSeconds": 30,
+              "perSide": false,
+              "restSeconds": 10
+            },
+            {
+              "exerciseId": "o-seated-catcow",
+              "mode": "time",
+              "sets": 1,
+              "workSeconds": 40,
+              "perSide": false,
+              "restSeconds": 10
+            }
+          ]
+        },
+        {
+          "id": "b2",
+          "name": "拉伸放松",
+          "type": "main",
+          "rounds": 1,
+          "restBetweenRoundsSeconds": 0,
+          "items": [
+            {
+              "exerciseId": "o-seated-twist",
+              "mode": "time",
+              "sets": 2,
+              "workSeconds": 30,
+              "perSide": false,
+              "restSeconds": 10
+            },
+            {
+              "exerciseId": "h-chair-lat",
+              "mode": "time",
+              "sets": 2,
+              "workSeconds": 25,
+              "perSide": false,
+              "restSeconds": 10
+            },
+            {
+              "exerciseId": "o-stand-sidebend",
+              "mode": "time",
+              "sets": 2,
+              "workSeconds": 20,
+              "perSide": true,
+              "restSeconds": 10
+            },
+            {
+              "exerciseId": "o-stand-quad",
+              "mode": "time",
+              "sets": 2,
+              "workSeconds": 20,
+              "perSide": true,
+              "restSeconds": 10
+            },
+            {
+              "exerciseId": "o-seated-fig4",
+              "mode": "time",
+              "sets": 2,
+              "workSeconds": 20,
+              "perSide": true,
+              "restSeconds": 10
+            },
+            {
+              "exerciseId": "o-stand-lunge",
+              "mode": "time",
+              "sets": 2,
+              "workSeconds": 20,
+              "perSide": true,
+              "restSeconds": 10
+            }
+          ]
+        }
+      ],
+      "notes": [
+        "按你选的 10 分钟调整了组数/轮数（约 12 分钟）"
+      ],
+      "safetyNotes": [
+        "动作过程中出现关节刺痛、麻木或头晕，请立即停止。",
+        "本计划为通用健身建议，不能替代医生或康复治疗师的意见。"
+      ]
+    },
+    "savedAt": "2026-11-01T17:21:23.868914",
+    "sdkVersion": 1
+  },
+  "legacy": {
+    "chat": [
+      {
+        "id": "legacy-office-relax",
+        "role": "assistant",
+        "at": "2026-10-31T00:00:00.000Z",
+        "plan": {
+          "schemaVersion": 1,
+          "id": "plan-1793524646693",
+          "source": "template",
+          "templateId": "office-relax",
+          "title": "工位肩颈腰放松",
+          "summary": "坐着站着都能做，不用换衣服，缓解久坐僵硬。",
+          "goal": "relax",
+          "scene": "home",
+          "equipment": [
+            "chair",
+            "wall",
+            "mat",
+            "block"
+          ],
+          "level": 1,
+          "targetMinutes": 10,
+          "blocks": [
+            {
+              "id": "b1",
+              "name": "唤醒",
+              "type": "warmup",
+              "rounds": 1,
+              "restBetweenRoundsSeconds": 0,
+              "items": [
+                {
+                  "exerciseId": "n-pelvis-circle",
+                  "mode": "time",
+                  "sets": 1,
+                  "workSeconds": 30,
+                  "perSide": false,
+                  "restSeconds": 10
+                },
+                {
+                  "exerciseId": "o-seated-catcow",
+                  "mode": "time",
+                  "sets": 1,
+                  "workSeconds": 40,
+                  "perSide": false,
+                  "restSeconds": 10
+                }
+              ]
+            },
+            {
+              "id": "b2",
+              "name": "拉伸放松",
+              "type": "main",
+              "rounds": 1,
+              "restBetweenRoundsSeconds": 0,
+              "items": [
+                {
+                  "exerciseId": "o-seated-twist",
+                  "mode": "time",
+                  "sets": 2,
+                  "workSeconds": 30,
+                  "perSide": false,
+                  "restSeconds": 10
+                },
+                {
+                  "exerciseId": "h-chair-lat",
+                  "mode": "time",
+                  "sets": 2,
+                  "workSeconds": 25,
+                  "perSide": false,
+                  "restSeconds": 10
+                },
+                {
+                  "exerciseId": "o-stand-sidebend",
+                  "mode": "time",
+                  "sets": 2,
+                  "workSeconds": 20,
+                  "perSide": true,
+                  "restSeconds": 10
+                },
+                {
+                  "exerciseId": "o-stand-quad",
+                  "mode": "time",
+                  "sets": 2,
+                  "workSeconds": 20,
+                  "perSide": true,
+                  "restSeconds": 10
+                },
+                {
+                  "exerciseId": "o-seated-fig4",
+                  "mode": "time",
+                  "sets": 2,
+                  "workSeconds": 20,
+                  "perSide": true,
+                  "restSeconds": 10
+                },
+                {
+                  "exerciseId": "o-stand-lunge",
+                  "mode": "time",
+                  "sets": 2,
+                  "workSeconds": 20,
+                  "perSide": true,
+                  "restSeconds": 10
+                }
+              ]
+            }
+          ],
+          "notes": [
+            "按你选的 10 分钟调整了组数/轮数（约 12 分钟）"
+          ],
+          "safetyNotes": [
+            "动作过程中出现关节刺痛、麻木或头晕，请立即停止。",
+            "本计划为通用健身建议，不能替代医生或康复治疗师的意见。"
+          ]
+        },
+        "request": {
+          "scene": "home",
+          "equipment": [
+            "chair",
+            "wall",
+            "mat",
+            "block"
+          ],
+          "level": 1,
+          "minutes": 10,
+          "goal": "relax",
+          "language": "zh"
+        },
+        "aiVisible": true
+      }
+    ],
+    "coachDisplay": [],
+    "coachSessionJson": null
+  }
+}

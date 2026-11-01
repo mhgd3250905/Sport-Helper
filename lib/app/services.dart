@@ -4,13 +4,10 @@ import 'dart:convert';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter/widgets.dart';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
+import 'package:ugk_coach_chat/ugk_coach_chat.dart';
 import 'package:ugk_trainer/ugk_trainer.dart';
 
-import '../chat/chat_controller.dart';
-import '../chat/ai_chat_engine.dart';
 import '../chat/ai_coach_config.dart';
-import '../chat/chat_models.dart';
-import '../chat/app_chat_actions.dart';
 import '../data/app_store.dart';
 import '../diagnostics/runtime_log.dart';
 import '../diagnostics/training_media_log.dart';
@@ -21,6 +18,7 @@ import '../domain/template.dart';
 import '../packs/drill_pack.dart';
 import '../voice/voice_asset_bundle.dart';
 import '../voice/voice_library.dart';
+import 'coach_chat.dart';
 import 'training_media_config.dart';
 import 'app_test_pack.dart';
 import 'app_test_catalog.dart';
@@ -92,7 +90,10 @@ class AppServices {
   String? _prefetchedPlan;
   int _prefetchEpoch = 0;
 
-  void _prefetchChatPlan() => prefetchPlan(chat.currentPlan);
+  void _prefetchChatPlan() {
+    final plan = chat.currentPlan;
+    prefetchPlan(plan == null ? null : TrainingPlan.fromJson(plan.toJson()));
+  }
 
   /// Start downloads without delaying navigation, the clock or voice output.
   void prefetchPlan(TrainingPlan? plan) {
@@ -210,10 +211,13 @@ class AppServices {
   }
 
   Future<void> setAiMemoryEnabled(bool enabled) async {
-    final engine = chatEngine;
-    if (engine is AiChatEngine) engine.enableUserMemory = enabled;
+    final controller = _chat;
+    if (controller != null) {
+      await controller.start();
+      controller.agent.enableUserMemory = enabled;
+    }
     await store.setAiMemoryEnabled(enabled);
-    await chat.flushPersistence();
+    await _chat?.flushPersistence();
     RuntimeLog.instance.record(
       'settings.ai_memory',
       fields: {'enabled': enabled},
@@ -221,16 +225,17 @@ class AppServices {
   }
 
   Future<void> clearAiMemory() async {
-    final engine = chatEngine;
-    if (engine is AiChatEngine) {
-      await engine.clearMemory();
+    final controller = _chat;
+    if (controller != null) {
+      await controller.start();
+      await controller.agent.clearMemory();
     } else {
       await userMemoryStore.save([]);
-      if ((await userMemoryStore.load()).isNotEmpty) {
-        throw StateError('AI memory could not be cleared from local storage');
-      }
     }
-    await chat.flushPersistence();
+    if ((await userMemoryStore.load()).isNotEmpty) {
+      throw StateError('AI memory could not be cleared from local storage');
+    }
+    await _chat?.flushPersistence();
     RuntimeLog.instance.record('settings.ai_memory_cleared');
   }
 
@@ -246,10 +251,13 @@ class AppServices {
 
   /// The output belongs to the App, so page navigation never destroys it.
   Future<void> dispose() async {
-    chat.dispose();
+    final controller = _chat;
+    if (controller != null) {
+      await controller.close();
+      controller.dispose();
+    }
     _mediaLog?.dispose();
     media?.dispose();
-    if (chatEngine case final ManagedChatEngine managed) managed.dispose();
     final output = voiceOutput;
     if (output is JustAudioVoiceOutput) {
       await output.dispose();
@@ -258,69 +266,15 @@ class AppServices {
     }
   }
 
-  /// No token means the original offline engine; a token never goes to storage.
-  late final ChatEngine chatEngine = _createChatEngine();
-
-  ChatEngine _createChatEngine() {
-    const local = AppChatActions();
-    final catalog = coachCatalog;
-    final profile = coachProfile;
-    final id = deviceId;
-    RuntimeLog.instance.record(
-      'chat.engine',
-      fields: {
-        'hasKey': aiConfig.enabled,
-        'hasDeviceIdentity': id != null,
-        'available': catalog != null && profile != null,
-        'catalogCount': catalog?.length ?? 0,
-        'route':
-            !aiConfig.enabled ||
-                catalog == null ||
-                profile == null ||
-                id == null
-            ? 'local'
-            : 'sdk',
-        'reason': !aiConfig.enabled
-            ? 'missing_key'
-            : id == null
-            ? 'identity_unavailable'
-            : catalog == null
-            ? 'catalog_unavailable'
-            : profile == null
-            ? 'profile_unavailable'
-            : 'configured',
-      },
-    );
-    if (!aiConfig.enabled || catalog == null || profile == null || id == null) {
-      return local;
-    }
-    return AiChatEngine(
-      local: local,
-      catalog: catalog,
-      profile: profile,
-      client: aiConfig.createClient(deviceId: id),
-      memoryStore: userMemoryStore,
-      enableUserMemory: store.aiMemoryEnabled,
-    );
-  }
-
-  /// The "typing" pause before a reply (zero in tests and screenshots).
+  /// The original reply pause; tests may opt into a zero duration.
   final Duration chatReplyDelay;
 
-  /// The home conversation lives as long as the app (pages come and go).
-  late final ChatController chat = _createChat();
+  /// One SDK controller owns conversation, history, tools and training returns.
+  CoachChatController? _chat;
+  CoachChatController get chat => _chat ??= _createChat();
 
-  ChatController _createChat() {
-    final controller = ChatController(
-      engine: chatEngine,
-      store: store,
-      replyDelay: chatReplyDelay,
-      prepareReply: media == null
-          ? null
-          : () async {
-              await media!.canDownload();
-            },
-    );
+  CoachChatController _createChat() {
+    final controller = createSmartfitChat(this);
     if (media != null) controller.addListener(_prefetchChatPlan);
     return controller;
   }

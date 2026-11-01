@@ -12,12 +12,15 @@ import '../support.dart';
 /// Product catalogue/profile and model scripts using the SDK public protocol.
 /// The fixture never sets an Agent ledger or admits a card itself.
 class CoachV2Fixtures {
-  CoachV2Fixtures._(this.library, this.catalog, this.profile);
+  CoachV2Fixtures._(this.library, this.catalog, this.profile, this.poseHub);
   final ExerciseLibrary library;
   final coach.Catalog catalog;
   final coach.CoachProfile profile;
+  final coach.PoseHubAppTestCatalog poseHub;
 
-  static Future<CoachV2Fixtures> load() async {
+  static Future<CoachV2Fixtures> load() async => loadSync();
+
+  static CoachV2Fixtures loadSync() {
     final config = File('.dart_tool/package_config.json');
     final packages =
         (jsonDecode(config.readAsStringSync()) as Map)['packages'] as List;
@@ -25,11 +28,11 @@ class CoachV2Fixtures {
       (p) => p['name'] == 'ugk_trainer',
     );
     final root = config.absolute.uri.resolve("${trainer['rootUri']}/");
-    final bytes = await File.fromUri(
+    final bytes = File.fromUri(
       root.resolve(
         '${PoseHubActionLibrary.assetRoot.replaceFirst('packages/ugk_trainer/', '')}catalog.json',
       ),
-    ).readAsBytes();
+    ).readAsBytesSync();
     final sdk = coach.PoseHubAppTestCatalog.fromBytes(bytes);
     final content = AppTestContent.build(
       catalog: AppTestCatalog.fromSdk(sdk),
@@ -41,6 +44,7 @@ class CoachV2Fixtures {
       coach.CoachProfile.fromJson(
         jsonDecode(File('assets/coach/smartfit.json').readAsStringSync()),
       ),
+      sdk,
     );
   }
 

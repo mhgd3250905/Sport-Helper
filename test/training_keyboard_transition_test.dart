@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smartfit/app/services.dart';
-import 'package:smartfit/ui/chat/chat_composer_dock.dart';
 import 'package:smartfit/ui/chat/chat_home_page.dart';
-import 'package:smartfit/ui/chat/chat_timeline.dart';
-import 'package:smartfit/ui/chat/plan_card.dart';
 import 'package:smartfit/ui/exercise_video.dart';
 import 'package:smartfit/ui/player_page.dart';
 import 'package:smartfit/ui/theme.dart';
 import 'package:smartfit/ui/training_route.dart';
 
 import 'app_flow_test.dart'
-    show services, showManualChatCard, warmTrainingPoster;
+    show services, showManualChatCard, warmTrainingPoster, chatScroll;
 
 Finder _key(String value, {bool offstage = false}) =>
     find.byKey(ValueKey(value), skipOffstage: !offstage);
@@ -33,7 +30,11 @@ void main() {
         });
         await app.store.acceptSafety(blocked: false);
         app.chat.start();
-        final plan = await showManualChatCard(app, template: 'office-relax');
+        final plan = await showManualChatCard(
+          app,
+          template: 'office-relax',
+          tester: tester,
+        );
         await tester.pumpWidget(
           AppScope(
             services: app,
@@ -49,23 +50,22 @@ void main() {
         tester.view.viewInsets = const FakeViewPadding(bottom: 360);
         await tester.pumpAndSettle();
         final source = tester.element(find.byType(ChatHomePage));
-        final dock = tester.widget<ChatComposerDock>(
-          find.byType(ChatComposerDock),
-        );
-        expect(dock.focusNode.hasFocus, isTrue);
+        final input = tester.widget<TextField>(_key('chat-input'));
+        double extent() => tester
+            .getSize(_key('chat-composer-dock-boundary', offstage: true))
+            .height;
+        expect(input.focusNode!.hasFocus, isTrue);
         final start = _key('plan-start-${plan.id}');
         await tester.ensureVisible(start);
         await tester.pumpAndSettle();
         await warmTrainingPoster(tester, app, plan, sourceContext: source);
         final viewport = _key('chat-messages-boundary', offstage: true);
         final viewportBefore = tester.getRect(viewport);
-        final card = find.byType(PlanCard, skipOffstage: false);
+        final card = _key('plan-clip-${plan.id}', offstage: true);
         final cardBefore = tester.getRect(card);
-        final scroll = tester
-            .widget<ChatTimeline>(find.byType(ChatTimeline))
-            .controller;
+        final scroll = chatScroll(tester);
         final offsetBefore = scroll.offset;
-        final extentBefore = dock.extent.value;
+        final extentBefore = extent();
         expect(extentBefore, greaterThan(360));
         await tester.tap(start);
         final player = find.byType(PlayerPage, skipOffstage: false);
@@ -76,8 +76,8 @@ void main() {
         expect(player, findsOneWidget);
         final control = TrainingRouteScope.maybeOf(tester.element(player))!;
         expect(control.entered, isFalse);
-        expect(dock.focusNode.hasFocus, isFalse);
-        expect(dock.extent.value, extentBefore);
+        expect(input.focusNode!.hasFocus, isFalse);
+        expect(extent(), extentBefore);
         expect(tester.getRect(viewport), viewportBefore);
         expect(tester.getRect(card), cardBefore);
         await tester.pump(const Duration(milliseconds: 150));
@@ -85,21 +85,21 @@ void main() {
         tester.view.viewPadding = const FakeViewPadding(bottom: 24);
         await tester.pump();
         expect(control.entered, isFalse);
-        expect(dock.extent.value, extentBefore);
+        expect(extent(), extentBefore);
         expect(tester.getRect(viewport), viewportBefore);
         expect(tester.getRect(card), cardBefore);
         expect(scroll.offset, offsetBefore);
         expect(find.byType(ExerciseVideo, skipOffstage: false), findsNothing);
         await tester.pump(const Duration(milliseconds: 149));
-        expect(dock.extent.value, extentBefore);
+        expect(extent(), extentBefore);
         expect(tester.getRect(viewport), viewportBefore);
         expect(scroll.offset, offsetBefore);
         await tester.pump(const Duration(milliseconds: 1));
         await tester.pump(const Duration(microseconds: 1));
         await tester.pump();
         expect(control.entered, isTrue);
-        expect(dock.extent.value, lessThan(extentBefore - 300));
-        final normalExtent = dock.extent.value;
+        expect(extent(), lessThan(extentBefore - 300));
+        final normalExtent = extent();
         await tester.tap(_key('close'));
         await tester.pumpAndSettle();
         await tester.tap(_key('close-confirm'));
@@ -109,14 +109,14 @@ void main() {
         await tester.pumpAndSettle();
         expect(find.byType(PlayerPage), findsNothing);
         expect(tester.element(find.byType(ChatHomePage)), same(source));
-        expect(dock.extent.value, normalExtent);
+        expect(extent(), normalExtent);
         expect(scroll.offset, offsetBefore);
         // The guard must not suppress ordinary keyboard behavior after return.
         await tester.tap(_key('chat-input'));
         tester.view.viewInsets = const FakeViewPadding(bottom: 240);
         await tester.pumpAndSettle();
-        expect(dock.focusNode.hasFocus, isTrue);
-        expect(dock.extent.value, greaterThan(normalExtent + 200));
+        expect(input.focusNode!.hasFocus, isTrue);
+        expect(extent(), greaterThan(normalExtent + 200));
         expect(tester.takeException(), isNull);
       },
     );

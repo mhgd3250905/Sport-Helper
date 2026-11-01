@@ -14,14 +14,12 @@ import 'package:smartfit/app/posehub_asset_bundle.dart';
 import 'package:smartfit/app/posehub_bundled_images.dart';
 import 'package:smartfit/app/posehub_media_repository.dart';
 import 'package:smartfit/data/app_store.dart';
-import 'package:smartfit/chat/chat_controller.dart';
+import 'package:smartfit/app/coach_chat.dart';
 import 'package:smartfit/domain/exercise.dart';
 import 'package:smartfit/domain/plan.dart';
 import 'package:smartfit/ui/alpha_artwork.dart';
 import 'package:smartfit/ui/chat/chat_home_page.dart';
-import 'package:smartfit/ui/chat/coach_task_bubble.dart';
 import 'package:smartfit/ui/chat/coach_ui_adapter.dart';
-import 'package:smartfit/ui/chat/plan_card.dart';
 import 'package:smartfit/ui/chat/saved_plans_page.dart';
 import 'package:smartfit/ui/library_page.dart';
 import 'package:smartfit/ui/plan_page.dart';
@@ -276,6 +274,8 @@ void main() {
       await store.acceptSafety(blocked: false);
       await store.setAppearance(palette.brightness.name);
       final services = AppServices(
+        coachCatalog: fixture.catalog,
+        coachProfile: fixture.profile,
         library: fixture.library,
         catalog: loadCatalog(),
         store: store,
@@ -303,13 +303,21 @@ void main() {
         await tester.pump(const Duration(milliseconds: 600));
       }
 
-      Widget planCard() => PlanCard(
-        plan: _plan,
-        library: fixture.library,
-        saved: false,
-        onStart: () {},
-        onSave: () {},
-        onOpen: () {},
+      Widget planCard() => Builder(
+        builder: (context) => CoachUiTheme(
+          style: smartfitCoachUiStyle(),
+          child: CoachPlanCard(
+            plan: toCoachRoutine(_plan, fixture.library),
+            library: CoachExerciseLibrary([
+              for (final id in _plan.exerciseIds)
+                toCoachExercise(fixture.library[id]),
+            ]),
+            saved: false,
+            onStart: (_) {},
+            onSave: () {},
+            onOpen: () {},
+          ),
+        ),
       );
 
       // 0: Real recommendation/plan SDK cards in one shared App theme.
@@ -346,21 +354,35 @@ void main() {
       await _shot(tester, '00-card-surfaces-$theme');
       tester.view.physicalSize = const Size(1170, 2532);
 
-      // 1: Same SDK progress snapshot, presented by App generation widget.
-      final generation =
-          Function.apply(CoachTaskBubble.new, [], {
-                #task: _task(),
-                #waiting: true,
-                #onCancel: () {},
-                if (Platform.environment['SF_SCREENSHOT_AFTER'] == '1') ...{
-                  #sessionState: _session(),
-                  #library: fixture.library,
-                },
-              })
-              as Widget;
+      // 1: Same progress snapshot, presented by the SDK generation widget.
+      final taskSummary = coach.CoachTaskSummary.fromState(
+        Platform.environment['SF_SCREENSHOT_AFTER'] == '1' ? _session() : null,
+        task: _task(),
+      );
+      final generation = CoachTaskBubble(
+        title: taskSummary.title,
+        status: taskSummary.status,
+        phase: taskSummary.phase,
+        parameters: taskSummary.parameters,
+        picks: taskSummary.picks
+            .where(fixture.library.contains)
+            .toList(growable: false),
+        complete: taskSummary.complete,
+        waiting: true,
+        onCancel: () {},
+        cutoutBuilder: smartfitCoachAppProfile(services).visual.cutoutBuilder,
+      );
       await show(
         Scaffold(
-          body: Padding(padding: const EdgeInsets.all(16), child: generation),
+          body: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Builder(
+              builder: (context) => CoachUiTheme(
+                style: smartfitCoachUiStyle(),
+                child: generation,
+              ),
+            ),
+          ),
         ),
       );
       await _shot(tester, '01-generation-$theme');
@@ -383,10 +405,8 @@ void main() {
       await _shot(tester, '02-plan-expanded-$theme');
 
       // 3: Production chat and composer, including panel-to-dock junction.
-      final chat = ChatController(
-        engine: services.chatEngine,
-        store: store,
-        replyDelay: Duration.zero,
+      final chat = createSmartfitChat(
+        services,
         clock: () => DateTime(2026, 10, 29, 10),
       );
       addTearDown(chat.dispose);

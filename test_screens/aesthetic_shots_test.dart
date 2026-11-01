@@ -20,14 +20,26 @@ import 'package:smartfit/voice/voice_queue.dart';
 
 import '../test/app_flow_test.dart' show MemoryStorage;
 import '../test/support.dart';
+import '../test/support/coach_v2_fixtures.dart';
 
 Future<void> _loadFonts() async {
   final l = FontLoader('NotoSansSC')
-    ..addFont(Future.value(ByteData.sublistView(File('assets/fonts/NotoSansSC.ttf').readAsBytesSync())));
+    ..addFont(
+      Future.value(
+        ByteData.sublistView(
+          File('assets/fonts/NotoSansSC.ttf').readAsBytesSync(),
+        ),
+      ),
+    );
   await l.load();
-  final icons = File('${Platform.environment['FLUTTER_ROOT'] ?? '/workspace/flutter-sdk'}/bin/cache/artifacts/material_fonts/MaterialIcons-Regular.otf');
+  final icons = File(
+    '${Platform.environment['FLUTTER_ROOT'] ?? '/workspace/flutter-sdk'}/bin/cache/artifacts/material_fonts/MaterialIcons-Regular.otf',
+  );
   if (icons.existsSync()) {
-    await (FontLoader('MaterialIcons')..addFont(Future.value(ByteData.sublistView(icons.readAsBytesSync())))).load();
+    await (FontLoader(
+          'MaterialIcons',
+        )..addFont(Future.value(ByteData.sublistView(icons.readAsBytesSync()))))
+        .load();
   }
 }
 
@@ -48,22 +60,31 @@ Future<void> _settleImages(WidgetTester tester) async {
 Future<void> _shot(WidgetTester tester, String name) async {
   await _settleImages(tester);
   final out = Platform.environment['SF_SCREENSHOT_DIR'] ?? '/tmp/sf-shots';
-  await expectLater(find.byType(MaterialApp).first, matchesGoldenFile(Uri.file('$out/$name.png')));
+  await expectLater(
+    find.byType(MaterialApp).first,
+    matchesGoldenFile(Uri.file('$out/$name.png')),
+  );
 }
 
 Future<AppServices> _app(WidgetTester tester, String theme) async {
   final store = AppStore(MemoryStorage())..starfield = false;
   await store.setAppearance(theme);
   await store.acceptSafety(blocked: false);
+  final chatFixture = CoachV2Fixtures.loadSync();
   final s = AppServices(
-    library: loadLibrary(),
+    coachCatalog: chatFixture.catalog,
+    coachProfile: chatFixture.profile,
+    poseHubCatalog: chatFixture.poseHub,
+    library: chatFixture.library,
     catalog: loadCatalog(),
     store: store,
     voiceLibrary: VoiceLibrary.empty,
     voiceOutput: const MutedVoiceOutput(),
     chatReplyDelay: Duration.zero,
   );
-  await tester.pumpWidget(SmartFitApp(key: UniqueKey(), services: s, fontFamily: 'NotoSansSC'));
+  await tester.pumpWidget(
+    SmartFitApp(key: UniqueKey(), services: s, fontFamily: 'NotoSansSC'),
+  );
   await tester.pump(const Duration(seconds: 2));
   return s;
 }
@@ -100,7 +121,9 @@ void main() {
       if (_want('card')) await _shot(tester, 'card-$theme');
 
       final start = find.byWidgetPredicate(
-        (w) => w.key is ValueKey<String> && (w.key! as ValueKey<String>).value.startsWith('plan-start-'),
+        (w) =>
+            w.key is ValueKey<String> &&
+            (w.key! as ValueKey<String>).value.startsWith('plan-start-'),
       );
       await tester.tap(start.last);
       await _settle(tester, 1200);

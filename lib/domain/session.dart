@@ -37,4 +37,6 @@ class SessionBuilder {
       _builder.planSeconds(trainerPlan(plan));
   int occurrenceCount(TrainingPlan plan) =>
       _builder.occurrenceCount(trainerPlan(plan));
+  coach.PlanExecutionTiming executionTiming(coach.TrainingPlan plan) =>
+      _builder.executionTiming(plan);
 }

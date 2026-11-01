@@ -6,7 +6,7 @@ import 'package:smartfit/app/build_info.dart';
 import 'package:smartfit/app/training_media_config.dart';
 import 'package:smartfit/data/app_store.dart';
 import 'package:smartfit/diagnostics/action_issue_store.dart';
-import 'package:smartfit/chat/safety_script.dart';
+import 'package:smartfit/app/health_notice.dart';
 import 'package:smartfit/ui/about_page.dart';
 import 'package:smartfit/ui/settings_widgets.dart';
 import 'package:smartfit/ui/theme.dart';

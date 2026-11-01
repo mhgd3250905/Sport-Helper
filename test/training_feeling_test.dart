@@ -3,9 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smartfit/app/services.dart';
-import 'package:smartfit/chat/ai_chat_engine.dart';
-import 'package:smartfit/chat/app_chat_actions.dart';
-import 'package:smartfit/chat/chat_controller.dart';
 import 'package:smartfit/core/storage/local_state_storage.dart';
 import 'package:smartfit/data/app_store.dart';
 import 'package:smartfit/diagnostics/runtime_log.dart';
@@ -20,6 +17,7 @@ import 'package:ugk_trainer/ugk_trainer.dart' as trainer;
 
 import 'support.dart';
 import 'support/coach_v2_fixtures.dart';
+import 'support/chat_sdk_support.dart';
 
 class _Storage implements LocalStateStorage {
   final values = <String, String>{};
@@ -330,26 +328,15 @@ void main() {
       addTearDown(app.store.dispose);
       await app.store.acceptSafety(blocked: false);
       final client = coach.FakeLlmClient(['你好。'], latency: Duration.zero);
-      final ai = AiChatEngine(
-        local: const AppChatActions(),
-        catalog: fixture.catalog,
-        profile: fixture.profile,
-        client: client,
-        enableUserMemory: false,
-      );
-      final chat = ChatController(
-        engine: ai,
-        store: app.store,
-        replyDelay: Duration.zero,
-      )..start();
-      addTearDown(ai.dispose);
-      addTearDown(chat.dispose);
-      final before = ai.conversation.exportSession().toJson();
+      final chat = fakeHostChat(sdkChatServices(app.store, fixture), client);
+      expect((await chat.start()).ok, isTrue);
+      addTearDown(chat.close);
+      final before = chat.conversation.exportSession().toJson();
       await app.recordTrainingCompletion(
         _receipt(feeling: trainer.TrainingFeeling.justRight),
       );
       expect(client.requests, isEmpty);
-      expect(ai.conversation.exportSession().toJson(), before);
+      expect(chat.conversation.exportSession().toJson(), before);
       expect(await app.store.aiMemoryStore.load(), isEmpty);
       await chat.send('你好');
       expect(client.requests, hasLength(1));

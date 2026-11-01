@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:ugk_coach/ugk_coach.dart' as coach;
 import 'package:ugk_coach_ui/ugk_coach_ui.dart';
 
-import '../../chat/chat_models.dart' show ChatMessage;
 import '../../domain/exercise.dart';
 import '../../domain/plan.dart';
 import '../../app/posehub_asset_bundle.dart';
@@ -17,104 +15,6 @@ import '../theme/widgets.dart';
 import '../theme/polish_card.dart';
 import '../theme/ui_polish_tokens.dart';
 import '../training_visible_poster_preload.dart';
-
-/// Product tokens, trusted media and controls; the SDK owns conversation and
-/// routine rendering. Navigation, storage and credentials remain App concerns.
-Widget withSmartfitCoachUi(BuildContext context, Widget child) =>
-    CoachUiTheme.contains(context)
-    ? child
-    : CoachUiTheme(style: smartfitCoachUiStyle(), child: child);
-
-/// Only this plan card replaces its save copy and adds a host-owned action.
-/// The SDK continues to own its footer, start button and expansion timeline.
-Widget withSmartfitPlanSaveUi(
-  BuildContext context,
-  Widget child, {
-  required String planId,
-  String? saveLabel,
-  String? savedLabel,
-  VoidCallback? onSaveCopy,
-}) {
-  if (saveLabel == null && savedLabel == null && onSaveCopy == null) {
-    return withSmartfitCoachUi(context, child);
-  }
-  final base = CoachUiTheme.contains(context)
-      ? CoachUiTheme.of(context)
-      : smartfitCoachUiStyle();
-  final strings = base.strings;
-  final builders = base.builders;
-  final primaryBuilder =
-      builders.textAction ?? smartfitCoachUiStyle().builders.textAction!;
-  return CoachUiTheme(
-    style: CoachUiStyle(
-      colors: base.colors,
-      typography: base.typography,
-      strings: CoachUiStrings(
-        expand: strings.expand,
-        collapse: strings.collapse,
-        expandDetails: strings.expandDetails,
-        collapseDetails: strings.collapseDetails,
-        save: saveLabel ?? strings.save,
-        saved: savedLabel ?? strings.saved,
-        start: strings.start,
-        cancel: strings.cancel,
-        preparing: strings.preparing,
-        progressHint: strings.progressHint,
-        answerHint: strings.answerHint,
-        submitAnswer: strings.submitAnswer,
-        multipleHint: strings.multipleHint,
-        planFromActions: strings.planFromActions,
-        actionUnavailable: strings.actionUnavailable,
-        planDetails: strings.planDetails,
-        timeLabel: strings.timeLabel,
-      ),
-      builders: CoachUiBuilders(
-        pressable: builders.pressable,
-        controlFace: builders.controlFace,
-        textAction: (context, action) {
-          final primary = primaryBuilder(context, action);
-          if (onSaveCopy == null ||
-              action.key != ValueKey('plan-save-$planId')) {
-            return primary;
-          }
-          return Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              KeyedSubtree(
-                key: ValueKey('plan-primary-save-$planId'),
-                child: primary,
-              ),
-              const SizedBox(width: 12),
-              SfPressable(
-                key: ValueKey('plan-save-copy-$planId'),
-                semanticLabel: '另存一份',
-                onTap: onSaveCopy,
-                child: SizedBox(
-                  height: 44,
-                  child: Center(
-                    child: Text(
-                      '另存一份',
-                      style: SfType.callout.copyWith(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: SfColors.accent,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          );
-        },
-        surface: builders.surface,
-        icon: builders.icon,
-        startButton: builders.startButton,
-        media: builders.media,
-      ),
-    ),
-    child: child,
-  );
-}
 
 /// Saved plans reuse the SDK plan view and its normal App theme. Its left
 /// action opens details instead of saving, using the approved primary ink.
@@ -173,40 +73,6 @@ CoachMediaPalette coachMediaPalette(SfPalette p) => CoachMediaPalette(
   onStage: p.onStage,
   onStageMuted: p.onStageMuted,
 );
-
-CoachQuestionData toCoachQuestionData(ChatMessage message) {
-  final question = message.question!;
-  return CoachQuestionData(
-    id: message.id,
-    question: question.question,
-    mode: switch (question.mode) {
-      coach.AskUserMode.text => CoachQuestionMode.text,
-      coach.AskUserMode.choice => CoachQuestionMode.choice,
-      coach.AskUserMode.form => CoachQuestionMode.form,
-    },
-    options: question.options,
-    multiple: question.multiple,
-    answered: message.questionAnswered,
-    answeredChoices: message.answeredChoices,
-    answeredForm: message.answeredForm,
-    isConfirmation: question.isConfirmation,
-    focus: question.focus,
-    defaultSelections: question.defaultSelections,
-    fields: [
-      for (final field in question.fields)
-        CoachQuestionField(
-          key: field.key,
-          label: field.label,
-          options: field.options,
-          multiple: field.multiple,
-          initialSelections: field.preselected,
-          previousSelections: field.previousSelections,
-          optionsByScene: field.optionsByScene,
-        ),
-    ],
-    skipLabel: question.skipLabel,
-  );
-}
 
 CoachUiStyle smartfitCoachUiStyle({bool planDetailsAction = false}) {
   final p = SfColors.palette;

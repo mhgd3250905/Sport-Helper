@@ -4,9 +4,6 @@ import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:smartfit/app/build_info.dart';
-import 'package:smartfit/chat/ai_chat_engine.dart';
-import 'package:smartfit/chat/app_chat_actions.dart';
-import 'package:smartfit/chat/chat_controller.dart';
 import 'package:smartfit/data/app_store.dart';
 import 'package:smartfit/diagnostics/runtime_log.dart';
 import 'package:smartfit/diagnostics/session_snapshot_archive.dart';
@@ -14,6 +11,8 @@ import 'package:ugk_coach/ugk_coach.dart' as coach;
 
 import '../app_flow_test.dart' show MemoryStorage;
 import '../support/coach_v2_fixtures.dart';
+import '../support/chat_sdk_support.dart';
+import 'package:ugk_coach_chat/ugk_coach_chat.dart';
 
 class _Archive implements SessionSnapshotArchive {
   final contents = <String>[];
@@ -222,7 +221,7 @@ void main() {
     },
   );
 
-  Future<(ChatController, AiChatEngine, coach.FakeLlmClient)> setup(
+  Future<(CoachChatController, CoachChatController, coach.FakeLlmClient)> setup(
     RuntimeLog log,
     List<Object> script,
   ) async {
@@ -232,28 +231,18 @@ void main() {
     final store = AppStore(storage);
     await store.acceptSafety(blocked: false);
     final client = coach.FakeLlmClient(script, latency: Duration.zero);
-    final engine = AiChatEngine(
-      local: const AppChatActions(),
-      catalog: fixture.catalog,
-      profile: fixture.profile,
-      client: client,
-    );
-    final chat = ChatController(
-      engine: engine,
-      store: store,
-      replyDelay: Duration.zero,
-    )..start();
+    final chat = fakeHostChat(sdkChatServices(store, fixture), client);
+    expect((await chat.start()).ok, isTrue);
     addTearDown(() async {
-      chat.dispose();
-      engine.dispose();
+      await chat.close();
       await log.flush();
       RuntimeLog.instance = previous;
     });
-    return (chat, engine, client);
+    return (chat, chat, client);
   }
 
   test(
-    'real SDK tools, accepted params and raw user input reach only logs',
+    'real SDK tools and accepted params reach logs without leaking into chat',
     () async {
       final log = RuntimeLog(enabled: true, snapshotArchive: _Archive());
       final (chat, _, _) = await setup(log, fixture.planTurn());
@@ -261,10 +250,6 @@ void main() {
       await chat.send(input);
       await log.flush();
       final events = _events(log);
-      expect(
-        events.singleWhere((e) => e['event'] == 'chat.user')['data']['text'],
-        input,
-      );
       final calls = events
           .where((e) => e['event'] == 'ai.tool.requested')
           .toList();
@@ -300,6 +285,23 @@ void main() {
   );
 
   test(
+    'raw user text reaches diagnostics without trimming its whitespace',
+    () async {
+      final log = RuntimeLog(enabled: true, snapshotArchive: _Archive());
+      final (chat, _, _) = await setup(log, fixture.planTurn());
+      const input = '  在家徒手10分钟拉伸\n';
+      await chat.send(input);
+      await log.flush();
+      expect(
+        _events(
+          log,
+        ).singleWhere((event) => event['event'] == 'chat.user')['data']['text'],
+        input,
+      );
+    },
+  );
+
+  test(
     'new conversation durably archives before reset and queues new input',
     () async {
       final archive = _Archive();
@@ -313,13 +315,22 @@ void main() {
       final calls = client.requests.length;
       archive.gate = Completer<void>();
       final reset = chat.newConversation();
-      expect(jsonDecode(archive.contents.single), before);
-      final queued = chat.send('你好');
-      await Future<void>.delayed(Duration.zero);
-      expect(client.requests.length, calls);
-      archive.gate!.complete();
-      await reset;
-      await queued;
+      Future<Object?>? queued;
+      try {
+        expect(
+          archive.contents,
+          hasLength(1),
+          reason: 'The old host archived before resetting its conversation',
+        );
+        expect(jsonDecode(archive.contents.single), before);
+        queued = chat.send('你好');
+        await Future<void>.delayed(Duration.zero);
+        expect(client.requests.length, calls);
+      } finally {
+        if (!archive.gate!.isCompleted) archive.gate!.complete();
+        await reset;
+        await queued;
+      }
       expect(client.requests.length, calls + 1);
       expect(engine.agent.sessionState.userTurns.map((t) => t.text), ['你好']);
       expect(

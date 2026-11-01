@@ -243,6 +243,8 @@ void main() {
           ..voice = const VoiceSettings(voice: false, chimes: false);
         await store.acceptSafety(blocked: false);
         final services = AppServices(
+          coachCatalog: fixture.catalog,
+          coachProfile: fixture.profile,
           library: fixture.library,
           catalog: loadCatalog(),
           store: store,

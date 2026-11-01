@@ -18,7 +18,7 @@ import 'package:smartfit/app/posehub_asset_bundle.dart';
 import 'package:smartfit/app/posehub_bundled_images.dart';
 import 'package:smartfit/app/posehub_media_repository.dart';
 import 'package:smartfit/app/services.dart';
-import 'package:smartfit/chat/chat_controller.dart';
+import 'package:smartfit/app/coach_chat.dart';
 import 'package:smartfit/data/app_store.dart';
 import 'package:smartfit/domain/exercise.dart';
 import 'package:smartfit/domain/plan.dart';
@@ -212,6 +212,8 @@ void main() {
           );
         }
         final services = AppServices(
+          coachCatalog: fixture.catalog,
+          coachProfile: fixture.profile,
           library: fixture.library,
           catalog: loadCatalog(),
           store: store,
@@ -223,10 +225,8 @@ void main() {
         );
         addTearDown(services.dispose);
         addTearDown(store.dispose);
-        final chat = ChatController(
-          engine: services.chatEngine,
-          store: store,
-          replyDelay: Duration.zero,
+        final chat = createSmartfitChat(
+          services,
           clock: () => DateTime(2026, 10, 29, 10),
         );
         addTearDown(chat.dispose);

@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smartfit/app/services.dart';
 import 'package:smartfit/app/user_memory_store.dart';
-import 'package:smartfit/chat/ai_chat_engine.dart';
 import 'package:smartfit/chat/ai_coach_config.dart';
 import 'package:smartfit/core/storage/local_state_storage.dart';
 import 'package:smartfit/data/app_store.dart';
@@ -113,19 +112,20 @@ void main() {
       final store = AppStore(storage);
       await store.load();
       final s = _services(storage, store: store, ai: true);
-      final engine = s.chatEngine as AiChatEngine;
-      addTearDown(engine.dispose);
-      expect(engine.enableUserMemory, isFalse);
-      expect(engine.agent.memoryStore, same(store.aiMemoryStore));
+      await s.chat.start();
+      final chat = s.chat;
+      addTearDown(chat.close);
+      expect(chat.agent.enableUserMemory, isFalse);
+      expect(chat.agent.memoryStore, same(store.aiMemoryStore));
 
       await s.setAiMemoryEnabled(true);
-      expect(engine.enableUserMemory, isTrue);
+      expect(chat.agent.enableUserMemory, isTrue);
       expect(store.aiMemoryEnabled, isTrue);
       storage.failWriteKey = AppStore.key;
       await expectLater(s.setAiMemoryEnabled(false), throwsStateError);
-      expect(engine.enableUserMemory, isFalse);
+      expect(chat.agent.enableUserMemory, isFalse);
       expect(store.aiMemoryEnabled, isFalse);
-      expect((await engine.agent.memory()).single.text, '新手');
+      expect((await chat.agent.memory()).single.text, '新手');
 
       storage.failWriteKey = null;
       await s.setAiMemoryEnabled(false);
@@ -141,8 +141,9 @@ void main() {
     () async {
       final storage = _Storage();
       final s = _services(storage, ai: true);
-      final engine = s.chatEngine as AiChatEngine;
-      addTearDown(engine.dispose);
+      await s.chat.start();
+      final chat = s.chat;
+      addTearDown(chat.close);
       await s.store.aiMemoryStore.save([
         coach.MemoryEntry(
           coach.MemoryKind.equipment,
@@ -150,14 +151,14 @@ void main() {
           at: DateTime.utc(2026, 10, 21),
         ),
       ]);
-      expect((await engine.agent.memory()).single.text, '家里有哑铃');
+      expect((await chat.agent.memory()).single.text, '家里有哑铃');
       storage.failWriteKey = LocalUserMemoryStore.key;
 
       await expectLater(s.clearAiMemory(), throwsStateError);
       expect((await s.store.aiMemoryStore.load()).single.text, '家里有哑铃');
       storage.failWriteKey = null;
       await s.clearAiMemory();
-      expect(await engine.agent.memory(), isEmpty);
+      expect(await chat.agent.memory(), isEmpty);
       expect(await AppStore(storage).aiMemoryStore.load(), isEmpty);
     },
   );

@@ -24,9 +24,9 @@ void main() {
                   defaults = CoachUiStyle.fromTheme(Theme.of(context));
                   // A recommendation must reset the surrounding conversation's
                   // custom plan-card builders, rather than inheriting them.
-                  return withSmartfitCoachUi(
-                    context,
-                    Builder(
+                  return CoachUiTheme(
+                    style: smartfitCoachUiStyle(),
+                    child: Builder(
                       builder: (context) => withSmartfitRecommendUi(
                         context,
                         Builder(

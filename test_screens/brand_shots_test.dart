@@ -9,17 +9,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smartfit/app/services.dart';
-import 'package:smartfit/chat/chat_models.dart';
+import 'package:ugk_coach_chat/ugk_coach_chat.dart';
+import 'package:ugk_coach/ugk_coach.dart' as coach;
 import 'package:smartfit/data/app_store.dart';
 import 'package:smartfit/domain/exercise.dart';
 import 'package:smartfit/domain/plan.dart';
 import 'package:smartfit/main.dart';
-import 'package:smartfit/ui/chat/plan_card.dart';
+import 'package:ugk_coach_ui/ugk_coach_ui.dart';
 import 'package:smartfit/voice/voice_library.dart';
 import 'package:smartfit/voice/voice_queue.dart';
 
 import '../test/app_flow_test.dart' show MemoryStorage;
 import '../test/support.dart';
+import '../test/support/coach_v2_fixtures.dart';
 
 const _plan = TrainingPlan(
   id: 'brand-review-core',
@@ -92,8 +94,12 @@ Future<AppServices> _services(
   final store = AppStore(MemoryStorage())..starfield = false;
   await store.setAppearance(theme);
   await store.acceptSafety(blocked: false);
+  final chatFixture = CoachV2Fixtures.loadSync();
   final services = AppServices(
-    library: loadLibrary(),
+    coachCatalog: chatFixture.catalog,
+    coachProfile: chatFixture.profile,
+    poseHubCatalog: chatFixture.poseHub,
+    library: chatFixture.library,
     catalog: loadCatalog(),
     store: store,
     voiceLibrary: VoiceLibrary.empty,
@@ -101,45 +107,44 @@ Future<AppServices> _services(
     chatReplyDelay: Duration.zero,
   );
 
-  // Start once, then replace only this in-memory controller's fixture data.
-  // No request goes to AI, and no real conversation is read or overwritten.
-  final chat = services.chat..start();
+  // Seed the legacy storage port; the shared controller owns restoration.
   final now = DateTime.now();
   final at = DateTime(now.year, now.month, now.day, 9, 41);
-  chat.messages.clear();
-  if (conversation) {
-    chat.messages.addAll([
-      ChatMessage(
-        id: 'brand-review-user',
-        role: ChatRole.user,
-        at: at,
-        text: '今天在家练 15 分钟，想活动全身。',
-      ),
-      ChatMessage(
-        id: 'brand-review-reply',
-        role: ChatRole.assistant,
-        at: at,
-        text: '好，安排一组徒手轻力量。按自己的节奏来，动作不舒服就停下。',
-      ),
-      ChatMessage(
-        id: 'brand-review-plan',
-        role: ChatRole.assistant,
-        at: at,
-        plan: _plan,
-      ),
-    ]);
-    chat.suggestions = const ['再短一点', '难一点', '换掉第 2 个', '换一套'];
-  } else {
-    chat.messages.add(
-      ChatMessage(
-        id: 'brand-review-greeting',
-        role: ChatRole.assistant,
-        at: at,
-        text: '早上好\n说说今天想怎么练？',
-        greeting: true,
-      ),
-    );
-  }
+  await store.setChatLog([
+    for (final message
+        in conversation
+            ? [
+                ChatMessage(
+                  id: 'brand-review-user',
+                  role: ChatRole.user,
+                  at: at,
+                  text: '今天在家练 15 分钟，想活动全身。',
+                ),
+                ChatMessage(
+                  id: 'brand-review-reply',
+                  role: ChatRole.assistant,
+                  at: at,
+                  text: '好，安排一组徒手轻力量。按自己的节奏来，动作不舒服就停下。',
+                ),
+                ChatMessage(
+                  id: 'brand-review-plan',
+                  role: ChatRole.assistant,
+                  at: at,
+                  plan: const coach.PlanCodec().decode(_plan.toJson()),
+                ),
+              ]
+            : [
+                ChatMessage(
+                  id: 'brand-review-greeting',
+                  role: ChatRole.assistant,
+                  at: at,
+                  text: '早上好\n说说今天想怎么练？',
+                  greeting: true,
+                ),
+              ])
+      message.toJson(),
+  ]);
+  await services.chat.start();
   return services;
 }
 
@@ -177,7 +182,7 @@ void main() {
         );
         await tester.pumpAndSettle();
         if (conversation) {
-          expect(find.byType(PlanCard), findsOneWidget);
+          expect(find.byType(CoachPlanCard), findsOneWidget);
           expect(find.text('今天在家练 15 分钟，想活动全身。'), findsOneWidget);
         } else {
           expect(find.text('早上好'), findsOneWidget);

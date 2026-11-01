@@ -3,9 +3,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:smartfit/main.dart';
 import 'package:smartfit/ui/about_page.dart';
 import 'package:smartfit/ui/chat/chat_home_page.dart';
-import 'package:smartfit/ui/plan_page.dart';
+import 'package:ugk_coach_chat/ugk_coach_chat.dart';
 import 'package:smartfit/ui/player_page.dart';
-import 'package:smartfit/ui/guide_media.dart';
+import 'package:smartfit/ui/cached_exercise_media.dart';
 import 'package:smartfit/ui/training_route.dart';
 
 import 'app_flow_test.dart'
@@ -19,10 +19,11 @@ void main() {
     final s = services();
     await s.store.acceptSafety(blocked: false);
     s.chat.start();
-    await showManualChatCard(s);
+    await showManualChatCard(s, tester: tester);
     final plan = s.chat.currentPlan!;
     await s.chat.save(plan);
     final messages = s.chat.messages.length;
+    await tester.runAsync(s.chat.start);
     await tester.pumpWidget(SmartFitApp(services: s));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('chat-panel-toggle')));
@@ -48,29 +49,32 @@ void main() {
       final s = services();
       await s.store.acceptSafety(blocked: false);
       s.chat.start();
-      await showManualChatCard(s, template: 'office-relax');
+      await showManualChatCard(s, template: 'office-relax', tester: tester);
       final plan = s.chat.currentPlan!;
+      await tester.runAsync(s.chat.start);
       await tester.pumpWidget(SmartFitApp(services: s));
       await tester.pumpAndSettle();
       final chatElement = tester.element(find.byType(ChatHomePage));
       await tester.tap(find.byKey(ValueKey('plan-open-${plan.id}')));
       await tester.pumpAndSettle();
-      expect(find.byType(PlanPage), findsOneWidget);
-      final detailElement = tester.element(find.byType(PlanPage));
+      expect(find.byType(CoachChatPlanDetailsPage), findsOneWidget);
+      final detailElement = tester.element(
+        find.byType(CoachChatPlanDetailsPage),
+      );
       await warmTrainingPoster(tester, s, plan, sourceContext: detailElement);
       await tester.tap(find.byKey(const ValueKey('start')));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 50));
       final retiringDetails = find.descendant(
-        of: find.byType(PlanPage, skipOffstage: false),
-        matching: find.byType(GuideMedia, skipOffstage: false),
+        of: find.byType(CoachChatPlanDetailsPage, skipOffstage: false),
+        matching: find.byType(CachedExerciseMedia, skipOffstage: false),
         skipOffstage: false,
       );
       expect(retiringDetails, findsWidgets);
       expect(
         tester
-            .widgetList<GuideMedia>(retiringDetails)
-            .every((v) => v.coordinator.activeSlot == null),
+            .widgetList<CachedExerciseMedia>(retiringDetails)
+            .every((v) => v.paused || !v.playing),
         isTrue,
         reason: 'The source preview stops before the trainer starts',
       );
@@ -119,16 +123,19 @@ void main() {
       await tester.pump();
       expect(find.byType(PlayerPage), findsNothing);
       await tester.pumpAndSettle();
-      expect(find.byType(PlanPage), findsOneWidget);
-      expect(tester.element(find.byType(PlanPage)), same(detailElement));
-      final restoredPreview = tester.widgetList<GuideMedia>(
-        find.byType(GuideMedia),
+      expect(find.byType(CoachChatPlanDetailsPage), findsOneWidget);
+      expect(
+        tester.element(find.byType(CoachChatPlanDetailsPage)),
+        same(detailElement),
+      );
+      final restoredPreview = tester.widgetList<CachedExerciseMedia>(
+        find.byType(CachedExerciseMedia),
       );
       expect(restoredPreview, isNotEmpty);
-      expect(restoredPreview.every((media) => media.enabled), isTrue);
+      expect(restoredPreview.every((media) => !media.paused), isTrue);
       expect(s.store.history, hasLength(1));
       expect(s.chat.messages.last.text, contains('这次先到这儿'));
-      Navigator.of(tester.element(find.byType(PlanPage))).pop();
+      Navigator.of(tester.element(find.byType(CoachChatPlanDetailsPage))).pop();
       await tester.pumpAndSettle();
       expect(find.byType(ChatHomePage), findsOneWidget);
       expect(tester.element(find.byType(ChatHomePage)), same(chatElement));

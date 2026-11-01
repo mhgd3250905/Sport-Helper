@@ -285,7 +285,7 @@ void main() {
         final s = services();
         await s.store.acceptSafety(blocked: false);
         s.chat.start();
-        await showManualChatCard(s);
+        await showManualChatCard(s, tester: tester);
         // Hero and strip previews switch to each theme's bundled stills.
         final items = s.chat.currentPlan!.items.toList();
         final hero = s.library[items.first.exerciseId];
@@ -294,6 +294,7 @@ void main() {
 
         tester.platformDispatcher.platformBrightnessTestValue = Brightness.dark;
         addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
+        await tester.runAsync(s.chat.start);
         await tester.pumpWidget(SmartFitApp(services: s));
         await tester.pumpAndSettle();
         expect(SfColors.isDark, isTrue);

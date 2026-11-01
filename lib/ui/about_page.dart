@@ -7,7 +7,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import '../app/services.dart';
 import '../app/build_info.dart';
 import '../app/training_media_config.dart';
-import '../chat/safety_script.dart' show disclaimerText;
+import '../app/health_notice.dart' show disclaimerText;
 import '../diagnostics/runtime_log.dart';
 import '../diagnostics/frame_recorder.dart';
 import '../diagnostics/training_transition_timings.dart';

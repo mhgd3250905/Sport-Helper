@@ -4,8 +4,11 @@
 // The app bundles Noto Sans SC, so no font needs copying in.
 // Each shot seeds an in-memory store and scripts the conversation.
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:ugk_coach/ugk_coach.dart' as coach;
 import 'package:flutter/scheduler.dart';
 import 'package:smartfit/app/services.dart';
 import 'package:smartfit/core/storage/local_state_storage.dart';
@@ -24,10 +27,14 @@ class _Memory implements LocalStateStorage {
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final (lib, catalog, _, _) = await AppServices.loadContent();
+  final (lib, catalog, _, coachCatalog) = await AppServices.loadContent();
   final store = AppStore(_Memory());
   final shot = Uri.base.queryParameters['shot'] ?? 'shell';
   final services = AppServices(
+    coachCatalog: coachCatalog,
+    coachProfile: coach.CoachProfile.fromJson(
+      jsonDecode(await rootBundle.loadString('assets/coach/smartfit.json')),
+    ),
     library: lib,
     catalog: catalog,
     store: store,
@@ -36,7 +43,9 @@ Future<void> main() async {
     chatReplyDelay: Duration.zero,
   );
   // ?theme=light shoots the light (白色无边空间) palette.
-  if (Uri.base.queryParameters['theme'] case final t?) await store.setAppearance(t);
+  if (Uri.base.queryParameters['theme'] case final t?) {
+    await store.setAppearance(t);
+  }
   if (!shot.startsWith('opening')) await store.acceptSafety(blocked: false);
   final chat = services.chat..start();
   switch (shot) {
@@ -56,7 +65,12 @@ Future<void> main() async {
       // Slowed only once the card has settled (its own entrance would be
       // slowed too); the click comes after SHOT_WAIT ≥ 12 s.
       await chat.send('在家 15 分钟练核心，徒手');
-      unawaited(Future<void>.delayed(const Duration(seconds: 8), () => timeDilation = 40));
+      unawaited(
+        Future<void>.delayed(
+          const Duration(seconds: 8),
+          () => timeDilation = 40,
+        ),
+      );
     case 'drawer':
       for (final t in ['在办公室午休 10 分钟，肩颈很僵', '在家 15 分钟练核心，徒手', '睡前放松一下，15 分钟']) {
         await chat.send(t);

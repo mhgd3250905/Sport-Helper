@@ -1,14 +1,11 @@
 // Chat home discovery, explicit navigation/settings and SDK-owned text.
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:smartfit/chat/chat_controller.dart';
-import 'package:smartfit/chat/ai_chat_engine.dart';
-import 'package:smartfit/chat/app_chat_actions.dart';
 import 'package:smartfit/app/services.dart';
+import 'package:smartfit/domain/session.dart' show trainerPlan;
 import 'package:smartfit/data/app_store.dart';
 import 'package:smartfit/main.dart';
 import 'package:smartfit/ui/about_page.dart';
-import 'package:smartfit/ui/chat/chat_widgets.dart';
 import 'package:smartfit/ui/chat/chat_home_page.dart';
 import 'package:smartfit/ui/library_page.dart';
 import 'package:smartfit/ui/theme.dart';
@@ -17,6 +14,7 @@ import 'package:ugk_coach/ugk_coach.dart' as coach;
 
 import 'app_flow_test.dart' show services, tall, showManualChatCard;
 import 'support/coach_v2_fixtures.dart';
+import 'support/chat_sdk_support.dart';
 
 void main() {
   late CoachV2Fixtures fixture;
@@ -28,51 +26,6 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('chat-send')));
     await tester.pumpAndSettle();
   }
-
-  test('the greeting follows the hour', () {
-    expect(greetingFor(DateTime(2026, 10, 20, 8)), '早上好');
-    expect(greetingFor(DateTime(2026, 10, 20, 12)), '中午好');
-    expect(greetingFor(DateTime(2026, 10, 20, 15)), '下午好');
-    expect(greetingFor(DateTime(2026, 10, 20, 20)), '晚上好');
-    expect(greetingFor(DateTime(2026, 10, 20, 1)), '夜深了');
-  });
-
-  testWidgets(
-    'opening: a large greeting (no bubble) and first-visit discovery chips',
-    (tester) async {
-      tall(tester);
-      final s = services();
-      await s.store.acceptSafety(blocked: false);
-      await tester.pumpWidget(SmartFitApp(services: s));
-      await tester.pumpAndSettle();
-      final g = s.chat.messages.single;
-      expect(g.greeting, isTrue);
-      expect(find.byType(GreetingBlock), findsOneWidget);
-      expect(find.byType(MessageBubble), findsNothing);
-      expect(find.text(greetingFor(DateTime.now())), findsOneWidget);
-      expect(find.text('说说今天想怎么练？'), findsOneWidget);
-      // First visit: plan examples, then 你能做什么 with its glyph.
-      expect(s.chat.suggestions.last, '你能做什么');
-      await tester.dragUntilVisible(
-        find.text('你能做什么'),
-        find.descendant(
-          of: find.byType(SuggestionStrip),
-          matching: find.byType(Scrollable),
-        ),
-        const Offset(-120, 0),
-      );
-      await tester.pumpAndSettle();
-      final help = find
-          .ancestor(of: find.text('你能做什么'), matching: find.byType(Row))
-          .first;
-      expect(
-        find.descendant(of: help, matching: find.byType(SfIcon)),
-        findsOneWidget,
-      );
-      // The greeting survives a restart as a greeting.
-      expect(g.toJson()['greeting'], isTrue);
-    },
-  );
 
   testWidgets(
     'returning users retain training history and use the plan panel',
@@ -90,12 +43,13 @@ void main() {
         ),
       );
       s.chat.start();
-      final plan = await showManualChatCard(s);
-      final saved = await s.chat.save(plan);
-      s.chat.finished(plan, completed: 8, total: 8);
+      final plan = await showManualChatCard(s, tester: tester);
+      final saved = await s.chat.save(trainerPlan(plan));
+      s.chat.finished(trainerPlan(plan), completed: 8, total: 8);
       expect(s.chat.suggestions, contains('在家 20 分钟练核心'));
       expect(s.chat.suggestions, isNot(contains('上次那个')));
       expect(s.store.history.single.title, '核心激活');
+      await tester.runAsync(s.chat.start);
       await tester.pumpWidget(SmartFitApp(services: s));
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const ValueKey('chat-panel-toggle')));
@@ -112,6 +66,7 @@ void main() {
     tall(tester);
     final s = services();
     await s.store.acceptSafety(blocked: false);
+    await tester.runAsync(s.chat.start);
     await tester.pumpWidget(SmartFitApp(services: s));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('chat-panel-toggle')));
@@ -144,24 +99,19 @@ void main() {
       tall(tester);
       final s = services();
       await s.store.acceptSafety(blocked: false);
-      final client = coach.FakeLlmClient(
-        List.filled(4, 'SDK 已收到。'),
-        latency: Duration.zero,
-      );
-      final engine = AiChatEngine(
-        local: const AppChatActions(),
-        catalog: fixture.catalog,
-        profile: fixture.profile,
-        client: client,
-        enableUserMemory: false,
-      );
-      final chat = ChatController(
-        engine: engine,
-        store: s.store,
-        replyDelay: Duration.zero,
-      );
-      addTearDown(chat.dispose);
-      addTearDown(engine.dispose);
+      final client = coach.FakeLlmClient([
+        for (var index = 0; index < 4; index++)
+          CoachV2Fixtures.batch([
+            CoachV2Fixtures.call('host-explicit-$index', 'ask_user', {
+              'question': '这次准备练多久？',
+              'mode': 'choice',
+              'options': ['10分钟', '15分钟'],
+            }),
+          ]),
+      ], latency: Duration.zero);
+      final chat = fakeHostChat(sdkChatServices(s.store, fixture), client);
+      addTearDown(chat.close);
+      await tester.runAsync(chat.start);
       await tester.pumpWidget(
         AppScope(
           services: s,
@@ -182,7 +132,7 @@ void main() {
         expect(find.byType(AboutPage), findsNothing);
       }
       expect(client.requests, hasLength(4));
-      expect(engine.agent.sessionState.userTurns.map((turn) => turn.text), [
+      expect(chat.agent.sessionState.userTurns.map((turn) => turn.text), [
         '换浅色',
         '关掉语音',
         '有哪些拉伸动作',
@@ -197,6 +147,7 @@ void main() {
     tall(tester);
     final s = services();
     await s.store.acceptSafety(blocked: false);
+    await tester.runAsync(s.chat.start);
     await tester.pumpWidget(SmartFitApp(services: s));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('chat-panel-toggle')));
@@ -228,6 +179,7 @@ void main() {
     tall(tester);
     final s = services();
     await s.store.acceptSafety(blocked: false);
+    await tester.runAsync(s.chat.start);
     await tester.pumpWidget(SmartFitApp(services: s));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('chat-panel-toggle')));
@@ -250,13 +202,10 @@ void main() {
   ) async {
     tall(tester);
     final s = services();
+    await tester.runAsync(s.chat.start);
     await tester.pumpWidget(SmartFitApp(services: s));
     await tester.pumpAndSettle();
-    await tester.tap(
-      find.byWidgetPredicate(
-        (w) => w is OptionPill && w.label == '我已了解' && w.enabled,
-      ),
-    );
+    await tester.tap(find.text('我已了解').hitTestable());
     await tester.pumpAndSettle();
     expect(find.text('安全确认 1/4'), findsOneWidget);
     expect(find.textContaining('1/4\u3000'), findsNothing);

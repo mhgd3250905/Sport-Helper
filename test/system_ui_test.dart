@@ -5,18 +5,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:smartfit/chat/chat_models.dart';
+import 'package:ugk_coach_chat/ugk_coach_chat.dart';
 import 'package:smartfit/domain/exercise.dart';
 import 'package:smartfit/domain/plan.dart';
 import 'package:smartfit/main.dart';
-import 'package:smartfit/ui/chat/chat_widgets.dart';
-import 'package:smartfit/ui/chat/chat_timeline.dart';
 import 'package:smartfit/ui/library_page.dart';
 import 'package:smartfit/ui/plan_page.dart';
 import 'package:smartfit/ui/player_page.dart';
 import 'package:smartfit/ui/theme.dart';
 
-import 'app_flow_test.dart' show services;
+import 'app_flow_test.dart' show services, chatScroll;
 
 const _plan = TrainingPlan(
   id: 'system-bars',
@@ -115,10 +113,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final chat = find.byType(ChatTimeline);
-      final widget = tester.widget<ChatTimeline>(chat);
-      expect(widget.topInset, 32);
-      expect(widget.fadeTop, isFalse);
+      final chat = find.byKey(const ValueKey('chat-messages-boundary'));
       final list = find.descendant(of: chat, matching: find.byType(ListView));
       expect(
         tester.widget<ListView>(list).padding!.resolve(TextDirection.ltr).top,
@@ -140,9 +135,21 @@ void main() {
           .01,
         ),
       );
-      expect(tester.getRect(find.byType(ChatInputBar)).bottom, 820);
+      expect(
+        tester
+            .getRect(
+              find
+                  .ancestor(
+                    of: find.byKey(const ValueKey('chat-composer-face')),
+                    matching: find.byType(Padding),
+                  )
+                  .first,
+            )
+            .bottom,
+        820,
+      );
 
-      final controller = widget.controller;
+      final controller = chatScroll(tester);
       controller.jumpTo(controller.position.maxScrollExtent);
       await tester.pumpAndSettle();
       expect(
@@ -248,6 +255,7 @@ void main() {
       final s = services();
       await s.store.acceptSafety(blocked: false);
       await s.store.setAppearance('light');
+      await tester.runAsync(s.chat.start);
       await tester.pumpWidget(SmartFitApp(services: s));
       await tester.pumpAndSettle();
 

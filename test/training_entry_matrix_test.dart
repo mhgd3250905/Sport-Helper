@@ -5,11 +5,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:smartfit/app/services.dart';
 import 'package:smartfit/domain/saved_plan.dart';
 import 'package:smartfit/ui/chat/chat_home_page.dart';
-import 'package:smartfit/ui/chat/chat_timeline.dart';
-import 'package:smartfit/ui/chat/plan_card.dart';
 import 'package:smartfit/ui/chat/saved_plans_page.dart';
 import 'package:smartfit/ui/exercise_video.dart';
-import 'package:smartfit/ui/plan_page.dart';
+import 'package:ugk_coach_chat/ugk_coach_chat.dart';
 import 'package:smartfit/ui/player_page.dart';
 import 'package:smartfit/ui/theme.dart';
 import 'package:smartfit/ui/training_poster_image.dart';
@@ -20,7 +18,7 @@ import 'package:ugk_trainer/ugk_trainer.dart'
     show TrainerCountdownDigits, TrainerPlayer;
 
 import 'app_flow_test.dart'
-    show services, showManualChatCard, warmTrainingPoster;
+    show services, showManualChatCard, warmTrainingPoster, chatScroll;
 
 enum _Entry { chatCollapsed, chatExpanded, savedPlan, guide }
 
@@ -105,8 +103,7 @@ void _expectCompleteFrame(WidgetTester tester, {required bool gated}) {
 
 ScrollController _sourceScroll(WidgetTester tester, _Entry entry) =>
     switch (entry) {
-      _Entry.chatCollapsed || _Entry.chatExpanded =>
-        tester.widget<ChatTimeline>(find.byType(ChatTimeline)).controller,
+      _Entry.chatCollapsed || _Entry.chatExpanded => chatScroll(tester),
       _Entry.savedPlan =>
         tester.widget<CustomScrollView>(_key('saved-plans-scroll')).controller!,
       _Entry.guide => tester.widget<ListView>(_key('plan-article')).controller!,
@@ -115,7 +112,7 @@ ScrollController _sourceScroll(WidgetTester tester, _Entry entry) =>
 Finder _sourcePage(_Entry entry) => find.byType(switch (entry) {
   _Entry.chatCollapsed || _Entry.chatExpanded => ChatHomePage,
   _Entry.savedPlan => SavedPlansPage,
-  _Entry.guide => PlanPage,
+  _Entry.guide => CoachChatPlanDetailsPage,
 }, skipOffstage: false);
 
 void main() {
@@ -138,7 +135,11 @@ void main() {
           });
           await app.store.acceptSafety(blocked: false);
           app.chat.start();
-          final plan = await showManualChatCard(app, template: 'office-relax');
+          final plan = await showManualChatCard(
+            app,
+            template: 'office-relax',
+            tester: tester,
+          );
           SavedPlan? saved;
           if (entry == _Entry.savedPlan) {
             saved = await app.store.savePlan(plan, name: '已保存的舒展');
@@ -175,16 +176,25 @@ void main() {
             await tester.tap(_key('plan-open-${plan.id}'));
             await tester.pumpAndSettle();
             start = _key('start');
-            repeatStart = tester.widget<SfPressable>(start).onTap!;
+            repeatStart = () => unawaited(
+              app.chat.startTraining(
+                tester.element(find.byType(CoachChatPlanDetailsPage)),
+                app.chat.messages.lastWhere((row) => row.plan?.id == plan.id),
+                sourceEntry: 'guide',
+              ),
+            );
           } else {
             if (entry == _Entry.chatExpanded) {
               await tester.tap(_key('plan-expand-${plan.id}'));
               await tester.pumpAndSettle();
             }
             start = _key('plan-start-${plan.id}');
-            repeatStart = tester
-                .widget<PlanCard>(find.byType(PlanCard))
-                .onStart;
+            repeatStart = () => unawaited(
+              app.chat.startTraining(
+                tester.element(find.byType(ChatHomePage)),
+                app.chat.messages.lastWhere((row) => row.plan?.id == plan.id),
+              ),
+            );
           }
           await tester.ensureVisible(start);
           await tester.pumpAndSettle();
@@ -201,7 +211,7 @@ void main() {
               : entry == _Entry.chatExpanded;
           final sourceCard = switch (entry) {
             _Entry.chatCollapsed ||
-            _Entry.chatExpanded => find.byType(PlanCard),
+            _Entry.chatExpanded => _key('plan-clip-${plan.id}'),
             _Entry.savedPlan => _key('saved-expanded-${saved!.id}'),
             _Entry.guide => _key('plan-introduction'),
           };
