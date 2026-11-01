@@ -1,0 +1,328 @@
+{
+  "schema": "smartfit-coach-chat-sdk-0a6c3aa-closeout@1",
+  "date": "2026-11-01",
+  "recordedAtUtc": "2026-11-01T15:33:22.358841+00:00",
+  "branch": "codex/coach-chat-sdk",
+  "source": "df4e460f5e2c6395300012d10ab0899f868cf897",
+  "continuedFrom": "a5d5f66eeddcec7eb9097ace84e6c7d8a9b1e663",
+  "version": "0.1.0+53",
+  "versionCode": 2053,
+  "sdk": {
+    "ugk_coach": "0a6c3aaea9e3890d938799703f97819d5986ee7d",
+    "ugk_coach_ui": "0a6c3aaea9e3890d938799703f97819d5986ee7d",
+    "ugk_trainer": "0a6c3aaea9e3890d938799703f97819d5986ee7d",
+    "ugk_coach_chat": "0a6c3aaea9e3890d938799703f97819d5986ee7d",
+    "ugk_trainer_runtime": "0a6c3aaea9e3890d938799703f97819d5986ee7d"
+  },
+  "coachOverride": "0a6c3aaea9e3890d938799703f97819d5986ee7d",
+  "hostAdapters": [
+    "requestCompose()",
+    "CoachChatUserInput.rawText",
+    "beforeNewConversation(snapshot)"
+  ],
+  "sdkPatched": false,
+  "appConversationLogicReimplemented": false,
+  "diagnostics": {
+    "event": "coach_chat.chat.turn.result",
+    "rawResultMapPreserved": true,
+    "nullErrorTypePreservedOnSuccess": true,
+    "publicOpenAiConfigAuthBuildBodyAndCloseForwarded": true,
+    "requestsRetriesCancellationAndLeaseReleaseUnchanged": true,
+    "newDiagnosticsRegressions": 4
+  },
+  "scopeAmendment": {
+    "requestedNormalTurns": 20,
+    "recordBoundaryTurn": 21,
+    "doNotBypassSdkLimit": true
+  },
+  "tests": {
+    "passed": 678,
+    "failed": 0,
+    "skipped": 0,
+    "analysisIssues": 0,
+    "strictOfflineLockPassed": true,
+    "nonSdkDependenciesUnchanged": true,
+    "originalSevenAssertionsUnchanged": true,
+    "fiveCompleteTestFilesByteIdentical": true,
+    "assertionBaselineSource": "083cdad2bb10908342c4dac4b91629e028e7233c",
+    "originalSevenRegressionsPassed": true
+  },
+  "frames": {
+    "baselineSource": "3eb2a9e88ef4d28e02f4cf306c1716d61baa7f10",
+    "renderedSource": "df4e460f5e2c6395300012d10ab0899f868cf897",
+    "frames": 22,
+    "zeroRgbaFrames": 22,
+    "byteIdenticalPngFrames": 22,
+    "differentPixels": 0,
+    "checkedPixels": 7241520,
+    "viewport": [
+      390,
+      844
+    ],
+    "dpr": 1,
+    "waitingRepaintBoundariesByTheme": [
+      4,
+      4
+    ],
+    "cropMaskOrToleranceApplied": false,
+    "deviceOrPerformanceEvidence": false
+  },
+  "legacyAutomated": {
+    "templates": [
+      "core",
+      "office-relax"
+    ],
+    "firstAndSecondBootPassed": true,
+    "originalCardsTargetsDosesAndSavedPlansPreserved": true,
+    "modelRequests": 0,
+    "entireStorageJsonByteUnchangedClaimed": false,
+    "note": "Legacy coachDisplay is migrated into the new envelope."
+  },
+  "originalThreeLive": {
+    "passed": true,
+    "inputs": [
+      "在家拉伸5分钟，入门，徒手和瑜伽垫，重点大腿内侧和髋部，无不适",
+      "推荐几个拉大腿内侧的动作",
+      "换一套，缩短到3分钟"
+    ],
+    "sameSession": true,
+    "outerRetries": 0,
+    "metrics": {
+      "llmCalls": 10,
+      "httpAttempts": 10,
+      "usage": {
+        "promptTokens": {
+          "sdkNormalizedTotal": 100742,
+          "callsWithPositiveValue": 10
+        },
+        "completionTokens": {
+          "sdkNormalizedTotal": 4165,
+          "callsWithPositiveValue": 10
+        },
+        "cachedTokens": {
+          "sdkNormalizedTotal": 68480,
+          "callsWithPositiveValue": 10
+        },
+        "reasoningTokens": {
+          "sdkNormalizedTotal": 2534,
+          "callsWithPositiveValue": 8
+        }
+      }
+    },
+    "elapsedMs": 35742,
+    "turns": [
+      {
+        "turn": 1,
+        "passed": true,
+        "status": "ok",
+        "elapsedMs": 17581,
+        "httpAttempts": 4,
+        "inputTokens": 40609,
+        "outputTokens": 2134,
+        "hasQuestion": false,
+        "targetSeconds": 300,
+        "cardSeconds": 314.0,
+        "executionIncludingPreparationSeconds": 314.0,
+        "catalogEstimateSeconds": 314.0,
+        "issueCodes": [
+          "quote_not_found"
+        ]
+      },
+      {
+        "turn": 2,
+        "passed": true,
+        "status": "ok",
+        "elapsedMs": 5328,
+        "httpAttempts": 2,
+        "inputTokens": 16711,
+        "outputTokens": 558,
+        "hasQuestion": false,
+        "targetSeconds": null,
+        "cardSeconds": null,
+        "executionIncludingPreparationSeconds": null,
+        "catalogEstimateSeconds": null,
+        "issueCodes": []
+      },
+      {
+        "turn": 3,
+        "passed": true,
+        "status": "ok",
+        "elapsedMs": 12727,
+        "httpAttempts": 4,
+        "inputTokens": 43422,
+        "outputTokens": 1473,
+        "hasQuestion": false,
+        "targetSeconds": 180,
+        "cardSeconds": 183.0,
+        "executionIncludingPreparationSeconds": 183.0,
+        "catalogEstimateSeconds": 179.0,
+        "issueCodes": []
+      }
+    ],
+    "recommendations": 4,
+    "planTimingTolerance": 0.1,
+    "timingEvidence": "Production SessionBuilder phase durations including prep; no device training stopwatch.",
+    "manualWorkPhases": 0,
+    "questions": 0,
+    "toolFailuresRecovered": {
+      "quote_not_found": 1,
+      "skipped_after_error": 1
+    }
+  },
+  "sameSessionLive": {
+    "passed": true,
+    "sameProductionController": true,
+    "sameAgentAcrossTurns": true,
+    "successfulNormalTurns": 20,
+    "boundaryTurn": 21,
+    "elapsedMs": 245693,
+    "metrics": {
+      "llmCalls": 55,
+      "httpAttempts": 55,
+      "usage": {
+        "promptTokens": {
+          "sdkNormalizedTotal": 586756,
+          "callsWithPositiveValue": 55
+        },
+        "completionTokens": {
+          "sdkNormalizedTotal": 26550,
+          "callsWithPositiveValue": 55
+        },
+        "cachedTokens": {
+          "sdkNormalizedTotal": 389504,
+          "callsWithPositiveValue": 55
+        },
+        "reasoningTokens": {
+          "sdkNormalizedTotal": 17173,
+          "callsWithPositiveValue": 52
+        }
+      }
+    },
+    "conversationResets": 0,
+    "outerRetries": 0,
+    "transportMaxRetries": 0,
+    "maximumActualRequestBytes": 57775,
+    "maximumSdkAfterBytes": 57775,
+    "maximumBeforeCompactionBytes": 57775,
+    "hardLimitBytes": 65536,
+    "all55RequestsMatchSdkAfterBytes": true,
+    "requestsWithCompactionObserved": 36,
+    "firstFold": {
+      "turn": 2,
+      "beforeBytes": 48548,
+      "afterBytes": 22435
+    },
+    "maximumSeedBytes": 0,
+    "runtimeLogEvents": 847,
+    "perTurnEvents": 21,
+    "everyEventHasErrorTypeKey": true,
+    "perTurnEventsIdenticalAfterRuntimeReload": true,
+    "boundary": {
+      "status": "limitReached",
+      "errorType": null,
+      "failureKind": "conversationLimit",
+      "elapsedMs": 42,
+      "httpAttempts": 0,
+      "text": "本次对话已到长度上限，请开启新对话继续。",
+      "noNetworkMisreport": true,
+      "guidesNewConversation": true
+    },
+    "turnsOver20Seconds": [
+      {
+        "turn": 17,
+        "elapsedMs": 23760
+      },
+      {
+        "turn": 18,
+        "elapsedMs": 21848
+      }
+    ],
+    "scope": "Fresh synthetic session via production controller and real model; not phone long-chat or old-archive model continuation.",
+    "preCompactionRequestCrossed64KB": false
+  },
+  "apk": {
+    "path": "E:\\AII-3D\\3D-Sport-AI\\deliveries\\coach-chat-sdk-plus53-0a6c3aa-20261101\\release-preparation\\SmartFit-coach-chat-sdk-0.1.0+53-df4e460-internal-arm64-v8a-release.apk",
+    "bytes": 42833292,
+    "sha256": "e9fd563bd891e9c40ce620782c128b1ec70e4d607d6354cbd305af2d6948594c",
+    "packageName": "com.ugk.smartfit.internal",
+    "mode": "release",
+    "abi": "arm64-v8a",
+    "source": "df4e460f5e2c6395300012d10ab0899f868cf897",
+    "sourceFingerprint": "cbb167039b1185a21a8282b81ce0d2db994ab9931f9dda63c0c93be4dc42d6bb",
+    "signerCertificateSha256": "3761270a4764157f0e389014a9e5b800b05403bfddce0f4f7f8c039f6a53bdc7",
+    "signingSchemes": {
+      "v1": false,
+      "v2": true,
+      "v3": false,
+      "v3.1": false,
+      "v4": false
+    },
+    "sameSigningCertificate": true,
+    "zipalign16KBPassed": true,
+    "nativeElf16KBPassed": true,
+    "storageJniPassed": true,
+    "noMp4InZipOrAssetManifest": true,
+    "originalNotoPreserved": true,
+    "retainedStaticAndAudioFiles": 1737,
+    "nativeLibrariesCount": 4,
+    "independentVerificationPassed": true,
+    "privateDefinesFileRemoved": true
+  },
+  "deviceUpgrade": {
+    "passed": true,
+    "model": "2602BRT18C",
+    "android": 16,
+    "api": 36,
+    "fromVersionCode": 2052,
+    "toVersionCode": 2053,
+    "singleAdbInstallR": true,
+    "installedApkHashVerified": true,
+    "firstInstallTimeUser0Unchanged": true,
+    "ordinaryNonDebuggableRelease": true,
+    "oldNineActionConversationAndSixOfNineCompletionRecovered": true,
+    "savedPlans": 2,
+    "savedActionCounts": [
+      11,
+      8
+    ],
+    "allNineteenDosesExact": true,
+    "oldDetailsOpened": true,
+    "launchesVerified": 2,
+    "secondLaunchAfterForceStop": true,
+    "privateStateReadOrSeeded": false,
+    "dataClearedOrUninstalled": false,
+    "deviceModelRequests": 0,
+    "trainingStarted": false,
+    "rawPrivateContentCommitted": false,
+    "modelRequestEvidence": "No send action during restore navigation; not a device network-capture result."
+  },
+  "nativePerformanceMeasured": false,
+  "nativeTrainingPlaybackMeasured": false,
+  "publication": {
+    "mode": "Normal feature-branch push only",
+    "sdkMainMustEqualImmediatelyBeforePush": "0a6c3aaea9e3890d938799703f97819d5986ee7d",
+    "noMergeToMain": true,
+    "releaseBranchUnchanged": true,
+    "tagsUnchanged": true,
+    "docsOnlyAfterSource": true,
+    "postPushTruthReceipt": "E:\\AII-3D\\3D-Sport-AI\\deliveries\\coach-chat-sdk-plus53-0a6c3aa-20261101\\final-push-receipt.json"
+  },
+  "evidenceRoot": "E:\\AII-3D\\3D-Sport-AI\\deliveries\\coach-chat-sdk-plus53-0a6c3aa-20261101",
+  "evidenceSha256": {
+    "preflight.json": "743d4c1c3a180c460d8b4bd47abbe6dc45bf91b7126574e0e7d58e7b5710be5a",
+    "scope-amendment.json": "261b3c8375f05f4772342ec45ab38ab8031c6e38996767ceecdf480896a86ae9",
+    "final-software-gates.json": "f9d529414da4e5e01d5f25b86e5f81925479d1dbf85102b4a12c100235c26081",
+    "release-preparation/seven-assertions-unchanged.json": "8aed1b499b8bd9f6b1544e32312ad9e2eaf3a0df14744b8270952972424e80a8",
+    "release-preparation/seven-regressions-full-pass.json": "0ce403f6120b02e6f6f0119275a8bb892d9f990166690afbcecd295509acd30e",
+    "frames/source-bindings.json": "098aaf72ccbcf0ace0640449c69767edeb0bbee9c6275aa299f05e3966876561",
+    "frames/pixel-diff.json": "d9af528128493a941bed602445ce672151298d17562d2dfeab8475889e95abdd",
+    "live-chat/summary.json": "43f1cfec987482e76bc79b555b60661f5998651e41953fd5e410fb51e186eaa4",
+    "live-chat/long-session-summary.json": "44725401d60653f318afcbcbefdfd97fdb328824d1c7f7df73c962acb22741bc",
+    "live-source-binding.json": "8ad9c52f25d0b14c3e674e58c0712238a7a599018b9d9fdba93d7448df01b27f",
+    "release-preparation/release-apk.json": "1169ceb6c5258421b92e434d094869c345375273347bfec593abcaa22e56ddc9",
+    "release-preparation/validation-release.json": "eb4a765372620f9627d9c07bd73e3231f564dc939d036827099efc71b4170553",
+    "phone-upgrade/install-receipt.json": "8046ec60a183e5bb0c4bfd911c4f8788767329f248c7d7c6f356690e98bbcbf3",
+    "phone-upgrade/restore-verification.json": "713675858ac542ad3348e2c0cf660e610ee5f4b93b629784461217ad8ca5d8d9",
+    "phone-upgrade/restore-navigation-actions.jsonl": "1ac9c9d89cbe3fb7a83d93f376ca729e1ac15429188eeb6d0b6814bf93e2c886"
+  }
+}
