@@ -9,6 +9,7 @@ import 'package:smartfit/diagnostics/frame_recorder.dart';
 import 'package:smartfit/diagnostics/performance_report.dart';
 import 'package:smartfit/ui/performance_settings.dart';
 import 'package:smartfit/ui/theme.dart';
+import 'support/widget_test_timeout.dart';
 
 const _channel = MethodChannel('smartfit/performance');
 const _device = <String, Object?>{
@@ -55,6 +56,7 @@ class _ControlledService extends PerformanceReportService {
 }
 
 void main() {
+  configureWidgetTestTimeout();
   final binding = TestWidgetsFlutterBinding.ensureInitialized();
   final recorders = <FrameRecorder>[];
   var nextTimestamp = 1000000;

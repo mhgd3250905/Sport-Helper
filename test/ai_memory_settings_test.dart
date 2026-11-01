@@ -16,6 +16,7 @@ import 'package:smartfit/voice/voice_queue.dart';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
 
 import 'support.dart';
+import 'support/widget_test_timeout.dart';
 
 class _Storage implements LocalStateStorage {
   final values = <String, String>{};
@@ -81,6 +82,7 @@ Future<void> _confirmClear(WidgetTester tester) async {
 }
 
 void main() {
+  configureWidgetTestTimeout();
   testWidgets('no Key hides AI memory controls and AI service copy', (
     tester,
   ) async {

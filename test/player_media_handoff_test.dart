@@ -9,8 +9,10 @@ import 'package:smartfit/ui/theme.dart';
 import 'package:ugk_trainer/ugk_trainer.dart';
 
 import 'app_flow_test.dart' show services, tall;
+import 'support/widget_test_timeout.dart';
 
 void main() {
+  configureWidgetTestTimeout();
   testWidgets(
     'App media builder retains its handoff owner across rapid skips',
     (tester) async {

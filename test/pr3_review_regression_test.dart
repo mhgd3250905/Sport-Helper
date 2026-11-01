@@ -19,6 +19,7 @@ import 'package:ugk_trainer/ugk_trainer.dart'
     show TrainerRingPainter, UgkPlayPauseButton;
 
 import 'app_flow_test.dart' show services, tall;
+import 'support/widget_test_timeout.dart';
 
 const _two = TrainingPlan(
   id: 'two',
@@ -99,6 +100,7 @@ Widget _host(Widget child) => MaterialApp(
 );
 
 void main() {
+  configureWidgetTestTimeout();
   test('P1: cache-only videos retain verified metadata and all themed stills', () {
     final index = _json('assets/packs/index.json');
     final versions = {

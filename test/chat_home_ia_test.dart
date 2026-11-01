@@ -16,8 +16,10 @@ import 'app_flow_test.dart'
     show services, tall, showManualChatCard, pumpOperation;
 import 'support/coach_v2_fixtures.dart';
 import 'support/chat_sdk_support.dart';
+import 'support/widget_test_timeout.dart';
 
 void main() {
+  configureWidgetTestTimeout();
   late CoachV2Fixtures fixture;
   setUpAll(() async => fixture = await CoachV2Fixtures.load());
 

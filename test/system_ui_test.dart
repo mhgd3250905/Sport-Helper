@@ -15,6 +15,7 @@ import 'package:smartfit/ui/player_page.dart';
 import 'package:smartfit/ui/theme.dart';
 
 import 'app_flow_test.dart' show services, chatScroll;
+import 'support/widget_test_timeout.dart';
 
 const _plan = TrainingPlan(
   id: 'system-bars',
@@ -48,6 +49,7 @@ const _plan = TrainingPlan(
 );
 
 void main() {
+  configureWidgetTestTimeout();
   tearDown(() {
     SfColors.palette = SfPalette.dark;
   });

@@ -11,6 +11,7 @@ import 'package:ugk_trainer/ugk_trainer.dart' as trainer;
 import 'app_flow_test.dart'
     show MemoryStorage, services, tall, showManualChatCard;
 import 'support.dart';
+import 'support/widget_test_timeout.dart';
 
 double _lum(Color c) => c.computeLuminance();
 double contrast(Color fg, Color bg) {
@@ -30,6 +31,7 @@ Iterable<String> _assetsIn(WidgetTester tester) =>
     }).whereType<String>();
 
 void main() {
+  configureWidgetTestTimeout();
   tearDown(() => SfColors.palette = SfPalette.dark);
 
   group('offline theme-matched realistic media', () {

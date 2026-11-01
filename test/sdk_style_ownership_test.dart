@@ -4,8 +4,10 @@ import 'package:smartfit/ui/chat/coach_ui_adapter.dart';
 import 'package:smartfit/ui/theme.dart';
 import 'package:smartfit/ui/theme/polish_card.dart';
 import 'package:ugk_coach_ui/ugk_coach_ui.dart';
+import 'support/widget_test_timeout.dart';
 
 void main() {
+  configureWidgetTestTimeout();
   for (final palette in [SfPalette.light, SfPalette.dark]) {
     testWidgets(
       'recommendations keep SDK surfaces, controls and typography in ${palette.brightness.name}',

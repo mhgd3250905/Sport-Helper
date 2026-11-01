@@ -22,6 +22,7 @@ import 'package:smartfit/ui/theme.dart';
 import 'package:smartfit/voice/voice_library.dart';
 import 'package:smartfit/voice/voice_queue.dart';
 import 'package:ugk_trainer/ugk_trainer.dart' show DrillMediaPlaybackSnapshot;
+import 'support/widget_test_timeout.dart';
 
 class _Storage implements LocalStateStorage {
   final values = <String, String>{};
@@ -143,6 +144,7 @@ Future<void> _show(
 }
 
 void main() {
+  configureWidgetTestTimeout();
   TestWidgetsFlutterBinding.ensureInitialized();
   final messenger =
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;

@@ -18,6 +18,7 @@ import 'package:smartfit/voice/voice_queue.dart';
 import 'package:ugk_trainer/ugk_trainer.dart' as trainer;
 
 import 'support.dart';
+import 'support/widget_test_timeout.dart';
 
 const _plan = TrainingPlan(
   id: 'transition-boundary',
@@ -295,6 +296,7 @@ bool _hasCompletion(WidgetTester tester) => find
     .isNotEmpty;
 
 void main() {
+  configureWidgetTestTimeout();
   late _NativeVideo native;
   setUp(() {
     native = _NativeVideo();

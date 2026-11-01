@@ -10,6 +10,7 @@ import 'package:smartfit/voice/voice_library.dart';
 import 'package:smartfit/voice/voice_queue.dart';
 
 import 'support.dart';
+import 'support/widget_test_timeout.dart';
 
 class _MemoryStorage implements LocalStateStorage {
   final _data = <String, String>{};
@@ -22,6 +23,7 @@ class _MemoryStorage implements LocalStateStorage {
 }
 
 void main() {
+  configureWidgetTestTimeout();
   const matcher = DescriptionMatcher();
 
   test('built-in discomfort descriptions protect the affected part', () {

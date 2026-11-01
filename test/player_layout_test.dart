@@ -9,6 +9,7 @@ import 'package:smartfit/ui/player_page.dart';
 import 'package:smartfit/ui/theme.dart';
 
 import 'app_flow_test.dart' show services, tall;
+import 'support/widget_test_timeout.dart';
 
 const _two = TrainingPlan(
   id: 'two', source: 'template', title: '两个动作', summary: '', goal: 'relax', scene: 'home',
@@ -20,6 +21,7 @@ const _two = TrainingPlan(
 );
 
 void main() {
+  configureWidgetTestTimeout();
   testWidgets('prep → work → rest: the ring, the name and the controls stay put', (tester) async {
     tall(tester);
     final s = services();

@@ -19,6 +19,7 @@ import 'package:ugk_trainer/ugk_trainer.dart'
 
 import 'app_flow_test.dart'
     show services, showManualChatCard, warmTrainingPoster, chatScroll;
+import 'support/widget_test_timeout.dart';
 
 enum _Entry { chatCollapsed, chatExpanded, savedPlan, guide }
 
@@ -116,6 +117,7 @@ Finder _sourcePage(_Entry entry) => find.byType(switch (entry) {
 }, skipOffstage: false);
 
 void main() {
+  configureWidgetTestTimeout();
   for (final palette in [SfPalette.light, SfPalette.dark]) {
     for (final entry in _Entry.values) {
       testWidgets(

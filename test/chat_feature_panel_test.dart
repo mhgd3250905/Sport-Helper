@@ -8,10 +8,12 @@ import 'package:smartfit/ui/chat/saved_plans_page.dart';
 
 import 'app_flow_test.dart'
     show MemoryStorage, services, tall, showManualChatCard;
+import 'support/widget_test_timeout.dart';
 
 const _toggle = ValueKey('chat-panel-toggle');
 
 void main() {
+  configureWidgetTestTimeout();
   test(
     'obsolete keyboard height is ignored without disturbing preferences',
     () async {

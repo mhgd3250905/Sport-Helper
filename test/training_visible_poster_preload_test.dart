@@ -7,6 +7,7 @@ import 'package:smartfit/ui/training_poster_image.dart';
 import 'package:smartfit/ui/training_visible_poster_preload.dart';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
 import 'package:ugk_trainer/ugk_trainer.dart';
+import 'support/widget_test_timeout.dart';
 
 class _RecordingAssets extends CachingAssetBundle {
   final loads = <String>[];
@@ -45,6 +46,7 @@ Future<ImageInfo> _decodedImage(ImageProvider provider, BuildContext context) {
 }
 
 void main() {
+  configureWidgetTestTimeout();
   late coach.PoseHubAppTestCatalog catalog;
   setUpAll(() async => catalog = await PoseHubActionLibrary.load());
 

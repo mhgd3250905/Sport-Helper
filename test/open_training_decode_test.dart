@@ -13,6 +13,7 @@ import 'package:smartfit/ui/theme.dart';
 import 'package:smartfit/ui/training_poster_image.dart';
 
 import 'app_flow_test.dart' show services;
+import 'support/widget_test_timeout.dart';
 
 class _SlowPosters extends CachingAssetBundle {
   final image = Completer<ByteData>();
@@ -28,6 +29,7 @@ class _SlowPosters extends CachingAssetBundle {
 }
 
 void main() {
+  configureWidgetTestTimeout();
   for (final palette in [SfPalette.light, SfPalette.dark]) {
     testWidgets(
       '${palette.brightness.name}: decode admission times out at 150ms without starting or pushing an empty page',

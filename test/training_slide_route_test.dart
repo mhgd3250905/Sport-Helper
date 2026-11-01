@@ -7,6 +7,7 @@ import 'package:smartfit/app/training_transition_activity.dart';
 import 'package:smartfit/diagnostics/frame_recorder.dart';
 import 'package:smartfit/diagnostics/training_transition_timings.dart';
 import 'package:smartfit/ui/training_route.dart';
+import 'support/widget_test_timeout.dart';
 
 const _open = ValueKey('slide-probe-open');
 const _otherNavigation = ValueKey('slide-probe-other-navigation');
@@ -19,6 +20,7 @@ const _retry = ValueKey('slide-probe-retry-view');
 const _slide = ValueKey('training-slide');
 
 void main() {
+  configureWidgetTestTimeout();
   TestWidgetsFlutterBinding.ensureInitialized();
 
   setUp(() {

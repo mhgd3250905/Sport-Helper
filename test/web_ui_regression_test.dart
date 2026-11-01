@@ -12,6 +12,7 @@ import 'package:smartfit/voice/voice_library.dart';
 import 'package:smartfit/voice/voice_queue.dart';
 
 import 'support.dart';
+import 'support/widget_test_timeout.dart';
 
 class _Storage implements LocalStateStorage {
   @override
@@ -78,6 +79,7 @@ Future<void> _show(
 }
 
 void main() {
+  configureWidgetTestTimeout();
   testWidgets('manual replacement cannot add unavailable equipment', (
     tester,
   ) async {

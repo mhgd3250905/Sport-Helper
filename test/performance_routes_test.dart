@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smartfit/diagnostics/frame_recorder.dart';
 import 'package:smartfit/diagnostics/performance_routes.dart';
+import 'support/widget_test_timeout.dart';
 
 void main() {
+  configureWidgetTestTimeout();
   TestWidgetsFlutterBinding.ensureInitialized();
 
   testWidgets('navigation restores each previous fixed page label on pop', (

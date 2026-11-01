@@ -9,11 +9,13 @@ import 'package:smartfit/ui/training_route.dart';
 
 import 'app_flow_test.dart'
     show services, showManualChatCard, warmTrainingPoster, chatScroll;
+import 'support/widget_test_timeout.dart';
 
 Finder _key(String value, {bool offstage = false}) =>
     find.byKey(ValueKey(value), skipOffstage: !offstage);
 
 void main() {
+  configureWidgetTestTimeout();
   for (final palette in [SfPalette.light, SfPalette.dark]) {
     testWidgets(
       '${palette.brightness.name}: IME hide at 150ms cannot move the source list',

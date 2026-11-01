@@ -11,6 +11,7 @@ import 'app_flow_test.dart' show MemoryStorage, tall, pumpOperation;
 import 'support/coach_v2_fixtures.dart';
 import 'support/chat_sdk_support.dart';
 import 'package:ugk_coach_chat/ugk_coach_chat.dart';
+import 'support/widget_test_timeout.dart';
 
 late CoachV2Fixtures fixtures;
 
@@ -52,6 +53,7 @@ Future<void> _settleRequest(
 }
 
 void main() {
+  configureWidgetTestTimeout();
   TestWidgetsFlutterBinding.ensureInitialized();
   setUpAll(() async => fixtures = await CoachV2Fixtures.load());
 

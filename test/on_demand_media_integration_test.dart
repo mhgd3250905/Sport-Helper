@@ -24,6 +24,7 @@ import 'package:smartfit/voice/voice_queue.dart';
 import 'package:ugk_trainer/ugk_trainer.dart' as trainer;
 
 import 'support.dart';
+import 'support/widget_test_timeout.dart';
 
 class _Storage implements LocalStateStorage {
   final data = <String, String>{};
@@ -173,6 +174,7 @@ Future<void> _open(
 }
 
 void main() {
+  configureWidgetTestTimeout();
   TestWidgetsFlutterBinding.ensureInitialized();
 
   test(

@@ -18,6 +18,7 @@ import 'package:smartfit/ui/theme/countdown.dart';
 import 'package:smartfit/ui/theme/transitions.dart';
 
 import 'app_flow_test.dart' show services, tall;
+import 'support/widget_test_timeout.dart';
 
 Widget _host(Widget child, {bool reduced = false}) => MaterialApp(
   theme: buildTheme(),
@@ -61,6 +62,7 @@ const _hold = TrainingPlan(
 );
 
 void main() {
+  configureWidgetTestTimeout();
   testWidgets(
     'countdown: the last seconds breathe; reduced motion only changes colour',
     (tester) async {

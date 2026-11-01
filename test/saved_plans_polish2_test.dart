@@ -12,6 +12,7 @@ import 'package:smartfit/ui/theme.dart';
 import 'package:ugk_coach_ui/ugk_coach_ui.dart';
 
 import 'app_flow_test.dart' show services;
+import 'support/widget_test_timeout.dart';
 
 TrainingPlan _plan(int index) => TrainingPlan(
   id: 'polish2-plan-$index',
@@ -134,6 +135,7 @@ List<BoxDecoration> _decorations(WidgetTester tester, Finder finder) => [
 ];
 
 void main() {
+  configureWidgetTestTimeout();
   tearDown(() => SfColors.palette = SfPalette.dark);
 
   for (final palette in [SfPalette.light, SfPalette.dark]) {

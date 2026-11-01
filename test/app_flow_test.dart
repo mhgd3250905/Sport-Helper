@@ -28,6 +28,7 @@ import 'support/coach_v2_fixtures.dart';
 import 'support/chat_sdk_support.dart';
 import 'package:smartfit/app/coach_chat.dart';
 import 'package:ugk_coach_ui/ugk_coach_ui.dart' show CoachOptionPill;
+import 'support/widget_test_timeout.dart';
 
 class MemoryStorage implements LocalStateStorage {
   final data = <String, String>{};
@@ -250,6 +251,7 @@ ScrollController chatScroll(WidgetTester tester) => tester
     .controller!;
 
 void main() {
+  configureWidgetTestTimeout();
   testWidgets(
     'skipping the last exercise while paused still records the result',
     (tester) async {

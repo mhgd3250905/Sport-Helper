@@ -12,6 +12,7 @@ import 'package:ugk_coach/ugk_coach.dart' as coach;
 import 'package:ugk_trainer/ugk_trainer.dart';
 
 import 'posehub_ui_support.dart';
+import 'support/widget_test_timeout.dart';
 
 class _Voice extends MutedVoiceOutput {
   var begins = 0;
@@ -52,6 +53,7 @@ TrainingPlan _plan(List<coach.PoseHubPackAction> actions) => TrainingPlan(
 );
 
 void main() {
+  configureWidgetTestTimeout();
   final binding = TestWidgetsFlutterBinding.ensureInitialized();
   late coach.PoseHubAppTestCatalog catalog;
   late PoseHubUiVideoPlatform platform;

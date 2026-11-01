@@ -4,8 +4,10 @@ import 'package:smartfit/main.dart';
 import 'package:smartfit/ui/library_page.dart';
 
 import 'app_flow_test.dart' show services, tall;
+import 'support/widget_test_timeout.dart';
 
 void main() {
+  configureWidgetTestTimeout();
   testWidgets('route return leaves composer unfocused until an explicit tap', (
     tester,
   ) async {

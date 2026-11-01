@@ -9,6 +9,7 @@ import 'package:smartfit/diagnostics/training_transition_timings.dart';
 import 'package:smartfit/diagnostics/training_transition_timings_storage.dart';
 import 'package:smartfit/ui/theme.dart';
 import 'package:smartfit/ui/training_transition_timings_page.dart';
+import 'support/widget_test_timeout.dart';
 
 class _Storage implements TrainingTransitionTimingsStorage {
   @override
@@ -18,6 +19,7 @@ class _Storage implements TrainingTransitionTimingsStorage {
 }
 
 void main() {
+  configureWidgetTestTimeout();
   var now = 1000;
   late TrainingTransitionTimings recorder;
   final binding = TestWidgetsFlutterBinding.ensureInitialized();

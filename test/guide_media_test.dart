@@ -12,6 +12,7 @@ import 'package:ugk_coach/ugk_coach.dart' as coach;
 import 'package:ugk_trainer/ugk_trainer.dart';
 
 import 'posehub_ui_support.dart';
+import 'support/widget_test_timeout.dart';
 
 class _VideoPlatform extends PackedAlphaPlatform
     implements PackedAlphaUriPlatform {
@@ -65,6 +66,7 @@ double _opacity(WidgetTester tester, String slot) => tester
     .value;
 
 void main() {
+  configureWidgetTestTimeout();
   late coach.PoseHubAppTestCatalog catalog;
   late _VideoPlatform platform;
   setUpAll(() async => catalog = await PoseHubActionLibrary.load());

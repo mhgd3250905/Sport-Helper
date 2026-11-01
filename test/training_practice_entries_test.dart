@@ -18,6 +18,7 @@ import 'package:ugk_coach_ui/ugk_coach_ui.dart';
 import 'package:ugk_trainer/ugk_trainer.dart';
 
 import 'posehub_ui_support.dart';
+import 'support/widget_test_timeout.dart';
 
 enum _Entry { actionLibrary, recommendation }
 
@@ -96,6 +97,7 @@ void _expectCompletePreview(WidgetTester tester, {required bool gated}) {
 }
 
 void main() {
+  configureWidgetTestTimeout();
   final binding = TestWidgetsFlutterBinding.ensureInitialized();
   late coach.PoseHubAppTestCatalog catalog;
   late ExerciseLibrary library;

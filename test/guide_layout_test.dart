@@ -8,6 +8,7 @@ import 'package:smartfit/ui/plan_page.dart';
 import 'package:smartfit/ui/theme.dart';
 
 import 'app_flow_test.dart' show services;
+import 'support/widget_test_timeout.dart';
 
 TrainingPlan _plan({int count = 3}) => TrainingPlan(
   id: 'guide-layout',
@@ -93,6 +94,7 @@ ListView _list(WidgetTester tester) =>
     tester.widget<ListView>(_key('plan-article'));
 
 void main() {
+  configureWidgetTestTimeout();
   tearDown(() => SfColors.palette = SfPalette.dark);
 
   for (final palette in [SfPalette.light, SfPalette.dark]) {

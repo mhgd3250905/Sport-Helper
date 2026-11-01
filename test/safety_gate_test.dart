@@ -16,8 +16,10 @@ import 'package:smartfit/domain/session.dart' show trainerPlan;
 import 'package:ugk_coach/ugk_coach.dart' as coach;
 import 'support/chat_sdk_support.dart';
 import 'support/coach_v2_fixtures.dart';
+import 'support/widget_test_timeout.dart';
 
 void main() {
+  configureWidgetTestTimeout();
   testWidgets(
     'first launch: the custom form cannot bypass safety with custom plans or templates',
     (tester) async {

@@ -8,6 +8,7 @@ import 'package:smartfit/diagnostics/log_export.dart';
 import 'package:smartfit/diagnostics/runtime_log.dart';
 import 'package:smartfit/ui/runtime_log_settings.dart';
 import 'package:smartfit/ui/theme.dart';
+import 'support/widget_test_timeout.dart';
 
 class _Exporter implements RuntimeLogExporter {
   final pending = Completer<LogExportResult>();
@@ -46,6 +47,7 @@ Future<void> _show(
 }
 
 void main() {
+  configureWidgetTestTimeout();
   TestWidgetsFlutterBinding.ensureInitialized();
   const channel = MethodChannel('smartfit/runtime_log_export');
   final messenger =

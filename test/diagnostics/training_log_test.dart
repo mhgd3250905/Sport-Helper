@@ -12,12 +12,14 @@ import 'package:smartfit/domain/exercise.dart' as app_exercise;
 import 'package:ugk_trainer/ugk_trainer.dart';
 
 import '../app_flow_test.dart' as fixture;
+import '../support/widget_test_timeout.dart';
 
 List<Map<String, dynamic>> events(RuntimeLog log) =>
     (jsonDecode(log.exportJson())['events'] as List)
         .cast<Map<String, dynamic>>();
 
 void main() {
+  configureWidgetTestTimeout();
   TestWidgetsFlutterBinding.ensureInitialized();
 
   testWidgets(

@@ -27,6 +27,7 @@ import 'package:ugk_trainer/ugk_trainer.dart' as trainer;
 import 'app_flow_test.dart' show MemoryStorage;
 import 'support.dart';
 import 'posehub_ui_support.dart' show PoseHubUiRepository;
+import 'support/widget_test_timeout.dart';
 
 /// Read the real installed-path bundle in setUpAll's real async zone. Widget
 /// fake-async tests then decode those same bytes without stranding file handles.
@@ -114,6 +115,7 @@ Future<List<int>> _fixtureImage() async {
 }
 
 void main() {
+  configureWidgetTestTimeout();
   TestWidgetsFlutterBinding.ensureInitialized();
   late ExerciseLibrary plain;
   late ExerciseLibrary library;

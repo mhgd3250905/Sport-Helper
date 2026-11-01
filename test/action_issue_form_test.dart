@@ -7,6 +7,7 @@ import 'package:smartfit/diagnostics/action_issue.dart';
 import 'package:smartfit/diagnostics/action_issue_store.dart';
 import 'package:smartfit/ui/action_issue_form.dart';
 import 'package:smartfit/ui/theme.dart';
+import 'support/widget_test_timeout.dart';
 
 class _Storage implements LocalStateStorage {
   String? value;
@@ -55,6 +56,7 @@ Future<void> _show(
 );
 
 void main() {
+  configureWidgetTestTimeout();
   testWidgets(
     'light form saves optional tags and a note only after durable write',
     (tester) async {

@@ -17,6 +17,7 @@ import 'package:ugk_coach/ugk_coach.dart' as coach;
 import 'package:ugk_trainer/ugk_trainer.dart' as trainer;
 
 import 'support.dart';
+import 'support/widget_test_timeout.dart';
 
 class _Storage implements LocalStateStorage {
   final values = <String, String>{};
@@ -127,6 +128,7 @@ Future<void> _advance(WidgetTester tester, int seconds) async {
 }
 
 void main() {
+  configureWidgetTestTimeout();
   testWidgets(
     'missing repSeconds counts automatically with trainer default pacing',
     (tester) async {

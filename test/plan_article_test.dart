@@ -16,6 +16,7 @@ import 'package:ugk_trainer/ugk_trainer.dart'
     show PackedAlphaPlatform, PackedAlphaUriPlatform, UgkPackedAlphaVideo;
 
 import 'app_flow_test.dart' show services, warmTrainingPoster;
+import 'support/widget_test_timeout.dart';
 
 const _plan = TrainingPlan(
   id: 'article',
@@ -244,6 +245,7 @@ String? _asset(ImageProvider provider) => switch (provider) {
 };
 
 void main() {
+  configureWidgetTestTimeout();
   late _PreviewPlatform platform;
   setUp(() {
     platform = _PreviewPlatform();

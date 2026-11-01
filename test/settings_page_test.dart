@@ -15,8 +15,10 @@ import 'package:smartfit/ui/training_media_settings.dart';
 
 import 'posehub_ui_support.dart';
 import 'settings_support.dart';
+import 'support/widget_test_timeout.dart';
 
 void main() {
+  configureWidgetTestTimeout();
   TestWidgetsFlutterBinding.ensureInitialized();
   setUpAll(() async {
     await AppBuildInfo.initialize(

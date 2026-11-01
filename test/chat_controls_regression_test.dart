@@ -12,6 +12,7 @@ import 'package:smartfit/voice/voice_queue.dart';
 import 'package:ugk_coach_ui/ugk_coach_ui.dart';
 
 import 'support.dart';
+import 'support/widget_test_timeout.dart';
 
 class _MemoryStorage implements LocalStateStorage {
   @override
@@ -21,6 +22,7 @@ class _MemoryStorage implements LocalStateStorage {
 }
 
 void main() {
+  configureWidgetTestTimeout();
   testWidgets('the empty plans page scrolls in a small landscape viewport', (
     tester,
   ) async {

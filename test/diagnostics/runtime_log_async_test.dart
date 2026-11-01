@@ -8,6 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:smartfit/app/training_transition_activity.dart';
 import 'package:smartfit/core/storage/local_state_storage.dart';
 import 'package:smartfit/diagnostics/runtime_log.dart';
+import '../support/widget_test_timeout.dart';
 
 class _Storage implements LocalStateStorage {
   final values = <String>[];
@@ -35,6 +36,7 @@ Map<String, Object?> _encodeInDifferentIsolate(Map<String, Object?> request) =>
     };
 
 void main() {
+  configureWidgetTestTimeout();
   testWidgets('automatic bursts encode once after the caller yields', (
     tester,
   ) async {

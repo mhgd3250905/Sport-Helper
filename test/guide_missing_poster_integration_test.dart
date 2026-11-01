@@ -16,6 +16,7 @@ import 'package:ugk_trainer/ugk_trainer.dart';
 
 import 'app_flow_test.dart' show services;
 import 'posehub_ui_support.dart';
+import 'support/widget_test_timeout.dart';
 
 class _MissingImages extends CachingAssetBundle {
   @override
@@ -113,6 +114,7 @@ String? _filePath(ImageProvider provider) => switch (provider) {
 };
 
 void main() {
+  configureWidgetTestTimeout();
   final binding = TestWidgetsFlutterBinding.ensureInitialized();
   const channel = MethodChannel('smartfit/guide_poster');
   late coach.PoseHubAppTestCatalog catalog;

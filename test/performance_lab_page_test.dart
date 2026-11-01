@@ -4,8 +4,10 @@ import 'package:smartfit/diagnostics/frame_recorder.dart';
 import 'package:smartfit/diagnostics/performance_report.dart';
 import 'package:smartfit/ui/performance_lab_page.dart';
 import 'package:smartfit/ui/theme.dart';
+import 'support/widget_test_timeout.dart';
 
 void main() {
+  configureWidgetTestTimeout();
   testWidgets(
     'ten fixed real-workload cells retain normal appearance and no experiment switches',
     (tester) async {

@@ -10,8 +10,10 @@ import 'package:smartfit/ui/training_route.dart';
 
 import 'app_flow_test.dart'
     show services, tall, showManualChatCard, warmTrainingPoster;
+import 'support/widget_test_timeout.dart';
 
 void main() {
+  configureWidgetTestTimeout();
   testWidgets('appearance changes keep a pushed route and conversation state', (
     tester,
   ) async {

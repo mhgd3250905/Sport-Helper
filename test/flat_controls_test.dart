@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smartfit/ui/theme.dart';
+import 'support/widget_test_timeout.dart';
 
 void main() {
+  configureWidgetTestTimeout();
   tearDown(() => SfColors.palette = SfPalette.dark);
 
   testWidgets('segmented thumb stays flat and still activates choices', (
