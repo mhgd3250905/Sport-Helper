@@ -23,7 +23,10 @@ class CoachChatDiagnostics {
       CoachGatewayBinding(
         create: () async {
           final lease = await gateway.create();
-          final client = _ObservedChatClient(lease.client, this);
+          final inner = lease.client;
+          final client = inner is coach.OpenAiCompatibleClient
+              ? _ObservedOpenAiChatClient(inner, this)
+              : _ObservedChatClient(inner, this);
           final release = lease.release;
           return release == null
               ? CoachClientLease.shared(client)
@@ -51,6 +54,19 @@ class CoachChatDiagnostics {
         // SDK publishes this before the display notification starts the trace.
         _userInputs[detail.messageId] = detail;
       }
+      return;
+    }
+    if (event == 'chat.turn.result' && detail is Map<String, Object?>) {
+      log.recordDeveloper(
+        'coach_chat.chat.turn.result',
+        operation: _operation,
+        fields: {
+          'status': detail['status'],
+          'errorType': detail['errorType'],
+          'kind': detail['failureKind'],
+        },
+        data: detail,
+      );
       return;
     }
     if (detail is! coach.AgentEvent) {
@@ -142,6 +158,32 @@ class CoachChatDiagnostics {
     _trace = null;
     _watch = null;
   }
+}
+
+/// Preserve the concrete public encoder used by the SDK's context budget while
+/// observing the same client, transport, cancellation and lease release.
+class _ObservedOpenAiChatClient extends _ObservedChatClient
+    implements coach.OpenAiCompatibleClient {
+  _ObservedOpenAiChatClient(
+    coach.OpenAiCompatibleClient super.inner,
+    super.owner,
+  );
+
+  coach.OpenAiCompatibleClient get _client =>
+      inner as coach.OpenAiCompatibleClient;
+
+  @override
+  coach.LlmConfig get config => _client.config;
+
+  @override
+  coach.AuthProvider get auth => _client.auth;
+
+  @override
+  Map<String, Object?> buildBody(coach.LlmRequest request) =>
+      _client.buildBody(request);
+
+  @override
+  void close() => _client.close();
 }
 
 class _ObservedChatClient implements coach.LlmClient {

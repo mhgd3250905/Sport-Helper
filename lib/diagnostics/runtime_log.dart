@@ -148,6 +148,7 @@ class RuntimeLog {
     'ai.tool.requested',
     'ai.tool.result',
     'ai.agent.event',
+    'coach_chat.chat.turn.result',
     'chat.session.archived',
   };
 
