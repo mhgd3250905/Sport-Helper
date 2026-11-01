@@ -78,7 +78,7 @@ CoachChatController createSmartfitChat(
           ),
           controller: () => controller,
           observer: diagnostics.observe,
-          beforeHistoryWrite: diagnostics.flushArchives,
+          beforeNewConversation: diagnostics.archiveConversation,
         ),
     replyDelay: services.chatReplyDelay,
     prepareReply: services.media == null
@@ -97,18 +97,16 @@ CoachChatBindings smartfitCoachChatBindings(
   CoachGatewayBinding? gateway,
   CoachChatController Function()? controller,
   CoachChatObserver? observer,
-  Future<void> Function()? beforeHistoryWrite,
+  Future<void> Function(CoachChatSnapshot snapshot)? beforeNewConversation,
 }) => CoachChatBindings(
   storageNamespace: smartfitCoachChatNamespace,
   gateway: gateway ?? smartfitCoachGateway(services),
   plans: SmartfitCoachPlanStore(services.store),
-  history: SmartfitCoachChatHistoryStore(
-    services.store,
-    beforeWrite: beforeHistoryWrite,
-  ),
+  history: SmartfitCoachChatHistoryStore(services.store),
   preferences: SmartfitCoachChatPreferenceStore(services.store),
   memory: services.userMemoryStore,
   actions: smartfitCoachChatActions(services, controller: controller),
+  beforeNewConversation: beforeNewConversation,
   observer:
       observer ??
       (event, detail) => RuntimeLog.instance.record(
@@ -180,7 +178,10 @@ CoachChatHostActions smartfitCoachChatActions(
             sourceEntry: 'saved_plan',
           ),
         ),
-        onCompose: () => Navigator.of(context).pop(),
+        onCompose: () {
+          Navigator.of(context).pop();
+          chat().requestCompose();
+        },
         onDetails: (saved, sourceContext) =>
             _openSavedDetails(sourceContext, chat(), services.store, saved),
       ),

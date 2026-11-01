@@ -590,8 +590,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: b025ee88bd1a6d69564ce96a473302739c981c3b
-      resolved-ref: b025ee88bd1a6d69564ce96a473302739c981c3b
+      ref: a13e3b674359c93c941f7f59d1edf09a6d609487
+      resolved-ref: a13e3b674359c93c941f7f59d1edf09a6d609487
       url: "https://github.com/mhgd3250905/ugk-3d-pose-sdk.git"
     source: git
     version: "0.8.0"
@@ -599,8 +599,8 @@ packages:
     dependency: "direct main"
     description:
       path: "packages/ugk_coach_chat"
-      ref: b025ee88bd1a6d69564ce96a473302739c981c3b
-      resolved-ref: b025ee88bd1a6d69564ce96a473302739c981c3b
+      ref: a13e3b674359c93c941f7f59d1edf09a6d609487
+      resolved-ref: a13e3b674359c93c941f7f59d1edf09a6d609487
       url: "https://github.com/mhgd3250905/ugk-3d-pose-sdk.git"
     source: git
     version: "0.1.0"
@@ -608,8 +608,8 @@ packages:
     dependency: "direct main"
     description:
       path: "packages/ugk_coach_ui"
-      ref: b025ee88bd1a6d69564ce96a473302739c981c3b
-      resolved-ref: b025ee88bd1a6d69564ce96a473302739c981c3b
+      ref: a13e3b674359c93c941f7f59d1edf09a6d609487
+      resolved-ref: a13e3b674359c93c941f7f59d1edf09a6d609487
       url: "https://github.com/mhgd3250905/ugk-3d-pose-sdk.git"
     source: git
     version: "0.4.0"
@@ -617,8 +617,8 @@ packages:
     dependency: "direct main"
     description:
       path: "packages/ugk_trainer"
-      ref: b025ee88bd1a6d69564ce96a473302739c981c3b
-      resolved-ref: b025ee88bd1a6d69564ce96a473302739c981c3b
+      ref: a13e3b674359c93c941f7f59d1edf09a6d609487
+      resolved-ref: a13e3b674359c93c941f7f59d1edf09a6d609487
       url: "https://github.com/mhgd3250905/ugk-3d-pose-sdk.git"
     source: git
     version: "0.6.0"
@@ -626,8 +626,8 @@ packages:
     dependency: "direct main"
     description:
       path: "packages/ugk_trainer_runtime"
-      ref: b025ee88bd1a6d69564ce96a473302739c981c3b
-      resolved-ref: b025ee88bd1a6d69564ce96a473302739c981c3b
+      ref: a13e3b674359c93c941f7f59d1edf09a6d609487
+      resolved-ref: a13e3b674359c93c941f7f59d1edf09a6d609487
       url: "https://github.com/mhgd3250905/ugk-3d-pose-sdk.git"
     source: git
     version: "0.1.0"

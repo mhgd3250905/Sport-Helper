@@ -52,9 +52,8 @@ class SmartfitCoachPlanStore extends CoachPlanStorageAdapter {
 
 /// New envelopes use their own namespace/key; all three legacy fields survive.
 class SmartfitCoachChatHistoryStore extends CoachChatHistoryStore {
-  SmartfitCoachChatHistoryStore(this.store, {this.beforeWrite});
+  SmartfitCoachChatHistoryStore(this.store);
   final AppStore store;
-  final Future<void> Function()? beforeWrite;
 
   @override
   Future<CoachChatSnapshot?> load(String namespace) async {
@@ -64,7 +63,6 @@ class SmartfitCoachChatHistoryStore extends CoachChatHistoryStore {
 
   @override
   Future<void> write(String namespace, CoachChatSnapshot snapshot) async {
-    await beforeWrite?.call();
     await store.writeChatEnvelope(namespace, snapshot.toJson());
   }
 

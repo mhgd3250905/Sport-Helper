@@ -23,7 +23,7 @@ const _inputs = [
   '推荐几个拉大腿内侧的动作',
   '换一套，缩短到3分钟',
 ];
-const _sdk = 'b025ee88bd1a6d69564ce96a473302739c981c3b';
+const _sdk = 'a13e3b674359c93c941f7f59d1edf09a6d609487';
 
 class _Storage implements LocalStateStorage {
   final values = <String, String>{};

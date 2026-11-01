@@ -16,10 +16,8 @@ class CoachChatDiagnostics {
   String? _operation, _turnId;
   int _step = 0, _attempt = 0;
   final _seen = <String>{};
+  final _userInputs = <String, CoachChatUserInput>{};
   bool _initial = true;
-  CoachChatSnapshot? _previous;
-  bool _resetArchiveQueued = false;
-  Future<void> _archives = Future.value();
 
   CoachGatewayBinding observeGateway(CoachGatewayBinding gateway) =>
       CoachGatewayBinding(
@@ -40,6 +38,7 @@ class CoachChatDiagnostics {
       (_) {},
       onDone: () {
         _finish();
+        _userInputs.clear();
         controller.removeListener(_changed);
         _controller = null;
       },
@@ -47,6 +46,13 @@ class CoachChatDiagnostics {
   }
 
   void observe(String event, Object? detail) {
+    if (event == 'chat.user' && detail is CoachChatUserInput) {
+      if (!_seen.contains(detail.messageId)) {
+        // SDK publishes this before the display notification starts the trace.
+        _userInputs[detail.messageId] = detail;
+      }
+      return;
+    }
     if (detail is! coach.AgentEvent) {
       log.record(
         'coach_chat.$event',
@@ -94,58 +100,21 @@ class CoachChatDiagnostics {
     }
     for (final message in controller.messages) {
       if (!_seen.add(message.id) || _initial || !message.isUser) continue;
+      final input = _userInputs.remove(message.id);
       log.recordDeveloper(
         'chat.user',
         operation: _operation,
-        data: {'text': message.text},
+        data: {'text': input?.rawText ?? message.text},
       );
     }
     _initial = false;
     if (!controller.typing && _trace != null) _finish();
-    // SDK has no public reset observer. Preserve the latest complete public
-    // snapshot when an entire display is replaced by a new empty conversation.
-    // This observes storage history only; it never modifies the SDK lifecycle.
-    try {
-      final snapshot = controller.exportSnapshot();
-      final previous = _previous;
-      final state = snapshot.session.sessionState;
-      final fresh =
-          state.userTurns.isEmpty &&
-          state.params.isEmpty &&
-          state.plans.isEmpty;
-      final previousState = previous?.session.sessionState;
-      final hadCore =
-          previousState != null &&
-          (previousState.userTurns.isNotEmpty ||
-              previousState.params.isNotEmpty ||
-              previousState.plans.isNotEmpty);
-      final ids = snapshot.messages.map((message) => message['id']).toSet();
-      final displayReplaced =
-          previous != null &&
-          previous.messages.isNotEmpty &&
-          previous.messages.every((message) => !ids.contains(message['id']));
-      // Core reset notifies before display replacement. Archive the complete
-      // pre-reset public snapshot once, before either intermediate publication.
-      if (previous != null &&
-          fresh &&
-          !_resetArchiveQueued &&
-          (hadCore || displayReplaced)) {
-        log.record('chat.conversation.new');
-        _archives = _archives.then(
-          (_) => log.archiveSession(previous.session.toJson()),
-        );
-        _resetArchiveQueued = !displayReplaced;
-      } else if (displayReplaced && _resetArchiveQueued) {
-        _resetArchiveQueued = false;
-      }
-      if (!fresh) _resetArchiveQueued = false;
-      _previous = snapshot;
-    } on StateError {
-      // start() may still be reading stores; no session is exported yet.
-    }
   }
 
-  Future<void> flushArchives() => _archives;
+  Future<void> archiveConversation(CoachChatSnapshot snapshot) {
+    log.record('chat.conversation.new');
+    return log.archiveSession(snapshot.session.toJson());
+  }
 
   void _finish() {
     if (_trace == null) return;

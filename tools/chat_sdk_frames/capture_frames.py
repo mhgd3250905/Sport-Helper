@@ -15,7 +15,7 @@ import subprocess
 from urllib.parse import unquote, urlparse
 
 HERE = Path(__file__).resolve().parent
-SDK_PIN = "b025ee88bd1a6d69564ce96a473302739c981c3b"
+SDK_PIN = "a13e3b674359c93c941f7f59d1edf09a6d609487"
 SDK_PACKAGES = {"ugk_coach", "ugk_coach_ui", "ugk_trainer", "ugk_trainer_runtime", "ugk_coach_chat"}
 
 
