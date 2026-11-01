@@ -1,5 +1,9 @@
 # 智能健身助手 SmartFit
 
+## +52 对话 SDK 候选（2026-11-01，门禁阻断）
+
+`codex/coach-chat-sdk` / `0.1.0+52`，五包固定 SDK `b025ee8`；22 张浅深帧零差、真实三轮双时长通过。最终全量 667 通过、7 失败、0 跳过，严格分析 0；四类 SDK 兼容缺口尚未修复，未出 APK、未推送或合并。详见[本轮一页报告](docs/coach-chat-sdk-plus52-2026-11-01.md)。下方记录保留各原时点事实。
+
 ## +50 main 本地升版与新包（2026-10-31）
 
 已先快进同步远端 main 13c0bb4（PR #6 已合入 6ef2e3a），再补本地 **0.1.0+50 / 2050**。本轮打包/测试源 `4ef76006d47e06cdeacdcdc77a647436284ab98f`；生成卡实现及四个 RepaintBoundary 原样保留，SDK/lock 不变。main 重新全量 **861/861、0 失败/跳过**，fatal-infos 分析 **0 问题**；新 release **42,657,546B / 42.658MB**，签名/16KB/JNI/资源门禁及独立复验通过。本轮未操作手机；旧 profile 图仅作相同实现的历史证据。本地版本及台账尚未推送，不打 tag，不动 release/1.0 或 SDK。详见[本轮记录](docs/task-bubble-fidelity-plus50-main-2026-10-31.md)与[产物台账](docs/reports/task-bubble-fidelity-plus50-main.json)。下方 +49 和旧候选叙述保留原时点事实。

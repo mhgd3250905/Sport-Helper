@@ -1,0 +1,420 @@
+{
+  "schema": "smartfit-coach-chat-plus52-closeout@1",
+  "date": "2026-11-01",
+  "branch": "codex/coach-chat-sdk",
+  "functionalAndFullGateSource": "ff554f197a8f537119ace2023520716b9210f5fb",
+  "baseLocalMain": "731c6671f8f7f12a13454ad7b8fb03a08c5b2693",
+  "version": "0.1.0+52",
+  "sdkPin": "b025ee88bd1a6d69564ce96a473302739c981c3b",
+  "packages": [
+    "ugk_coach",
+    "ugk_coach_ui",
+    "ugk_trainer",
+    "ugk_coach_chat",
+    "ugk_trainer_runtime"
+  ],
+  "fixedAuthorizedActions": 219,
+  "currentPlannableActions": 211,
+  "localImplementationFilesDeleted": [
+    {
+      "path": "lib/chat/ai_chat_engine.dart",
+      "lines": 474
+    },
+    {
+      "path": "lib/chat/app_chat_actions.dart",
+      "lines": 151
+    },
+    {
+      "path": "lib/chat/chat_controller.dart",
+      "lines": 1185
+    },
+    {
+      "path": "lib/chat/chat_models.dart",
+      "lines": 628
+    },
+    {
+      "path": "lib/chat/safety_script.dart",
+      "lines": 39
+    },
+    {
+      "path": "lib/ui/chat/chat_bubble_adapter.dart",
+      "lines": 93
+    },
+    {
+      "path": "lib/ui/chat/chat_composer_dock.dart",
+      "lines": 505
+    },
+    {
+      "path": "lib/ui/chat/chat_timeline.dart",
+      "lines": 206
+    },
+    {
+      "path": "lib/ui/chat/chat_widgets.dart",
+      "lines": 411
+    },
+    {
+      "path": "lib/ui/chat/coach_delivery_transition.dart",
+      "lines": 223
+    },
+    {
+      "path": "lib/ui/chat/coach_task_bubble.dart",
+      "lines": 1228
+    },
+    {
+      "path": "lib/ui/chat/cosmos.dart",
+      "lines": 217
+    },
+    {
+      "path": "lib/ui/chat/plan_card.dart",
+      "lines": 72
+    },
+    {
+      "path": "lib/ui/chat/plan_focus_label.dart",
+      "lines": 197
+    },
+    {
+      "path": "lib/ui/chat/validated_plan_card.dart",
+      "lines": 51
+    }
+  ],
+  "deletedFullFiles": 15,
+  "deletedFullFileLines": 5680,
+  "thinChatHomeLines": 24,
+  "testsPassed": 667,
+  "testsFailed": 7,
+  "testsSkipped": 0,
+  "analysisIssues": 0,
+  "failureClassification": {
+    "schema": "smartfit-coach-chat-final-failures@1",
+    "source": "ff554f197a8f537119ace2023520716b9210f5fb",
+    "sdk": "b025ee88bd1a6d69564ce96a473302739c981c3b",
+    "passed": 667,
+    "failed": 7,
+    "skipped": 0,
+    "analysisIssues": 0,
+    "failureClasses": [
+      "diagnostic-original-user-input",
+      "durable-session-archive-before-reset",
+      "legacy-non-ai-display-restore",
+      "saved-plans-compose-focus"
+    ],
+    "failures": [
+      {
+        "logLine": 134,
+        "file": "chat_home_ia_test.dart",
+        "case": "drawer: empty state",
+        "sdkGap": "saved-plans-compose-focus",
+        "originalLogHeading": "00:33 +89 -1: E:/AII-3D/3D-Sport-AI/Sport-Helper-coach-chat-sdk/test/chat_home_ia_test.dart: drawer: empty state 去排一套 closes it and focuses the input [E]"
+      },
+      {
+        "logLine": 163,
+        "file": "chat_keyboard_focus_test.dart",
+        "case": "foreground return hides keyboard",
+        "sdkGap": "saved-plans-compose-focus",
+        "originalLogHeading": "00:35 +91 -2: E:/AII-3D/3D-Sport-AI/Sport-Helper-coach-chat-sdk/test/chat_keyboard_focus_test.dart: foreground return hides keyboard; explicit compose still focuses [E]"
+      },
+      {
+        "logLine": 224,
+        "file": "developer_log_details_test.dart",
+        "case": "raw user text reaches diagnostics",
+        "sdkGap": "diagnostic-original-user-input",
+        "originalLogHeading": "00:42 +134 -3: E:/AII-3D/3D-Sport-AI/Sport-Helper-coach-chat-sdk/test/diagnostics/developer_log_details_test.dart: raw user text reaches diagnostics without trimming its whitespace [E]"
+      },
+      {
+        "logLine": 239,
+        "file": "developer_log_details_test.dart",
+        "case": "new conversation durably archives before reset",
+        "sdkGap": "durable-session-archive-before-reset",
+        "originalLogHeading": "00:42 +134 -4: E:/AII-3D/3D-Sport-AI/Sport-Helper-coach-chat-sdk/test/diagnostics/developer_log_details_test.dart: new conversation durably archives before reset and queues new input [E]"
+      },
+      {
+        "logLine": 271,
+        "file": "performance_fixture_test.dart",
+        "case": "mixed fixture has 12 fixed real plan cards",
+        "sdkGap": "legacy-non-ai-display-restore",
+        "originalLogHeading": "00:44 +152 -5: E:/AII-3D/3D-Sport-AI/Sport-Helper-coach-chat-sdk/test/diagnostics/performance_fixture_test.dart: mixed fixture has 12 fixed real plan cards and the same 72 timestamps [E]"
+      },
+      {
+        "logLine": 396,
+        "file": "legacy_template_chat_regression_test.dart",
+        "case": "unchanged stored SF core template",
+        "sdkGap": "legacy-non-ai-display-restore",
+        "originalLogHeading": "00:58 +247 -6: E:/AII-3D/3D-Sport-AI/Sport-Helper-coach-chat-sdk/test/legacy_template_chat_regression_test.dart: unchanged stored SF core template remains visible across SDK boots [E]"
+      },
+      {
+        "logLine": 407,
+        "file": "legacy_template_chat_regression_test.dart",
+        "case": "unchanged stored SF office-relax template",
+        "sdkGap": "legacy-non-ai-display-restore",
+        "originalLogHeading": "00:58 +247 -7: E:/AII-3D/3D-Sport-AI/Sport-Helper-coach-chat-sdk/test/legacy_template_chat_regression_test.dart: unchanged stored SF office-relax template remains visible across SDK boots [E]"
+      }
+    ],
+    "logSha256": "c12ebe2cd383da8bd514a97c66718175c13ef3b31363ad5dda81ab807be02c82",
+    "sdkGapsEvidenceSha256": "2ffe66e06b30cdb3d3ea831f2a9ab13a800d1c0899f06426de1584df0156fcd6",
+    "allFailuresRemainBlocking": true,
+    "fullSoftwareGatePassed": false,
+    "sdkOrAppBypassApplied": false,
+    "apkBuilt": false,
+    "claimBoundary": "Classification does not convert failed tests to passes. All raw attempts and assertions remain retained."
+  },
+  "framesSummary": {
+    "framesRequired": 22,
+    "framesCaptured": 22,
+    "zeroPixelFrames": 22,
+    "nonzeroFrames": 0,
+    "missingFrames": [],
+    "totalDifferentPixels": 0,
+    "strict22FrameZeroGatePassed": true,
+    "captureExitCode": 0,
+    "waitingBubbleRepaintBoundaryCounts": [
+      4,
+      4
+    ],
+    "actualSfSdkTrainingRouteFramesObserved": 6,
+    "baselineSource": "3eb2a9e88ef4d28e02f4cf306c1716d61baa7f10",
+    "newSource": "111c87e099b08569eb63e7e0beed6ff2fd5012d6",
+    "capturedBytesCommittedSource": "111c87e099b08569eb63e7e0beed6ff2fd5012d6",
+    "sdkPin": "b025ee88bd1a6d69564ce96a473302739c981c3b",
+    "noCropMaskOrTolerance": true,
+    "harkAcceptance": "pending; not inferred from pixel equality",
+    "isPhoneOrPerformanceEvidence": false
+  },
+  "framePixels": [
+    {
+      "frame": "light-empty",
+      "differentPixels": 0,
+      "pngBytesIdentical": true
+    },
+    {
+      "frame": "light-waiting-250ms",
+      "differentPixels": 0,
+      "pngBytesIdentical": true
+    },
+    {
+      "frame": "light-plan-collapsed",
+      "differentPixels": 0,
+      "pngBytesIdentical": true
+    },
+    {
+      "frame": "light-plan-expand-280ms",
+      "differentPixels": 0,
+      "pngBytesIdentical": true
+    },
+    {
+      "frame": "light-plan-expanded",
+      "differentPixels": 0,
+      "pngBytesIdentical": true
+    },
+    {
+      "frame": "light-recommendations",
+      "differentPixels": 0,
+      "pngBytesIdentical": true
+    },
+    {
+      "frame": "light-focused-saved-plan",
+      "differentPixels": 0,
+      "pngBytesIdentical": true
+    },
+    {
+      "frame": "light-training-enter-150ms",
+      "differentPixels": 0,
+      "pngBytesIdentical": true
+    },
+    {
+      "frame": "light-training-enter-300ms",
+      "differentPixels": 0,
+      "pngBytesIdentical": true
+    },
+    {
+      "frame": "light-training-exit-140ms",
+      "differentPixels": 0,
+      "pngBytesIdentical": true
+    },
+    {
+      "frame": "light-training-return",
+      "differentPixels": 0,
+      "pngBytesIdentical": true
+    },
+    {
+      "frame": "dark-empty",
+      "differentPixels": 0,
+      "pngBytesIdentical": true
+    },
+    {
+      "frame": "dark-waiting-250ms",
+      "differentPixels": 0,
+      "pngBytesIdentical": true
+    },
+    {
+      "frame": "dark-plan-collapsed",
+      "differentPixels": 0,
+      "pngBytesIdentical": true
+    },
+    {
+      "frame": "dark-plan-expand-280ms",
+      "differentPixels": 0,
+      "pngBytesIdentical": true
+    },
+    {
+      "frame": "dark-plan-expanded",
+      "differentPixels": 0,
+      "pngBytesIdentical": true
+    },
+    {
+      "frame": "dark-recommendations",
+      "differentPixels": 0,
+      "pngBytesIdentical": true
+    },
+    {
+      "frame": "dark-focused-saved-plan",
+      "differentPixels": 0,
+      "pngBytesIdentical": true
+    },
+    {
+      "frame": "dark-training-enter-150ms",
+      "differentPixels": 0,
+      "pngBytesIdentical": true
+    },
+    {
+      "frame": "dark-training-enter-300ms",
+      "differentPixels": 0,
+      "pngBytesIdentical": true
+    },
+    {
+      "frame": "dark-training-exit-140ms",
+      "differentPixels": 0,
+      "pngBytesIdentical": true
+    },
+    {
+      "frame": "dark-training-return",
+      "differentPixels": 0,
+      "pngBytesIdentical": true
+    }
+  ],
+  "liveSource": "111c87e099b08569eb63e7e0beed6ff2fd5012d6",
+  "realModelTurns": [
+    {
+      "turn": 1,
+      "passed": true,
+      "elapsedMs": 16107,
+      "llmCalls": 5,
+      "httpAttempts": 5,
+      "anomalyOver20Seconds": false,
+      "anomalyOver8Calls": false,
+      "draftPlanRequests": 1,
+      "durationFitFailedResponses": 0,
+      "durationFitFailedToolResponseIds": [],
+      "durationRedraftRequestsAfterFailure": 0,
+      "durationRedraftSuccessReceipts": 0,
+      "quoteNotFoundResponses": 1,
+      "askUserRequests": 0,
+      "timing": {
+        "targetSeconds": 300,
+        "cardSeconds": 314.0,
+        "executionIncludingPrepSeconds": 314.0,
+        "catalogEstimateSeconds": 312.0,
+        "cardUses": "SDK toCoachRoutine profile.executionTiming",
+        "isEstimate": false,
+        "manualLabel": null,
+        "manualWorkPhases": []
+      },
+      "recommendedActions": 0,
+      "inputTokens": 53970,
+      "outputTokens": 1979
+    },
+    {
+      "turn": 2,
+      "passed": true,
+      "elapsedMs": 6675,
+      "llmCalls": 2,
+      "httpAttempts": 2,
+      "anomalyOver20Seconds": false,
+      "anomalyOver8Calls": false,
+      "draftPlanRequests": 0,
+      "durationFitFailedResponses": 0,
+      "durationFitFailedToolResponseIds": [],
+      "durationRedraftRequestsAfterFailure": 0,
+      "durationRedraftSuccessReceipts": 0,
+      "quoteNotFoundResponses": 0,
+      "askUserRequests": 0,
+      "timing": {},
+      "recommendedActions": 4,
+      "inputTokens": 17476,
+      "outputTokens": 746
+    },
+    {
+      "turn": 3,
+      "passed": true,
+      "elapsedMs": 21384,
+      "llmCalls": 4,
+      "httpAttempts": 4,
+      "anomalyOver20Seconds": true,
+      "anomalyOver8Calls": false,
+      "draftPlanRequests": 2,
+      "durationFitFailedResponses": 1,
+      "durationFitFailedToolResponseIds": [
+        "call_00_pkd9vrEjMzwLXWFk4F819525"
+      ],
+      "durationRedraftRequestsAfterFailure": 1,
+      "durationRedraftSuccessReceipts": 1,
+      "quoteNotFoundResponses": 0,
+      "askUserRequests": 0,
+      "timing": {
+        "targetSeconds": 180,
+        "cardSeconds": 189.0,
+        "executionIncludingPrepSeconds": 189.0,
+        "catalogEstimateSeconds": 189.0,
+        "cardUses": "SDK toCoachRoutine profile.executionTiming",
+        "isEstimate": false,
+        "manualLabel": null,
+        "manualWorkPhases": []
+      },
+      "recommendedActions": 0,
+      "inputTokens": 57585,
+      "outputTokens": 2745
+    }
+  ],
+  "realModelTotalInputTokens": 129031,
+  "realModelTotalOutputTokens": 5470,
+  "realModelOuterRetries": 0,
+  "sdkGapIds": [
+    "saved-plans-compose-focus",
+    "diagnostic-original-user-input",
+    "durable-session-archive-before-reset",
+    "legacy-non-ai-display-restore"
+  ],
+  "fullSoftwareGatePassed": false,
+  "featureAccepted": false,
+  "apkBuilt": false,
+  "apkPath": null,
+  "apkBytes": null,
+  "signature16KbJniRun": false,
+  "deviceOperated": false,
+  "sdkOrAppBypassApplied": false,
+  "testFixtureBoundary": {
+    "legacyMediaCase": "The original 30-second work / five-minute target fixture tests the host prefetch port. Three invalid SDK setup assertions were replaced, without making the SDK admit this invalid training plan.",
+    "imeCase": "All 0/150/299ms geometry and offset assertions retained. After release, the returned offset is checked against the actual min/max scroll range; recorded max drops from 55 to 0 before any receipt.",
+    "productionFilesChangedForTheseTestRepairs": false
+  },
+  "evidenceRootRelativeToRepo": "../deliveries/coach-chat-sdk-plus52-20261101",
+  "evidenceSha256": {
+    "final-software-gates.json": "10d89b8d7ec3ef47dd6f54bd824a8056870e743959dacd3035ec8c250a49ad4a",
+    "final-failure-classification.json": "a71f6e2c6ba354681d763a45209fb7b0a039fb9b2a3efc87d8a5e3c799494aba",
+    "frames/pixel-diff-final.json": "9d0a8f77b68ad30d7b19e8eb47a2fb08668acaf9e6d53edc5233cd3aba7a5d06",
+    "frames/source-bindings-final.json": "e39790a371adb93962630c1c83a0c4b6b94bf27cd65fb7eee8d491089ba50c2a",
+    "live-chat/summary.json": "241800722dbaa04eaf612f2ac3a216a1e6dc0199b83e7806b5b223e3d6f49cf4",
+    "live-protocol-analysis.json": "3fe613fa46c26068a5caa4284f4f8688e4b3cd897f6a7185d9f259bae4764b23",
+    "live-source-binding.json": "66e2c69b327f3abfa9f14b3d25e20e7ba80a9daad405ed1eed9b56809e4ea370",
+    "source111-to-final-equivalence.json": "b82770fd07a7a81ef001aa9764531380d88160b3a27dc54faf8a814651f7ce47",
+    "production-migration-review.json": "50e4f0e5f7a805f1bb4611a4aefbfb65afabab16a918631cf4e8ae77843c7a10",
+    "sdk-gaps.json": "2ffe66e06b30cdb3d3ea831f2a9ab13a800d1c0899f06426de1584df0156fcd6",
+    "preflight.json": "6ca488d69f32a17636fa401c4a0349e217e36f81f8e7afa03958ee6594bb20dd",
+    "media-fixture-review.json": "686c3cbce31f65c7bd7a151938661ff657f12a09bb548112e9c5dead3f0d62c6",
+    "post-full4-host-fixture-repair.json": "ba8e01e4a894520d538f23650d9b1a1f8258c6121cdf9ead08da8aeff54cb161",
+    "ime-scroll-range-diagnostic.json": "a8fb4b4bce0a25a8aeabade8e6d937a31298571b9bf01cbe03cc4e541b4c9b51"
+  },
+  "protectedRefFinalReceipt": "protected-boundaries-final.json",
+  "sourceBoundary": "Real model and 22 frames executed at 111c87e; all later functional-source changes are test-only. The exact 2708 runtime inputs and frame driver are unchanged. Later closeout commits contain only documentation.",
+  "timingEvidenceKind": "Production SessionBuilder phase.seconds sum including preparation, not device wall-clock training. isEstimate=false means no manual-counted work stages.",
+  "deviceWallClockTrainingMeasured": false
+}
