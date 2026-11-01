@@ -1,7 +1,7 @@
 name: smartfit
 description: "智能健身助手 — 描述训练场景，按模板生成训练计划，预渲染动作跟练。"
 publish_to: 'none'
-version: 0.1.0+50
+version: 0.1.0+52
 
 environment:
   sdk: ^3.12.0
@@ -16,18 +16,30 @@ dependencies:
     git:
       url: https://github.com/mhgd3250905/ugk-3d-pose-sdk.git
       path: packages/ugk_trainer
-      ref: 66dd98a549c1ff5fedecb626a7c88583090a1440
+      ref: b025ee88bd1a6d69564ce96a473302739c981c3b
   ugk_coach:
     version: 0.8.0
     git:
       url: https://github.com/mhgd3250905/ugk-3d-pose-sdk.git
-      ref: 66dd98a549c1ff5fedecb626a7c88583090a1440
+      ref: b025ee88bd1a6d69564ce96a473302739c981c3b
   ugk_coach_ui:
     version: 0.4.0
     git:
       url: https://github.com/mhgd3250905/ugk-3d-pose-sdk.git
       path: packages/ugk_coach_ui
-      ref: 66dd98a549c1ff5fedecb626a7c88583090a1440
+      ref: b025ee88bd1a6d69564ce96a473302739c981c3b
+  ugk_coach_chat:
+    version: 0.1.0
+    git:
+      url: https://github.com/mhgd3250905/ugk-3d-pose-sdk.git
+      path: packages/ugk_coach_chat
+      ref: b025ee88bd1a6d69564ce96a473302739c981c3b
+  ugk_trainer_runtime:
+    version: 0.1.0
+    git:
+      url: https://github.com/mhgd3250905/ugk-3d-pose-sdk.git
+      path: packages/ugk_trainer_runtime
+      ref: b025ee88bd1a6d69564ce96a473302739c981c3b
   shared_preferences: 2.5.6
   webview_flutter: 4.14.1
   webview_flutter_android: 4.14.1
@@ -42,12 +54,12 @@ dependencies:
   package_info_plus: 10.2.2
 
 # Keep the trainer's transitive coach source on the same reviewed main commit
-# as all three App SDK packages, independently of tag movement.
+# as all five App SDK packages, independently of tag movement.
 dependency_overrides:
   ugk_coach:
     git:
       url: https://github.com/mhgd3250905/ugk-3d-pose-sdk.git
-      ref: 66dd98a549c1ff5fedecb626a7c88583090a1440
+      ref: b025ee88bd1a6d69564ce96a473302739c981c3b
 
 dev_dependencies:
   shared_preferences_platform_interface: 2.4.2
