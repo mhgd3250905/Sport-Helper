@@ -26,11 +26,15 @@ const _inputs = [
 ];
 const _sdk = String.fromEnvironment(
   'SMARTFIT_EXPECT_SDK',
-  defaultValue: '0a6c3aaea9e3890d938799703f97819d5986ee7d',
+  defaultValue: '7d9be56a6c02b7a28e3d5d5cd9f6c3f1a23ac723',
 );
 const _continueLongSession = bool.fromEnvironment('SMARTFIT_LONG_SESSION');
+const _normalTurns = 50;
+const _limitTurn = _normalTurns + 1;
+const _expectedHardLimitBytes = 256 * 1024;
 // The first three inputs above remain the original acceptance conversation.
-// These continue that same controller, without reset or an outer retry.
+// Repeat these follow-ups in that same controller until fifty normal turns;
+// never reset the controller or apply an outer retry to reach the count.
 const _longInputs = [
   '先不改方案，解释一下刚才计划第一个动作怎么做，哪些地方要注意',
   '推荐两个适合入门的大腿内侧拉伸动作',
@@ -270,6 +274,9 @@ List<String> _diagnosticProblems(
     if (request['measurement'] is! String) {
       problems.add('request_byte_measurement_missing');
     }
+    if (request['hardLimitBytes'] != _expectedHardLimitBytes) {
+      problems.add('unexpected_sdk_hard_limit');
+    }
     if (request['fitsHardLimit'] != true ||
         request['afterBytes'] is! int ||
         request['hardLimitBytes'] is! int ||
@@ -331,7 +338,7 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   test(
     _continueLongSession
-        ? 'original three turns then same-session twenty and limit boundary'
+        ? 'original three turns then same-session fifty and limit boundary'
         : 'three real turns through the SF shared chat module',
     () async {
       const config = AiCoachConfig.fromEnvironment();
@@ -390,7 +397,7 @@ void main() {
         testCatalog: testCatalog,
         poseHubCatalog: sdkCatalog,
         chatReplyDelay: Duration.zero,
-        deviceId: 'smartfit-chat-sdk-plus53-validation',
+        deviceId: 'smartfit-chat-sdk-50-turn-validation',
       );
       final observed = _Observed(
         config.createClient(deviceId: services.deviceId!),
@@ -407,7 +414,16 @@ void main() {
       final turns = <Map<String, Object?>>[];
       final failures = <String>[];
       final inputs = _continueLongSession
-          ? [..._inputs, ..._longInputs, _limitInput]
+          ? [
+              ..._inputs,
+              for (
+                var index = 0;
+                index < _normalTurns - _inputs.length;
+                index++
+              )
+                _longInputs[index % _longInputs.length],
+              _limitInput,
+            ]
           : _inputs;
       var originalCallCount = 0;
       var originalElapsedMs = 0;
@@ -439,6 +455,7 @@ void main() {
         expect(controller.agent.history, isEmpty);
         final originalAgent = controller.agent;
         expect(_longInputs.length, 17);
+        if (_continueLongSession) expect(inputs.length, _limitTurn);
         _write(
           File('${root.path}/initial-snapshot.json'),
           controller.exportSnapshot().toJson(),
@@ -456,7 +473,7 @@ void main() {
           final watch = Stopwatch()..start();
           final result = await controller.send(input);
           watch.stop();
-          final expectLimit = _continueLongSession && index == 20;
+          final expectLimit = _continueLongSession && index == _normalTurns;
           final contextRequests = [
             for (final diagnostic
                 in controller.agent.contextRequestDiagnostics.skip(
@@ -508,7 +525,7 @@ void main() {
                 !expectedText.contains('不太稳');
             final noModelRequest = observed.calls.length == firstCall;
             if (result?.status != coach.TurnStatus.limitReached) {
-              problems.add('twenty_first_turn_not_limit_reached');
+              problems.add('fifty_first_turn_not_limit_reached');
             }
             if (!textMatches) {
               problems.add('limit_copy_or_new_chat_guidance_wrong');
@@ -516,10 +533,12 @@ void main() {
             if (!noModelRequest || contextRequests.isNotEmpty) {
               problems.add('limit_turn_unexpected_model_request');
             }
-            if (controller.agent.turnCount != 20) {
+            if (controller.agent.turnCount != _normalTurns) {
               problems.add('limit_turn_changed_conversation_count');
             }
             limitBoundary = {
+              'attemptedTurn': _limitTurn,
+              'expectedMaximumNormalTurns': _normalTurns,
               'expectedStatus': 'limitReached',
               'expectedFailureKind': 'conversationLimit',
               'expectedText': expectedText,
@@ -759,18 +778,20 @@ void main() {
         _write(File('${root.path}/summary.json'), originalSummary);
         if (_continueLongSession) {
           final bytes = _byteSummary(turns, observed.calls);
-          final normalTurns = turns.take(20).toList();
+          final normalTurns = turns.take(_normalTurns).toList();
           final normalPassed = normalTurns
               .where((turn) => turn['status'] == 'ok' && turn['passed'] == true)
               .length;
           final limitPassed =
-              turns.length == 21 &&
-              turns.last['turn'] == 21 &&
+              turns.length == _limitTurn &&
+              turns.last['turn'] == _limitTurn &&
               turns.last['passed'] == true;
-          if (normalPassed != 20) failures.add('twenty_turns_not_all_passed');
-          if (!limitPassed) failures.add('twenty_first_boundary_not_passed');
+          if (normalPassed != _normalTurns) {
+            failures.add('fifty_turns_not_all_passed');
+          }
+          if (!limitPassed) failures.add('fifty_first_boundary_not_passed');
           _write(File('${root.path}/long-session-summary.json'), {
-            'schema': 'smartfit-coach-chat-same-session-20-plus-limit@1',
+            'schema': 'smartfit-coach-chat-same-session-50-plus-limit@1',
             'source': source,
             'sdk': _sdk,
             'sessionCount': 1,
@@ -780,10 +801,14 @@ void main() {
             ),
             'originalThreeSummary': 'summary.json',
             'originalThreePassed': originalSummary['passed'],
-            'normalTurnsRequested': 20,
+            'normalTurnsRequested': _normalTurns,
             'normalTurnsPassed': normalPassed,
-            'twentyFirstAttempted': turns.length == 21,
-            'twentyFirstBoundaryPassed': limitPassed,
+            'limitTurn': _limitTurn,
+            'limitTurnAttempted': turns.length == _limitTurn,
+            'limitBoundaryPassed': limitPassed,
+            'fiftyFirstAttempted': turns.length == _limitTurn,
+            'fiftyFirstBoundaryPassed': limitPassed,
+            'expectedHardLimitBytes': _expectedHardLimitBytes,
             'inputs': inputs,
             'elapsedMs': timer.elapsedMilliseconds,
             'metrics': _metrics(observed.calls),
@@ -804,7 +829,8 @@ void main() {
               for (final t in turns) {...t}..remove('snapshot'),
             ],
             'failures': failures,
-            'passed': failures.isEmpty && normalPassed == 20 && limitPassed,
+            'passed':
+                failures.isEmpty && normalPassed == _normalTurns && limitPassed,
           });
         }
       }
