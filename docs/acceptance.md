@@ -1,5 +1,53 @@
 # 本机验收记录
 
+## 当前 +54 验收与证据绑定（2026-11-04）
+
+当前已测运行源码为 `c9823e61457eb3e8839c867c01b5b7fe110d7c73`，与本次文档整理前本地 `main`、远端 `refs/heads/main` 一致；SDK 五包及 coach override 固定 `693cbc02cdf284163409868e117e438515c6a8d8`。当前版本、APK 身份与摘要统一见[版本台账](version-management.md)。PR #7 / #8 已合并；下方旧报告的 Draft 或“未合 main”保留原时点含义。
+
+本节沿用 2026-11-03 的结构化回执，并在 2026-11-04 文档收束时重新核对其源码 SHA、摘要和适用范围。本轮只改文档，c9823e6 后没有运行源码、依赖或测试变化，因此复用同 SHA 的软件证据；没有重跑全量测试、重新构建、读取 APK、调用模型或操作设备。
+
+| 检查 | 命令 / 方法 | 结果、时间与 source state |
+| --- | --- | --- |
+| 严格锁文件 | Flutter 3.44.7 `flutter pub get --offline --enforce-lockfile` | c9823e6；2026-11-03 15:27:51–15:28:01 +08，成功 |
+| 全量 Flutter 测试 | `flutter test --no-pub --concurrency=1 --timeout=60s --flavor internal --reporter expanded --dart-define=SMARTFIT_POSEHUB_PACK=true --dart-define=SMARTFIT_ALPHA_CARDS=true --dart-define=UGK_INTERNAL_MEDIA_PREVIEW=true` | c9823e6；2026-11-03 15:28:05–15:31:40 +08，**679 通过 / 0 失败 / 0 跳过** |
+| 严格静态分析 | `flutter analyze --no-pub --fatal-infos` | c9823e6；2026-11-03 15:31:41–15:31:56 +08，**0 问题** |
+| 指定四文件 | 上述测试命令另加 `--update-goldens test/posehub_library_page_test.dart test/chat_home_ia_test.dart test_screens/posehub_library_review_test.dart test/domain_test.dart` | c9823e6；2026-11-03 15:26:51–15:27:35 +08，**34 / 0 / 0**；属于全量相关覆盖，不与 679 相加 |
+| 正常尺寸浅深主题 | 指定四文件测试采集 | 同 c9823e6，6 张新截图；用于本轮界面观察，**未做前后像素差比较** |
+| 动作集合 | `catalog-audit.json` 比较 e2430a6→7263b74 的浏览范围；另核对 `git diff 7263b74..c9823e6 -- lib/ui/posehub_library_page.dart` 无差异 | 训练动作 **211→211**，无增删或改名；媒体目录为 219 项，不与训练动作数混用 |
+| 换侧余量 | 同源码领域 / 排程测试代表用例 | 含 1 次换侧，预计 **193 秒**、执行排程 **200 秒**；3 秒只进入预计值，原阶段不变。这是代码契约，不是真机秒表实测 |
+| 既有 APK 复验 | `release-preparation/validation-release.json` 的历史产物门禁回执 | c9823e6 的 internal arm64 release，`0.1.0 / 2054`，42,855,748 B；2026-11-03 15:35:59 +08，签名、ZIP/ELF 16KB、存储 JNI 与资源检查通过；本轮未生成新包 |
+
+证据目录为 `../../deliveries/sdk-pin-v0.6.0-7263b74-20261103/`，实际读取并核对的结构化回执如下：
+
+| 回执 | SHA-256 |
+| --- | --- |
+| [final-software-gates.json](../../deliveries/sdk-pin-v0.6.0-7263b74-20261103/final-software-gates.json) | `b4da3727c81239e3553854501f2a3b345cc7be8d7befa2d6c01e1dc429f49adc` |
+| [targeted-c9823e6/receipt.json](../../deliveries/sdk-pin-v0.6.0-7263b74-20261103/targeted-c9823e6/receipt.json) | `53e4b0c32ba4a78a754e39d1057b3a34224f07010db785467e9857556c28d447` |
+| [release-preparation/validation-release.json](../../deliveries/sdk-pin-v0.6.0-7263b74-20261103/release-preparation/validation-release.json) | `f7af75485613878e18e9146a452778016d4023303655f1fde363aa09dffc31f2` |
+
+[最终交付回执](../../deliveries/sdk-pin-v0.6.0-7263b74-20261103/final-delivery-receipt.json)记录当时分支的源码与 APK 身份；其“未合 main”保护状态是交付时点，最新主线事实由本次 Git / PR 核对更新。原指定测试在 7263b74 的 **29 通过 / 4 失败**保留在交付报告，c9823e6 的 34/0/0 不覆盖原失败记录。
+
+## 当前待验与历史证据边界
+
+- **+54 用户真机验收 pending-user**：搜索、快捷行、筛选计数、聊天返回键和 Performance Lab 等交互仍待用户结果；自动化和接线检查不等于真机验收。
+- SF 主 App 固定 `zh-CN`，没有语言切换入口。测试宿主的中英适配通过不能写成真实 SF 随系统语言切换。
+- +53 的 22 帧像素一致、20 轮成功 / 第 21 轮上限以及原机 2052→2053 升级后两次恢复，均只属于原 `df4e460` / SDK `0a6c3aa` / 2053 包；不作为 c9823e6 的新实测。
+- +54 的 `52d30ae` 源码可证明探针配置为 50 个正常轮次；本次没有读取对应实测回执，因此不登记“50+51 轮通过”。
+- 本轮不做大字号 / 小屏验证；缩略图排查继续按用户要求跳过。原生播放、长训练、量化性能和 iOS 专项不由软件门禁或旧包恢复观察推定通过。
+
+## 本次文档收束范围
+
+基线为已记录的 +49 主线收束 `2309de349df34a12a2d72b33ac0ef71f2780c0dc`，是当前 c9823e6 的祖先；有限 delta 为 **22 个提交 / 201 条路径**。Preflight 完整工作区状态为空（tracked / staged / unstaged / untracked 均 0），既有改动无需归属处理。当前事实源为 README 直接声明的版本台账、验收记录、阶段交接、对话界面及开发者日志说明；下方旧检查点均为历史背景。
+
+本轮修正当前版本 / SDK / 主线状态滞后，整理近期优化及证据边界，保留旧验证和失败记录。修改后按文档差异、链接与当前源码身份做必要核对；提交并普通 push 已获用户授权，最终 SHA 与推送状态以 Git 核对为准，不预填成功。软件门禁继续绑定 c9823e6；文档提交不冒充新 APK 源码。
+
+2026-11-04 文档验证：`python -` 只读检查通过，覆盖本轮 6 份文档、当前区 31 个本地链接、17 个现存代码路径、3 份回执的 SHA-256 与完整源码 SHA；历史正文保留、折叠区与代码围栏平衡。`git diff --check` 通过。验证状态为 c9823e6 加本次 6 份文档修改，完整 status 仅这 6 项 tracked 修改、staged 与 untracked 均 0；运行源码、测试和依赖无变化。
+
+## 历史验收记录
+
+<details>
+<summary>展开 +53 及更早原时点记录；其中“当前”、待办与设备结论仅适用于各自日期和源码</summary>
+
 ## +53 长会话 SDK 交付（2026-11-01）
 
 `codex/coach-chat-sdk` / **0.1.0+53 / 2053**，五包及 coach override 固定 SDK `0a6c3aa`。源码 `df4e460`：原 7 条断言所在 5 个文件字节未改；全量 **678/0/0**、严格分析 0、浅深 **22 帧零差**。原三段真实对话双时长 ±10% 通过，同一 controller **20 轮成功＋第 21 轮正确上限提示**，最大实际请求 **57,775 B**。release **42,833,292 B**，原证书/16KB/JNI 通过；原手机 **2052→2053** 保留数据升级，两次启动均恢复旧对话与两套计划全部 **19 项剂量**。真实长聊与原机恢复证据分列；仅推本分支，不合 main、不动 release、不打 tag。 详见[本轮一页报告](coach-chat-sdk-plus53-0a6c3aa-2026-11-01.md)；下方记录保留各原时点事实。
@@ -452,3 +500,5 @@ Get-FileHash build/app/outputs/flutter-apk/app-release.apk -Algorithm SHA256
 ```
 
 将设备结果和构建结果更新到本文件，相关问题修复并复验后，再提交完整里程碑并标记 `m3-local-verified`。APK、keystore、密钥及 `local.properties` 保持在版本管理之外。
+
+</details>

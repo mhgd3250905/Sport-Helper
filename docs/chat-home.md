@@ -1,5 +1,47 @@
 # 对话式主界面
 
+## 当前实现：共享 SDK 对话（+54，2026-11-04）
+
+当前代码源为 `main@c9823e61457eb3e8839c867c01b5b7fe110d7c73`，App **0.1.0+54 / internal arm64 2054**；SDK 五包及 coach override 固定 `693cbc02cdf284163409868e117e438515c6a8d8`（`ugk_trainer-v0.6.0`）。PR #7、#8 已合并，当前版本与交付事实见[版本台账](version-management.md)，软件与设备证据分列见[验收记录](acceptance.md)。
+
+### SDK 与宿主分工
+
+`ChatHomePage` 现在仅包装 SDK `CoachChatPage`。App 生命周期由 `AppServices` 持有唯一 `CoachChatController`；对话页面、消息与卡片、输入面板、会话和交付交互使用共享 SDK。App 提供明确授权的动作集合、profile、训练 executionTiming、品牌视觉、gateway、持久化和导航，不再维护原 `AiChatEngine` / `ChatController` / `chat_widgets` 对话实现。
+
+| 路径 | 当前责任 |
+| --- | --- |
+| `lib/app/coach_chat.dart` | profile、动作范围与训练时序装配；SDK controller、gateway lease、observer 和宿主操作绑定 |
+| `lib/app/coach_chat_scope.dart` | SmartFit 明确授权的动作 ID 集合；与加载目录求交后交给 SDK scope manifest |
+| `lib/app/coach_chat_storage.dart` | 计划、聊天历史和偏好 adapter；记忆继续由宿主 store 提供 |
+| `lib/data/app_store.dart` | 已存计划、训练记录、偏好与 SDK envelope 的本地持久化 |
+| `lib/ui/chat/chat_home_page.dart` | SDK 对话页面薄壳，透传 controller、scrollController、clock 与返回键配置 |
+| `lib/ui/chat/coach_chat_visuals.dart` | 品牌 palette、字体、图标、动作图与预览媒体，预加载与退役回调 |
+| `lib/diagnostics/coach_chat_diagnostics.dart` | SDK 公开协议的只读观测与新对话前归档；不改变请求、准入、重试或取消 |
+| `lib/chat/ai_coach_config.dart` | `SMARTFIT_AI_*` 注入与客户端创建，Key 不进入文档、日志或 Git |
+
+### 保存、恢复与宿主操作
+
+SDK `CoachChatSnapshot` 写入独立 namespace `smartfit.chat.v1` 的 envelope；原聊天、原显示消息与原 coach session 三类 legacy 字段保留，供 SDK 迁移读取。已保存计划仍由 `AppStore` 作为唯一持久化写入方，adapter 传递 external ID、SDK 版本和 storage revision；保存失败或冲突按实际结果回给 SDK，不能先显示已保存。
+
+新对话通过 SDK `beforeNewConversation` hook，把传入快照的 `session.toJson()` 交给开发者归档服务；保存的聊天 envelope 与开发者归档是不同用途。App 继续提供“我的计划”、动作库、动作详情、手动模板和设置的路由。已存计划可发送回同一 SDK 对话继续讨论，或通过已校验引用进入详情及训练；不清空其他计划、训练记录、记忆或设置。
+
+训练从宿主绑定进入唯一 `openTraining`，沿用训练转场、首帧和媒体承接，SDK source viewport 只在短暂进入/退出活动期 hold。完成感受按同一训练结果更新本地记录，不变成教练轮次、记忆或推荐。对话返回键由 SDK 页面参数控制，Performance Lab 使用其独立 fixture controller；本次不以静态接线核对代替真机交互验收。
+
+SF 主 App 固定 `zh-CN`，没有语言切换入口；中英测试宿主覆盖仅证明 locale adapter 兼容。缩略图问题已按用户要求跳过，不在本次文档收束中恢复排查。
+
+### 近期优化与验证范围
+
++50 生成卡视觉细节已进入主线；+52 将对话实现迁入共享 SDK；+53 保留长会话轮次诊断与真实请求编码；+54 更新 trainer、动作库接入和 SDK 身份。当前探针配置为 50 轮，本轮没有 50 轮加第 51 轮的实测回执，不记为当前验证通过。+53 的旧 22 帧、20 轮加第 21 轮及 2053 恢复证据各自保留原源码绑定。
+
+`c9823e6` 的既有软件回执为全量 **679/0/0**、指定四文件 **34/0/0**、严格分析 0 问题与锁文件通过；正常尺寸浅深主题 6 张截图不属于像素差比较。本轮仅对齐文档，没有重新打包或操作设备，+54 真机验收仍待用户反馈。未追加大字号、小屏幕测试。
+
+## 历史主界面记录
+
+<details>
+<summary>+50 及更早的原行为、代码地图与验证</summary>
+
+以下“当前”、旧宿主类名、旧 SDK/API 及测试数字只适用于对应历史日期。当前代码职责以上方共享 SDK 对话说明为准；历史记录不覆盖新的版本、合并状态或验收边界。
+
 ## +50 main 本地升版与新包（2026-10-31）
 
 已先快进同步远端 main 13c0bb4（PR #6 已合入 6ef2e3a），再补本地 **0.1.0+50 / 2050**。本轮打包/测试源 `4ef76006d47e06cdeacdcdc77a647436284ab98f`；生成卡实现及四个 RepaintBoundary 原样保留，SDK/lock 不变。main 重新全量 **861/861、0 失败/跳过**，fatal-infos 分析 **0 问题**；新 release **42,657,546B / 42.658MB**，签名/16KB/JNI/资源门禁及独立复验通过。本轮未操作手机；旧 profile 图仅作相同实现的历史证据。本地版本及台账尚未推送，不打 tag，不动 release/1.0 或 SDK。详见[本轮记录](task-bubble-fidelity-plus50-main-2026-10-31.md)与[产物台账](reports/task-bubble-fidelity-plus50-main.json)。下方 +49 和旧候选叙述保留原时点事实。
@@ -218,5 +260,7 @@ App 生命周期内长期持有一个 `CoachSession`，关闭 AI 界面不清空
 ## 本轮核心验证
 
 `+8` 的六条新交互均 ok、无回落，真实覆盖重试恢复、slow、记忆持久化与隔离；独立 show_actions 严格补验 4 步、72.908 秒通过，App 接收原准入动作对象，未误交付计划。原六条脚本的臀桥无卡断言失败及 exit 1 如实保留。2026-10-21 开哥授权以 `ebb0840` 合 main，合并树等于审核分支 `f0ebafc`，运行源码、测试和 APK 保持 `b393044`，本次未重跑；已推送 origin/main 并核对远端一致。完整指标见 [0.3.2 验证记录](coach-032-smoke-2026-10-21.md)。
+
+</details>
 
 </details>

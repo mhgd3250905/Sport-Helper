@@ -1,5 +1,37 @@
 # 智能健身助手（SmartFit）交接说明
 
+## 当前接手：+54 / SDK v0.6.0（2026-11-04）
+
+当前代码与既有验证源为 `main@c9823e61457eb3e8839c867c01b5b7fe110d7c73`；本次文档收束不改变运行源码或既有 APK。App 为 **0.1.0+54 / internal arm64 2054**，SDK 五包及 coach override 统一锁定 `693cbc02cdf284163409868e117e438515c6a8d8`（`ugk_trainer-v0.6.0`）。已核对 origin/main 与该代码 SHA 一致，PR #7、#8 均已合并；旧交付报告中的 Draft、未合并与仅推候选分支描述属于生成当时的状态。当前版本、产物身份及证据分别以[版本台账](version-management.md)和[验收记录](acceptance.md)为准。
+
+近期已进入主线的工作包括 +50 生成卡细节、+52 共享 SDK 对话迁移及兼容修复、+53 长会话与诊断保留、+54 的 50 轮探针配置及新 trainer/动作库接入。50 轮是当前探针配置，本轮没有 50 轮加第 51 轮实测回执，不记作已通过。+53 的 22 帧、20 轮加第 21 轮、2053 真机恢复记录继续只绑定其原版本。
+
+### 当前职责与接手路径
+
+| 入口 | 当前职责 |
+| --- | --- |
+| `lib/ui/chat/chat_home_page.dart` | App 生命周期及依赖查询的薄壳；对话页面由 SDK `CoachChatPage` 实现 |
+| `lib/app/services.dart`、`lib/app/coach_chat.dart` | 持有唯一 SDK `CoachChatController`，装配动作授权、profile、gateway、存储、记忆及宿主导航 |
+| `lib/app/coach_chat_storage.dart`、`lib/data/app_store.dart` | SDK 快照的新 namespace envelope、legacy 迁移输入、偏好和已存计划的唯一持久化写入 |
+| `lib/ui/chat/coach_chat_visuals.dart` | 品牌色、字体、图标、真实媒体及预览生命周期；SDK 负责对话组件与交互 |
+| `lib/diagnostics/coach_chat_diagnostics.dart` | 只读观察公开事件、真实请求编码与轮次结果；新对话前归档 SDK session |
+| `lib/ui/open_training.dart`、`lib/ui/training_route.dart` | 共用训练入口、转场与媒体承接；完成感受仍只回写本地训练记录 |
+
+### 验证与下一步边界
+
+`c9823e6` 的既有回执记录全量 **679 通过 / 0 失败 / 0 跳过**，指定四文件 **34/0/0**，严格分析 0 问题、锁文件检查通过；正常尺寸浅深主题 6 张新截图属于软件渲染证据，并非像素差比较。APK 的同签名、16KB、JNI 及素材核对沿用该源码的既有回执。本次只更新文档，没有重新测试应用、打包或操作设备；+54 真机体验仍待用户验收。
+
+后续按用户安排推进。缩略图排查已跳过，不自动恢复；用户重新安排时先报告真实读取路径与空白原因。SF 主 App 固定 `zh-CN`，没有语言切换入口；测试宿主中英适配不等于真实 App 可切换语言。不追加大字号、小屏幕验证。
+
+本机继续负责 Android 与主线交付；合并、推送和发布以用户当次授权为准，本次已授权文档保存提交与普通 push。保留所有其他工作树、WIP 和历史 stash，不清理、覆盖或重置。`release/1.0`、SDK 源码和其他项目不在本轮范围，不打 tag。保留 Snow 的 CC BY 4.0 署名，不提交凭据、keystore、`local.properties`、APK 或 build 产物。
+
+## 历史交接记录
+
+<details>
+<summary>+50 及更早的原时点记录</summary>
+
+以下“当前”“尚未推送”“未合并”、分支冻结及旧代码地图均只描述各自记录日期；当前接手使用上方 +54 入口。原始验证数字与设备边界保留，不提升为 +54 的验证结果。
+
 ## +50 main 本地升版与新包（2026-10-31）
 
 已先快进同步远端 main 13c0bb4（PR #6 已合入 6ef2e3a），再补本地 **0.1.0+50 / 2050**。本轮打包/测试源 `4ef76006d47e06cdeacdcdc77a647436284ab98f`；生成卡实现及四个 RepaintBoundary 原样保留，SDK/lock 不变。main 重新全量 **861/861、0 失败/跳过**，fatal-infos 分析 **0 问题**；新 release **42,657,546B / 42.658MB**，签名/16KB/JNI/资源门禁及独立复验通过。本轮未操作手机；旧 profile 图仅作相同实现的历史证据。本地版本及台账尚未推送，不打 tag，不动 release/1.0 或 SDK。详见[本轮记录](task-bubble-fidelity-plus50-main-2026-10-31.md)与[产物台账](reports/task-bubble-fidelity-plus50-main.json)。下方 +49 和旧候选叙述保留原时点事实。
@@ -314,3 +346,5 @@ flutter build apk --release
 - 每个里程碑 commit + tag，下一个建议 `m3-local-verified`（本机测试与真机验收通过后）。
 - 公开仓库：不提交密钥、token、keystore、`local.properties`、APK/build 产物。
 - 生成文件（exercises.json、templates.json、voice manifest）改动应通过 `tools/` 脚本再生成，不手改。
+
+</details>

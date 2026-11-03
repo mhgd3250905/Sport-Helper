@@ -1,5 +1,47 @@
 # 智能健身助手 SmartFit
 
+## 当前主线与交付（2026-11-04 对齐）
+
+当前 App 为 **0.1.0+54**，主线代码与现有验证源为 `c9823e61457eb3e8839c867c01b5b7fe110d7c73`。2026-11-04 只读核对时，本地 `main` 与远端 `origin/main` 均为该提交；[PR #7](https://github.com/mhgd3250905/Sport-Helper/pull/7) 和 [PR #8](https://github.com/mhgd3250905/Sport-Helper/pull/8) 均已合并。本次收束只整理 README、台账、验收、交接和实现说明，后续文档提交不改变 APK 的构建来源。
+
+SDK 五包（`ugk_coach`、`ugk_coach_ui`、`ugk_coach_chat`、`ugk_trainer`、`ugk_trainer_runtime`）及 coach override、锁文件统一固定 **`693cbc02cdf284163409868e117e438515c6a8d8`**，对应 `ugk_trainer-v0.6.0`。内部 arm64 release 身份为 `com.ugk.smartfit.internal / 0.1.0 / 2054`，现有 APK **42,855,748 B**；完整文件名、哈希与证据来源见版本台账。
+
+| 当前事实源 | 内容 |
+| --- | --- |
+| [版本管理与台账](docs/version-management.md) | App / SDK、包身份、构建来源与主线状态 |
+| [验收记录](docs/acceptance.md) | 命令、时间、源码 SHA、软件结果与设备证据边界 |
+| [阶段交接](docs/HANDOVER.md) | 当前接手状态、待验事项和有效约束 |
+| [对话主界面](docs/chat-home.md) | SDK 对话模块与 App 宿主的实际职责、代码入口 |
+| [开发者日志](docs/developer-logging-2026-10-28.md) | 当前诊断事件、轮次结果、会话归档与持久化契约 |
+
+这些入口的顶部当前区为现行说明；下方折叠的日期记录为历史，旧“当前”“未推送”“不合 main”只描述其原时点。
+
+## 近期更新整理
+
+| 阶段 | 已落入当前主线的内容 | 原阶段证据 |
+| --- | --- | --- |
+| +50 | 生成卡视觉与动效参数对齐；保留独立重绘边界，随后完成主线升版 | [原主线记录](docs/task-bubble-fidelity-plus50-main-2026-10-31.md) |
+| +52 | 对话页、时间线、输入面板和会话控制迁入共享 SDK；App 保留品牌视觉、存储和导航适配；接入新对话前归档、原始输入与输入聚焦端口 | [修复交付](docs/coach-chat-sdk-plus52-a13e3b-2026-11-01.md) |
+| +53 | 接入长会话 SDK，宿主保留逐轮字节、错误类型和真实请求编码器；完成该版本长聊与旧档升级恢复验证 | [原版本报告](docs/coach-chat-sdk-plus53-0a6c3aa-2026-11-01.md) |
+| +54 | 长聊探针正常轮数配置升至 50；随后接入 trainer v0.6.0、换侧预计余量、动作库范围与宿主语言文案配置、性能实验页单一退出入口，并同步 SDK 身份展示和测试契约 | [当前台账](docs/version-management.md)、[当前验收](docs/acceptance.md) |
+
+当前 `ChatHomePage` 是 SDK `CoachChatPage` 的薄包装；`AppServices` 持有同一个 `CoachChatController`。App 接入本地计划、历史、偏好、记忆、健康确认及训练导航；已存计划由 `AppStore` 唯一持久化。新对话在 SDK 重置前归档快照，存储 envelope 保留旧档迁移字段。具体入口以对话主界面文档为准，历史 `lib/chat/chat_controller.dart` 等文件已退出当前实现。
+
+动作库保留 **211 个可浏览动作**，媒体目录共 **219 项**，本次 SDK 接入未删减动作。筛选在 SDK 弹窗内应用或重置，文案适配宿主 locale；真实 SmartFit 固定 **zh-CN**，目前没有语言切换入口。训练预计值接入每次换侧 **3 秒余量**；代表用例预计 193 秒、执行排程 200 秒，属于代码契约验证。
+
+## 当前验证与待验边界
+
+既有回执精确绑定 `c9823e61457eb3e8839c867c01b5b7fe110d7c73`：指定四文件 **34 通过 / 0 失败 / 0 跳过**，全量 **679 / 0 / 0**，严格分析 **0 问题**，严格锁文件通过。现有 APK 的原签名、ZIP/ELF 16KB、Storage JNI 与资源门禁已有独立复验记录。本次只改文档，复用相同源码的有效软件证据，不重建 APK。
+
+该版正常尺寸浅深主题 6 张图是新采集截图，**没有作像素差比较**。+53 的 22 帧零差、20+21 轮及 2052→2053 原机恢复属于原源码、原 SDK 与原包，不能移作 +54 的新验证。探针配置为 50 轮本身也不证明当前版本完成 50+51 轮实测。
+
+**+54 真机验收待用户确认。** 本次不操作手机，不补做大字号或小屏测试；已跳过的缩略图排查继续保持跳过。其他工作树、`release/1.0` 和 SDK 源码不在本次文档收束范围内，商店发布与 tag 不属于本次提交、push。
+
+## 历史阶段记录
+
+<details>
+<summary>2026-11-01 及更早的交付、验证与构建说明（保留原时点事实）</summary>
+
 ## +53 长会话 SDK 交付（2026-11-01）
 
 `codex/coach-chat-sdk` / **0.1.0+53 / 2053**，五包及 coach override 固定 SDK `0a6c3aa`。源码 `df4e460`：原 7 条断言所在 5 个文件字节未改；全量 **678/0/0**、严格分析 0、浅深 **22 帧零差**。原三段真实对话双时长 ±10% 通过，同一 controller **20 轮成功＋第 21 轮正确上限提示**，最大实际请求 **57,775 B**。release **42,833,292 B**，原证书/16KB/JNI 通过；原手机 **2052→2053** 保留数据升级，两次启动均恢复旧对话与两套计划全部 **19 项剂量**。真实长聊与原机恢复证据分列；仅推本分支，不合 main、不动 release、不打 tag。 详见[本轮一页报告](docs/coach-chat-sdk-plus53-0a6c3aa-2026-11-01.md)；下方记录保留各原时点事实。
@@ -284,5 +326,7 @@ python3 tools/packs/validate_packs.py --decode
 动作视频来自 Pose-Hub（mhgd3250905/3D-Pose-Hub）：46 条为 v0.2.0 深色成片（经 HipLab 冻结版本），47 条为 Pose-Hub 云盘归档的绿幕母版，本仓库抠像到同色背景。
 人物派生自 Blender Studio Snow（CC BY 4.0，署名见 `assets/licenses/Drill-media-ATTRIBUTION.md`，App「关于」页展示）。
 3D-Pose-Hub 与 HipLab 只作参考与素材来源，本仓库不向它们写入任何内容。
+
+</details>
 
 </details>

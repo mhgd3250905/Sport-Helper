@@ -1,5 +1,42 @@
 # 版本管理与台账
 
+## 当前主线与交付台账（2026-11-04）
+
+当前 App 为 **0.1.0+54**。本次文档整理前，本地 `main` 与远端 `refs/heads/main` 均核对为 `c9823e61457eb3e8839c867c01b5b7fe110d7c73`；[PR #7](https://github.com/mhgd3250905/Sport-Helper/pull/7) 与 [PR #8](https://github.com/mhgd3250905/Sport-Helper/pull/8) 已合并，分别对应 `e2430a689db45dfb437484821324c72ea377d774`、`c9823e61457eb3e8839c867c01b5b7fe110d7c73`。旧交付报告中的 Draft、未合 main 或未推送描述属于原时点，不能替代本节的主线核对。
+
+| 项目 | 当前事实与来源 |
+| --- | --- |
+| 运行源码 / 已测与打包源码 | `c9823e61457eb3e8839c867c01b5b7fe110d7c73`；本次文档提交不替代该 APK 的源码身份 |
+| App / 原生包身份 | `pubspec.yaml` 为 `0.1.0+54`；既有 arm64 internal release 回执为 `com.ugk.smartfit.internal` / versionName `0.1.0` / versionCode `2054`；原生构建号由实际包元数据确认，不从 `+54` 推断 |
+| SDK 固定源码 | 五包及 coach override 统一固定 `693cbc02cdf284163409868e117e438515c6a8d8`，对应 `ugk_trainer-v0.6.0`；`pubspec.yaml`、`pubspec.lock` 的 ref/resolved-ref 与 `AppBuildInfo.sdkRef` 一致 |
+| SDK 包版本 | `ugk_coach 0.8.0`、`ugk_coach_ui 0.4.0`、`ugk_trainer 0.6.0`、`ugk_coach_chat 0.1.0`、`ugk_trainer_runtime 0.1.0` |
+| 软件门禁 | 同一 c9823e6 源码：全量 **679 通过 / 0 失败 / 0 跳过**；指定四文件 **34 / 0 / 0**；严格分析 0 问题，离线严格锁文件通过；命令、日期和源码绑定见[验收记录](acceptance.md) |
+| APK 文件 | `SmartFit-sdk-v0.6.0-c9823e6-0.1.0+54-internal-arm64-v8a-release.apk` |
+| APK 大小 / SHA-256 | **42,855,748 B**；`669998db28c5b7474ab577957068609c0207b4cf0abc1e32208fa4462879b61e` |
+| 既有 APK 门禁 | 回执记录原证书、ZIP/ELF 16KB、存储 JNI 与资源检查通过；本轮不重新构建或读取 APK，不把历史产物观察写为新构建 |
+| 签名身份 | 沿用既有开发证书，SHA-256 `3761270a4764157f0e389014a9e5b800b05403bfddce0f4f7f8c039f6a53bdc7`；不记为正式生产签名 |
+| 动作 / 媒体目录 | 训练动作 **211→211**，减少 0、新增 0、改名 0；媒体目录 219 项，两类计数含义不同 |
+| 用户验收 | **pending-user**；+54 真机结果尚未确认。SF 主 App 固定 `zh-CN`，没有语言切换入口；测试宿主的中英适配通过不等于真实 App 可切语言 |
+
+既有交付回执：[软件门禁](../../deliveries/sdk-pin-v0.6.0-7263b74-20261103/final-software-gates.json)、[指定四文件](../../deliveries/sdk-pin-v0.6.0-7263b74-20261103/targeted-c9823e6/receipt.json)、[动作集合审计](../../deliveries/sdk-pin-v0.6.0-7263b74-20261103/catalog-audit.json)、[APK 门禁](../../deliveries/sdk-pin-v0.6.0-7263b74-20261103/release-preparation/validation-release.json)、[最终交付回执](../../deliveries/sdk-pin-v0.6.0-7263b74-20261103/final-delivery-receipt.json)。这些回执保留交付时点的分支及保护状态；最新主线归属以本节 Git / PR 核对为准。
+
+## 近期更新索引（+49 收束后至 +54）
+
+| 阶段 | 已进入当前主线的变化 | 验证边界 |
+| --- | --- | --- |
+| +50 | 任务气泡按原型数值对齐，保留四个 RepaintBoundary；主线升版出包 | [原主线交付记录](task-bubble-fidelity-plus50-main-2026-10-31.md) 的 861 项测试与 APK 属于 `4ef76006d47e06cdeacdcdc77a647436284ab98f` |
+| +52 | 对话迁移到共享 `ugk_coach_chat`，App 保留存储、导航及宿主适配；随后接入 a13e3b6 修复 | [首轮阻断](coach-chat-sdk-plus52-2026-11-01.md)与[修复交付](coach-chat-sdk-plus52-a13e3b-2026-11-01.md)分列，原失败不抹除 |
+| +53 | 长会话 SDK 接入，保留每轮原始请求字节及错误类型诊断；原机保留数据升级恢复 | [20+21 轮、22 帧与原机恢复](coach-chat-sdk-plus53-0a6c3aa-2026-11-01.md)仅属于 `df4e460` / SDK `0a6c3aa` / 2053 包 |
+| +54 前段 | `52d30ae` 将探针正常轮数配置为 50，并升级当时 SDK | 源码可核对探针配置；本次未读取对应实测回执，不登记“50+51 轮已通过” |
+| +54 当前 | SDK 固定 trainer v0.6.0；统一五包身份展示，修正动作库宿主 locale / State 定位测试，补齐搜索与筛选覆盖 | c9823e6 软件门禁见上表；预计 193 秒 / 执行 200 秒为代码计时契约，未据此认定真机训练秒表通过 |
+
+本次收束范围为已记录 +49 主线收束 `2309de349df34a12a2d72b33ac0ef71f2780c0dc` 至 c9823e6 的 **22 个提交 / 201 条路径**，本轮只对齐文档与台账。按用户授权提交并普通 push，最终提交和推送结果以 Git 远端核对为准；不预写尚未发生的 SHA 或推送回执。不新增 tag，不操作发布分支、SDK 源码、其他工作树或设备。大字号 / 小屏验证不在本轮范围，缩略图排查继续按用户要求跳过。
+
+## 历史版本与交付记录
+
+<details>
+<summary>展开 +53 及更早原时点记录；其中“当前”、候选和未合并状态均只适用于各自日期</summary>
+
 ## +53 长会话 SDK 交付（2026-11-01）
 
 `codex/coach-chat-sdk` / **0.1.0+53 / 2053**，五包及 coach override 固定 SDK `0a6c3aa`。源码 `df4e460`：原 7 条断言所在 5 个文件字节未改；全量 **678/0/0**、严格分析 0、浅深 **22 帧零差**。原三段真实对话双时长 ±10% 通过，同一 controller **20 轮成功＋第 21 轮正确上限提示**，最大实际请求 **57,775 B**。release **42,833,292 B**，原证书/16KB/JNI 通过；原手机 **2052→2053** 保留数据升级，两次启动均恢复旧对话与两套计划全部 **19 项剂量**。真实长聊与原机恢复证据分列；仅推本分支，不合 main、不动 release、不打 tag。 详见[本轮一页报告](coach-chat-sdk-plus53-0a6c3aa-2026-11-01.md)；下方记录保留各原时点事实。
@@ -383,6 +420,8 @@ SDK 默认 `maxSteps=10`，每次 HTTP 超时 120 秒且不重试，App 整轮�
 | `git diff --name-status 7ef80d75331a150b6a258ef3ba0c27832fd1e54b..d0b1c7ef6198a469a7f0a7cedcaa7c9f2512dbe7` | 仅 `docs/HANDOVER.md`、`docs/acceptance.md`、`docs/pr3-local-review.md` | 上一阶段 Preflight 重新核对，说明当时已有运行源码验证为何仍适用 |
 
 PR #3 合并提交与已测源的树均为 `029a952876a816ffa72f28def688cd62ba34b1d1`。该阶段文档整理期间核对运行源码与配置无差异，并校验文档链接、标签指向、版本字段及差异格式，没有因文档变化重复全量 Flutter 测试。这是 M7 的历史范围；训练接入使用当前上方记录的 156 项测试及独立真机证据。
+
+</details>
 
 ## 后续版本维护规则
 

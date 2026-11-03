@@ -1,6 +1,17 @@
 # 开发者日志：版本、工具与会话快照
 
+## 当前接线（+54，2026-11-04）
+
+当前代码与既有验证源为 `c9823e61457eb3e8839c867c01b5b7fe110d7c73`，App `0.1.0+54 / 2054`，SDK 五包及 coach override 固定 `693cbc02cdf284163409868e117e438515c6a8d8`（`ugk_trainer-v0.6.0`）。`CoachChatDiagnostics` 通过 SDK observer、controller 和 gateway lease 只读观察公开事件与请求；不选择工具、不修改请求/响应，不改变取消、重试或准入。版本与既有软件、设备证据见[台账](version-management.md)及[验收记录](acceptance.md)。本次只更新设计说明，没有读取用户日志或重新操作设备。
+
+<details>
+<summary>+40 日志能力的历史检查点</summary>
+
 日志能力检查点为 `5a1e25405f799bc8835a2d54fc9225dde6d45dfc`，位于 `codex/coach-v2`，当时继承 +39 的 SDK `32d2839a4edb6d47e5ffe362215ec1a94b208824`。该能力已随 +40 `428c5f3db4a90907889a2fa3e0eb9633b38a48b0` 出包，SDK 三包现统一为 `1532f0825b93777139be0e92e715ebec144a73b9`；版本与验收见[台账](version-management.md)及[+40 记录](coach-v2-plus40-2026-10-28.md)。下列日志契约继续适用，仅用于开发者日志，不把参数、工具或快照显示在聊天界面。
+
+以上“现统一”和检查点验证只属于 2026-10-28 原时点；当前接线与字段契约使用下文。
+
+</details>
 
 ## 版本与事件
 
@@ -10,10 +21,11 @@
 
 | 事件 | 详细字段 |
 | --- | --- |
-| `chat.user` | 原始 `text`（保留前后空白及换行）、实际发送的 `sentText`、询问 ID、显示标签、是否宿主明确指令 |
+| `chat.user` | `data.text` 优先使用 SDK `CoachChatUserInput.rawText`，缺失时用用户消息文本 |
 | `ai.tool.requested` | SDK 原始工具名、调用 ID、批次和序号、原始及解析后的参数；`set_params.parameters` 逐项保存 `name/value/source/quote` 等全部原字段 |
 | `ai.tool.result` | 同一工具身份、回执来源、`receiptAvailable`、结构化结果摘要 |
 | `ai.agent.event` | SDK 原始事件名、轮次、任务、节点；节点事件附当前 SDK 已接受参数的完整来源字段 |
+| `coach_chat.chat.turn.result` | SDK 公开的轮次结果 detail；白名单元数据另列 status、errorType、kind（来自 failureKind） |
 | `chat.session.archived` | 独立会话快照的文件名与保存状态 |
 
 结果摘要只选取状态、错误/修复信息、变化字段、参数、计数等相关字段，避免复制整份目录或技能。取消轮次不套用新轮次的历史，重复历史不重复记录，工具 ID 重用以批次关联。
@@ -22,14 +34,20 @@
 
 ## 新对话归档与保留
 
-开始“新对话”时，先取得当前 `controller.exportSession().toJson()`，在取消/清空前形成归档内容；归档写入完成后才清空 SDK 会话。归档期间的新输入等候这次重置完成，多次点击合并为一次。保存失败只记错误类型，不弹窗、不阻断新对话。
+开始“新对话”时，由 SDK 的 `beforeNewConversation(CoachChatSnapshot)` hook 把清空前快照传给宿主；`CoachChatDiagnostics.archiveConversation` 将 `snapshot.session.toJson()` 交给 `RuntimeLog.archiveSession`。聊天恢复使用的完整 `CoachChatSnapshot` envelope 由 history adapter 独立保存，两者不能混称。SDK 负责新对话与后续输入的顺序；归档失败由日志层记录错误类型，不弹窗、不阻断新对话。
 
 原生路径为 App 私有 Application Support 下的 `diagnostics/session-snapshots/`，文件名 `SmartFit-session-<UTC>-<序号>-<随机后缀>.json`。先在该归档目录的临时子目录写文件并 flush，再在同一文件系统内原子重命名到归档目录；仅轮换本服务文件，保留最近 5 份，不清除其他数据。Web 开发测试使用相同接口的内存归档，不新增下载或 UI。
 
 运行日志沿用最近 7 天、1500 条、512 KiB 的有界保留策略，与会话快照的 5 份保留相互独立。正式 flavor 关闭；内测或显式开启的 debug 才采集详细内容。
 
+自动持久化等待训练转场空闲，合并突发事件并串行写入；完整脱敏及 JSON 编码在 worker isolate 执行，防止旧快照覆盖新快照。导出/显式 flush 仍可要求写入，不把整个训练期间都当作转场。
+
 ## 凭据与请求头
 
 采集器不接收 HTTP 请求头、完整 HTTP 请求或 reasoning。构建注入的 Key 在日志初始化前注册为脱敏值，客户端创建时再次保护实际 Key。递归移除凭据/请求头键，清理原文中的已知 Key、Base64 变体和显式鉴权值；同样处理嵌套 JSON 字符串和归档快照。用户原话及 `quote` 除凭据脱敏外保留原文。
 
-SDK 公开协议回归覆盖真实工具名、失败与跳过回执、终端缺失回执、参数来源及取消；宿主回归覆盖真实版本读取、原话重载、脱敏、JSON 数值溢出、归档顺序、后续输入排队和保留最近 5 份。检查点的测试命令与结果保留在本机 `deliveries/developer-logging/`，不以本地测试替代装机验收。
+观测 OpenAI 兼容客户端时保留其公开的 `config`、`auth`、`buildBody` 与 `close` 接口，真实请求体编码继续委托原客户端，供 SDK 上下文预算使用；这些接口透传不表示把鉴权值、请求头或完整请求体写入日志。
+
+当前接线的相关回归包括 `test/diagnostics/coach_chat_turn_diagnostics_test.dart`、`test/diagnostics/developer_log_details_test.dart`、`test/coach_session_snapshot_test.dart`：分别约束轮次诊断与编码器透传、日志/归档细节，以及 SDK envelope 和 legacy 恢复。测试结果及源码绑定以[验收记录](acceptance.md)为准；本次文档更新沿用已绑定源码的既有回执，未重跑这些测试。
+
+历史 SDK 公开协议回归覆盖真实工具名、失败与跳过回执、终端缺失回执、参数来源及取消；宿主回归覆盖真实版本读取、原话重载、脱敏、JSON 数值溢出、归档顺序、后续输入排队和保留最近 5 份。+40 检查点的测试命令与结果保留在本机 `deliveries/developer-logging/`，不以本地测试替代装机验收。
