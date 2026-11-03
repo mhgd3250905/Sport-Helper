@@ -382,7 +382,8 @@ void main() {
           restSeconds: 10,
         ),
       ]);
-      final ph = SessionBuilder(lib).phases(p);
+      final builder = SessionBuilder(lib);
+      final ph = builder.phases(p);
       expect(ph.map((x) => x.kind).toList(), [
         PhaseKind.prep,
         PhaseKind.work,
@@ -400,6 +401,11 @@ void main() {
       expect(ph[4].nextExerciseId, 's-figure4');
       expect(ph[5].side, Side.right);
       expect(ph[7].side, Side.left);
+      expect(
+        builder.planSeconds(p),
+        193,
+      ); // One switch adds 3s to the estimate.
+      expect(builder.executionTiming(trainerPlan(p)).totalSeconds, 200);
     });
 
     test('circuit rounds repeat items and rest between rounds', () {

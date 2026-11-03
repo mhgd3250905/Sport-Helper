@@ -160,6 +160,19 @@ void main() {
         expect(repo.actionRequests, isEmpty);
         expect(repo.fileRequests, isEmpty);
 
+        await tester.tap(find.byKey(const ValueKey('posehub-quick-胸')));
+        await tester.pumpAndSettle();
+        final chestCount = catalog.semanticCompleteActions
+            .where(
+              (action) => PoseHubActionFacets.matches(action, bodyPart: '胸'),
+            )
+            .length;
+        expect(chestCount, greaterThan(0));
+        expect(count(tester), chestCount);
+        await tester.tap(find.byKey(const ValueKey('posehub-quick-全部')));
+        await tester.pumpAndSettle();
+        expect(count(tester), 211);
+
         // SDK v0.6.0: facet chips live in the filter sheet.
         Future<void> tapChip(String key) async {
           final chip = find.byKey(ValueKey(key));
@@ -179,8 +192,6 @@ void main() {
               .selected,
           isTrue,
         );
-        await tester.tap(find.byKey(const ValueKey('posehub-filter-apply')));
-        await tester.pumpAndSettle();
         final expected = catalog.semanticCompleteActions
             .where(
               (action) => PoseHubActionFacets.matches(
@@ -192,6 +203,15 @@ void main() {
             )
             .length;
         expect(expected, greaterThan(0));
+        expect(
+          find.descendant(
+            of: find.byKey(const ValueKey('posehub-filter-apply')),
+            matching: find.text('查看 $expected 个动作'),
+          ),
+          findsOneWidget,
+        );
+        await tester.tap(find.byKey(const ValueKey('posehub-filter-apply')));
+        await tester.pumpAndSettle();
         expect(count(tester), expected);
         expect(
           find.byKey(const ValueKey('posehub-filter-badge')),
@@ -220,7 +240,7 @@ void main() {
         );
         await tester.enterText(
           find.byKey(const ValueKey('posehub-search')),
-          last.id,
+          '__missing_action__',
         );
         await tester.pumpAndSettle();
         expect(
@@ -241,7 +261,7 @@ void main() {
         expect(repo.actionRequests, isEmpty);
         FocusManager.instance.primaryFocus?.unfocus();
         await tester.pumpAndSettle();
-        final browserState = tester.state(find.byType(PoseHubActionBrowser));
+        final browserState = tester.state(find.byType(TrainingLibraryBrowser));
         final position = tester
             .state<ScrollableState>(
               find.descendant(
@@ -261,7 +281,7 @@ void main() {
         await tester.pumpAndSettle();
         expect(find.byType(TrainerPlayer), findsNothing);
         expect(
-          tester.state(find.byType(PoseHubActionBrowser)),
+          tester.state(find.byType(TrainingLibraryBrowser)),
           same(browserState),
         );
         expect(position.pixels, offset);
@@ -367,6 +387,90 @@ void main() {
       },
     );
   }
+
+  testWidgets('library copy follows the host locale without losing its scope', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1080, 2100);
+    tester.view.devicePixelRatio = 2.5;
+    addTearDown(tester.view.reset);
+    final locale = ValueNotifier(const Locale('zh', 'CN'));
+    addTearDown(locale.dispose);
+    final repo = PoseHubUiRepository(mediaBaseUri: base);
+    final services = poseHubUiServices(catalog: catalog, media: repo);
+    final search = find.byKey(const ValueKey('posehub-search'));
+    final filter = find.byKey(const ValueKey('posehub-filter-button'));
+    final apply = find.byKey(const ValueKey('posehub-filter-apply'));
+    await tester.pumpWidget(
+      ValueListenableBuilder<Locale>(
+        valueListenable: locale,
+        builder: (_, value, child) => poseHubUiApp(
+          palette: SfPalette.light,
+          services: services,
+          locale: value,
+          home: const LibraryPage(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(count(tester), 211);
+    expect(
+      tester.widget<TextField>(search).decoration!.hintText,
+      '搜动作，中文或英文都行',
+    );
+    expect(
+      find.descendant(of: filter, matching: find.text('筛选')),
+      findsOneWidget,
+    );
+    await tester.tap(filter);
+    await tester.pumpAndSettle();
+    expect(
+      find.descendant(of: apply, matching: find.text('查看 211 个动作')),
+      findsOneWidget,
+    );
+    await tester.tap(apply);
+    await tester.pumpAndSettle();
+    final browserState = tester.state(find.byType(TrainingLibraryBrowser));
+
+    locale.value = const Locale('en');
+    await tester.pumpAndSettle();
+    expect(
+      tester.state(find.byType(TrainingLibraryBrowser)),
+      same(browserState),
+    );
+    expect(count(tester), 211);
+    expect(
+      tester.widget<TextField>(search).decoration!.hintText,
+      'Search moves in English or Chinese',
+    );
+    expect(
+      find.descendant(of: filter, matching: find.text('Filter')),
+      findsOneWidget,
+    );
+    final action = catalog.semanticCompleteActions.first;
+    await tester.enterText(search, action.id);
+    await tester.pumpAndSettle();
+    expect(count(tester), 1);
+    expect(find.byKey(ValueKey('posehub-action-${action.id}')), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('posehub-search-clear')));
+    await tester.pumpAndSettle();
+    expect(count(tester), 211);
+    await tester.tap(filter);
+    await tester.pumpAndSettle();
+    expect(
+      find.descendant(of: apply, matching: find.text('Show 211 moves')),
+      findsOneWidget,
+    );
+    expect(find.text('Reset'), findsOneWidget);
+    await tester.tap(apply);
+    await tester.pumpAndSettle();
+    expect(repo.actionRequests, isEmpty);
+    expect(repo.fileRequests, isEmpty);
+    expect(tester.takeException(), isNull);
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+    repo.dispose();
+  });
 
   testWidgets(
     'coach action opens SDK preview and leaving it never saves a workout',

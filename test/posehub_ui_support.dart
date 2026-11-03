@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:smartfit/app/posehub_media_repository.dart';
 import 'package:smartfit/app/services.dart';
 import 'package:smartfit/core/storage/local_state_storage.dart';
@@ -158,10 +159,18 @@ Widget poseHubUiApp({
   required Widget home,
   AppServices? services,
   GlobalKey<NavigatorState>? navigatorKey,
+  Locale locale = const Locale('zh', 'CN'),
 }) {
   final app = MaterialApp(
     debugShowCheckedModeBanner: false,
     navigatorKey: navigatorKey,
+    locale: locale,
+    supportedLocales: const [Locale('zh', 'CN'), Locale('en')],
+    localizationsDelegates: const [
+      GlobalMaterialLocalizations.delegate,
+      GlobalWidgetsLocalizations.delegate,
+      GlobalCupertinoLocalizations.delegate,
+    ],
     theme: buildTheme(palette),
     builder: (_, child) => SfPaletteScope(child: child!),
     home: home,
