@@ -164,11 +164,17 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('panel-library')));
     await tester.pumpAndSettle();
     expect(find.byType(LibraryPage), findsOneWidget);
+    // SDK v0.6.0: facet chips live in the filter sheet.
+    await tester.tap(find.byKey(const ValueKey('posehub-filter-button')));
+    await tester.pumpAndSettle();
     final stretch = find.byKey(const ValueKey('posehub-类型-拉伸放松'));
     await tester.ensureVisible(stretch);
     await tester.tap(stretch);
     await tester.pumpAndSettle();
     expect(tester.widget<ChoiceChip>(stretch).selected, isTrue);
+    await tester.tap(find.byKey(const ValueKey('posehub-filter-apply')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('posehub-filter-badge')), findsOneWidget);
     await tester.tap(find.byTooltip('返回').first);
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('chat-panel-toggle')));

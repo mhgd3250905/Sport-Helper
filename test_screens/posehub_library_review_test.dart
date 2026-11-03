@@ -104,10 +104,20 @@ void main() {
         );
         await _shot(tester, 'library-${palette.brightness.name}');
 
+        // SDK v0.6.0: facet chips live in the filter sheet.
+        await tester.tap(find.byKey(const ValueKey('posehub-filter-button')));
+        await tester.pumpAndSettle();
         await tester.tap(find.byKey(const ValueKey('posehub-器械-徒手')));
+        await tester.pump();
+        await tester.tap(find.byKey(const ValueKey('posehub-filter-apply')));
         await tester.pumpAndSettle();
         await _shot(tester, 'library-filtered-${palette.brightness.name}');
-        await tester.tap(find.byKey(const ValueKey('posehub-clear-filters')));
+        await tester.tap(find.byKey(const ValueKey('posehub-filter-button')));
+        await tester.pumpAndSettle();
+        await tester.tap(find.byKey(const ValueKey('posehub-filter-reset')));
+        await tester.pump();
+        await tester.tap(find.byKey(const ValueKey('posehub-filter-apply')));
+        await tester.pumpAndSettle();
         final action = catalog.semanticCompleteActions.first;
         await tester.enterText(
           find.byKey(const ValueKey('posehub-search')),

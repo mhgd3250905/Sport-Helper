@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
@@ -23,6 +24,32 @@ class PoseHubLibraryPage extends StatefulWidget {
 
 class _PoseHubLibraryPageState extends State<PoseHubLibraryPage> {
   SmartFitPoseHubMediaPreparer? _preparer;
+  TrainingLibraryConfig? _config;
+  coach.PoseHubAppTestCatalog? _configCatalog;
+  String? _configLanguage;
+
+  /// Library strings follow the app locale (SDK v0.6.0). The scope keeps every
+  /// browsable action, so the list is the one SF showed without a config.
+  TrainingLibraryConfig _libraryConfig(String languageTag) {
+    if (_config case final config?
+        when identical(_configCatalog, widget.catalog) &&
+            _configLanguage == languageTag) {
+      return config;
+    }
+    _configCatalog = widget.catalog;
+    _configLanguage = languageTag;
+    return _config = TrainingLibraryConfig(
+      scopeManifest: coach.CoachActionScopeManifest.fromCatalogBytes(
+        appId: 'smartfit',
+        catalogBytes: utf8.encode(jsonEncode(widget.catalog.raw)),
+        allowedActionIds: widget.catalog.semanticCompleteActions.map(
+          (action) => action.id,
+        ),
+      ),
+      strings: TrainingLibraryStrings.forLanguage(languageTag),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -48,6 +75,9 @@ class _PoseHubLibraryPageState extends State<PoseHubLibraryPage> {
     return TrainingVisiblePosterPreload(
       child: PoseHubActionBrowser(
         catalog: widget.catalog,
+        libraryConfig: _libraryConfig(
+          Localizations.localeOf(context).toLanguageTag(),
+        ),
         mediaBaseUri:
             widget.media?.mediaBaseUri ??
             Uri(scheme: 'file', path: '/__posehub_cache_unavailable__/'),

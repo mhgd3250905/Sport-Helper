@@ -423,5 +423,7 @@ class _PerformanceCaseRunnerState extends State<PerformanceCaseRunner>
   Widget _conversation() => ChatHomePage(
     controller: widget.fixture.controller,
     scrollController: _scroll,
+    // The runner header owns 退出; no second (SDK) back button.
+    showBackButton: false,
   );
 }

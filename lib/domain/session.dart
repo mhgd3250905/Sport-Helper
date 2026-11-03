@@ -28,6 +28,9 @@ class SessionBuilder {
         rhythms: trainerRhythms(library),
         known: library.contains,
         prepSeconds: prepSeconds,
+        // Estimate allowance per side switch (SDK v0.6.0, user 2026-11-03).
+        sideSwitchMarginSeconds:
+            trainer.SessionBuilder.recommendedSideSwitchMarginSeconds,
       );
 
   final trainer.SessionBuilder _builder;

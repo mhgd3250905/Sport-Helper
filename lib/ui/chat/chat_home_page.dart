@@ -10,15 +10,20 @@ class ChatHomePage extends StatelessWidget {
     this.controller,
     this.scrollController,
     this.clock,
+    this.showBackButton,
   });
   final CoachChatController? controller;
   final ScrollController? scrollController;
   final DateTime Function()? clock;
+
+  /// SDK CoachChatPage back button; null shows it when the route can pop.
+  final bool? showBackButton;
 
   @override
   Widget build(BuildContext context) => CoachChatPage(
     controller: controller ?? AppServices.of(context).chat,
     scrollController: scrollController,
     clock: clock,
+    showBackButton: showBackButton,
   );
 }

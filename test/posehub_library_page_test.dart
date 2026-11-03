@@ -160,11 +160,26 @@ void main() {
         expect(repo.actionRequests, isEmpty);
         expect(repo.fileRequests, isEmpty);
 
-        await tester.tap(find.byKey(const ValueKey('posehub-器械-徒手')));
+        // SDK v0.6.0: facet chips live in the filter sheet.
+        Future<void> tapChip(String key) async {
+          final chip = find.byKey(ValueKey(key));
+          await tester.ensureVisible(chip);
+          await tester.tap(chip);
+          await tester.pumpAndSettle();
+        }
+
+        await tester.tap(find.byKey(const ValueKey('posehub-filter-button')));
         await tester.pumpAndSettle();
-        await tester.tap(find.byKey(const ValueKey('posehub-部位-胸')));
-        await tester.pumpAndSettle();
-        await tester.tap(find.byKey(const ValueKey('posehub-类型-力量')));
+        await tapChip('posehub-器械-徒手');
+        await tapChip('posehub-部位-胸');
+        await tapChip('posehub-类型-力量');
+        expect(
+          tester
+              .widget<ChoiceChip>(find.byKey(const ValueKey('posehub-器械-徒手')))
+              .selected,
+          isTrue,
+        );
+        await tester.tap(find.byKey(const ValueKey('posehub-filter-apply')));
         await tester.pumpAndSettle();
         final expected = catalog.semanticCompleteActions
             .where(
@@ -179,12 +194,14 @@ void main() {
         expect(expected, greaterThan(0));
         expect(count(tester), expected);
         expect(
-          tester
-              .widget<ChoiceChip>(find.byKey(const ValueKey('posehub-器械-徒手')))
-              .selected,
-          isTrue,
+          find.byKey(const ValueKey('posehub-filter-badge')),
+          findsOneWidget,
         );
-        await tester.tap(find.byKey(const ValueKey('posehub-clear-filters')));
+        await tester.tap(find.byKey(const ValueKey('posehub-filter-button')));
+        await tester.pumpAndSettle();
+        await tester.tap(find.byKey(const ValueKey('posehub-filter-reset')));
+        await tester.pump();
+        await tester.tap(find.byKey(const ValueKey('posehub-filter-apply')));
         await tester.pumpAndSettle();
         expect(count(tester), 211);
         final last = catalog.semanticCompleteActions.last;

@@ -16,30 +16,30 @@ dependencies:
     git:
       url: https://github.com/mhgd3250905/ugk-3d-pose-sdk.git
       path: packages/ugk_trainer
-      ref: d4502f35b1503d41cd782aa7fb3780c7f6591ad0
+      ref: 693cbc02cdf284163409868e117e438515c6a8d8
   ugk_coach:
     version: 0.8.0
     git:
       url: https://github.com/mhgd3250905/ugk-3d-pose-sdk.git
-      ref: d4502f35b1503d41cd782aa7fb3780c7f6591ad0
+      ref: 693cbc02cdf284163409868e117e438515c6a8d8
   ugk_coach_ui:
     version: 0.4.0
     git:
       url: https://github.com/mhgd3250905/ugk-3d-pose-sdk.git
       path: packages/ugk_coach_ui
-      ref: d4502f35b1503d41cd782aa7fb3780c7f6591ad0
+      ref: 693cbc02cdf284163409868e117e438515c6a8d8
   ugk_coach_chat:
     version: 0.1.0
     git:
       url: https://github.com/mhgd3250905/ugk-3d-pose-sdk.git
       path: packages/ugk_coach_chat
-      ref: d4502f35b1503d41cd782aa7fb3780c7f6591ad0
+      ref: 693cbc02cdf284163409868e117e438515c6a8d8
   ugk_trainer_runtime:
     version: 0.1.0
     git:
       url: https://github.com/mhgd3250905/ugk-3d-pose-sdk.git
       path: packages/ugk_trainer_runtime
-      ref: d4502f35b1503d41cd782aa7fb3780c7f6591ad0
+      ref: 693cbc02cdf284163409868e117e438515c6a8d8
   shared_preferences: 2.5.6
   webview_flutter: 4.14.1
   webview_flutter_android: 4.14.1
@@ -59,7 +59,7 @@ dependency_overrides:
   ugk_coach:
     git:
       url: https://github.com/mhgd3250905/ugk-3d-pose-sdk.git
-      ref: d4502f35b1503d41cd782aa7fb3780c7f6591ad0
+      ref: 693cbc02cdf284163409868e117e438515c6a8d8
 
 dev_dependencies:
   shared_preferences_platform_interface: 2.4.2
