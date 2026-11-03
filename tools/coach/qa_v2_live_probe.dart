@@ -139,6 +139,11 @@ const _scenarios = [
   ),
 ];
 
+// Supplemental coverage is opt-in and never reruns a failed original case.
+const _extraScenarios = [
+  _Scenario('equipment-multiselect', '想练背', place: '居家'),
+];
+
 /// Simulation policy only: select an option exactly as the model displayed it.
 /// Never synthesize a free-text answer to an unexpected open-ended question.
 String? selectProbeAnswer(
@@ -449,6 +454,21 @@ void main() {
       const outputPath = String.fromEnvironment('SMARTFIT_LIVE_OUTPUT');
       const source = String.fromEnvironment('SMARTFIT_BUILD_SOURCE');
       const token = String.fromEnvironment('SMARTFIT_AI_TOKEN');
+      const scenarioSelection = String.fromEnvironment('SMARTFIT_QA_SCENARIOS');
+      final requestedIds = scenarioSelection
+          .split(',')
+          .map((id) => id.trim())
+          .where((id) => id.isNotEmpty)
+          .toSet();
+      final available = {
+        for (final s in [..._scenarios, ..._extraScenarios]) s.id: s,
+      };
+      if (requestedIds.any((id) => !available.containsKey(id))) {
+        throw StateError('Unknown explicit QA scenario ID.');
+      }
+      final selectedScenarios = requestedIds.isEmpty
+          ? _scenarios
+          : [for (final id in requestedIds) available[id]!];
       if (outputPath.isEmpty || source.length != 40 || token.isEmpty) {
         throw StateError(
           'Explicit output/source and private runner token required.',
@@ -474,7 +494,7 @@ void main() {
       }
       final config = AiCoachConfig(token: token, modelName: qaProbeModel);
       final report = <String, Object?>{
-        'schema': 'smartfit-native-sdk-qa-v2-five-live-conversations@2',
+        'schema': 'smartfit-native-sdk-qa-v2-live-conversations@3',
         'startedAtUtc': DateTime.now().toUtc().toIso8601String(),
         'sourceCommit': source,
         'sourceWorkingTreeStatus': _git([
@@ -492,6 +512,10 @@ void main() {
             'CoachChatController.send / answerQuestion / answerChoices; SDK admission and ChatMessage rendering',
         'tagsLoading': 'same production loadAppAiTags rootBundle loader',
         'outerRetries': 0,
+        'scenarioSelection': [for (final s in selectedScenarios) s.id],
+        'supplementalOnly': selectedScenarios.every(
+          (s) => _extraScenarios.contains(s),
+        ),
         'answerPolicy':
             'original option text; preferred place/equipment, otherwise first model option; open question stops; native multiselect chooses original dumbbell and mat options',
         'conversations': <Map<String, Object?>>[],
@@ -533,7 +557,7 @@ void main() {
       final failures = report['failures'] as List<String>;
       final conversations =
           report['conversations'] as List<Map<String, Object?>>;
-      for (final scenario in _scenarios) {
+      for (final scenario in selectedScenarios) {
         final store = AppStore(_Storage());
         await store.load();
         await store.acceptSafety(blocked: false);
@@ -678,8 +702,10 @@ void main() {
               if (question == null) {
                 throw StateError('Missing answerable native question.');
               }
-              if (scenario.id == 'home-dumbbell-twenty' &&
-                  nativeFollowUp == 2 &&
+              if (((scenario.id == 'home-dumbbell-twenty' &&
+                          nativeFollowUp == 2) ||
+                      (scenario.id == 'equipment-multiselect' &&
+                          nativeFollowUp == 0)) &&
                   reply.askStep == QaAskStep.equipment) {
                 final options = question.question!.options;
                 final dumbbell = _originalOption(options, ['哑铃']);
@@ -699,7 +725,11 @@ void main() {
               } else {
                 final answer = selectProbeAnswer(
                   reply,
-                  place: scenario.place,
+                  place:
+                      scenario.id == 'equipment-multiselect' &&
+                          nativeFollowUp == 2
+                      ? '健身房'
+                      : scenario.place,
                   equipment: scenario.equipment,
                 );
                 if (answer == null) {
@@ -715,6 +745,24 @@ void main() {
             } else if (scenario.followUp != null && !followUpSent) {
               input = scenario.followUp!;
               followUpSent = true;
+            } else if (scenario.id == 'equipment-multiselect' &&
+                nativeFollowUp == 0) {
+              conversation['conditionsBeforeVenueChange'] = reply.conditions;
+              final chip = _originalOption(assistant.quickActions, [
+                '换场地',
+                '换个场地',
+                '换个地方',
+              ]);
+              if (chip == null) {
+                turn['quickActionNotEmitted'] = true;
+                input = '换场地';
+                api = 'typed-send';
+              } else {
+                turn['selectedOriginalChip'] = chip;
+                input = chip;
+                api = 'send(original-quickAction)';
+              }
+              nativeFollowUp = 2;
             } else if (scenario.id == 'home-dumbbell-twenty' &&
                 nativeFollowUp == 0) {
               if (reply.plan == null || reply.planOrderedIds.length < 2) {
@@ -753,10 +801,17 @@ void main() {
           conversation['allActualRequestsThinkingMax'] =
               observed.calls.isNotEmpty &&
               observed.calls.every((c) => c['requestContractVerified'] == true);
-          if (scenario.id == 'home-dumbbell-twenty') {
+          if (scenario.id == 'home-dumbbell-twenty' ||
+              scenario.id == 'equipment-multiselect') {
             conversation['nativeMultiselectObserved'] = multiselectObserved;
             if (!multiselectObserved) {
               failures.add('${scenario.id}:native-multiselect-not-exercised');
+            }
+          }
+          if (scenario.id == 'equipment-multiselect') {
+            conversation['finalPlace'] = controller.qaAgent.state.place;
+            if (controller.qaAgent.state.place != 'gym') {
+              failures.add('${scenario.id}:venue-change-not-completed');
             }
           }
           for (final observation in observations) {
