@@ -1,0 +1,1606 @@
+{
+  "format": "pose-hub-ai-vocabulary@1",
+  "version": "0.1.0",
+  "status": "draft-phase1",
+  "date": "2026-11-03",
+  "purpose": "AI 选动作用的固定词表。每个动作标签文件 catalog/ai-tags/actions/<id>.json 的枚举值只能取这里的 id。只有 aiSummary、notes、reviewNotes 是自由文本。",
+  "sources": [
+    "catalog/production/v3-text/*.json（249 份 r2 文案与 tags，权威动作清单）",
+    "catalog/taxonomy.json（20 个肌群、器械、体位、场所）",
+    "catalog/catalog.json（v0.3 旧目录 142 个，仅作交叉参考）"
+  ],
+  "dimensions": {
+    "scenes": {
+      "type": "multi",
+      "required": true,
+      "description": "能在哪些场所做。按动作本身的需求判断，不按'谁会用'判断。",
+      "values": {
+        "home": {
+          "zh": "居家",
+          "en": "Home",
+          "definition": "家里客厅或卧室：有地面、墙、椅子，可铺垫子；默认有 mat/chair/wall/towel/book/water-bottle。"
+        },
+        "office": {
+          "zh": "办公室",
+          "en": "Office",
+          "definition": "工位旁穿着通勤衣服可做：不躺地不跪地（floorRequired=false），impact=none，sweat≤light；默认只有 chair/wall/desk。"
+        },
+        "gym": {
+          "zh": "健身房",
+          "en": "Gym",
+          "definition": "有全部常见器械；居家能做的动作健身房都能做，但只有需要健身房器械时才只标 gym。"
+        },
+        "outdoor": {
+          "zh": "户外",
+          "en": "Outdoor",
+          "definition": "公园、操场：地面可能脏或不平，不默认有垫子；站姿、行走、借助长椅/栏杆的动作适合。"
+        },
+        "hotel": {
+          "zh": "酒店",
+          "en": "Hotel",
+          "definition": "酒店房间：空间小、地毯或地板、床/椅子/墙，没有器械，楼下有人（impact 应为 none/low）。"
+        }
+      }
+    },
+    "space": {
+      "type": "single",
+      "required": true,
+      "description": "动作占用的地面空间。",
+      "values": {
+        "in-place": {
+          "zh": "原地",
+          "en": "In place",
+          "definition": "站或坐在约 1×1 米内完成，不需要铺开身体。"
+        },
+        "mat": {
+          "zh": "一张垫子",
+          "en": "Mat-sized",
+          "definition": "身体需要铺开（躺、跪、俯撑、侧卧），约 2×1 米。"
+        },
+        "walking": {
+          "zh": "需要走动",
+          "en": "Walking room",
+          "definition": "动作要向前/侧移动几步以上（行走、侧步、爬行），需要 3 米以上通道。"
+        }
+      }
+    },
+    "floorRequired": {
+      "type": "boolean",
+      "required": true,
+      "description": "是否需要身体躺、跪、坐或撑在地面上（脚以外部位着地）。true 的动作办公室默认不推荐。与 taxonomy positions.*.floor 一致，但坐在地上的 seated 也算 true。"
+    },
+    "impact": {
+      "type": "single",
+      "required": true,
+      "description": "跳跃/冲击与噪音。",
+      "values": {
+        "none": {
+          "zh": "无冲击",
+          "en": "None",
+          "definition": "双脚或支撑点始终不离地，几乎没有声音。"
+        },
+        "low": {
+          "zh": "低冲击",
+          "en": "Low",
+          "definition": "有踏步、脚步落地或器械轻碰，声音很小，楼下基本听不到。"
+        },
+        "high": {
+          "zh": "高冲击",
+          "en": "High",
+          "definition": "跳跃、双脚离地落下，会有明显声音，可能打扰楼下。"
+        }
+      }
+    },
+    "sweat": {
+      "type": "single",
+      "required": true,
+      "description": "按默认剂量做完后的出汗程度，用于办公室/通勤场景过滤。",
+      "values": {
+        "none": {
+          "zh": "不出汗",
+          "en": "None",
+          "definition": "穿通勤衣服做完不会出汗。"
+        },
+        "light": {
+          "zh": "微汗",
+          "en": "Light",
+          "definition": "可能微微发热，一般不需要换衣服。"
+        },
+        "moderate": {
+          "zh": "明显出汗",
+          "en": "Moderate",
+          "definition": "会出汗，做完最好擦汗或换衣服。"
+        },
+        "high": {
+          "zh": "大量出汗",
+          "en": "High",
+          "definition": "连续高心率，衣服会湿。"
+        }
+      }
+    },
+    "requiredEquipment": {
+      "type": "multi",
+      "required": true,
+      "vocabulary": "equipment",
+      "description": "不具备就不能按原样做的器械。空数组 = 徒手。mat 只在躺跪撑地时算必需；软地毯/床可替代时仍写 mat，替代写 substitutes。"
+    },
+    "optionalEquipment": {
+      "type": "multi",
+      "required": true,
+      "vocabulary": "equipment",
+      "description": "有了更舒服或更好调节、但不是必需的器械（例如站姿动作扶墙可选）。"
+    },
+    "substitutes": {
+      "type": "list",
+      "required": true,
+      "description": "必需器械的家用替代。每项 {for: equipment id, use: [equipment id...], loadNote: 'lighter'|'similar'|'heavier'}。例如 {for:'dumbbell', use:['water-bottle'], loadNote:'lighter'}。",
+      "itemShape": {
+        "for": "equipment id",
+        "use": "[equipment id]",
+        "loadNote": "lighter|similar|heavier"
+      }
+    },
+    "equipment": {
+      "type": "vocabulary-only",
+      "description": "器械 id 表。aliases 是 v3 文案 tags.equipment 中出现过的同义写法，批量打标时归一到本 id。",
+      "values": {
+        "mat": {
+          "zh": "瑜伽垫",
+          "en": "Mat",
+          "definition": "瑜伽垫或任何软垫，用于躺、跪、撑地。",
+          "defaultScenes": [
+            "home",
+            "gym",
+            "hotel"
+          ],
+          "aliases": [],
+          "kind": "equipment"
+        },
+        "chair": {
+          "zh": "椅子/凳子",
+          "en": "Chair or stool",
+          "definition": "稳固、不带轮子的椅子或凳子；扶、坐、踩、撑都用这个 id。",
+          "defaultScenes": [
+            "home",
+            "office",
+            "gym",
+            "hotel"
+          ],
+          "aliases": [
+            "stool"
+          ],
+          "kind": "equipment"
+        },
+        "wall": {
+          "zh": "墙",
+          "en": "Wall",
+          "definition": "可以靠、推、贴的平整墙面。",
+          "defaultScenes": [
+            "home",
+            "office",
+            "gym",
+            "hotel",
+            "outdoor"
+          ],
+          "aliases": [],
+          "kind": "equipment"
+        },
+        "doorframe": {
+          "zh": "门框",
+          "en": "Doorframe",
+          "definition": "可扶住或抵住的门框。",
+          "defaultScenes": [
+            "home",
+            "office",
+            "hotel"
+          ],
+          "aliases": [],
+          "kind": "equipment"
+        },
+        "block": {
+          "zh": "瑜伽砖",
+          "en": "Yoga block",
+          "definition": "瑜伽砖或泡沫块；可用厚书代替。",
+          "defaultScenes": [
+            "home",
+            "gym"
+          ],
+          "aliases": [
+            "yoga-block",
+            "yoga-blocks",
+            "foam-block"
+          ],
+          "kind": "equipment"
+        },
+        "towel": {
+          "zh": "毛巾",
+          "en": "Towel",
+          "definition": "长毛巾，用于拉、绕、垫或在地板上当滑垫。",
+          "defaultScenes": [
+            "home",
+            "gym",
+            "hotel"
+          ],
+          "aliases": [],
+          "kind": "equipment"
+        },
+        "band": {
+          "zh": "长弹力带",
+          "en": "Resistance band",
+          "definition": "长条或环形长弹力带（非迷你带）。",
+          "defaultScenes": [
+            "home",
+            "gym"
+          ],
+          "aliases": [
+            "resistance-band"
+          ],
+          "kind": "equipment"
+        },
+        "mini-band": {
+          "zh": "迷你弹力带",
+          "en": "Mini band",
+          "definition": "套在大腿/脚踝上的短环形弹力带。",
+          "defaultScenes": [
+            "home",
+            "gym"
+          ],
+          "aliases": [],
+          "kind": "equipment"
+        },
+        "dumbbell": {
+          "zh": "哑铃",
+          "en": "Dumbbell",
+          "definition": "单只或一对哑铃。",
+          "defaultScenes": [
+            "gym"
+          ],
+          "aliases": [],
+          "kind": "equipment"
+        },
+        "kettlebell": {
+          "zh": "壶铃",
+          "en": "Kettlebell",
+          "definition": "壶铃。",
+          "defaultScenes": [
+            "gym"
+          ],
+          "aliases": [],
+          "kind": "equipment"
+        },
+        "barbell": {
+          "zh": "杠铃杆",
+          "en": "Barbell",
+          "definition": "杠铃杆（含地雷杆用杆）。",
+          "defaultScenes": [
+            "gym"
+          ],
+          "aliases": [],
+          "kind": "equipment"
+        },
+        "bench": {
+          "zh": "训练凳",
+          "en": "Bench",
+          "definition": "平/可调训练凳；家里可用稳固矮凳或床沿替代时写在 substitutes。",
+          "defaultScenes": [
+            "gym"
+          ],
+          "aliases": [],
+          "kind": "equipment"
+        },
+        "slider": {
+          "zh": "滑盘",
+          "en": "Slider",
+          "definition": "滑盘；木地板上可用毛巾代替。",
+          "defaultScenes": [
+            "gym"
+          ],
+          "aliases": [
+            "sliders"
+          ],
+          "kind": "equipment"
+        },
+        "parallettes": {
+          "zh": "俯撑架",
+          "en": "Parallettes",
+          "definition": "平行杆/俯撑架。",
+          "defaultScenes": [
+            "gym"
+          ],
+          "aliases": [],
+          "kind": "equipment"
+        },
+        "pullup-bar": {
+          "zh": "单杠",
+          "en": "Pull-up bar",
+          "definition": "单杠或门框单杠。",
+          "defaultScenes": [
+            "gym",
+            "outdoor"
+          ],
+          "aliases": [
+            "pull-up-bar"
+          ],
+          "kind": "equipment"
+        },
+        "dip-bars": {
+          "zh": "双杠",
+          "en": "Dip bars",
+          "definition": "双杠。",
+          "defaultScenes": [
+            "gym",
+            "outdoor"
+          ],
+          "aliases": [],
+          "kind": "equipment"
+        },
+        "rings": {
+          "zh": "吊环",
+          "en": "Gymnastic rings",
+          "definition": "吊环。",
+          "defaultScenes": [
+            "gym"
+          ],
+          "aliases": [
+            "gymnastic-rings"
+          ],
+          "kind": "equipment"
+        },
+        "foam-roller": {
+          "zh": "泡沫轴",
+          "en": "Foam roller",
+          "definition": "泡沫轴。",
+          "defaultScenes": [
+            "home",
+            "gym"
+          ],
+          "aliases": [],
+          "kind": "equipment"
+        },
+        "swiss-ball": {
+          "zh": "瑞士球",
+          "en": "Stability ball",
+          "definition": "健身球/瑞士球。",
+          "defaultScenes": [
+            "gym"
+          ],
+          "aliases": [
+            "stability-ball"
+          ],
+          "kind": "equipment"
+        },
+        "cable": {
+          "zh": "绳索器械",
+          "en": "Cable machine",
+          "definition": "龙门架/绳索器械。",
+          "defaultScenes": [
+            "gym"
+          ],
+          "aliases": [
+            "cable-machine"
+          ],
+          "kind": "equipment"
+        },
+        "d-handle": {
+          "zh": "D 形把手",
+          "en": "D-handle",
+          "definition": "绳索器械单手把手（配件）。",
+          "defaultScenes": [
+            "gym"
+          ],
+          "aliases": [],
+          "kind": "attachment"
+        },
+        "ankle-strap": {
+          "zh": "脚踝绑带",
+          "en": "Ankle strap",
+          "definition": "绳索器械脚踝绑带（配件）。",
+          "defaultScenes": [
+            "gym"
+          ],
+          "aliases": [],
+          "kind": "attachment"
+        },
+        "landmine": {
+          "zh": "地雷杆",
+          "en": "Landmine",
+          "definition": "地雷杆底座。",
+          "defaultScenes": [
+            "gym"
+          ],
+          "aliases": [],
+          "kind": "equipment"
+        },
+        "roman-chair": {
+          "zh": "45° 罗马椅",
+          "en": "45° Roman chair",
+          "definition": "45 度罗马椅。",
+          "defaultScenes": [
+            "gym"
+          ],
+          "aliases": [],
+          "kind": "equipment"
+        },
+        "ghd": {
+          "zh": "GHD 臀腿训练器",
+          "en": "GHD",
+          "definition": "臀腿训练器。",
+          "defaultScenes": [
+            "gym"
+          ],
+          "aliases": [],
+          "kind": "equipment"
+        },
+        "reverse-hyper": {
+          "zh": "反向背伸机",
+          "en": "Reverse hyper",
+          "definition": "反向背伸机。",
+          "defaultScenes": [
+            "gym"
+          ],
+          "aliases": [],
+          "kind": "equipment"
+        },
+        "hip-abductor-machine": {
+          "zh": "髋外展机",
+          "en": "Hip abductor machine",
+          "definition": "坐姿髋外展机。",
+          "defaultScenes": [
+            "gym"
+          ],
+          "aliases": [
+            "hip-abduction-machine"
+          ],
+          "kind": "equipment"
+        },
+        "leg-extension-machine": {
+          "zh": "腿屈伸机",
+          "en": "Leg extension machine",
+          "definition": "坐姿腿屈伸机。",
+          "defaultScenes": [
+            "gym"
+          ],
+          "aliases": [],
+          "kind": "equipment"
+        },
+        "water-bottle": {
+          "zh": "水瓶",
+          "en": "Water bottle",
+          "definition": "装满水的瓶子，0.5–2 kg，常用作轻哑铃替代。",
+          "defaultScenes": [
+            "home",
+            "office",
+            "hotel",
+            "outdoor"
+          ],
+          "aliases": [],
+          "kind": "household"
+        },
+        "backpack": {
+          "zh": "背包",
+          "en": "Backpack",
+          "definition": "装书或水的背包，可当负重或壶铃替代。",
+          "defaultScenes": [
+            "home",
+            "office",
+            "hotel",
+            "outdoor"
+          ],
+          "aliases": [],
+          "kind": "household"
+        },
+        "book": {
+          "zh": "厚书",
+          "en": "Thick book",
+          "definition": "厚书，可当瑜伽砖或垫高物。",
+          "defaultScenes": [
+            "home",
+            "office",
+            "hotel"
+          ],
+          "aliases": [],
+          "kind": "household"
+        },
+        "stairs": {
+          "zh": "台阶",
+          "en": "Step or stairs",
+          "definition": "一级台阶或稳固踏台。",
+          "defaultScenes": [
+            "home",
+            "outdoor",
+            "gym"
+          ],
+          "aliases": [],
+          "kind": "household"
+        }
+      }
+    },
+    "trainingType": {
+      "type": "multi",
+      "required": true,
+      "description": "训练类型，第一个为主类型。由 v3 tags.category 映射：strength→strength，stretch→static-stretch 或 dynamic-stretch（看是否停住保持），mobility→mobility，stability→stability-control，balance→balance，cardio→cardio，assessment→按实际做法（多为 mobility/static-stretch，notes 注明）。",
+      "legacyCategoryMap": {
+        "strength": [
+          "strength"
+        ],
+        "stretch": [
+          "static-stretch",
+          "dynamic-stretch"
+        ],
+        "mobility": [
+          "mobility",
+          "dynamic-stretch"
+        ],
+        "stability": [
+          "stability-control"
+        ],
+        "balance": [
+          "balance"
+        ],
+        "cardio": [
+          "cardio"
+        ],
+        "assessment": [
+          "mobility",
+          "static-stretch"
+        ],
+        "core": [
+          "strength",
+          "stability-control"
+        ]
+      },
+      "values": {
+        "strength": {
+          "zh": "力量",
+          "en": "Strength",
+          "definition": "对抗自重或外部阻力，反复做到肌肉疲劳，提升力量或肌肉量。"
+        },
+        "static-stretch": {
+          "zh": "静态拉伸",
+          "en": "Static stretch",
+          "definition": "进入拉伸位后停住保持 15 秒以上，目标是拉长肌肉。"
+        },
+        "dynamic-stretch": {
+          "zh": "动态拉伸",
+          "en": "Dynamic stretch",
+          "definition": "有节奏地进出拉伸位、每次停留很短，用于热身。"
+        },
+        "mobility": {
+          "zh": "灵活性",
+          "en": "Mobility",
+          "definition": "主动控制关节在较大范围内活动（画圈、转动、开合），重点是关节活动度而非拉长单块肌肉。"
+        },
+        "stability-control": {
+          "zh": "稳定控制",
+          "en": "Stability & control",
+          "definition": "保持躯干或关节姿势对抗外力/重力（平板、抗旋转、鸟狗），重点是不动或慢速控制。"
+        },
+        "cardio": {
+          "zh": "有氧",
+          "en": "Cardio",
+          "definition": "连续动作使心率持续升高。"
+        },
+        "balance": {
+          "zh": "平衡",
+          "en": "Balance",
+          "definition": "缩小支撑面（单腿、窄站）并控制重心。"
+        },
+        "breathing": {
+          "zh": "呼吸",
+          "en": "Breathing",
+          "definition": "以呼吸节奏、腹式/肋间呼吸为主要内容。"
+        },
+        "assessment": {
+          "zh": "评估",
+          "en": "Assessment",
+          "definition": "用来测试活动度或能力的动作；AI 编排训练时默认不选，除非用户要求自测。"
+        }
+      }
+    },
+    "movementPattern": {
+      "type": "multi",
+      "required": true,
+      "description": "基本动作模式；纯静态拉伸、呼吸或不属于下列模式的关节活动可为空数组。",
+      "values": {
+        "squat": {
+          "zh": "蹲",
+          "en": "Squat",
+          "definition": "双腿屈髋屈膝下蹲再站起，膝和髋都大幅活动。"
+        },
+        "hinge": {
+          "zh": "髋铰链",
+          "en": "Hinge",
+          "definition": "以髋为轴前倾/抬起躯干，背保持平直，膝微屈（硬拉、臀桥、早安）。"
+        },
+        "lunge": {
+          "zh": "弓步/分腿",
+          "en": "Lunge",
+          "definition": "前后或左右分腿，单腿为主承重（弓步、分腿蹲、上台阶）。"
+        },
+        "push-horizontal": {
+          "zh": "水平推",
+          "en": "Horizontal push",
+          "definition": "手臂向身体前方推离（俯卧撑、卧推）。"
+        },
+        "push-vertical": {
+          "zh": "垂直推",
+          "en": "Vertical push",
+          "definition": "手臂向头顶上方推（推举、倒立撑）。"
+        },
+        "pull-horizontal": {
+          "zh": "水平拉",
+          "en": "Horizontal pull",
+          "definition": "手臂从前方拉向躯干（划船、反向飞鸟）。"
+        },
+        "pull-vertical": {
+          "zh": "垂直拉",
+          "en": "Vertical pull",
+          "definition": "手臂从头顶上方往下拉（引体、下拉）。"
+        },
+        "rotation": {
+          "zh": "旋转",
+          "en": "Rotation",
+          "definition": "躯干或髋主动转动。"
+        },
+        "anti-rotation": {
+          "zh": "抗旋转",
+          "en": "Anti-rotation",
+          "definition": "对抗让躯干转动的力（Pallof、单手提物、鸟狗）。"
+        },
+        "anti-extension": {
+          "zh": "抗伸展",
+          "en": "Anti-extension",
+          "definition": "对抗腰往下塌（平板、死虫、空心体）。"
+        },
+        "anti-lateral-flexion": {
+          "zh": "抗侧屈",
+          "en": "Anti-lateral flexion",
+          "definition": "对抗躯干侧弯（侧平板、单手提物行走）。"
+        },
+        "carry": {
+          "zh": "负重行走/保持",
+          "en": "Carry",
+          "definition": "手持负重站立或行走。"
+        },
+        "gait": {
+          "zh": "步态",
+          "en": "Gait",
+          "definition": "行走、踏步、抬膝、爬行等交替下肢模式。"
+        },
+        "isolation": {
+          "zh": "单关节孤立",
+          "en": "Isolation",
+          "definition": "主要只动一个关节（弯举、侧平举、踮脚、腿屈伸）。"
+        }
+      }
+    },
+    "contraction": {
+      "type": "multi",
+      "required": true,
+      "description": "主要收缩方式；rep_hold 类可同时含两者。",
+      "values": {
+        "dynamic": {
+          "zh": "动态",
+          "en": "Dynamic",
+          "definition": "肌肉在动作中缩短和拉长（反复做）。"
+        },
+        "isometric": {
+          "zh": "等长",
+          "en": "Isometric",
+          "definition": "关节不动、肌肉持续发力保持姿势。"
+        }
+      }
+    },
+    "plane": {
+      "type": "multi",
+      "required": true,
+      "description": "主要运动平面；多平面动作写多个。静态保持写抵抗的力所在平面。",
+      "values": {
+        "sagittal": {
+          "zh": "矢状面",
+          "en": "Sagittal",
+          "definition": "前后方向：屈伸（深蹲、弯举、前后摆）。"
+        },
+        "frontal": {
+          "zh": "冠状面",
+          "en": "Frontal",
+          "definition": "左右方向：外展内收、侧屈（侧平举、侧弓步）。"
+        },
+        "transverse": {
+          "zh": "水平面",
+          "en": "Transverse",
+          "definition": "转动方向：旋转、水平内收外展（转体、开书）。"
+        }
+      }
+    },
+    "bodyRegion": {
+      "type": "multi",
+      "required": true,
+      "description": "主要训练区域；全身动作写 full，不再罗列其他。",
+      "values": {
+        "upper": {
+          "zh": "上肢",
+          "en": "Upper body",
+          "definition": "肩、手臂、胸、上背。"
+        },
+        "core": {
+          "zh": "核心",
+          "en": "Core",
+          "definition": "腹部、腰背、骨盆控制。"
+        },
+        "lower": {
+          "zh": "下肢",
+          "en": "Lower body",
+          "definition": "髋、腿、脚踝。"
+        },
+        "full": {
+          "zh": "全身",
+          "en": "Full body",
+          "definition": "上下肢和核心同时大量参与。"
+        }
+      }
+    },
+    "muscles": {
+      "type": "vocabulary-only",
+      "description": "肌群 id。前 20 个与 catalog/taxonomy.json muscleGroups 完全一致，后 4 个为本次补充（见 addedReason）。v3Aliases 是 v3 文案 tags.activeMuscles/synergistMuscles 里的粗粒度写法，批量打标时按动作实际做法拆到本表 id，不能机械替换。",
+      "values": {
+        "deltoids": {
+          "zh": "三角肌",
+          "en": "Deltoids",
+          "definition": "肩部前中后束。",
+          "v3Aliases": [
+            "deltoids"
+          ]
+        },
+        "rotator-cuff": {
+          "zh": "肩袖肌群",
+          "en": "Rotator cuff",
+          "definition": "冈上、冈下、小圆、肩胛下肌，负责肩旋转和稳定。",
+          "v3Aliases": [
+            "rotator-cuff"
+          ]
+        },
+        "triceps": {
+          "zh": "肱三头肌",
+          "en": "Triceps",
+          "definition": "上臂后侧，伸肘。",
+          "v3Aliases": [
+            "triceps"
+          ]
+        },
+        "biceps": {
+          "zh": "肱二头肌",
+          "en": "Biceps",
+          "definition": "上臂前侧，屈肘与前臂外旋（含肱肌、肱桡肌）。",
+          "v3Aliases": [
+            "biceps"
+          ]
+        },
+        "forearms": {
+          "zh": "前臂·腕屈伸肌",
+          "en": "Forearms",
+          "definition": "前臂屈腕、伸腕、握力和前臂旋转肌群。",
+          "v3Aliases": [
+            "forearms"
+          ]
+        },
+        "serratus": {
+          "zh": "前锯肌",
+          "en": "Serratus anterior",
+          "definition": "肋侧，肩胛前伸与上回旋（推到底再往前送）。",
+          "v3Aliases": []
+        },
+        "scapular": {
+          "zh": "斜方肌中下部·菱形肌",
+          "en": "Mid/lower traps & rhomboids",
+          "definition": "肩胛后缩、下沉、上回旋。v3 的 upper-back 多数应归到这里（划船、反向飞鸟、YTW）。",
+          "v3Aliases": [
+            "upper-back"
+          ]
+        },
+        "chest": {
+          "zh": "胸大肌",
+          "en": "Chest",
+          "definition": "胸大肌（含胸小肌），水平内收与推。",
+          "v3Aliases": [
+            "chest"
+          ]
+        },
+        "lats": {
+          "zh": "背阔肌",
+          "en": "Lats",
+          "definition": "背阔肌和大圆肌，肩伸展与内收（下拉、划船）。",
+          "v3Aliases": [
+            "lats",
+            "upper-back"
+          ]
+        },
+        "abs": {
+          "zh": "腹直肌（含腹横肌）",
+          "en": "Abs",
+          "definition": "腹直肌与深层腹横肌，抗伸展与卷腹。v3 的 core 默认归到这里，含转体/抗旋转时再加 obliques。",
+          "v3Aliases": [
+            "core"
+          ]
+        },
+        "obliques": {
+          "zh": "腹斜肌",
+          "en": "Obliques",
+          "definition": "腹内外斜肌，旋转、抗旋转、侧屈。",
+          "v3Aliases": [
+            "obliques",
+            "core"
+          ]
+        },
+        "erectors": {
+          "zh": "竖脊肌",
+          "en": "Spinal erectors",
+          "definition": "脊柱两侧伸肌（含多裂肌、腰方肌近似归此）。v3 的 lower-back 归到这里。",
+          "v3Aliases": [
+            "lower-back"
+          ]
+        },
+        "hip-flexors": {
+          "zh": "髋屈肌",
+          "en": "Hip flexors",
+          "definition": "髂腰肌、股直肌近端、阔筋膜张肌，抬腿与前倾。",
+          "v3Aliases": [
+            "hip-flexors"
+          ]
+        },
+        "glute-max": {
+          "zh": "臀大肌",
+          "en": "Glute max",
+          "definition": "伸髋、外旋。v3 的 glutes 默认归到这里，以外展为主的动作改为 hip-abductors。",
+          "v3Aliases": [
+            "glutes"
+          ]
+        },
+        "hip-abductors": {
+          "zh": "臀中肌·髋外展",
+          "en": "Hip abductors",
+          "definition": "臀中肌、臀小肌，外展与单腿站时稳骨盆。v3 的 abductors 归到这里。",
+          "v3Aliases": [
+            "abductors",
+            "glutes"
+          ]
+        },
+        "adductors": {
+          "zh": "内收肌群",
+          "en": "Adductors",
+          "definition": "大腿内侧。",
+          "v3Aliases": [
+            "adductors"
+          ]
+        },
+        "quadriceps": {
+          "zh": "股四头肌",
+          "en": "Quadriceps",
+          "definition": "大腿前侧，伸膝。",
+          "v3Aliases": [
+            "quadriceps"
+          ]
+        },
+        "hamstrings": {
+          "zh": "腘绳肌",
+          "en": "Hamstrings",
+          "definition": "大腿后侧，屈膝与伸髋。",
+          "v3Aliases": [
+            "hamstrings"
+          ]
+        },
+        "calves": {
+          "zh": "小腿三头肌",
+          "en": "Calves",
+          "definition": "腓肠肌与比目鱼肌，踮脚。",
+          "v3Aliases": [
+            "calves"
+          ]
+        },
+        "tibialis": {
+          "zh": "胫骨前肌",
+          "en": "Tibialis anterior",
+          "definition": "小腿前侧，勾脚与足内翻。",
+          "v3Aliases": [
+            "tibialis"
+          ]
+        },
+        "neck": {
+          "zh": "颈部肌群",
+          "en": "Neck muscles",
+          "definition": "颈深屈肌、颈后伸肌、胸锁乳突肌。",
+          "v3Aliases": [
+            "neck"
+          ],
+          "addedReason": "v3 文案已有 1 个动作使用 neck；颈部活动和拉伸（办公室高频需求）在现有 20 个 id 里没有对应。"
+        },
+        "upper-traps": {
+          "zh": "斜方肌上部·肩胛提肌",
+          "en": "Upper traps & levator scapulae",
+          "definition": "耸肩、上提肩胛；颈肩拉伸的主要被拉肌。",
+          "v3Aliases": [],
+          "addedReason": "h-db-shrug、h-db-overhead-shrug 的主动肌和颈肩侧拉的被拉肌不属于 scapular（中下部）也不属于 neck；办公室肩颈放松需要单独区分。"
+        },
+        "hip-rotators": {
+          "zh": "髋深层旋转肌",
+          "en": "Deep hip rotators",
+          "definition": "梨状肌等深层外旋肌及髋内旋相关肌群。",
+          "v3Aliases": [],
+          "addedReason": "90/90、鸽子式、髋内外旋（n-prone-ir、o-supported-hip-ir 等十余个 HipLab 动作）的目标肌不是臀大肌也不是臀中肌，归入现有 id 会误导 AI 选动作。"
+        },
+        "peroneals": {
+          "zh": "腓骨长短肌",
+          "en": "Peroneals",
+          "definition": "小腿外侧，足外翻与踝外侧稳定。",
+          "v3Aliases": [],
+          "addedReason": "o-supported-ankle-eversion 等脚踝外翻动作的主动肌在现有 20 个 id 里没有对应；只有 tibialis（内翻）。"
+        }
+      }
+    },
+    "primaryMuscles": {
+      "type": "multi",
+      "required": true,
+      "vocabulary": "muscles",
+      "description": "主要发力肌（主动肌），通常 1–3 个；应与 v3 tags.activeMuscles 一致（换算到本表 id）。纯静态拉伸可为空，此时 stretchedMuscles 必填。"
+    },
+    "secondaryMuscles": {
+      "type": "multi",
+      "required": true,
+      "vocabulary": "muscles",
+      "description": "协同肌：帮助完成动作但不是主要目标；对应 v3 tags.synergistMuscles。"
+    },
+    "stabilizers": {
+      "type": "multi",
+      "required": true,
+      "vocabulary": "muscles",
+      "description": "稳定肌：保持姿势不变形、不直接产生动作（例如深蹲里的腹部、划船里的竖脊肌）。"
+    },
+    "stretchedMuscles": {
+      "type": "multi",
+      "requiredWhen": "trainingType 含 static-stretch 或 dynamic-stretch",
+      "vocabulary": "muscles",
+      "description": "被拉长的目标肌群。拉伸类必填；灵活性动作有明确被拉肌时也可填。"
+    },
+    "joints": {
+      "type": "list",
+      "required": true,
+      "description": "主要活动或承力的关节及动作，形如 [{joint, actions:[...]}]，只列有意义的关节（通常 1–4 个）。",
+      "itemShape": {
+        "joint": "joint id",
+        "actions": "[joint action id]"
+      },
+      "jointValues": {
+        "cervical-spine": {
+          "zh": "颈椎",
+          "en": "Cervical spine",
+          "definition": "脖子。"
+        },
+        "thoracic-spine": {
+          "zh": "胸椎",
+          "en": "Thoracic spine",
+          "definition": "上背。"
+        },
+        "lumbar-spine": {
+          "zh": "腰椎",
+          "en": "Lumbar spine",
+          "definition": "腰。"
+        },
+        "scapulothoracic": {
+          "zh": "肩胛胸壁",
+          "en": "Scapulothoracic",
+          "definition": "肩胛骨在胸廓上的滑动。"
+        },
+        "shoulder": {
+          "zh": "肩关节",
+          "en": "Shoulder (glenohumeral)",
+          "definition": "盂肱关节。"
+        },
+        "elbow": {
+          "zh": "肘",
+          "en": "Elbow",
+          "definition": "屈伸肘。"
+        },
+        "forearm": {
+          "zh": "前臂旋转",
+          "en": "Radioulnar",
+          "definition": "前臂旋前旋后。"
+        },
+        "wrist": {
+          "zh": "腕",
+          "en": "Wrist",
+          "definition": "腕关节。"
+        },
+        "hip": {
+          "zh": "髋",
+          "en": "Hip",
+          "definition": "髋关节。"
+        },
+        "knee": {
+          "zh": "膝",
+          "en": "Knee",
+          "definition": "膝关节。"
+        },
+        "ankle": {
+          "zh": "踝",
+          "en": "Ankle",
+          "definition": "踝关节与距下关节。"
+        }
+      },
+      "actionValues": {
+        "flexion": {
+          "zh": "屈",
+          "en": "Flexion",
+          "definition": "关节动作：屈。"
+        },
+        "extension": {
+          "zh": "伸",
+          "en": "Extension",
+          "definition": "关节动作：伸。"
+        },
+        "abduction": {
+          "zh": "外展",
+          "en": "Abduction",
+          "definition": "关节动作：外展。"
+        },
+        "adduction": {
+          "zh": "内收",
+          "en": "Adduction",
+          "definition": "关节动作：内收。"
+        },
+        "internal-rotation": {
+          "zh": "内旋",
+          "en": "Internal rotation",
+          "definition": "关节动作：内旋。"
+        },
+        "external-rotation": {
+          "zh": "外旋",
+          "en": "External rotation",
+          "definition": "关节动作：外旋。"
+        },
+        "horizontal-abduction": {
+          "zh": "水平外展",
+          "en": "Horizontal abduction",
+          "definition": "关节动作：水平外展。"
+        },
+        "horizontal-adduction": {
+          "zh": "水平内收",
+          "en": "Horizontal adduction",
+          "definition": "关节动作：水平内收。"
+        },
+        "rotation": {
+          "zh": "旋转（脊柱）",
+          "en": "Rotation (spine)",
+          "definition": "关节动作：旋转（脊柱）。"
+        },
+        "lateral-flexion": {
+          "zh": "侧屈",
+          "en": "Lateral flexion",
+          "definition": "关节动作：侧屈。"
+        },
+        "elevation": {
+          "zh": "上提",
+          "en": "Elevation",
+          "definition": "关节动作：上提。"
+        },
+        "depression": {
+          "zh": "下沉",
+          "en": "Depression",
+          "definition": "关节动作：下沉。"
+        },
+        "protraction": {
+          "zh": "前伸",
+          "en": "Protraction",
+          "definition": "关节动作：前伸。"
+        },
+        "retraction": {
+          "zh": "后缩",
+          "en": "Retraction",
+          "definition": "关节动作：后缩。"
+        },
+        "upward-rotation": {
+          "zh": "上回旋",
+          "en": "Upward rotation",
+          "definition": "关节动作：上回旋。"
+        },
+        "downward-rotation": {
+          "zh": "下回旋",
+          "en": "Downward rotation",
+          "definition": "关节动作：下回旋。"
+        },
+        "pronation": {
+          "zh": "旋前",
+          "en": "Pronation",
+          "definition": "关节动作：旋前。"
+        },
+        "supination": {
+          "zh": "旋后",
+          "en": "Supination",
+          "definition": "关节动作：旋后。"
+        },
+        "dorsiflexion": {
+          "zh": "背屈（勾脚）",
+          "en": "Dorsiflexion",
+          "definition": "关节动作：背屈（勾脚）。"
+        },
+        "plantarflexion": {
+          "zh": "跖屈（绷脚）",
+          "en": "Plantarflexion",
+          "definition": "关节动作：跖屈（绷脚）。"
+        },
+        "inversion": {
+          "zh": "内翻",
+          "en": "Inversion",
+          "definition": "关节动作：内翻。"
+        },
+        "eversion": {
+          "zh": "外翻",
+          "en": "Eversion",
+          "definition": "关节动作：外翻。"
+        },
+        "radial-deviation": {
+          "zh": "桡偏",
+          "en": "Radial deviation",
+          "definition": "关节动作：桡偏。"
+        },
+        "ulnar-deviation": {
+          "zh": "尺偏",
+          "en": "Ulnar deviation",
+          "definition": "关节动作：尺偏。"
+        },
+        "circumduction": {
+          "zh": "环转",
+          "en": "Circumduction",
+          "definition": "关节动作：环转。"
+        },
+        "isometric-hold": {
+          "zh": "保持不动",
+          "en": "Isometric hold",
+          "definition": "关节承力但保持角度不变（平板中的肩、腰）。"
+        }
+      }
+    },
+    "difficulty": {
+      "type": "integer",
+      "required": true,
+      "minimum": 1,
+      "maximum": 5,
+      "description": "1–5 级。v3 文案用 1–3，本表扩到 5 级以容纳技巧类动作：v3 的 1/2/3 一般对应本表 1/2/3，只有技巧/高力量动作上调到 4–5，差异写 notes。",
+      "levels": {
+        "1": {
+          "zh": "入门",
+          "en": "Beginner",
+          "definition": "支撑面大或有扶靠，徒手或很轻负重，动作简单，第一次做跟着口令就能做对。"
+        },
+        "2": {
+          "zh": "基础",
+          "en": "Novice",
+          "definition": "需要基本身体控制：全幅度自重、轻中负重、扶物单腿、需要协调两三个要点。"
+        },
+        "3": {
+          "zh": "中级",
+          "en": "Intermediate",
+          "definition": "不扶单腿/分腿负重、标准俯卧撑类全身支撑、末端活动度或较快协调，新手要先练前置能力。"
+        },
+        "4": {
+          "zh": "进阶",
+          "en": "Advanced",
+          "definition": "需要较高相对力量或技巧：引体、L 坐保持、手枪蹲、深度柔韧类。"
+        },
+        "5": {
+          "zh": "高阶技巧",
+          "en": "Expert",
+          "definition": "体操/街舞技巧级：俯撑平衡、托马斯全旋要素、单臂类。"
+        }
+      }
+    },
+    "intensity": {
+      "type": "single",
+      "required": true,
+      "description": "按默认剂量做时的心率强度。",
+      "values": {
+        "low": {
+          "zh": "低",
+          "en": "Low",
+          "definition": "心率基本不升，能正常说话（拉伸、活动度、呼吸、多数静态保持）。"
+        },
+        "moderate": {
+          "zh": "中",
+          "en": "Moderate",
+          "definition": "心率明显上升，说话略喘（多数力量组）。"
+        },
+        "high": {
+          "zh": "高",
+          "en": "High",
+          "definition": "心率接近较高水平，说话断续（快节奏全身动作、跳跃、大肌群高次数）。"
+        }
+      }
+    },
+    "prerequisites": {
+      "type": "multi",
+      "required": true,
+      "description": "做这个动作前最好已经具备的能力；入门动作可为空。",
+      "values": {
+        "floor-transfer": {
+          "zh": "能自己上下地面",
+          "en": "Can get down and up from floor",
+          "definition": "不扶或轻扶即可坐下/躺下再起来。"
+        },
+        "kneeling-tolerance": {
+          "zh": "跪地不痛",
+          "en": "Pain-free kneeling",
+          "definition": "膝盖跪在垫上 30 秒以上不痛。"
+        },
+        "wrist-loading": {
+          "zh": "手腕可承重",
+          "en": "Wrist weight-bearing",
+          "definition": "四足或俯撑时手腕无痛。"
+        },
+        "overhead-range": {
+          "zh": "手臂能无痛举过头",
+          "en": "Pain-free overhead reach",
+          "definition": "双臂能贴近耳朵举过头且不耸肩、不痛。"
+        },
+        "deep-squat-range": {
+          "zh": "能蹲到大腿平行",
+          "en": "Squat to parallel",
+          "definition": "脚跟不离地蹲到大腿接近水平。"
+        },
+        "hip-hinge": {
+          "zh": "会髋铰链",
+          "en": "Hip hinge pattern",
+          "definition": "能以髋为轴前倾且背保持平直。"
+        },
+        "neutral-spine": {
+          "zh": "能保持背平直",
+          "en": "Neutral spine control",
+          "definition": "动作中腰背不塌、不拱。"
+        },
+        "single-leg-supported": {
+          "zh": "扶物单腿站 30 秒",
+          "en": "Supported single-leg stance 30 s",
+          "definition": "轻扶椅子或墙单腿站稳 30 秒。"
+        },
+        "single-leg-unsupported": {
+          "zh": "不扶单腿站 30 秒",
+          "en": "Unsupported single-leg stance 30 s",
+          "definition": "不扶任何东西单腿站稳 30 秒。"
+        },
+        "split-stance": {
+          "zh": "能稳住分腿姿势",
+          "en": "Stable split stance",
+          "definition": "前后分腿站或半跪时不晃。"
+        },
+        "plank-30s": {
+          "zh": "平板支撑 30 秒",
+          "en": "30 s plank",
+          "definition": "前臂或直臂平板稳定 30 秒。"
+        },
+        "pushup-10": {
+          "zh": "10 个标准俯卧撑",
+          "en": "10 push-ups",
+          "definition": "能连续做 10 个标准俯卧撑。"
+        },
+        "hang-30s": {
+          "zh": "悬垂 30 秒",
+          "en": "30 s dead hang",
+          "definition": "能在单杠上直臂悬垂 30 秒。"
+        },
+        "pullup-1": {
+          "zh": "1 个引体向上",
+          "en": "1 pull-up",
+          "definition": "能完成 1 个标准引体。"
+        },
+        "band-anchor": {
+          "zh": "会固定弹力带",
+          "en": "Can anchor a band",
+          "definition": "能把弹力带安全固定在门/柱或脚上。"
+        }
+      }
+    },
+    "laterality": {
+      "type": "single",
+      "required": true,
+      "description": "左右侧方式。注意 v3 的 unilateral=true 同时包含了单侧和交替两种。",
+      "values": {
+        "bilateral": {
+          "zh": "双侧同时",
+          "en": "Bilateral",
+          "definition": "左右同时做同样的事。"
+        },
+        "unilateral": {
+          "zh": "单侧",
+          "en": "Unilateral",
+          "definition": "一侧做完规定量再换另一侧（training.perSide=each-side-separately）。"
+        },
+        "alternating": {
+          "zh": "左右交替",
+          "en": "Alternating",
+          "definition": "每次换一侧（training.kind=rep_alternate 等）。"
+        }
+      }
+    },
+    "jointStress": {
+      "type": "object",
+      "required": true,
+      "keys": [
+        "knee",
+        "lumbar",
+        "shoulder",
+        "wrist",
+        "neck",
+        "ankle",
+        "hip"
+      ],
+      "description": "按默认剂量、正确做法时各关节的负担。七个键都必填。高负担动作也只用 moderate，说明需要注意；不表示安全或危险的医疗判断。",
+      "values": {
+        "none": {
+          "zh": "无",
+          "en": "None",
+          "definition": "该关节基本不承力或只轻微活动。"
+        },
+        "low": {
+          "zh": "低",
+          "en": "Low",
+          "definition": "该关节参与但负担小，一般人无感。"
+        },
+        "moderate": {
+          "zh": "需注意",
+          "en": "Moderate",
+          "definition": "该关节承重/末端/反复受力，此处有不适的人应减量或换动作。"
+        }
+      },
+      "keyLabels": {
+        "knee": "膝",
+        "lumbar": "腰",
+        "shoulder": "肩",
+        "wrist": "手腕",
+        "neck": "颈",
+        "ankle": "踝",
+        "hip": "髋"
+      },
+      "legacyCautionMap": {
+        "膝": "knee",
+        "腰": "lumbar",
+        "肩": "shoulder",
+        "手腕": "wrist",
+        "颈": "neck",
+        "髋": "hip",
+        "大腿内侧": "hip"
+      }
+    },
+    "populationNotes": {
+      "type": "list",
+      "required": true,
+      "description": "面向人群的提示，只做提示不做医疗判断。每项 {population, flag, reasons:[...]}；未列出的人群表示没有特别提示。",
+      "itemShape": {
+        "population": "population id",
+        "flag": "flag id",
+        "reasons": "[reason id]"
+      },
+      "populations": {
+        "beginner": {
+          "zh": "新手",
+          "en": "Beginner",
+          "definition": "很少或从未规律训练的人。"
+        },
+        "older-adult": {
+          "zh": "年长者",
+          "en": "Older adult",
+          "definition": "65 岁左右及以上，关注平衡与上下地面。"
+        },
+        "pregnancy": {
+          "zh": "孕期",
+          "en": "Pregnancy",
+          "definition": "孕期人群；仰卧、腹部受压、平衡和憋气相关提示。"
+        },
+        "postpartum": {
+          "zh": "产后",
+          "en": "Postpartum",
+          "definition": "产后恢复期，关注腹压和盆底。"
+        },
+        "hypertension": {
+          "zh": "高血压",
+          "en": "Hypertension",
+          "definition": "血压偏高人群；憋气、头低于心脏、大重量相关提示。"
+        },
+        "overweight": {
+          "zh": "体重较大",
+          "en": "Higher body weight",
+          "definition": "体重较大人群；跳跃和关节负担相关提示。"
+        }
+      },
+      "flags": {
+        "suitable": {
+          "zh": "适合",
+          "en": "Suitable",
+          "definition": "一般可以作为该人群的选择。"
+        },
+        "modify": {
+          "zh": "建议调整",
+          "en": "Modify",
+          "definition": "可以做，但建议用退阶、扶物或减小幅度。"
+        },
+        "caution": {
+          "zh": "谨慎",
+          "en": "Caution",
+          "definition": "有相关情况的人先确认自身情况再做，AI 不应主动首选。"
+        }
+      },
+      "reasons": {
+        "supine-position": {
+          "zh": "长时间仰卧",
+          "en": "Prolonged supine",
+          "definition": "平躺保持较久。"
+        },
+        "prone-position": {
+          "zh": "俯卧腹部受压",
+          "en": "Prone / belly pressure",
+          "definition": "腹部贴地或受压。"
+        },
+        "breath-holding-risk": {
+          "zh": "容易憋气",
+          "en": "Breath-holding risk",
+          "definition": "发力时容易憋气。"
+        },
+        "head-below-heart": {
+          "zh": "头低于心脏",
+          "en": "Head below heart",
+          "definition": "倒立或头低位。"
+        },
+        "high-impact": {
+          "zh": "冲击",
+          "en": "Impact",
+          "definition": "有跳跃或落地冲击。"
+        },
+        "balance-demand": {
+          "zh": "平衡要求",
+          "en": "Balance demand",
+          "definition": "单腿或窄支撑，有跌倒可能。"
+        },
+        "floor-transfer": {
+          "zh": "上下地面",
+          "en": "Floor transfer",
+          "definition": "需要躺下再起来。"
+        },
+        "heavy-load": {
+          "zh": "负重",
+          "en": "Load",
+          "definition": "外部负重较大。"
+        },
+        "abdominal-pressure": {
+          "zh": "腹压高",
+          "en": "High intra-abdominal pressure",
+          "definition": "卷腹、空心体等腹压大的姿势。"
+        },
+        "end-range-stretch": {
+          "zh": "末端拉伸",
+          "en": "End-range stretch",
+          "definition": "接近关节末端的深度拉伸。"
+        },
+        "low-demand": {
+          "zh": "负担很小",
+          "en": "Low demand",
+          "definition": "负担小、可控，适合作为入门选择。"
+        }
+      }
+    },
+    "sessionRole": {
+      "type": "multi",
+      "required": true,
+      "description": "在一次训练里适合放的位置，可多选。",
+      "values": {
+        "warmup": {
+          "zh": "热身",
+          "en": "Warm-up",
+          "definition": "低强度、动态，为后面训练准备关节和肌肉。"
+        },
+        "main": {
+          "zh": "主训练",
+          "en": "Main",
+          "definition": "训练主体：力量、稳定或有氧的主要组。"
+        },
+        "cooldown": {
+          "zh": "放松",
+          "en": "Cool-down",
+          "definition": "训练后降心率、拉伸、恢复。"
+        }
+      }
+    },
+    "goals": {
+      "type": "multi",
+      "required": true,
+      "description": "能服务的目标，按贡献大小排序。",
+      "values": {
+        "strength": {
+          "zh": "力量",
+          "en": "Strength",
+          "definition": "提升发力能力。"
+        },
+        "hypertrophy": {
+          "zh": "增肌",
+          "en": "Hypertrophy",
+          "definition": "能加负重/次数做到接近力竭，促进肌肉增长。"
+        },
+        "fat-loss": {
+          "zh": "减脂",
+          "en": "Fat loss",
+          "definition": "动用大肌群或心率较高，消耗较多。"
+        },
+        "posture": {
+          "zh": "体态",
+          "en": "Posture",
+          "definition": "改善圆肩、骨盆前倾等常见体态。"
+        },
+        "desk-relief": {
+          "zh": "久坐缓解",
+          "en": "Desk relief",
+          "definition": "缓解久坐引起的颈肩、腰、髋紧张，适合工间做。"
+        },
+        "mobility": {
+          "zh": "柔韧灵活",
+          "en": "Mobility & flexibility",
+          "definition": "提升关节活动度或肌肉延展性。"
+        },
+        "performance": {
+          "zh": "运动表现",
+          "en": "Performance",
+          "definition": "服务街舞、跑跳等专项能力。"
+        },
+        "recovery": {
+          "zh": "恢复",
+          "en": "Recovery",
+          "definition": "训练后或疲劳时低负担恢复。"
+        }
+      }
+    },
+    "alternatives": {
+      "type": "multi",
+      "required": true,
+      "vocabulary": "action-id",
+      "description": "同难度、同目标、可互换的动作 id（必须是 249 个定稿动作之一）。常用于器械或场景不满足时替换。"
+    },
+    "regressions": {
+      "type": "multi",
+      "required": true,
+      "vocabulary": "action-id",
+      "description": "更容易的版本（退阶）的动作 id。"
+    },
+    "progressions": {
+      "type": "multi",
+      "required": true,
+      "vocabulary": "action-id",
+      "description": "更难的版本（进阶）的动作 id。"
+    },
+    "aiSummary": {
+      "type": "text",
+      "required": true,
+      "description": "唯一的面向 AI 的自由文本：中英各一句，说清 AI 什么时候该选它（谁、在哪、为了什么）。中文 ≤ 60 字。",
+      "shape": {
+        "zh": "string",
+        "en": "string"
+      }
+    },
+    "confidence": {
+      "type": "single",
+      "required": true,
+      "description": "标注者对本文件整体的把握。",
+      "values": {
+        "high": {
+          "zh": "高",
+          "en": "High",
+          "definition": "文案、cues、已有标签一致，动作常见，判断明确。"
+        },
+        "medium": {
+          "zh": "中",
+          "en": "Medium",
+          "definition": "个别字段需要推断或与已有标签有冲突。"
+        },
+        "low": {
+          "zh": "低",
+          "en": "Low",
+          "definition": "动作少见或文案/动画信息不足，需要人工复核。"
+        }
+      }
+    }
+  }
+}

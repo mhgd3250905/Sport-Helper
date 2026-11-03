@@ -32,12 +32,12 @@ class AiCoachConfig {
   bool get enabled => token.trim().isNotEmpty;
 
   static const baseUrl = 'https://ai.uuugk.win/v1';
-  static const model = 'deepseek-flash';
+  static const model = 'deepseek-v4.1-flash';
 
   coach.OpenAiCompatibleClient createClient({required String deviceId}) {
     RuntimeLog.instance.protectSecret(token.trim());
     return coach.OpenAiCompatibleClient(
-      // Retry individual steps in CoachAgent, without transport retries.
+      // Retry individual steps in the SDK agent, without transport retries.
       config: coach.LlmConfig.ugkWorker.copyWith(
         baseUrl: endpoint,
         model: modelName,

@@ -6,8 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
+import 'package:ugk_coach_chat/ugk_coach_chat.dart' show CoachChatAgentMode;
 
 import 'app/services.dart';
+import 'app/app_ai_tags.dart';
 import 'app/app_test_catalog.dart';
 import 'app/app_test_content.dart';
 import 'app/posehub_asset_bundle.dart';
@@ -193,6 +195,8 @@ Future<void> main() async {
     // No persisted identifier means no proxy call; offline training still works.
   }
   final services = AppServices(
+    agentMode: CoachChatAgentMode.qaV2,
+    appAiTags: await loadAppAiTags(),
     library: activeLibrary,
     catalog: catalog,
     store: store,

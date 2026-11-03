@@ -47,6 +47,8 @@ CoachAppProfile smartfitCoachAppProfile(AppServices services) {
       allowedActionIds: smartfitCoachAuthorizedActionIds.where(ids.contains),
     ),
     coachProfile: profile,
+    agentMode: services.agentMode,
+    aiTags: services.appAiTags,
     conversationPolicy: coach.CoachScopeConversationPolicy(
       specialty: '通用健身与拉伸',
       suggestions: const ['来一套 5 分钟拉伸', '推荐几个动作', '今天练什么'],

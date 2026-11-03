@@ -1,0 +1,2053 @@
+{
+  "format": "smartfit-ai-tags-provenance@1",
+  "repository": "https://github.com/mhgd3250905/3D-Pose-Hub",
+  "branch": "codex/ai-action-tags",
+  "pullRequest": "https://github.com/mhgd3250905/3D-Pose-Hub/pull/26",
+  "sourceCommit": "5d17c24af859d905dbbdee4b1d623b99881ac618",
+  "sourceRoot": "catalog/ai-tags/",
+  "recordedDate": "2026-11-04",
+  "status": "ai-draft",
+  "reviewed": false,
+  "testOnly": true,
+  "actionCount": 249,
+  "statusCounts": {
+    "ai-draft": 249
+  },
+  "confidenceCounts": {
+    "high": 219,
+    "medium": 27,
+    "low": 3
+  },
+  "sourceFilesAreByteExact": true,
+  "aggregate": {
+    "path": "actions.json",
+    "asset": "assets/coach/ai-tags/actions.json",
+    "shape": "Map<String, Map<String, Object?>>: action ID to its complete unmodified source JSON object",
+    "sha256": "f3d1e03420a68520233d2d47ee91d60d679a4391b70a6739dd109a6b14e7de65",
+    "bytes": 789843,
+    "actionCount": 249,
+    "valuesEqualSourceJson": true,
+    "valuesEqualArchivedSourceJson": true
+  },
+  "sourceReadmeCaveat": "Source README and PR body still describe the initial five examples; this exact commit contains 249 action JSON files. Every imported action remains ai-draft.",
+  "licenseDeclaration": "No standalone ai-tags license or repository root LICENSE was found at this commit. Imported for the user-authorized internal test only; no open-source license is inferred. Existing model/media third-party attributions do not grant a blanket ai-tags license.",
+  "usageBoundary": "AI tags are draft descriptive inputs only. SDK catalog, authorization, safety and deterministic plan/training gates remain authoritative.",
+  "files": [
+    {
+      "sourcePath": "catalog/ai-tags/README.md",
+      "path": "README.md",
+      "gitBlob": "4801e37b661fe8f42e5da867c3ec9e4a632c68cb",
+      "bytes": 3594,
+      "sha256": "65397832e13495644d3fd03d877e5e2b9385c09b68818c31429c6f9d1ec85227"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/abs-A.json",
+      "path": "actions/abs-A.json",
+      "gitBlob": "1a84b9f700991c499ea36d201029ddb2a4a4273d",
+      "bytes": 3334,
+      "sha256": "cffa08aab827c3f39f062d7fc151d0e5c9367ad2b3d8ab7f0578c2718566599a",
+      "id": "abs-A"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/abs-B.json",
+      "path": "actions/abs-B.json",
+      "gitBlob": "19e5b84b8a3182999b70e2f56258eab14ba92482",
+      "bytes": 3298,
+      "sha256": "7542d31b42d90f33f2a9d28fa3a420887fc579a61b0f5a18f0227a2496640c34",
+      "id": "abs-B"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/abs-C.json",
+      "path": "actions/abs-C.json",
+      "gitBlob": "c82bbca6f199bf076c4f406184d51991cfd000a4",
+      "bytes": 3114,
+      "sha256": "d7d4b251628bd56dde5a9d614e5bc53735f99577ac5fffa7d7a2c8e5297741ee",
+      "id": "abs-C"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/adductors-A.json",
+      "path": "actions/adductors-A.json",
+      "gitBlob": "c0a70286edea2309b414534cb69b7b55b1fc9757",
+      "bytes": 3855,
+      "sha256": "1e8b69b5cca842cee3e2e025296651d3953cba029a2328e57e7142c39df7eafd",
+      "id": "adductors-A"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/adductors-B.json",
+      "path": "actions/adductors-B.json",
+      "gitBlob": "8758fab29713cace4405daaac69b84580995f91d",
+      "bytes": 2466,
+      "sha256": "a7549dea7645827e58effc1e1e3bc7c0b2a519c5506a7f8cb0f3145a07fde573",
+      "id": "adductors-B"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/adductors-C.json",
+      "path": "actions/adductors-C.json",
+      "gitBlob": "c7413f9f7ae7c31ac607381b48ea0d73cc133442",
+      "bytes": 2224,
+      "sha256": "c5371c5d7592170a7a46eedd81b345e535051d7ea8a7753dffe1da6d3dd77f75",
+      "id": "adductors-C"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/chest-A.json",
+      "path": "actions/chest-A.json",
+      "gitBlob": "d704bfd20923add2fd83854d6872b901ad410b09",
+      "bytes": 2954,
+      "sha256": "566a3bbc5bc3d034cefa4c43ab6e5623010d30805dbab9c189c4b89c016ce315",
+      "id": "chest-A"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/chest-B.json",
+      "path": "actions/chest-B.json",
+      "gitBlob": "a0294f17a65e746a2f553a0f386af5070bfafe44",
+      "bytes": 2274,
+      "sha256": "4e97c86e8c6b8236c17a3f6b83e8bc0db139b7440ab19edea5c66fad72382b31",
+      "id": "chest-B"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/chest-C.json",
+      "path": "actions/chest-C.json",
+      "gitBlob": "788f6a0a5a2d2e49c2612c19465d6aa858f06ab9",
+      "bytes": 2419,
+      "sha256": "513d9b936df755e493a378a87391d5b419044e59f4b5786d33213bcdb4663b68",
+      "id": "chest-C"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/deltoids-A.json",
+      "path": "actions/deltoids-A.json",
+      "gitBlob": "7fe7395d924bc3397235626f8db4ac298730051c",
+      "bytes": 2656,
+      "sha256": "0d6a7251def1c24809683704f2bdfbc4a578bc94fa7741c5b1fa059ea099b66d",
+      "id": "deltoids-A"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/deltoids-B.json",
+      "path": "actions/deltoids-B.json",
+      "gitBlob": "5cae6cb5f63d39888181abb1e4017bbfd4b867e5",
+      "bytes": 3017,
+      "sha256": "5264c399976f5032eb32d6e497f35ff1261b183b026a2eed049f042e425fcc45",
+      "id": "deltoids-B"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/deltoids-C.json",
+      "path": "actions/deltoids-C.json",
+      "gitBlob": "e8700bbf5bc27d54643fef099e28c30882024823",
+      "bytes": 2496,
+      "sha256": "14150528053f2bcde4aeca3445b9b5cb3ba0ba95238442921d9d063bfa7c5c83",
+      "id": "deltoids-C"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/erectors-A.json",
+      "path": "actions/erectors-A.json",
+      "gitBlob": "4e625bbd810c495c95e33755800f62f0464830d3",
+      "bytes": 3485,
+      "sha256": "2a8b1e2b9f308cfaf1309deeacb97f655c5a7c8d429b3665c3ecf0b2bf916964",
+      "id": "erectors-A"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/erectors-B.json",
+      "path": "actions/erectors-B.json",
+      "gitBlob": "5c3e7d370ecbc08388c29ae31a60bc98540a0c1f",
+      "bytes": 3058,
+      "sha256": "1f4ad058920ac262cc18b5af8791d868d7b5139c7f6300a67f762c15aac8ef48",
+      "id": "erectors-B"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/erectors-C.json",
+      "path": "actions/erectors-C.json",
+      "gitBlob": "6f832c7dcc67cd56c0a8fedfc8baf8215d8931e1",
+      "bytes": 2481,
+      "sha256": "853a7b98506ca234920c71ac401a23578e44a9d8abccb30ed6527d63b0709752",
+      "id": "erectors-C"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/forearms-A.json",
+      "path": "actions/forearms-A.json",
+      "gitBlob": "db6688b76547623cf4597fbe4cbfc94ca6ae5be2",
+      "bytes": 3121,
+      "sha256": "8d4f11a1f4697fd451de4063fe875c8bb43b5be3e439c6ec473b49824891de07",
+      "id": "forearms-A"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/forearms-B.json",
+      "path": "actions/forearms-B.json",
+      "gitBlob": "f9f06a15e78b24e19a8a9880788b0e2269660ef9",
+      "bytes": 2526,
+      "sha256": "54b21b08b37a4e3d4f89d7910397f25ac0e41e70d4e8c0d9b6df2f36adbb2d9f",
+      "id": "forearms-B"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/forearms-C.json",
+      "path": "actions/forearms-C.json",
+      "gitBlob": "a1b1eb26835891018a36b908606c30440ad44c0a",
+      "bytes": 2332,
+      "sha256": "a8b710ecce79941d561e6e1a4a723031a4efea6f3566ec7a057a662e819553c5",
+      "id": "forearms-C"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/g-cable-hip-abduction.json",
+      "path": "actions/g-cable-hip-abduction.json",
+      "gitBlob": "0787ebc7849ccc94c037c34ed21d59b9923c0eb7",
+      "bytes": 2993,
+      "sha256": "0ef1a5956486f3c97271646404ae1699f813e5f6b3ebc7d68dce827b56c2067d",
+      "id": "g-cable-hip-abduction"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/g-cable-hip-extension.json",
+      "path": "actions/g-cable-hip-extension.json",
+      "gitBlob": "8695a419f60088594621de8f6af947b5ef44cace",
+      "bytes": 2888,
+      "sha256": "955faa035a7ef8566623442e6e833631795f29211557bce12dc8de4c44fb4fb4",
+      "id": "g-cable-hip-extension"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/glute-max-A.json",
+      "path": "actions/glute-max-A.json",
+      "gitBlob": "b265c9e502ed8745b242a95ff693020fa5f1ee65",
+      "bytes": 2996,
+      "sha256": "9ca6eea444f6507f243cc47593fd99fc6cf57e614c68689610df44612221ca90",
+      "id": "glute-max-A"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/glute-max-B.json",
+      "path": "actions/glute-max-B.json",
+      "gitBlob": "712a0c2317b01a255b3df884aa17320fe95ee4be",
+      "bytes": 2811,
+      "sha256": "2e847d06a649f0197f0ed7a0a49eb8d2fc3aaf41bc89f43ec448dac852b36066",
+      "id": "glute-max-B"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/glute-max-C.json",
+      "path": "actions/glute-max-C.json",
+      "gitBlob": "db833f8886d3ef032447200bb0347174deb4450a",
+      "bytes": 2372,
+      "sha256": "0df981fc6359eb3b2e5cd2476d09a5c4b2d10e6d8dc76bac8cf62263ca2e34a5",
+      "id": "glute-max-C"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-9090-liftoff.json",
+      "path": "actions/h-9090-liftoff.json",
+      "gitBlob": "a6f9ae5ec3be23ef3698ba70cb3b6c52d56d9c4e",
+      "bytes": 3315,
+      "sha256": "b173d5d2e6343ef7a8b0b56d11ad38c2e97aec27d1761e48e4a56d66c6caa0d7",
+      "id": "h-9090-liftoff"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-adductor-rock.json",
+      "path": "actions/h-adductor-rock.json",
+      "gitBlob": "f4579d9d4822edcc030cbfe5aa5abc317fc78b6f",
+      "bytes": 2871,
+      "sha256": "05d7b47f4229a48cdf23a4fcba40ea11f34ff2ada5714f679f43020a37039498",
+      "id": "h-adductor-rock"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-banana.json",
+      "path": "actions/h-banana.json",
+      "gitBlob": "e0af627febff8c6f222f84a3b00ec39368acf91c",
+      "bytes": 3027,
+      "sha256": "5a1b182f89c998f36a65263c406f8e0a8ae3ac3ed5ca37ff3b9e8bebda6f8c51",
+      "id": "h-banana"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-band-biceps-curl.json",
+      "path": "actions/h-band-biceps-curl.json",
+      "gitBlob": "3127625a8e5dee83e1d1f4a0fb970f78d19acf94",
+      "bytes": 2339,
+      "sha256": "50745006eb189ffd882ba3a4ff65961767fd613a9c454c6669e9f6085c099351",
+      "id": "h-band-biceps-curl"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-band-chest-fly.json",
+      "path": "actions/h-band-chest-fly.json",
+      "gitBlob": "eec47223625a8a3f9620dcdacb568c73699a55d6",
+      "bytes": 2368,
+      "sha256": "9e60bafe379cb53dbb7d614472e477f409ca9d1d9263049d1a94f023688f8a73",
+      "id": "h-band-chest-fly"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-band-face-pull.json",
+      "path": "actions/h-band-face-pull.json",
+      "gitBlob": "65a07f9da1edfc6e93357824fb327cf2c361ccb5",
+      "bytes": 3200,
+      "sha256": "cc76c2949c6c451b6d1896bb5d1a35f21c5c36b0046356f4015a92debab128a2",
+      "id": "h-band-face-pull"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-band-hip-extension.json",
+      "path": "actions/h-band-hip-extension.json",
+      "gitBlob": "973257c62ce41f5235ad71cc882e5cd42b946bd6",
+      "bytes": 3073,
+      "sha256": "83d6356ba6526122a424837858bc01e050b800d837645ea8122d26e00988d979",
+      "id": "h-band-hip-extension"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-band-hip-ir.json",
+      "path": "actions/h-band-hip-ir.json",
+      "gitBlob": "2f31dbba5836c106e61703e7b6501f2423798e83",
+      "bytes": 3038,
+      "sha256": "8540ec3e1ca1801cd0417fd7ca7892c0b0130da2ab2a79faa7e87fd7a8e0691f",
+      "id": "h-band-hip-ir"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-band-leg-out.json",
+      "path": "actions/h-band-leg-out.json",
+      "gitBlob": "a8002d1092d851e3183bebdb5c57ea2754ebeff1",
+      "bytes": 3188,
+      "sha256": "f4a15597c52ba03c372d4cdd9a03bb64cbb9ccf0225eb457a9aeaceb052e39d3",
+      "id": "h-band-leg-out"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-band-pallof.json",
+      "path": "actions/h-band-pallof.json",
+      "gitBlob": "91542d26ba4faa0e39260840898dd22f6fa9e940",
+      "bytes": 3308,
+      "sha256": "73e17e3f3da17e8563995866b057c2bfb764d8911ae6e7bf41bb16fc1c9e4e96",
+      "id": "h-band-pallof"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-band-pull-apart.json",
+      "path": "actions/h-band-pull-apart.json",
+      "gitBlob": "dbdb5172be700d8e58b0f105c9aace53b3303b09",
+      "bytes": 2982,
+      "sha256": "69ecdc36058a42b7d45591c16dc64cf09e2d1b8b5bf6a7299cf334d06f6f8f80",
+      "id": "h-band-pull-apart"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-band-row.json",
+      "path": "actions/h-band-row.json",
+      "gitBlob": "5c617c15773dc8dedde1bf8321bbb5b2055d0bcd",
+      "bytes": 3241,
+      "sha256": "62f80b290bdc901a8978dbf40ca0e205d9f63a9d9e68f411fe35f1870de9a672",
+      "id": "h-band-row"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-band-shoulder-ir.json",
+      "path": "actions/h-band-shoulder-ir.json",
+      "gitBlob": "d3033df91d1a9c56cec3cb6ab680b1d5b98c7237",
+      "bytes": 2378,
+      "sha256": "f7e4eaae02f68a7e088302a229f8afa8a2b344fbb18d8833cafaf40857f7cc60",
+      "id": "h-band-shoulder-ir"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-band-standing-abduction.json",
+      "path": "actions/h-band-standing-abduction.json",
+      "gitBlob": "ed87d9d3db1f8c491fc369e6a9fc27312e2dd448",
+      "bytes": 2947,
+      "sha256": "e3ef638ca7fc5bf426f1e84db69c212d10110cde53394d86b8721d8cd1e02628",
+      "id": "h-band-standing-abduction"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-band-standing-adduction.json",
+      "path": "actions/h-band-standing-adduction.json",
+      "gitBlob": "0aecec0505aa83bac21d061aa55b2a15f76918bd",
+      "bytes": 2385,
+      "sha256": "d23129abaafd6926f5149c694f490069b55520584299386ff52244275f59ffdc",
+      "id": "h-band-standing-adduction"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-band-stepout.json",
+      "path": "actions/h-band-stepout.json",
+      "gitBlob": "922e46aac2b2493d0a52a16b698738b55469225f",
+      "bytes": 2969,
+      "sha256": "ac9bd68c8ce175f884f6169fb42124cb64e6f9ac8c0e41d5a93d1848934e7bde",
+      "id": "h-band-stepout"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-band-straight-leg-raise.json",
+      "path": "actions/h-band-straight-leg-raise.json",
+      "gitBlob": "ec03e4285c611345da1ababb9d3d431f58a6f202",
+      "bytes": 2563,
+      "sha256": "ca1445a7169d5577517f67d667032ed638b53376ddbcfe8aaca7956d420e3963",
+      "id": "h-band-straight-leg-raise"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-band-triceps-pressdown.json",
+      "path": "actions/h-band-triceps-pressdown.json",
+      "gitBlob": "6e17008a0e28cdc326d3e7b6f8c2dfa121799e19",
+      "bytes": 2363,
+      "sha256": "cc94cbce10551eca22f24ade4382d1d644b396c13ba684c5bb16f03abee735cd",
+      "id": "h-band-triceps-pressdown"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-bear-plank.json",
+      "path": "actions/h-bear-plank.json",
+      "gitBlob": "5c82af91179258fbb1c83fb450a5e6159511bd48",
+      "bytes": 3185,
+      "sha256": "848f4a7c599c259f9a705213b1a2250a4719415838a46a1839b31d888fcba33a",
+      "id": "h-bear-plank"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-bent-knee-calf-raise.json",
+      "path": "actions/h-bent-knee-calf-raise.json",
+      "gitBlob": "ac5323e2631fb34024e4c9f59bde80eeb42ba412",
+      "bytes": 2097,
+      "sha256": "9184364a617f8bf614e162826df8a75737e02932fffa0c1b5bc3d17e38fffaa0",
+      "id": "h-bent-knee-calf-raise"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-biceps-self.json",
+      "path": "actions/h-biceps-self.json",
+      "gitBlob": "101c1e1772e606f8a02e4df1ffb304261976e14d",
+      "bytes": 2005,
+      "sha256": "c8418ba87f957dde5508fc08ad62a2d67b2511089c49f1a93cba72b716794d44",
+      "id": "h-biceps-self"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-bilateral-farmer-hold-native.json",
+      "path": "actions/h-bilateral-farmer-hold-native.json",
+      "gitBlob": "4b6a65975bac05b1d1f4d8177057fd4d37a8c210",
+      "bytes": 2926,
+      "sha256": "9df13f78f2d2715c9a49bf44ee76d80159a110538abd63db190de83dd561cbe4",
+      "id": "h-bilateral-farmer-hold-native"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-bilateral-upper-back-hug.json",
+      "path": "actions/h-bilateral-upper-back-hug.json",
+      "gitBlob": "9bd1ee45edb7352617f3d96406bcbd9c90c6ca77",
+      "bytes": 2711,
+      "sha256": "a1ed25a53af79ae03a2e20e9c4c57e9ea63affdd77246bf74dd3f6a0d37c513e",
+      "id": "h-bilateral-upper-back-hug"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-bridge-march.json",
+      "path": "actions/h-bridge-march.json",
+      "gitBlob": "5f64393d55a5852ba8466f27c7f344f0a11091e4",
+      "bytes": 3167,
+      "sha256": "6f40e0e60b095053bacbd8d3ee1bdaed16270bfd84430582a61bfa9c3745918a",
+      "id": "h-bridge-march"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-bridge-overhead.json",
+      "path": "actions/h-bridge-overhead.json",
+      "gitBlob": "658fc7abfb45626305c0dac19175476f6fb376d5",
+      "bytes": 3358,
+      "sha256": "1b2422ecf0a97771a89cc913792b4b415fe705e2b8695e6c8395eb1de06a81ff",
+      "id": "h-bridge-overhead"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-bulgarian.json",
+      "path": "actions/h-bulgarian.json",
+      "gitBlob": "966acf22d733151f5a8ac71968fd7d6047a0345a",
+      "bytes": 3281,
+      "sha256": "2044aa2869a4934f8927b1288ac7ab1bd62f0ef1b8a4b2fbbac558a782c50cf7",
+      "id": "h-bulgarian"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-butterfly-active.json",
+      "path": "actions/h-butterfly-active.json",
+      "gitBlob": "02a89c43043e586114c3c312651a4a1c78c4c881",
+      "bytes": 2946,
+      "sha256": "7823885b250bdf7d0817e1c9c472f5755694a9126fc08bc842fd1c6e410ae38e",
+      "id": "h-butterfly-active"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-calf-raise.json",
+      "path": "actions/h-calf-raise.json",
+      "gitBlob": "e8eff6be0156da7f47deafe31b0af1008d9a386f",
+      "bytes": 2365,
+      "sha256": "ce4ad886dafa1a7a7d424fb2edc7bd148a4f173e5afddbb5b35cd3270e3b6cdd",
+      "id": "h-calf-raise"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-catcow-quad.json",
+      "path": "actions/h-catcow-quad.json",
+      "gitBlob": "92fdc730811bf63dbbee4aaadaa64628809a4c72",
+      "bytes": 3619,
+      "sha256": "97a421d5acb5c79a9b9f2e50f49277a84c2ad969b7e84f0210f1628b90050dfd",
+      "id": "h-catcow-quad"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-chair-dip.json",
+      "path": "actions/h-chair-dip.json",
+      "gitBlob": "f5570be696ffea903019bf62be2c38002f4e42dd",
+      "bytes": 2226,
+      "sha256": "8380233b9e12fa4ef4116d2ddfcbc429fd0617144f2a2b88cdeac297a4573208",
+      "id": "h-chair-dip"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-chair-elbow-triceps-stretch.json",
+      "path": "actions/h-chair-elbow-triceps-stretch.json",
+      "gitBlob": "a56c182ce0945ca7cead2887953ee3f44a813adc",
+      "bytes": 2728,
+      "sha256": "4f22995641ccfcaaec7f9358436392075a9cd28f3c130cdb38c9feccc3354ab2",
+      "id": "h-chair-elbow-triceps-stretch"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-chair-kickback.json",
+      "path": "actions/h-chair-kickback.json",
+      "gitBlob": "bb51238044f9f80de65530b863cf9dc6d54b0a00",
+      "bytes": 2556,
+      "sha256": "6897609dceae2991d6a619b9d340ff284216443dffa172f0af7e9adb10ffedfc",
+      "id": "h-chair-kickback"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-chair-lat.json",
+      "path": "actions/h-chair-lat.json",
+      "gitBlob": "0403478c1390c0832843dbd58ef830e9cc817b9f",
+      "bytes": 2724,
+      "sha256": "6e4bf552956318cad3b383ff349429ea673a4dc136aa2a9e8d4b9957cb006bf1",
+      "id": "h-chair-lat"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-chair-progressive-front-split-native.json",
+      "path": "actions/h-chair-progressive-front-split-native.json",
+      "gitBlob": "5f1aa4ac6333bc1b0bfec630ae97c1f573e9f160",
+      "bytes": 3304,
+      "sha256": "6ef22d456e253cbe25d2efefa10373e9ab87f88844274ec2705f5493865ae0d4",
+      "id": "h-chair-progressive-front-split-native"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-chair-single-leg-hip-thrust.json",
+      "path": "actions/h-chair-single-leg-hip-thrust.json",
+      "gitBlob": "f0c5fd44cd77b0321aaef0ba375b32242ad829b4",
+      "bytes": 2990,
+      "sha256": "3aa791f8f36aafa95d548fa729e04eed6c400a2add38e21d6c4c0e06552819c7",
+      "id": "h-chair-single-leg-hip-thrust"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-chair-sit-to-stand.json",
+      "path": "actions/h-chair-sit-to-stand.json",
+      "gitBlob": "59eaee892fdf8d3e2e80ca9f023eb7a038494c77",
+      "bytes": 2859,
+      "sha256": "272a00ac22875f9744715fe01b10cef4fa4154bc51edd22430934d7b388c1ee4",
+      "id": "h-chair-sit-to-stand"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-chair-step-up.json",
+      "path": "actions/h-chair-step-up.json",
+      "gitBlob": "852df6e231415715107d1ba36c5a67449c97f4ac",
+      "bytes": 3506,
+      "sha256": "b626500dce10ac92a2df39882c3b9a8032c120ead3f6d12ad2ec5978fe9bcc87",
+      "id": "h-chair-step-up"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-chair-tspine.json",
+      "path": "actions/h-chair-tspine.json",
+      "gitBlob": "704b2916100ceb394ec321f3bd44a91e55448dec",
+      "bytes": 3024,
+      "sha256": "6d6b8fe829b114655983391d684ca223246d870004fc0e85525212b301a34378",
+      "id": "h-chair-tspine"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-close-stance-forward-fold-native.json",
+      "path": "actions/h-close-stance-forward-fold-native.json",
+      "gitBlob": "4e25e1f9b308cf9781cadca492cfd6bbc044b0c7",
+      "bytes": 2787,
+      "sha256": "1375d3257d8c189e9d5a0d901750d4076e38ef0244726a8cea326512ae4041b4",
+      "id": "h-close-stance-forward-fold-native"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-cobra.json",
+      "path": "actions/h-cobra.json",
+      "gitBlob": "4868b923a6bbdf2d5ebb315286346441467dd893",
+      "bytes": 2995,
+      "sha256": "b70e869d307fed40d1a6fa12aaa31d5d4c96289a44c6deef2c1ad68f9923d627",
+      "id": "h-cobra"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-couch-stretch.json",
+      "path": "actions/h-couch-stretch.json",
+      "gitBlob": "0cd4cecb519ef8ef8a610684687a39eab31acb08",
+      "bytes": 3406,
+      "sha256": "fb51035694b3dc95fc6a9f33a6eaee5892c584de4e7f2252e6fb7b3df687d20f",
+      "id": "h-couch-stretch"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-crossbody.json",
+      "path": "actions/h-crossbody.json",
+      "gitBlob": "64cbc0e6d29276899c563bcef5ba115608c56916",
+      "bytes": 2492,
+      "sha256": "a2d2a4f0951073a8cc4995eae54b2db3e2d69a6ff15523e6d3a6780f0fc03f33",
+      "id": "h-crossbody"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-crunch.json",
+      "path": "actions/h-crunch.json",
+      "gitBlob": "ba50d28e72a12108c6f9a71b2f55ff6302503e7a",
+      "bytes": 2949,
+      "sha256": "2b8e3c1beb063cd86dfc93d78982fdec328ddc02e644291836aaa048d0aee43b",
+      "id": "h-crunch"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-db-calf-raise.json",
+      "path": "actions/h-db-calf-raise.json",
+      "gitBlob": "91eb6e47b6e44b09bca94826e881220923788e47",
+      "bytes": 2043,
+      "sha256": "87f14da177470f3f8257f239f4a7c454b99dba789521f5296765852cf6df1e4c",
+      "id": "h-db-calf-raise"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-db-curl.json",
+      "path": "actions/h-db-curl.json",
+      "gitBlob": "691db5fb0d95d9d0023ca473681fc2039bd66c17",
+      "bytes": 2344,
+      "sha256": "f9ac9ca7e073b3dcbda2a80446df60b4baad4c73e44113f442b952d01992b6c3",
+      "id": "h-db-curl"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-db-floor-fly.json",
+      "path": "actions/h-db-floor-fly.json",
+      "gitBlob": "43c7bf9c10e1c4e163a65650f0434df569ff8fb1",
+      "bytes": 2356,
+      "sha256": "e86da801379d43793a36939f231d4af6534b27968a4f4833637d8428793ad83b",
+      "id": "h-db-floor-fly"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-db-floor-press.json",
+      "path": "actions/h-db-floor-press.json",
+      "gitBlob": "8ba832a30fc4507950d78d13607192dabc5bd715",
+      "bytes": 2544,
+      "sha256": "db08cf6e425090273d207977fdb4a7b973b69533c6908712a2863ff82af02bb3",
+      "id": "h-db-floor-press"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-db-front-raise.json",
+      "path": "actions/h-db-front-raise.json",
+      "gitBlob": "cfca6b9cd95719c9ebf8e21b5c76d3d7d67b0265",
+      "bytes": 1940,
+      "sha256": "04cef05c2075f549e0281316b78f04749311289bb87eaed008cac875763a78df",
+      "id": "h-db-front-raise"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-db-hammer-curl.json",
+      "path": "actions/h-db-hammer-curl.json",
+      "gitBlob": "d4e37676af896212e87da9b81eac7aafebd33c82",
+      "bytes": 1959,
+      "sha256": "09978c71d5b293b60b347f74130f00c708ca1c87669a163b96b355f38cd952fc",
+      "id": "h-db-hammer-curl"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-db-kickback.json",
+      "path": "actions/h-db-kickback.json",
+      "gitBlob": "54a6dc35ab6c9776042f7c9a22219f859eb9f5f7",
+      "bytes": 2171,
+      "sha256": "3ce208e24a7b3fb3c64fc28b9a49de6e64c6ab49f0f11bd8e13e76d5444935b0",
+      "id": "h-db-kickback"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-db-lateral.json",
+      "path": "actions/h-db-lateral.json",
+      "gitBlob": "469ada149194f88133aded602cbe82d2fee79d7a",
+      "bytes": 1949,
+      "sha256": "9ce5bef15165a4acb1628174d55699328c41a2c2ec8e7db1d83f64f9d866c317",
+      "id": "h-db-lateral"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-db-overhead-shrug.json",
+      "path": "actions/h-db-overhead-shrug.json",
+      "gitBlob": "981d873c49c2f01f6a53063977bb5bc22ab85afd",
+      "bytes": 2818,
+      "sha256": "250aa1d1e2a16ea5572976c7e96e4617e465b156d6e4c96a847c8d0c89b676d6",
+      "id": "h-db-overhead-shrug"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-db-overhead-triceps-extension.json",
+      "path": "actions/h-db-overhead-triceps-extension.json",
+      "gitBlob": "fc0581e56253b13ff5ef22d85c8b4f46db6b8e4b",
+      "bytes": 2050,
+      "sha256": "0938a74bab6b64aba837094842dd70bba41531e23d43578ffe45cbca87854f70",
+      "id": "h-db-overhead-triceps-extension"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-db-press.json",
+      "path": "actions/h-db-press.json",
+      "gitBlob": "6ed5948ed4143dd4aef6dcba70bc3a823e2a5aa4",
+      "bytes": 2133,
+      "sha256": "48c7674c9a332537b7826049dfabbaa31f26c8d2b0b170dff0ef0c7863811cd4",
+      "id": "h-db-press"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-db-rdl.json",
+      "path": "actions/h-db-rdl.json",
+      "gitBlob": "b9a8eb878536b8f52d60a44edc6574017c3e851f",
+      "bytes": 2773,
+      "sha256": "1a2664bcd0e809b8ab5981947202b16e7c3c2b1a18b04f186c702150825df03b",
+      "id": "h-db-rdl"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-db-reverse-curl.json",
+      "path": "actions/h-db-reverse-curl.json",
+      "gitBlob": "9a06e69c3d6c1127993ee3438d49b7b036b71fef",
+      "bytes": 2054,
+      "sha256": "9292785dda3c0f5f7deb883c6527a166ad1af19c56e533bd7531ed8ff985773f",
+      "id": "h-db-reverse-curl"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-db-reverse-fly.json",
+      "path": "actions/h-db-reverse-fly.json",
+      "gitBlob": "52f79d6d9cc91474dc1943b23aab29cf861703e6",
+      "bytes": 2791,
+      "sha256": "2ccf5c23366d05a2308a3109aae3fafd508faaef7a0e67d4ec0ad675e4be2f51",
+      "id": "h-db-reverse-fly"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-db-row.json",
+      "path": "actions/h-db-row.json",
+      "gitBlob": "8bae9479e0f3043582c76eb9c2e88f34458e4234",
+      "bytes": 2949,
+      "sha256": "90f41176bfebd6f7820f910dc1803315cff9300f6054542cb6c5db6ee7fbce3e",
+      "id": "h-db-row"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-db-shrug.json",
+      "path": "actions/h-db-shrug.json",
+      "gitBlob": "6359b8d203b91ce53483fb4ad2159ab56bfda8b7",
+      "bytes": 2588,
+      "sha256": "0df9fd34b96499bb4f7b13b255664280de5468c8b1bf9dd7b1e0e87f3807e904",
+      "id": "h-db-shrug"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-db-split-squat.json",
+      "path": "actions/h-db-split-squat.json",
+      "gitBlob": "001686c826ce68749437de003aff9eae8d8ca29e",
+      "bytes": 3006,
+      "sha256": "0f09d77c9e193426831883be9a4c43b26081b0cfce3bd64eaa3c1ed83edb1656",
+      "id": "h-db-split-squat"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-db-supported-calf-raise.json",
+      "path": "actions/h-db-supported-calf-raise.json",
+      "gitBlob": "4b539fd207c30744a31dbfc9858aca8336914ba5",
+      "bytes": 2400,
+      "sha256": "237d46ba1be9f7c52dcce2b6607fb8fe46f4ababd53afc3d0fc94252d80bb6be",
+      "id": "h-db-supported-calf-raise"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-db-zottman-curl.json",
+      "path": "actions/h-db-zottman-curl.json",
+      "gitBlob": "f0d73fc709f7f74cfb07d42b83d4720c4dc16c23",
+      "bytes": 1952,
+      "sha256": "df22d3678e063a9b03385d67c0d4c5143c8e42d981e04ec230dd33b1d594f6b3",
+      "id": "h-db-zottman-curl"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-dd-shoulder.json",
+      "path": "actions/h-dd-shoulder.json",
+      "gitBlob": "3b01e77dd82db9a8eff5de3241e22ea46e9e92fc",
+      "bytes": 3522,
+      "sha256": "bc1044c3693c17a59431db2aef56bbf5ef793852531b49a6218809d356992156",
+      "id": "h-dd-shoulder"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-donkey-kick.json",
+      "path": "actions/h-donkey-kick.json",
+      "gitBlob": "22ba2aa92964a5d76fbca5e10303b22b44c0dda3",
+      "bytes": 2865,
+      "sha256": "8a263067c6b9ed30ae8382fbb45c33bf5b1cffd197ae61179ec157c207be8e41",
+      "id": "h-donkey-kick"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-doorframe-forearms-pec-native-r3.json",
+      "path": "actions/h-doorframe-forearms-pec-native-r3.json",
+      "gitBlob": "5cf76f3993016bbc0e91758bf47bdf07b756717a",
+      "bytes": 2608,
+      "sha256": "ea63fdc8cca8321d7c86c12519c6ecce63099cd913deb61f843386c843493fe0",
+      "id": "h-doorframe-forearms-pec-native-r3"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-fixed-bar-vertical-pull.json",
+      "path": "actions/h-fixed-bar-vertical-pull.json",
+      "gitBlob": "8756ec1ecc9746707510e9e9b64daddf63c617b4",
+      "bytes": 3504,
+      "sha256": "da3f526013493706be90d2c0d33fb5d93d43f602d7d909f5c837736bff3d6737",
+      "id": "h-fixed-bar-vertical-pull"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-floor-nordic-hand-reset.json",
+      "path": "actions/h-floor-nordic-hand-reset.json",
+      "gitBlob": "f072bbb494a2b1666db0c5df17f1951ee920ad9d",
+      "bytes": 3279,
+      "sha256": "cba2ba5b0e5e2659a342aba16c0ecdaed50fac6a536b864855cd04d0dddb0fa3",
+      "id": "h-floor-nordic-hand-reset"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-forearm-plank.json",
+      "path": "actions/h-forearm-plank.json",
+      "gitBlob": "ce7696d3102015ae6f1b9c29a4561cdf9fd2c71f",
+      "bytes": 3344,
+      "sha256": "54a9824cb707c35637f33e3305a57f1c520bb4c7a7b8f7f8cf4d389ab8f41ad6",
+      "id": "h-forearm-plank"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-forward-lunge.json",
+      "path": "actions/h-forward-lunge.json",
+      "gitBlob": "80a992c8ff798ac93ef2d53bc72bf2bb9e5a803e",
+      "bytes": 3198,
+      "sha256": "ac619e52ffa23b89700adcb1c24e5e51e80258e7548c028c7e32257a227a976e",
+      "id": "h-forward-lunge"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-goblet-squat.json",
+      "path": "actions/h-goblet-squat.json",
+      "gitBlob": "7cbf14f3df4a360f52324adb057331b91fdcbc16",
+      "bytes": 3059,
+      "sha256": "cc588b038e433c30ad9c5122303e1d87eaf052ed349631f7ed39c6621f42e533",
+      "id": "h-goblet-squat"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-good-morning.json",
+      "path": "actions/h-good-morning.json",
+      "gitBlob": "dc398e8e144e921d3a67cae65e44791a06e3d698",
+      "bytes": 2826,
+      "sha256": "5a0029a0d170f839a1ed3db1df92484827b3ea1acf44cece6ad4bd5bb95e5cdf",
+      "id": "h-good-morning"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-half-kneeling-quad-stretch.json",
+      "path": "actions/h-half-kneeling-quad-stretch.json",
+      "gitBlob": "361bb082706fe1ae98ce46b8dc763280fa693ba8",
+      "bytes": 3372,
+      "sha256": "633a036928864aeee2b76f46891b21692e00582dc0ec05637e776519c66fb520",
+      "id": "h-half-kneeling-quad-stretch"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-hip-gate.json",
+      "path": "actions/h-hip-gate.json",
+      "gitBlob": "b54f52cbd45c9dfc91675517a8df6f06e1730195",
+      "bytes": 3038,
+      "sha256": "5c016a0cb022bd2fde784085dc1b78825847dc25938c9149949b371aae854666",
+      "id": "h-hip-gate"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-incline-pushup.json",
+      "path": "actions/h-incline-pushup.json",
+      "gitBlob": "b7568edbae2427053f48064a9bce6dfbeef55bb3",
+      "bytes": 3100,
+      "sha256": "2319a829023a30ee4630af99f87631fcb93fccd95be016cd30b36cedd5ac4932",
+      "id": "h-incline-pushup"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-inner-thigh.json",
+      "path": "actions/h-inner-thigh.json",
+      "gitBlob": "b0676c3c2528fa96cd15513de09fd078e4137a73",
+      "bytes": 2373,
+      "sha256": "a48caf18fd9988c0517fb43080fb1ae8e3b069ba22a377e9168f43adb6120aee",
+      "id": "h-inner-thigh"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-kb-swing.json",
+      "path": "actions/h-kb-swing.json",
+      "gitBlob": "7886db5bdd6fafd592de1e0825a6b6502991711e",
+      "bytes": 3517,
+      "sha256": "c4ee60b97dad884b460866d9bf6fb6c5893ebc890572f41ea0f03321f009211f",
+      "id": "h-kb-swing"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-knee-hug.json",
+      "path": "actions/h-knee-hug.json",
+      "gitBlob": "46aa2e1b756acd65ea3878fe4d87f4285dbf510b",
+      "bytes": 2562,
+      "sha256": "65d6e97f6f039b759404f5756babdb168d6edb98b6243b3435aec611733823dc",
+      "id": "h-knee-hug"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-knee-wall-dorsiflexion-native.json",
+      "path": "actions/h-knee-wall-dorsiflexion-native.json",
+      "gitBlob": "9d6a7953a91639edc1dbfa2a6789db68e6957633",
+      "bytes": 2624,
+      "sha256": "452cf0c71987c0b2bd8724daaac4cc4a7324416bffd712ff32fc4c2b9719093d",
+      "id": "h-knee-wall-dorsiflexion-native"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-kneeling-instep-stretch.json",
+      "path": "actions/h-kneeling-instep-stretch.json",
+      "gitBlob": "479841eebcc49b3c734823e7280f2fd5dcacf610",
+      "bytes": 2635,
+      "sha256": "d05fac5267221f0a22a63c9f8a7f51a589d53ee703295a2d9d953012a4e14560",
+      "id": "h-kneeling-instep-stretch"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-kneeling-pushup.json",
+      "path": "actions/h-kneeling-pushup.json",
+      "gitBlob": "c72635b8e054f3e0523b59568c58d2e43707a353",
+      "bytes": 2934,
+      "sha256": "bc24efe6f64608de82e7d82b32eb1848e10098aeb0a05d5d5671ef24adfc08b8",
+      "id": "h-kneeling-pushup"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-kneeling-thread-needle.json",
+      "path": "actions/h-kneeling-thread-needle.json",
+      "gitBlob": "59d1b9fa7e1b1d784590d75dd1521bb230902d6b",
+      "bytes": 2727,
+      "sha256": "7d9ba94ddfe6acebae04605b69c2db2b31c6b1f84581ca2b779fb809221bd241",
+      "id": "h-kneeling-thread-needle"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-lateral-step-lunge.json",
+      "path": "actions/h-lateral-step-lunge.json",
+      "gitBlob": "cf20280b2a1085325683b3071978c17b1d4a05bd",
+      "bytes": 2827,
+      "sha256": "ff0a8167c8cb92a7a7ae02b7b2905149068a7ddd2a77e27d7af599916269e474",
+      "id": "h-lateral-step-lunge"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-mountain-climber.json",
+      "path": "actions/h-mountain-climber.json",
+      "gitBlob": "57c658f7654a2c270e378dafc5600d615f00e2e6",
+      "bytes": 3131,
+      "sha256": "1e803e2e03e4a49ffbf17179fcf9f84bd455e8cb7976e8982d21876b5cead37d",
+      "id": "h-mountain-climber"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-open-book.json",
+      "path": "actions/h-open-book.json",
+      "gitBlob": "ab0c36632c1957d98728bb6509eb4be3f848f8d7",
+      "bytes": 2794,
+      "sha256": "76e29fb6463f3bee18c1669b7fc9b93b8868245ff20e68c662bb5e1808be7077",
+      "id": "h-open-book"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-overhead-triceps-stretch.json",
+      "path": "actions/h-overhead-triceps-stretch.json",
+      "gitBlob": "16d00c5e49cab79906869c34716ae7fd7f07dae4",
+      "bytes": 2535,
+      "sha256": "3a0ef27a51b11ead9d37d8ce7ccf998e002dd13584849d3ed37d9a711859f08d",
+      "id": "h-overhead-triceps-stretch"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-pike-pushup.json",
+      "path": "actions/h-pike-pushup.json",
+      "gitBlob": "a1c3f06113ee75dfca39d6fd6fe0bb1618c6eb47",
+      "bytes": 3115,
+      "sha256": "7ab758db96e05dea183fb7f30626b6379d0d8f6ef194a9b602263a91e9cd6523",
+      "id": "h-pike-pushup"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-pike-scapular-elevation.json",
+      "path": "actions/h-pike-scapular-elevation.json",
+      "gitBlob": "fbba6814987bf5720c6b2991a21ff47f9825b4e0",
+      "bytes": 3034,
+      "sha256": "8600c5ef88b35439936485653e7ba3643b0b4a90c205b122a74506fc52f2066a",
+      "id": "h-pike-scapular-elevation"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-plank-side-step.json",
+      "path": "actions/h-plank-side-step.json",
+      "gitBlob": "a24b6e7548cc21e2cd4a0d82d0bde0852653ad1f",
+      "bytes": 2970,
+      "sha256": "a17615a8aecaa4ce2d2b295238141bd8da8ea717af48b67049389298b155965f",
+      "id": "h-plank-side-step"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-quad-cars.json",
+      "path": "actions/h-quad-cars.json",
+      "gitBlob": "ecb62488bf8a08a502c74d5e45d96820550f39e3",
+      "bytes": 2708,
+      "sha256": "019f44f8a34153c55a94c19a5a68ca64d39b407f1b6f2236e85a29a4fef20fe0",
+      "id": "h-quad-cars"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-quadruped-open.json",
+      "path": "actions/h-quadruped-open.json",
+      "gitBlob": "63e51f472a6c4de2652831675ee7a4ef07f5e7fd",
+      "bytes": 2681,
+      "sha256": "b91934f7e202ba8286a782e9344a0e5a0d844fddb3a4d9a2e090bd8d9498450e",
+      "id": "h-quadruped-open"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-quadruped-rockback.json",
+      "path": "actions/h-quadruped-rockback.json",
+      "gitBlob": "b9bd5ec72888a2176b302a4ba32719b4fcf9ea1b",
+      "bytes": 2692,
+      "sha256": "c0ffb64df48237e9d3d26f4523a7822abf996effc2e1a63e3a769a34293b61e2",
+      "id": "h-quadruped-rockback"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-reverse-clam.json",
+      "path": "actions/h-reverse-clam.json",
+      "gitBlob": "62b991a8780b4374edb9c5722e1fd9ef6696fad1",
+      "bytes": 2443,
+      "sha256": "ce53d70356450d0aa049009390c70a26dd1700c9f24d276fa91fc8d413ab25d2",
+      "id": "h-reverse-clam"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-reverse-crunch.json",
+      "path": "actions/h-reverse-crunch.json",
+      "gitBlob": "3c2a9947e92410578c11f19dd9325bf7bb6660f7",
+      "bytes": 2814,
+      "sha256": "2aba18dba5424439fc527530e6a164d9931bac02e748acb63751de828688f432",
+      "id": "h-reverse-crunch"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-reverse-lunge.json",
+      "path": "actions/h-reverse-lunge.json",
+      "gitBlob": "65426e3651dab280b0c4e7746d3694525204a513",
+      "bytes": 3357,
+      "sha256": "45e786f3609cd9f69d1abc2c15745195dacef9c4456472e0ccc9edd5650fadfb",
+      "id": "h-reverse-lunge"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-russian-twist.json",
+      "path": "actions/h-russian-twist.json",
+      "gitBlob": "547e9297306035c62c68efd2f123d1254968a5b1",
+      "bytes": 2997,
+      "sha256": "0ecd2588de7578d15dc1d567ad7ab44dc202042b7268725601fabf27d8c043d4",
+      "id": "h-russian-twist"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-seated-reachback.json",
+      "path": "actions/h-seated-reachback.json",
+      "gitBlob": "adc25375a0c2f57e751766c872d579603688ff27",
+      "bytes": 2845,
+      "sha256": "27b24209b7db28e300445dd653c8640f873a920dc1a0f348d252d7c5216d75a8",
+      "id": "h-seated-reachback"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-short-side-plank.json",
+      "path": "actions/h-short-side-plank.json",
+      "gitBlob": "8ddac4af884ebce05518108876985f991332e478",
+      "bytes": 2565,
+      "sha256": "7ddaad688cdf6c222e7e8f741ff53437ea0aee95de93a3506a0d2b88ead601f7",
+      "id": "h-short-side-plank"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-side-er.json",
+      "path": "actions/h-side-er.json",
+      "gitBlob": "d83681ca6cb85d578a27603b60a7265c1fe309c8",
+      "bytes": 1947,
+      "sha256": "646eb69fe810b9e95e73d6e046fc05d8d99b5dd8643ebf03c279fa4d0d86cda2",
+      "id": "h-side-er"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-side-leg-raise.json",
+      "path": "actions/h-side-leg-raise.json",
+      "gitBlob": "02820d69199dc196188b3b55dca188e04042f2ac",
+      "bytes": 2738,
+      "sha256": "80d974988a33ed43631c88b63a18cb5db09bf33e8b54a7d4c7085b55433ab30b",
+      "id": "h-side-leg-raise"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-slider-body-saw.json",
+      "path": "actions/h-slider-body-saw.json",
+      "gitBlob": "dc740d2e24fd69cd24a7824c74afd3df2595b8f1",
+      "bytes": 3306,
+      "sha256": "e049ff73c3f5a6c061253e9dbf3746a993ef35442a9261346ce3bb139f364ff6",
+      "id": "h-slider-body-saw"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-squat.json",
+      "path": "actions/h-squat.json",
+      "gitBlob": "09d0651845c40bf2bf4cfca89a500724c58e68f5",
+      "bytes": 3540,
+      "sha256": "00b25ba911aa9ad9a76feee4a57c3b50316d7d3600f8ea435792c50fa25140c7",
+      "id": "h-squat"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-standing-arm-extension-stretch.json",
+      "path": "actions/h-standing-arm-extension-stretch.json",
+      "gitBlob": "1357e63c0714a736305c53a6a3b14b30f4182b46",
+      "bytes": 2638,
+      "sha256": "9f209492462ac95ec3a11eec7d9240555338a0489ad860af196efc999cc7052b",
+      "id": "h-standing-arm-extension-stretch"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-standing-forearm-rotation.json",
+      "path": "actions/h-standing-forearm-rotation.json",
+      "gitBlob": "e03e7727ae2503bcecc607c059f1e71329d6f97f",
+      "bytes": 1893,
+      "sha256": "b6cb6e063ac389303ae4f2543c095035d907130d0838cbc9687ba1b14e94fd00",
+      "id": "h-standing-forearm-rotation"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-standing-wrist-deviation.json",
+      "path": "actions/h-standing-wrist-deviation.json",
+      "gitBlob": "dc3fec54281d3c2a746fab78d784397d47ded394",
+      "bytes": 1870,
+      "sha256": "d7076ed4f6a81ceb8ba7a3f5bea57912331b40f7ff0b0c9a194719421610805b",
+      "id": "h-standing-wrist-deviation"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-standing-wrist-extensor-stretch.json",
+      "path": "actions/h-standing-wrist-extensor-stretch.json",
+      "gitBlob": "cf8996793158eae136113d9ea21321b32c355789",
+      "bytes": 2519,
+      "sha256": "565ee2517b9875b6e0e6f5fe444fdd016449e474857089d278915ef00701fb67",
+      "id": "h-standing-wrist-extensor-stretch"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-step-jack.json",
+      "path": "actions/h-step-jack.json",
+      "gitBlob": "20456288a8ec72f023e0d6c7fe10674a2bf3f073",
+      "bytes": 2817,
+      "sha256": "36ae7aaf0b38a0a390334a132001004314c8f1e8a8a583510dd811d2a4b61653",
+      "id": "h-step-jack"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-straight-arm-hang-native.json",
+      "path": "actions/h-straight-arm-hang-native.json",
+      "gitBlob": "ee9999c67e5a3e66781683d077e946511c65581d",
+      "bytes": 3042,
+      "sha256": "71cf5a0ff49299383dc33b682f1ca91c05591cdce6fb1df696172679ecd88ace",
+      "id": "h-straight-arm-hang-native"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-suitcase-hold.json",
+      "path": "actions/h-suitcase-hold.json",
+      "gitBlob": "855a065f8060b16d2fe6633c3d2522626822d6cd",
+      "bytes": 2915,
+      "sha256": "3ba964d490b5223c35b688f693ac4ca71f3577f099347182e7c1d92e4a3aa5ec",
+      "id": "h-suitcase-hold"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-suitcase-march.json",
+      "path": "actions/h-suitcase-march.json",
+      "gitBlob": "ca010943c00de243fb738086e3e900cb08895bd1",
+      "bytes": 3005,
+      "sha256": "63cbebb9768ddac9638233cb8d8aa9ed27b9326ed189cb5ce07c15f628389779",
+      "id": "h-suitcase-march"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-sumo-pry.json",
+      "path": "actions/h-sumo-pry.json",
+      "gitBlob": "db9568d09171823dcc2765788c90f65b9d1cf604",
+      "bytes": 3053,
+      "sha256": "bd9ae70b9cc69abd06eb136d9af176be1e242b4139e1105ea634cb642ab7e90f",
+      "id": "h-sumo-pry"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-superman.json",
+      "path": "actions/h-superman.json",
+      "gitBlob": "caa7618073c8e62859671195f378248730d6cf0f",
+      "bytes": 2703,
+      "sha256": "16cdc9962b3f85a0155001657990a5ee6328725744fdfc27c217c2efb9e6a08f",
+      "id": "h-superman"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-supine-bilateral-leg-raise.json",
+      "path": "actions/h-supine-bilateral-leg-raise.json",
+      "gitBlob": "8231dabdebf35b3b813d3cb8eb806a080b7e19fb",
+      "bytes": 2984,
+      "sha256": "053dfe74f2007c21d6aaa666383acd8ebf97f0de976d81ad52226e769071d2ca",
+      "id": "h-supine-bilateral-leg-raise"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-supine-cactus-chest.json",
+      "path": "actions/h-supine-cactus-chest.json",
+      "gitBlob": "6aa0d43147053a70543e98fca2466482f88a1e2b",
+      "bytes": 2743,
+      "sha256": "afc9cbe0333b7ad244182fa40c4b19fc647adc04d166265cf5863122d9f30a44",
+      "id": "h-supine-cactus-chest"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-supine-heel-slide.json",
+      "path": "actions/h-supine-heel-slide.json",
+      "gitBlob": "50340ea5a5f15002a321ec357d04b4403cee8e85",
+      "bytes": 2776,
+      "sha256": "24666ed584a6af84dea0ce6ac9f6ea7278b8ad310431b17bba25713a9709d998",
+      "id": "h-supine-heel-slide"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-supine-twist.json",
+      "path": "actions/h-supine-twist.json",
+      "gitBlob": "d67c057467bc92c49cf1a813e2c89079331aa32a",
+      "bytes": 2633,
+      "sha256": "c3955f0ab83cd26088b86aba75d12629bc990713291f6ac8b1ffdaf73178d02e",
+      "id": "h-supine-twist"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-supported-single-leg-calf.json",
+      "path": "actions/h-supported-single-leg-calf.json",
+      "gitBlob": "dddd6cd97f591a90c8d3dd275aca1ae1eea4a124",
+      "bytes": 2493,
+      "sha256": "75f041980d429edf586ace69c05d948973e3daa8ef3f3032effad675c6b68934",
+      "id": "h-supported-single-leg-calf"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-tabletop.json",
+      "path": "actions/h-tabletop.json",
+      "gitBlob": "0df5c428f799c34550b590e1d890f28c95a4490b",
+      "bytes": 3171,
+      "sha256": "f33f31e0ec3009ac21301e3f31aa7ac415e3ce7487c5c9ced43f254bf2dc053c",
+      "id": "h-tabletop"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-tib-raise.json",
+      "path": "actions/h-tib-raise.json",
+      "gitBlob": "43ed9fc373f597b61e84afaeac826fd960345d46",
+      "bytes": 1835,
+      "sha256": "48833f08d1ee84b78c7c02e6e826962f117cf74aedb47bc7ac66f9ed51c0e040",
+      "id": "h-tib-raise"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-towel-behind.json",
+      "path": "actions/h-towel-behind.json",
+      "gitBlob": "2acea68628099de5d8d676d660297e6a426665e1",
+      "bytes": 2618,
+      "sha256": "857e0b604c1d29b0f8cd7d7dc48fbe6e177b6da49e4e434a975c196be20e295f",
+      "id": "h-towel-behind"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-towel-isometric-curl.json",
+      "path": "actions/h-towel-isometric-curl.json",
+      "gitBlob": "629a9e128b6257750d7d7622d12ed009bbaa782e",
+      "bytes": 1945,
+      "sha256": "794be8ff69f3b85d899e2ca8fadf6553fdd3c85be9e3dad5ac2b61d30915f270",
+      "id": "h-towel-isometric-curl"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-towel-pass.json",
+      "path": "actions/h-towel-pass.json",
+      "gitBlob": "ea038207eaac436a2715d3f320703c578cfd3752",
+      "bytes": 2766,
+      "sha256": "f71c85e4f37e215a485446e96d164c1bdb6ad0ccb3b3ba74a66e068458ad1fc3",
+      "id": "h-towel-pass"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-towel-pulldown.json",
+      "path": "actions/h-towel-pulldown.json",
+      "gitBlob": "d43475acca117cd997a4ce936adabb2c09b6e8d2",
+      "bytes": 2754,
+      "sha256": "5d3380b225b7cfd11ba3e213f87584a126d052e2b8c91bf249e0d93c93cd5360",
+      "id": "h-towel-pulldown"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-unsupported-star-reach-native.json",
+      "path": "actions/h-unsupported-star-reach-native.json",
+      "gitBlob": "dcca4f42d322c55c18d420161903c7ccf1640006",
+      "bytes": 3186,
+      "sha256": "f68dcd35938f34bece19ccdc1f6c7db7ae47db9c30109032276c131254a076b4",
+      "id": "h-unsupported-star-reach-native"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-wall-angel.json",
+      "path": "actions/h-wall-angel.json",
+      "gitBlob": "8fa9e6cc0e2d43f585983087b4f0a20a1decd1d4",
+      "bytes": 2925,
+      "sha256": "62c47b2bcbf0f36d3fa74d9f47c30673fd05617811aad63f1719d0df7af88471",
+      "id": "h-wall-angel"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-wall-calf-bent-knee.json",
+      "path": "actions/h-wall-calf-bent-knee.json",
+      "gitBlob": "da758d19538b60e9ad38cc282c6751ddbe21b250",
+      "bytes": 2425,
+      "sha256": "779dc9f284c444a88954967c5333bd5478295342b81e41231f1473a1f21e38f8",
+      "id": "h-wall-calf-bent-knee"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-wall-calf.json",
+      "path": "actions/h-wall-calf.json",
+      "gitBlob": "c3d4563cddb879f97371099895cd98b3d113c88e",
+      "bytes": 2495,
+      "sha256": "21a48e3dab0d772a318134609439c060775feb83b893e2d7c891d406a8656032",
+      "id": "h-wall-calf"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-wall-palm-lift.json",
+      "path": "actions/h-wall-palm-lift.json",
+      "gitBlob": "e6a3aee9751d39c065ecbd9133c6341c780c6376",
+      "bytes": 2330,
+      "sha256": "12ed83da8efe23098e40fbe059737538a73090fc4b565513da2f168c17cb0310",
+      "id": "h-wall-palm-lift"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-wall-pec.json",
+      "path": "actions/h-wall-pec.json",
+      "gitBlob": "8184dc62e6cd12b02e134a1b2badd0e5ebb6b309",
+      "bytes": 2593,
+      "sha256": "73dd970089ccc550937ecc2489c94529feafdbe33e3a1c2186f9e0c0b04e862f",
+      "id": "h-wall-pec"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-wall-straddle.json",
+      "path": "actions/h-wall-straddle.json",
+      "gitBlob": "92bd9a2c8088b91ae3ae8237e88d1af3e92d4e00",
+      "bytes": 2547,
+      "sha256": "22a63e12ba8cbb98bca79d9f06b3a59f617a4813397092fc2cc10a082010fa35",
+      "id": "h-wall-straddle"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/h-wall-wrist-flexor-stretch.json",
+      "path": "actions/h-wall-wrist-flexor-stretch.json",
+      "gitBlob": "b93c0123c42b1fef208c02f408427725722d7f25",
+      "bytes": 2475,
+      "sha256": "3ba172d495eec03a2c1c167880ea45a02412bae2b75dbbdfcbfda171fd299d81",
+      "id": "h-wall-wrist-flexor-stretch"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/hamstrings-A.json",
+      "path": "actions/hamstrings-A.json",
+      "gitBlob": "7d78f2c9983f11e8de3bf164aeb665903f25fc0e",
+      "bytes": 3128,
+      "sha256": "2cbe9a69c5bf740a9135f468a49bfc3d3827701f8d13ab751c859df0c14d6d43",
+      "id": "hamstrings-A"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/hamstrings-B.json",
+      "path": "actions/hamstrings-B.json",
+      "gitBlob": "f4b1e6a9d82c377e3876ba86894baab127a6470b",
+      "bytes": 3140,
+      "sha256": "9eafc6d186af4de34307cbd80498cb4b0f50aab95015108e37148e51d25ab6e2",
+      "id": "hamstrings-B"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/hamstrings-C.json",
+      "path": "actions/hamstrings-C.json",
+      "gitBlob": "ae10f9e71612f25006ec5d8f8e52f797258a9efb",
+      "bytes": 2822,
+      "sha256": "ff3f445abe6653b67aa4a2445090619c3ea9f1d8e9258d7de509c4f79b63474f",
+      "id": "hamstrings-C"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/hip-abductors-A.json",
+      "path": "actions/hip-abductors-A.json",
+      "gitBlob": "46214df6506cc1901a2649e6fd5d6409cfa8cce2",
+      "bytes": 2769,
+      "sha256": "1ffdd3c9ef6e619f2327509d0732a2da6d35814eca9c635eb2cdbdf96ae49f3d",
+      "id": "hip-abductors-A"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/hip-abductors-B.json",
+      "path": "actions/hip-abductors-B.json",
+      "gitBlob": "15ba0d64c108f83f68aee963dbacf36fdb388f8d",
+      "bytes": 2739,
+      "sha256": "be756e217f492d9bb6f4e2046d1ee1b3432420b4020d085afef891b41f4e8dbe",
+      "id": "hip-abductors-B"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/hip-abductors-C.json",
+      "path": "actions/hip-abductors-C.json",
+      "gitBlob": "a4a4f7224e222503afe46f962adc4b5e1a5588f1",
+      "bytes": 2722,
+      "sha256": "a84fac6d0dfad62b4e1df4072d76b6f5b2f0180c06d45d206d57539d2330b018",
+      "id": "hip-abductors-C"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/hip-flexors-A.json",
+      "path": "actions/hip-flexors-A.json",
+      "gitBlob": "64332ae5dee8daaa36c645509d5194fce57eae86",
+      "bytes": 2908,
+      "sha256": "8746ead4128dc389b46fb6986c8e81537124766959344d86587143a2f74f2b91",
+      "id": "hip-flexors-A"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/hip-flexors-B.json",
+      "path": "actions/hip-flexors-B.json",
+      "gitBlob": "29836fafc858c702d7e927a40d492ef4212780b0",
+      "bytes": 3558,
+      "sha256": "0081bbec84ced204873c326be0b1f31105c31d7888b0c5b637a6a9c6f056b5ad",
+      "id": "hip-flexors-B"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/hip-flexors-C.json",
+      "path": "actions/hip-flexors-C.json",
+      "gitBlob": "0b070f2bfde734ee939497c13237b2fa85cbf98e",
+      "bytes": 3492,
+      "sha256": "a6168462b775afed9f4057e0f42055b0bbd05cb579a0bdaa86d2b13ab8adc359",
+      "id": "hip-flexors-C"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/lats-A.json",
+      "path": "actions/lats-A.json",
+      "gitBlob": "22dedab7c0cf6bc521e7610fa49e0c145e5854c5",
+      "bytes": 3391,
+      "sha256": "7667b2a79f0774a2178ef063572cce0f50588b41cf2bb000b83ea1719e7909ae",
+      "id": "lats-A"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/lats-B.json",
+      "path": "actions/lats-B.json",
+      "gitBlob": "e9fed2fb49b85c3814676ed77496023dfe54ff71",
+      "bytes": 3276,
+      "sha256": "f45a6b23d012be6b4da8cb78fb0da3335a440d88d65d6bf7cd505bace9990f79",
+      "id": "lats-B"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/lats-C.json",
+      "path": "actions/lats-C.json",
+      "gitBlob": "66e41cd20e17297411aad4aa9d3a37f74856085d",
+      "bytes": 3169,
+      "sha256": "a22ef5634a471e4125930658184989ffad5f73e4252b24e8554ceb96ed1399cc",
+      "id": "lats-C"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/n-chair-wiper.json",
+      "path": "actions/n-chair-wiper.json",
+      "gitBlob": "292cd804353467b46f300196f381480af6502957",
+      "bytes": 3093,
+      "sha256": "c2f3c391856447d0c42f675eb093de5d04b3c69b6bcd07188afc6a1c4333e6da",
+      "id": "n-chair-wiper"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/n-half-split.json",
+      "path": "actions/n-half-split.json",
+      "gitBlob": "0c805b494e0753f9bdd5a9d10e0b49f9f9a5939e",
+      "bytes": 3388,
+      "sha256": "2ff7ebcb2b836899f6bfa886d18c0ffec06f9d1266055177fc006849fb9ad4c3",
+      "id": "n-half-split"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/n-leg-circles.json",
+      "path": "actions/n-leg-circles.json",
+      "gitBlob": "93ba45b91ee9db57609c96ee3aaffe5f2e69b2f7",
+      "bytes": 2864,
+      "sha256": "486aaf3f81dabf51cc7d5e4cccc7a426a398bc54be95fbcb9186d83d718d85be",
+      "id": "n-leg-circles"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/n-pelvis-circle.json",
+      "path": "actions/n-pelvis-circle.json",
+      "gitBlob": "f3e8e4d0b9d0091285355ac7f7883155aa5944f1",
+      "bytes": 3045,
+      "sha256": "72d58d0490fc3077b3a05eb4faa61f0a470e135cc7503d49a6fa11bfd6ce466c",
+      "id": "n-pelvis-circle"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/n-prone-hip-ext.json",
+      "path": "actions/n-prone-hip-ext.json",
+      "gitBlob": "760e3b86ab27d0ce06af2af73abcf80c25f05318",
+      "bytes": 2986,
+      "sha256": "96a77e7f6ecfa7f59c557694604340aee469f1b95828ce881fa1f249a4ccf20c",
+      "id": "n-prone-hip-ext"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/n-prone-ir.json",
+      "path": "actions/n-prone-ir.json",
+      "gitBlob": "630020828cecda20943b587c3e46c09360c3aa9d",
+      "bytes": 2854,
+      "sha256": "6a65276ed60fd286288649f7ec1ce60e95840329c187a7d0cf41feb4234e1774",
+      "id": "n-prone-ir"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/n-seated-ir-drop.json",
+      "path": "actions/n-seated-ir-drop.json",
+      "gitBlob": "902d4d792ad5c15d6db80a90f618ff8590233b20",
+      "bytes": 3370,
+      "sha256": "18acea0aba7faa5723a02c8b437160d362cc151f7e34603571e1803d532ebee2",
+      "id": "n-seated-ir-drop"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/n-seated-knee-lift.json",
+      "path": "actions/n-seated-knee-lift.json",
+      "gitBlob": "162af3e0ce722ecaefa50566b14aa2d7076faca3",
+      "bytes": 2892,
+      "sha256": "2484b5ba031c27dc805a3fab48ecebed73f654770838e441919fe53a9694558b",
+      "id": "n-seated-knee-lift"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/n-seated-squeeze.json",
+      "path": "actions/n-seated-squeeze.json",
+      "gitBlob": "2697087bd4c6d5ffeeb1932319b9ba75b57e2b19",
+      "bytes": 2788,
+      "sha256": "0b0733a1f5e4ecb0887856373332691e978b21468a3e350150bd21baacb6aeab",
+      "id": "n-seated-squeeze"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/n-slider-lateral.json",
+      "path": "actions/n-slider-lateral.json",
+      "gitBlob": "dfe1429f30fadf742856f67f80770d982d22f71d",
+      "bytes": 3169,
+      "sha256": "8a0988a3c5d102f5b6dbe375263692b2b2c8298ae5519cca82da5cf475ff9601",
+      "id": "n-slider-lateral"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/n-squat-shift.json",
+      "path": "actions/n-squat-shift.json",
+      "gitBlob": "11770388697d5571f33e792bebf5f887e15bc88f",
+      "bytes": 3394,
+      "sha256": "4c889c6768de6c5328cd455e093eef7a09ad7b8fdcdff8de7ebcb0d2ccb3bd11",
+      "id": "n-squat-shift"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/n-straddle-fold.json",
+      "path": "actions/n-straddle-fold.json",
+      "gitBlob": "30f80ddb47cadb98ed9c069309f9e57f88b85d2c",
+      "bytes": 3261,
+      "sha256": "d4d3f41503856e039dcbcdaa0fd96fa359908e78e7062e14048441fec16b4387",
+      "id": "n-straddle-fold"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/n-thomas-test.json",
+      "path": "actions/n-thomas-test.json",
+      "gitBlob": "ae47f96e94a7fcb19e24e3b544a94d002b1c3123",
+      "bytes": 2893,
+      "sha256": "09033f0031899ba14047c76720aad5d5011371d5fd4c9d6b08d877121ce7cead",
+      "id": "n-thomas-test"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/n-wide-fold.json",
+      "path": "actions/n-wide-fold.json",
+      "gitBlob": "3b8d19c8f0846c00607e98d93b2a411fd9fbe360",
+      "bytes": 2599,
+      "sha256": "70fc14b58c2d4ff14d114697cdfd94fb009f1106e35e04c887a9cfb173ede1ee",
+      "id": "n-wide-fold"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/n-windshield.json",
+      "path": "actions/n-windshield.json",
+      "gitBlob": "7eebc38866fc325481144be68c4a63b7a8f37db4",
+      "bytes": 3154,
+      "sha256": "e7bb63ab78257d02a3b277a17468d2adda6f279a6e7da89293948349781c957f",
+      "id": "n-windshield"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/o-chair-knee-extension.json",
+      "path": "actions/o-chair-knee-extension.json",
+      "gitBlob": "4ad239a47f8ebb436bc12a4d9c249f972f1768a9",
+      "bytes": 2120,
+      "sha256": "d93f4e4be1e7a3c15f203cc1a00a0ab2d927269f96a884611707b645a9312c75",
+      "id": "o-chair-knee-extension"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/o-seated-calf-raise.json",
+      "path": "actions/o-seated-calf-raise.json",
+      "gitBlob": "0f469108f30d9696aeabac952c4003940a4ec387",
+      "bytes": 2051,
+      "sha256": "dd172c7b231df1292619dd1ec42466f623d54ad6f0dfe990b99f0b1d8b8cece2",
+      "id": "o-seated-calf-raise"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/o-seated-catcow.json",
+      "path": "actions/o-seated-catcow.json",
+      "gitBlob": "d01f16463dc6904d7b13be3df4418741fe469c61",
+      "bytes": 2771,
+      "sha256": "e3f20d2592af869940aaf0cf0a0397b38992e643ca52f7e4769cbc348d3f1ece",
+      "id": "o-seated-catcow"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/o-seated-fig4.json",
+      "path": "actions/o-seated-fig4.json",
+      "gitBlob": "337c6a159493c4b73401190f9ed891fc9ff80f70",
+      "bytes": 2453,
+      "sha256": "9b5bddce0944334c03a0d4cf49b38c6c3503437f7ccd5f0ba3abe8f8b2705c76",
+      "id": "o-seated-fig4"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/o-seated-ham.json",
+      "path": "actions/o-seated-ham.json",
+      "gitBlob": "050eee631bcf7c1f97c1816c4a73240f40d6d6e2",
+      "bytes": 2584,
+      "sha256": "3ccc6ea5a926ffa9e90d26275616a42c189e77d7e686da40148f9b6c5279d0df",
+      "id": "o-seated-ham"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/o-seated-hip-er.json",
+      "path": "actions/o-seated-hip-er.json",
+      "gitBlob": "146ac1baa44548ec06be4a2e51be8619db3d6944",
+      "bytes": 2629,
+      "sha256": "2ee034ef2140e37e11d077d98f82ec6c39584c5e520c922b1b2369a95b544e02",
+      "id": "o-seated-hip-er"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/o-seated-sidebend.json",
+      "path": "actions/o-seated-sidebend.json",
+      "gitBlob": "45be38c39adcc527b050ebe800e4b02760896744",
+      "bytes": 2615,
+      "sha256": "75398b22cb93e97a3eebbdc3140e7d61c937d183af1dd2d1efaee31ead95ca70",
+      "id": "o-seated-sidebend"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/o-seated-twist.json",
+      "path": "actions/o-seated-twist.json",
+      "gitBlob": "00c4b83eb87ebbc3e8b4b6bb7bdb464a0e271756",
+      "bytes": 2624,
+      "sha256": "4b230476da18fb539d6b72d5f505c02c99ba54e920c0ac6fa3fc35a0b9addeb1",
+      "id": "o-seated-twist"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/o-stand-crossreach.json",
+      "path": "actions/o-stand-crossreach.json",
+      "gitBlob": "2117531b86a559d023806f3e9680a0046ec5b01f",
+      "bytes": 2668,
+      "sha256": "c5ab61cf207872a60b82ce9dd2bff2571c94908fd5739a50d45d0bd633bcb7b4",
+      "id": "o-stand-crossreach"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/o-stand-ham.json",
+      "path": "actions/o-stand-ham.json",
+      "gitBlob": "d55471661c086e4611b4c56ea5ceac0f9228fbbb",
+      "bytes": 2600,
+      "sha256": "402470e3374cd228c3bb7160a6502c9ba9cd75e012942e5708be936dcdec61b4",
+      "id": "o-stand-ham"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/o-stand-lunge.json",
+      "path": "actions/o-stand-lunge.json",
+      "gitBlob": "d180495a6b3056c7249855f56c2a6206a60cac87",
+      "bytes": 2839,
+      "sha256": "43105c6cad7e822d7b73493bd43fdf38a06b159a92cc90b207842076a38651e5",
+      "id": "o-stand-lunge"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/o-stand-quad.json",
+      "path": "actions/o-stand-quad.json",
+      "gitBlob": "2116e4bf9dcf9cafd0fb6ed7221d16107e7d05f2",
+      "bytes": 2566,
+      "sha256": "2fafe8898c078c1983cd86c1ce63ce6849b78c17339d8950fc4643f97c045193",
+      "id": "o-stand-quad"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/o-stand-sidebend.json",
+      "path": "actions/o-stand-sidebend.json",
+      "gitBlob": "ec30ba4889ce81d3d1f568700c90c970d8040c33",
+      "bytes": 2561,
+      "sha256": "608d595375b8e4e8a1d298dcb0067996623c28280e652cf9bdd6c9a31aa291e3",
+      "id": "o-stand-sidebend"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/o-supported-ankle-eversion.json",
+      "path": "actions/o-supported-ankle-eversion.json",
+      "gitBlob": "865a508f746198a070eb009dbc444385f81b7f14",
+      "bytes": 2579,
+      "sha256": "8f1ee238aa0400bc7f0d35d5076c317f6e18753b3ee3230363420dc78ca44f3a",
+      "id": "o-supported-ankle-eversion"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/o-supported-ankle-inversion.json",
+      "path": "actions/o-supported-ankle-inversion.json",
+      "gitBlob": "3cf6165600ae6159fe988b56f75db82e1407667a",
+      "bytes": 2203,
+      "sha256": "98e74352a7713461a4851408265c811ee855ac4d3684146971b6d28553aebf3c",
+      "id": "o-supported-ankle-inversion"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/o-supported-ankle-pump.json",
+      "path": "actions/o-supported-ankle-pump.json",
+      "gitBlob": "750f17053c3fa739ea2f55a31db09edda11545b2",
+      "bytes": 2064,
+      "sha256": "d91e5da628ebfd2cd206025527fe5cd2f2cfb785575fbf5011e8dd0b5f7989e5",
+      "id": "o-supported-ankle-pump"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/o-supported-hip-airplane.json",
+      "path": "actions/o-supported-hip-airplane.json",
+      "gitBlob": "86f986b40e3fe78b1ce43988b4dc9bdc227867e3",
+      "bytes": 3889,
+      "sha256": "0009f7686fed91149a08e9812af6045cbefcc4667dbf35785c903a91a5639c7c",
+      "id": "o-supported-hip-airplane"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/o-supported-hip-hitch.json",
+      "path": "actions/o-supported-hip-hitch.json",
+      "gitBlob": "0737d7d29e395b93e746505a7ca45875b0fad20f",
+      "bytes": 2998,
+      "sha256": "d5726db95d0568dd4f7fa6d99d1cd04afdc25b1eefea0a4dd1aa36c69e0e5ce7",
+      "id": "o-supported-hip-hitch"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/o-supported-hip-ir.json",
+      "path": "actions/o-supported-hip-ir.json",
+      "gitBlob": "8e0d722dd25c34129120643294731ad35a384a83",
+      "bytes": 2826,
+      "sha256": "3d624284713280f03f8e3cf9d6441594d47819495d0cb7991bbafe9fa4d4ccb5",
+      "id": "o-supported-hip-ir"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/o-supported-knee-curl.json",
+      "path": "actions/o-supported-knee-curl.json",
+      "gitBlob": "e85cf61be13958b9a6bfd699a595e25875f9059d",
+      "bytes": 2090,
+      "sha256": "3337c763ffd31282692b7cc8ca32523a4157132f8bc13773ba09d0ead33f88f9",
+      "id": "o-supported-knee-curl"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/o-supported-march.json",
+      "path": "actions/o-supported-march.json",
+      "gitBlob": "520cb010a166caed7b8cf345495d19c2417038f3",
+      "bytes": 3114,
+      "sha256": "b531ade1e5a4841fbe6a1cdb1cc78843cf178de23f8d57c562e4afad935cd6fd",
+      "id": "o-supported-march"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/o-supported-mini-squat.json",
+      "path": "actions/o-supported-mini-squat.json",
+      "gitBlob": "c7d76ce25e585eb97e8c860add08b729c06d275a",
+      "bytes": 2966,
+      "sha256": "bf60ac9b6701c9e701ffd183b043ebec5289544c079bb1368f879f963abe98bd",
+      "id": "o-supported-mini-squat"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/o-supported-single-leg-rdl.json",
+      "path": "actions/o-supported-single-leg-rdl.json",
+      "gitBlob": "8c13a92747a0a53f236b4ee8539245231f415a46",
+      "bytes": 3146,
+      "sha256": "dd7c51674d4016e8ecd14b73c7ba4160b9745cbe62b1f5987cd6c14b2b9f0461",
+      "id": "o-supported-single-leg-rdl"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/o-supported-star-reach.json",
+      "path": "actions/o-supported-star-reach.json",
+      "gitBlob": "b31af70d568573b4b92203da9ff66338512a74c2",
+      "bytes": 3181,
+      "sha256": "8a55f43f2e087a44670683492ec26cd1b9687299bc6d525f5c4087a57d9b3abf",
+      "id": "o-supported-star-reach"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/o-wall-hip-hinge-stretch.json",
+      "path": "actions/o-wall-hip-hinge-stretch.json",
+      "gitBlob": "80831d80f30d67fc3b520576559a25f7392b2763",
+      "bytes": 2726,
+      "sha256": "5bca3ef501010bc025dca4ba9b8a00070b50b3ce9ef8e8218150ea66f032e18f",
+      "id": "o-wall-hip-hinge-stretch"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/obliques-A.json",
+      "path": "actions/obliques-A.json",
+      "gitBlob": "d0111106bee8ed7e2c55a981ff617b53017ca8e7",
+      "bytes": 3705,
+      "sha256": "ff2bacc22762eda3aca2d467c4e1ebceddf584e836ceee610e1576a657e9eb49",
+      "id": "obliques-A"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/obliques-B.json",
+      "path": "actions/obliques-B.json",
+      "gitBlob": "8580e58e94bfcc81ccca328dd5b9bf1d3e7afd18",
+      "bytes": 3575,
+      "sha256": "ce144ff9dc1008b63b34e10e7bb91fac500d1a58bc75e2a5c163ec1871fb52c2",
+      "id": "obliques-B"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/obliques-C.json",
+      "path": "actions/obliques-C.json",
+      "gitBlob": "7f053fa3268b80358ba92e2d8aa9fbe97aed21b4",
+      "bytes": 3316,
+      "sha256": "fca22fcb9aed9af96f7f55aed62f1ee53bfb89828a841582cfb92af85ff4bd8f",
+      "id": "obliques-C"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/quadriceps-A.json",
+      "path": "actions/quadriceps-A.json",
+      "gitBlob": "e5ff40af271d68156b039501e7bcf9f6501085f6",
+      "bytes": 2822,
+      "sha256": "23663161d6bb2e766023c967ce62beee2f58bc9ffd298a1f111cd3cc053af14d",
+      "id": "quadriceps-A"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/quadriceps-B.json",
+      "path": "actions/quadriceps-B.json",
+      "gitBlob": "c7c1d3070941a196a0535b71b8ae09de20621ea3",
+      "bytes": 2409,
+      "sha256": "73a21dbf0c559377d4e0519f3d3f374903db5ddf0dfab10c583eefbeaee75851",
+      "id": "quadriceps-B"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/quadriceps-C.json",
+      "path": "actions/quadriceps-C.json",
+      "gitBlob": "ba645247ede2445e6f8ec3cca15fe8bf907ad822",
+      "bytes": 2195,
+      "sha256": "f280c180a145b5a860ae38264455dc6767a9e2112c8135419409a0d39c9ba443",
+      "id": "quadriceps-C"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/rotator-cuff-A.json",
+      "path": "actions/rotator-cuff-A.json",
+      "gitBlob": "fc194aa41e80f873e176e686517f7cab93a1c3ce",
+      "bytes": 3558,
+      "sha256": "09978b9e24ba9a2c408ff337c35ea7f0744999add7129f9fe27dafbdc2fbff07",
+      "id": "rotator-cuff-A"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/rotator-cuff-B.json",
+      "path": "actions/rotator-cuff-B.json",
+      "gitBlob": "10bf6e74771a3319d862cec713f6de40f9a4a186",
+      "bytes": 3272,
+      "sha256": "87633fbf7b98d51a3ad3f3eda112bb966a650ad552b9ed6a33d5655d02444858",
+      "id": "rotator-cuff-B"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/rotator-cuff-C.json",
+      "path": "actions/rotator-cuff-C.json",
+      "gitBlob": "5c5ee655b678fad102336f5fcc08af9cdb65af47",
+      "bytes": 2963,
+      "sha256": "d2591068b04898434ca207f3eff1db03a11bcc617e0682f909528245a939197f",
+      "id": "rotator-cuff-C"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/s-9090.json",
+      "path": "actions/s-9090.json",
+      "gitBlob": "0d6612aeef51c81f6896462c3dcc8f354846639e",
+      "bytes": 2748,
+      "sha256": "38d26d50a0cfd6e52c05b0df586bdaf2d69e6fb7a466e9071bad474c97471a16",
+      "id": "s-9090"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/s-butterfly.json",
+      "path": "actions/s-butterfly.json",
+      "gitBlob": "73d1565bffdea316fa69466261c3064a45e0a97f",
+      "bytes": 2640,
+      "sha256": "3da636ecc293dadb993eb4de36dd4929c3bd2c6c02e6655e65a137fc9673b155",
+      "id": "s-butterfly"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/s-figure4.json",
+      "path": "actions/s-figure4.json",
+      "gitBlob": "8755c3d1930360852aaa8ddd6c1630b89de0ef4c",
+      "bytes": 2579,
+      "sha256": "c7d5aef4db6114557a78a41ac46bd5b4ff15a0b9f541582303eefec43778585c",
+      "id": "s-figure4"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/s-frog.json",
+      "path": "actions/s-frog.json",
+      "gitBlob": "4e29b549feedb4c551db07d4d4adbef9d5904955",
+      "bytes": 2524,
+      "sha256": "43e4a2cb89907ecc5d2998b8373f37bee2db0f9df841efb695d44feb255e9b71",
+      "id": "s-frog"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/s-kneel-hipflex.json",
+      "path": "actions/s-kneel-hipflex.json",
+      "gitBlob": "1846c0050dd2f7953d55a5d9e4cb8fca78522a04",
+      "bytes": 2483,
+      "sha256": "857e3ddf2ab4615b274576ef0edf95ce0c526377e4441db8bc1e2d34b83f42e1",
+      "id": "s-kneel-hipflex"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/s-lizard.json",
+      "path": "actions/s-lizard.json",
+      "gitBlob": "64da5e5d46892fe8736c3de7411971f4b55543ef",
+      "bytes": 2978,
+      "sha256": "ddfd84dff811d2059618efc4d061877546f51d4923451776156e87d8a58ce3a2",
+      "id": "s-lizard"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/s-pigeon.json",
+      "path": "actions/s-pigeon.json",
+      "gitBlob": "940ecf30dec18cca0842d103c79ac8e468ef0479",
+      "bytes": 3137,
+      "sha256": "1452529e8c4b24458522aa228d7219c89b8c04814fbdd53cd5e78a5b0c069ea6",
+      "id": "s-pigeon"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/s-seated-fold.json",
+      "path": "actions/s-seated-fold.json",
+      "gitBlob": "40e28dab3f912633aacecaf1661a4dee71007748",
+      "bytes": 2732,
+      "sha256": "23276cc40710175e9680185d4cd25d5462a2ffb2cdb82d61f55afd4f03dde705",
+      "id": "s-seated-fold"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/scapular-A.json",
+      "path": "actions/scapular-A.json",
+      "gitBlob": "7f6c60bef2dab9ace092ba299173f41f118ebe82",
+      "bytes": 3238,
+      "sha256": "7def2fd6f46135c28c31209bd3415995a55581ae8e4d05af3567018afe2bcfd8",
+      "id": "scapular-A"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/scapular-B.json",
+      "path": "actions/scapular-B.json",
+      "gitBlob": "13e963bdc65b74eb75883e40687f3cccd325bd44",
+      "bytes": 3396,
+      "sha256": "73857a1c61f82aac1b38dfbf520f611b13483aeaea9c324e0706e75ed347bdf7",
+      "id": "scapular-B"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/serratus-A.json",
+      "path": "actions/serratus-A.json",
+      "gitBlob": "8419719846b6bf00cc4cf877c0db2befbd6e4d9c",
+      "bytes": 2962,
+      "sha256": "890c111b2fdef6c09f382694bfd00f313455d0658dc5c5d9f86a78fe789ea0a3",
+      "id": "serratus-A"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/serratus-B.json",
+      "path": "actions/serratus-B.json",
+      "gitBlob": "eadb58cc73a4a5c5994ea96673f3fecce5ef63ee",
+      "bytes": 3040,
+      "sha256": "33694bad88ddbd10a4a9dedceb465dac8704455289afb98742e1a369e5927823",
+      "id": "serratus-B"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/serratus-C.json",
+      "path": "actions/serratus-C.json",
+      "gitBlob": "2c64203ea45e6364857c9524653d558dafc8229b",
+      "bytes": 3339,
+      "sha256": "c8a25f902799e46dd3b1393798f53a2ffad5a78804ca69ef2862a4512769c4be",
+      "id": "serratus-C"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/t-flare-side-hold.json",
+      "path": "actions/t-flare-side-hold.json",
+      "gitBlob": "40e2eeefadc330cd55e91b4ee2f53416479d2e2a",
+      "bytes": 3178,
+      "sha256": "ecdf4850eeaf233f1ef7c3aca96f1d02fc0f19369e6c0abfe243dde0588de9ab",
+      "id": "t-flare-side-hold"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/t-lsit-open-close.json",
+      "path": "actions/t-lsit-open-close.json",
+      "gitBlob": "4c2ef45c262a0f4e1a237d760107f5e4119806a6",
+      "bytes": 3888,
+      "sha256": "eb46839057dc222d988e9c9c361d58a057c067364c997bcca1167fe9792da411",
+      "id": "t-lsit-open-close"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/t-lsit-tuck.json",
+      "path": "actions/t-lsit-tuck.json",
+      "gitBlob": "2fd18fc9f125968fba33b3b0d27ef19466b2b394",
+      "bytes": 3801,
+      "sha256": "202a72b7fec8921b85e01e8704db45525e41780459b1fa69486297a805848296",
+      "id": "t-lsit-tuck"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/t-lsit-vsit-circles.json",
+      "path": "actions/t-lsit-vsit-circles.json",
+      "gitBlob": "870d74ff8532b74a2dc43778ba8bea1d69131e2c",
+      "bytes": 3830,
+      "sha256": "33a5e56c3a2f22cf5858cb2b8ffc899dd871e47fb2af24b0e99dc48abb8fbfea",
+      "id": "t-lsit-vsit-circles"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/t-lsit-wide.json",
+      "path": "actions/t-lsit-wide.json",
+      "gitBlob": "ca8697becb7997ad51d1d541ce8c375959bf97f5",
+      "bytes": 3825,
+      "sha256": "3393bbc650470499b4c7fd0a1ae8873e1f15653fa7e8634edaf3b0a8130205ac",
+      "id": "t-lsit-wide"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/t-seated-straddle-ext.json",
+      "path": "actions/t-seated-straddle-ext.json",
+      "gitBlob": "1bb2793b7a7ce805c30a44001de090b27d67ae92",
+      "bytes": 3314,
+      "sha256": "582f632379a5c055a83c9f965eee076bfa34b393dc2d0c7c542cd43c2f2a88cd",
+      "id": "t-seated-straddle-ext"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/t-seated-straddle-lift-1leg.json",
+      "path": "actions/t-seated-straddle-lift-1leg.json",
+      "gitBlob": "3ac44706b28d310d4c826e87acb88e2df0090540",
+      "bytes": 3419,
+      "sha256": "9cd11d1f446596a4d99e7843675a72939d34e194e5ba614acaeb0e9daacac12b",
+      "id": "t-seated-straddle-lift-1leg"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/t-seated-straddle-lifts.json",
+      "path": "actions/t-seated-straddle-lifts.json",
+      "gitBlob": "3b1f6929ef0692b18322aa4d8fb455bbb5a1a2b9",
+      "bytes": 3283,
+      "sha256": "912f8e0c1e76351051f10f6d8f6ff2a56a7bfc3f8519327f8e496318af03fd86",
+      "id": "t-seated-straddle-lifts"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/t-straddle-hold.json",
+      "path": "actions/t-straddle-hold.json",
+      "gitBlob": "1ecd410b652004769f1d4d41e190e149bc2ca297",
+      "bytes": 3760,
+      "sha256": "107cee73e4e3f2f69922288dd55b242ffc2d38ba0bfef2cbb455699346c0141c",
+      "id": "t-straddle-hold"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/t-tuck-planche.json",
+      "path": "actions/t-tuck-planche.json",
+      "gitBlob": "6eaad0ce2549b2909365988c7aad928d1f2e4b54",
+      "bytes": 3330,
+      "sha256": "ed262cad4e8d6eaee759151ca79074ebe314474a557d55090e4ddc8c7ae6acd1",
+      "id": "t-tuck-planche"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/t-vsit.json",
+      "path": "actions/t-vsit.json",
+      "gitBlob": "3b9d34b4a54c45d58725afae81bea224766ff993",
+      "bytes": 3634,
+      "sha256": "009a5068dedccda45ba9de64672e95e0fb05189871a742e93c4b0e62c14c72b5",
+      "id": "t-vsit"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/triceps-A.json",
+      "path": "actions/triceps-A.json",
+      "gitBlob": "5d00a2fe0a58100f1eef0d05a8931ecc65626112",
+      "bytes": 3129,
+      "sha256": "7b9875110469f1f1ff12e61e607a98e1c534ebef67f75fd51f1ae5f63ba0234b",
+      "id": "triceps-A"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/triceps-B.json",
+      "path": "actions/triceps-B.json",
+      "gitBlob": "ca0e89c7263a0b86b3139fff14b47f40742547f4",
+      "bytes": 3192,
+      "sha256": "b8351e3f43b7c2282246a0c7d9f022db3a29871b2b12337e4463c37177aa810f",
+      "id": "triceps-B"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/triceps-C.json",
+      "path": "actions/triceps-C.json",
+      "gitBlob": "26e99e1ecadc92eb68ba4bce61b7f41166fa629b",
+      "bytes": 2364,
+      "sha256": "fdae12164c4b255c26f66500cdc394e415b4e9914dad17fbc7b070e00389bb6a",
+      "id": "triceps-C"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/w-bird-dog.json",
+      "path": "actions/w-bird-dog.json",
+      "gitBlob": "311911a58f43d2fe2ede823fcc9a94283729d115",
+      "bytes": 3354,
+      "sha256": "c67e47da2116acc39c79adfd637d89090e47baeec70a50aa05dead3a41a95d39",
+      "id": "w-bird-dog"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/w-chair-hip-thrust.json",
+      "path": "actions/w-chair-hip-thrust.json",
+      "gitBlob": "73fc1405355b0868741b6655d27611dbfd46c89b",
+      "bytes": 3110,
+      "sha256": "a67cfa95044a9899154b135154ca5f30f9abb6946306099b6f25bad338230906",
+      "id": "w-chair-hip-thrust"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/w-clamshell.json",
+      "path": "actions/w-clamshell.json",
+      "gitBlob": "3d9b7f71e988442f174af238a2b5f2286d22a002",
+      "bytes": 2851,
+      "sha256": "adf819268b54fc7cd2e31d1977eb989d516c1aa7f417b87ab80034ccbf397347",
+      "id": "w-clamshell"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/w-dead-bug.json",
+      "path": "actions/w-dead-bug.json",
+      "gitBlob": "12b2737f783bd481542d64d571f1acd4d3c62109",
+      "bytes": 3570,
+      "sha256": "ee5de3a41ea3a239d0644b42bde1ef769e0598e173c7ff30a7ccd413c6029366",
+      "id": "w-dead-bug"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/w-feet-on-chair-bridge.json",
+      "path": "actions/w-feet-on-chair-bridge.json",
+      "gitBlob": "02ed927c1f1458b38ec824a7f69fa134425f891b",
+      "bytes": 3055,
+      "sha256": "1c474227177d216b54e58b0707b1b863fa217ecca9e84da0feb5cf917d444f94",
+      "id": "w-feet-on-chair-bridge"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/w-fire-hydrant.json",
+      "path": "actions/w-fire-hydrant.json",
+      "gitBlob": "e437c6debdc121f3fce2f6b5571325aacd09b0aa",
+      "bytes": 2785,
+      "sha256": "68bf6658b801a9491c0dc857a6cc69f679c5b648276769f7dd63165e01d71174",
+      "id": "w-fire-hydrant"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/w-prone-swimmer.json",
+      "path": "actions/w-prone-swimmer.json",
+      "gitBlob": "b015467aff8da3c2abae1e14f8108fe11488c850",
+      "bytes": 3109,
+      "sha256": "ea4fa53f75bc25989279685da658c11140153677a3af9302339b7513fbb97911",
+      "id": "w-prone-swimmer"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/actions/w-wall-sit.json",
+      "path": "actions/w-wall-sit.json",
+      "gitBlob": "5e44a36a3eae2052c6719099294a84e1ec8f7314",
+      "bytes": 3222,
+      "sha256": "074f7dbfd40fa8112d184065e3b499477546709eab1a8d7eb16b1552f8c8abac",
+      "id": "w-wall-sit"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/ai-tags.schema.json",
+      "path": "ai-tags.schema.json",
+      "gitBlob": "90a3c5c8ed60bfdc2685add62c0b2e7277174173",
+      "bytes": 18353,
+      "sha256": "6b92879ef75e25fb115db536fab9628c603753542a980f77c0b5ddd1d0f24808"
+    },
+    {
+      "sourcePath": "catalog/ai-tags/vocabulary.json",
+      "path": "vocabulary.json",
+      "gitBlob": "06ba39f6dbbf0a0e53a202f66eb575e61f453e87",
+      "bytes": 51460,
+      "sha256": "bed2b47a43ffc23cdef6202befadbe4c83b1da5dfd242cbf01354ec891f4c1fc"
+    }
+  ],
+  "rawFilesRetainedInRepository": false,
+  "rawArchiveRelativeToRepository": "../deliveries/sdk-pin-v0.7.0-f584c12-20261104/sources/ai-tags-original/",
+  "sourceFilePathMeaning": "files[].path is relative to the pinned catalog/ai-tags source root; actions/*.json are archived outside the repository, while README.md, vocabulary.json and ai-tags.schema.json remain alongside the aggregate."
+}
