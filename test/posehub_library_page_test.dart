@@ -12,7 +12,7 @@ import 'package:smartfit/ui/theme/trainer_theme.dart';
 import 'package:smartfit/ui/training_poster_image.dart';
 import 'package:smartfit/ui/training_route.dart';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
-import 'package:ugk_trainer/ugk_trainer.dart';
+import 'package:ugk_trainer/ugk_trainer.dart' hide TrainingPosterImages;
 
 import 'posehub_ui_support.dart';
 import 'support/widget_test_timeout.dart';
