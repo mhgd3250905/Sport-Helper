@@ -81,6 +81,8 @@ class RuntimeLog {
   // General metadata stays token-only. SDK chat diagnostic text is scoped below.
   static const _fields = {
     'reason',
+    'pack',
+    'channel',
     'status',
     'phase',
     'source',
