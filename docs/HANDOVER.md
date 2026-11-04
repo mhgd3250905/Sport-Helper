@@ -1,5 +1,49 @@
 # 智能健身助手（SmartFit）交接说明
 
+## 当前接手：main +21 / SDK 原生 QA
+
+当前 App 为 **0.1.0+21 / internal arm64 2021**。本轮功能已通过 [PR #9](https://github.com/mhgd3250905/Sport-Helper/pull/9) 合入 `main`；功能合入点、文档收束前 HEAD 为 `ff91fc56606c11e57d98c0dae79be111074a61e2`。这不是后续文档提交 SHA 的占位值，当前文档 HEAD 以 Git 为准。
+
+五个 SDK 包、coach override 与锁文件统一固定 **`f7b8a8e4853e9f50fc93888e1768ec1dbc75b588`**（本轮用户口径 **v0.7.2 内容**，完整 pin 为依赖身份）。运行、测试与现有 APK 源为 `3d39ca94b4c9144d388255bb56dff6e00f32877f`，与功能合入点的 Git tree 同为 `b4a6c96eb2b836c8330ad361fedc2fbb6ad4f29f`。本轮收束只修改文档，不把新文档提交充作重新打包或实测源码。
+
+当前版本与包身份见[版本台账](version-management.md)，命令、测试和来源绑定见[验收记录](acceptance.md)，实现职责见[对话主界面](chat-home.md)，observer 持久化与导出契约见[开发者日志](developer-logging-2026-10-28.md)。这些是 README 直接声明的当前入口；[+18 日期报告](qa-v2-sdk071-plus18-2026-11-04.md)明确属于 history，不能覆盖本节状态。
+
+### 当前接线与近期变化
+
+正式入口通过 `qaV2` 公开开关启用 SDK 原生问答，SDK 页面承接单选、多选、动作 / 计划连续编号和快捷按钮。默认模型为 `deepseek-v4.1-flash`，`https://ai.uuugk.win/v1` / Bearer；思考参数由 SDK 负责，App 不设置 thinking / extraBody 覆盖。原宿主的计划存储、历史、导航、训练入口和品牌视觉继续沿用。
+
+| 阶段 | 接手时应知道的事实 |
+| --- | --- |
+| +18 | 改为 SDK 原生 QA 接线，App 加载并传入未审 AI 标签，不保留 App 自写的教练代理实现 |
+| +19 | SDK 恢复接入与 observer 五字段透传对齐；`message` 先按既有规则脱敏再截至 300 字，持久化、重开、导出保留 |
+| +20 | 接入 SDK 计划准入修正，保留原授权与准入边界，宿主不开旁路 |
+| +21 | 接入新脚本场景与计划状态判定；计划轮日志 `hasPlan=true` 与实际卡片共同列入远程验收 |
+
+标签聚合为 `assets/coach/ai-tags/actions.json`，来源固定 Pose-Hub PR #26 / `5d17c24af859d905dbbdee4b1d623b99881ac618`。仓内 provenance 记录 **249 项、全部 `ai-draft`、`testOnly=true`、`reviewed=false`**，聚合 SHA-256 为 `f3d1e03420a68520233d2d47ee91d60d679a4391b70a6739dd109a6b14e7de65`。标签只用于测试；loader 原样读取聚合对象，不据标签增加动作授权或替换 SDK 目录、安全与计划准入。App 同时打包聚合和 provenance。
+
+### 软件与包的已知结果
+
+当前会话已核对 `3d39ca9` 的严格 analyze **0 问题**、全量 **689 通过 / 0 失败 / 0 跳过**，及成功生成的测试包观察；同树关系使这些软件证据适用于功能合入点。现有包为 `SmartFit-qa-v3-0.1.0+21-3d39ca9-internal-arm64-v8a-release.apk`，**43,059,957 B**，SHA-256 `975561d6f53646328db85812ad25bb6f891718677601d8fe7ea3daaebbafc91c`，沿用 +20 测试证书。具体位置由版本台账统一记录。
+
+本轮没有新真实模型调用。旧 +18 的 16 轮 / 34 请求及当时失败保留原来源，不转写成 +21 已通过；软件结果、包观察和用户手机验收各按实际范围记录。
+
+### 下一步：用户远程验收，7 项全部 pending
+
+- pending：说“练背”未给地点时先问地点；选居家后再问器械，不连问。
+- pending：办公场景不安排躺地动作。
+- pending：15 分钟计划卡前半全部为工位坐姿，后半全部为楼梯间站姿，正文与卡片顺序一致。
+- pending：指出顺序不对后，计划实际重排。
+- pending：要求仅换第 3 个时只换该项，或诚实说明不能替换。
+- pending：杀掉 App 并重开后，对话和计划卡都保留。
+- pending：生成计划的轮次日志记录 `hasPlan=true`。
+
+测试包由用户远程安装验收；收到反馈后再按其范围处理。缩略图排查继续保持跳过，SF 主 App 固定 `zh-CN`、没有语言切换入口，不追加大字号或小屏幕测试。本次只收束本项目文档，保留所有 WIP、其他工作树与 stash；不操作手机、SDK 源码、`release`、tag、其他 App 或媒体站。凭据、keystore、`local.properties`、APK 与 build 产物继续留在版本管理之外。
+
+## 历史交接记录
+
+<details>
+<summary>展开 +18 候选、原 +54 主线及更早交接；旧“当前”只描述原时点</summary>
+
 ## QA v2 测试候选（2026-11-04）
 
 分支 `codex/sdk-pin-v0.7.0`，App **0.1.0+18 / internal arm64 2018**，SDK `ugk_trainer-v0.7.1 / 9dd93163e9f355665e5c923f374c64f03bf65a86`。运行与 APK 源 `55442967ca6593b1279d81adfa030468aacd8731`；以下原 +54 主线记录保留原范围。
@@ -352,5 +396,7 @@ flutter build apk --release
 - 每个里程碑 commit + tag，下一个建议 `m3-local-verified`（本机测试与真机验收通过后）。
 - 公开仓库：不提交密钥、token、keystore、`local.properties`、APK/build 产物。
 - 生成文件（exercises.json、templates.json、voice manifest）改动应通过 `tools/` 脚本再生成，不手改。
+
+</details>
 
 </details>

@@ -1,5 +1,55 @@
 # 本机验收记录
 
+## 当前 +21 验收与源码绑定（2026-11-04）
+
+当前 App 为 **`0.1.0+21`**，SDK 五包及 coach override 固定 **`f7b8a8e4853e9f50fc93888e1768ec1dbc75b588`**（用户指定的 v0.7.2 内容）。[PR #9](https://github.com/mhgd3250905/Sport-Helper/pull/9) 已合入 main；功能合入点及本轮文档收束前 HEAD 为 `ff91fc56606c11e57d98c0dae79be111074a61e2`，当时远端 main 一致。文档保存点另以 Git 查询，不将此功能合入点描述为永远最新的 HEAD。
+
+下表验证及 APK 源码均为 **`3d39ca94b4c9144d388255bb56dff6e00f32877f`**。该源和 ff91fc5 的 tree 都是 `b4a6c96eb2b836c8330ad361fedc2fbb6ad4f29f`，Git diff 为空，故以下证据适用于相同运行源码的合入点。本次后续仅修改文档，不改变其运行、依赖、测试与构建配置，按此有限 delta 复用已有证据。
+
+## 已返回的软件与构建结果
+
+时间均为 **2026-11-04 / Asia/Shanghai（+08）**。本节依据当前会话已经返回的执行结果整理，本轮没有重新读取日志、构建产物、交付目录或 SDK 仓库。
+
+| 检查 | 实际命令 / 环境 | 已确认结果与时间 |
+| --- | --- | --- |
+| 依赖解析 | Flutter 3.44.7 `flutter pub get`；未加 `--offline` 或 `--enforce-lockfile` | 16:25:09–16:25:29 成功，lock 未变；main 同步后普通 pub get 也成功且未变。不声称本轮严格锁校验通过 |
+| 严格静态分析 | `flutter analyze --no-pub --fatal-infos` | 16:26:18–16:26:33，**0 问题** |
+| 全量 Flutter 测试 | `flutter test --no-pub --concurrency=1 --timeout=60s --flavor internal --reporter expanded --dart-define=SMARTFIT_POSEHUB_PACK=true --dart-define=SMARTFIT_ALPHA_CARDS=true --dart-define=UGK_INTERNAL_MEDIA_PREVIEW=true` | 16:26:58–16:30:48，**689 通过 / 0 失败 / 0 跳过** |
+| 测试目录与 HTTPS 冒烟环境 | `SMARTFIT_CATALOG_TEST_PACK` 指向固定 f7 SDK 的 `packages/ugk_trainer/assets/pose_hub/app-test-pack-r1`；`SMARTFIT_POSEHUB_V3_HTTPS_SMOKE=1` | 上述全量使用该目录及 HTTPS 冒烟设置；不替代真实模型或原生设备验证 |
+| internal arm64 release | `flutter build apk --release --no-pub --flavor internal --split-per-abi --target-platform android-arm64 --dart-define-from-file=<temporary private config>` | 16:41:49–16:43:25 成功；私密配置仅执行时提供，不记载其内容或实际路径 |
+| 既有 APK 独立核对 | 当时原生身份、签名、ZIP/ELF 16KB、存储 JNI、资源及编译配置检查 | 均通过；属于上述源码的已有包观察，本次文档 HEAD 没有新出包 |
+
+构建前两次曾因 JVM 内存失败；用户要求继续后，系统提交余量恢复并使用进程级低内存参数取得成功，期间没有源码变化。保留这两次失败的事实，不将环境恢复记为代码修复，也不改写成功包来源。
+
+| 已有交付包 | 核对结果 |
+| --- | --- |
+| 文件名 | `SmartFit-qa-v3-0.1.0+21-3d39ca9-internal-arm64-v8a-release.apk` |
+| 包身份 | `com.ugk.smartfit.internal` / `0.1.0` / **2021**，internal / arm64-v8a / release |
+| 大小 / SHA-256 | **43,059,957 B**；`975561d6f53646328db85812ad25bb6f891718677601d8fe7ea3daaebbafc91c` |
+| 测试证书 SHA-256 | `3761270a4764157f0e389014a9e5b800b05403bfddce0f4f7f8c039f6a53bdc7`，与 +20 相同；不记为生产签名 |
+| 来源位置 | `E:/AII-3D/3D-Sport-AI/deliveries/qa-v3-f7b8a8e-plus21-20261104/`；仅标识本会话已有交付位置，本轮未读取 |
+
+## 当前待验与历史证据边界
+
+**+21 的 7 项手机验收均为 pending，由用户远程验证。** 本轮未运行真实模型，未安装或操作手机；`hasPlan=true` 仍缺手机证据。软件与包门禁不能替代旧档恢复、问题和快捷按钮交互、计划生成、训练播放或设备性能验收。
+
+原 +18 / SDK9dd 的真实 **16 轮、34 次请求、15 成功与 1 次计划准入失败**只属于当时源码与模型运行。后续 +19 恢复降级、+20 准入统一、+21 QA v3 与日志修复已进入新源码，但没有把该批原场景重新真实运行于 f7，因此保留原失败与已知问题，不写为当前模型实测通过。
+
+原 +54 的 679 项、指定四文件 34 项、6 张正常尺寸新图及 APK；+53 的22帧、20+21轮与旧机升级恢复；以及旧阶段的严格锁文件证据，均留在下方历史区并绑定各自源码。大字号 / 小屏验证、已跳过的缩略图排查和其他专项设备结论不由本次文档收束扩展。
+
+## 本次文档收束范围
+
+baseline 为上一轮收束 **`78b9e2998375ba29c6edef4df222770ed006491c`**，同时是 ff91fc5 的第一父提交；其到收束前 HEAD 的有限 delta 为 **10 个提交 / 31 条路径**。Preflight 完整状态为空，tracked / staged / unstaged / untracked 均 0。README 一跳声明的版本台账、验收、交接、对话主界面与开发者日志说明为现行事实源；其折叠日期记录为 archive/history。
+
+本轮仅对齐 README 及五份文档中的 +21、main / PR #9、SDKf7、已有软件和产物证据与待验边界。689 项验证绑定 3d39ca9，合入点已用相同 tree / 空 diff 证明可复用；文档修改本身按相关文档检查验证，不重复昂贵全量。用户已授权保存、提交和普通 push，最终文档 SHA 与远端结果按 Git 核对，不预填尚未发生的成功。本轮不创建 tag，不操作 `release/1.0`、其他工作树、SDK 源码或设备。
+
+本轮文档只读验证 `python -` 已通过：覆盖六份文档的当前身份、15 个仓内链接、11 个源码路径、历史原文保留、折叠区与代码围栏平衡；4 个外部引用仅识别而未读取。`git diff --check` 通过。完整工作区状态为六项已归属本次 Agent 的 tracked 文档修改，staged / untracked 均 0；验证状态为 `ff91fc56606c11e57d98c0dae79be111074a61e2` 加这六份文档修改。相对已验证运行源，业务代码、依赖、测试、工具与资源的差异仍为 0。
+
+## 历史 +18 候选与 +54 验收快照
+
+<details>
+<summary>展开上一轮顶部原文；版本、分支、“当前”及软件与设备结论仅属于原时点</summary>
+
 ## QA v2 测试候选（2026-11-04）
 
 分支 `codex/sdk-pin-v0.7.0`，App **0.1.0+18 / internal arm64 2018**，SDK `ugk_trainer-v0.7.1 / 9dd93163e9f355665e5c923f374c64f03bf65a86`。运行与 APK 源 `55442967ca6593b1279d81adfa030468aacd8731`；以下原 +54 主线记录保留原范围。
@@ -48,6 +98,8 @@
 本轮修正当前版本 / SDK / 主线状态滞后，整理近期优化及证据边界，保留旧验证和失败记录。修改后按文档差异、链接与当前源码身份做必要核对；提交并普通 push 已获用户授权，最终 SHA 与推送状态以 Git 核对为准，不预填成功。软件门禁继续绑定 c9823e6；文档提交不冒充新 APK 源码。
 
 2026-11-04 文档验证：`python -` 只读检查通过，覆盖本轮 6 份文档、当前区 31 个本地链接、17 个现存代码路径、3 份回执的 SHA-256 与完整源码 SHA；历史正文保留、折叠区与代码围栏平衡。`git diff --check` 通过。验证状态为 c9823e6 加本次 6 份文档修改，完整 status 仅这 6 项 tracked 修改、staged 与 untracked 均 0；运行源码、测试和依赖无变化。
+
+</details>
 
 ## 历史验收记录
 

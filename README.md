@@ -1,5 +1,64 @@
 # 智能健身助手 SmartFit
 
+## 当前主线：+21 / SDK 原生 QA
+
+当前 App 为 **0.1.0+21 / internal arm64 2021**。本轮功能已通过 [PR #9](https://github.com/mhgd3250905/Sport-Helper/pull/9) 合入 `main`，功能合入点、文档收束前 HEAD 为 `ff91fc56606c11e57d98c0dae79be111074a61e2`。后续文档提交的 SHA 以 Git 为准，不改变下面的软件与 APK 来源。
+
+SDK 五包（`ugk_coach`、`ugk_coach_ui`、`ugk_coach_chat`、`ugk_trainer`、`ugk_trainer_runtime`）、coach override 和锁文件统一固定 **`f7b8a8e4853e9f50fc93888e1768ec1dbc75b588`**。本轮按用户口径称为 **v0.7.2 内容**，实际依赖身份以完整 Git pin 为准，不从标签名称推断包内版本。
+
+| 当前事实源 | 范围 |
+| --- | --- |
+| [版本管理与台账](docs/version-management.md) | App / SDK、运行与打包源码、包身份及主线状态 |
+| [验收记录](docs/acceptance.md) | 验证命令、结果、源码绑定和软件 / 设备证据边界 |
+| [阶段交接](docs/HANDOVER.md) | 当前接手状态、远程验收清单与有效约束 |
+| [对话主界面](docs/chat-home.md) | SDK 原生 QA、选择题、编号、快捷按钮与宿主职责 |
+| [开发者日志](docs/developer-logging-2026-10-28.md) | observer 字段、消息脱敏截断、持久化及导出契约 |
+
+以上五份文档的顶部当前区为现行入口；下方折叠的旧“当前”与候选描述只保留原时点事实。[+18 日期报告](docs/qa-v2-sdk071-plus18-2026-11-04.md)属于 **history**，其旧模型轮次、失败与 APK 不作为 +21 的新验证。
+
+## 本阶段更新
+
+| 阶段 | 已进入当前主线的内容 |
+| --- | --- |
+| +18 | 通过 SDK 原生 `CoachChatAgentMode.qaV2` 使用 `CoachQaAgent`，接入 App 打包的 AI 标签；选择题、动作 / 计划连续编号和快捷按钮由 SDK 页面承担 |
+| +19 | 对齐 SDK 恢复与诊断接线，透传 observer 的 `stage / errorType / message / status / reason`；消息先脱敏再截至 300 字，保留持久化、重开和导出 |
+| +20 | 接入 SDK 计划准入修正，动作与计划继续经过既有授权、准入和训练入口，不在 App 另写教练策略 |
+| +21 | 对齐新脚本场景与计划状态判定，计划轮以日志 `hasPlan=true` 作为核对项；软件门禁与手机验收分别记录 |
+
+正式启动启用 SDK 原生 QA，公开开关仍为 `CoachChatAgentMode.qaV2`，锁定版本使用新版工具脚本。默认模型为 **`deepseek-v4.1-flash`**，入口为 **`https://ai.uuugk.win/v1` / Bearer**。思考参数由 SDK 负责，App 不设置 thinking / extraBody 覆盖；凭据仅由构建环境注入。存储、导航、训练和品牌视觉继续由原宿主适配承接，详细职责见对话主界面文档。
+
+App 打包 **249 份 `ai-draft` 标签**，来源为 Pose-Hub PR #26 的固定提交 `5d17c24af859d905dbbdee4b1d623b99881ac618`。仓内 provenance 明确 `testOnly=true / reviewed=false`；标签只供本次测试，不能扩大动作授权范围，也不替代 SDK 目录、安全和计划准入。App 读取聚合 `actions.json` 并传给 SDK，来源与声明随 `provenance.json` 打包。
+
+## 软件结果与测试包
+
+运行、测试与现有 APK 均绑定源码 **`3d39ca94b4c9144d388255bb56dff6e00f32877f`**；它与功能合入点 `ff91fc5` 的 Git tree 均为 **`b4a6c96eb2b836c8330ad361fedc2fbb6ad4f29f`**。当前会话已核对严格 analyze **0 问题**、全量 **689 通过 / 0 失败 / 0 跳过**及成功包观察；本轮文档收束复用同树证据。
+
+| 测试包身份 | 当前已记录结果 |
+| --- | --- |
+| 文件名 | `SmartFit-qa-v3-0.1.0+21-3d39ca9-internal-arm64-v8a-release.apk` |
+| 包身份 / 大小 | `com.ugk.smartfit.internal / 0.1.0 / 2021`，**43,059,957 B** |
+| SHA-256 | `975561d6f53646328db85812ad25bb6f891718677601d8fe7ea3daaebbafc91c` |
+| 签名 | 沿用 +20 测试证书；不据此记为商店发布或设备验收 |
+
+完整产物位置和证据来源见版本台账、验收记录。旧 +18 的 16 轮 / 34 请求只属于旧报告；本轮没有新真实模型调用，软件通过不等于手机体验已通过。
+
+## 用户远程验收：7 项均待确认
+
+- 待验：说“练背”未给地点时先问地点；选居家后再问器械，不连问。
+- 待验：办公场景不安排躺地动作。
+- 待验：15 分钟计划卡前半全部为工位坐姿，后半全部为楼梯间站姿，正文与卡片顺序一致。
+- 待验：指出顺序不对后，计划实际重排。
+- 待验：要求仅换第 3 个时只换该项，或诚实说明不能替换。
+- 待验：杀掉 App 并重开后，对话和计划卡都保留。
+- 待验：生成计划的轮次日志记录 `hasPlan=true`。
+
+测试包交用户远程安装验收。本轮只整理本项目文档与台账；保留所有 WIP、其他工作树和 stash，不操作手机、SDK 源码、`release`、tag 或其他 App。
+
+## 历史阶段记录
+
+<details>
+<summary>展开 +18 候选、原 +54 主线及更早记录；保留各自源码与验收范围</summary>
+
 ## QA v2 测试候选（2026-11-04）
 
 分支 `codex/sdk-pin-v0.7.0`，App **0.1.0+18 / internal arm64 2018**，SDK `ugk_trainer-v0.7.1 / 9dd93163e9f355665e5c923f374c64f03bf65a86`。运行与 APK 源 `55442967ca6593b1279d81adfa030468aacd8731`；以下原 +54 主线记录保留原范围。
@@ -332,6 +391,8 @@ python3 tools/packs/validate_packs.py --decode
 动作视频来自 Pose-Hub（mhgd3250905/3D-Pose-Hub）：46 条为 v0.2.0 深色成片（经 HipLab 冻结版本），47 条为 Pose-Hub 云盘归档的绿幕母版，本仓库抠像到同色背景。
 人物派生自 Blender Studio Snow（CC BY 4.0，署名见 `assets/licenses/Drill-media-ATTRIBUTION.md`，App「关于」页展示）。
 3D-Pose-Hub 与 HipLab 只作参考与素材来源，本仓库不向它们写入任何内容。
+
+</details>
 
 </details>
 

@@ -1,5 +1,41 @@
 # 对话式主界面
 
+## 当前实现：共享 SDK QA 对话（+21，2026-11-04）
+
+App 当前为 **0.1.0+21 / internal arm64 2021**，功能已通过 PR #9 合入 `main@ff91fc56606c11e57d98c0dae79be111074a61e2`。SDK 五包、coach override、锁文件和 AppBuildInfo 统一固定 `f7b8a8e4853e9f50fc93888e1768ec1dbc75b588`。运行、软件验证与 APK 源为 `3d39ca94b4c9144d388255bb56dff6e00f32877f`；该源与功能合入点同树 `b4a6c96eb2b836c8330ad361fedc2fbb6ad4f29f`，差异为空。功能合入点、运行源与本轮文档提交分别记录。
+
+既有软件回执为严格分析 **0 问题**、全量 **689/0/0**；既有 +21 / 2021 包检查通过，签名与 +20 一致。本轮仅整理文档，没有重测、重建或操作设备。当前全部手机验收仍待用户远程安装反馈；下方 +18 的 685 项、真实 16 轮与 34 次请求只属于原源码，不能作为本版 f7 的真实模型或手机验证。
+
+### SDK 与宿主分工
+
+正式启动在 `main.dart` 显式配置 `agentMode: CoachChatAgentMode.qaV2`，并等待 `loadAppAiTags()`。`AppServices` 构造默认仍为 `legacy`、空标签，兼容既有调用方；不能把构造默认误写成正式入口的模式。App 将 mode、标签原 map、profile、独立授权动作 scope 和训练 executionTiming 交给 SDK，页面与对话控制继续使用 SDK 公开组件和 controller。App 不新增问答控制器、问答页面或恢复、重试适配层；这里仅说明宿主公开接线，不据此证明 SDK 内部行为或手机交互通过。
+
+| 路径 | 当前责任 |
+| --- | --- |
+| `lib/main.dart` | 正式启动显式选择 `qaV2`，加载 App 标签后创建 services |
+| `lib/app/services.dart` | 持有唯一 SDK `CoachChatController`，生命周期结束时关闭并释放；构造默认保留 legacy / 空标签 |
+| `lib/app/app_ai_tags.dart` | 从 `assets/coach/ai-tags/actions.json` 读取不可变的动作 ID → 原标签 map；这些标签是测试包携带的未审核 AI 草稿 |
+| `lib/app/coach_chat.dart` | profile、mode、aiTags、授权 scope 和训练时序装配；controller、gateway lease、observer、存储及宿主操作绑定 |
+| `lib/chat/ai_coach_config.dart` | `SMARTFIT_AI_*` 构建配置与客户端创建；Key 不进入文档、日志或 Git |
+| `lib/diagnostics/coach_chat_diagnostics.dart` | SDK 公开协议的只读观测与新对话前归档；不修改请求、准入、重试或取消 |
+
+标签加载与动作授权独立：scope 仍由 SmartFit 明确授权 ID 与实际加载目录求交后生成，传入标签不扩大授权集合。当前默认模型为 `deepseek-v4.1-flash`，默认地址 `https://ai.uuugk.win/v1`；均可通过相应 `SMARTFIT_AI_MODEL` / `SMARTFIT_AI_BASE_URL` 覆盖。默认鉴权为 Bearer，保留可选 worker 配置；客户端 `maxRetries: 0`，不在 App 叠加传输重试。这些默认值不代表本轮重新进行了真实模型请求。
+
+### 保存、宿主操作与验收边界
+
+宿主绑定继续提供 `smartfit.chat.v1` namespace 的历史、计划、偏好 adapter 与独立记忆 store。新对话前将 SDK 传入快照的 `session.toJson()` 交给开发者归档；归档与用于聊天恢复的完整 envelope 分开。训练、动作库、动作详情、我的计划、手动模板和设置入口保留，已存计划可以发送回同一 SDK 对话或进入详情及训练。
+
+SDK 发来的 Map 诊断字段和本轮 `ai.turn.end.hasPlan` 的识别规则见[开发者日志](developer-logging-2026-10-28.md)。`hasPlan` 只说明本轮公开结果是否带计划，不代表保存、开练或用户验收成功；当前没有本版手机 `hasPlan=true` 观察回执。分段姿势、卡片真实重排、正文一致、指定编号替换、无合适替换时诚实保留及重开恢复，仍需用户远程真机确认。
+
+SF 主 App 固定 `zh-CN`，没有语言切换入口。缩略图问题继续按用户要求跳过；本轮未追加大字号、小屏幕测试。
+
+## +18 与 +54 历史检查点
+
+<details>
+<summary>+18 QA 候选及 +54 主线的原始接线与证据</summary>
+
+以下原文中的“当前”、版本、源码和验证数字仅属于各自检查点；本页当前状态以上方 +21 区为准。
+
 ## QA v2 测试候选（2026-11-04）
 
 分支 `codex/sdk-pin-v0.7.0`，App **0.1.0+18 / internal arm64 2018**，SDK `ugk_trainer-v0.7.1 / 9dd93163e9f355665e5c923f374c64f03bf65a86`。运行与 APK 源 `55442967ca6593b1279d81adfa030468aacd8731`；以下原 +54 主线记录保留原范围。
@@ -40,6 +76,8 @@ SF 主 App 固定 `zh-CN`，没有语言切换入口；中英测试宿主覆盖�
 +50 生成卡视觉细节已进入主线；+52 将对话实现迁入共享 SDK；+53 保留长会话轮次诊断与真实请求编码；+54 更新 trainer、动作库接入和 SDK 身份。当前探针配置为 50 轮，本轮没有 50 轮加第 51 轮的实测回执，不记为当前验证通过。+53 的旧 22 帧、20 轮加第 21 轮及 2053 恢复证据各自保留原源码绑定。
 
 `c9823e6` 的既有软件回执为全量 **679/0/0**、指定四文件 **34/0/0**、严格分析 0 问题与锁文件通过；正常尺寸浅深主题 6 张截图不属于像素差比较。本轮仅对齐文档，没有重新打包或操作设备，+54 真机验收仍待用户反馈。未追加大字号、小屏幕测试。
+
+</details>
 
 ## 历史主界面记录
 
