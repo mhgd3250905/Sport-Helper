@@ -14,6 +14,8 @@ class CoachChatDiagnostics {
   CoachToolTrace? _trace;
   Stopwatch? _watch;
   String? _operation, _turnId;
+  // 问答模式不发 AgentEvent，_turnId 一直为空：改用「本轮开始后出现的新结果」认领。
+  Object? _resultBefore;
   int _step = 0, _attempt = 0;
   final _seen = <String>{};
   final _userInputs = <String, CoachChatUserInput>{};
@@ -121,6 +123,7 @@ class CoachChatDiagnostics {
       _step = 0;
       _attempt = 0;
       _turnId = null;
+      _resultBefore = controller.lastResult;
       log.record('chat.request.begin', operation: _operation);
     }
     for (final message in controller.messages) {
@@ -145,7 +148,9 @@ class CoachChatDiagnostics {
     if (_trace == null) return;
     final controller = _controller;
     final candidate = controller?.lastResult;
-    final result = candidate?.turnId == _turnId ? candidate : null;
+    final result = _turnId != null
+        ? (candidate?.turnId == _turnId ? candidate : null)
+        : (identical(candidate, _resultBefore) ? null : candidate);
     _trace?.finish(
       history: controller?.agent.history ?? const [],
       result: result,

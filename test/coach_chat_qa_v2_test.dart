@@ -26,27 +26,14 @@ import 'support/widget_test_timeout.dart';
 coach.LlmResponse _tool(String name, Map<String, Object?> args) =>
     CoachV2Fixtures.batch([CoachV2Fixtures.call(name, name, args)]);
 
-coach.LlmResponse _form({
-  String intent = 'actions',
-  String place = 'unknown',
-  String next = 'answer',
-  bool equipmentKnown = false,
-  List<String> equipment = const [],
-  String status = 'none',
-  List<String> types = const ['static-stretch'],
-}) => _tool('fill_form', {
-  'language': 'zh',
-  'intent': intent,
-  'place': place,
-  'place_word': place == 'home' ? '居家' : place,
-  'equipment_known': equipmentKnown,
-  'equipment': equipment,
-  'muscles': ['adductors'],
-  'types': types,
-  'answer_status': status,
-  'next': next,
-  if (intent == 'plan') 'minutes': 15,
-});
+coach.LlmResponse _conditions(Map<String, Object?> args) =>
+    _tool('set_conditions', {'language': 'zh', ...args});
+
+coach.LlmResponse _search({List<String> types = const ['static-stretch']}) =>
+    _tool('search_actions', {
+      'muscles': ['adductors'],
+      'types': types,
+    });
 
 List<String> _candidates(coach.LlmRequest request) => RegExp(
   r'^([A-Za-z0-9_-]+) \| ',
@@ -186,32 +173,34 @@ void main() {
     'native QA asks single/multiple choices, numbers cards and sends chips',
     (tester) async {
       final (services, chat, client) = await openOn(tester, [
-        _form(next: 'ask_place'),
         _tool('ask_user', {
+          'step': 'place',
           'question': '这次在哪里练？',
           'options': ['居家', '健身房', '办公室', '直接推荐'],
         }),
-        _form(place: 'home', status: 'answered', next: 'ask_equipment'),
+        _conditions({'place': 'home', 'place_word': '居家'}),
         _tool('ask_user', {
+          'step': 'equipment',
           'question': '手边有哪些器械？',
           'options': ['哑铃', '瑜伽垫', '椅子', '弹力带', '徒手', '直接推荐'],
+          'multi': true,
         }),
-        _form(
-          place: 'home',
-          equipmentKnown: true,
-          equipment: const ['dumbbell', 'mat'],
-          status: 'answered',
-        ),
-        (coach.LlmRequest request) => _tool('respond', {
+        _conditions({
+          'equipment_known': true,
+          'equipment': ['dumbbell', 'mat'],
+        }),
+        _search(),
+        (coach.LlmRequest request) => _tool('show_actions', {
           'text': '按你的条件选择了这些动作。',
           'items': [
-            for (final id in _candidates(request).take(2))
+            for (final id in _candidates(request).take(3))
               {'id': id, 'why': '适合当前条件'},
           ],
           'chips': ['换场地'],
         }),
-        _form(intent: 'change_place', place: 'home', next: 'ask_place'),
+        _conditions({'place': 'unknown'}),
         _tool('ask_user', {
+          'step': 'place',
           'question': '换到哪里练？',
           'options': ['居家', '健身房', '办公室', '直接推荐'],
         }),
@@ -240,7 +229,7 @@ void main() {
       }
       expect(
         client.requests,
-        hasLength(4),
+        hasLength(3),
         reason: 'Multi-select waits for Submit',
       );
       final submit = find.byKey(ValueKey('question-submit-${equipment.id}'));
@@ -283,10 +272,12 @@ void main() {
   ) async {
     var selectedIds = <String>[];
     final (services, chat, _) = await openOn(tester, [
-      _form(intent: 'plan', place: 'gym', types: const ['strength']),
+      _conditions({'place': 'gym', 'place_word': '健身房', 'minutes': 15}),
+      _search(types: const ['strength']),
       (coach.LlmRequest request) {
         selectedIds = _candidates(request);
         return _tool('build_plan', {
+          'mode': 'new',
           'main_ids': selectedIds,
           'minutes': 15,
           'title': '力量训练',
@@ -336,16 +327,30 @@ void main() {
   testWidgets(
     'native QA home plan keeps all section numbers and host save behavior',
     (tester) async {
+      var mainPicked = <String>[];
+      var warmPicked = <String>[];
       final (services, chat, _) = await openOn(tester, [
-        _form(
-          intent: 'plan',
-          place: 'home',
-          equipmentKnown: true,
-          equipment: const ['dumbbell', 'mat', 'chair', 'band'],
-          types: const ['strength'],
-        ),
+        _conditions({
+          'place': 'home',
+          'place_word': '居家',
+          'equipment_known': true,
+          'equipment': ['dumbbell', 'mat', 'chair', 'band'],
+          'minutes': 15,
+        }),
+        _search(types: const ['strength']),
+        (coach.LlmRequest request) {
+          mainPicked = _candidates(request);
+          return _tool('search_actions', {'roles': ['warmup'], 'limit': 3});
+        },
+        (coach.LlmRequest request) {
+          warmPicked = _candidates(request).take(1).toList();
+          return _tool('search_actions', {'roles': ['cooldown'], 'limit': 3});
+        },
         (coach.LlmRequest request) => _tool('build_plan', {
-          'main_ids': _candidates(request),
+          'mode': 'new',
+          'main_ids': mainPicked,
+          'warmup_ids': warmPicked,
+          'cooldown_ids': _candidates(request).take(1).toList(),
           'minutes': 15,
           'title': '力量训练',
           'block_names': {'warmup': '热身', 'main': '主训练', 'cooldown': '收操'},
@@ -407,10 +412,10 @@ void main() {
     (tester) async {
       final disk = MemoryStorage();
       final (_, first, _) = await openOn(tester, [
-        _form(next: 'ask_place'),
         _tool('ask_user', {
+          'step': 'place',
           'question': '准备在哪里练？',
-          'options': ['居家', '办公室'],
+          'options': ['居家', '健身房', '办公室', '直接推荐'],
         }),
       ], disk: disk);
       await tester.runAsync(() async {
