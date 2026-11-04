@@ -1,5 +1,11 @@
 # 对话式主界面
 
+## QA v2 测试候选（2026-11-04）
+
+分支 `codex/sdk-pin-v0.7.0`，App **0.1.0+18 / internal arm64 2018**，SDK `ugk_trainer-v0.7.1 / 9dd93163e9f355665e5c923f374c64f03bf65a86`。运行与 APK 源 `55442967ca6593b1279d81adfa030468aacd8731`；以下原 +54 主线记录保留原范围。
+
+正式入口仅加载 App 标签并配置 SDK `agentMode: qaV2`、`aiTags`；页面、单双选、连续编号及状态恢复继续由 SDK 负责。 软件全量 **685/0/0**、严格分析 0；真实 16 轮中 15 成功、1 次计划准入失败，34 请求均核对 max/enabled。计划门禁、器械元数据和肩痛输出的实测问题见[本轮报告](qa-v2-sdk071-plus18-2026-11-04.md)，真机待用户远程安装验收。
+
 ## 当前实现：共享 SDK 对话（+54，2026-11-04）
 
 当前代码源为 `main@c9823e61457eb3e8839c867c01b5b7fe110d7c73`，App **0.1.0+54 / internal arm64 2054**；SDK 五包及 coach override 固定 `693cbc02cdf284163409868e117e438515c6a8d8`（`ugk_trainer-v0.6.0`）。PR #7、#8 已合并，当前版本与交付事实见[版本台账](version-management.md)，软件与设备证据分列见[验收记录](acceptance.md)。

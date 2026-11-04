@@ -1,5 +1,11 @@
 # 开发者日志：版本、工具与会话快照
 
+## QA v2 测试候选（2026-11-04）
+
+分支 `codex/sdk-pin-v0.7.0`，App **0.1.0+18 / internal arm64 2018**，SDK `ugk_trainer-v0.7.1 / 9dd93163e9f355665e5c923f374c64f03bf65a86`。运行与 APK 源 `55442967ca6593b1279d81adfa030468aacd8731`；以下原 +54 主线记录保留原范围。
+
+原观测客户端和 SDK `chat.turn.result` 继续沿用；QA v2 的 detail 带 `agentMode: qaV2`，不能把 error 轮次的 steps=0 当成没有模型调用。 软件全量 **685/0/0**、严格分析 0；真实 16 轮中 15 成功、1 次计划准入失败，34 请求均核对 max/enabled。计划门禁、器械元数据和肩痛输出的实测问题见[本轮报告](qa-v2-sdk071-plus18-2026-11-04.md)，真机待用户远程安装验收。
+
 ## 当前接线（+54，2026-11-04）
 
 当前代码与既有验证源为 `c9823e61457eb3e8839c867c01b5b7fe110d7c73`，App `0.1.0+54 / 2054`，SDK 五包及 coach override 固定 `693cbc02cdf284163409868e117e438515c6a8d8`（`ugk_trainer-v0.6.0`）。`CoachChatDiagnostics` 通过 SDK observer、controller 和 gateway lease 只读观察公开事件与请求；不选择工具、不修改请求/响应，不改变取消、重试或准入。版本与既有软件、设备证据见[台账](version-management.md)及[验收记录](acceptance.md)。本次只更新设计说明，没有读取用户日志或重新操作设备。

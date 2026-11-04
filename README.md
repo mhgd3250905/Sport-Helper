@@ -1,5 +1,11 @@
 # 智能健身助手 SmartFit
 
+## QA v2 测试候选（2026-11-04）
+
+分支 `codex/sdk-pin-v0.7.0`，App **0.1.0+18 / internal arm64 2018**，SDK `ugk_trainer-v0.7.1 / 9dd93163e9f355665e5c923f374c64f03bf65a86`。运行与 APK 源 `55442967ca6593b1279d81adfa030468aacd8731`；以下原 +54 主线记录保留原范围。
+
+软件全量 **685/0/0**、严格分析 0；真实 16 轮中 15 成功、1 次计划准入失败，34 请求均核对 max/enabled。计划门禁、器械元数据和肩痛输出的实测问题见[本轮报告](docs/qa-v2-sdk071-plus18-2026-11-04.md)，真机待用户远程安装验收。
+
 ## 当前主线与交付（2026-11-04 对齐）
 
 当前 App 为 **0.1.0+54**，主线代码与现有验证源为 `c9823e61457eb3e8839c867c01b5b7fe110d7c73`。2026-11-04 只读核对时，本地 `main` 与远端 `origin/main` 均为该提交；[PR #7](https://github.com/mhgd3250905/Sport-Helper/pull/7) 和 [PR #8](https://github.com/mhgd3250905/Sport-Helper/pull/8) 均已合并。本次收束只整理 README、台账、验收、交接和实现说明，后续文档提交不改变 APK 的构建来源。

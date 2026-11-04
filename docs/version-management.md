@@ -1,5 +1,11 @@
 # 版本管理与台账
 
+## QA v2 测试候选（2026-11-04）
+
+分支 `codex/sdk-pin-v0.7.0`，App **0.1.0+18 / internal arm64 2018**，SDK `ugk_trainer-v0.7.1 / 9dd93163e9f355665e5c923f374c64f03bf65a86`。运行与 APK 源 `55442967ca6593b1279d81adfa030468aacd8731`；以下原 +54 主线记录保留原范围。
+
+软件全量 **685/0/0**、严格分析 0；真实 16 轮中 15 成功、1 次计划准入失败，34 请求均核对 max/enabled。计划门禁、器械元数据和肩痛输出的实测问题见[本轮报告](qa-v2-sdk071-plus18-2026-11-04.md)，真机待用户远程安装验收。
+
 ## 当前主线与交付台账（2026-11-04）
 
 当前 App 为 **0.1.0+54**。本次文档整理前，本地 `main` 与远端 `refs/heads/main` 均核对为 `c9823e61457eb3e8839c867c01b5b7fe110d7c73`；[PR #7](https://github.com/mhgd3250905/Sport-Helper/pull/7) 与 [PR #8](https://github.com/mhgd3250905/Sport-Helper/pull/8) 已合并，分别对应 `e2430a689db45dfb437484821324c72ea377d774`、`c9823e61457eb3e8839c867c01b5b7fe110d7c73`。旧交付报告中的 Draft、未合 main 或未推送描述属于原时点，不能替代本节的主线核对。
