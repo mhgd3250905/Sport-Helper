@@ -281,13 +281,7 @@ flutter:
     - assets/voice_lc32/v1/w-wall-sit/zh/
     # END drill packs
     - assets/library/
-    - path: assets/posehub/images-index.json
-      flavors:
-        - internal
     - path: assets/posehub/media-delivery.json
-      flavors:
-        - internal
-    - path: assets/posehub/images/75881cf91621c967f80732f0219f23e85b35e8bde5d1a51ee75dec5f7c5edd36/
       flavors:
         - internal
     - assets/media_player/

@@ -13,7 +13,6 @@ import 'app/app_ai_tags.dart';
 import 'app/app_test_catalog.dart';
 import 'app/app_test_content.dart';
 import 'app/posehub_asset_bundle.dart';
-import 'app/posehub_bundled_images.dart';
 import 'app/posehub_catalog_updates.dart';
 import 'app/posehub_media_config.dart';
 import 'app/posehub_media_delivery.dart';
@@ -124,17 +123,10 @@ Future<void> main() async {
       'posehub.catalog_loaded',
       fields: {'pack': poseHubPack, 'channel': PoseHubCatalogUpdates.channelName},
     );
-    PoseHubBundledImages? images;
-    try {
-      images = await PoseHubBundledImages.load(
-        catalogRevision: poseHubRevision,
-      );
-    } on Object catch (error) {
-      log.record(
-        'posehub.bundled_images_unavailable',
-        fields: RuntimeLog.errorFields(error),
-      );
-    }
+    // Posters come from the SDK's built-in r2-v1 standing images
+    // (packages/ugk_trainer/assets/pose_hub/app-pack-r2-v1/standing/); the
+    // r1-v3 APK image index was removed. Covers/thumbnails not in the APK use
+    // the ordinary verified downloader.
     var delivery = PoseHubMediaDelivery.unavailable(poseHubPack);
     try {
       delivery = await PoseHubMediaDelivery.load(
@@ -153,7 +145,6 @@ Future<void> main() async {
         catalogRevision: poseHubRevision,
         packVersion: delivery.packVersion,
         mediaBaseUrls: delivery.mediaBaseUrls,
-        bundledFileLoader: images?.loadFile,
       );
     } on Object catch (error) {
       log.record(

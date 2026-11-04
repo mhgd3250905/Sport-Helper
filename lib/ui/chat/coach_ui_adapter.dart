@@ -241,10 +241,10 @@ String _timeLabel(DateTime at, DateTime now) {
 }
 
 const _trainerStandingPrefix =
-    'packages/ugk_trainer/assets/pose_hub/app-test-pack-r1/standing/';
+    'packages/ugk_trainer/assets/pose_hub/app-pack-r2-v1/standing/';
 
 bool _isTrainerStandingAsset(String asset) => RegExp(
-  r'^packages/ugk_trainer/assets/pose_hub/app-test-pack-r1/standing/[A-Za-z0-9_-]+\.webp$',
+  r'^packages/ugk_trainer/assets/pose_hub/app-pack-r2-v1/standing/[A-Za-z0-9_-]+\.webp$',
 ).hasMatch(asset);
 
 String? _trainerStandingFor(Exercise exercise) {

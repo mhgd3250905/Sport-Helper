@@ -59,7 +59,7 @@ void main() {
     await tester.runAsync(
       () => TrainingPosterImages.precacheAsset(
         source,
-        'packages/ugk_trainer/assets/pose_hub/app-test-pack-r1/standing/${action.id}.webp',
+        'packages/ugk_trainer/assets/pose_hub/app-pack-r2-v1/standing/${action.id}.webp',
       ),
     );
     await tester.pump();
@@ -119,7 +119,7 @@ void main() {
           find.byKey(const ValueKey('posehub-images-preparing')),
           findsNothing,
         );
-        expect(count(tester), 211);
+        expect(count(tester), 249);
         final grid = tester.widget<GridView>(find.byType(GridView));
         expect(
           (grid.gridDelegate as SliverGridDelegateWithFixedCrossAxisCount)
@@ -152,7 +152,12 @@ void main() {
           1,
         );
         expect(find.textContaining('待补'), findsNothing);
-        expect(find.textContaining('219'), findsNothing);
+        // r2-v1 has no pending rows (249 = 249); keep the guard for a later
+        // catalogue whose full count differs from the complete count.
+        final all = catalog.allActions.length;
+        if (all != catalog.semanticCompleteActions.length) {
+          expect(find.textContaining('$all'), findsNothing);
+        }
         expect(
           find.text(catalog.semanticCompleteActions.first.id),
           findsNothing,
@@ -171,7 +176,7 @@ void main() {
         expect(count(tester), chestCount);
         await tester.tap(find.byKey(const ValueKey('posehub-quick-全部')));
         await tester.pumpAndSettle();
-        expect(count(tester), 211);
+        expect(count(tester), 249);
 
         // SDK v0.6.0: facet chips live in the filter sheet.
         Future<void> tapChip(String key) async {
@@ -223,7 +228,7 @@ void main() {
         await tester.pump();
         await tester.tap(find.byKey(const ValueKey('posehub-filter-apply')));
         await tester.pumpAndSettle();
-        expect(count(tester), 211);
+        expect(count(tester), 249);
         final last = catalog.semanticCompleteActions.last;
         await tester.scrollUntilVisible(
           find.byKey(ValueKey('posehub-action-${last.id}')),
@@ -413,7 +418,7 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    expect(count(tester), 211);
+    expect(count(tester), 249);
     expect(
       tester.widget<TextField>(search).decoration!.hintText,
       '搜动作，中文或英文都行',
@@ -425,7 +430,7 @@ void main() {
     await tester.tap(filter);
     await tester.pumpAndSettle();
     expect(
-      find.descendant(of: apply, matching: find.text('查看 211 个动作')),
+      find.descendant(of: apply, matching: find.text('查看 249 个动作')),
       findsOneWidget,
     );
     await tester.tap(apply);
@@ -438,7 +443,7 @@ void main() {
       tester.state(find.byType(TrainingLibraryBrowser)),
       same(browserState),
     );
-    expect(count(tester), 211);
+    expect(count(tester), 249);
     expect(
       tester.widget<TextField>(search).decoration!.hintText,
       'Search moves in English or Chinese',
@@ -454,11 +459,11 @@ void main() {
     expect(find.byKey(ValueKey('posehub-action-${action.id}')), findsOneWidget);
     await tester.tap(find.byKey(const ValueKey('posehub-search-clear')));
     await tester.pumpAndSettle();
-    expect(count(tester), 211);
+    expect(count(tester), 249);
     await tester.tap(filter);
     await tester.pumpAndSettle();
     expect(
-      find.descendant(of: apply, matching: find.text('Show 211 moves')),
+      find.descendant(of: apply, matching: find.text('Show 249 moves')),
       findsOneWidget,
     );
     expect(find.text('Reset'), findsOneWidget);
