@@ -278,48 +278,60 @@ void main() {
     },
   );
 
-  // Known SDK product issue: gym QA does not declare the equipment used by
-  // its generated plan. This regression verifies rejection, not a gym fix.
-  // The original positive failure and exact diagnostic are preserved in
-  // deliveries/sdk-pin-v0.7.1-9dd9316-plus18-20261104/gym-plan-admission-issue.json.
-  testWidgets(
-    'rejects SDK QA gym plan lacking required equipment declarations',
-    (tester) async {
-      var selectedIds = <String>[];
-      final (services, chat, _) = await openOn(tester, [
-        _form(intent: 'plan', place: 'gym', types: const ['strength']),
-        (coach.LlmRequest request) {
-          selectedIds = _candidates(request);
-          return _tool('build_plan', {
-            'main_ids': selectedIds,
-            'minutes': 15,
-            'title': '力量训练',
-            'block_names': {'warmup': '热身', 'main': '主训练', 'cooldown': '收操'},
-            'text': '按你的条件安排好了。',
-            'chips': ['换第一个'],
-          });
-        },
-      ]);
-      await mount(tester, services, chat);
-      await say(tester, '健身房练内收肌力量十五分钟');
-      expect(selectedIds, [
-        'adductors-B',
-        'h-band-standing-adduction',
-        'h-lateral-step-lunge',
-      ]);
-      expect(chat.lastResult?.status, coach.TurnStatus.error);
-      expect(
-        '${chat.lastResult?.error}',
-        contains('QA output failed the App action/plan admission gate'),
-      );
-      expect(chat.lastQaReply, isNull);
-      expect(chat.messages.where((message) => message.plan != null), isEmpty);
-      expect(find.byType(CoachPlanCard), findsNothing);
-      expect(services.store.savedPlans, isEmpty);
-      expect(tester.takeException(), isNull);
-      await tester.pumpWidget(const SizedBox());
-    },
-  );
+  testWidgets('admits SDK QA gym plan with aggregated equipment', (
+    tester,
+  ) async {
+    var selectedIds = <String>[];
+    final (services, chat, _) = await openOn(tester, [
+      _form(intent: 'plan', place: 'gym', types: const ['strength']),
+      (coach.LlmRequest request) {
+        selectedIds = _candidates(request);
+        return _tool('build_plan', {
+          'main_ids': selectedIds,
+          'minutes': 15,
+          'title': '力量训练',
+          'block_names': {'warmup': '热身', 'main': '主训练', 'cooldown': '收操'},
+          'text': '按你的条件安排好了。',
+          'chips': ['换第一个'],
+        });
+      },
+    ]);
+    await mount(tester, services, chat);
+    await say(tester, '健身房练内收肌力量十五分钟');
+    expect(selectedIds, [
+      'adductors-B',
+      'h-band-standing-adduction',
+      'h-lateral-step-lunge',
+    ]);
+    expect(
+      chat.lastResult?.status,
+      coach.TurnStatus.ok,
+      reason: '${chat.lastResult?.error}',
+    );
+    final plans = chat.messages
+        .where((message) => message.plan != null)
+        .toList();
+    expect(plans, hasLength(1));
+    final message = plans.single;
+    final plan = message.plan!;
+    expect(message.validatedPlan, isNotNull);
+    expect(identical(chat.lastResult!.plan!.plan, plan), isTrue);
+    expect(
+      chat.lastQaReply!.planOrderedIds,
+      plan.items.map((item) => item.exerciseId),
+    );
+    final requiredEquipment = {
+      for (final id in plan.exerciseIds) ...chat.catalog[id]!.equipment,
+    };
+    expect(plan.equipment.toSet(), requiredEquipment);
+    expect(plan.equipment, containsAll(['mat', 'bench', 'band']));
+    expect(find.byType(CoachPlanCard), findsOneWidget);
+    expect(services.store.savedPlans, isEmpty);
+    expect(tester.takeException(), isNull);
+    await tester.pumpWidget(const SizedBox());
+    // Allow the SDK card's already-started hero-bounds timeout to finish.
+    await tester.pump(const Duration(milliseconds: 400));
+  });
 
   testWidgets(
     'native QA home plan keeps all section numbers and host save behavior',

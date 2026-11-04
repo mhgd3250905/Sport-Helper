@@ -60,11 +60,7 @@ class CoachChatDiagnostics {
       log.recordDeveloper(
         'coach_chat.chat.turn.result',
         operation: _operation,
-        fields: {
-          'status': detail['status'],
-          'errorType': detail['errorType'],
-          'kind': detail['failureKind'],
-        },
+        fields: {..._sdkFields(detail), 'kind': detail['failureKind']},
         data: detail,
       );
       return;
@@ -72,7 +68,9 @@ class CoachChatDiagnostics {
     if (detail is! coach.AgentEvent) {
       log.record(
         'coach_chat.$event',
-        fields: {if (detail != null) 'errorType': RuntimeLog.errorType(detail)},
+        fields: detail is Map
+            ? _sdkFields(detail)
+            : {if (detail != null) 'errorType': RuntimeLog.errorType(detail)},
       );
       return;
     }
@@ -101,6 +99,17 @@ class CoachChatDiagnostics {
       },
     );
   }
+
+  static Map<String, Object?> _sdkFields(Map detail) => {
+    for (final key in const [
+      'stage',
+      'errorType',
+      'message',
+      'status',
+      'reason',
+    ])
+      if (detail.containsKey(key)) key: detail[key],
+  };
 
   void _changed() {
     final controller = _controller;
