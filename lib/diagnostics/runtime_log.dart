@@ -78,7 +78,7 @@ class RuntimeLog {
   int get entryCount => _entries.length;
   int get usedBytes => _bytes;
 
-  // No unrestricted strings, nested payloads, messages, headers, URLs or stacks.
+  // General metadata stays token-only. SDK chat diagnostic text is scoped below.
   static const _fields = {
     'reason',
     'status',
@@ -141,6 +141,13 @@ class RuntimeLog {
     'uncomfortable',
     'unselected',
   };
+  static const _coachChatFields = {
+    'stage',
+    'errorType',
+    'message',
+    'status',
+    'reason',
+  };
   static final _token = RegExp(r'^[A-Za-z0-9_.+\-]{1,96}$');
   static final _event = RegExp(r'^[a-z][a-z0-9_.]{0,63}$');
   static const _developerEvents = {
@@ -174,9 +181,15 @@ class RuntimeLog {
     return fields;
   }
 
-  Map<String, Object?> _safeFields(Map fields) => {
+  Map<String, Object?> _safeFields(String event, Map fields) => {
     for (final entry in fields.entries)
-      if (_fields.contains(entry.key) &&
+      if (event.startsWith('coach_chat.') &&
+          _coachChatFields.contains(entry.key) &&
+          (entry.value == null || entry.value is String))
+        entry.key as String: entry.key == 'message' && entry.value is String
+            ? _coachMessage(entry.value as String)
+            : entry.value
+      else if (_fields.contains(entry.key) &&
           (entry.key != 'feeling' || _feelingValues.contains(entry.value)) &&
           (entry.value is bool ||
               entry.value is int ||
@@ -184,6 +197,16 @@ class RuntimeLog {
               (entry.value is String && _token.hasMatch(entry.value))))
         entry.key as String: entry.value,
   };
+
+  String _coachMessage(String value) => String.fromCharCodes(
+    (_sanitizer.sanitize(value) as String).runes.take(300),
+  );
+
+  Object? _safeDeveloperData(String event, Map data) => _sanitizer.sanitize(
+    event.startsWith('coach_chat.') && data['message'] is String
+        ? {...data, 'message': _coachMessage(data['message'] as String)}
+        : data,
+  );
 
   Future<void> initialize() async {
     if (!enabled) return;
@@ -211,11 +234,15 @@ class RuntimeLog {
               'event': event['event'],
               'operation': ?_safeToken(event['operation']),
               'fields': _safeFields(
+                event['event'] as String,
                 event['fields'] is Map ? event['fields'] : {},
               ),
               if (_developerEvents.contains(event['event']) &&
                   event['data'] is Map)
-                'data': _sanitizer.sanitize(event['data']),
+                'data': _safeDeveloperData(
+                  event['event'] as String,
+                  event['data'] as Map,
+                ),
             });
           }
         }
@@ -246,7 +273,7 @@ class RuntimeLog {
       'sinceStartMs': _uptime.elapsedMilliseconds,
       'event': event,
       'operation': ?_safeToken(operation),
-      'fields': _safeFields(fields),
+      'fields': _safeFields(event, fields),
     });
     _revision++;
     _scheduleFlush();
@@ -267,8 +294,8 @@ class RuntimeLog {
       'sinceStartMs': _uptime.elapsedMilliseconds,
       'event': event,
       'operation': ?_safeToken(operation),
-      'fields': _safeFields(fields),
-      'data': _sanitizer.sanitize(data),
+      'fields': _safeFields(event, fields),
+      'data': _safeDeveloperData(event, data),
     });
     _revision++;
     _scheduleFlush();

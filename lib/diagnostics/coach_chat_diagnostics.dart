@@ -14,6 +14,8 @@ class CoachChatDiagnostics {
   CoachToolTrace? _trace;
   Stopwatch? _watch;
   String? _operation, _turnId;
+  // 问答模式不发 AgentEvent，_turnId 一直为空：改用「本轮开始后出现的新结果」认领。
+  Object? _resultBefore;
   int _step = 0, _attempt = 0;
   final _seen = <String>{};
   final _userInputs = <String, CoachChatUserInput>{};
@@ -60,11 +62,7 @@ class CoachChatDiagnostics {
       log.recordDeveloper(
         'coach_chat.chat.turn.result',
         operation: _operation,
-        fields: {
-          'status': detail['status'],
-          'errorType': detail['errorType'],
-          'kind': detail['failureKind'],
-        },
+        fields: {..._sdkFields(detail), 'kind': detail['failureKind']},
         data: detail,
       );
       return;
@@ -72,7 +70,9 @@ class CoachChatDiagnostics {
     if (detail is! coach.AgentEvent) {
       log.record(
         'coach_chat.$event',
-        fields: {if (detail != null) 'errorType': RuntimeLog.errorType(detail)},
+        fields: detail is Map
+            ? _sdkFields(detail)
+            : {if (detail != null) 'errorType': RuntimeLog.errorType(detail)},
       );
       return;
     }
@@ -102,6 +102,17 @@ class CoachChatDiagnostics {
     );
   }
 
+  static Map<String, Object?> _sdkFields(Map detail) => {
+    for (final key in const [
+      'stage',
+      'errorType',
+      'message',
+      'status',
+      'reason',
+    ])
+      if (detail.containsKey(key)) key: detail[key],
+  };
+
   void _changed() {
     final controller = _controller;
     if (controller == null) return;
@@ -112,6 +123,7 @@ class CoachChatDiagnostics {
       _step = 0;
       _attempt = 0;
       _turnId = null;
+      _resultBefore = controller.lastResult;
       log.record('chat.request.begin', operation: _operation);
     }
     for (final message in controller.messages) {
@@ -136,7 +148,9 @@ class CoachChatDiagnostics {
     if (_trace == null) return;
     final controller = _controller;
     final candidate = controller?.lastResult;
-    final result = candidate?.turnId == _turnId ? candidate : null;
+    final result = _turnId != null
+        ? (candidate?.turnId == _turnId ? candidate : null)
+        : (identical(candidate, _resultBefore) ? null : candidate);
     _trace?.finish(
       history: controller?.agent.history ?? const [],
       result: result,

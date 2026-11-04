@@ -26,7 +26,7 @@ const _inputs = [
 ];
 const _sdk = String.fromEnvironment(
   'SMARTFIT_EXPECT_SDK',
-  defaultValue: '693cbc02cdf284163409868e117e438515c6a8d8',
+  defaultValue: '9dd93163e9f355665e5c923f374c64f03bf65a86',
 );
 const _continueLongSession = bool.fromEnvironment('SMARTFIT_LONG_SESSION');
 const _normalTurns = 50;

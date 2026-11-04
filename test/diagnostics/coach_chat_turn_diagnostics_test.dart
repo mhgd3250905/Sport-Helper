@@ -127,6 +127,7 @@ void main() {
     });
     expect(turns.last['fields'], {
       'status': 'limitReached',
+      'errorType': null,
       'kind': 'conversationLimit',
     });
     expect((turns.last['data'] as Map).containsKey('errorType'), isTrue);

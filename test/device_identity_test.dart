@@ -112,7 +112,7 @@ void main() {
       ).createClient(deviceId: 'ea2c6891-654f-431b-a1f4-11a9a3e03bea');
       addTearDown(client.close);
       expect(client.config.baseUrl, 'https://ai.uuugk.win/v1');
-      expect(client.model, 'deepseek-flash');
+      expect(client.model, 'deepseek-v4.1-flash');
       expect(client.config.maxRetries, 0);
       expect(client.config.timeout, const Duration(seconds: 120));
       expect(client.config.maxTokens, 6000);

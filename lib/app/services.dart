@@ -43,6 +43,8 @@ class AppServices {
     this.testCatalog,
     this.poseHubCatalog,
     this.poseHubMedia,
+    this.agentMode = CoachChatAgentMode.legacy,
+    this.appAiTags = const {},
   }) : templates = TemplatePlanGenerator(
          lib: library,
          catalog: catalog,
@@ -74,6 +76,8 @@ class AppServices {
   }
 
   final ExerciseLibrary library;
+  final CoachChatAgentMode agentMode;
+  final Map<String, Map<String, Object?>> appAiTags;
   final AppTestCatalog? testCatalog;
   final coach.PoseHubAppTestCatalog? poseHubCatalog;
   final PoseHubMediaRepository? poseHubMedia;
