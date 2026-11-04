@@ -261,7 +261,9 @@ void main() {
           await tester.pump();
         }
         // ugk_trainer uses clock.stopwatch: widget-test time is deterministic.
-        await tester.pump(const Duration(milliseconds: 400));
+        // A counted work phase lasts as long as the SDK rhythm needs (r2-v1
+        // h-squat: 1 s lead + 12 × 4 s), so run 1 s to move the ring past 1 %.
+        await tester.pump(const Duration(seconds: 1));
         final ringPaint = find.byKey(const ValueKey('ring'));
         double ring() =>
             (tester.widget<CustomPaint>(ringPaint).painter!

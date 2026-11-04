@@ -187,7 +187,8 @@ void main() {
         catalog: catalog,
         legacyLibrary: ExerciseLibrary([_legacy(id: sdk.allActions.first.id)]),
       );
-      expect(content.library.length, 211);
+      // r2-v1 ships every action ready: 249 complete definitions.
+      expect(content.library.length, 249);
       expect(content.coachCatalog, isNot(same(ai)));
       expect(catalog.toCoachCatalog(), same(ai));
       expect(content.library.all.map((exercise) => exercise.id), ai.ids);
@@ -235,23 +236,41 @@ void main() {
   test(
     'unknown SDK execution stays self-paced while canonical rhythms retain holds',
     () async {
+      // r2-v1 defines an execution for every action, so the unknown-execution
+      // path runs on a copy of the real SDK catalogue in which one reps-dose
+      // and one time-dose action have their execution cleared (as r1-v3 had).
       final sdk = await PoseHubActionLibrary.load();
-      final catalog = AppTestCatalog.fromSdk(sdk);
-      final content = AppTestContent.build(
-        catalog: catalog,
+      final edited = jsonDecode(jsonEncode(sdk.raw)) as Map<String, dynamic>;
+      final cleared = <String>{};
+      for (final mode in ['reps', 'time']) {
+        final row = (edited['actions'] as List).cast<Map<String, dynamic>>()
+            .firstWhere(
+              (row) =>
+                  row['trainingDefinitionComplete'] == true &&
+                  row['availableForTraining'] == true &&
+                  (row['defaultDose'] as Map?)?['mode'] == mode,
+            );
+        (row['rhythm'] as Map<String, dynamic>)['execution'] = null;
+        cleared.add(row['id'] as String);
+      }
+      final unknownSdk = coach.PoseHubAppTestCatalog.fromJson(edited);
+      final unknownCatalog = AppTestCatalog.fromSdk(unknownSdk);
+      final unknownContent = AppTestContent.build(
+        catalog: unknownCatalog,
         legacyLibrary: ExerciseLibrary([]),
       );
-      final oldRhythms = trainer.rhythmsFromCatalog(catalog.toCoachCatalog()!);
-      final unknown = sdk.semanticCompleteActions.where((action) {
-        final rhythm = catalog.entries[action.id]!.training!.rhythm;
+      final unknown = unknownSdk.semanticCompleteActions.where((action) {
+        final rhythm = unknownCatalog.entries[action.id]!.training!.rhythm;
         return rhythm != null &&
             rhythm.containsKey('execution') &&
             rhythm['execution'] == null;
       }).toList();
-      expect(unknown, hasLength(69));
+      expect(unknown.map((action) => action.id).toSet(), cleared);
+      final modes = <DoseMode>{};
       for (final action in unknown) {
-        final exercise = content.library[action.id];
-        final rhythm = content.rhythms[action.id]!;
+        final exercise = unknownContent.library[action.id];
+        final rhythm = unknownContent.rhythms[action.id]!;
+        modes.add(exercise.dose.mode);
         expect(rhythm.phases, isEmpty, reason: action.id);
         expect(rhythm.counted, isFalse, reason: action.id);
         expect(exercise.repSeconds, isNull, reason: action.id);
@@ -267,12 +286,30 @@ void main() {
           expect(rhythm.selfPaced, isFalse);
         }
       }
-      // The original canonical definitions keep the established helper and
-      // holdSeconds rule; media duration never enters either code path.
+      expect(modes, {DoseMode.reps, DoseMode.time});
+
+      // The real r2-v1 SDK: no action is left without an execution, and every
+      // canonical definition keeps the established helper and holdSeconds
+      // rule; media duration never enters either code path.
+      final catalog = AppTestCatalog.fromSdk(sdk);
+      final content = AppTestContent.build(
+        catalog: catalog,
+        legacyLibrary: ExerciseLibrary([]),
+      );
+      final oldRhythms = trainer.rhythmsFromCatalog(catalog.toCoachCatalog()!);
+      expect(
+        sdk.semanticCompleteActions.where((action) {
+          final rhythm = catalog.entries[action.id]!.training!.rhythm;
+          return rhythm != null &&
+              rhythm.containsKey('execution') &&
+              rhythm['execution'] == null;
+        }),
+        isEmpty,
+      );
       final canonical = sdk.semanticCompleteActions.where(
         (action) => action.availableForTraining,
       );
-      expect(canonical, hasLength(142));
+      expect(canonical, hasLength(249));
       for (final action in canonical) {
         final training = catalog.entries[action.id]!.training!;
         var expected = oldRhythms[action.id]!;
