@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
 import 'package:ugk_trainer/ugk_trainer.dart';
 
-// SDK 264e853 bundled baseline: r2-v1 (249 actions). r1-v3 is not migrated;
+// SDK 97eb66d bundled baseline: r2-v1 (249 actions). r1-v3 is not migrated;
 // scapular-C and h-sleeper-stretch were deleted before r2-v1 (2026-11-04).
 const _r2v1CatalogSha =
     '02721e4c24a0445f2a05ef185b2569dc105566d630c5b8f901da059c0945117b';
