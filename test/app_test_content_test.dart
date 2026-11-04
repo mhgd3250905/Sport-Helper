@@ -243,7 +243,8 @@ void main() {
       final edited = jsonDecode(jsonEncode(sdk.raw)) as Map<String, dynamic>;
       final cleared = <String>{};
       for (final mode in ['reps', 'time']) {
-        final row = (edited['actions'] as List).cast<Map<String, dynamic>>()
+        final row = (edited['actions'] as List)
+            .cast<Map<String, dynamic>>()
             .firstWhere(
               (row) =>
                   row['trainingDefinitionComplete'] == true &&
