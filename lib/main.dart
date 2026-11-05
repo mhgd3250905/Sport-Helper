@@ -25,6 +25,7 @@ import 'package:ugk_trainer/ugk_trainer.dart'
         PoseHubActionLibrary,
         TrainingMediaRepository,
         TrainingMediaScope,
+        poseHubMediaPackOf,
         poseHubPackVersionOf;
 import 'core/storage/local_state_storage.dart';
 import 'data/app_store.dart';
@@ -121,16 +122,22 @@ Future<void> main() async {
     final poseHubPack = poseHubPackVersionOf(poseHubCatalog);
     log.record(
       'posehub.catalog_loaded',
-      fields: {'pack': poseHubPack, 'channel': PoseHubCatalogUpdates.channelName},
+      fields: {
+        'pack': poseHubPack,
+        'channel': PoseHubCatalogUpdates.channelName,
+      },
     );
     // Posters come from the SDK's built-in r2-v1 standing images
     // (packages/ugk_trainer/assets/pose_hub/app-pack-r2-v1/standing/); the
     // r1-v3 APK image index was removed. Covers/thumbnails not in the APK use
     // the ordinary verified downloader.
-    var delivery = PoseHubMediaDelivery.unavailable(poseHubPack);
+    // Media lives in the pack its catalogue's mediaDistribution names (r2-v2
+    // reuses r2-v1 media), which may differ from the catalogue pack.
+    final mediaPack = poseHubMediaPackOf(poseHubCatalog);
+    var delivery = PoseHubMediaDelivery.unavailable(mediaPack);
     try {
       delivery = await PoseHubMediaDelivery.load(
-        packVersion: poseHubPack,
+        packVersion: mediaPack,
         mediaBaseUrls: PoseHubMediaConfig.mediaBaseUrls,
       );
     } on Object catch (error) {

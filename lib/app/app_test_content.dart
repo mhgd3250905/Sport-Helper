@@ -124,9 +124,11 @@ class AppTestContent {
             seconds: (rawDose['seconds'] ?? rawDose['workSeconds']) as int?,
             restSeconds: rawDose['restSeconds']! as int,
           ),
+          // Per-side cost of one count: an alternating pair (one count =
+          // left + right) is planned as 每侧 N 次 × 2 sides (SDK rule).
           repSeconds:
               drill.defaultDose.mode == coach.DoseMode.reps && rhythm.counted
-              ? rhythm.cycleFor()
+              ? rhythm.planRepSecondsFor()
               : null,
           cues: drill.cues['zh'] ?? const [],
           cautions: drill.cautions,
@@ -163,7 +165,7 @@ coach.Catalog _planningCadence(
       drills.add(drill.raw);
       continue;
     }
-    final seconds = rhythm.cycleFor();
+    final seconds = rhythm.planRepSecondsFor();
     if (!seconds.isFinite || seconds <= 0) {
       drills.add(drill.raw);
       continue;
