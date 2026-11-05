@@ -39,6 +39,8 @@ class AppTestContent {
           'version': catalog.semanticSource?.version ?? '0.0.0',
           'drills': <Object?>[],
         });
+    // The SDK delivers each action's authored pace (`rhythm.execution`) on
+    // its definition (PR #18); SF uses it as given, never a dose default.
     final rhythms = trainer.rhythmsFromCatalog(
       sourceCatalog,
       overrides: {

@@ -260,12 +260,11 @@ void main() {
         catalog: unknownCatalog,
         legacyLibrary: ExerciseLibrary([]),
       );
-      final unknown = unknownSdk.semanticCompleteActions.where((action) {
-        final rhythm = unknownCatalog.entries[action.id]!.training!.rhythm;
-        return rhythm != null &&
-            rhythm.containsKey('execution') &&
-            rhythm['execution'] == null;
-      }).toList();
+      // The SDK delivers the pack's execution as the definition's rhythm
+      // (PR #18), so an unknown execution is read from the pack row itself.
+      final unknown = unknownSdk.semanticCompleteActions
+          .where(_unknownExecution)
+          .toList();
       expect(unknown.map((action) => action.id).toSet(), cleared);
       final modes = <DoseMode>{};
       for (final action in unknown) {
@@ -298,15 +297,7 @@ void main() {
         legacyLibrary: ExerciseLibrary([]),
       );
       final oldRhythms = trainer.rhythmsFromCatalog(catalog.toCoachCatalog()!);
-      expect(
-        sdk.semanticCompleteActions.where((action) {
-          final rhythm = catalog.entries[action.id]!.training!.rhythm;
-          return rhythm != null &&
-              rhythm.containsKey('execution') &&
-              rhythm['execution'] == null;
-        }),
-        isEmpty,
-      );
+      expect(sdk.semanticCompleteActions.where(_unknownExecution), isEmpty);
       final canonical = sdk.semanticCompleteActions.where(
         (action) => action.availableForTraining,
       );
@@ -320,6 +311,25 @@ void main() {
         expect(
           content.rhythms[action.id]!.toJson(),
           expected.toJson(),
+          reason: action.id,
+        );
+        // The pace is the pack's authored execution, not a dose default.
+        var authored = trainer.Rhythm.fromJson(
+          Map<String, dynamic>.from(
+            (action.raw['rhythm']! as Map)['execution']! as Map,
+          ),
+        );
+        if (training.holdSeconds case final hold? when authored.counted) {
+          authored = authored.withHold(hold);
+        }
+        expect(
+          content.rhythms[action.id]!.toJson(),
+          authored.toJson(),
+          reason: action.id,
+        );
+        expect(
+          content.rhythms[action.id]!.source,
+          trainer.RhythmSource.catalog,
           reason: action.id,
         );
       }
@@ -367,4 +377,11 @@ void main() {
         ? 'Set SMARTFIT_CATALOG_TEST_PACK for the current delivery.'
         : false,
   );
+}
+
+bool _unknownExecution(coach.PoseHubPackAction action) {
+  final rhythm = action.raw['rhythm'];
+  return rhythm is Map &&
+      rhythm.containsKey('execution') &&
+      rhythm['execution'] == null;
 }
