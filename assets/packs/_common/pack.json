@@ -156,6 +156,26 @@
     }
    },
    {
+    "id": "p.set",
+    "role": "phrase",
+    "text": {
+     "en": "Set"
+    },
+    "ms": {
+     "en": 580
+    }
+   },
+   {
+    "id": "p.round",
+    "role": "phrase",
+    "text": {
+     "en": "Round"
+    },
+    "ms": {
+     "en": 488
+    }
+   },
+   {
     "id": "p.last_set",
     "role": "phrase",
     "text": {
@@ -1380,9 +1400,17 @@
    "bytes": 6752,
    "sha256": "8bbdaf38f72d783ed130a88acf6a9a7db76109e5f90f389b71c0b62ed2dd3231"
   },
+  "voice/en/p.round.m4a": {
+   "bytes": 5168,
+   "sha256": "3b939c53ad5a04211383469f99620f761afa48ec38354f456ae3c1aa40ae59af"
+  },
   "voice/en/p.round_done.m4a": {
    "bytes": 8554,
    "sha256": "267d89b65ad1d6d5659fdb1d651357d54b00217278a47f4bc9803b401315c2f3"
+  },
+  "voice/en/p.set.m4a": {
+   "bytes": 5940,
+   "sha256": "28c69468151130b463935a8ebd0fa242e88837faca7d3e50adee7ec5df15f38e"
   },
   "voice/en/p.slow.m4a": {
    "bytes": 18853,

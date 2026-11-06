@@ -17,14 +17,15 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   test(
-    'App source uses all 1392 encoded zh+en assets and measured lengths',
+    'App source uses all 1394 encoded zh+en assets and measured lengths',
     () async {
       final (_, _, voices, _) = await AppServices.loadContent();
       final manifest = _manifest();
       final clips = manifest['clips'] as List;
-      expect(clips, hasLength(1392));
+      expect(clips, hasLength(1394));
       expect(clips.where((c) => (c as Map)['lang'] == 'zh'), hasLength(696));
-      expect(clips.where((c) => (c as Map)['lang'] == 'en'), hasLength(696));
+      // en has 2 more: the English-only ordinal nouns p.set / p.round.
+      expect(clips.where((c) => (c as Map)['lang'] == 'en'), hasLength(698));
       expect(voices.languages, {'zh', 'en'});
       final assets = await AssetManifest.loadFromAssetBundle(rootBundle);
       final bundled = assets.listAssets().toSet();

@@ -11,6 +11,8 @@ import 'package:smartfit/voice/voice_asset_bundle.dart';
 
 import 'support.dart';
 
+const englishOnly = {'p.set', 'p.round'};
+
 void main() {
   final voices = loadVoices();
   final bundle = VoiceAssetBundle.fromJson(
@@ -33,8 +35,11 @@ void main() {
     ];
     expect(ids, containsAll([for (var n = 1; n <= 60; n++) 'n.$n']));
     expect(ids, contains('p.last_rep'));
+    expect(ids, containsAll(['p.set', 'p.round']));
     for (final id in ids) {
-      for (final lang in ['zh', 'en']) {
+      // English-only nouns of the ordinal ("Set two"); Chinese says 第…组.
+      final langs = englishOnly.contains(id) ? ['en'] : ['zh', 'en'];
+      for (final lang in langs) {
         final clip = bundle.clip(id, lang);
         expect(clip, isNotNull, reason: '$id/$lang');
         expect(File(clip!.asset).existsSync(), isTrue, reason: clip.asset);
@@ -127,6 +132,22 @@ void main() {
       }
     });
   }
+
+  test('ordinal set/round in English is "Set three", not "Number three sets"', () {
+    String say(List<String> keys, String lang) =>
+        keys.map((k) => voices.line(k, lang: lang)).join(' ');
+    final set = voices.ordinalSet(3, lang: 'en');
+    expect(set, ['p.set', 'n.3']);
+    expect(say(set, 'en'), 'Set three');
+    expect(say(voices.ordinalRound(2, lang: 'en'), 'en'), 'Round two');
+    expect(say(voices.setsPhrase(3), 'en'), 'three sets');
+    for (final k in [...set, ...voices.ordinalRound(2, lang: 'en')]) {
+      expect(voices.has(k, lang: 'en'), isTrue, reason: k);
+    }
+    expect(SessionScript(source: voices, lang: 'en').whole(set), isTrue);
+    expect(say(voices.ordinalSet(3, lang: 'zh'), 'zh'), '第 三 组');
+    expect(say(voices.ordinalRound(2, lang: 'zh'), 'zh'), '第 二 轮');
+  });
 
   test('dose-paced 15 in English counts 11…15 with English clips', () {
     final said = countCues(

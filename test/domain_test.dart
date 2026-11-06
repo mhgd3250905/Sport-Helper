@@ -85,6 +85,8 @@ void main() {
         );
         for (final p in [packs.common, ...packs.exercises]) {
           for (final l in p.lines) {
+            // English-only ordinal nouns (p.set / p.round): Chinese says 第…组.
+            if (!l.text.containsKey('zh')) continue;
             final ms = l.ms['zh'];
             expect(ms, isNotNull, reason: '${p.id}/${l.id}');
             expect(ms, greaterThan(0), reason: '${p.id}/${l.id}');

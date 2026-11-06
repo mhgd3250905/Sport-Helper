@@ -11,8 +11,8 @@
     "zh": "公共语音包：数字、单位、口令、提示音",
     "en": "Shared counts, units, calls, chimes"
    },
-   "bytes": 1325904,
-   "sha256": "3141668b7c4905746a61b8c30a26611f19ad6b47d5d6ec87c317daa323a90d59"
+   "bytes": 1337012,
+   "sha256": "1631696478393c23e8b5073ea004d311a2b03b74426595f3615b2a9b5bd62d01"
   },
   {
    "id": "glute-max-A",
@@ -1036,7 +1036,7 @@
  ],
  "voiceBundle": {
   "asset": "assets/voice_lc32/v1/manifest.json",
-  "bytes": 675572,
-  "sha256": "2bf5a20d2a47ca2f57ba79a3c629abf4ee0c164a0f30c87eac928f1005377482"
+  "bytes": 676514,
+  "sha256": "22bb0b7dd537689fc0d87c6d51dd50439f81c8a6ea32038fc9bc24d4c2ca55d8"
  }
 }

@@ -118,7 +118,9 @@ class VoiceLibrary extends VoiceSource {
   @override
   List<String> repsPhrase(int n) => source.repsPhrase(n);
   @override
-  List<String> ordinalSet(int n) => source.ordinalSet(n);
+  List<String> ordinalSet(int n, {String lang = 'zh'}) =>
+      source.ordinalSet(n, lang: lang);
   @override
-  List<String> ordinalRound(int n) => source.ordinalRound(n);
+  List<String> ordinalRound(int n, {String lang = 'zh'}) =>
+      source.ordinalRound(n, lang: lang);
 }

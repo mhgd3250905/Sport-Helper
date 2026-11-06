@@ -2235,6 +2235,20 @@
     },
     {
       "pack": "_common",
+      "line": "p.round",
+      "lang": "en",
+      "asset": "assets/voice_lc32/v1/_common/en/p.round.m4a",
+      "bytes": 2952,
+      "sha256": "9f98d9ec131e5b1ba429302d1a4eba0d9d2b597fe9f2af4055321088fa606e17",
+      "decoded_ms": 511,
+      "duration_ms": 488,
+      "source": {
+        "asset": "assets/packs/_common/voice/en/p.round.m4a",
+        "sha256": "3b939c53ad5a04211383469f99620f761afa48ec38354f456ae3c1aa40ae59af"
+      }
+    },
+    {
+      "pack": "_common",
       "line": "p.round_done",
       "lang": "en",
       "asset": "assets/voice_lc32/v1/_common/en/p.round_done.m4a",
@@ -2245,6 +2259,20 @@
       "source": {
         "asset": "assets/packs/_common/voice/en/p.round_done.m4a",
         "sha256": "267d89b65ad1d6d5659fdb1d651357d54b00217278a47f4bc9803b401315c2f3"
+      }
+    },
+    {
+      "pack": "_common",
+      "line": "p.set",
+      "lang": "en",
+      "asset": "assets/voice_lc32/v1/_common/en/p.set.m4a",
+      "bytes": 3492,
+      "sha256": "f80f1d1ff6d4d9d2256231f1e1e3a3fc05905374809a9ceea37e98a9eaab0c20",
+      "decoded_ms": 604,
+      "duration_ms": 580,
+      "source": {
+        "asset": "assets/packs/_common/voice/en/p.set.m4a",
+        "sha256": "28c69468151130b463935a8ebd0fa242e88837faca7d3e50adee7ec5df15f38e"
       }
     },
     {
