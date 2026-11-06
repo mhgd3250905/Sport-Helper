@@ -1036,7 +1036,7 @@
  ],
  "voiceBundle": {
   "asset": "assets/voice_lc32/v1/manifest.json",
-  "bytes": 675577,
-  "sha256": "92a5d608a7ec4bebb94e4558505a4e8071fc741088528e0bed58e90718751896"
+  "bytes": 675572,
+  "sha256": "2bf5a20d2a47ca2f57ba79a3c629abf4ee0c164a0f30c87eac928f1005377482"
  }
 }

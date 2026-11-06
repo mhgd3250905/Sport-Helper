@@ -11,8 +11,10 @@ then appended to the manifest with its decoded length. Existing entries and
 files are never touched.
 
 Encoder: fdkaac (the original conversion's) when given with --fdkaac, else
-ffmpeg's native AAC-LC encoder at the same settings (the sandbox has no
-fdkaac build).
+ffmpeg's native AAC-LC encoder at the same settings with `-aac_coder fast`
+(the sandbox has no fdkaac build; ffmpeg's default twoloop coder overshoots
+true peak by up to +4 dB at 32 kbit/s, the fast coder keeps the source's
+<= -2.5 dBFS ceiling).
 
     python3 tools/voice/add_lc32_clips.py [--fdkaac /path/to/fdkaac] [--budget 100]
 """
@@ -37,6 +39,13 @@ def sha(p):
 
 def run(cmd):
     subprocess.run([str(c) for c in cmd], check=True, capture_output=True)
+
+
+def true_peak(path):
+    err = subprocess.run(['ffmpeg', '-nostats', '-hide_banner', '-nostdin', '-i', str(path),
+                          '-af', 'ebur128=peak=true', '-f', 'null', '-'],
+                         capture_output=True, text=True).stderr
+    return float([l for l in err.splitlines() if l.strip().startswith('Peak:')][-1].split()[1])
 
 
 def decoded_ms(path, tmp):
@@ -99,9 +108,15 @@ def main():
             if a.fdkaac:
                 run([a.fdkaac, *FDK, '-o', part, pcm])
             else:
-                run(['ffmpeg', '-v', 'error', '-nostdin', '-y', '-i', pcm, '-c:a', 'aac',
-                     '-profile:a', 'aac_low', '-b:a', '32000', '-ar', '22050', '-ac', '1',
-                     '-movflags', '+faststart', '-f', 'mp4', part])
+                # Keep true peak <= -1.3 dBTP (Pose-Hub voice standard): if the
+                # encode overshoots, trim the input 0.5 dB at a time.
+                for trim in (0, -0.5, -1.0, -1.5):
+                    run(['ffmpeg', '-v', 'error', '-nostdin', '-y', '-i', pcm, '-af', f'volume={trim}dB',
+                         '-c:a', 'aac', '-aac_coder', 'fast',
+                         '-profile:a', 'aac_low', '-b:a', '32000', '-ar', '22050', '-ac', '1',
+                         '-movflags', '+faststart', '-f', 'mp4', part])
+                    if true_peak(part) <= -1.3:
+                        break
             os.replace(part, dst)
             manifest['clips'].append({
                 'pack': pack, 'line': line, 'lang': lang,
