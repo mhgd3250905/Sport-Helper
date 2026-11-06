@@ -57,10 +57,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -68,70 +70,84 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "坐姿猫牛式"
+     "zh": "坐姿猫牛式",
+     "en": "Seated cat-cow"
     },
     "ms": {
-     "zh": 1184
+     "zh": 1184,
+     "en": 1068
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "坐姿猫牛式，活动下背"
+     "zh": "坐姿猫牛式，活动下背",
+     "en": "Seated cat-cow. Mobilizes the lower back."
     },
     "ms": {
-     "zh": 2252
+     "zh": 2252,
+     "en": 3367
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "坐椅前半，手放膝上"
+     "zh": "坐椅前半，手放膝上",
+     "en": "Sit on the front of the chair, hands on your knees"
     },
     "ms": {
-     "zh": 1997
+     "zh": 1997,
+     "en": 2531
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "坐在椅子前半部分，吸气挺胸，呼气拱背"
+     "zh": "坐在椅子前半部分，吸气挺胸，呼气拱背",
+     "en": "On the front half of the chair, breathe in and lift your chest, breathe out and round your back"
     },
     "ms": {
-     "zh": 3599
+     "zh": 3599,
+     "en": 4667
     }
    },
    {
     "id": "cue3",
     "role": "cue",
     "text": {
-     "zh": "挺胸抬头，再拱背低头"
+     "zh": "挺胸抬头，再拱背低头",
+     "en": "Chest up and look up, then round your back and look down"
     },
     "ms": {
-     "zh": 2183
+     "zh": 2183,
+     "en": 2833
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，挺胸抬头，再拱背低头"
+     "zh": "放松一下。下一组记住，挺胸抬头，再拱背低头",
+     "en": "Relax for a moment. Next set, remember: Chest up and look up, then round your back and look down"
     },
     "ms": {
-     "zh": 4667
+     "zh": 4667,
+     "en": 6478
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "坐姿猫牛式，完成"
+     "zh": "坐姿猫牛式，完成",
+     "en": "Seated cat-cow, done."
     },
     "ms": {
-     "zh": 1927
+     "zh": 1927,
+     "en": 1579
     }
    }
   ],
@@ -161,6 +177,34 @@
   "demo.mp4": {
    "bytes": 71515,
    "sha256": "31d26c228aaec615005bffa40168c8758d07dbb0031294160ed5712c8fab80a0"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 21716,
+   "sha256": "0fd1c231429a8898f508290a56f8bc9a0151b628ee0a68295fd180cb03f671d0"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 40204,
+   "sha256": "0b4228b6451fcde6d3a8bcd34b67728e8d339ac3d19b8a475ed83dcd7f52c1bc"
+  },
+  "voice/en/cue3.m4a": {
+   "bytes": 24359,
+   "sha256": "508cba07cf4c01b534c32074de39df7974bd5394ac863c93f385380eda9adddb"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 14063,
+   "sha256": "861fc14e84089c53e4a41c4d00e6aeb5081aecd4e4016e7693b3c01387056063"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 30611,
+   "sha256": "337614ad432c1a63010a766da135a87dce96072f1e993ac774f80137b27c0c0e"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 9832,
+   "sha256": "1e98dc3e868b718b0be0d0e56aa6d67eceae3e7fb8e971e0081d16a3a38dce59"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 56368,
+   "sha256": "1b4c97b7ad448e407c0faf23ad6ff7465fff869db51cfbf47cff4757a6f14082"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 17514,

@@ -60,10 +60,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -71,70 +73,84 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "扶椅站姿开髋门"
+     "zh": "扶椅站姿开髋门",
+     "en": "Chair-supported hip gate opener"
     },
     "ms": {
-     "zh": 1533
+     "zh": 1533,
+     "en": 1602
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "扶椅站姿开髋门，活动髋前侧和臀部外侧"
+     "zh": "扶椅站姿开髋门，活动髋前侧和臀部外侧",
+     "en": "Chair-supported hip gate opener. Mobilizes the front of the hips and the outer hips."
     },
     "ms": {
-     "zh": 3901
+     "zh": 3901,
+     "en": 4923
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "扶椅站稳，抬膝"
+     "zh": "扶椅站稳，抬膝",
+     "en": "Hold the chair, stand steady, lift the knee"
     },
     "ms": {
-     "zh": 1625
+     "zh": 1625,
+     "en": 2508
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "扶住椅子，膝盖抬高，向外画圈打开"
+     "zh": "扶住椅子，膝盖抬高，向外画圈打开",
+     "en": "Hold the chair, lift the knee and circle it open"
     },
     "ms": {
-     "zh": 3413
+     "zh": 3413,
+     "en": 2531
     }
    },
    {
     "id": "side_switch",
     "role": "side_switch",
     "text": {
-     "zh": "左侧同样，扶住椅子，膝盖抬高，向外画圈打开"
+     "zh": "左侧同样，扶住椅子，膝盖抬高，向外画圈打开",
+     "en": "Now the left side. Hold the chair, lift the knee and circle it open"
     },
     "ms": {
-     "zh": 4505
+     "zh": 4505,
+     "en": 4458
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，扶住椅子，膝盖抬高，向外画圈打开"
+     "zh": "放松一下。下一组记住，扶住椅子，膝盖抬高，向外画圈打开",
+     "en": "Relax for a moment. Next set, remember: Hold the chair, lift the knee and circle it open"
     },
     "ms": {
-     "zh": 5944
+     "zh": 5944,
+     "en": 6200
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "扶椅站姿开髋门，完成"
+     "zh": "扶椅站姿开髋门，完成",
+     "en": "Chair-supported hip gate opener, done."
     },
     "ms": {
-     "zh": 2183
+     "zh": 2183,
+     "en": 2183
     }
    }
   ],
@@ -164,6 +180,34 @@
   "demo.mp4": {
    "bytes": 101302,
    "sha256": "ec8b9fd5fc7ce71d783d1fa6491cc6b3ba0a88b474af2bfd8f7ed31856911338"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 21763,
+   "sha256": "47ddfba2bca7a60fe51bea1629a55337062cfc4b2512dd2071ce49d3425de86c"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 21833,
+   "sha256": "8d1c05c3fca535cb15b615c028f31974c0ca73b733423eaa021c6631b6ac39fd"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 19083,
+   "sha256": "c8192fd49930ee1386a45050c55897bcb53f852a340b853a51d89ebbfe55f9b1"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 39429,
+   "sha256": "fd4f1f2ffa9001fa819c4a3e1a1c0ddb178468815a47167a7caad3f074ddcbef"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 14148,
+   "sha256": "be91039e4cc8a487056ca96b27cb98dc62f3c5117814a877b08db612d937209d"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 52580,
+   "sha256": "675c1598d0c95164c0ac063fb14ec1ac97c1a7fc4d7594d6ecdf1eacf16225c6"
+  },
+  "voice/en/side_switch.m4a": {
+   "bytes": 35676,
+   "sha256": "983093b4cae823e5ea6323dc7e0140e4aa1aff3e2035873252d3cab87920f09b"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 14449,

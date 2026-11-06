@@ -59,10 +59,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -70,50 +72,60 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "哑铃罗马尼亚硬拉"
+     "zh": "哑铃罗马尼亚硬拉",
+     "en": "Dumbbell Romanian deadlift"
     },
     "ms": {
-     "zh": 1579
+     "zh": 1579,
+     "en": 1533
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "哑铃罗马尼亚硬拉，练大腿后侧和臀部"
+     "zh": "哑铃罗马尼亚硬拉，练大腿后侧和臀部",
+     "en": "Dumbbell Romanian deadlift. Works the hamstrings and the glutes."
     },
     "ms": {
-     "zh": 3437
+     "zh": 3437,
+     "en": 4133
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "哑铃贴腿下滑，臀部向后，背始终挺直"
+     "zh": "哑铃贴腿下滑，臀部向后，背始终挺直",
+     "en": "Slide the dumbbells down your legs, hips back, keep your back straight"
     },
     "ms": {
-     "zh": 3692
+     "zh": 3692,
+     "en": 3762
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，哑铃贴腿下滑，臀部向后，背始终挺直"
+     "zh": "放松一下。下一组记住，哑铃贴腿下滑，臀部向后，背始终挺直",
+     "en": "Relax for a moment. Next set, remember: Slide the dumbbells down your legs, hips back, keep your back straight"
     },
     "ms": {
-     "zh": 6223
+     "zh": 6223,
+     "en": 7407
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "哑铃罗马尼亚硬拉，完成"
+     "zh": "哑铃罗马尼亚硬拉，完成",
+     "en": "Dumbbell Romanian deadlift, done."
     },
     "ms": {
-     "zh": 2299
+     "zh": 2299,
+     "en": 1997
     }
    }
   ],
@@ -143,6 +155,26 @@
   "demo.mp4": {
    "bytes": 103356,
    "sha256": "1928a5dccee085420df823a0b47505868c9c515b325377a12e18e287ebc3c4ed"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 32222,
+   "sha256": "a710a449dae18ce6e95f200fe8e47a59adae370885ed16b4af598cd58b3563aa"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 17524,
+   "sha256": "f3f37f033eae2335485c7fb656e0801c631e65837beed495866c76775d461b6c"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 33102,
+   "sha256": "19d548c205bd256d78f938a7c07e1c93f23eebc4ff62c15def0ab7c310af1608"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 13517,
+   "sha256": "2fbe4fdf858bc626b2ea3ea6d5b35365b1dca4340f0e9fc87d54bd31a0f9e80e"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 64466,
+   "sha256": "d77ff4a37aefe96bc64550edb00f08b4742ee7217ad7ec3eab6e9b5ad5fa40c4"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 31333,

@@ -61,10 +61,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -72,70 +74,84 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "坐姿分腿体前屈"
+     "zh": "坐姿分腿体前屈",
+     "en": "Seated straddle forward fold"
     },
     "ms": {
-     "zh": 1625
+     "zh": 1625,
+     "en": 1649
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "坐姿分腿体前屈，拉伸大腿内侧和大腿后侧"
+     "zh": "坐姿分腿体前屈，拉伸大腿内侧和大腿后侧",
+     "en": "Seated straddle forward fold. Stretches the inner thighs and the hamstrings."
     },
     "ms": {
-     "zh": 4272
+     "zh": 4272,
+     "en": 4737
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "坐地双腿分开"
+     "zh": "坐地双腿分开",
+     "en": "Sit on the floor, legs wide apart"
     },
     "ms": {
-     "zh": 1416
+     "zh": 1416,
+     "en": 2183
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "分腿坐直，从髋部慢慢往前倾"
+     "zh": "分腿坐直，从髋部慢慢往前倾",
+     "en": "Legs apart, sit tall, lean forward slowly from the hips"
     },
     "ms": {
-     "zh": 2879
+     "zh": 2879,
+     "en": 3576
     }
    },
    {
     "id": "cue3",
     "role": "cue",
     "text": {
-     "zh": "背挺直向前倾"
+     "zh": "背挺直向前倾",
+     "en": "Lean forward with a straight back"
     },
     "ms": {
-     "zh": 1347
+     "zh": 1347,
+     "en": 1672
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，背挺直向前倾"
+     "zh": "放松一下。下一组记住，背挺直向前倾",
+     "en": "Relax for a moment. Next set, remember: Lean forward with a straight back"
     },
     "ms": {
-     "zh": 3831
+     "zh": 3831,
+     "en": 5294
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "坐姿分腿体前屈，完成"
+     "zh": "坐姿分腿体前屈，完成",
+     "en": "Seated straddle forward fold, done."
     },
     "ms": {
-     "zh": 2345
+     "zh": 2345,
+     "en": 2136
     }
    }
   ],
@@ -165,6 +181,34 @@
   "demo.mp4": {
    "bytes": 155467,
    "sha256": "2ef40893e177d2d47ffc86e99b0a354add8bbde93cabaf2a7db457ab71365d31"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 19005,
+   "sha256": "b8a7782e8c19fc5489a0d5834b341d6bd0b50525d43954adf4687cac4e528194"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 30665,
+   "sha256": "f43568842680e7c25c85fd34c49e43b0b88781dab76e815e98a7fa6f4157fcbd"
+  },
+  "voice/en/cue3.m4a": {
+   "bytes": 14934,
+   "sha256": "e1b071a8b2f2cc28eb000590bded08b9ae5c57813de42fa64e60bcf9c05d08cc"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 18630,
+   "sha256": "ad4b88be5339cf6dfcbb4f37010732062ce4cf691ce5a6f9a02af378327a0f2e"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 36586,
+   "sha256": "3fba191d5e365b4eb46c01ea1855d22fee62424fba4b84e51b819727d85b8550"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 14688,
+   "sha256": "6912dc03cdac578885ff20d55916ffc85701f8a5a0f673f8248ab7e7e040bb42"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 45798,
+   "sha256": "7eef2adf22565480b2c55cd84eaaf14aae50f18f3c0981ba9307ef25341c0fc5"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 12779,

@@ -64,10 +64,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -75,70 +77,84 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "靠墙天使"
+     "zh": "靠墙天使",
+     "en": "Wall angel"
     },
     "ms": {
-     "zh": 1091
+     "zh": 1091,
+     "en": 813
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "靠墙天使，活动胸部、背部和上背"
+     "zh": "靠墙天使，活动胸部、背部和上背",
+     "en": "Wall angel. Mobilizes the chest, the back and the upper back."
     },
     "ms": {
-     "zh": 3251
+     "zh": 3251,
+     "en": 4481
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "背、头贴墙，手臂成 W"
+     "zh": "背、头贴墙，手臂成 W",
+     "en": "Back and head on the wall, arms in a W"
     },
     "ms": {
-     "zh": 2601
+     "zh": 2601,
+     "en": 2438
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "后背和手臂贴墙，慢慢向上滑再向下"
+     "zh": "后背和手臂贴墙，慢慢向上滑再向下",
+     "en": "Back and arms on the wall, slide up slowly, then down"
     },
     "ms": {
-     "zh": 3437
+     "zh": 3437,
+     "en": 3181
     }
    },
    {
     "id": "cue3",
     "role": "cue",
     "text": {
-     "zh": "手臂沿墙上滑，腰不离墙"
+     "zh": "手臂沿墙上滑，腰不离墙",
+     "en": "Slide your arms up the wall, keep your low back on the wall"
     },
     "ms": {
-     "zh": 2392
+     "zh": 2392,
+     "en": 2949
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，手臂沿墙上滑，腰不离墙"
+     "zh": "放松一下。下一组记住，手臂沿墙上滑，腰不离墙",
+     "en": "Relax for a moment. Next set, remember: Slide your arms up the wall, keep your low back on the wall"
     },
     "ms": {
-     "zh": 4830
+     "zh": 4830,
+     "en": 6571
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "靠墙天使，完成"
+     "zh": "靠墙天使，完成",
+     "en": "Wall angel, done."
     },
     "ms": {
-     "zh": 1741
+     "zh": 1741,
+     "en": 1393
     }
    }
   ],
@@ -168,6 +184,34 @@
   "demo.mp4": {
    "bytes": 83071,
    "sha256": "a3b925c91b9a69a2d93fe94a442927bbfc7d0b744da00c6b4d0e1011d55da679"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 21055,
+   "sha256": "6a8d729b0f4835be95de6a2d40aaa176bd57200b9d7bbe79ba6cbe5160e51e19"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 27250,
+   "sha256": "b2276a16d8aa1870b047ad3741fdd1c0367120cf0312b6c37169aebb1e53daf7"
+  },
+  "voice/en/cue3.m4a": {
+   "bytes": 25184,
+   "sha256": "9dec3d1470deca5ca81964b32e94a1bdcef94299aef2b52855941cb249bd3118"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 12584,
+   "sha256": "6ce0d00109a9045e81b983c3012bae020621b149839048676caee55bed70c3cd"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 36005,
+   "sha256": "69a332b0fd553d66474e3c62b6ec6e1a70a6f569dbf8eff6afff38889baf8863"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 7765,
+   "sha256": "7dc4847cd1afa3003a0635b9b35d28e26e3ea5627fe73723742dae42113cf928"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 57043,
+   "sha256": "aca870084229d33e17c7ea128b2868c7beccac4ee6206c1032a66d81ba352a57"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 22515,

@@ -35,9 +35,15 @@ def seal(d: Path, errors: list) -> dict:
                 errors.append(f"{d.name}: line {line['id']} [{lang}] has no decoded length "
                               '(run tools/voice/build_voice.py)')
     files = {}
+    recorded = pack.get('files') or {}
     for rel in sorted(set(P.listed_files(pack))):
         f = d / rel
         if not f.is_file():
+            # Media are delivered on demand and not checked in; keep the
+            # checksum the pack already records for them.
+            if not rel.startswith('voice/') and rel in recorded:
+                files[rel] = recorded[rel]
+                continue
             errors.append(f'{d.name}: missing {rel}')
             continue
         files[rel] = {'bytes': f.stat().st_size, 'sha256': P.sha256(f)}

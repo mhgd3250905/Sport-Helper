@@ -59,10 +59,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -70,70 +72,84 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "四足消防栓"
+     "zh": "四足消防栓",
+     "en": "Quadruped fire hydrant"
     },
     "ms": {
-     "zh": 1231
+     "zh": 1231,
+     "en": 1486
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "四足消防栓，练臀部外侧"
+     "zh": "四足消防栓，练臀部外侧",
+     "en": "Quadruped fire hydrant. Works the outer hips."
     },
     "ms": {
-     "zh": 2485
+     "zh": 2485,
+     "en": 3460
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "手在肩下、膝在髋下"
+     "zh": "手在肩下、膝在髋下",
+     "en": "Hands under shoulders, knees under hips"
     },
     "ms": {
-     "zh": 2043
+     "zh": 2043,
+     "en": 2113
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "四点跪姿，膝盖向侧面抬起，躯干不倾斜"
+     "zh": "四点跪姿，膝盖向侧面抬起，躯干不倾斜",
+     "en": "On all fours, lift the knee out to the side, do not tilt your trunk"
     },
     "ms": {
-     "zh": 3971
+     "zh": 3971,
+     "en": 3646
     }
    },
    {
     "id": "side_switch",
     "role": "side_switch",
     "text": {
-     "zh": "左侧同样，四点跪姿，膝盖向侧面抬起，躯干不倾斜"
+     "zh": "左侧同样，四点跪姿，膝盖向侧面抬起，躯干不倾斜",
+     "en": "Now the left side. On all fours, lift the knee out to the side, do not tilt your trunk"
     },
     "ms": {
-     "zh": 5062
+     "zh": 5062,
+     "en": 5596
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，四点跪姿，膝盖向侧面抬起，躯干不倾斜"
+     "zh": "放松一下。下一组记住，四点跪姿，膝盖向侧面抬起，躯干不倾斜",
+     "en": "Relax for a moment. Next set, remember: On all fours, lift the knee out to the side, do not tilt your trunk"
     },
     "ms": {
-     "zh": 6478
+     "zh": 6478,
+     "en": 7268
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "四足消防栓，完成"
+     "zh": "四足消防栓，完成",
+     "en": "Quadruped fire hydrant, done."
     },
     "ms": {
-     "zh": 1997
+     "zh": 1997,
+     "en": 2020
     }
    }
   ],
@@ -163,6 +179,34 @@
   "demo.mp4": {
    "bytes": 210498,
    "sha256": "d2c8dccbae2c46ce37d8c071fbbbe64024cf8b47fed5174094795c6e4df7db54"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 18409,
+   "sha256": "02848f0277006cc5c53d68b07bd676d6f16a756d191ab589b3b9d1077620d736"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 31155,
+   "sha256": "c1f3a0f54ca9ae7d43266e3c63c649f2019710bfce02921226eb5cf084cbe11e"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 17559,
+   "sha256": "82eaab4389f21d6d7f56ec22c3cd442cc55eed6a78571421416f3e457229eb0a"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 27641,
+   "sha256": "1d21a13625130bf7b6b5b1eb94d00f8c678ae9b4c89281ac1bb9e15bd9ee3160"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 13380,
+   "sha256": "c8471739290d5a1dde56ec57d54bb00fb7979713f68fc6bcffb2532a7b9a8b02"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 62349,
+   "sha256": "d1eb2981b322e4da74510d9fea68cb1db0278378772fcff94c2afc748c3bb5f8"
+  },
+  "voice/en/side_switch.m4a": {
+   "bytes": 50808,
+   "sha256": "a9ca7f4052a0d7905aaf3f78a636b1bd3a8ff2bada33787bd7518a10d7e3c944"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 17887,

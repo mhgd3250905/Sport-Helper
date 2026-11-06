@@ -57,10 +57,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -68,70 +70,84 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "蜥蜴式低弓步"
+     "zh": "蜥蜴式低弓步",
+     "en": "Lizard lunge"
     },
     "ms": {
-     "zh": 1277
+     "zh": 1277,
+     "en": 975
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "蜥蜴式低弓步，拉伸髋前侧"
+     "zh": "蜥蜴式低弓步，拉伸髋前侧",
+     "en": "Lizard lunge. Stretches the front of the hips."
     },
     "ms": {
-     "zh": 2577
+     "zh": 2577,
+     "en": 3320
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "前脚放在手外侧，髋往下沉"
+     "zh": "前脚放在手外侧，髋往下沉",
+     "en": "Front foot outside your hand, sink the hips"
     },
     "ms": {
-     "zh": 2647
+     "zh": 2647,
+     "en": 2276
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "髋向下沉，呼吸放松"
+     "zh": "髋向下沉，呼吸放松",
+     "en": "Sink the hips, breathe and relax"
     },
     "ms": {
-     "zh": 2020
+     "zh": 2020,
+     "en": 2020
     }
    },
    {
     "id": "side_switch",
     "role": "side_switch",
     "text": {
-     "zh": "左侧同样，前脚放在手外侧，髋往下沉"
+     "zh": "左侧同样，前脚放在手外侧，髋往下沉",
+     "en": "Now the left side. Front foot outside your hand, sink the hips"
     },
     "ms": {
-     "zh": 3738
+     "zh": 3738,
+     "en": 4249
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，髋向下沉，呼吸放松"
+     "zh": "放松一下。下一组记住，髋向下沉，呼吸放松",
+     "en": "Relax for a moment. Next set, remember: Sink the hips, breathe and relax"
     },
     "ms": {
-     "zh": 4528
+     "zh": 4528,
+     "en": 5619
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "蜥蜴式低弓步，完成"
+     "zh": "蜥蜴式低弓步，完成",
+     "en": "Lizard lunge, done."
     },
     "ms": {
-     "zh": 2020
+     "zh": 2020,
+     "en": 1509
     }
    }
   ],
@@ -161,6 +177,34 @@
   "demo.mp4": {
    "bytes": 71538,
    "sha256": "5191e1eaa51ea7cedc37628c61aba45432ee7e4553036a2d0af79432e08e3dd4"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 19779,
+   "sha256": "211cde2d3ab66d960de5d43b6417477cd5bfeae2a2dffd71aaea52bbb8e80b34"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 17582,
+   "sha256": "825e1628474b2993a918ae601e90b74664748544d14fa52bfad2e061cc12b762"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 13536,
+   "sha256": "395328f8ca3ef28e9d8273ff269798e631b4a442573428f580161f0ba119971f"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 28231,
+   "sha256": "07508a9e33aa9b734524972519671d6461cd15ed121360f9dcebe73d359d9549"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 9191,
+   "sha256": "654c61b4a0234f25fd7609bdce1ee6f371bf0447c774b61878f4995861f36975"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 48864,
+   "sha256": "1abef5fbbfcec53c14df31de1d705092490fe5d4f252e79683dacd1f86c32a55"
+  },
+  "voice/en/side_switch.m4a": {
+   "bytes": 37361,
+   "sha256": "1531396650b346e07e14a8cdb8a6cde50cd4f7fa274eb52831eb5d7984ba923b"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 22815,

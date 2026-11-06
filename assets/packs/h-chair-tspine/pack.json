@@ -60,10 +60,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -71,60 +73,72 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "跪姿椅面胸椎伸展"
+     "zh": "跪姿椅面胸椎伸展",
+     "en": "Kneeling chair thoracic extension"
     },
     "ms": {
-     "zh": 1672
+     "zh": 1672,
+     "en": 1881
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "跪姿椅面胸椎伸展，拉伸背部和下背"
+     "zh": "跪姿椅面胸椎伸展，拉伸背部和下背",
+     "en": "Kneeling chair thoracic extension. Stretches the back and the lower back."
     },
     "ms": {
-     "zh": 3228
+     "zh": 3228,
+     "en": 4481
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "跪姿，手肘放椅面"
+     "zh": "跪姿，手肘放椅面",
+     "en": "Kneel, elbows on the seat"
     },
     "ms": {
-     "zh": 1834
+     "zh": 1834,
+     "en": 1695
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "手肘搭椅面，胸口慢慢下沉"
+     "zh": "手肘搭椅面，胸口慢慢下沉",
+     "en": "Elbows on the seat, let your chest sink slowly"
     },
     "ms": {
-     "zh": 2717
+     "zh": 2717,
+     "en": 2670
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，手肘搭椅面，胸口慢慢下沉"
+     "zh": "放松一下。下一组记住，手肘搭椅面，胸口慢慢下沉",
+     "en": "Relax for a moment. Next set, remember: Elbows on the seat, let your chest sink slowly"
     },
     "ms": {
-     "zh": 5155
+     "zh": 5155,
+     "en": 6269
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "跪姿椅面胸椎伸展，完成"
+     "zh": "跪姿椅面胸椎伸展，完成",
+     "en": "Kneeling chair thoracic extension, done."
     },
     "ms": {
-     "zh": 2392
+     "zh": 2392,
+     "en": 2392
     }
    }
   ],
@@ -154,6 +168,30 @@
   "demo.mp4": {
    "bytes": 85615,
    "sha256": "aab24788a76d9cefb6b2410990ce30bb2969aa591e97b895669d099ecee5eef2"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 15053,
+   "sha256": "59d4afe54ec29fd093c824a510557f0a1f4568845a4945f801562baee2af6659"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 22819,
+   "sha256": "d00b7c7abed13a5a37b6bcade2a29f2e24f047f0ef089717e05a8608d48d033c"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 20612,
+   "sha256": "016e62e528385fead687ad67daf90cc9ee4eaad248a10e223a3a3184d0344855"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 34301,
+   "sha256": "c099284e35249796066b6a0476edcb7a491de7330052ac452173c690c71181e9"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 16576,
+   "sha256": "e25a190a417f4b47cd9ebaefd0c70c6ab88a82ac6f671107e248db0dbf67b093"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 53447,
+   "sha256": "abea9c06ccd3302c15fa58a8eac299c9bc62fbf4fc48ae4d66e04cac2898b55b"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 16184,

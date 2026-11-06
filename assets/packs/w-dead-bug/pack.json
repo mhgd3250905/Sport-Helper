@@ -56,10 +56,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -67,60 +69,72 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "死虫式"
+     "zh": "死虫式",
+     "en": "Dead bug"
     },
     "ms": {
-     "zh": 882
+     "zh": 882,
+     "en": 697
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "死虫式，练腹部"
+     "zh": "死虫式，练腹部",
+     "en": "Dead bug. Works the abs."
     },
     "ms": {
-     "zh": 1718
+     "zh": 1718,
+     "en": 2461
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "下背紧贴地面，对侧手脚慢慢伸远"
+     "zh": "下背紧贴地面，对侧手脚慢慢伸远",
+     "en": "Low back pressed to the floor, reach the opposite arm and leg away slowly"
     },
     "ms": {
-     "zh": 3228
+     "zh": 3228,
+     "en": 3808
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "对侧手脚慢慢下放，腰不离地"
+     "zh": "对侧手脚慢慢下放，腰不离地",
+     "en": "Lower the opposite arm and leg slowly, low back stays down"
     },
     "ms": {
-     "zh": 2670
+     "zh": 2670,
+     "en": 3344
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，对侧手脚慢慢下放，腰不离地"
+     "zh": "放松一下。下一组记住，对侧手脚慢慢下放，腰不离地",
+     "en": "Relax for a moment. Next set, remember: Lower the opposite arm and leg slowly, low back stays down"
     },
     "ms": {
-     "zh": 5224
+     "zh": 5224,
+     "en": 6966
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "死虫式，完成"
+     "zh": "死虫式，完成",
+     "en": "Dead bug, done."
     },
     "ms": {
-     "zh": 1602
+     "zh": 1602,
+     "en": 1254
     }
    }
   ],
@@ -150,6 +164,30 @@
   "demo.mp4": {
    "bytes": 89732,
    "sha256": "fe5c2f14eb4dad44abb36bb619fb93407688a339bcb34edfbe31c6a2178d3796"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 32481,
+   "sha256": "3114fa23630039a855f4899b415fcd92de243e2c85a295df005a60b2cc67d9c4"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 28598,
+   "sha256": "ff2cac8fb26f19a5ec430af14c311b8fead495a4c5eb0b7f0c9f53c1eb93b5b7"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 11397,
+   "sha256": "605f3a21424aaae6136e1ec0fec758462ffee2b55b7061fbb1346328ada07959"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 21392,
+   "sha256": "8d41b6440b61b2d8d149f49802e24f93ee67d2c4d0aae53b60d4dce44a27e3f2"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 6875,
+   "sha256": "45ae92853acca8e87e4693b86ede2097dc677df6785afa3e1e2656410d7c8fcf"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 58847,
+   "sha256": "49fec004afb0eaf223d003b19398a09d86676e1f4a3d04e048e84b1fb55bd87b"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 27658,

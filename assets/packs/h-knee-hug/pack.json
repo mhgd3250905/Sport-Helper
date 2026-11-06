@@ -60,10 +60,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -71,60 +73,72 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "仰卧抱膝"
+     "zh": "仰卧抱膝",
+     "en": "Supine knees to chest"
     },
     "ms": {
-     "zh": 929
+     "zh": 929,
+     "en": 1463
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "仰卧抱膝，拉伸下背和臀部"
+     "zh": "仰卧抱膝，拉伸下背和臀部",
+     "en": "Supine knees to chest. Stretches the lower back and the glutes."
     },
     "ms": {
-     "zh": 2461
+     "zh": 2461,
+     "en": 4180
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "双手抱膝，慢慢呼吸"
+     "zh": "双手抱膝，慢慢呼吸",
+     "en": "Hug your knees and breathe slowly"
     },
     "ms": {
-     "zh": 2043
+     "zh": 2043,
+     "en": 1695
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "膝靠向胸口，腰背放松"
+     "zh": "膝靠向胸口，腰背放松",
+     "en": "Knees toward your chest, relax your back"
     },
     "ms": {
-     "zh": 2252
+     "zh": 2252,
+     "en": 2368
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，膝靠向胸口，腰背放松"
+     "zh": "放松一下。下一组记住，膝靠向胸口，腰背放松",
+     "en": "Relax for a moment. Next set, remember: Knees toward your chest, relax your back"
     },
     "ms": {
-     "zh": 4760
+     "zh": 4760,
+     "en": 6014
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "仰卧抱膝，完成"
+     "zh": "仰卧抱膝，完成",
+     "en": "Supine knees to chest, done."
     },
     "ms": {
-     "zh": 1625
+     "zh": 1625,
+     "en": 1858
     }
    }
   ],
@@ -154,6 +168,30 @@
   "demo.mp4": {
    "bytes": 108673,
    "sha256": "fb1ae7314dbb03bd35564cde560bc56e16fb18631a40ec68f2d6da8c4405c83d"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 14977,
+   "sha256": "e7dbfb1ec00cc40c0f5c4e9f7db42fbdd875c2d9cb60030d7510adc7ecd69e17"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 20580,
+   "sha256": "b1b1b57a3e307e5406fdc30e16a169107078bc6ab883c08dd392e56ecaabf2f5"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 16394,
+   "sha256": "612463235b4a8fa368308da74e16537bb8f70c41f7871a4afe82e657b38c873f"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 32564,
+   "sha256": "6e1300f0b519da2aff2a0962c5b696d046c89aa138be50831909f922053702ff"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 13041,
+   "sha256": "4da6a0b25330220d6afdb09fd7d5e32a81c39e89e776f2c6a4b567684b330ac0"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 51430,
+   "sha256": "c20293382ddf7ad1d3eb804157592e244ef167ff7c2e6b110862e530c3085e02"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 17880,

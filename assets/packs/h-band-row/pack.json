@@ -57,10 +57,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -68,50 +70,60 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "弹力带坐姿划船"
+     "zh": "弹力带坐姿划船",
+     "en": "Seated band row"
     },
     "ms": {
-     "zh": 1625
+     "zh": 1625,
+     "en": 1022
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "弹力带坐姿划船，练背部和上背"
+     "zh": "弹力带坐姿划船，练背部和上背",
+     "en": "Seated band row. Works the back and the upper back."
     },
     "ms": {
-     "zh": 2995
+     "zh": 2995,
+     "en": 3437
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "坐直，手肘贴身向后拉，夹紧肩胛"
+     "zh": "坐直，手肘贴身向后拉，夹紧肩胛",
+     "en": "Sit tall, pull your elbows back close to your body, squeeze your shoulder blades"
     },
     "ms": {
-     "zh": 3367
+     "zh": 3367,
+     "en": 4272
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，坐直，手肘贴身向后拉，夹紧肩胛"
+     "zh": "放松一下。下一组记住，坐直，手肘贴身向后拉，夹紧肩胛",
+     "en": "Relax for a moment. Next set, remember: Sit tall, pull your elbows back close to your body, squeeze your shoulder blades"
     },
     "ms": {
-     "zh": 5851
+     "zh": 5851,
+     "en": 7918
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "弹力带坐姿划船，完成"
+     "zh": "弹力带坐姿划船，完成",
+     "en": "Seated band row, done."
     },
     "ms": {
-     "zh": 2322
+     "zh": 2322,
+     "en": 1625
     }
    }
   ],
@@ -141,6 +153,26 @@
   "demo.mp4": {
    "bytes": 123139,
    "sha256": "221d94d6062a0b88bd54fdcd679a241c1305f721a2a29354b5d687641305f055"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 36389,
+   "sha256": "bc0fd7fc29d14a3eba738d2ac04b0ffec370126d690d9016137aa3c32ae85af6"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 14441,
+   "sha256": "621b463f98b62f38539d0b4dff0314493056e246026b7000a175735ca8e4e41a"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 29413,
+   "sha256": "6678489c8097891a31396bf5c0fc504ae692726428e6ce41a6dacb0c881bcf34"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 9545,
+   "sha256": "d208a7a8eb9e7f46f70acf4e876eca90d3678f632d8efb82cd9dcaca5278aa6b"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 67992,
+   "sha256": "e6a814afbe2c9e6880f27f3544863e3f561665bb514fda94a1594ffff1c66ebf"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 28620,

@@ -59,10 +59,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -70,70 +72,84 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "哑铃侧平举"
+     "zh": "哑铃侧平举",
+     "en": "Dumbbell lateral raise"
     },
     "ms": {
-     "zh": 1184
+     "zh": 1184,
+     "en": 1300
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "哑铃侧平举，练肩膀"
+     "zh": "哑铃侧平举，练肩膀",
+     "en": "Dumbbell lateral raise. Works the shoulders."
     },
     "ms": {
-     "zh": 1997
+     "zh": 1997,
+     "en": 3228
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "微屈肘，肩膀下沉"
+     "zh": "微屈肘，肩膀下沉",
+     "en": "Elbows slightly bent, shoulders down"
     },
     "ms": {
-     "zh": 1927
+     "zh": 1927,
+     "en": 2159
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "手肘微屈，向侧面抬到肩高，不耸肩"
+     "zh": "手肘微屈，向侧面抬到肩高，不耸肩",
+     "en": "Elbows soft, raise out to the side to shoulder height, do not shrug"
     },
     "ms": {
-     "zh": 3553
+     "zh": 3553,
+     "en": 3692
     }
    },
    {
     "id": "cue3",
     "role": "cue",
     "text": {
-     "zh": "手臂抬到与肩同高"
+     "zh": "手臂抬到与肩同高",
+     "en": "Raise your arms to shoulder height"
     },
     "ms": {
-     "zh": 1881
+     "zh": 1881,
+     "en": 1625
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，手臂抬到与肩同高"
+     "zh": "放松一下。下一组记住，手臂抬到与肩同高",
+     "en": "Relax for a moment. Next set, remember: Raise your arms to shoulder height"
     },
     "ms": {
-     "zh": 4110
+     "zh": 4110,
+     "en": 5248
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "哑铃侧平举，完成"
+     "zh": "哑铃侧平举，完成",
+     "en": "Dumbbell lateral raise, done."
     },
     "ms": {
-     "zh": 1881
+     "zh": 1881,
+     "en": 1811
     }
    }
   ],
@@ -163,6 +179,34 @@
   "demo.mp4": {
    "bytes": 89191,
    "sha256": "e609146fc0cf9867a5a624fecfd01f537efb3f5d31f8b695957d24e435d43f2e"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 18881,
+   "sha256": "d51e60c7d25a56249a984f16455428d6b89c17da74a892fc794813de82a870e4"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 32526,
+   "sha256": "9d32daab872f52fde1ca1f902909f6bbe799e5fe7b983ae83d88359789ca572f"
+  },
+  "voice/en/cue3.m4a": {
+   "bytes": 14564,
+   "sha256": "7e79fc0e691228590734b41f6a29e5de920ea84c3d3f30f027898a55b780c605"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 15985,
+   "sha256": "7cecec645eec0033c70237d9e3719226d604a933c0f3b52df526b83ab06aa361"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 26369,
+   "sha256": "267929098b8ebd143d7af7be1691473fae87f9f2c51b45235d6fff80e96be6b8"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 11853,
+   "sha256": "d686db025bb23934245ab952a6dd3aa88c770b582be177a06cad9484e4774835"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 44893,
+   "sha256": "3ea5a7b0025bf8f7eca0808ce71136cd80efe97045f857ef2a3f1ea2e753ef73"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 16990,

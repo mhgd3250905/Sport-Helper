@@ -59,10 +59,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -70,80 +72,96 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "坐姿腘绳肌前伸"
+     "zh": "坐姿腘绳肌前伸",
+     "en": "Seated hamstring stretch"
     },
     "ms": {
-     "zh": 1811
+     "zh": 1811,
+     "en": 1440
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "坐姿腘绳肌前伸，拉伸大腿后侧"
+     "zh": "坐姿腘绳肌前伸，拉伸大腿后侧",
+     "en": "Seated hamstring stretch. Stretches the hamstrings."
     },
     "ms": {
-     "zh": 3111
+     "zh": 3111,
+     "en": 3646
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "坐椅前缘，一腿伸直"
+     "zh": "坐椅前缘，一腿伸直",
+     "en": "Sit on the front edge of the chair, one leg straight"
     },
     "ms": {
-     "zh": 1997
+     "zh": 1997,
+     "en": 2763
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "腿伸直，脚尖勾起，背挺直往前"
+     "zh": "腿伸直，脚尖勾起，背挺直往前",
+     "en": "Leg straight, toes up, lean forward with a straight back"
     },
     "ms": {
-     "zh": 3158
+     "zh": 3158,
+     "en": 3181
     }
    },
    {
     "id": "cue3",
     "role": "cue",
     "text": {
-     "zh": "背挺直前倾，大腿后侧拉长"
+     "zh": "背挺直前倾，大腿后侧拉长",
+     "en": "Lean forward with a straight back, feel the hamstrings lengthen"
     },
     "ms": {
-     "zh": 2694
+     "zh": 2694,
+     "en": 3158
     }
    },
    {
     "id": "side_switch",
     "role": "side_switch",
     "text": {
-     "zh": "左侧同样，腿伸直，脚尖勾起，背挺直往前"
+     "zh": "左侧同样，腿伸直，脚尖勾起，背挺直往前",
+     "en": "Now the left side. Leg straight, toes up, lean forward with a straight back"
     },
     "ms": {
-     "zh": 4272
+     "zh": 4272,
+     "en": 5108
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，背挺直前倾，大腿后侧拉长"
+     "zh": "放松一下。下一组记住，背挺直前倾，大腿后侧拉长",
+     "en": "Relax for a moment. Next set, remember: Lean forward with a straight back, feel the hamstrings lengthen"
     },
     "ms": {
-     "zh": 5178
+     "zh": 5178,
+     "en": 6780
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "坐姿腘绳肌前伸，完成"
+     "zh": "坐姿腘绳肌前伸，完成",
+     "en": "Seated hamstring stretch, done."
     },
     "ms": {
-     "zh": 2345
+     "zh": 2345,
+     "en": 1881
     }
    }
   ],
@@ -173,6 +191,38 @@
   "demo.mp4": {
    "bytes": 68458,
    "sha256": "47a2459b3d80ae778fb4c025da5e104fda78494e62c92371a49050ad3d7b7afd"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 23670,
+   "sha256": "418da27b3be2817cf9554292bd4efe0ab18952f88c74b3bd8974fdce4700b3bd"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 27766,
+   "sha256": "4c1fe2b9845ad96431dfadd2060650957367b525be2bf3baf8e90ce7dfd6bac7"
+  },
+  "voice/en/cue3.m4a": {
+   "bytes": 27158,
+   "sha256": "9b7374f8fd01756178f2696d2d585702f1ab5fc3e8695f77c85306fc4ca1b5e4"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 16595,
+   "sha256": "71bfbde19042d842149f679f98cfe900dfc47022f44c1eb40786f2e1f0876b8e"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 28665,
+   "sha256": "45060f53e5766329f40a36b30a5e04eb6d90f9d1a2d6df7c1f12c8e2e2f918b5"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 12826,
+   "sha256": "a45d58dd47bc48b3aa76c6bd57399c7520481158a6ebe185e0c6c7eba33c1b19"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 58253,
+   "sha256": "91f81d5f52d3e4076cf4f210ae193be40befae31bc9aed3967f165e165cbbf9a"
+  },
+  "voice/en/side_switch.m4a": {
+   "bytes": 42415,
+   "sha256": "31dc4045683c420919214ceeb913e18c45589ec16c570e762d35b77c7eeccca9"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 17419,

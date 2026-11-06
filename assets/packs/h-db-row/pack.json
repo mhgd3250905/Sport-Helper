@@ -62,10 +62,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -73,80 +75,96 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "扶椅单臂哑铃划船"
+     "zh": "扶椅单臂哑铃划船",
+     "en": "Chair-supported one-arm dumbbell row"
     },
     "ms": {
-     "zh": 1695
+     "zh": 1695,
+     "en": 1811
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "扶椅单臂哑铃划船，练背部和上背"
+     "zh": "扶椅单臂哑铃划船，练背部和上背",
+     "en": "Chair-supported one-arm dumbbell row. Works the back and the upper back."
     },
     "ms": {
-     "zh": 3019
+     "zh": 3019,
+     "en": 4226
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "一手扶椅，背部平直"
+     "zh": "一手扶椅，背部平直",
+     "en": "One hand on the chair, back flat"
     },
     "ms": {
-     "zh": 1997
+     "zh": 1997,
+     "en": 2067
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "背部平直，手肘向后拉到身侧"
+     "zh": "背部平直，手肘向后拉到身侧",
+     "en": "Back flat, pull your elbow back to your side"
     },
     "ms": {
-     "zh": 2833
+     "zh": 2833,
+     "en": 2485
     }
    },
    {
     "id": "cue3",
     "role": "cue",
     "text": {
-     "zh": "肘向后上方拉，肩胛收紧"
+     "zh": "肘向后上方拉，肩胛收紧",
+     "en": "Pull the elbow back and up, squeeze the shoulder blade"
     },
     "ms": {
-     "zh": 2392
+     "zh": 2392,
+     "en": 2647
     }
    },
    {
     "id": "side_switch",
     "role": "side_switch",
     "text": {
-     "zh": "左侧同样，背部平直，手肘向后拉到身侧"
+     "zh": "左侧同样，背部平直，手肘向后拉到身侧",
+     "en": "Now the left side. Back flat, pull your elbow back to your side"
     },
     "ms": {
-     "zh": 3971
+     "zh": 3971,
+     "en": 4435
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，肘向后上方拉，肩胛收紧"
+     "zh": "放松一下。下一组记住，肘向后上方拉，肩胛收紧",
+     "en": "Relax for a moment. Next set, remember: Pull the elbow back and up, squeeze the shoulder blade"
     },
     "ms": {
-     "zh": 4899
+     "zh": 4899,
+     "en": 6293
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "扶椅单臂哑铃划船，完成"
+     "zh": "扶椅单臂哑铃划船，完成",
+     "en": "Chair-supported one-arm dumbbell row, done."
     },
     "ms": {
-     "zh": 2368
+     "zh": 2368,
+     "en": 2392
     }
    }
   ],
@@ -176,6 +194,38 @@
   "demo.mp4": {
    "bytes": 165229,
    "sha256": "c0ae58e17fbf89be3d472cf6f19d0e2f8cb3ed3964d0d7166992d33aa3255d67"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 18057,
+   "sha256": "c1539420f6f29f96d9dd21535274d01668c0d0e71f214aa7c4b7175f3a4df2df"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 21636,
+   "sha256": "fcbec2c7e7054e6b416c0016d8759d04e2b6573076aaa9b2075a988840aa59c4"
+  },
+  "voice/en/cue3.m4a": {
+   "bytes": 22769,
+   "sha256": "5f898dadac80524eb7b262cbe75c529257c808d81990e5e58799d0fcfdbb44aa"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 20826,
+   "sha256": "8136f872c1f25ea9c772fc79c94933f9f39229689420fff85e632f7285390a40"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 33096,
+   "sha256": "eef6068a755399a59bf65c4ceacb11c4db2adc4fbce9a0d224790f17cc6116ae"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 16044,
+   "sha256": "08d1b61d92d6be2ce43d0e09f68b93320b3b0d01d61e43bd5a3324ce15eca859"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 54342,
+   "sha256": "ecbc10feb12c2c458f2811511262d0f783f02b9f955ee9111f3b8498728c92fd"
+  },
+  "voice/en/side_switch.m4a": {
+   "bytes": 39480,
+   "sha256": "39f9d2ba9e273044a9b00188bcdad494fdd28ff8ee84efcd8fc93ee1a4de8490"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 17428,

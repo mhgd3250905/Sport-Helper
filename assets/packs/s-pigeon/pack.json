@@ -60,10 +60,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -71,80 +73,96 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "鸽子式，直立扶砖版"
+     "zh": "鸽子式，直立扶砖版",
+     "en": "Upright pigeon with blocks"
     },
     "ms": {
-     "zh": 1950
+     "zh": 1950,
+     "en": 1486
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "鸽子式，直立扶砖版，拉伸臀部"
+     "zh": "鸽子式，直立扶砖版，拉伸臀部",
+     "en": "Upright pigeon with blocks. Stretches the glutes."
     },
     "ms": {
-     "zh": 3042
+     "zh": 3042,
+     "en": 3506
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "前腿屈膝横放"
+     "zh": "前腿屈膝横放",
+     "en": "Front leg bent across in front of you"
     },
     "ms": {
-     "zh": 1393
+     "zh": 1393,
+     "en": 1811
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "上身立直，手扶砖，髋往下沉"
+     "zh": "上身立直，手扶砖，髋往下沉",
+     "en": "Stay upright, hands on the blocks, sink the hips"
     },
     "ms": {
-     "zh": 3019
+     "zh": 3019,
+     "en": 2949
     }
    },
    {
     "id": "cue3",
     "role": "cue",
     "text": {
-     "zh": "身体前倾，臀部拉长"
+     "zh": "身体前倾，臀部拉长",
+     "en": "Lean forward, feel the glutes lengthen"
     },
     "ms": {
-     "zh": 2090
+     "zh": 2090,
+     "en": 2183
     }
    },
    {
     "id": "side_switch",
     "role": "side_switch",
     "text": {
-     "zh": "左侧同样，上身立直，手扶砖，髋往下沉"
+     "zh": "左侧同样，上身立直，手扶砖，髋往下沉",
+     "en": "Now the left side. Stay upright, hands on the blocks, sink the hips"
     },
     "ms": {
-     "zh": 4040
+     "zh": 4040,
+     "en": 4876
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，身体前倾，臀部拉长"
+     "zh": "放松一下。下一组记住，身体前倾，臀部拉长",
+     "en": "Relax for a moment. Next set, remember: Lean forward, feel the glutes lengthen"
     },
     "ms": {
-     "zh": 4574
+     "zh": 4574,
+     "en": 5759
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "鸽子式，直立扶砖版，完成"
+     "zh": "鸽子式，直立扶砖版，完成",
+     "en": "Upright pigeon with blocks, done."
     },
     "ms": {
-     "zh": 2670
+     "zh": 2670,
+     "en": 1950
     }
    }
   ],
@@ -174,6 +192,38 @@
   "demo.mp4": {
    "bytes": 36503,
    "sha256": "643edb3b66e925db1cb16e668b21a86ea0b41a47011102fde74f991604e19bcc"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 16165,
+   "sha256": "77cd79e0f5b5b0927f1e785ae88c49e73cbcdb81d3a0155ff1a1a3611a9daede"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 26044,
+   "sha256": "33d7f932cd03ba0e7c0cd74f55f4f76401f78183c3fa179e46bcbbcb346a62e1"
+  },
+  "voice/en/cue3.m4a": {
+   "bytes": 19012,
+   "sha256": "b31d53d01f2fb2770ce2e5f9114d2f77ad2109e6ed9da49654f6cc7d69d05288"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 17127,
+   "sha256": "57c175fb96037f2cb226e740fc73e0d83c78dc498c13fd85e1f325248ec891f0"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 27719,
+   "sha256": "9c5cc79feb0635efdc3eef260f09f4a6e30ad669ac7f0b2157e5922ee9792965"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 13324,
+   "sha256": "ea919bfa89a0b145c48d081a09aec49eb280ac319b18d22f0c43d28187182e88"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 49329,
+   "sha256": "4b847aa20e7ac35daa6213743d30e94d5b639f282fd792c05e3c167ed847f3b9"
+  },
+  "voice/en/side_switch.m4a": {
+   "bytes": 43789,
+   "sha256": "9bf98bb55fa55f501ea176ce39a266b33cd3c234bd6afa9dd2beb22d3e199ea2"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 12404,

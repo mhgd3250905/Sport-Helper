@@ -59,10 +59,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -70,60 +72,72 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "徒手深蹲"
+     "zh": "徒手深蹲",
+     "en": "Bodyweight squat"
     },
     "ms": {
-     "zh": 975
+     "zh": 975,
+     "en": 1045
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "徒手深蹲，练大腿前侧和臀部"
+     "zh": "徒手深蹲，练大腿前侧和臀部",
+     "en": "Bodyweight squat. Works the quads and the glutes."
     },
     "ms": {
-     "zh": 2833
+     "zh": 2833,
+     "en": 3483
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "脚略宽于髋，脚尖微外"
+     "zh": "脚略宽于髋，脚尖微外",
+     "en": "Feet a little wider than hips, toes slightly out"
     },
     "ms": {
-     "zh": 2183
+     "zh": 2183,
+     "en": 2577
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "臀部向后下坐，膝盖和脚尖同向"
+     "zh": "臀部向后下坐，膝盖和脚尖同向",
+     "en": "Sit your hips back and down, knees in line with your toes"
     },
     "ms": {
-     "zh": 2972
+     "zh": 2972,
+     "en": 3065
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，臀部向后下坐，膝盖和脚尖同向"
+     "zh": "放松一下。下一组记住，臀部向后下坐，膝盖和脚尖同向",
+     "en": "Relax for a moment. Next set, remember: Sit your hips back and down, knees in line with your toes"
     },
     "ms": {
-     "zh": 5457
+     "zh": 5457,
+     "en": 6711
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "徒手深蹲，完成"
+     "zh": "徒手深蹲，完成",
+     "en": "Bodyweight squat, done."
     },
     "ms": {
-     "zh": 1718
+     "zh": 1718,
+     "en": 1533
     }
    }
   ],
@@ -153,6 +167,30 @@
   "demo.mp4": {
    "bytes": 145953,
    "sha256": "097eb8626455234984caf1a415799ffce68d2928e5923b28ce326e6fe39a8036"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 22269,
+   "sha256": "ecfe913790510b5541b079259d24b636c693da42efc2602dcc5a2a91d20a5966"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 26189,
+   "sha256": "019ed97916c39a7640a9c012e86715f997dc9b001f40d78e2525266cd5608660"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 13772,
+   "sha256": "cf2d64e70e4d73adb1f5fa9697b2de409a82f0957db68b10a47290972cb12bf2"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 30559,
+   "sha256": "d44e8371faf464317a3a8a8c29fab294a46acd68974c761823beb70bb9dcd652"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 9721,
+   "sha256": "b8073e6f71eb0fb515bac3feec9b0844f4397a718a7998f73655f6c1d1e095d9"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 56918,
+   "sha256": "051c3c5f320ccaec54493890f0c443af4d5e23c51509261d76fe75d7fdb673b3"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 18895,

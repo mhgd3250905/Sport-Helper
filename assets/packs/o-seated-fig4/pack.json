@@ -60,10 +60,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -71,70 +73,84 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "坐姿四字前压"
+     "zh": "坐姿四字前压",
+     "en": "Seated figure four stretch"
     },
     "ms": {
-     "zh": 1393
+     "zh": 1393,
+     "en": 1579
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "坐姿四字前压，拉伸臀部"
+     "zh": "坐姿四字前压，拉伸臀部",
+     "en": "Seated figure four stretch. Stretches the glutes."
     },
     "ms": {
-     "zh": 2392
+     "zh": 2392,
+     "en": 3599
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "脚踝搭在膝盖上，背挺直往前压"
+     "zh": "脚踝搭在膝盖上，背挺直往前压",
+     "en": "Ankle on the knee, keep the back straight and lean forward"
     },
     "ms": {
-     "zh": 2879
+     "zh": 2879,
+     "en": 2856
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "背挺直向前倾，臀部拉长"
+     "zh": "背挺直向前倾，臀部拉长",
+     "en": "Lean forward with a straight back, feel the glutes lengthen"
     },
     "ms": {
-     "zh": 2461
+     "zh": 2461,
+     "en": 2972
     }
    },
    {
     "id": "side_switch",
     "role": "side_switch",
     "text": {
-     "zh": "左侧同样，脚踝搭在膝盖上，背挺直往前压"
+     "zh": "左侧同样，脚踝搭在膝盖上，背挺直往前压",
+     "en": "Now the left side. Ankle on the knee, keep the back straight and lean forward"
     },
     "ms": {
-     "zh": 3971
+     "zh": 3971,
+     "en": 4807
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，背挺直向前倾，臀部拉长"
+     "zh": "放松一下。下一组记住，背挺直向前倾，臀部拉长",
+     "en": "Relax for a moment. Next set, remember: Lean forward with a straight back, feel the glutes lengthen"
     },
     "ms": {
-     "zh": 5201
+     "zh": 5201,
+     "en": 6641
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "坐姿四字前压，完成"
+     "zh": "坐姿四字前压，完成",
+     "en": "Seated figure four stretch, done."
     },
     "ms": {
-     "zh": 2090
+     "zh": 2090,
+     "en": 2090
     }
    }
   ],
@@ -164,6 +180,34 @@
   "demo.mp4": {
    "bytes": 90555,
    "sha256": "4d828dac20ceaa03911fdf50578ee12bd29f5430bd8110b6c16fac9c108c5462"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 24640,
+   "sha256": "c2ae825a4a1f12a23d29a29bcecce33ab6a98af98187a8f1bb450e595dd6a3ad"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 25402,
+   "sha256": "ffba9f769e680819a14cd72262886f1856b79cd0a22fe5f4063d3e5d7b1bc2e1"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 18149,
+   "sha256": "8d77c03788ed1681d033c6b06f39741cf96acc57cfad0ba93c5b400bbe34a701"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 27621,
+   "sha256": "6b619b1f4a8b498e0b44ac010d9753ba267009570fe4eaf456a62ce790b0417b"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 13957,
+   "sha256": "8a07902b61e2536874e549cd3fe7e18b0e84f3817c1b2f67b747f5af718f0f53"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 58034,
+   "sha256": "88093aacc7422ed49bd7d2ed76a9ad4589a2241da1f482a8bb252bdf777d8caf"
+  },
+  "voice/en/side_switch.m4a": {
+   "bytes": 38553,
+   "sha256": "bdb42e8544b8c33d1d819bb5a700b9840649886e3f5b5ec9cf13eb755a5a34e7"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 24779,

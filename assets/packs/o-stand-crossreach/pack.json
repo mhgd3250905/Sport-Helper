@@ -58,10 +58,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -69,70 +71,84 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "扶椅站姿交叉侧伸"
+     "zh": "扶椅站姿交叉侧伸",
+     "en": "Chair-supported cross-leg side reach"
     },
     "ms": {
-     "zh": 1741
+     "zh": 1741,
+     "en": 1997
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "扶椅站姿交叉侧伸，拉伸臀部外侧"
+     "zh": "扶椅站姿交叉侧伸，拉伸臀部外侧",
+     "en": "Chair-supported cross-leg side reach. Stretches the outer hips."
     },
     "ms": {
-     "zh": 3158
+     "zh": 3158,
+     "en": 4156
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "一条腿交叉到后面，手臂向上向侧面伸"
+     "zh": "一条腿交叉到后面，手臂向上向侧面伸",
+     "en": "Cross one leg behind, reach your arm up and over to the side"
     },
     "ms": {
-     "zh": 3576
+     "zh": 3576,
+     "en": 3181
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "手臂向侧上方伸，髋外侧拉长"
+     "zh": "手臂向侧上方伸，髋外侧拉长",
+     "en": "Reach up and over, feel the outer hip lengthen"
     },
     "ms": {
-     "zh": 2902
+     "zh": 2902,
+     "en": 2461
     }
    },
    {
     "id": "side_switch",
     "role": "side_switch",
     "text": {
-     "zh": "左侧同样，一条腿交叉到后面，手臂向上向侧面伸"
+     "zh": "左侧同样，一条腿交叉到后面，手臂向上向侧面伸",
+     "en": "Now the left side. Cross one leg behind, reach your arm up and over to the side"
     },
     "ms": {
-     "zh": 4644
+     "zh": 4644,
+     "en": 5108
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，手臂向侧上方伸，髋外侧拉长"
+     "zh": "放松一下。下一组记住，手臂向侧上方伸，髋外侧拉长",
+     "en": "Relax for a moment. Next set, remember: Reach up and over, feel the outer hip lengthen"
     },
     "ms": {
-     "zh": 5433
+     "zh": 5433,
+     "en": 6130
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "扶椅站姿交叉侧伸，完成"
+     "zh": "扶椅站姿交叉侧伸，完成",
+     "en": "Chair-supported cross-leg side reach, done."
     },
     "ms": {
-     "zh": 2461
+     "zh": 2461,
+     "en": 2485
     }
    }
   ],
@@ -162,6 +178,34 @@
   "demo.mp4": {
    "bytes": 60289,
    "sha256": "b68e6bb55a31489b37fe791039b20bcb135331dfeb21ddd91271a308bf698fa6"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 27255,
+   "sha256": "2fd43ee36e83bb0032467c91d52d7ad554e1bd26079ee454b0d157fe93bcdcea"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 21220,
+   "sha256": "455a52048f36622c530d8c479be7b7ff4a245a449b634eebe1c22422a510e435"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 21642,
+   "sha256": "01665131104f95c0297b56bb8194405d5d399c949834c4d49734586ac7691c89"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 31396,
+   "sha256": "adeefbf7f2585f542038931939badf147c5b1a87dcfc4760c90611025ebea77e"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 17529,
+   "sha256": "5a7a5e301d1cb739dfeb17f0c9e05b57ac3c3eb484f3c4277868a921cee4ffdb"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 52298,
+   "sha256": "de243c17c1dbf11d42baf70805f2c894997e46f15ae54def441bb1c2e5d86956"
+  },
+  "voice/en/side_switch.m4a": {
+   "bytes": 44720,
+   "sha256": "bf7a01900cc29cf15d1a1321dda2ac2e4c7cf88a8324ea68154f102f983575c8"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 30362,

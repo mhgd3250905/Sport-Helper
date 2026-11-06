@@ -52,10 +52,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -63,50 +65,60 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "坐姿分腿单腿抬起"
+     "zh": "坐姿分腿单腿抬起",
+     "en": "Seated straddle single-leg lift"
     },
     "ms": {
-     "zh": 1858
+     "zh": 1858,
+     "en": 1834
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "坐姿分腿单腿抬起，练髋前侧"
+     "zh": "坐姿分腿单腿抬起，练髋前侧",
+     "en": "Seated straddle single-leg lift. Works the front of the hips."
     },
     "ms": {
-     "zh": 2972
+     "zh": 2972,
+     "en": 3971
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "分腿坐直，一条腿抬离地面"
+     "zh": "分腿坐直，一条腿抬离地面",
+     "en": "Legs apart, sit tall, lift one leg off the floor"
     },
     "ms": {
-     "zh": 2485
+     "zh": 2485,
+     "en": 3297
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，分腿坐直，一条腿抬离地面"
+     "zh": "放松一下。下一组记住，分腿坐直，一条腿抬离地面",
+     "en": "Relax for a moment. Next set, remember: Legs apart, sit tall, lift one leg off the floor"
     },
     "ms": {
-     "zh": 4992
+     "zh": 4992,
+     "en": 6920
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "坐姿分腿单腿抬起，完成"
+     "zh": "坐姿分腿单腿抬起，完成",
+     "en": "Seated straddle single-leg lift, done."
     },
     "ms": {
-     "zh": 2554
+     "zh": 2554,
+     "en": 2322
     }
    }
   ],
@@ -136,6 +148,26 @@
   "demo.mp4": {
    "bytes": 157863,
    "sha256": "dd05cf9081163b380d73c7f3f672362ed724e89f08c80cdcc1ea786e0465df04"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 28085,
+   "sha256": "e78f1a4e98c8787ed47feda9c021515053bdb090116a4e0196a49822c72fe185"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 20242,
+   "sha256": "e6c07043d36995eb36020efbb5e3584525172dc11c6858d2f64640abff946c05"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 30446,
+   "sha256": "6b4beb635c600d49b4dbc7f3bfc9e9f56ec55d4bf67553a03ac5746aaa6b1f80"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 16260,
+   "sha256": "a845f0d12e3a25586cd5652f73c12ee62da8a574c012843e9585b42f4425cf0f"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 59685,
+   "sha256": "9dd245629caa1f1c8ea81d9600fa878f20eafd8569b86ce2b125c018e6ad7ae1"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 21487,

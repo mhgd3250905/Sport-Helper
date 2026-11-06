@@ -60,10 +60,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -71,60 +73,72 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "俯卧小腿外摆"
+     "zh": "俯卧小腿外摆",
+     "en": "Prone hip internal rotation"
     },
     "ms": {
-     "zh": 1324
+     "zh": 1324,
+     "en": 1602
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "俯卧小腿外摆，活动臀部"
+     "zh": "俯卧小腿外摆，活动臀部",
+     "en": "Prone hip internal rotation. Mobilizes the glutes."
     },
     "ms": {
-     "zh": 2299
+     "zh": 2299,
+     "en": 3715
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "俯卧屈膝 90 度"
+     "zh": "俯卧屈膝 90 度",
+     "en": "Lie face down, knees bent to ninety degrees"
     },
     "ms": {
-     "zh": 1440
+     "zh": 1440,
+     "en": 2601
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "趴着，屈膝，小腿向外侧摆"
+     "zh": "趴着，屈膝，小腿向外侧摆",
+     "en": "Face down, knees bent, swing the shins out to the sides"
     },
     "ms": {
-     "zh": 2763
+     "zh": 2763,
+     "en": 3251
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，趴着，屈膝，小腿向外侧摆"
+     "zh": "放松一下。下一组记住，趴着，屈膝，小腿向外侧摆",
+     "en": "Relax for a moment. Next set, remember: Face down, knees bent, swing the shins out to the sides"
     },
     "ms": {
-     "zh": 5248
+     "zh": 5248,
+     "en": 6920
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "俯卧小腿外摆，完成"
+     "zh": "俯卧小腿外摆，完成",
+     "en": "Prone hip internal rotation, done."
     },
     "ms": {
-     "zh": 1997
+     "zh": 1997,
+     "en": 2067
     }
    }
   ],
@@ -154,6 +168,30 @@
   "demo.mp4": {
    "bytes": 157602,
    "sha256": "b105bf13b45b77cfb601f3255ebbf0bba8e17da9e965576d3f79cd7d3b4da438"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 22867,
+   "sha256": "608a678c3cfcd89f8351aa0677e4b52d2c4d39f48da5e5e5e8cc933c1268888b"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 27810,
+   "sha256": "24895fe2dfc5e5fa90a13405a5d963013b36d0bcbdc1cd279b5a1228aa48bdb8"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 18140,
+   "sha256": "dd62bbbd19942b1ab9f26708e50eb873f8c4b9bd5d524ee69ccc9d9134d75686"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 28669,
+   "sha256": "7df6e79c745051292f34aa32e9a1618bd0b71bb6002c61142d50c681d8529fdf"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 14137,
+   "sha256": "d6cd05301de4a7e9d3affde5913422e65836c4739fcc0de7a90d889a3f7a81b1"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 59649,
+   "sha256": "c15f610a46fec6e36e5aa3f56041e85ad6d17ac27f631a7553b421e11bb17eb6"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 12957,

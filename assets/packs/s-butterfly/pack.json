@@ -56,10 +56,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -67,60 +69,72 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "蝴蝶式"
+     "zh": "蝴蝶式",
+     "en": "Seated butterfly stretch"
     },
     "ms": {
-     "zh": 813
+     "zh": 813,
+     "en": 1486
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "蝴蝶式，拉伸大腿内侧"
+     "zh": "蝴蝶式，拉伸大腿内侧",
+     "en": "Seated butterfly stretch. Stretches the inner thighs."
     },
     "ms": {
-     "zh": 2299
+     "zh": 2299,
+     "en": 3715
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "脚心对脚心，坐直，让膝盖自然落下"
+     "zh": "脚心对脚心，坐直，让膝盖自然落下",
+     "en": "Soles together, sit tall, let the knees drop"
     },
     "ms": {
-     "zh": 3367
+     "zh": 3367,
+     "en": 2786
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "膝盖自然下落，不硬压"
+     "zh": "膝盖自然下落，不硬压",
+     "en": "Let the knees drop on their own, do not force them"
     },
     "ms": {
-     "zh": 2113
+     "zh": 2113,
+     "en": 2554
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，膝盖自然下落，不硬压"
+     "zh": "放松一下。下一组记住，膝盖自然下落，不硬压",
+     "en": "Relax for a moment. Next set, remember: Let the knees drop on their own, do not force them"
     },
     "ms": {
-     "zh": 4574
+     "zh": 4574,
+     "en": 6246
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "蝴蝶式，完成"
+     "zh": "蝴蝶式，完成",
+     "en": "Seated butterfly stretch, done."
     },
     "ms": {
-     "zh": 1533
+     "zh": 1533,
+     "en": 1974
     }
    }
   ],
@@ -150,6 +164,30 @@
   "demo.mp4": {
    "bytes": 115417,
    "sha256": "ca9b14b9fc27abc5c9b4d3b70c5d8fc24c072196d35a14b0ea92296fe977b285"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 23956,
+   "sha256": "e483f2d6958e3b00aa5a886c535816af07aadfd7b9d494b1286326099b732646"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 22136,
+   "sha256": "1ee696e03e4edf763747c5b5e5e1323c37b2e1cb00ac3d4492a3f724200fdc4a"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 17372,
+   "sha256": "c37ba03ee1a51f727f5d1b1c0b2e17e0cddb5acf866c6551433f238ec72635f9"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 29198,
+   "sha256": "9919d3a4b9e53230c7aadf3bfce2ad2d0750561589b90e439afe237b929722da"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 13381,
+   "sha256": "016406d0901dc3ba7233ab87eba5a758b1572506522c2175d7f414c2954191ec"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 53213,
+   "sha256": "568e47ca5df61d152b978f339fa19ce8872074a191e325b969c8a21b59ff820e"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 28769,

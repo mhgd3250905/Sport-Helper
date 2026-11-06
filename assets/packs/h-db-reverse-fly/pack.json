@@ -59,10 +59,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -70,50 +72,60 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "哑铃俯身飞鸟"
+     "zh": "哑铃俯身飞鸟",
+     "en": "Bent-over dumbbell reverse fly"
     },
     "ms": {
-     "zh": 1370
+     "zh": 1370,
+     "en": 1625
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "哑铃俯身飞鸟，练肩膀和上背"
+     "zh": "哑铃俯身飞鸟，练肩膀和上背",
+     "en": "Bent-over dumbbell reverse fly. Works the shoulders and the upper back."
     },
     "ms": {
-     "zh": 2833
+     "zh": 2833,
+     "en": 4249
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "俯身背平，双臂向两侧打开，夹紧肩胛"
+     "zh": "俯身背平，双臂向两侧打开，夹紧肩胛",
+     "en": "Hinge forward with a flat back, open your arms to the sides, squeeze your shoulder blades"
     },
     "ms": {
-     "zh": 3924
+     "zh": 3924,
+     "en": 4574
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，俯身背平，双臂向两侧打开，夹紧肩胛"
+     "zh": "放松一下。下一组记住，俯身背平，双臂向两侧打开，夹紧肩胛",
+     "en": "Relax for a moment. Next set, remember: Hinge forward with a flat back, open your arms to the sides, squeeze your shoulder blades"
     },
     "ms": {
-     "zh": 6432
+     "zh": 6432,
+     "en": 8290
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "哑铃俯身飞鸟，完成"
+     "zh": "哑铃俯身飞鸟，完成",
+     "en": "Bent-over dumbbell reverse fly, done."
     },
     "ms": {
-     "zh": 2113
+     "zh": 2113,
+     "en": 2183
     }
    }
   ],
@@ -143,6 +155,26 @@
   "demo.mp4": {
    "bytes": 124030,
    "sha256": "88bfb5101f2c1af8a7fdc9cf69e18f335f6ac6602071e01f791bea72b349badd"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 38460,
+   "sha256": "e26f0d0e155effe4f2ffb1fad005cb18cf3cc8a033bb3bb2f3b5cf7b7f9971e7"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 19033,
+   "sha256": "5b23df6e658dd0a6c62e5de243cecc7d10b670ca7265849b9f4ef2af6b035821"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 33185,
+   "sha256": "566c8bce1dbc52e6cad201ec2e5fe9ff8eac82344520657db3d34f22f2eb0419"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 14475,
+   "sha256": "cb43de1fe960e023e1f4f508955ceb9e9b4d5d3cce2039e0846026e0c38779da"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 72177,
+   "sha256": "5789294a2e9abc4a6712e11ef52c77cf1236ee8531867f209528b7b1b0c8b552"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 33307,

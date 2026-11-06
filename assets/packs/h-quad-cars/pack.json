@@ -62,10 +62,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -73,80 +75,96 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "四足髋关节画圈"
+     "zh": "四足髋关节画圈",
+     "en": "Quadruped hip circles"
     },
     "ms": {
-     "zh": 1672
+     "zh": 1672,
+     "en": 1393
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "四足髋关节画圈，活动臀部"
+     "zh": "四足髋关节画圈，活动臀部",
+     "en": "Quadruped hip circles. Mobilizes the glutes."
     },
     "ms": {
-     "zh": 2647
+     "zh": 2647,
+     "en": 3529
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "四足支撑，躯干稳定"
+     "zh": "四足支撑，躯干稳定",
+     "en": "On all fours, keep your trunk steady"
     },
     "ms": {
-     "zh": 2020
+     "zh": 2020,
+     "en": 2090
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "四点跪姿，膝盖画一个尽量大的圈，腰不要动"
+     "zh": "四点跪姿，膝盖画一个尽量大的圈，腰不要动",
+     "en": "On all fours, draw a big circle with the knee, keep the low back still"
     },
     "ms": {
-     "zh": 3947
+     "zh": 3947,
+     "en": 3762
     }
    },
    {
     "id": "cue3",
     "role": "cue",
     "text": {
-     "zh": "膝向侧后方慢慢画大圈"
+     "zh": "膝向侧后方慢慢画大圈",
+     "en": "Circle the knee slowly out and back"
     },
     "ms": {
-     "zh": 2322
+     "zh": 2322,
+     "en": 1788
     }
    },
    {
     "id": "side_switch",
     "role": "side_switch",
     "text": {
-     "zh": "左侧同样，四点跪姿，膝盖画一个尽量大的圈，腰不要动"
+     "zh": "左侧同样，四点跪姿，膝盖画一个尽量大的圈，腰不要动",
+     "en": "Now the left side. On all fours, draw a big circle with the knee, keep the low back still"
     },
     "ms": {
-     "zh": 5016
+     "zh": 5016,
+     "en": 5689
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，膝向侧后方慢慢画大圈"
+     "zh": "放松一下。下一组记住，膝向侧后方慢慢画大圈",
+     "en": "Relax for a moment. Next set, remember: Circle the knee slowly out and back"
     },
     "ms": {
-     "zh": 4876
+     "zh": 4876,
+     "en": 5410
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "四足髋关节画圈，完成"
+     "zh": "四足髋关节画圈，完成",
+     "en": "Quadruped hip circles, done."
     },
     "ms": {
-     "zh": 2299
+     "zh": 2299,
+     "en": 1858
     }
    }
   ],
@@ -176,6 +194,38 @@
   "demo.mp4": {
    "bytes": 131629,
    "sha256": "32b5d382419561ed326d760afcf0b18c230bf9d1904fac297436be344b0c3ff7"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 18075,
+   "sha256": "5944d25fe0f945e95125d5dab858086df46d493c53ea4c4b99c6ba8708054454"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 32655,
+   "sha256": "4de9e405a384833ffb84a98f271c2572d5bf8758b2dd1919a573dc9feed52d27"
+  },
+  "voice/en/cue3.m4a": {
+   "bytes": 15901,
+   "sha256": "31a04393af112f834a9a3bbb954aeba9c064fb847bf56cd72092a6776be2914d"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 16380,
+   "sha256": "d1ae3aa15417bf21ecf94e5ca24447b55382dd2af8d4b0481bd2ade211aea98c"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 28639,
+   "sha256": "1e728c814002fb6d9cc29eaa5501c7181e830b59d2ffedf2c26914e7a70f876a"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 12459,
+   "sha256": "17464adc1b0f9081eaab9e4179c29c507665f31fe69d85d278f85145a8a6a420"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 47024,
+   "sha256": "5862112c0050903ff8710ff973af20b1443e0f96906ddb6ef0c364f9e6e2c38b"
+  },
+  "voice/en/side_switch.m4a": {
+   "bytes": 45191,
+   "sha256": "aa959119245b288b07a3a3e1382e989ae5c0a7755e47e77290f5d30936f1510d"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 17746,

@@ -56,10 +56,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -67,70 +69,84 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "站姿侧抬腿"
+     "zh": "站姿侧抬腿",
+     "en": "Standing side leg raise"
     },
     "ms": {
-     "zh": 1207
+     "zh": 1207,
+     "en": 1579
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "站姿侧抬腿，练臀部外侧"
+     "zh": "站姿侧抬腿，练臀部外侧",
+     "en": "Standing side leg raise. Works the outer hips."
     },
     "ms": {
-     "zh": 2461
+     "zh": 2461,
+     "en": 3553
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "身体站直，脚尖朝前"
+     "zh": "身体站直，脚尖朝前",
+     "en": "Stand tall, toes forward"
     },
     "ms": {
-     "zh": 2183
+     "zh": 2183,
+     "en": 1788
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "身体保持直立，腿向侧面抬起再慢慢放下"
+     "zh": "身体保持直立，腿向侧面抬起再慢慢放下",
+     "en": "Stay upright, lift the leg out to the side, then lower slowly"
     },
     "ms": {
-     "zh": 4040
+     "zh": 4040,
+     "en": 3506
     }
    },
    {
     "id": "side_switch",
     "role": "side_switch",
     "text": {
-     "zh": "左侧同样，身体保持直立，腿向侧面抬起再慢慢放下"
+     "zh": "左侧同样，身体保持直立，腿向侧面抬起再慢慢放下",
+     "en": "Now the left side. Stay upright, lift the leg out to the side, then lower slowly"
     },
     "ms": {
-     "zh": 5132
+     "zh": 5132,
+     "en": 5433
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，身体保持直立，腿向侧面抬起再慢慢放下"
+     "zh": "放松一下。下一组记住，身体保持直立，腿向侧面抬起再慢慢放下",
+     "en": "Relax for a moment. Next set, remember: Stay upright, lift the leg out to the side, then lower slowly"
     },
     "ms": {
-     "zh": 6525
+     "zh": 6525,
+     "en": 7129
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "站姿侧抬腿，完成"
+     "zh": "站姿侧抬腿，完成",
+     "en": "Standing side leg raise, done."
     },
     "ms": {
-     "zh": 1904
+     "zh": 1904,
+     "en": 2090
     }
    }
   ],
@@ -160,6 +176,34 @@
   "demo.mp4": {
    "bytes": 52435,
    "sha256": "d04bfa91e859fe593fc7a3e6c24e6789051d7dafdba5463f0ca54acbf034e68e"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 15708,
+   "sha256": "0a91de7338f47e61916a93230ee27df7265a2d7d8485ffabee60afc47ea8951e"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 29786,
+   "sha256": "c9c3646f11653cba5adfa233d0ce0d25c4d1aece5687160fd73dd51e9a60cf83"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 18339,
+   "sha256": "4a5d16b2236064de7f1c395e20e7069a7665e53b3839bc2ba99daae263c6721b"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 27379,
+   "sha256": "6f650220d8d97370a10dd9a4aac6661c74264ea3633d52864fb7552ad9801ae9"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 13963,
+   "sha256": "edd893e42c67aa5f5bb0208d4c557357ed5ca6b8f9674c15b4d4d4d121502af9"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 61358,
+   "sha256": "d602efd00c524611061d70c215dc4ab21db1f861abf0108b347dc7105a33ce83"
+  },
+  "voice/en/side_switch.m4a": {
+   "bytes": 48475,
+   "sha256": "4f669630813e8510451a2ff540ad0535c4ef496e4bec32b192a0e7d7acd4ab7b"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 18984,

@@ -24,6 +24,7 @@ docs/voice-audit-2026-10-18.md), ported unchanged:
 
     PYTHONPATH=/path/to/edge_tts:/path/to/numpy python3 tools/voice/build_voice.py build
     python3 tools/voice/build_voice.py build --budget 100   # stop after ~100 s, re-run to resume
+    python3 tools/voice/build_voice.py build --missing-only --budget 100  # add a new language only
     python3 tools/voice/audit_voice.py --raw                # gate: 0 failures
 
 Then seal the packs: python3 tools/packs/build_packs.py --pubspec pubspec.yaml
@@ -222,6 +223,10 @@ async def render(unique, budget_end):
 
 def cmd_build(a):
     jobs = jobs_from_packs()
+    if a.missing_only:
+        # Add clips that have no file yet (e.g. a new language) without
+        # re-rendering, touching or dropping any existing clip.
+        jobs = [j for j in jobs if not (j[0] / P.voice_file(j[2], j[1])).exists()]
     unique = {}
     for d, lid, lang, text, voice in jobs:
         unique[cache_key(text, voice, RATE[lang])] = (text, voice, RATE[lang])
@@ -255,7 +260,7 @@ def cmd_build(a):
             keep.add(rel)
             total += dst.stat().st_size
         for f in (d / 'voice').rglob('*.m4a'):
-            if f.relative_to(d).as_posix() not in keep:
+            if not a.missing_only and f.relative_to(d).as_posix() not in keep:
                 f.unlink()
         pack['voice']['postProcess'] = (f'HipLab {PROCESS_VERSION}: edge trim, -16 LUFS fixed gain, '
                                         'alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz')
@@ -268,6 +273,8 @@ def main():
     sub = p.add_subparsers(dest='cmd', required=True)
     b = sub.add_parser('build')
     b.add_argument('--budget', type=float, help='seconds of processing before stopping (resume later)')
+    b.add_argument('--missing-only', action='store_true',
+                   help='only render lines whose clip file does not exist yet; keep every existing clip')
     a = p.parse_args()
     {'build': cmd_build}[a.cmd](a)
 

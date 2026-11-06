@@ -56,10 +56,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -67,60 +69,72 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "侧卧蚌式开合"
+     "zh": "侧卧蚌式开合",
+     "en": "Side-lying clamshell"
     },
     "ms": {
-     "zh": 1370
+     "zh": 1370,
+     "en": 1324
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "侧卧蚌式开合，练臀部外侧"
+     "zh": "侧卧蚌式开合，练臀部外侧",
+     "en": "Side-lying clamshell. Works the outer hips."
     },
     "ms": {
-     "zh": 2531
+     "zh": 2531,
+     "en": 3320
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "双脚并拢，上侧膝盖打开，骨盆不后倒"
+     "zh": "双脚并拢，上侧膝盖打开，骨盆不后倒",
+     "en": "Feet together, open the top knee, do not let the pelvis roll back"
     },
     "ms": {
-     "zh": 3576
+     "zh": 3576,
+     "en": 3692
     }
    },
    {
     "id": "side_switch",
     "role": "side_switch",
     "text": {
-     "zh": "左侧同样，双脚并拢，上侧膝盖打开，骨盆不后倒"
+     "zh": "左侧同样，双脚并拢，上侧膝盖打开，骨盆不后倒",
+     "en": "Now the left side. Feet together, open the top knee, do not let the pelvis roll back"
     },
     "ms": {
-     "zh": 4621
+     "zh": 4621,
+     "en": 5642
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，双脚并拢，上侧膝盖打开，骨盆不后倒"
+     "zh": "放松一下。下一组记住，双脚并拢，上侧膝盖打开，骨盆不后倒",
+     "en": "Relax for a moment. Next set, remember: Feet together, open the top knee, do not let the pelvis roll back"
     },
     "ms": {
-     "zh": 6037
+     "zh": 6037,
+     "en": 7430
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "侧卧蚌式开合，完成"
+     "zh": "侧卧蚌式开合，完成",
+     "en": "Side-lying clamshell, done."
     },
     "ms": {
-     "zh": 2020
+     "zh": 2020,
+     "en": 1788
     }
    }
   ],
@@ -150,6 +164,30 @@
   "demo.mp4": {
    "bytes": 91924,
    "sha256": "7766719b950f4bce08f44c300a65c4918edbb8a6c81ab097f6abdf972d365d4f"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 31286,
+   "sha256": "2deed5b2dcdfcc512fcd1a7e2173783608ad97339313c611c4bfc077bfaeb5b5"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 15834,
+   "sha256": "71e04ad50553b64d134a58b920cdda2c20f6f9164223ab13ce4d3a93bf46d338"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 27216,
+   "sha256": "701881af167be1da9549a6066b1a169e528bc1b276a6005ecd5d509440c208a6"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 11985,
+   "sha256": "2af89c2c251945b38a19f7c7c32b89402f20eca583b178b012358b24650fd9f8"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 64611,
+   "sha256": "fd1e87616c72f656f86f3bc7c3b7af938632c88a76d62ea731ec1b6048a237b4"
+  },
+  "voice/en/side_switch.m4a": {
+   "bytes": 46119,
+   "sha256": "c746e1df4b1120b97eb6a73182d46d1049047667e2c6bd0876cf7bc8b5385014"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 30511,

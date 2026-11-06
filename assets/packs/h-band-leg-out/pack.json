@@ -61,10 +61,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -72,70 +74,84 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "仰卧弹力带单腿侧落"
+     "zh": "仰卧弹力带单腿侧落",
+     "en": "Supine band leg lower-out"
     },
     "ms": {
-     "zh": 1881
+     "zh": 1881,
+     "en": 1672
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "仰卧弹力带单腿侧落，拉伸大腿内侧和大腿后侧"
+     "zh": "仰卧弹力带单腿侧落，拉伸大腿内侧和大腿后侧",
+     "en": "Supine band leg lower-out. Stretches the inner thighs and the hamstrings."
     },
     "ms": {
-     "zh": 4598
+     "zh": 4598,
+     "en": 4737
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "弹力带套脚，腿伸直上举"
+     "zh": "弹力带套脚，腿伸直上举",
+     "en": "Band around the foot, raise the straight leg"
     },
     "ms": {
-     "zh": 2438
+     "zh": 2438,
+     "en": 2322
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "腿伸直，慢慢向外侧落下"
+     "zh": "腿伸直，慢慢向外侧落下",
+     "en": "Keep the leg straight and lower it out to the side slowly"
     },
     "ms": {
-     "zh": 2461
+     "zh": 2461,
+     "en": 2624
     }
    },
    {
     "id": "side_switch",
     "role": "side_switch",
     "text": {
-     "zh": "左侧同样，腿伸直，慢慢向外侧落下"
+     "zh": "左侧同样，腿伸直，慢慢向外侧落下",
+     "en": "Now the left side. Keep the leg straight and lower it out to the side slowly"
     },
     "ms": {
-     "zh": 3599
+     "zh": 3599,
+     "en": 4551
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，腿伸直，慢慢向外侧落下"
+     "zh": "放松一下。下一组记住，腿伸直，慢慢向外侧落下",
+     "en": "Relax for a moment. Next set, remember: Keep the leg straight and lower it out to the side slowly"
     },
     "ms": {
-     "zh": 4946
+     "zh": 4946,
+     "en": 6316
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "仰卧弹力带单腿侧落，完成"
+     "zh": "仰卧弹力带单腿侧落，完成",
+     "en": "Supine band leg lower-out, done."
     },
     "ms": {
-     "zh": 2763
+     "zh": 2763,
+     "en": 2113
     }
    }
   ],
@@ -165,6 +181,34 @@
   "demo.mp4": {
    "bytes": 155925,
    "sha256": "bb1fd86b18ada5191001782483af6af1f153cd8e6299b84695124687e6ba7d4a"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 20175,
+   "sha256": "ae97f691424387c51e6569d1a078917875bde7ad36e9890f1820e40bc7854128"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 22634,
+   "sha256": "57978058652f3f9a156aadc960d75ebd03891e7105583b3738a78dea2ef71b7a"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 18503,
+   "sha256": "7ece5e96413597fa5a7debef4bae5e67e3d2b12b63ad6450b9c6c0f997ac77ae"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 36915,
+   "sha256": "a8c46bd8dbc148d9e527005b29c6c53ca231df99634df42b1892bfa25fc027d8"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 14904,
+   "sha256": "53a09bc6a2490bd9ada67ebfebf9299d9a74bdece2a5efe9f59b540299076f23"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 54345,
+   "sha256": "e6bb0946538d814eff7707286c3fbaf6e60c286c6cf612420501dc0982016119"
+  },
+  "voice/en/side_switch.m4a": {
+   "bytes": 35410,
+   "sha256": "e4b622440a8fc88c838b68a804078a5f69ff840de5714db3f6214f63e6ba4fe8"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 21176,

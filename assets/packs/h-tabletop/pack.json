@@ -62,10 +62,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -73,70 +75,84 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "桌面式后撑抬髋"
+     "zh": "桌面式后撑抬髋",
+     "en": "Reverse tabletop bridge"
     },
     "ms": {
-     "zh": 1556
+     "zh": 1556,
+     "en": 1509
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "桌面式后撑抬髋，练胸部和肩膀"
+     "zh": "桌面式后撑抬髋，练胸部和肩膀",
+     "en": "Reverse tabletop bridge. Works the chest and the shoulders."
     },
     "ms": {
-     "zh": 2926
+     "zh": 2926,
+     "en": 4063
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "手在肩后，指尖朝前"
+     "zh": "手在肩后，指尖朝前",
+     "en": "Hands behind your shoulders, fingers forward"
     },
     "ms": {
-     "zh": 2113
+     "zh": 2113,
+     "en": 2345
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "手在肩下，推地把臀部抬到桌面高度"
+     "zh": "手在肩下，推地把臀部抬到桌面高度",
+     "en": "Hands under your shoulders, push the floor and lift your hips to table height"
     },
     "ms": {
-     "zh": 3344
+     "zh": 3344,
+     "en": 3762
     }
    },
    {
     "id": "cue3",
     "role": "cue",
     "text": {
-     "zh": "顶髋成桌面，胸口打开"
+     "zh": "顶髋成桌面，胸口打开",
+     "en": "Lift the hips into a tabletop, open your chest"
     },
     "ms": {
-     "zh": 2229
+     "zh": 2229,
+     "en": 2601
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，顶髋成桌面，胸口打开"
+     "zh": "放松一下。下一组记住，顶髋成桌面，胸口打开",
+     "en": "Relax for a moment. Next set, remember: Lift the hips into a tabletop, open your chest"
     },
     "ms": {
-     "zh": 4760
+     "zh": 4760,
+     "en": 6269
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "桌面式后撑抬髋，完成"
+     "zh": "桌面式后撑抬髋，完成",
+     "en": "Reverse tabletop bridge, done."
     },
     "ms": {
-     "zh": 2252
+     "zh": 2252,
+     "en": 1950
     }
    }
   ],
@@ -166,6 +182,34 @@
   "demo.mp4": {
    "bytes": 127274,
    "sha256": "91ce58eb24f290b68ed2557bd9eab7dcd6c291c521700f272392160fe4e05600"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 20569,
+   "sha256": "159135887309a8b0b1747d689351a100c433364f7d1277e3d36fcac7a25984f2"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 32105,
+   "sha256": "e22df25746d96aee7dde220284606813670224d4e8981b4d676fa33cce309fd7"
+  },
+  "voice/en/cue3.m4a": {
+   "bytes": 22606,
+   "sha256": "52d4f77566ef84195383af7bbf78c3060bdaa48d5efe6784d8a075d81e79a0af"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 17170,
+   "sha256": "4b3193838dfd0e5872c799f62c73f833ac85571da9ea082b87115f3c2fff21e8"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 32460,
+   "sha256": "f4a7034807e8948eaad8312ce007ed2e2f6e2083c15776f93607c25e97b1f7c7"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 13388,
+   "sha256": "2459610107dda55fd61083ee763664bcc83207fee1ecd5750f9ba9143d2ffa25"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 54306,
+   "sha256": "a33cfd161d8abe148cf55c08bd60cd9cb7ea800f56ab5fd6b7596c040bf251ca"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 18504,

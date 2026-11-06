@@ -62,10 +62,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -73,80 +75,96 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "侧卧反向蚌式"
+     "zh": "侧卧反向蚌式",
+     "en": "Side-lying reverse clamshell"
     },
     "ms": {
-     "zh": 1416
+     "zh": 1416,
+     "en": 1625
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "侧卧反向蚌式，练臀部"
+     "zh": "侧卧反向蚌式，练臀部",
+     "en": "Side-lying reverse clamshell. Works the glutes."
     },
     "ms": {
-     "zh": 2299
+     "zh": 2299,
+     "en": 3437
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "侧卧屈膝，膝盖并拢"
+     "zh": "侧卧屈膝，膝盖并拢",
+     "en": "Lie on your side, knees bent and together"
     },
     "ms": {
-     "zh": 1997
+     "zh": 1997,
+     "en": 2485
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "膝盖并拢，小腿慢慢向上抬"
+     "zh": "膝盖并拢，小腿慢慢向上抬",
+     "en": "Knees together, lift the shin up slowly"
     },
     "ms": {
-     "zh": 2670
+     "zh": 2670,
+     "en": 2229
     }
    },
    {
     "id": "cue3",
     "role": "cue",
     "text": {
-     "zh": "小腿向上抬起，做髋内旋"
+     "zh": "小腿向上抬起，做髋内旋",
+     "en": "Lift the shin up to rotate the hip in"
     },
     "ms": {
-     "zh": 2554
+     "zh": 2554,
+     "en": 1881
     }
    },
    {
     "id": "side_switch",
     "role": "side_switch",
     "text": {
-     "zh": "左侧同样，膝盖并拢，小腿慢慢向上抬"
+     "zh": "左侧同样，膝盖并拢，小腿慢慢向上抬",
+     "en": "Now the left side. Knees together, lift the shin up slowly"
     },
     "ms": {
-     "zh": 3785
+     "zh": 3785,
+     "en": 4156
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，小腿向上抬起，做髋内旋"
+     "zh": "放松一下。下一组记住，小腿向上抬起，做髋内旋",
+     "en": "Relax for a moment. Next set, remember: Lift the shin up to rotate the hip in"
     },
     "ms": {
-     "zh": 5062
+     "zh": 5062,
+     "en": 5503
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "侧卧反向蚌式，完成"
+     "zh": "侧卧反向蚌式，完成",
+     "en": "Side-lying reverse clamshell, done."
     },
     "ms": {
-     "zh": 2113
+     "zh": 2113,
+     "en": 2113
     }
    }
   ],
@@ -176,6 +194,38 @@
   "demo.mp4": {
    "bytes": 111722,
    "sha256": "8681cdf3d048329a62b30d36873ce28cd49628fa4731820efd3fefb7be08c0dd"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 21592,
+   "sha256": "2e4ad3597d42812d3a0e3bebd357cd01d93e856eeb9fb3076c57fe6d340037f6"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 19486,
+   "sha256": "0b9a6633d912d06ae989c404dd664df6ec564fe8b5ba49708cae5de85e7510a9"
+  },
+  "voice/en/cue3.m4a": {
+   "bytes": 16666,
+   "sha256": "eb49702b752cc32e8d1427ca1b3f974bab850649c1e810f2eb8a1e66a6b82312"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 18331,
+   "sha256": "6d72a6a7fc1f874d13f9db43a91e4b81bfdd2ac4b7495a0b6122b90cbfa58bf2"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 26177,
+   "sha256": "5871e6c5bd3442b33b81cdfef21ad4c5dba90e69118fd009dccb7560fd5a923a"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 14404,
+   "sha256": "14025d93fba3a88d026592cb5800ab0dbccecbb66c74cc6823a372413a099dda"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 46793,
+   "sha256": "5570339574061116182f05f314b3c4b9ffe12f2f4064e04d882c261291b58cdd"
+  },
+  "voice/en/side_switch.m4a": {
+   "bytes": 36061,
+   "sha256": "ef5ffffe1661257d2b90684d6a1af8933c9af56c75680b600bae59c72a91ab50"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 17536,

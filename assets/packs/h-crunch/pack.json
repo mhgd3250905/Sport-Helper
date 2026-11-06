@@ -59,10 +59,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -70,70 +72,84 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "卷腹"
+     "zh": "卷腹",
+     "en": "Crunch"
     },
     "ms": {
-     "zh": 627
+     "zh": 627,
+     "en": 580
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "卷腹，练腹部"
+     "zh": "卷腹，练腹部",
+     "en": "Crunch. Works the abs."
     },
     "ms": {
-     "zh": 1486
+     "zh": 1486,
+     "en": 2345
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "屈膝仰卧，手轻扶耳侧"
+     "zh": "屈膝仰卧，手轻扶耳侧",
+     "en": "Knees bent, lie on your back, hands lightly by your ears"
     },
     "ms": {
-     "zh": 2183
+     "zh": 2183,
+     "en": 3297
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "下背贴地，用腹部把肩胛卷离地面"
+     "zh": "下背贴地，用腹部把肩胛卷离地面",
+     "en": "Low back on the floor, curl your shoulder blades up with your abs"
     },
     "ms": {
-     "zh": 3158
+     "zh": 3158,
+     "en": 3251
     }
    },
    {
     "id": "cue3",
     "role": "cue",
     "text": {
-     "zh": "用腹部卷起上背，下巴不夹"
+     "zh": "用腹部卷起上背，下巴不夹",
+     "en": "Curl the upper back up with your abs, do not tuck your chin"
     },
     "ms": {
-     "zh": 2415
+     "zh": 2415,
+     "en": 2972
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，用腹部卷起上背，下巴不夹"
+     "zh": "放松一下。下一组记住，用腹部卷起上背，下巴不夹",
+     "en": "Relax for a moment. Next set, remember: Curl the upper back up with your abs, do not tuck your chin"
     },
     "ms": {
-     "zh": 4899
+     "zh": 4899,
+     "en": 6641
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "卷腹，完成"
+     "zh": "卷腹，完成",
+     "en": "Crunch, done."
     },
     "ms": {
-     "zh": 1393
+     "zh": 1393,
+     "en": 1138
     }
    }
   ],
@@ -163,6 +179,34 @@
   "demo.mp4": {
    "bytes": 121994,
    "sha256": "37de3be5589e10ddc9e862614f7eceb2d1bebc011b8f5446f5547ae075f344c2"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 28085,
+   "sha256": "88629fb0f6a0e2769f25185ba114f48329675779077d4c39d36ab8ec27e55549"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 27869,
+   "sha256": "b52f21d9667721be067012ad35aee376467970875f704880efb0e30c132f63c3"
+  },
+  "voice/en/cue3.m4a": {
+   "bytes": 25349,
+   "sha256": "37ffc972f769ee6b825abc392ea8d5406c984254abd2a67bd9b7461d958b1d74"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 10459,
+   "sha256": "1d17a7c681d924a73d087c0eafc4a89a41c07216e0f44d01d4884faccc8dc032"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 20345,
+   "sha256": "a29740c26e859f0d33224419541536023d74557c030b8e4a431c47486d459624"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 5946,
+   "sha256": "2841a5017fbcdb24782747bdb5791ee7fab9e927661bd033d0c41b9d2e184096"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 57395,
+   "sha256": "eb243d7a68846640ecae6a0b6d9b058c4f37697df8eca5af2aa8888dd7c29ce1"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 19094,

@@ -27,850 +27,1032 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "lines": [
    {
     "id": "p.welcome",
     "role": "phrase",
     "text": {
-     "zh": "准备开始训练"
+     "zh": "准备开始训练",
+     "en": "Get ready to train."
     },
     "ms": {
-     "zh": 1254
+     "zh": 1254,
+     "en": 1091
     }
    },
    {
     "id": "p.total",
     "role": "phrase",
     "text": {
-     "zh": "全程大约"
+     "zh": "全程大约",
+     "en": "Total time, about"
     },
     "ms": {
-     "zh": 1045
+     "zh": 1045,
+     "en": 1324
     }
    },
    {
     "id": "p.first",
     "role": "phrase",
     "text": {
-     "zh": "第一个动作"
+     "zh": "第一个动作",
+     "en": "First exercise."
     },
     "ms": {
-     "zh": 952
+     "zh": 952,
+     "en": 1231
     }
    },
    {
     "id": "p.next",
     "role": "phrase",
     "text": {
-     "zh": "下一个动作"
+     "zh": "下一个动作",
+     "en": "Next exercise."
     },
     "ms": {
-     "zh": 1045
+     "zh": 1045,
+     "en": 1277
     }
    },
    {
     "id": "p.go",
     "role": "phrase",
     "text": {
-     "zh": "开始"
+     "zh": "开始",
+     "en": "Start."
     },
     "ms": {
-     "zh": 673
+     "zh": 673,
+     "en": 650
     }
    },
    {
     "id": "p.go_right",
     "role": "phrase",
     "text": {
-     "zh": "先做右侧，开始"
+     "zh": "先做右侧，开始",
+     "en": "Right side. Start."
     },
     "ms": {
-     "zh": 1718
+     "zh": 1718,
+     "en": 2252
     }
    },
    {
     "id": "p.switch_left",
     "role": "phrase",
     "text": {
-     "zh": "换左侧"
+     "zh": "换左侧",
+     "en": "Switch left."
     },
     "ms": {
-     "zh": 813
+     "zh": 813,
+     "en": 882
     }
    },
    {
     "id": "p.rest",
     "role": "phrase",
     "text": {
-     "zh": "休息"
+     "zh": "休息",
+     "en": "Rest."
     },
     "ms": {
-     "zh": 650
+     "zh": 650,
+     "en": 557
     }
    },
    {
     "id": "p.nice",
     "role": "phrase",
     "text": {
-     "zh": "很好"
+     "zh": "很好",
+     "en": "Well done."
     },
     "ms": {
-     "zh": 627
+     "zh": 627,
+     "en": 720
     }
    },
    {
     "id": "p.di",
     "role": "phrase",
     "text": {
-     "zh": "第"
+     "zh": "第",
+     "en": "Number"
     },
     "ms": {
-     "zh": 395
+     "zh": 395,
+     "en": 557
     }
    },
    {
     "id": "p.last_set",
     "role": "phrase",
     "text": {
-     "zh": "最后一组"
+     "zh": "最后一组",
+     "en": "Last set."
     },
     "ms": {
-     "zh": 882
+     "zh": 882,
+     "en": 882
+    }
+   },
+   {
+    "id": "p.last_rep",
+    "role": "phrase",
+    "text": {
+     "zh": "最后一个",
+     "en": "Last one."
+    },
+    "ms": {
+     "zh": 859,
+     "en": 766
     }
    },
    {
     "id": "p.round_done",
     "role": "phrase",
     "text": {
-     "zh": "这一轮完成"
+     "zh": "这一轮完成",
+     "en": "Round complete."
     },
     "ms": {
-     "zh": 1045
+     "zh": 1045,
+     "en": 952
     }
    },
    {
     "id": "p.ten_left",
     "role": "phrase",
     "text": {
-     "zh": "还剩十秒"
+     "zh": "还剩十秒",
+     "en": "Ten seconds left."
     },
     "ms": {
-     "zh": 1022
+     "zh": 1022,
+     "en": 1161
     }
    },
    {
     "id": "p.half",
     "role": "phrase",
     "text": {
-     "zh": "坚持住，已经过半"
+     "zh": "坚持住，已经过半",
+     "en": "Halfway. Keep going."
     },
     "ms": {
-     "zh": 1695
+     "zh": 1695,
+     "en": 2206
     }
    },
    {
     "id": "p.finish",
     "role": "phrase",
     "text": {
-     "zh": "训练完成，做得很好"
+     "zh": "训练完成，做得很好",
+     "en": "Training complete. Well done."
     },
     "ms": {
-     "zh": 2020
+     "zh": 2020,
+     "en": 2554
     }
    },
    {
     "id": "p.per_side",
     "role": "phrase",
     "text": {
-     "zh": "每侧"
+     "zh": "每侧",
+     "en": "per side"
     },
     "ms": {
-     "zh": 673
+     "zh": 673,
+     "en": 743
     }
    },
    {
     "id": "p.resume",
     "role": "phrase",
     "text": {
-     "zh": "继续"
+     "zh": "继续",
+     "en": "Resume."
     },
     "ms": {
-     "zh": 650
+     "zh": 650,
+     "en": 697
     }
    },
    {
     "id": "p.slow",
     "role": "phrase",
     "text": {
-     "zh": "动作放慢，控制节奏"
+     "zh": "动作放慢，控制节奏",
+     "en": "Slow down. Stay in control."
     },
     "ms": {
-     "zh": 1950
+     "zh": 1950,
+     "en": 2624
     }
    },
    {
     "id": "p.paused",
     "role": "phrase",
     "text": {
-     "zh": "已暂停"
+     "zh": "已暂停",
+     "en": "Paused."
     },
     "ms": {
-     "zh": 882
+     "zh": 882,
+     "en": 580
     }
    },
    {
     "id": "u.min",
     "role": "unit",
     "text": {
-     "zh": "分钟"
+     "zh": "分钟",
+     "en": "minutes"
     },
     "ms": {
-     "zh": 580
+     "zh": 580,
+     "en": 650
     }
    },
    {
     "id": "u.sec",
     "role": "unit",
     "text": {
-     "zh": "秒"
+     "zh": "秒",
+     "en": "seconds"
     },
     "ms": {
-     "zh": 441
+     "zh": 441,
+     "en": 743
     }
    },
    {
     "id": "u.reps",
     "role": "unit",
     "text": {
-     "zh": "次"
+     "zh": "次",
+     "en": "repetitions"
     },
     "ms": {
-     "zh": 441
+     "zh": 441,
+     "en": 975
     }
    },
    {
     "id": "u.sets",
     "role": "unit",
     "text": {
-     "zh": "组"
+     "zh": "组",
+     "en": "sets"
     },
     "ms": {
-     "zh": 441
+     "zh": 441,
+     "en": 650
     }
    },
    {
     "id": "u.rounds",
     "role": "unit",
     "text": {
-     "zh": "轮"
+     "zh": "轮",
+     "en": "rounds"
     },
     "ms": {
-     "zh": 441
+     "zh": 441,
+     "en": 604
     }
    },
    {
     "id": "n.1",
     "role": "count",
     "text": {
-     "zh": "一"
+     "zh": "一",
+     "en": "one"
     },
     "ms": {
-     "zh": 395
+     "zh": 395,
+     "en": 488
     }
    },
    {
     "id": "n.2",
     "role": "count",
     "text": {
-     "zh": "二"
+     "zh": "二",
+     "en": "two"
     },
     "ms": {
-     "zh": 418
+     "zh": 418,
+     "en": 488
     }
    },
    {
     "id": "n.3",
     "role": "count",
     "text": {
-     "zh": "三"
+     "zh": "三",
+     "en": "three"
     },
     "ms": {
-     "zh": 464
+     "zh": 464,
+     "en": 464
     }
    },
    {
     "id": "n.4",
     "role": "count",
     "text": {
-     "zh": "四"
+     "zh": "四",
+     "en": "four"
     },
     "ms": {
-     "zh": 488
+     "zh": 488,
+     "en": 557
     }
    },
    {
     "id": "n.5",
     "role": "count",
     "text": {
-     "zh": "五"
+     "zh": "五",
+     "en": "five"
     },
     "ms": {
-     "zh": 418
+     "zh": 418,
+     "en": 580
     }
    },
    {
     "id": "n.6",
     "role": "count",
     "text": {
-     "zh": "六"
+     "zh": "六",
+     "en": "six"
     },
     "ms": {
-     "zh": 441
+     "zh": 441,
+     "en": 627
     }
    },
    {
     "id": "n.7",
     "role": "count",
     "text": {
-     "zh": "七"
+     "zh": "七",
+     "en": "seven"
     },
     "ms": {
-     "zh": 464
+     "zh": 464,
+     "en": 627
     }
    },
    {
     "id": "n.8",
     "role": "count",
     "text": {
-     "zh": "八"
+     "zh": "八",
+     "en": "eight"
     },
     "ms": {
-     "zh": 418
+     "zh": 418,
+     "en": 488
     }
    },
    {
     "id": "n.9",
     "role": "count",
     "text": {
-     "zh": "九"
+     "zh": "九",
+     "en": "nine"
     },
     "ms": {
-     "zh": 418
+     "zh": 418,
+     "en": 557
     }
    },
    {
     "id": "n.10",
     "role": "count",
     "text": {
-     "zh": "十"
+     "zh": "十",
+     "en": "ten"
     },
     "ms": {
-     "zh": 511
+     "zh": 511,
+     "en": 511
     }
    },
    {
     "id": "n.11",
     "role": "count",
     "text": {
-     "zh": "十一"
+     "zh": "十一",
+     "en": "eleven"
     },
     "ms": {
-     "zh": 650
+     "zh": 650,
+     "en": 673
     }
    },
    {
     "id": "n.12",
     "role": "count",
     "text": {
-     "zh": "十二"
+     "zh": "十二",
+     "en": "twelve"
     },
     "ms": {
-     "zh": 627
+     "zh": 627,
+     "en": 580
     }
    },
    {
     "id": "n.13",
     "role": "count",
     "text": {
-     "zh": "十三"
+     "zh": "十三",
+     "en": "thirteen"
     },
     "ms": {
-     "zh": 650
+     "zh": 650,
+     "en": 697
     }
    },
    {
     "id": "n.14",
     "role": "count",
     "text": {
-     "zh": "十四"
+     "zh": "十四",
+     "en": "fourteen"
     },
     "ms": {
-     "zh": 673
+     "zh": 673,
+     "en": 743
     }
    },
    {
     "id": "n.15",
     "role": "count",
     "text": {
-     "zh": "十五"
+     "zh": "十五",
+     "en": "fifteen"
     },
     "ms": {
-     "zh": 673
+     "zh": 673,
+     "en": 697
     }
    },
    {
     "id": "n.16",
     "role": "count",
     "text": {
-     "zh": "十六"
+     "zh": "十六",
+     "en": "sixteen"
     },
     "ms": {
-     "zh": 673
+     "zh": 673,
+     "en": 813
     }
    },
    {
     "id": "n.17",
     "role": "count",
     "text": {
-     "zh": "十七"
+     "zh": "十七",
+     "en": "seventeen"
     },
     "ms": {
-     "zh": 697
+     "zh": 697,
+     "en": 859
     }
    },
    {
     "id": "n.18",
     "role": "count",
     "text": {
-     "zh": "十八"
+     "zh": "十八",
+     "en": "eighteen"
     },
     "ms": {
-     "zh": 627
+     "zh": 627,
+     "en": 650
     }
    },
    {
     "id": "n.19",
     "role": "count",
     "text": {
-     "zh": "十九"
+     "zh": "十九",
+     "en": "nineteen"
     },
     "ms": {
-     "zh": 673
+     "zh": 673,
+     "en": 720
     }
    },
    {
     "id": "n.20",
     "role": "count",
     "text": {
-     "zh": "二十"
+     "zh": "二十",
+     "en": "twenty"
     },
     "ms": {
-     "zh": 650
+     "zh": 650,
+     "en": 580
     }
    },
    {
     "id": "n.21",
     "role": "count",
     "text": {
-     "zh": "二十一"
+     "zh": "二十一",
+     "en": "twenty one"
     },
     "ms": {
-     "zh": 697
+     "zh": 697,
+     "en": 789
     }
    },
    {
     "id": "n.22",
     "role": "count",
     "text": {
-     "zh": "二十二"
+     "zh": "二十二",
+     "en": "twenty two"
     },
     "ms": {
-     "zh": 697
+     "zh": 697,
+     "en": 836
     }
    },
    {
     "id": "n.23",
     "role": "count",
     "text": {
-     "zh": "二十三"
+     "zh": "二十三",
+     "en": "twenty three"
     },
     "ms": {
-     "zh": 743
+     "zh": 743,
+     "en": 859
     }
    },
    {
     "id": "n.24",
     "role": "count",
     "text": {
-     "zh": "二十四"
+     "zh": "二十四",
+     "en": "twenty four"
     },
     "ms": {
-     "zh": 743
+     "zh": 743,
+     "en": 882
     }
    },
    {
     "id": "n.25",
     "role": "count",
     "text": {
-     "zh": "二十五"
+     "zh": "二十五",
+     "en": "twenty five"
     },
     "ms": {
-     "zh": 743
+     "zh": 743,
+     "en": 906
     }
    },
    {
     "id": "n.26",
     "role": "count",
     "text": {
-     "zh": "二十六"
+     "zh": "二十六",
+     "en": "twenty six"
     },
     "ms": {
-     "zh": 743
+     "zh": 743,
+     "en": 952
     }
    },
    {
     "id": "n.27",
     "role": "count",
     "text": {
-     "zh": "二十七"
+     "zh": "二十七",
+     "en": "twenty seven"
     },
     "ms": {
-     "zh": 743
+     "zh": 743,
+     "en": 882
     }
    },
    {
     "id": "n.28",
     "role": "count",
     "text": {
-     "zh": "二十八"
+     "zh": "二十八",
+     "en": "twenty eight"
     },
     "ms": {
-     "zh": 697
+     "zh": 697,
+     "en": 789
     }
    },
    {
     "id": "n.29",
     "role": "count",
     "text": {
-     "zh": "二十九"
+     "zh": "二十九",
+     "en": "twenty nine"
     },
     "ms": {
-     "zh": 766
+     "zh": 766,
+     "en": 859
     }
    },
    {
     "id": "n.30",
     "role": "count",
     "text": {
-     "zh": "三十"
+     "zh": "三十",
+     "en": "thirty"
     },
     "ms": {
-     "zh": 743
+     "zh": 743,
+     "en": 488
     }
    },
    {
     "id": "n.31",
     "role": "count",
     "text": {
-     "zh": "三十一"
+     "zh": "三十一",
+     "en": "thirty one"
     },
     "ms": {
-     "zh": 789
+     "zh": 789,
+     "en": 789
     }
    },
    {
     "id": "n.32",
     "role": "count",
     "text": {
-     "zh": "三十二"
+     "zh": "三十二",
+     "en": "thirty two"
     },
     "ms": {
-     "zh": 766
+     "zh": 766,
+     "en": 813
     }
    },
    {
     "id": "n.33",
     "role": "count",
     "text": {
-     "zh": "三十三"
+     "zh": "三十三",
+     "en": "thirty three"
     },
     "ms": {
-     "zh": 813
+     "zh": 813,
+     "en": 813
     }
    },
    {
     "id": "n.34",
     "role": "count",
     "text": {
-     "zh": "三十四"
+     "zh": "三十四",
+     "en": "thirty four"
     },
     "ms": {
-     "zh": 813
+     "zh": 813,
+     "en": 859
     }
    },
    {
     "id": "n.35",
     "role": "count",
     "text": {
-     "zh": "三十五"
+     "zh": "三十五",
+     "en": "thirty five"
     },
     "ms": {
-     "zh": 813
+     "zh": 813,
+     "en": 882
     }
    },
    {
     "id": "n.36",
     "role": "count",
     "text": {
-     "zh": "三十六"
+     "zh": "三十六",
+     "en": "thirty six"
     },
     "ms": {
-     "zh": 766
+     "zh": 766,
+     "en": 906
     }
    },
    {
     "id": "n.37",
     "role": "count",
     "text": {
-     "zh": "三十七"
+     "zh": "三十七",
+     "en": "thirty seven"
     },
     "ms": {
-     "zh": 813
+     "zh": 813,
+     "en": 859
     }
    },
    {
     "id": "n.38",
     "role": "count",
     "text": {
-     "zh": "三十八"
+     "zh": "三十八",
+     "en": "thirty eight"
     },
     "ms": {
-     "zh": 789
+     "zh": 789,
+     "en": 766
     }
    },
    {
     "id": "n.39",
     "role": "count",
     "text": {
-     "zh": "三十九"
+     "zh": "三十九",
+     "en": "thirty nine"
     },
     "ms": {
-     "zh": 836
+     "zh": 836,
+     "en": 813
     }
    },
    {
     "id": "n.40",
     "role": "count",
     "text": {
-     "zh": "四十"
+     "zh": "四十",
+     "en": "forty"
     },
     "ms": {
-     "zh": 697
+     "zh": 697,
+     "en": 557
     }
    },
    {
     "id": "n.41",
     "role": "count",
     "text": {
-     "zh": "四十一"
+     "zh": "四十一",
+     "en": "forty one"
     },
     "ms": {
-     "zh": 766
+     "zh": 766,
+     "en": 813
     }
    },
    {
     "id": "n.42",
     "role": "count",
     "text": {
-     "zh": "四十二"
+     "zh": "四十二",
+     "en": "forty two"
     },
     "ms": {
-     "zh": 766
+     "zh": 766,
+     "en": 882
     }
    },
    {
     "id": "n.43",
     "role": "count",
     "text": {
-     "zh": "四十三"
+     "zh": "四十三",
+     "en": "forty three"
     },
     "ms": {
-     "zh": 813
+     "zh": 813,
+     "en": 859
     }
    },
    {
     "id": "n.44",
     "role": "count",
     "text": {
-     "zh": "四十四"
+     "zh": "四十四",
+     "en": "forty four"
     },
     "ms": {
-     "zh": 836
+     "zh": 836,
+     "en": 882
     }
    },
    {
     "id": "n.45",
     "role": "count",
     "text": {
-     "zh": "四十五"
+     "zh": "四十五",
+     "en": "forty five"
     },
     "ms": {
-     "zh": 813
+     "zh": 813,
+     "en": 929
     }
    },
    {
     "id": "n.46",
     "role": "count",
     "text": {
-     "zh": "四十六"
+     "zh": "四十六",
+     "en": "forty six"
     },
     "ms": {
-     "zh": 766
+     "zh": 766,
+     "en": 975
     }
    },
    {
     "id": "n.47",
     "role": "count",
     "text": {
-     "zh": "四十七"
+     "zh": "四十七",
+     "en": "forty seven"
     },
     "ms": {
-     "zh": 813
+     "zh": 813,
+     "en": 882
     }
    },
    {
     "id": "n.48",
     "role": "count",
     "text": {
-     "zh": "四十八"
+     "zh": "四十八",
+     "en": "forty eight"
     },
     "ms": {
-     "zh": 789
+     "zh": 789,
+     "en": 836
     }
    },
    {
     "id": "n.49",
     "role": "count",
     "text": {
-     "zh": "四十九"
+     "zh": "四十九",
+     "en": "forty nine"
     },
     "ms": {
-     "zh": 813
+     "zh": 813,
+     "en": 882
     }
    },
    {
     "id": "n.50",
     "role": "count",
     "text": {
-     "zh": "五十"
+     "zh": "五十",
+     "en": "fifty"
     },
     "ms": {
-     "zh": 650
+     "zh": 650,
+     "en": 627
     }
    },
    {
     "id": "n.51",
     "role": "count",
     "text": {
-     "zh": "五十一"
+     "zh": "五十一",
+     "en": "fifty one"
     },
     "ms": {
-     "zh": 697
+     "zh": 697,
+     "en": 813
     }
    },
    {
     "id": "n.52",
     "role": "count",
     "text": {
-     "zh": "五十二"
+     "zh": "五十二",
+     "en": "fifty two"
     },
     "ms": {
-     "zh": 720
+     "zh": 720,
+     "en": 859
     }
    },
    {
     "id": "n.53",
     "role": "count",
     "text": {
-     "zh": "五十三"
+     "zh": "五十三",
+     "en": "fifty three"
     },
     "ms": {
-     "zh": 720
+     "zh": 720,
+     "en": 859
     }
    },
    {
     "id": "n.54",
     "role": "count",
     "text": {
-     "zh": "五十四"
+     "zh": "五十四",
+     "en": "fifty four"
     },
     "ms": {
-     "zh": 720
+     "zh": 720,
+     "en": 906
     }
    },
    {
     "id": "n.55",
     "role": "count",
     "text": {
-     "zh": "五十五"
+     "zh": "五十五",
+     "en": "fifty five"
     },
     "ms": {
-     "zh": 766
+     "zh": 766,
+     "en": 929
     }
    },
    {
     "id": "n.56",
     "role": "count",
     "text": {
-     "zh": "五十六"
+     "zh": "五十六",
+     "en": "fifty six"
     },
     "ms": {
-     "zh": 720
+     "zh": 720,
+     "en": 952
     }
    },
    {
     "id": "n.57",
     "role": "count",
     "text": {
-     "zh": "五十七"
+     "zh": "五十七",
+     "en": "fifty seven"
     },
     "ms": {
-     "zh": 743
+     "zh": 743,
+     "en": 882
     }
    },
    {
     "id": "n.58",
     "role": "count",
     "text": {
-     "zh": "五十八"
+     "zh": "五十八",
+     "en": "fifty eight"
     },
     "ms": {
-     "zh": 697
+     "zh": 697,
+     "en": 789
     }
    },
    {
     "id": "n.59",
     "role": "count",
     "text": {
-     "zh": "五十九"
+     "zh": "五十九",
+     "en": "fifty nine"
     },
     "ms": {
-     "zh": 766
+     "zh": 766,
+     "en": 859
     }
    },
    {
     "id": "n.60",
     "role": "count",
     "text": {
-     "zh": "六十"
+     "zh": "六十",
+     "en": "sixty"
     },
     "ms": {
-     "zh": 673
+     "zh": 673,
+     "en": 697
     }
    }
   ],
@@ -901,6 +1083,346 @@
   "chime/tick.m4a": {
    "bytes": 1767,
    "sha256": "7a872b638edc5989b3f04b7433817579b928b7e32045b7afccec966f3bbd41f7"
+  },
+  "voice/en/n.1.m4a": {
+   "bytes": 4975,
+   "sha256": "7dc423000299c71621d983ce81312fd23b57a05f6e37d5ba63c1e1f74690654c"
+  },
+  "voice/en/n.10.m4a": {
+   "bytes": 5177,
+   "sha256": "98b3e3bffd86b7717cd6f59ac93808f5233e608fa20d1f77401db8487ef95c1b"
+  },
+  "voice/en/n.11.m4a": {
+   "bytes": 6663,
+   "sha256": "7f0284720b60338bd4d36394003ebb56a81e71241ce8110a42f3a39ec7679fff"
+  },
+  "voice/en/n.12.m4a": {
+   "bytes": 5689,
+   "sha256": "24e5c05a9961922909fc7ff32d88c44e7ebc0ba857226630b60031de932d72f9"
+  },
+  "voice/en/n.13.m4a": {
+   "bytes": 6750,
+   "sha256": "c101ef0908f3c41152dbc512e65814a7be02f24abe22c28d3772a4e2d8474a25"
+  },
+  "voice/en/n.14.m4a": {
+   "bytes": 7060,
+   "sha256": "858b26d593a6c553c7b9a5455935c2b70e7e4407f2763c9db2d3f06562753b2a"
+  },
+  "voice/en/n.15.m4a": {
+   "bytes": 6900,
+   "sha256": "acca8d81dc4960122fee592a759958ef760b0cb4b45dde65739465d94644af44"
+  },
+  "voice/en/n.16.m4a": {
+   "bytes": 7795,
+   "sha256": "fb4358b9dc7884a9e3e242652b2e96ae9ca5dd9e8bae38fa247adadffb130288"
+  },
+  "voice/en/n.17.m4a": {
+   "bytes": 8211,
+   "sha256": "e941bbbab052358834f0bbcf4fbeabc60a73d15d21864eac999b3c8364279366"
+  },
+  "voice/en/n.18.m4a": {
+   "bytes": 6332,
+   "sha256": "c5d75bead24808d7cc414ba94fc1a5b9da3eb13c99d261727ca22868acdccb53"
+  },
+  "voice/en/n.19.m4a": {
+   "bytes": 6908,
+   "sha256": "bd9b70f05e5559c21e9b61542736e0969f8ad6a03ebc4fed933ba38173150d1a"
+  },
+  "voice/en/n.2.m4a": {
+   "bytes": 5153,
+   "sha256": "0b2a46269715e05922b818c85fe470bd9c3322d7138c3d532998cbb6899c1307"
+  },
+  "voice/en/n.20.m4a": {
+   "bytes": 5887,
+   "sha256": "b87f0a7ccd8d8ab3df54658bb96b0f1ac1c0e18d830bfeeaa288f00fc32b83f5"
+  },
+  "voice/en/n.21.m4a": {
+   "bytes": 7551,
+   "sha256": "63b9954f012dc93509463f7ed2691ae8c8f29333361e2852c06e57ceb13c97f6"
+  },
+  "voice/en/n.22.m4a": {
+   "bytes": 7971,
+   "sha256": "08a519624c19801fc0060bbdce1404c23be85fcb320fa948ba041c2a1d8c01c2"
+  },
+  "voice/en/n.23.m4a": {
+   "bytes": 8163,
+   "sha256": "9a77350eecade94d76d2fbb51939cb94c2b9e2291aa3bc90df868a6ca7c5cc98"
+  },
+  "voice/en/n.24.m4a": {
+   "bytes": 8386,
+   "sha256": "0e8f320a8c0d02e892f0bcedd3cb5c6bdddba599c0551dc376d475814cd34cbc"
+  },
+  "voice/en/n.25.m4a": {
+   "bytes": 8521,
+   "sha256": "3c82cdfda6ec4711cb3638a0f5131de5edf94dd63cbd9364492e082aeac8ae6b"
+  },
+  "voice/en/n.26.m4a": {
+   "bytes": 8987,
+   "sha256": "bc87b247ce14c511439898934cf1b517f9cc1a3089bb260a8b49bf980decc24e"
+  },
+  "voice/en/n.27.m4a": {
+   "bytes": 8329,
+   "sha256": "9c3490e0658d6cce74d411f12aaa0e73cdc7af6b73021e30571aaa04107720fb"
+  },
+  "voice/en/n.28.m4a": {
+   "bytes": 7593,
+   "sha256": "c13854246b37206a9ffd962c4e8ddee6776a4ffb944c182513bd4081a1410d11"
+  },
+  "voice/en/n.29.m4a": {
+   "bytes": 8044,
+   "sha256": "6b1a138cd6029a04dcc69d8bf38bf197fefe121155393bb2907eb524a5117a50"
+  },
+  "voice/en/n.3.m4a": {
+   "bytes": 4964,
+   "sha256": "8fc5281399f980495a696eff13a5a611869fe52a8d8ac6d72324a7b23612e5cf"
+  },
+  "voice/en/n.30.m4a": {
+   "bytes": 5161,
+   "sha256": "2edc94b076e3f6b177fe83827b886d31f66dbae7e1f379c6d7aab1d45b89485f"
+  },
+  "voice/en/n.31.m4a": {
+   "bytes": 7416,
+   "sha256": "6ac536680f1adefda752293c2d89bfb79c721e1c4c41559fdf5f0ffb84617ff6"
+  },
+  "voice/en/n.32.m4a": {
+   "bytes": 7838,
+   "sha256": "ffc4239bdd0f777193aa913806977771f6f6a89b9a140b7c50c43bde1b9f8ade"
+  },
+  "voice/en/n.33.m4a": {
+   "bytes": 7628,
+   "sha256": "a4aabf306e6e4dfe19e9d85167ca1a72ec0027b6b8eef839e9335920b732fa88"
+  },
+  "voice/en/n.34.m4a": {
+   "bytes": 8010,
+   "sha256": "711f42180a0cd36f0c36841ef5506f4015baaf9510adf3f79d8604e06281b43e"
+  },
+  "voice/en/n.35.m4a": {
+   "bytes": 8200,
+   "sha256": "13b14490fd5118e921f5405dcc8f13ef959efb61724c27536338b0bb14f09076"
+  },
+  "voice/en/n.36.m4a": {
+   "bytes": 8546,
+   "sha256": "1165ae163ff3696a24734c038c5417fb82b5c3beaed27a3f3a848845fe2bf69e"
+  },
+  "voice/en/n.37.m4a": {
+   "bytes": 8052,
+   "sha256": "4461772c6dcf259ac58012bf5e22ab5b16c1c934312c48ab532946e831a22ad7"
+  },
+  "voice/en/n.38.m4a": {
+   "bytes": 7442,
+   "sha256": "9643b291c9f9bbc475f76ab1462a851fd4aabeffc8f0a5d19b560417ae62fd21"
+  },
+  "voice/en/n.39.m4a": {
+   "bytes": 7829,
+   "sha256": "c651b912dc6aaebdef809e8d6463d879c40a2d6ff5f07713a7ef260c8ec31511"
+  },
+  "voice/en/n.4.m4a": {
+   "bytes": 5599,
+   "sha256": "5b4827307428b6cfb1675cae2e529dcccd96afee16836468fe55427992f7e823"
+  },
+  "voice/en/n.40.m4a": {
+   "bytes": 5573,
+   "sha256": "5ca348d7ffd66d91a29824e1d74c8d131973cab8f2bb4753d5a5ba2f41cd838f"
+  },
+  "voice/en/n.41.m4a": {
+   "bytes": 7789,
+   "sha256": "0a55906d7b2e850d6daa5277b8470471c3f10c0214a004f368bbf1c01f38647e"
+  },
+  "voice/en/n.42.m4a": {
+   "bytes": 8219,
+   "sha256": "cdb548c11bcfe697386efecf8c36fba2ffb37e9afcf8a8c594a14a68585e5449"
+  },
+  "voice/en/n.43.m4a": {
+   "bytes": 8212,
+   "sha256": "d62095c81e093750fe9b9d6802c797b8b803a589f515578a4382f9d3ddcee18a"
+  },
+  "voice/en/n.44.m4a": {
+   "bytes": 8508,
+   "sha256": "56bb19b31386a149ad3bf3a4d3798c1fbeaf273c105b210897ce54902f24c97b"
+  },
+  "voice/en/n.45.m4a": {
+   "bytes": 8779,
+   "sha256": "e1c83d96adbe2b18b7193cf0897b39a80b071a2ba759b152287da88b02f27093"
+  },
+  "voice/en/n.46.m4a": {
+   "bytes": 9131,
+   "sha256": "e26e3027ffc862ec53ccd79eb3bb048d34549e0cc4f47556fe09b73415f46939"
+  },
+  "voice/en/n.47.m4a": {
+   "bytes": 8372,
+   "sha256": "7293f302dac8851708ffa2921118df5d08237897a90c55cf49cb8b42e794e191"
+  },
+  "voice/en/n.48.m4a": {
+   "bytes": 7801,
+   "sha256": "10103fe96b2365b816cc4c6950143909907f5cc16a2b3f6f057958e383e14a33"
+  },
+  "voice/en/n.49.m4a": {
+   "bytes": 8376,
+   "sha256": "eaba51f8fcef343f79f3645a308f059af45299b858979fb455b7cae468f32933"
+  },
+  "voice/en/n.5.m4a": {
+   "bytes": 5991,
+   "sha256": "ab49c25f39ece0a40438ad6f64987ddbd9a5dd3a54646e283040893a0bcd6f10"
+  },
+  "voice/en/n.50.m4a": {
+   "bytes": 6323,
+   "sha256": "f51c8bcd93f30d3c28959fd91cae9c6cba788751ca812f37e0f5497aa3551dba"
+  },
+  "voice/en/n.51.m4a": {
+   "bytes": 7813,
+   "sha256": "91ae80d7628a8673dbab89114f41ab6ba9a8c98a7228c922fd62739bd410e3f8"
+  },
+  "voice/en/n.52.m4a": {
+   "bytes": 8247,
+   "sha256": "505d5ddb6c7501dd41279bcd8460f447f52412048d41155fff5e729c9e8a7251"
+  },
+  "voice/en/n.53.m4a": {
+   "bytes": 8211,
+   "sha256": "19588126366784df4aae17bad22342d1ec0e8ceecc0f5a4b813e913bb4132e14"
+  },
+  "voice/en/n.54.m4a": {
+   "bytes": 8569,
+   "sha256": "68773aa8ba220ea3a6bb96733537754076f42c2a6829efdebdf60fb385b5cdcd"
+  },
+  "voice/en/n.55.m4a": {
+   "bytes": 8735,
+   "sha256": "06c42e6177d632301b9f5b79e040c89b7c42d277d4168e07f4fac32968016f29"
+  },
+  "voice/en/n.56.m4a": {
+   "bytes": 8922,
+   "sha256": "6b2971c5b330c45c1e1d1d6817c0739b1a624223db600c491783dd58e716afdb"
+  },
+  "voice/en/n.57.m4a": {
+   "bytes": 8395,
+   "sha256": "6e94d1363b5f0931197afaea3c483182a448e5ca4c89060f10175f3344c2b1f4"
+  },
+  "voice/en/n.58.m4a": {
+   "bytes": 7663,
+   "sha256": "762b68350791a0ccdd8d6f5a0e39d73c4e0b141e2860b65d7c4ed60b82ee13c8"
+  },
+  "voice/en/n.59.m4a": {
+   "bytes": 8152,
+   "sha256": "c72dc5c4c81fa63ab8b200f262680fb97494058ad6cc7a7d801fb654b09b958d"
+  },
+  "voice/en/n.6.m4a": {
+   "bytes": 6189,
+   "sha256": "6a6e73d65fd95d5a354df67281c52baa85bbc5552c85aeee51841654bc9b0af0"
+  },
+  "voice/en/n.60.m4a": {
+   "bytes": 6879,
+   "sha256": "dea1c3f1c5795f72fefdae5421b959904aacb1d4ed32c3f2995461b95092c00e"
+  },
+  "voice/en/n.7.m4a": {
+   "bytes": 6166,
+   "sha256": "114642f3dd21713ccb8fffd316ce13342bd1016ec820cd94be46537fb3b8adcf"
+  },
+  "voice/en/n.8.m4a": {
+   "bytes": 4976,
+   "sha256": "a3cd50c2f3b059718dd1146cbcd70e11540d823be09d15bfaa27563ad60939f3"
+  },
+  "voice/en/n.9.m4a": {
+   "bytes": 5734,
+   "sha256": "4c0b500573af6329591b723b14f0b22b1b2c68018f769f6f8be8a5d3738cce34"
+  },
+  "voice/en/p.di.m4a": {
+   "bytes": 5625,
+   "sha256": "664dd8385c57261f7f6d170f1e4e18c20a44b6de602d3cb8b7a4dd68e2900f1d"
+  },
+  "voice/en/p.finish.m4a": {
+   "bytes": 22066,
+   "sha256": "8bd9c3ac28246303fef527b2cc220e32da693071e346885d6fc204f09ed608e6"
+  },
+  "voice/en/p.first.m4a": {
+   "bytes": 11311,
+   "sha256": "4689edfbb45a9d23b1ef57dab7c8287c641be3a5a2fc4913e56fcab986a2f2af"
+  },
+  "voice/en/p.go.m4a": {
+   "bytes": 6273,
+   "sha256": "0ae662e64dcc0a51ec1139649056c7e0ab916560632561cf43f7b19b7a4c618e"
+  },
+  "voice/en/p.go_right.m4a": {
+   "bytes": 19534,
+   "sha256": "3c9592d7d5bb6f5ba4237e54b7f2b82d6a3081c1d6a7361a432220d829358cfe"
+  },
+  "voice/en/p.half.m4a": {
+   "bytes": 15547,
+   "sha256": "78e1fff91f4787c95195387bbd349f19352a9f37828edd9a6e0937b2900d0cec"
+  },
+  "voice/en/p.last_rep.m4a": {
+   "bytes": 7429,
+   "sha256": "346e9b461dfb63223415998660450a779bb8cad64d790b7dce8b1e56574388c6"
+  },
+  "voice/en/p.last_set.m4a": {
+   "bytes": 8439,
+   "sha256": "ebd6360eee13f5ec6c0c7d93395a38cbc6568c36e076659b858b0c1082d4973a"
+  },
+  "voice/en/p.next.m4a": {
+   "bytes": 11587,
+   "sha256": "404635831cb1d66ecbff92917ef815bbe61403ba37bc3ab7949a0f31ecf1d8a0"
+  },
+  "voice/en/p.nice.m4a": {
+   "bytes": 7086,
+   "sha256": "41d53a0b6c60f367cc0d882962fb2b49142f57548008f3c387c0e741ebe3a0f8"
+  },
+  "voice/en/p.paused.m4a": {
+   "bytes": 5979,
+   "sha256": "b3e2ea7c187203d87a88a739f282aa33e76f1a2b04b33e919e75cac0e01f4046"
+  },
+  "voice/en/p.per_side.m4a": {
+   "bytes": 7076,
+   "sha256": "f04a3775733bcfe10d6b3edc5e4634ccd275ecafe00ef54183ca4b0a3987fd36"
+  },
+  "voice/en/p.rest.m4a": {
+   "bytes": 5749,
+   "sha256": "301838654d75459f6ec9ab0ddaac072430383d52af3777fe71fe478550f68701"
+  },
+  "voice/en/p.resume.m4a": {
+   "bytes": 6752,
+   "sha256": "8bbdaf38f72d783ed130a88acf6a9a7db76109e5f90f389b71c0b62ed2dd3231"
+  },
+  "voice/en/p.round_done.m4a": {
+   "bytes": 8554,
+   "sha256": "267d89b65ad1d6d5659fdb1d651357d54b00217278a47f4bc9803b401315c2f3"
+  },
+  "voice/en/p.slow.m4a": {
+   "bytes": 18853,
+   "sha256": "25ff377e87df1b8c9708e8e71d01abc353af61f0903702e1645fdbba4eff7f2c"
+  },
+  "voice/en/p.switch_left.m4a": {
+   "bytes": 8405,
+   "sha256": "9ee054f6f3251a55b266f974917d8c1006b12f9521c0221fca03c8dbb75e285b"
+  },
+  "voice/en/p.ten_left.m4a": {
+   "bytes": 10792,
+   "sha256": "e43556eff121ecdc75228582c3440bebeb421753585376843f7a1e147cd53b0a"
+  },
+  "voice/en/p.total.m4a": {
+   "bytes": 12001,
+   "sha256": "e66f363a12001b64d24b821678a82cd4e52293a63542f7248eb241938a478e03"
+  },
+  "voice/en/p.welcome.m4a": {
+   "bytes": 10084,
+   "sha256": "3af30025318b02876a9a98be155f7bd0c6cfd5af2fc7fef1b9d5233a4e55423b"
+  },
+  "voice/en/u.min.m4a": {
+   "bytes": 6484,
+   "sha256": "2d7ef0257ed6577240bfa5e28d4307bd9f525de5e9b4dd4d5e9a33ae2594dc1f"
+  },
+  "voice/en/u.reps.m4a": {
+   "bytes": 9159,
+   "sha256": "c578dbdc53dbe0fc98f3f2dfa4317d9b78fcf5216c0b430afa5fdae441fa45a4"
+  },
+  "voice/en/u.rounds.m4a": {
+   "bytes": 6106,
+   "sha256": "c50a5f4cb1cf770ddb472883e9853b2c7bf0d1722400618847b3bf8961d31269"
+  },
+  "voice/en/u.sec.m4a": {
+   "bytes": 7230,
+   "sha256": "2ab43c51531c3499744392a152845a0beccd4f40361996066dbbf9f56480936e"
+  },
+  "voice/en/u.sets.m4a": {
+   "bytes": 6317,
+   "sha256": "46a59dc876b9ccef97ca5ebcdd5590a8b11655b6a46995162a9f4d0a9fb947a7"
   },
   "voice/zh/n.1.m4a": {
    "bytes": 4306,
@@ -1165,6 +1687,10 @@
   "voice/zh/p.half.m4a": {
    "bytes": 14958,
    "sha256": "caa638c7490c55f68a39e208284c7ad7b1f4389dae45831861d7f2dcb6aef978"
+  },
+  "voice/zh/p.last_rep.m4a": {
+   "bytes": 8212,
+   "sha256": "12470ba273ff0b4eb169d3d1a08ccd8990b5cb53fa015c8479b0611024b5903b"
   },
   "voice/zh/p.last_set.m4a": {
    "bytes": 8367,

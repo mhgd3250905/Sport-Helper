@@ -61,10 +61,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -72,60 +74,72 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "站姿哑铃推举"
+     "zh": "站姿哑铃推举",
+     "en": "Standing dumbbell shoulder press"
     },
     "ms": {
-     "zh": 1370
+     "zh": 1370,
+     "en": 1741
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "站姿哑铃推举，练肩膀和手臂后侧"
+     "zh": "站姿哑铃推举，练肩膀和手臂后侧",
+     "en": "Standing dumbbell shoulder press. Works the shoulders and the triceps."
     },
     "ms": {
-     "zh": 3228
+     "zh": 3228,
+     "en": 4365
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "收紧腹部，哑铃从肩旁推到头顶，腰不后仰"
+     "zh": "收紧腹部，哑铃从肩旁推到头顶，腰不后仰",
+     "en": "Brace your abs, press the dumbbells from your shoulders overhead, do not lean back"
     },
     "ms": {
-     "zh": 4017
+     "zh": 4017,
+     "en": 4133
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "哑铃推到头顶正上方"
+     "zh": "哑铃推到头顶正上方",
+     "en": "Press the dumbbells straight overhead"
     },
     "ms": {
-     "zh": 2067
+     "zh": 2067,
+     "en": 1718
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，哑铃推到头顶正上方"
+     "zh": "放松一下。下一组记住，哑铃推到头顶正上方",
+     "en": "Relax for a moment. Next set, remember: Press the dumbbells straight overhead"
     },
     "ms": {
-     "zh": 4365
+     "zh": 4365,
+     "en": 5364
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "站姿哑铃推举，完成"
+     "zh": "站姿哑铃推举，完成",
+     "en": "Standing dumbbell shoulder press, done."
     },
     "ms": {
-     "zh": 2043
+     "zh": 2043,
+     "en": 2252
     }
    }
   ],
@@ -155,6 +169,30 @@
   "demo.mp4": {
    "bytes": 70137,
    "sha256": "ff04092b48507073b08913bf3abee99c36e51adc0887df97076fe50778b5a1c8"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 35266,
+   "sha256": "b8e8b8317bb46df078227f43916887d964b8c3684d794eab8098e949a6804d7d"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 15251,
+   "sha256": "c5ab3b8890ea2895959ac24e43522b80e4bb88b165251942f47c062d176e2e9c"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 19631,
+   "sha256": "4ffec3aa69f8e4e307a65b0eca40091029dda1b6a08c827f4e0cf4c3f06f1bb2"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 33784,
+   "sha256": "b1a916c141755d52b8ec5a46815fd364e8c8c9b3f71b3e011f0e5ddc09d776b5"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 15490,
+   "sha256": "9e60beaef9b0594670753a91381f5c5819e6db6d63c036c30d8ed815eaac92e0"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 46332,
+   "sha256": "8a97a112d72e35dccd872e00b6d71390474b05ac81ed285b6ddb3b09b48b2dbb"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 34108,

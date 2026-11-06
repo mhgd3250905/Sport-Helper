@@ -59,10 +59,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -70,70 +72,84 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "靠墙仰卧 V 字分腿"
+     "zh": "靠墙仰卧 V 字分腿",
+     "en": "Legs up the wall straddle"
     },
     "ms": {
-     "zh": 1765
+     "zh": 1765,
+     "en": 1393
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "靠墙仰卧 V 字分腿，拉伸大腿内侧和大腿后侧"
+     "zh": "靠墙仰卧 V 字分腿，拉伸大腿内侧和大腿后侧",
+     "en": "Legs up the wall straddle. Stretches the inner thighs and the hamstrings."
     },
     "ms": {
-     "zh": 4458
+     "zh": 4458,
+     "en": 4458
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "臀部贴墙，腿靠墙"
+     "zh": "臀部贴墙，腿靠墙",
+     "en": "Hips against the wall, legs up the wall"
     },
     "ms": {
-     "zh": 1950
+     "zh": 1950,
+     "en": 2206
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "腿靠墙，让双腿自然向两侧打开"
+     "zh": "腿靠墙，让双腿自然向两侧打开",
+     "en": "Legs up the wall, let them fall open to the sides"
     },
     "ms": {
-     "zh": 3111
+     "zh": 3111,
+     "en": 2810
     }
    },
    {
     "id": "cue3",
     "role": "cue",
     "text": {
-     "zh": "双腿慢慢分开下落"
+     "zh": "双腿慢慢分开下落",
+     "en": "Let your legs slide apart slowly"
     },
     "ms": {
-     "zh": 1834
+     "zh": 1834,
+     "en": 1858
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，双腿慢慢分开下落"
+     "zh": "放松一下。下一组记住，双腿慢慢分开下落",
+     "en": "Relax for a moment. Next set, remember: Let your legs slide apart slowly"
     },
     "ms": {
-     "zh": 4272
+     "zh": 4272,
+     "en": 5433
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "靠墙仰卧 V 字分腿，完成"
+     "zh": "靠墙仰卧 V 字分腿，完成",
+     "en": "Legs up the wall straddle, done."
     },
     "ms": {
-     "zh": 2531
+     "zh": 2531,
+     "en": 1881
     }
    }
   ],
@@ -163,6 +179,34 @@
   "demo.mp4": {
    "bytes": 156369,
    "sha256": "58e414d18740582f289da225ade1ca6d9411f0bccbc96d74ad531e4fb9f9bfe0"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 19155,
+   "sha256": "6daef695be505b0f5c191bf8588cdcf003c710948fb0e73e37fc815166179256"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 24317,
+   "sha256": "dcc9b6d0735035ec3688d5cf5624c8848750e908c9ee2877efe72f62d12104e5"
+  },
+  "voice/en/cue3.m4a": {
+   "bytes": 16334,
+   "sha256": "d7b3e8befe477e5db13299d2fa3011c42e455fd5ab72966e6de7c35ee0a8d467"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 16586,
+   "sha256": "7bc81462476ab003fd16f828d2630df3920147c8450e121b22c4de55de70360f"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 34377,
+   "sha256": "08e989e948dd8eefeaa0af5f72f779428cbe9d584e8179eb4585385baf524dc0"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 12435,
+   "sha256": "9629af9b5e9a0ba1646f133c4cca0ffe732e7960d4e9c29e7fad18f7411ccc45"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 46188,
+   "sha256": "c00e287b15a2f456ce0e13ed4679742791dca7ca82f01e48bb62d3ef55cbb92a"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 17187,

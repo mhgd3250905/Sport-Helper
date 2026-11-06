@@ -55,10 +55,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -66,60 +68,72 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "滑垫侧向滑"
+     "zh": "滑垫侧向滑",
+     "en": "Slider lateral slide"
     },
     "ms": {
-     "zh": 1207
+     "zh": 1207,
+     "en": 1393
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "滑垫侧向滑，活动大腿内侧"
+     "zh": "滑垫侧向滑，活动大腿内侧",
+     "en": "Slider lateral slide. Mobilizes the inner thighs."
     },
     "ms": {
-     "zh": 2577
+     "zh": 2577,
+     "en": 3785
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "一只脚向侧面滑出去，再收回来"
+     "zh": "一只脚向侧面滑出去，再收回来",
+     "en": "Slide one foot out to the side, then bring it back"
     },
     "ms": {
-     "zh": 2856
+     "zh": 2856,
+     "en": 2717
     }
    },
    {
     "id": "side_switch",
     "role": "side_switch",
     "text": {
-     "zh": "左侧同样，一只脚向侧面滑出去，再收回来"
+     "zh": "左侧同样，一只脚向侧面滑出去，再收回来",
+     "en": "Now the left side. Slide one foot out to the side, then bring it back"
     },
     "ms": {
-     "zh": 3971
+     "zh": 3971,
+     "en": 4644
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，一只脚向侧面滑出去，再收回来"
+     "zh": "放松一下。下一组记住，一只脚向侧面滑出去，再收回来",
+     "en": "Relax for a moment. Next set, remember: Slide one foot out to the side, then bring it back"
     },
     "ms": {
-     "zh": 5317
+     "zh": 5317,
+     "en": 6362
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "滑垫侧向滑，完成"
+     "zh": "滑垫侧向滑，完成",
+     "en": "Slider lateral slide, done."
     },
     "ms": {
-     "zh": 1881
+     "zh": 1881,
+     "en": 1881
     }
    }
   ],
@@ -149,6 +163,30 @@
   "demo.mp4": {
    "bytes": 123783,
    "sha256": "d5499fa9af00855f08e4317ccdafd436273cb765b6e680a59df4c3459e3be82a"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 23830,
+   "sha256": "3f6a21d8f8d094503643420849ddf14b1396ed49285c58efca069115d7ffd660"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 16625,
+   "sha256": "9405c845e48865ea7e88f9cbb82486f9e8772a26ba7ff562797dc95a06aa3a8e"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 30901,
+   "sha256": "766f80a5f9c1033a533e232d5edb04e71c09a500e77fe11e9fe258618f75dbc4"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 12422,
+   "sha256": "bc1584e15aaa83818a70c50adf13fe7f46648a7c69d79e6b11bf86f48a303296"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 54564,
+   "sha256": "4af6e19f32194788fc31fba5f4d319d78fca7fbaa63d78cb397f059b030194a3"
+  },
+  "voice/en/side_switch.m4a": {
+   "bytes": 36776,
+   "sha256": "91bc630fa12e01cfd1f261fc41c8d206e0193e43b4c85848cdf61fd87f69ac06"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 24641,

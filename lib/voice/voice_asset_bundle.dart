@@ -6,6 +6,9 @@ class VoiceAssetBundle {
   VoiceAssetBundle._(this.clips);
 
   static const manifestAsset = 'assets/voice_lc32/v1/manifest.json';
+
+  /// Voice languages SF ships (Chinese since v1, English since 0.1.0+26).
+  static const supportedLanguages = {'zh', 'en'};
   final Map<String, Map<String, VoiceAssetClip>> clips;
 
   factory VoiceAssetBundle.fromJson(Map<String, dynamic> json) {
@@ -31,7 +34,7 @@ class VoiceAssetBundle {
       final ms = entry['decoded_ms'] as int;
       if (!safePack.hasMatch(pack) ||
           !safeLine.hasMatch(line) ||
-          lang != 'zh' ||
+          !supportedLanguages.contains(lang) ||
           asset != 'assets/voice_lc32/v1/$pack/$lang/$line.m4a' ||
           ms <= 0 ||
           (entry['bytes'] as int) <= 0 ||

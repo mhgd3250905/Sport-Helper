@@ -61,10 +61,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -72,70 +74,84 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "椅子保加利亚分腿蹲"
+     "zh": "椅子保加利亚分腿蹲",
+     "en": "Chair Bulgarian split squat"
     },
     "ms": {
-     "zh": 1765
+     "zh": 1765,
+     "en": 1718
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "椅子保加利亚分腿蹲，练大腿前侧和臀部"
+     "zh": "椅子保加利亚分腿蹲，练大腿前侧和臀部",
+     "en": "Chair Bulgarian split squat. Works the quads and the glutes."
     },
     "ms": {
-     "zh": 3646
+     "zh": 3646,
+     "en": 4133
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "后脚搭椅，前膝对准脚尖，身体垂直下沉"
+     "zh": "后脚搭椅，前膝对准脚尖，身体垂直下沉",
+     "en": "Back foot on the chair, front knee over the toes, lower straight down"
     },
     "ms": {
-     "zh": 3878
+     "zh": 3878,
+     "en": 3669
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "身体下沉到前腿大腿接近水平"
+     "zh": "身体下沉到前腿大腿接近水平",
+     "en": "Lower until the front thigh is nearly level"
     },
     "ms": {
-     "zh": 2879
+     "zh": 2879,
+     "en": 2276
     }
    },
    {
     "id": "side_switch",
     "role": "side_switch",
     "text": {
-     "zh": "左侧同样，后脚搭椅，前膝对准脚尖，身体垂直下沉"
+     "zh": "左侧同样，后脚搭椅，前膝对准脚尖，身体垂直下沉",
+     "en": "Now the left side. Back foot on the chair, front knee over the toes, lower straight down"
     },
     "ms": {
-     "zh": 5016
+     "zh": 5016,
+     "en": 5596
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，身体下沉到前腿大腿接近水平"
+     "zh": "放松一下。下一组记住，身体下沉到前腿大腿接近水平",
+     "en": "Relax for a moment. Next set, remember: Lower until the front thigh is nearly level"
     },
     "ms": {
-     "zh": 5317
+     "zh": 5317,
+     "en": 5851
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "椅子保加利亚分腿蹲，完成"
+     "zh": "椅子保加利亚分腿蹲，完成",
+     "en": "Chair Bulgarian split squat, done."
     },
     "ms": {
-     "zh": 2461
+     "zh": 2461,
+     "en": 2206
     }
    }
   ],
@@ -165,6 +181,34 @@
   "demo.mp4": {
    "bytes": 97294,
    "sha256": "571d7683a0625ab9630a8f450b5f23cfed01dfad90c672ffaf7fbbaf6adc7c10"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 31123,
+   "sha256": "24e06f71f17e58d1c79954c974ea45731c3fcf5a8c11b976a323df8f349ee7c0"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 19857,
+   "sha256": "7a78674b2b40aa54cedb0f1c1f819d1da4d20db64df02ca3d979b9a535937476"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 19300,
+   "sha256": "2bc3a02de755f17fd12909a0224844d3e6823955f49d6acf2bde5b8f0a86d4ca"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 31693,
+   "sha256": "e717b004def9b7342805f8993dda16cf8ae39392169362b81cc55258c3e7ae0e"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 15279,
+   "sha256": "5fd63bb44cf7780318732fba93d82ecdec6402301543257c8eae62da028f916a"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 49885,
+   "sha256": "115c932be3d013dd3974aff1a87dfdfeb40b4416437bb7a481f6bb1135eb6be0"
+  },
+  "voice/en/side_switch.m4a": {
+   "bytes": 45400,
+   "sha256": "6e156ae4f5a053237d2d1b2a1d46471ca20f72e9b352e86d68d825e3fdee7542"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 32971,

@@ -57,10 +57,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -68,60 +70,72 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "扶椅背阔肌拉伸"
+     "zh": "扶椅背阔肌拉伸",
+     "en": "Chair-supported lat stretch"
     },
     "ms": {
-     "zh": 1556
+     "zh": 1556,
+     "en": 1556
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "扶椅背阔肌拉伸，拉伸背部"
+     "zh": "扶椅背阔肌拉伸，拉伸背部",
+     "en": "Chair-supported lat stretch. Stretches the back."
     },
     "ms": {
-     "zh": 2577
+     "zh": 2577,
+     "en": 3390
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "双手扶椅，臀部向后推，胸口下沉"
+     "zh": "双手扶椅，臀部向后推，胸口下沉",
+     "en": "Hands on the chair, push your hips back, let your chest sink"
     },
     "ms": {
-     "zh": 3460
+     "zh": 3460,
+     "en": 3367
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "胸口下沉，感觉腋下拉长"
+     "zh": "胸口下沉，感觉腋下拉长",
+     "en": "Chest sinks, feel the stretch under your arms"
     },
     "ms": {
-     "zh": 2485
+     "zh": 2485,
+     "en": 2508
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，胸口下沉，感觉腋下拉长"
+     "zh": "放松一下。下一组记住，胸口下沉，感觉腋下拉长",
+     "en": "Relax for a moment. Next set, remember: Chest sinks, feel the stretch under your arms"
     },
     "ms": {
-     "zh": 4992
+     "zh": 4992,
+     "en": 6130
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "扶椅背阔肌拉伸，完成"
+     "zh": "扶椅背阔肌拉伸，完成",
+     "en": "Chair-supported lat stretch, done."
     },
     "ms": {
-     "zh": 2252
+     "zh": 2252,
+     "en": 1997
     }
    }
   ],
@@ -151,6 +165,30 @@
   "demo.mp4": {
    "bytes": 121828,
    "sha256": "ca61f37bb01507d3f43b5a865026e5bc74622b8c0ca0c6d68f120540c2f717e9"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 28765,
+   "sha256": "fac5509d48fb561706d1adf4575a87cfd9bdeb6c582c8f8e81764e8f67232d1f"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 21629,
+   "sha256": "90497730b3d92d83e4c081751f316578daf75755087d98da8398e17136c06f10"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 17536,
+   "sha256": "a87b2d30d20ae86e991205a467da2fee127652990652fde8f5b0ef182a850c64"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 26163,
+   "sha256": "d6809d7f36798ba53f2da3f4349407fadd3b0f3c5b472f8d5739fa367a52ea09"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 13810,
+   "sha256": "e3dd75fc083b81609b83e928ef96fbcfaeee482b6693f7ab813fe363642b6b19"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 52101,
+   "sha256": "6c3b9ccdc7738a6a8f9c9c1f64b6ac50f00d0dfd2b187bce81ad4177cae6fec8"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 29383,

@@ -60,10 +60,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -71,60 +73,72 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "坐姿扶椅扭转"
+     "zh": "坐姿扶椅扭转",
+     "en": "Seated chair twist"
     },
     "ms": {
-     "zh": 1324
+     "zh": 1324,
+     "en": 1231
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "坐姿扶椅扭转，拉伸腰两侧和下背"
+     "zh": "坐姿扶椅扭转，拉伸腰两侧和下背",
+     "en": "Seated chair twist. Stretches the sides of the waist and the lower back."
     },
     "ms": {
-     "zh": 3135
+     "zh": 3135,
+     "en": 4435
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "坐直，手扶椅背慢慢转身，先长高再转"
+     "zh": "坐直，手扶椅背慢慢转身，先长高再转",
+     "en": "Sit tall, hold the chair back and turn slowly. Grow tall first, then turn"
     },
     "ms": {
-     "zh": 3715
+     "zh": 3715,
+     "en": 5317
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "呼气时向一侧转体"
+     "zh": "呼气时向一侧转体",
+     "en": "Breathe out as you turn to one side"
     },
     "ms": {
-     "zh": 1950
+     "zh": 1950,
+     "en": 1695
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，呼气时向一侧转体"
+     "zh": "放松一下。下一组记住，呼气时向一侧转体",
+     "en": "Relax for a moment. Next set, remember: Breathe out as you turn to one side"
     },
     "ms": {
-     "zh": 4272
+     "zh": 4272,
+     "en": 5294
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "坐姿扶椅扭转，完成"
+     "zh": "坐姿扶椅扭转，完成",
+     "en": "Seated chair twist, done."
     },
     "ms": {
-     "zh": 2020
+     "zh": 2020,
+     "en": 1672
     }
    }
   ],
@@ -154,6 +168,30 @@
   "demo.mp4": {
    "bytes": 71588,
    "sha256": "23443c6adfe81c30bfbf9cc358f9ff7b16b93b5e79b852b1dea6d54840716ac5"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 42011,
+   "sha256": "6eea2aaaaaec6eef5ed8c02d67b9faf4650ac8053c8d3ae940872f16e70f2fa0"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 15019,
+   "sha256": "b10e91816a4d684adc52ac7f42e2e693c0494442fab35781564cd14ae507304d"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 14887,
+   "sha256": "209a0d1fdfcbb86b319e8d05566d93989ff169cc17ab0a3a21b40699f25855f9"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 35014,
+   "sha256": "46cb8efa46f606fe3130523eda789faeca01868af775279b0713a485e7c21e38"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 11105,
+   "sha256": "a17d686205db0116267ca8f4d0081f1bdeb149970a2e1e8ce413a9e4b1240252"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 45278,
+   "sha256": "994d58cdbc99e1e4444918f784d9e54acceb47364e1e08ead50402b4b43d25a2"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 31559,

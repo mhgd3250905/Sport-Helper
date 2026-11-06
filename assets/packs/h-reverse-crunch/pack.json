@@ -59,10 +59,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -70,70 +72,84 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "反向卷腹"
+     "zh": "反向卷腹",
+     "en": "Reverse crunch"
     },
     "ms": {
-     "zh": 998
+     "zh": 998,
+     "en": 998
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "反向卷腹，练腹部"
+     "zh": "反向卷腹，练腹部",
+     "en": "Reverse crunch. Works the abs."
     },
     "ms": {
-     "zh": 1858
+     "zh": 1858,
+     "en": 2763
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "仰卧屈膝抬腿"
+     "zh": "仰卧屈膝抬腿",
+     "en": "Lie on your back, knees bent, legs up"
     },
     "ms": {
-     "zh": 1370
+     "zh": 1370,
+     "en": 2438
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "屈膝把骨盆卷离地面，慢慢放回"
+     "zh": "屈膝把骨盆卷离地面，慢慢放回",
+     "en": "Knees bent, curl your pelvis off the floor, lower slowly"
     },
     "ms": {
-     "zh": 2879
+     "zh": 2879,
+     "en": 3344
     }
    },
    {
     "id": "cue3",
     "role": "cue",
     "text": {
-     "zh": "卷起骨盆，膝向胸口靠近"
+     "zh": "卷起骨盆，膝向胸口靠近",
+     "en": "Curl the pelvis up, knees toward your chest"
     },
     "ms": {
-     "zh": 2415
+     "zh": 2415,
+     "en": 2345
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，卷起骨盆，膝向胸口靠近"
+     "zh": "放松一下。下一组记住，卷起骨盆，膝向胸口靠近",
+     "en": "Relax for a moment. Next set, remember: Curl the pelvis up, knees toward your chest"
     },
     "ms": {
-     "zh": 4923
+     "zh": 4923,
+     "en": 6060
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "反向卷腹，完成"
+     "zh": "反向卷腹，完成",
+     "en": "Reverse crunch, done."
     },
     "ms": {
-     "zh": 1718
+     "zh": 1718,
+     "en": 1533
     }
    }
   ],
@@ -163,6 +179,34 @@
   "demo.mp4": {
    "bytes": 117973,
    "sha256": "b725be639e576f87680bd89af757d80b898ff96b57e026f87778243f98aebecb"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 21187,
+   "sha256": "d63cd081cf48106d5266b24903adf628e088a5eddb7a9d93a76f2c174245a8cb"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 28633,
+   "sha256": "4bca00f6c3875d104176265975e6c4c6126f83b3722c28e8bbd8e4d189be75e5"
+  },
+  "voice/en/cue3.m4a": {
+   "bytes": 20398,
+   "sha256": "009503f591e8757f9022be96f8e58bfa30c206451c77fc028b91c39d11f31798"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 13557,
+   "sha256": "a4f1c1151132554ecef014f9f35fccb50c33def5a66a5d2435bcb1e257c542e0"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 20396,
+   "sha256": "530b250e8ab33c933261b6a11c9a97d7171873339995f8f87998ec0d68a76943"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 9388,
+   "sha256": "0b07929f72fa587d519526fbe0a8a49661d1ddd12b37f8cc3a823bc3c9c93b79"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 52679,
+   "sha256": "a7431da0e2b7c2938e221fb9365b7f51a2470e459101932038ce7494d0c7b244"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 12406,

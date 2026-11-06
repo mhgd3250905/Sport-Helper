@@ -58,10 +58,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -69,60 +71,72 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "椅子臀推"
+     "zh": "椅子臀推",
+     "en": "Chair hip thrust"
     },
     "ms": {
-     "zh": 929
+     "zh": 929,
+     "en": 1068
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "椅子臀推，练臀部"
+     "zh": "椅子臀推，练臀部",
+     "en": "Chair hip thrust. Works the glutes."
     },
     "ms": {
-     "zh": 1811
+     "zh": 1811,
+     "en": 2902
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "上背靠椅边，双脚踩稳"
+     "zh": "上背靠椅边，双脚踩稳",
+     "en": "Upper back on the edge of the chair, feet planted"
     },
     "ms": {
-     "zh": 2252
+     "zh": 2252,
+     "en": 2508
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "上背靠椅沿，臀部推到身体成一条直线"
+     "zh": "上背靠椅沿，臀部推到身体成一条直线",
+     "en": "Upper back on the chair, drive your hips up until your body is in one straight line"
     },
     "ms": {
-     "zh": 3437
+     "zh": 3437,
+     "en": 4110
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，上背靠椅沿，臀部推到身体成一条直线"
+     "zh": "放松一下。下一组记住，上背靠椅沿，臀部推到身体成一条直线",
+     "en": "Relax for a moment. Next set, remember: Upper back on the chair, drive your hips up until your body is in one straight line"
     },
     "ms": {
-     "zh": 5851
+     "zh": 5851,
+     "en": 7779
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "椅子臀推，完成"
+     "zh": "椅子臀推，完成",
+     "en": "Chair hip thrust, done."
     },
     "ms": {
-     "zh": 1672
+     "zh": 1672,
+     "en": 1602
     }
    }
   ],
@@ -152,6 +166,30 @@
   "demo.mp4": {
    "bytes": 96748,
    "sha256": "d271c8a7532d770ef13472df1ca3a69439302687dd85c3bc847ab2be0b37a96e"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 21743,
+   "sha256": "1f0458a848577882ea774b22028a56189cbe14ac7c66772f97cdbf9ebd707cef"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 34697,
+   "sha256": "9e3bbd5522da4ebeb2291acc5c87b1fb17bf3c3509342c4caa65a3358f0b3784"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 14103,
+   "sha256": "81019ac558253dab2771323351316a60b1efad60ab19f0f8feaa77881cba8333"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 25601,
+   "sha256": "192f3bbf23b19a685ca6fb212b145f9f198ad7f172539d6c3052d845e805a55d"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 9928,
+   "sha256": "a8d203f47381fb7aaad24b2fa4c12c49f24164ac85b1246b2c43108b2f18e05c"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 67437,
+   "sha256": "a6a96cbee4cdca4a41ab29eb5994302e1a63b7880d1ce9b0397ea45fb39ef88a"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 19469,

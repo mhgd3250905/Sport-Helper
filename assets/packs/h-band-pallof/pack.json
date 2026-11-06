@@ -56,10 +56,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -67,60 +69,72 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "弹力带抗旋转推"
+     "zh": "弹力带抗旋转推",
+     "en": "Band Pallof press"
     },
     "ms": {
-     "zh": 1509
+     "zh": 1509,
+     "en": 1254
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "弹力带抗旋转推，练腰两侧"
+     "zh": "弹力带抗旋转推，练腰两侧",
+     "en": "Band Pallof press. Works the sides of the waist."
     },
     "ms": {
-     "zh": 2601
+     "zh": 2601,
+     "en": 3599
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "侧对锚点站稳"
+     "zh": "侧对锚点站稳",
+     "en": "Stand side-on to the anchor, feet steady"
     },
     "ms": {
-     "zh": 1347
+     "zh": 1347,
+     "en": 2252
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "双手向前推直，身体不被弹力带拉转"
+     "zh": "双手向前推直，身体不被弹力带拉转",
+     "en": "Press both hands straight out, do not let the band twist you"
     },
     "ms": {
-     "zh": 3390
+     "zh": 3390,
+     "en": 2972
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，双手向前推直，身体不被弹力带拉转"
+     "zh": "放松一下。下一组记住，双手向前推直，身体不被弹力带拉转",
+     "en": "Relax for a moment. Next set, remember: Press both hands straight out, do not let the band twist you"
     },
     "ms": {
-     "zh": 5898
+     "zh": 5898,
+     "en": 6664
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "弹力带抗旋转推，完成"
+     "zh": "弹力带抗旋转推，完成",
+     "en": "Band Pallof press, done."
     },
     "ms": {
-     "zh": 2299
+     "zh": 2299,
+     "en": 1718
     }
    }
   ],
@@ -150,6 +164,30 @@
   "demo.mp4": {
    "bytes": 72448,
    "sha256": "26f532b6abbf2c2d7704e5aa252f53865627a7edbbb75b263bab113b5ec6fc67"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 19632,
+   "sha256": "b8e750b08e237293fd0a35d688da6165a106c833425458d3a28e91edffb9ec69"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 25423,
+   "sha256": "0c559eb4f217dc86ba4ee099218ef95d8ad23874922fe59a8a010f0d77d6a211"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 15136,
+   "sha256": "d9c689bdf7dfb6d16c0c5d09a4ba1f2e38f601611cdee991e9725211b1909f54"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 29727,
+   "sha256": "fbc213a907e753b26d2e6344016a8430c8810ff30f1db57df6cf50a01a26cbb4"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 11525,
+   "sha256": "088c2ff6a5044d0bffa0c0fe8c44a0c1247bfba4e8703d023d21dcd7ff950bde"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 57066,
+   "sha256": "521baee949ecd99e58a6add329d025e17f4101f423f1bdbb43ab3e35feccdc56"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 12179,

@@ -60,10 +60,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -71,60 +73,72 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "椅子上步"
+     "zh": "椅子上步",
+     "en": "Chair step-up"
     },
     "ms": {
-     "zh": 906
+     "zh": 906,
+     "en": 882
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "椅子上步，练大腿前侧和臀部"
+     "zh": "椅子上步，练大腿前侧和臀部",
+     "en": "Chair step-up. Works the quads and the glutes."
     },
     "ms": {
-     "zh": 2763
+     "zh": 2763,
+     "en": 3297
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "整只脚踩稳椅面，用前腿发力站起"
+     "zh": "整只脚踩稳椅面，用前腿发力站起",
+     "en": "Whole foot on the seat, stand up with the front leg"
     },
     "ms": {
-     "zh": 3181
+     "zh": 3181,
+     "en": 2601
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "用前腿蹬起，不靠后脚弹"
+     "zh": "用前腿蹬起，不靠后脚弹",
+     "en": "Drive up with the front leg, do not bounce off the back foot"
     },
     "ms": {
-     "zh": 2415
+     "zh": 2415,
+     "en": 2972
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，用前腿蹬起，不靠后脚弹"
+     "zh": "放松一下。下一组记住，用前腿蹬起，不靠后脚弹",
+     "en": "Relax for a moment. Next set, remember: Drive up with the front leg, do not bounce off the back foot"
     },
     "ms": {
-     "zh": 4899
+     "zh": 4899,
+     "en": 6711
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "椅子上步，完成"
+     "zh": "椅子上步，完成",
+     "en": "Chair step-up, done."
     },
     "ms": {
-     "zh": 1649
+     "zh": 1649,
+     "en": 1370
     }
    }
   ],
@@ -154,6 +168,30 @@
   "demo.mp4": {
    "bytes": 91142,
    "sha256": "ac4e18affe3e909a557f4ec2e6e2451fb47b640783cc79f7a13017f96d926388"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 22496,
+   "sha256": "8e8b02ec9a783b272b3526fab8011fc8ad28e92be84abb3b6ed08500ca84d8da"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 25483,
+   "sha256": "38a52118e00486d1c44c29e6736dba63383804179af2ee43e9abc504ae9f85b9"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 12356,
+   "sha256": "9d79a704deaffe3f530972ed6943f129c053b8a54be81b368700ecd0567530eb"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 24926,
+   "sha256": "d80458d5f37c9fd0fe5954e589ea411e086586cc877151d117747f2796ccbc44"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 8167,
+   "sha256": "5d5dae083e2f98835f3ebfcefa0f5eba3ab6203c8261f56c66408c8e017c3063"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 58311,
+   "sha256": "0f4f79406b2642cfcba217f2d1bbe2cd1e8a7755fd8d7aa22590dad9e897aaaa"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 27227,

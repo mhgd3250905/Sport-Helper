@@ -62,10 +62,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -73,70 +75,84 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "弹力带水平拉开"
+     "zh": "弹力带水平拉开",
+     "en": "Band pull-apart"
     },
     "ms": {
-     "zh": 1533
+     "zh": 1533,
+     "en": 1022
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "弹力带水平拉开，练上背和肩膀"
+     "zh": "弹力带水平拉开，练上背和肩膀",
+     "en": "Band pull-apart. Works the upper back and the shoulders."
     },
     "ms": {
-     "zh": 2902
+     "zh": 2902,
+     "en": 3692
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "双臂前平举握带"
+     "zh": "双臂前平举握带",
+     "en": "Arms straight out in front, hold the band"
     },
     "ms": {
-     "zh": 1556
+     "zh": 1556,
+     "en": 2159
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "手臂伸直与肩同高，把弹力带向两侧拉开"
+     "zh": "手臂伸直与肩同高，把弹力带向两侧拉开",
+     "en": "Arms straight at shoulder height, pull the band apart"
     },
     "ms": {
-     "zh": 3785
+     "zh": 3785,
+     "en": 2624
     }
    },
    {
     "id": "cue3",
     "role": "cue",
     "text": {
-     "zh": "向两侧拉开到胸前，肩不耸"
+     "zh": "向两侧拉开到胸前，肩不耸",
+     "en": "Pull it apart to your chest, shoulders down"
     },
     "ms": {
-     "zh": 2601
+     "zh": 2601,
+     "en": 2392
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，向两侧拉开到胸前，肩不耸"
+     "zh": "放松一下。下一组记住，向两侧拉开到胸前，肩不耸",
+     "en": "Relax for a moment. Next set, remember: Pull it apart to your chest, shoulders down"
     },
     "ms": {
-     "zh": 5108
+     "zh": 5108,
+     "en": 6014
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "弹力带水平拉开，完成"
+     "zh": "弹力带水平拉开，完成",
+     "en": "Band pull-apart, done."
     },
     "ms": {
-     "zh": 2229
+     "zh": 2229,
+     "en": 1533
     }
    }
   ],
@@ -166,6 +182,34 @@
   "demo.mp4": {
    "bytes": 116629,
    "sha256": "b08363a35513cce8718d4453d7d15ee852f60f3f307991054bfc54fdd7d64ae9"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 18967,
+   "sha256": "cfbe6e74b4be7c7e0e81743c2a5749b1b81ad0a4347867c84cee4f2de4d62c2c"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 22731,
+   "sha256": "69f6491a348351964b930a2d08d9bb312f5ffb32bdb94b02e38a4828d2a888e8"
+  },
+  "voice/en/cue3.m4a": {
+   "bytes": 20723,
+   "sha256": "838175cf6998073c059061346118c077ba6539c4059840d5c3fdc0b2d46b3d6d"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 13575,
+   "sha256": "1eefff4ad6530dba193a388f836dbcce57d78cbfa29b8f17bf53b85737531c6c"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 31864,
+   "sha256": "2abde8cfe5693bba9cffdff758c479d096ad8e795db3f0cecbe61157b4b5d00b"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 9575,
+   "sha256": "4186c6339d19f61d807ca895bf202cd153624c054935afbd46c858f19c6e7524"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 51581,
+   "sha256": "acc414c7a780c5617c260518d3d5660335f06a677c10d2752e94e05999d048ae"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 13834,

@@ -56,10 +56,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -67,60 +69,72 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "90 90 后腿主动抬起"
+     "zh": "90 90 后腿主动抬起",
+     "en": "Ninety-ninety rear leg lift-off"
     },
     "ms": {
-     "zh": 2159
+     "zh": 2159,
+     "en": 1811
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "90 90 后腿主动抬起，活动臀部"
+     "zh": "90 90 后腿主动抬起，活动臀部",
+     "en": "Ninety-ninety rear leg lift-off. Mobilizes the glutes."
     },
     "ms": {
-     "zh": 3135
+     "zh": 3135,
+     "en": 3971
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "坐直，后腿膝盖慢慢抬离地面，再慢慢放下"
+     "zh": "坐直，后腿膝盖慢慢抬离地面，再慢慢放下",
+     "en": "Sit tall, lift the back knee slowly, then lower it slowly"
     },
     "ms": {
-     "zh": 4087
+     "zh": 4087,
+     "en": 3506
     }
    },
    {
     "id": "side_switch",
     "role": "side_switch",
     "text": {
-     "zh": "左侧同样，坐直，后腿膝盖慢慢抬离地面，再慢慢放下"
+     "zh": "左侧同样，坐直，后腿膝盖慢慢抬离地面，再慢慢放下",
+     "en": "Now the left side. Sit tall, lift the back knee slowly, then lower it slowly"
     },
     "ms": {
-     "zh": 5155
+     "zh": 5155,
+     "en": 5410
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，坐直，后腿膝盖慢慢抬离地面，再慢慢放下"
+     "zh": "放松一下。下一组记住，坐直，后腿膝盖慢慢抬离地面，再慢慢放下",
+     "en": "Relax for a moment. Next set, remember: Sit tall, lift the back knee slowly, then lower it slowly"
     },
     "ms": {
-     "zh": 6571
+     "zh": 6571,
+     "en": 7105
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "90 90 后腿主动抬起，完成"
+     "zh": "90 90 后腿主动抬起，完成",
+     "en": "Ninety-ninety rear leg lift-off, done."
     },
     "ms": {
-     "zh": 2810
+     "zh": 2810,
+     "en": 2276
     }
    }
   ],
@@ -150,6 +164,30 @@
   "demo.mp4": {
    "bytes": 93262,
    "sha256": "14fb61e05b3edb5b477e5a9da5a6c615c70923dd2d7a7e23072b46383c1599ed"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 29784,
+   "sha256": "c46e66084ae364692993fe5557d08981428284cdbd95f6f05bd0d4947da05949"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 19863,
+   "sha256": "8c80f1682dfbddb2c984c4e480903b3a20064c0daf34395774d7cfcb331b9273"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 30258,
+   "sha256": "1e20320bec25261250b46ad589f80982882e2374d56271151818f685ee726627"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 16037,
+   "sha256": "e3ce730a84d26ffd7f00d87acf786aa03d4babadbbb2a7087805f2a546caf630"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 60218,
+   "sha256": "86d11d87faaa52fc244bbb01aa893e1f1b659ca0fd9c18dc2428d1a35808e873"
+  },
+  "voice/en/side_switch.m4a": {
+   "bytes": 47481,
+   "sha256": "05a3dbfff7349502792c84b1c0c7854f86f22cc0f26d4a24c1e0339e4e17a5e3"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 34521,

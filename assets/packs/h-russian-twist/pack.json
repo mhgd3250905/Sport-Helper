@@ -59,10 +59,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -70,70 +72,84 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "俄罗斯转体"
+     "zh": "俄罗斯转体",
+     "en": "Russian twist, feet down"
     },
     "ms": {
-     "zh": 1115
+     "zh": 1115,
+     "en": 1718
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "俄罗斯转体，练腰两侧"
+     "zh": "俄罗斯转体，练腰两侧",
+     "en": "Russian twist, feet down. Works the sides of the waist."
     },
     "ms": {
-     "zh": 2183
+     "zh": 2183,
+     "en": 3994
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "坐姿后倾，脚着地"
+     "zh": "坐姿后倾，脚着地",
+     "en": "Sit and lean back, feet on the floor"
     },
     "ms": {
-     "zh": 1834
+     "zh": 1834,
+     "en": 2113
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "上身微后仰，背挺直，左右转动肩膀"
+     "zh": "上身微后仰，背挺直，左右转动肩膀",
+     "en": "Lean back a little, back straight, turn your shoulders side to side"
     },
     "ms": {
-     "zh": 3413
+     "zh": 3413,
+     "en": 3483
     }
    },
    {
     "id": "cue3",
     "role": "cue",
     "text": {
-     "zh": "左右转动上身，骨盆稳定"
+     "zh": "左右转动上身，骨盆稳定",
+     "en": "Turn the upper body side to side, keep the pelvis still"
     },
     "ms": {
-     "zh": 2392
+     "zh": 2392,
+     "en": 2972
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，左右转动上身，骨盆稳定"
+     "zh": "放松一下。下一组记住，左右转动上身，骨盆稳定",
+     "en": "Relax for a moment. Next set, remember: Turn the upper body side to side, keep the pelvis still"
     },
     "ms": {
-     "zh": 4923
+     "zh": 4923,
+     "en": 6687
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "俄罗斯转体，完成"
+     "zh": "俄罗斯转体，完成",
+     "en": "Russian twist, feet down, done."
     },
     "ms": {
-     "zh": 1858
+     "zh": 1858,
+     "en": 2206
     }
    }
   ],
@@ -163,6 +179,34 @@
   "demo.mp4": {
    "bytes": 165529,
    "sha256": "0268a87968bf16780cd09100dbf55ec75ad6f8e8fb267e2ff41befff9c715553"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 18502,
+   "sha256": "32f319cf3af03d2222bd7c94a42efe8a5abcb1fb48df74a07b669d78f23fe389"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 29655,
+   "sha256": "da0e3eccd8b628cb7bd72ab578ac9a5396ca9d01a9afa7c2ec0f36805a0b9e8b"
+  },
+  "voice/en/cue3.m4a": {
+   "bytes": 25642,
+   "sha256": "df86a45db58547bdb871cd57a268aea733f98619115cf8a85e5aaad364c4bae2"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 19180,
+   "sha256": "2ebd0437d1e5d618f97e44a5deccb86522a9a5483b00b57d3a93e889b56024b0"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 30450,
+   "sha256": "61937dd5106c27a6c04c6f003a7ec713028786e4fce5e538b99148db5cc5cf34"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 15114,
+   "sha256": "60169be3b145c0cfc739c3f95e3ff4c8ee0a825cf7289a08542247630473d61c"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 57674,
+   "sha256": "ebc665d9098e412e55e92d050873df5ee48c8932c36157a301f514c7e214b62f"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 16131,

@@ -56,10 +56,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -67,50 +69,60 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "靠墙勾脚尖"
+     "zh": "靠墙勾脚尖",
+     "en": "Wall tibialis raise"
     },
     "ms": {
-     "zh": 1231
+     "zh": 1231,
+     "en": 1324
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "靠墙勾脚尖，练小腿前侧"
+     "zh": "靠墙勾脚尖，练小腿前侧",
+     "en": "Wall tibialis raise. Works the shins."
     },
     "ms": {
-     "zh": 2461
+     "zh": 2461,
+     "en": 3204
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "背靠墙，脚尖勾起再放下，脚跟不离地"
+     "zh": "背靠墙，脚尖勾起再放下，脚跟不离地",
+     "en": "Back against the wall, lift your toes and lower them, heels stay down"
     },
     "ms": {
-     "zh": 3367
+     "zh": 3367,
+     "en": 3785
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，背靠墙，脚尖勾起再放下，脚跟不离地"
+     "zh": "放松一下。下一组记住，背靠墙，脚尖勾起再放下，脚跟不离地",
+     "en": "Relax for a moment. Next set, remember: Back against the wall, lift your toes and lower them, heels stay down"
     },
     "ms": {
-     "zh": 5782
+     "zh": 5782,
+     "en": 7477
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "靠墙勾脚尖，完成"
+     "zh": "靠墙勾脚尖，完成",
+     "en": "Wall tibialis raise, done."
     },
     "ms": {
-     "zh": 1927
+     "zh": 1927,
+     "en": 1834
     }
    }
   ],
@@ -140,6 +152,26 @@
   "demo.mp4": {
    "bytes": 76267,
    "sha256": "6a672dd700a666139e44a6ee61f462ebeda7f97a5519c528c3dc182bef702bb5"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 32249,
+   "sha256": "ffaf13366afb846be03aa5265def0aa1af1be5731dd14e16b8e1089e80da1f46"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 16171,
+   "sha256": "3d543677ea5744fa87ffdf28f9d202880cddf474c76bb3f6902a0b88001888ce"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 25693,
+   "sha256": "1c5485431ca21034aeea6a04e05d7fbd0127fff2b53e77f9bfab8080bbdb58ce"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 12093,
+   "sha256": "229358746c7d8fee3e673a2b86af84ab8e95def7e925b68ef043e61f473e1ccf"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 64168,
+   "sha256": "d8072e94ef83ebe98f4139dcd7852cf69cc2edfc3d144ee40bf9dfd64d19ad12"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 28604,

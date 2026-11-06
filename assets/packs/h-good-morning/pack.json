@@ -59,10 +59,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -70,60 +72,72 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "徒手早安式"
+     "zh": "徒手早安式",
+     "en": "Bodyweight good morning"
     },
     "ms": {
-     "zh": 1161
+     "zh": 1161,
+     "en": 1207
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "徒手早安式，练大腿后侧和下背"
+     "zh": "徒手早安式，练大腿后侧和下背",
+     "en": "Bodyweight good morning. Works the hamstrings and the lower back."
     },
     "ms": {
-     "zh": 2972
+     "zh": 2972,
+     "en": 3971
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "微屈膝，臀部向后推"
+     "zh": "微屈膝，臀部向后推",
+     "en": "Knees soft, push your hips back"
     },
     "ms": {
-     "zh": 2067
+     "zh": 2067,
+     "en": 1927
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "背挺直，臀部向后推，感到大腿后侧拉紧再起身"
+     "zh": "背挺直，臀部向后推，感到大腿后侧拉紧再起身",
+     "en": "Back straight, push your hips back until the hamstrings feel tight, then stand up"
     },
     "ms": {
-     "zh": 4435
+     "zh": 4435,
+     "en": 4203
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，背挺直，臀部向后推，感到大腿后侧拉紧再起身"
+     "zh": "放松一下。下一组记住，背挺直，臀部向后推，感到大腿后侧拉紧再起身",
+     "en": "Relax for a moment. Next set, remember: Back straight, push your hips back until the hamstrings feel tight, then stand up"
     },
     "ms": {
-     "zh": 6896
+     "zh": 6896,
+     "en": 7918
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "徒手早安式，完成"
+     "zh": "徒手早安式，完成",
+     "en": "Bodyweight good morning, done."
     },
     "ms": {
-     "zh": 1834
+     "zh": 1834,
+     "en": 1695
     }
    }
   ],
@@ -153,6 +167,30 @@
   "demo.mp4": {
    "bytes": 107469,
    "sha256": "58014cb56080b560f9e112db265cb8fc64fb352c59d913c04e87cb36da85cc41"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 16845,
+   "sha256": "9a4462adf13be6ba878e7bc3c3a1857c280764e4a0624d241d1ca0e32364f441"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 35530,
+   "sha256": "b14d44e0b02b8f6a2fa80c06c7877f574d581a4a5c66f9b140c109005f6fa38f"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 15060,
+   "sha256": "d2e6bd4f382e814a840b325c58452050722f58fea8f60735b4da4607258cddb7"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 34076,
+   "sha256": "578afd8f61941cdd30bf83b70eb8a44bf6dad0c0419ddae471958e615596a886"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 10918,
+   "sha256": "0a5b8c47daaa022a1f4198dd804ba9c2ffcaf0cdc76401aba6e0befe393ea916"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 69541,
+   "sha256": "661dcf5aa037b54d48fcd14f411370a298a1d220a450effed424e4f439c5b235"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 17978,

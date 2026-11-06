@@ -60,10 +60,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -71,80 +73,96 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "俯卧屈膝抬腿"
+     "zh": "俯卧屈膝抬腿",
+     "en": "Prone bent-knee hip extension"
     },
     "ms": {
-     "zh": 1370
+     "zh": 1370,
+     "en": 1556
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "俯卧屈膝抬腿，练臀部"
+     "zh": "俯卧屈膝抬腿，练臀部",
+     "en": "Prone bent-knee hip extension. Works the glutes."
     },
     "ms": {
-     "zh": 2159
+     "zh": 2159,
+     "en": 3344
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "俯卧，一腿屈膝"
+     "zh": "俯卧，一腿屈膝",
+     "en": "Lie face down, one knee bent"
     },
     "ms": {
-     "zh": 1649
+     "zh": 1649,
+     "en": 1811
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "趴着，屈膝，大腿慢慢抬离地面"
+     "zh": "趴着，屈膝，大腿慢慢抬离地面",
+     "en": "Face down, knee bent, lift the thigh slowly off the floor"
     },
     "ms": {
-     "zh": 3135
+     "zh": 3135,
+     "en": 3297
     }
    },
    {
     "id": "cue3",
     "role": "cue",
     "text": {
-     "zh": "脚底推向天花板，臀部收紧"
+     "zh": "脚底推向天花板，臀部收紧",
+     "en": "Push the sole toward the ceiling, squeeze your glutes"
     },
     "ms": {
-     "zh": 2624
+     "zh": 2624,
+     "en": 2670
     }
    },
    {
     "id": "side_switch",
     "role": "side_switch",
     "text": {
-     "zh": "左侧同样，趴着，屈膝，大腿慢慢抬离地面"
+     "zh": "左侧同样，趴着，屈膝，大腿慢慢抬离地面",
+     "en": "Now the left side. Face down, knee bent, lift the thigh slowly off the floor"
     },
     "ms": {
-     "zh": 4249
+     "zh": 4249,
+     "en": 5248
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，脚底推向天花板，臀部收紧"
+     "zh": "放松一下。下一组记住，脚底推向天花板，臀部收紧",
+     "en": "Relax for a moment. Next set, remember: Push the sole toward the ceiling, squeeze your glutes"
     },
     "ms": {
-     "zh": 5201
+     "zh": 5201,
+     "en": 6362
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "俯卧屈膝抬腿，完成"
+     "zh": "俯卧屈膝抬腿，完成",
+     "en": "Prone bent-knee hip extension, done."
     },
     "ms": {
-     "zh": 2043
+     "zh": 2043,
+     "en": 2043
     }
    }
   ],
@@ -174,6 +192,38 @@
   "demo.mp4": {
    "bytes": 84554,
    "sha256": "e9ac906a289df35909507b106c86f9f9eb31a6abeddaea42642852864827b519"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 16031,
+   "sha256": "2387b4132d052a10c7313802d3eb701c55eabb6a830990198315696235472a05"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 28233,
+   "sha256": "16fbfac796f9fbfc21ed89d283049d3d7ba04e046c3c3bca45882138b0a015c5"
+  },
+  "voice/en/cue3.m4a": {
+   "bytes": 23063,
+   "sha256": "e6d2c94a242dd3e3ae2e5a81c4de3bc169e437d7491ba0c8b63c8df83e109907"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 17907,
+   "sha256": "8e7ab9d91fbc26472e057d1a5f1d4e4075eb27ab7fc520f1ffce1fc8f67f5abb"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 25919,
+   "sha256": "41a54f4425c4ea320d27803492e1676cb585f136e9c6107342a67ca1ded56a8e"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 13898,
+   "sha256": "b214ba1eef0817249679079db40a5eb30bb86366d72b82e094ead3e9fdc973d3"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 54483,
+   "sha256": "19edc5eccb16dc3a674c307bdc13ff63f08444506dad8763f891de5470d2a812"
+  },
+  "voice/en/side_switch.m4a": {
+   "bytes": 46267,
+   "sha256": "2b0d94d790aa4c965ad5ab6812059ff31aba8cab4d7f9884b66c48d94126eb69"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 14532,

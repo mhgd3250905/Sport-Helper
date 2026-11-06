@@ -60,10 +60,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -71,70 +73,84 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "低冲击开合跳"
+     "zh": "低冲击开合跳",
+     "en": "Low-impact step jack"
     },
     "ms": {
-     "zh": 1324
+     "zh": 1324,
+     "en": 1370
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "低冲击开合跳，练肩膀和臀部外侧"
+     "zh": "低冲击开合跳，练肩膀和臀部外侧",
+     "en": "Low-impact step jack. Works the shoulders and the outer hips."
     },
     "ms": {
-     "zh": 3251
+     "zh": 3251,
+     "en": 4040
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "左右交替向侧迈步"
+     "zh": "左右交替向侧迈步",
+     "en": "Step out to the side, one side at a time"
     },
     "ms": {
-     "zh": 1904
+     "zh": 1904,
+     "en": 2485
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "一只脚向侧面迈开，同时双臂上举"
+     "zh": "一只脚向侧面迈开，同时双臂上举",
+     "en": "Step one foot out to the side and raise both arms"
     },
     "ms": {
-     "zh": 3204
+     "zh": 3204,
+     "en": 2624
     }
    },
    {
     "id": "cue3",
     "role": "cue",
     "text": {
-     "zh": "手臂同时上举，保持节奏"
+     "zh": "手臂同时上举，保持节奏",
+     "en": "Raise the arms at the same time, keep the rhythm"
     },
     "ms": {
-     "zh": 2438
+     "zh": 2438,
+     "en": 2577
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，手臂同时上举，保持节奏"
+     "zh": "放松一下。下一组记住，手臂同时上举，保持节奏",
+     "en": "Relax for a moment. Next set, remember: Raise the arms at the same time, keep the rhythm"
     },
     "ms": {
-     "zh": 4876
+     "zh": 4876,
+     "en": 6246
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "低冲击开合跳，完成"
+     "zh": "低冲击开合跳，完成",
+     "en": "Low-impact step jack, done."
     },
     "ms": {
-     "zh": 2090
+     "zh": 2090,
+     "en": 1881
     }
    }
   ],
@@ -164,6 +180,34 @@
   "demo.mp4": {
    "bytes": 95365,
    "sha256": "1a9f0e9791da846d092cde0e76150d1a42dbdf1d24b214a36beaedbc46ca6ae9"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 21396,
+   "sha256": "c1c536e935be21c69fd1ecf8af991b4e12afd2ee0f85b65d13962a9bdf2b8ce2"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 22738,
+   "sha256": "472e444dfb2f2c835c23fc375ac2fd6b656f46dea06e1941d0ef881588fc13c0"
+  },
+  "voice/en/cue3.m4a": {
+   "bytes": 22183,
+   "sha256": "c6d3ae31804542bf4ddc6032b6ac77d4204cfee59c79ea0dc7c18a5439820b69"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 16633,
+   "sha256": "c60629d2e5b8b7798698b22d609e040e2f35bed8aa1bdce3ac7607c2cd4833d0"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 33094,
+   "sha256": "4f8e9f7449c832e4e1947a14dd3c095d1429daf0b0a6bf182f929afb8c89f358"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 12229,
+   "sha256": "62aa3ed6d126f6cdf5af1ffe4903fe0b10459837dced8cc8a7dbdd5b4058c845"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 53375,
+   "sha256": "156bc863f8a2595d8ee7640aef070d3e739f2da08d216f802756a947e0c6b565"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 16672,

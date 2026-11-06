@@ -58,10 +58,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -69,60 +71,72 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "仰卧香蕉式侧伸"
+     "zh": "仰卧香蕉式侧伸",
+     "en": "Supine banana stretch"
     },
     "ms": {
-     "zh": 1556
+     "zh": 1556,
+     "en": 1463
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "仰卧香蕉式侧伸，拉伸腰两侧和背部"
+     "zh": "仰卧香蕉式侧伸，拉伸腰两侧和背部",
+     "en": "Supine banana stretch. Stretches the sides of the waist and the back."
     },
     "ms": {
-     "zh": 3344
+     "zh": 3344,
+     "en": 4365
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "仰卧，手脚同侧移动"
+     "zh": "仰卧，手脚同侧移动",
+     "en": "Lie on your back, move your arms and legs to the same side"
     },
     "ms": {
-     "zh": 1950
+     "zh": 1950,
+     "en": 3181
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "仰卧把身体弯成香蕉形，感受体侧拉长"
+     "zh": "仰卧把身体弯成香蕉形，感受体侧拉长",
+     "en": "Curve your body into a banana shape, feel your side lengthen"
     },
     "ms": {
-     "zh": 3553
+     "zh": 3553,
+     "en": 3111
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，仰卧把身体弯成香蕉形，感受体侧拉长"
+     "zh": "放松一下。下一组记住，仰卧把身体弯成香蕉形，感受体侧拉长",
+     "en": "Relax for a moment. Next set, remember: Curve your body into a banana shape, feel your side lengthen"
     },
     "ms": {
-     "zh": 6084
+     "zh": 6084,
+     "en": 6827
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "仰卧香蕉式侧伸，完成"
+     "zh": "仰卧香蕉式侧伸，完成",
+     "en": "Supine banana stretch, done."
     },
     "ms": {
-     "zh": 2252
+     "zh": 2252,
+     "en": 1950
     }
    }
   ],
@@ -152,6 +166,30 @@
   "demo.mp4": {
    "bytes": 94515,
    "sha256": "092d3a04290c31b1271cdaa6af91ab94ed576da8ca33a7915278c11cbe0a4f09"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 27090,
+   "sha256": "e84c2a5131d327ccae895012ca5c16dc0bf5dc1722345ec366a17816a89e5149"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 26729,
+   "sha256": "070d0382fcaa21a16090282d3e5405f734126c71f79a30f92d699d90a67f5a1c"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 16969,
+   "sha256": "135ce0ef361ac6b51b0c7bb4d7110f72f26ba38d382b5c9e694564471b2c83e9"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 35085,
+   "sha256": "1da6ed5ae16ca8da56dbf11e480621fd021f30be8dd69d2e2fd67ff013d3ce91"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 13167,
+   "sha256": "7194bef91a1017dbd251c3a2fb0443f5bccd770d519276ed92d30fecf71dfe05"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 59408,
+   "sha256": "eae394e187b047fa2a2550499c338fdef7408f8024d49fb7a962153721976898"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 17159,

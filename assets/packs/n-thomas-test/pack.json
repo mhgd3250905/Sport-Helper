@@ -59,10 +59,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -70,70 +72,84 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "仰卧单膝抱胸"
+     "zh": "仰卧单膝抱胸",
+     "en": "Supine single knee to chest"
     },
     "ms": {
-     "zh": 1347
+     "zh": 1347,
+     "en": 1672
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "仰卧单膝抱胸，拉伸髋前侧"
+     "zh": "仰卧单膝抱胸，拉伸髋前侧",
+     "en": "Supine single knee to chest. Stretches the front of the hips."
     },
     "ms": {
-     "zh": 2647
+     "zh": 2647,
+     "en": 4017
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "仰卧，抱一侧膝到胸"
+     "zh": "仰卧，抱一侧膝到胸",
+     "en": "Lie on your back, hug one knee to your chest"
     },
     "ms": {
-     "zh": 1904
+     "zh": 1904,
+     "en": 2531
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "抱住一边膝盖，另一条腿放松伸直"
+     "zh": "抱住一边膝盖，另一条腿放松伸直",
+     "en": "Hug one knee, let the other leg relax straight"
     },
     "ms": {
-     "zh": 2995
+     "zh": 2995,
+     "en": 2670
     }
    },
    {
     "id": "side_switch",
     "role": "side_switch",
     "text": {
-     "zh": "左侧同样，抱住一边膝盖，另一条腿放松伸直"
+     "zh": "左侧同样，抱住一边膝盖，另一条腿放松伸直",
+     "en": "Now the left side. Hug one knee, let the other leg relax straight"
     },
     "ms": {
-     "zh": 4133
+     "zh": 4133,
+     "en": 4598
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，抱住一边膝盖，另一条腿放松伸直"
+     "zh": "放松一下。下一组记住，抱住一边膝盖，另一条腿放松伸直",
+     "en": "Relax for a moment. Next set, remember: Hug one knee, let the other leg relax straight"
     },
     "ms": {
-     "zh": 5526
+     "zh": 5526,
+     "en": 6269
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "仰卧单膝抱胸，完成"
+     "zh": "仰卧单膝抱胸，完成",
+     "en": "Supine single knee to chest, done."
     },
     "ms": {
-     "zh": 2020
+     "zh": 2020,
+     "en": 2090
     }
    }
   ],
@@ -163,6 +179,34 @@
   "demo.mp4": {
    "bytes": 74694,
    "sha256": "decd043d5b0b7c0b72558167c9a05de623f7c0774de2d5e1fada27b7508c2991"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 21954,
+   "sha256": "85af8f8602f6631cf189bc04211f621a9ae98cc3cc79f224536b921b509da51c"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 23081,
+   "sha256": "8b318a2c47479534267dd7fb432d01ad245f680366fbb1d7135a49f163fb17bb"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 18165,
+   "sha256": "ac003952c8c18d63f64c4d77c4a3fb46dd5d92d7d840994b13bd2f979e521cb1"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 30650,
+   "sha256": "e00c53f6300a05cf9d8b8e6bbbd0ac75931585334b320a7a62a6692098aae0c9"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 14899,
+   "sha256": "029c1cac5bf2992de4c596cb4af4243610095e049629b2befe83bb6175b7e010"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 53251,
+   "sha256": "031ce486160258d2559de070bc94f12edf6820599da3d2f97d31f4624691bde9"
+  },
+  "voice/en/side_switch.m4a": {
+   "bytes": 35831,
+   "sha256": "c2b0d7e678c2ddf4148ba7e52f356b0b4af67bb3c246436e58aee2c14f2ef3a5"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 16625,

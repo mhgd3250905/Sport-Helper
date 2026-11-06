@@ -62,10 +62,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -73,70 +75,84 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "坐椅弹力带髋内旋"
+     "zh": "坐椅弹力带髋内旋",
+     "en": "Seated band hip internal rotation"
     },
     "ms": {
-     "zh": 1718
+     "zh": 1718,
+     "en": 1950
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "坐椅弹力带髋内旋，练臀部"
+     "zh": "坐椅弹力带髋内旋，练臀部",
+     "en": "Seated band hip internal rotation. Works the glutes."
     },
     "ms": {
-     "zh": 2601
+     "zh": 2601,
+     "en": 3738
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "坐椅，弹力带套在脚踝"
+     "zh": "坐椅，弹力带套在脚踝",
+     "en": "Sit on the chair, band around the ankle"
     },
     "ms": {
-     "zh": 2229
+     "zh": 2229,
+     "en": 2206
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "膝盖不动，小腿向外转"
+     "zh": "膝盖不动，小腿向外转",
+     "en": "Keep the knee still, turn the shin outward"
     },
     "ms": {
-     "zh": 2206
+     "zh": 2206,
+     "en": 2113
     }
    },
    {
     "id": "side_switch",
     "role": "side_switch",
     "text": {
-     "zh": "左侧同样，膝盖不动，小腿向外转"
+     "zh": "左侧同样，膝盖不动，小腿向外转",
+     "en": "Now the left side. Keep the knee still, turn the shin outward"
     },
     "ms": {
-     "zh": 3251
+     "zh": 3251,
+     "en": 4040
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，膝盖不动，小腿向外转"
+     "zh": "放松一下。下一组记住，膝盖不动，小腿向外转",
+     "en": "Relax for a moment. Next set, remember: Keep the knee still, turn the shin outward"
     },
     "ms": {
-     "zh": 4644
+     "zh": 4644,
+     "en": 5735
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "坐椅弹力带髋内旋，完成"
+     "zh": "坐椅弹力带髋内旋，完成",
+     "en": "Seated band hip internal rotation, done."
     },
     "ms": {
-     "zh": 2415
+     "zh": 2415,
+     "en": 2461
     }
    }
   ],
@@ -166,6 +182,34 @@
   "demo.mp4": {
    "bytes": 76960,
    "sha256": "ae2f91c935ca74293e8fae9f08bfebb3fa74bcb1ec249f8d8e79573e45e9dabb"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 19172,
+   "sha256": "29fecec29f0503a55eb01840690fc9f05a850ff141edde1dd8a6de5974fa049e"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 18311,
+   "sha256": "00d7c12f51970bc6a34b6c7ae6331f61c54bafbbaa4e2b89ba25f98454ba165a"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 21356,
+   "sha256": "7bd870db2489d47dc00776cbb6e61a7e2bedd4ae006d50bff81bdddb683e2581"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 28643,
+   "sha256": "19ce7a0a365aef9b70eef4d4e4e312bf36d4bcf9cb41cf12f35e6283d4b59bd9"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 17210,
+   "sha256": "05ce288a8a41663a732089376b1ffb5d5c5588b9a1014fa2597eb4d64df88fcf"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 50073,
+   "sha256": "9fe2c529a41fcfc5e89736ee8fbdc19532257aef9cedc36aa87998069dc4601a"
+  },
+  "voice/en/side_switch.m4a": {
+   "bytes": 31278,
+   "sha256": "93875c192077b58b08a6187933f12a67e06f9e50335987b44ded8567b8d45d5f"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 19287,
