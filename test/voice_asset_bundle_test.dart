@@ -16,57 +16,63 @@ Map<String, dynamic> _manifest() =>
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  test('App source uses all 695 encoded assets and measured lengths', () async {
-    final (_, _, voices, _) = await AppServices.loadContent();
-    final manifest = _manifest();
-    final clips = manifest['clips'] as List;
-    expect(clips, hasLength(695));
-    expect(voices.languages, {'zh'});
-    final assets = await AssetManifest.loadFromAssetBundle(rootBundle);
-    final bundled = assets.listAssets().toSet();
-    final target = <String>{};
-    for (final raw in clips) {
-      final clip = raw as Map;
-      final key = clip['pack'] == '_common'
-          ? clip['line'] as String
-          : '${clip['pack']}/${clip['line']}';
-      final asset = clip['asset'] as String;
-      target.add(asset);
-      expect(voices.has(key), isTrue, reason: key);
-      expect(voices.asset(key), asset, reason: key);
+  test(
+    'App source uses all 1392 encoded zh+en assets and measured lengths',
+    () async {
+      final (_, _, voices, _) = await AppServices.loadContent();
+      final manifest = _manifest();
+      final clips = manifest['clips'] as List;
+      expect(clips, hasLength(1392));
+      expect(clips.where((c) => (c as Map)['lang'] == 'zh'), hasLength(696));
+      expect(clips.where((c) => (c as Map)['lang'] == 'en'), hasLength(696));
+      expect(voices.languages, {'zh', 'en'});
+      final assets = await AssetManifest.loadFromAssetBundle(rootBundle);
+      final bundled = assets.listAssets().toSet();
+      final target = <String>{};
+      for (final raw in clips) {
+        final clip = raw as Map;
+        final key = clip['pack'] == '_common'
+            ? clip['line'] as String
+            : '${clip['pack']}/${clip['line']}';
+        final lang = clip['lang'] as String;
+        final asset = clip['asset'] as String;
+        target.add(asset);
+        expect(voices.has(key, lang: lang), isTrue, reason: '$key/$lang');
+        expect(voices.asset(key, lang: lang), asset, reason: '$key/$lang');
+        expect(
+          voices.seconds(key, lang: lang),
+          (clip['decoded_ms'] as int) / 1000,
+          reason: key,
+        );
+        expect(bundled, contains(asset), reason: key);
+        expect(voices.line(key, lang: lang), isNotEmpty, reason: '$key/$lang');
+      }
       expect(
-        voices.seconds(key),
-        (clip['decoded_ms'] as int) / 1000,
-        reason: key,
+        bundled
+            .where(
+              (p) => p.startsWith('assets/voice_lc32/') && p.endsWith('.m4a'),
+            )
+            .toSet(),
+        target,
       );
-      expect(bundled, contains(asset), reason: key);
-      expect(voices.line(key), isNotEmpty, reason: key);
-    }
-    expect(
-      bundled
-          .where(
-            (p) => p.startsWith('assets/voice_lc32/') && p.endsWith('.m4a'),
-          )
-          .toSet(),
-      target,
-    );
-    expect(
-      bundled.where(
-        (p) => p.startsWith('assets/packs/') && p.contains('/voice/'),
-      ),
-      isEmpty,
-    );
-    for (final chime in ['tick', 'start', 'end', 'finish', 'silence']) {
-      expect(voices.has('chime.$chime'), isTrue);
       expect(
-        voices.asset('chime.$chime'),
-        'assets/packs/_common/chime/$chime.m4a',
+        bundled.where(
+          (p) => p.startsWith('assets/packs/') && p.contains('/voice/'),
+        ),
+        isEmpty,
       );
-      expect(bundled, contains(voices.asset('chime.$chime')));
-      expect(voices.seconds('chime.$chime'), 0);
-    }
-    expect(voices.has('n.1', lang: 'en'), isFalse);
-  });
+      for (final chime in ['tick', 'start', 'end', 'finish', 'silence']) {
+        expect(voices.has('chime.$chime'), isTrue);
+        expect(
+          voices.asset('chime.$chime'),
+          'assets/packs/_common/chime/$chime.m4a',
+        );
+        expect(bundled, contains(voices.asset('chime.$chime')));
+        expect(voices.seconds('chime.$chime'), 0);
+      }
+      expect(voices.has('n.1', lang: 'en'), isTrue);
+    },
+  );
 
   test(
     'phrase duration sums the new decoded lengths rather than old pack ms',
