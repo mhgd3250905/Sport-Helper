@@ -112,7 +112,7 @@ class _SinglePracticePageState extends State<SinglePracticePage> {
       });
     }
     final asset =
-        'packages/ugk_trainer/assets/pose_hub/app-test-pack-r1/standing/${widget.page.action.id}.webp';
+        'packages/ugk_trainer/assets/pose_hub/app-pack-r2-v1/standing/${widget.page.action.id}.webp';
     final ready =
         (control?.canPlay ?? true) &&
         (widget.page.startMode == TrainerStartMode.preview || _gateOpen);

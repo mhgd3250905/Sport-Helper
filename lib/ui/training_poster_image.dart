@@ -20,7 +20,7 @@ abstract final class TrainingPosterImages {
     final media = exercise.media;
     return {
       if (action != null)
-        'packages/ugk_trainer/assets/pose_hub/app-test-pack-r1/standing/${action.id}.webp',
+        'packages/ugk_trainer/assets/pose_hub/app-pack-r2-v1/standing/${action.id}.webp',
       if (media.alphaPlaybackPoster?.isNotEmpty == true)
         media.alphaPlaybackPoster!,
       media.playbackPosterFor(

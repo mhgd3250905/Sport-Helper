@@ -202,7 +202,7 @@ Future<_Fixture> _mount(WidgetTester tester, _Fixture fixture) async {
   await tester.runAsync(
     () => TrainingPosterImages.precacheAsset(
       source,
-      'packages/ugk_trainer/assets/pose_hub/app-test-pack-r1/standing/${fixture.action.id}.webp',
+      'packages/ugk_trainer/assets/pose_hub/app-pack-r2-v1/standing/${fixture.action.id}.webp',
     ),
   );
   await tester.tap(find.text('open practice'));

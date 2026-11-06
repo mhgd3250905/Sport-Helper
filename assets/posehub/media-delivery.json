@@ -1,10 +1,7 @@
 {
-  "format": "smartfit-posehub-file-delivery@2",
+  "format": "smartfit-posehub-file-delivery@3",
   "ready": true,
-  "packVersion": "r1-v3",
-  "catalogSha256": "75881cf91621c967f80732f0219f23e85b35e8bde5d1a51ee75dec5f7c5edd36",
-  "releaseTag": "posehub-app-test-pack-r1-v3",
   "mediaBaseUrls": [
-    "https://media.uuugk.win/pack/r1-v3/"
+    "https://media.uuugk.win/pack/{pack}/"
   ]
 }

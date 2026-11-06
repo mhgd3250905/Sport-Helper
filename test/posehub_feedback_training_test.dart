@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -52,13 +53,41 @@ TrainingPlan _plan(List<coach.PoseHubPackAction> actions) => TrainingPlan(
   ],
 );
 
+/// r2-v1 ships no definition-incomplete action, so the pending legacy case is
+/// built from a copy of the real catalogue with its first action marked
+/// incomplete (the shape r1-v3 used for 训练说明待补 actions).
+coach.PoseHubAppTestCatalog _withPendingFirst(
+  coach.PoseHubAppTestCatalog source,
+) {
+  final raw = jsonDecode(jsonEncode(source.raw)) as Map<String, dynamic>;
+  final actions = (raw['actions'] as List).cast<Map<String, dynamic>>();
+  final first = actions.first;
+  final id = first['id'] as String;
+  first['trainingDefinitionComplete'] = false;
+  first['availableForTraining'] = false;
+  final semantics = first['trainingSemantics'] as Map<String, dynamic>;
+  semantics['definitionComplete'] = false;
+  semantics['status'] = 'partial-unreviewed';
+  semantics['missingRequiredFields'] = ['defaultDose'];
+  final summary = raw['trainingSemantics'] as Map<String, dynamic>;
+  final complete = (summary['definitionCompleteIds'] as List)..remove(id);
+  summary['definitionCompleteCount'] = complete.length;
+  summary['incompleteActionIds'] = [
+    ...(summary['incompleteActionIds'] as List? ?? const []),
+    id,
+  ];
+  return coach.PoseHubAppTestCatalog.fromJson(raw);
+}
+
 void main() {
   configureWidgetTestTimeout();
   final binding = TestWidgetsFlutterBinding.ensureInitialized();
   late coach.PoseHubAppTestCatalog catalog;
   late PoseHubUiVideoPlatform platform;
   final base = Uri.parse('file:///ui-contract-pack/');
-  setUpAll(() async => catalog = await PoseHubActionLibrary.load());
+  setUpAll(
+    () async => catalog = _withPendingFirst(await PoseHubActionLibrary.load()),
+  );
   setUp(() {
     platform = PoseHubUiVideoPlatform();
     UgkPackedAlphaVideo.debugPlatform = platform;

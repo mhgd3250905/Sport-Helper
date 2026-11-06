@@ -13,7 +13,7 @@ import 'app/app_ai_tags.dart';
 import 'app/app_test_catalog.dart';
 import 'app/app_test_content.dart';
 import 'app/posehub_asset_bundle.dart';
-import 'app/posehub_bundled_images.dart';
+import 'app/posehub_catalog_updates.dart';
 import 'app/posehub_media_config.dart';
 import 'app/posehub_media_delivery.dart';
 import 'app/posehub_media_repository.dart';
@@ -21,7 +21,13 @@ import 'app/build_info.dart';
 import 'app/device_identity.dart';
 import 'app/training_media_config.dart';
 import 'package:ugk_trainer/ugk_trainer.dart'
-    show PoseHubActionLibrary, TrainingMediaRepository, TrainingMediaScope;
+    show
+        PoseHubActionLibrary,
+        TrainingMediaRepository,
+        TrainingMediaScope,
+        poseHubMediaPackOf,
+        poseHubPackVersionOf,
+        withPoseHubCatalogVoice;
 import 'core/storage/local_state_storage.dart';
 import 'data/app_store.dart';
 import 'diagnostics/runtime_log.dart';
@@ -93,26 +99,46 @@ Future<void> main() async {
     };
   }
   registerFontLicense();
+  if (PoseHubMediaConfig.enabled) {
+    // Opens the verified hot-update cache before the first load, then checks
+    // the channel pointer in the background (launch + daily on resume).
+    await PoseHubCatalogUpdates.start(
+      onEvent: (event) => log.record(
+        event.name,
+        fields: {
+          'pack': ?event.pack,
+          'code': ?event.reason?.split(RegExp(r'[:\s]')).first,
+        },
+      ),
+    );
+  }
   final poseHubCatalog = PoseHubMediaConfig.enabled
       ? await PoseHubActionLibrary.load()
       : null;
+  final poseHubRevision = poseHubCatalog == null
+      ? PoseHubActionLibrary.catalogSha256
+      : poseHubCatalogRevisionOf(poseHubCatalog);
   PoseHubMediaRepository? poseHubMedia;
   if (poseHubCatalog != null) {
-    PoseHubBundledImages? images;
-    try {
-      images = await PoseHubBundledImages.load(
-        catalogRevision: PoseHubActionLibrary.catalogSha256,
-      );
-    } on Object catch (error) {
-      log.record(
-        'posehub.bundled_images_unavailable',
-        fields: RuntimeLog.errorFields(error),
-      );
-    }
-    var delivery = PoseHubMediaDelivery.unavailable();
+    final poseHubPack = poseHubPackVersionOf(poseHubCatalog);
+    log.record(
+      'posehub.catalog_loaded',
+      fields: {
+        'pack': poseHubPack,
+        'channel': PoseHubCatalogUpdates.channelName,
+      },
+    );
+    // Posters come from the SDK's built-in r2-v1 standing images
+    // (packages/ugk_trainer/assets/pose_hub/app-pack-r2-v1/standing/); the
+    // r1-v3 APK image index was removed. Covers/thumbnails not in the APK use
+    // the ordinary verified downloader.
+    // Media lives in the pack its catalogue's mediaDistribution names (r2-v2
+    // reuses r2-v1 media), which may differ from the catalogue pack.
+    final mediaPack = poseHubMediaPackOf(poseHubCatalog);
+    var delivery = PoseHubMediaDelivery.unavailable(mediaPack);
     try {
       delivery = await PoseHubMediaDelivery.load(
-        catalogRevision: PoseHubActionLibrary.catalogSha256,
+        packVersion: mediaPack,
         mediaBaseUrls: PoseHubMediaConfig.mediaBaseUrls,
       );
     } on Object catch (error) {
@@ -124,10 +150,9 @@ Future<void> main() async {
     try {
       poseHubMedia = await PoseHubMediaRepository.create(
         catalog: poseHubCatalog,
-        catalogRevision: PoseHubActionLibrary.catalogSha256,
+        catalogRevision: poseHubRevision,
         packVersion: delivery.packVersion,
         mediaBaseUrls: delivery.mediaBaseUrls,
-        bundledFileLoader: images?.loadFile,
       );
     } on Object catch (error) {
       log.record(
@@ -200,7 +225,11 @@ Future<void> main() async {
     library: activeLibrary,
     catalog: catalog,
     store: store,
-    voiceLibrary: voices,
+    // SDK: the active Pose-Hub catalogue's own recorded name / key point
+    // for actions without a bundled pack (downloaded + verified on demand).
+    voiceLibrary: poseHubCatalog == null
+        ? voices
+        : await withPoseHubCatalogVoice(voices, catalog: poseHubCatalog),
     voiceOutput: JustAudioVoiceOutput(),
     coachCatalog: activeCoachCatalog,
     testCatalog: testContent?.catalog,

@@ -56,7 +56,7 @@ class _VisibleStandingAssetBundle extends CachingAssetBundle {
   Future<ByteData> load(String key) async {
     final bytes = await parent.load(key);
     if (key.startsWith(
-          'packages/ugk_trainer/assets/pose_hub/app-test-pack-r1/standing/',
+          'packages/ugk_trainer/assets/pose_hub/app-pack-r2-v1/standing/',
         ) &&
         key.endsWith('.webp') &&
         _seen.add(key)) {
