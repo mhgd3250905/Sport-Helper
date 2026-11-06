@@ -223,7 +223,8 @@ async def render(unique, budget_end):
 
 def cmd_build(a):
     jobs = jobs_from_packs()
-    if a.missing_only:
+    missing_only = getattr(a, 'missing_only', False)
+    if missing_only:
         # Add clips that have no file yet (e.g. a new language) without
         # re-rendering, touching or dropping any existing clip.
         jobs = [j for j in jobs if not (j[0] / P.voice_file(j[2], j[1])).exists()]
@@ -260,7 +261,7 @@ def cmd_build(a):
             keep.add(rel)
             total += dst.stat().st_size
         for f in (d / 'voice').rglob('*.m4a'):
-            if not a.missing_only and f.relative_to(d).as_posix() not in keep:
+            if not missing_only and f.relative_to(d).as_posix() not in keep:
                 f.unlink()
         pack['voice']['postProcess'] = (f'HipLab {PROCESS_VERSION}: edge trim, -16 LUFS fixed gain, '
                                         'alimiter -2.5 dBFS, AAC 64k mono 44.1 kHz cutoff 12 kHz')
