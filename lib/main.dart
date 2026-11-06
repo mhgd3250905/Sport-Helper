@@ -26,7 +26,8 @@ import 'package:ugk_trainer/ugk_trainer.dart'
         TrainingMediaRepository,
         TrainingMediaScope,
         poseHubMediaPackOf,
-        poseHubPackVersionOf;
+        poseHubPackVersionOf,
+        withPoseHubCatalogVoice;
 import 'core/storage/local_state_storage.dart';
 import 'data/app_store.dart';
 import 'diagnostics/runtime_log.dart';
@@ -224,7 +225,11 @@ Future<void> main() async {
     library: activeLibrary,
     catalog: catalog,
     store: store,
-    voiceLibrary: voices,
+    // SDK: the active Pose-Hub catalogue's own recorded name / key point
+    // for actions without a bundled pack (downloaded + verified on demand).
+    voiceLibrary: poseHubCatalog == null
+        ? voices
+        : await withPoseHubCatalogVoice(voices, catalog: poseHubCatalog),
     voiceOutput: JustAudioVoiceOutput(),
     coachCatalog: activeCoachCatalog,
     testCatalog: testContent?.catalog,
