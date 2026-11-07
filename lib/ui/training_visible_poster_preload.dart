@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:ugk_trainer/ugk_trainer.dart' show PoseHubActionLibrary;
 
 import 'training_poster_image.dart';
 
@@ -55,9 +56,7 @@ class _VisibleStandingAssetBundle extends CachingAssetBundle {
   @override
   Future<ByteData> load(String key) async {
     final bytes = await parent.load(key);
-    if (key.startsWith(
-          'packages/ugk_trainer/assets/pose_hub/app-pack-r2-v1/standing/',
-        ) &&
+    if (key.startsWith(PoseHubActionLibrary.standingAssetRoot) &&
         key.endsWith('.webp') &&
         _seen.add(key)) {
       onLoaded(key);

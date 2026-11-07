@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:ugk_coach_ui/ugk_coach_ui.dart';
+import 'package:ugk_trainer/ugk_trainer.dart'
+    show PoseHubActionLibrary, PoseHubStandingImage, TrainerTheme;
 
 import '../../domain/exercise.dart';
 import '../../domain/plan.dart';
 import '../../app/posehub_asset_bundle.dart';
+import '../../app/services.dart';
 import '../alpha_artwork.dart';
 import '../plan_presentation.dart';
 import '../theme.dart' show levelZh;
@@ -240,12 +243,13 @@ String _timeLabel(DateTime at, DateTime now) {
   };
 }
 
-const _trainerStandingPrefix =
-    'packages/ugk_trainer/assets/pose_hub/app-pack-r2-v1/standing/';
+const _trainerStandingPrefix = PoseHubActionLibrary.standingAssetRoot;
 
-bool _isTrainerStandingAsset(String asset) => RegExp(
-  r'^packages/ugk_trainer/assets/pose_hub/app-pack-r2-v1/standing/[A-Za-z0-9_-]+\.webp$',
-).hasMatch(asset);
+bool _isTrainerStandingAsset(String asset) =>
+    asset.startsWith(_trainerStandingPrefix) &&
+    RegExp(
+      r'^[A-Za-z0-9_-]+\.webp$',
+    ).hasMatch(asset.substring(_trainerStandingPrefix.length));
 
 String? _trainerStandingFor(Exercise exercise) {
   if (!RegExp(r'^[A-Za-z0-9_-]+$').hasMatch(exercise.id)) return null;
@@ -256,6 +260,36 @@ String? _trainerStandingFor(Exercise exercise) {
       '${PoseHubAssetBundle.prefix}${Uri.encodeComponent(exercise.id)}/cover';
   if (exercise.media.alphaCover != cover) return null;
   return '$_trainerStandingPrefix${exercise.id}.webp';
+}
+
+CoachExerciseArtworkBuilder? _catalogArtworkFor(Exercise exercise) {
+  final standing = _trainerStandingFor(exercise);
+  if (standing == null) return null;
+  return (context, {required bool thumbnail}) {
+    final action = context
+        .dependOnInheritedWidgetOfExactType<AppScope>()
+        ?.services
+        .poseHubCatalog
+        ?.tryGet(exercise.id);
+    if (action != null) {
+      return PoseHubStandingImage(
+        action: action,
+        thumbnail: thumbnail,
+        theme: Theme.of(context).brightness == Brightness.dark
+            ? TrainerTheme.dark
+            : TrainerTheme.light,
+      );
+    }
+    final fallback = sfPoster(exercise);
+    return Image.asset(
+      fallback.isEmpty || fallback.startsWith(PoseHubAssetBundle.prefix)
+          ? standing
+          : fallback,
+      fit: BoxFit.contain,
+      gaplessPlayback: true,
+      errorBuilder: (_, _, _) => const SizedBox.shrink(),
+    );
+  };
 }
 
 CoachExercise toCoachExercise(
@@ -283,6 +317,7 @@ CoachExercise toCoachExercise(
     levelLabel: levelZh(e.level),
     equipmentLabel: gear.isEmpty ? '徒手' : gear.map(equipmentLabel).join('、'),
     cues: e.cues,
+    artworkBuilder: _catalogArtworkFor(e),
     cutout: alpha
         ? _trainerStandingFor(e) ?? e.media.alphaCover
         : SfCutouts.has(e)
@@ -296,7 +331,7 @@ CoachExercise toCoachExercise(
   );
 }
 
-/// The action browser and recommendations share the SDK's bundled first frame.
+/// The action browser and recommendations share the SDK's catalogue artwork.
 /// Media IDs are resolved from the trusted catalog, never from model text.
 CoachExercise toCoachRecommendationExercise(Exercise exercise) {
   final adapted = toCoachExercise(exercise);
@@ -309,6 +344,7 @@ CoachExercise toCoachRecommendationExercise(Exercise exercise) {
     levelLabel: adapted.levelLabel,
     equipmentLabel: adapted.equipmentLabel,
     cues: adapted.cues,
+    artworkBuilder: adapted.artworkBuilder,
     cutout: adapted.cutout,
     stillCutout: _trainerStandingFor(exercise) ?? adapted.stillCutout,
   );

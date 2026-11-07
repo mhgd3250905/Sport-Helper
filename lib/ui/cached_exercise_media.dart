@@ -30,7 +30,7 @@ bool observedVideoWrap(double previous, double current) =>
     current < previous / 2 &&
     previous - current >= .25;
 
-/// The SDK standing index binds all 249 r2-v1 images to sourceVideo.frameIndex=0.
+/// The SDK standing index binds bundled images to sourceVideo.frameIndex=0.
 /// The packaging gate verifies its catalog/video SHA before including them.
 /// Legacy covers have their own explicit frame-zero fields.
 class ExerciseFrameZero extends StatefulWidget {
@@ -172,7 +172,7 @@ class _ExerciseFrameZeroState extends State<ExerciseFrameZero> {
     final media = exercise.media;
     final candidates = {
       if (action != null)
-        'packages/ugk_trainer/assets/pose_hub/app-pack-r2-v1/standing/${action.id}.webp',
+        '${PoseHubActionLibrary.standingAssetRoot}${action.id}.webp',
       if (media.alphaPlaybackPoster?.isNotEmpty == true)
         media.alphaPlaybackPoster!,
       media.playbackPosterFor(light: light),

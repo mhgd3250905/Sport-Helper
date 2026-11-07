@@ -59,7 +59,7 @@ void main() {
       final bundle = _RecordingAssets();
       final action = catalog.semanticCompleteActions.first;
       final asset =
-          'packages/ugk_trainer/assets/pose_hub/app-pack-r2-v1/standing/${action.id}.webp';
+          'packages/ugk_trainer/assets/pose_hub/app-pack-r2-v7/standing/${action.id}.webp';
       late BuildContext outer;
       late BuildContext inner;
       late AssetBundle observed;

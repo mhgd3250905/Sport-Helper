@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ugk_trainer/ugk_trainer.dart' show PoseHubActionLibrary;
 
 import '../app/services.dart';
 import '../domain/exercise.dart';
@@ -20,7 +21,7 @@ abstract final class TrainingPosterImages {
     final media = exercise.media;
     return {
       if (action != null)
-        'packages/ugk_trainer/assets/pose_hub/app-pack-r2-v1/standing/${action.id}.webp',
+        '${PoseHubActionLibrary.standingAssetRoot}${action.id}.webp',
       if (media.alphaPlaybackPoster?.isNotEmpty == true)
         media.alphaPlaybackPoster!,
       media.playbackPosterFor(

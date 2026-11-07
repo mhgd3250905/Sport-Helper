@@ -128,12 +128,11 @@ Future<void> main() async {
         'channel': PoseHubCatalogUpdates.channelName,
       },
     );
-    // Posters come from the SDK's built-in r2-v1 standing images
-    // (packages/ugk_trainer/assets/pose_hub/app-pack-r2-v1/standing/); the
-    // r1-v3 APK image index was removed. Covers/thumbnails not in the APK use
-    // the ordinary verified downloader.
-    // Media lives in the pack its catalogue's mediaDistribution names (r2-v2
-    // reuses r2-v1 media), which may differ from the catalogue pack.
+    // The SDK binds bundled standing images to their source video's identity.
+    // Cards use its verified catalogue cover/thumbnail cache for newer media,
+    // keeping the bundled standing image as the offline fallback.
+    // Catalogue revisions can reuse an earlier media pack. Follow the active
+    // catalogue's mediaDistribution rather than its catalogue pack name.
     final mediaPack = poseHubMediaPackOf(poseHubCatalog);
     var delivery = PoseHubMediaDelivery.unavailable(mediaPack);
     try {

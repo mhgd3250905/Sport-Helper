@@ -95,7 +95,7 @@ Iterable<String> _images(WidgetTester tester) => tester
     .map((asset) => asset.assetName);
 
 String _standing(String id) =>
-    'packages/ugk_trainer/assets/pose_hub/app-pack-r2-v1/standing/$id.webp';
+    'packages/ugk_trainer/assets/pose_hub/app-pack-r2-v7/standing/$id.webp';
 
 Future<List<int>> _fixtureImage() async {
   final recorder = ui.PictureRecorder();
