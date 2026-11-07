@@ -131,7 +131,7 @@ void main() {
     catalog = await PoseHubActionLibrary.load();
     temporary = await Directory.systemTemp.createTemp('smartfit-guide-poster-');
     final bytes = await rootBundle.load(
-      'packages/ugk_trainer/assets/pose_hub/app-pack-r2-v7/standing/'
+      'packages/ugk_trainer/assets/pose_hub/app-pack-r2-v10/standing/'
       '${catalog.semanticCompleteActions.first.id}.webp',
     );
     poster = await File('${temporary.path}/cached-frame.webp').writeAsBytes(
