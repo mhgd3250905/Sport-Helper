@@ -3,12 +3,14 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:smartfit/app/posehub_media_repository.dart';
 import 'package:smartfit/domain/exercise.dart';
 import 'package:smartfit/domain/plan.dart';
 import 'package:smartfit/ui/cached_exercise_media.dart';
 import 'package:smartfit/ui/exercise_video.dart';
 import 'package:smartfit/ui/player_page.dart';
 import 'package:smartfit/ui/theme.dart';
+import 'package:smartfit/ui/training_media_progress.dart';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
 import 'package:ugk_trainer/ugk_trainer.dart';
 
@@ -19,6 +21,19 @@ class _Voice extends MutedVoiceOutput {
   var begins = 0;
   @override
   Future<void> begin() async => begins++;
+}
+
+class _TrainingRepository extends PoseHubUiRepository
+    implements PoseHubTrainingVideoPreparation {
+  _TrainingRepository(
+    this.catalog, {
+    required super.mediaBaseUri,
+    super.onEnsureFile,
+  });
+  final coach.PoseHubAppTestCatalog catalog;
+  @override
+  Future<Uri> ensureVideo(String actionId, {bool priority = false}) =>
+      ensureFile(catalog.tryGet(actionId)!.video);
 }
 
 TrainingPlan _plan(List<coach.PoseHubPackAction> actions) => TrainingPlan(
@@ -113,11 +128,12 @@ void main() {
           ...catalog.semanticCompleteActions.take(2),
         ];
         final pending = {
-          for (final action in actions) action.id: Completer<Uri>(),
+          for (final action in actions) action.video.path: Completer<Uri>(),
         };
-        final repo = PoseHubUiRepository(
+        final repo = _TrainingRepository(
+          catalog,
           mediaBaseUri: base,
-          onEnsureAction: (id) => pending[id]!.future,
+          onEnsureFile: (file) => pending[file.path]!.future,
         );
         final voice = _Voice();
         final services = poseHubUiServices(
@@ -138,11 +154,16 @@ void main() {
         expect(find.text('准备训练'), findsNothing);
         expect(find.byType(PoseHubMediaPreparationPanel), findsNothing);
         expect(voice.begins, 1);
-        expect(repo.actionRequests.toSet(), {actions[0].id, actions[1].id});
+        expect(repo.actionRequests, isEmpty);
+        expect(repo.fileRequests, [actions.first.video]);
         final player = tester.widget<TrainerPlayer>(find.byType(TrainerPlayer));
         final video = tester.widget<ExerciseVideo>(find.byType(ExerciseVideo));
         expect(player.poseHubActionOf!(actions.first.id), same(actions.first));
-        expect(player.poseHubMediaPreparer, same(services.poseHubPreparer));
+        expect(player.poseHubMediaPreparer, isA<TrainingVideoPreparer>());
+        expect(
+          player.poseHubMediaPreparer,
+          isNot(same(services.poseHubPreparer)),
+        );
         expect(video.mediaPreparer, isA<PoseHubMediaPrefetcher>());
         expect(video.mediaPreparer, isNot(same(services.poseHubPreparer)));
         expect(find.byType(ExerciseFrameZero), findsOneWidget);
@@ -159,7 +180,7 @@ void main() {
           await tester.pump(const Duration(milliseconds: 100));
         }
         expect(int.parse(counter()), lessThan(before));
-        pending[actions.first.id]!.completeError(
+        pending[actions.first.video.path]!.completeError(
           StateError('UI transport failure'),
         );
         await tester.pump();
@@ -206,4 +227,49 @@ void main() {
       },
     );
   }
+
+  testWidgets(
+    'non-training playback keeps the original whole-action preparer',
+    (tester) async {
+      final action = catalog.semanticCompleteActions.first;
+      final pending = Completer<Uri>();
+      final repo = PoseHubUiRepository(
+        mediaBaseUri: base,
+        onEnsureAction: (_) => pending.future,
+      );
+      final services = poseHubUiServices(
+        catalog: catalog,
+        media: repo,
+        library: ExerciseLibrary([poseHubUiExercise(action)]),
+      );
+      await tester.pumpWidget(
+        poseHubUiApp(
+          palette: SfPalette.dark,
+          services: services,
+          home: Scaffold(
+            body: SizedBox.square(
+              dimension: 240,
+              child: ExerciseVideo(exercise: poseHubUiExercise(action)),
+            ),
+          ),
+        ),
+      );
+      for (var i = 0; i < 8; i++) {
+        await tester.pump();
+      }
+      final media = tester.widget<CachedExerciseMedia>(
+        find.byType(CachedExerciseMedia),
+      );
+      expect(media.mediaPreparer, same(services.poseHubPreparer));
+      expect(repo.actionRequests, [action.id]);
+      expect(repo.fileRequests, isEmpty);
+      expect(media.training, isFalse);
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox.shrink());
+      pending.complete(base);
+      await tester.pump();
+      repo.dispose();
+      services.store.dispose();
+    },
+  );
 }

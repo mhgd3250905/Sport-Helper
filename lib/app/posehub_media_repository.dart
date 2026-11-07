@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
+import 'package:ugk_trainer/ugk_trainer.dart' show CatalogMediaTimingCallback;
 
 import 'posehub_media_repository_stub.dart'
     if (dart.library.io) 'posehub_media_repository_io.dart'
@@ -14,6 +15,8 @@ export 'posehub_media_repository_types.dart'
         PoseHubDownloadPhase,
         PoseHubDownloadState,
         PoseHubMediaException,
+        PoseHubMediaTimingAnchor,
+        PoseHubTrainingVideoPreparation,
         PoseHubLegacyVideoFile,
         PoseHubVideoCache,
         PoseHubVideoCacheAccess,
@@ -27,6 +30,7 @@ abstract interface class PoseHubMediaRepository {
     String packVersion = 'r1-v3',
     String? rootDirectory,
     PoseHubBundledFileLoader? bundledFileLoader,
+    CatalogMediaTimingCallback? onTiming,
   }) => _create(
     catalog: catalog,
     catalogRevision: catalogRevision,
@@ -34,6 +38,7 @@ abstract interface class PoseHubMediaRepository {
     packVersion: packVersion,
     rootDirectory: rootDirectory,
     bundledFileLoader: bundledFileLoader,
+    onTiming: onTiming,
   );
 
   @visibleForTesting
@@ -44,6 +49,7 @@ abstract interface class PoseHubMediaRepository {
     String packVersion = 'r1-v3',
     required String rootDirectory,
     PoseHubBundledFileLoader? bundledFileLoader,
+    CatalogMediaTimingCallback? onTiming,
     bool allowInsecureLocalhost = false,
     Duration timeout = const Duration(seconds: 15),
     Duration progressInterval = const Duration(milliseconds: 100),
@@ -60,6 +66,7 @@ abstract interface class PoseHubMediaRepository {
     packVersion: packVersion,
     rootDirectory: rootDirectory,
     bundledFileLoader: bundledFileLoader,
+    onTiming: onTiming,
     allowInsecureLocalhost: allowInsecureLocalhost,
     timeout: timeout,
     progressInterval: progressInterval,
@@ -86,6 +93,7 @@ Future<PoseHubMediaRepository> _create({
   required String packVersion,
   String? rootDirectory,
   PoseHubBundledFileLoader? bundledFileLoader,
+  CatalogMediaTimingCallback? onTiming,
   bool allowInsecureLocalhost = false,
   Duration timeout = const Duration(seconds: 15),
   Duration progressInterval = const Duration(milliseconds: 100),
@@ -113,6 +121,8 @@ Future<PoseHubMediaRepository> _create({
       for (final file in action.files.values) file.path: file,
   };
   final bases = List<Uri>.unmodifiable(mediaBaseUrls);
+  final timing = PoseHubMediaTiming(catalog, onTiming: onTiming);
+  timing.repository('create_start');
   final store = await platform.createPoseHubMediaStore(
     revision: catalogRevision,
     packVersion: packVersion,
@@ -128,7 +138,9 @@ Future<PoseHubMediaRepository> _create({
     maxVideoCacheBytes: maxVideoCacheBytes,
     legacyCacheDirectory: legacyCacheDirectory,
     legacyVideos: legacyVideos,
+    timing: timing,
   );
+  timing.repository('create_complete', result: 'ok');
   return _Repository(
     catalog,
     files,
@@ -138,6 +150,7 @@ Future<PoseHubMediaRepository> _create({
     timeout,
     progressInterval,
     maxConcurrent,
+    timing,
   );
 }
 
@@ -145,7 +158,9 @@ class _Repository
     implements
         PoseHubMediaRepository,
         PoseHubVideoCache,
-        PoseHubVideoCacheAccess {
+        PoseHubVideoCacheAccess,
+        PoseHubMediaTimingAnchor,
+        PoseHubTrainingVideoPreparation {
   _Repository(
     this.catalog,
     this.files,
@@ -155,6 +170,7 @@ class _Repository
     this.timeout,
     this.progressInterval,
     this.maxConcurrent,
+    this.timing,
   ) {
     for (final action in catalog.allActions) {
       for (final role in action.files.entries) {
@@ -174,6 +190,7 @@ class _Repository
   final PoseHubBundledFileLoader? loadBundle;
   final Duration timeout, progressInterval;
   final int maxConcurrent;
+  final PoseHubMediaTiming timing;
   final _fileJobs = <String, Future<Uri>>{};
   final _contentJobs = <String, Future<Uri>>{};
   final _actionJobs = <String, Future<Uri>>{};
@@ -186,7 +203,10 @@ class _Repository
   final _images = <String>{};
   final _videos = <String>{};
   final _lastProgress = <String, DateTime>{};
-  final _queue = <({Completer<void> ready, int? generation})>[];
+  final _queue =
+      <({Completer<void> ready, int? generation, String contentKey})>[];
+  final _priorityContent = <String>{};
+  final _afterClearPriority = <String>{};
   int _active = 0;
   int _generation = 0;
   Future<void>? _clearing;
@@ -194,6 +214,9 @@ class _Repository
 
   @override
   Uri get mediaBaseUri => store.mediaBaseUri;
+
+  @override
+  void markTrainingEntry() => timing.markTrainingEntry();
 
   void _check([int? generation]) {
     if (_disposed) {
@@ -330,30 +353,69 @@ class _Repository
   }
 
   @override
-  Future<Uri> ensureFile(coach.PoseHubPackFile file) {
+  Future<Uri> ensureFile(coach.PoseHubPackFile file) => _requestFile(file);
+
+  @override
+  Future<Uri> ensureVideo(String actionId, {bool priority = false}) {
+    try {
+      return _requestFile(_action(actionId).video, priority: priority);
+    } catch (error, stack) {
+      return Future.error(error, stack);
+    }
+  }
+
+  void _promote(coach.PoseHubPackFile file) {
+    _priorityContent.add(file.sha256);
+    final index = _queue.indexWhere((entry) => entry.contentKey == file.sha256);
+    if (index > 0) {
+      final entry = _queue.removeAt(index);
+      _queue.insert(0, entry);
+      timing.event(
+        file,
+        'promoted',
+        queueDepth: _queue.length,
+        activeSlots: _active,
+      );
+    }
+  }
+
+  Future<Uri> _requestFile(
+    coach.PoseHubPackFile file, {
+    bool priority = false,
+  }) {
     try {
       file = _known(file);
     } catch (error, stack) {
       return Future.error(error, stack);
     }
     if (_clearing case final barrier?) {
-      return _afterClear(
-        _afterClearFiles,
-        file.path,
-        barrier,
-        () => ensureFile(file),
-      );
+      if (priority) _afterClearPriority.add(file.path);
+      return _afterClear(_afterClearFiles, file.path, barrier, () {
+        final requestedPriority = _afterClearPriority.remove(file.path);
+        return _requestFile(file, priority: priority || requestedPriority);
+      });
     }
-    if (_fileJobs[file.path] case final job?) return job;
+    if (priority) _promote(file);
+    if (_fileJobs[file.path] case final job?) {
+      timing.event(file, 'joined');
+      return job;
+    }
+    timing.begin(file);
     final generation = _images.contains(file.path) ? null : _generation;
     final job = Future<Uri>.microtask(() => _ensureFile(file, generation));
     _fileJobs[file.path] = job;
     job.then<void>(
       (_) {
         _fileJobs.remove(file.path);
+        if (!_contentJobs.containsKey(file.sha256)) {
+          _priorityContent.remove(file.sha256);
+        }
       },
       onError: (Object _, StackTrace _) {
         _fileJobs.remove(file.path);
+        if (!_contentJobs.containsKey(file.sha256)) {
+          _priorityContent.remove(file.sha256);
+        }
       },
     );
     return job;
@@ -369,22 +431,27 @@ class _Repository
     try {
       _check(generation);
       _set(file, PoseHubDownloadPhase.checking);
+      timing.event(file, 'cache_lookup');
       final cached = await store.cached(file);
       _check(generation);
       if (cached != null) {
         _set(file, PoseHubDownloadPhase.ready, received: file.bytes);
+        timing.end(file, result: 'cache');
         return cached;
       }
       final content = await _content(file, generation);
       _check(generation);
       _set(file, PoseHubDownloadPhase.verifying, received: file.bytes);
+      timing.event(file, 'materialize_start', source: 'publish');
       final uri = await store.materialize(file, content);
       _check(generation);
       _set(file, PoseHubDownloadPhase.ready, received: file.bytes);
+      timing.end(file, result: 'ok');
       return uri;
     } catch (error) {
       final safe = _safeError(error);
       _set(file, PoseHubDownloadPhase.failed, error: safe);
+      timing.end(file, result: 'failed', code: safe.code);
       throw safe;
     } finally {
       for (final release in releases) {
@@ -394,25 +461,39 @@ class _Repository
   }
 
   Future<Uri> _content(coach.PoseHubPackFile file, int? generation) {
-    if (_contentJobs[file.sha256] case final job?) return job;
+    if (_contentJobs[file.sha256] case final job?) {
+      timing.event(file, 'content_joined', source: 'cache');
+      return job;
+    }
     final job = Future<Uri>.microtask(() => _prepareContent(file, generation));
     _contentJobs[file.sha256] = job;
     job.then<void>(
       (_) {
         _contentJobs.remove(file.sha256);
+        _priorityContent.remove(file.sha256);
       },
       onError: (Object _, StackTrace _) {
         _contentJobs.remove(file.sha256);
+        _priorityContent.remove(file.sha256);
       },
     );
     return job;
   }
 
-  Future<void> _acquire(int? generation) async {
+  Future<void> _acquire(coach.PoseHubPackFile file, int? generation) async {
     _check(generation);
     if (_active >= maxConcurrent) {
       final waiter = Completer<void>();
-      _queue.add((ready: waiter, generation: generation));
+      final entry = (
+        ready: waiter,
+        generation: generation,
+        contentKey: file.sha256,
+      );
+      if (_priorityContent.contains(file.sha256)) {
+        _queue.insert(0, entry);
+      } else {
+        _queue.add(entry);
+      }
       await waiter.future;
     } else {
       _active++;
@@ -432,13 +513,28 @@ class _Repository
     int? generation,
   ) async {
     _contentState(file, PoseHubDownloadPhase.queued);
-    await _acquire(generation);
+    timing.event(
+      file,
+      'enqueued',
+      queueDepth: _queue.length,
+      activeSlots: _active,
+    );
+    await _acquire(file, generation);
+    timing.event(
+      file,
+      'slot_acquired',
+      queueDepth: _queue.length,
+      activeSlots: _active,
+    );
     try {
       _check(generation);
       _contentState(file, PoseHubDownloadPhase.checking);
       final reusable = await store.reusable(file);
       _check(generation);
-      if (reusable != null) return reusable;
+      if (reusable != null) {
+        timing.event(file, 'reusable', source: 'cache');
+        return reusable;
+      }
       void progress(int n) =>
           _contentState(file, PoseHubDownloadPhase.downloading, received: n);
       void verifying() => _contentState(
@@ -447,6 +543,7 @@ class _Repository
         received: file.bytes,
       );
       if (_images.contains(file.path) && loadBundle != null) {
+        timing.event(file, 'bundle_lookup', source: 'bundle');
         final bytes = await loadBundle!(file).timeout(timeout);
         _check(generation);
         if (bytes != null) {
@@ -460,9 +557,17 @@ class _Repository
         );
       }
       Object? failure;
+      var baseIndex = 0;
       for (final base in bases) {
         _check(generation);
         _contentState(file, PoseHubDownloadPhase.downloading);
+        timing.event(
+          file,
+          'attempt',
+          baseIndex: baseIndex,
+          retry: baseIndex,
+          source: 'network',
+        );
         try {
           return await store.download(
             file,
@@ -471,6 +576,12 @@ class _Repository
             verifying,
           );
         } catch (error) {
+          timing.event(
+            file,
+            'attempt_failed',
+            result: 'failed',
+            errorCode: _safeError(error).code,
+          );
           // A disposed consumer does not start a new mirror request. Each
           // failed transport has already closed and removed its own temp file.
           _check(generation);
@@ -479,6 +590,7 @@ class _Repository
           }
           failure = error;
         }
+        baseIndex++;
       }
       throw _safeError(failure!);
     } finally {
@@ -638,6 +750,8 @@ class _Repository
       );
     }
     _queue.clear();
+    _priorityContent.clear();
+    _afterClearPriority.clear();
     for (final state in [..._fileStates.values, ..._actionStates.values]) {
       state.dispose();
     }

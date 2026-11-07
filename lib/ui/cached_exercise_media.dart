@@ -10,6 +10,7 @@ import '../app/posehub_media_repository.dart';
 import '../app/posehub_media_repository_types.dart';
 import '../app/services.dart';
 import '../domain/exercise.dart';
+import '../diagnostics/runtime_log.dart';
 import 'guide_cached_poster.dart';
 import 'theme.dart';
 
@@ -223,6 +224,8 @@ class CachedExerciseMedia extends StatefulWidget {
     super.key,
     required this.exercise,
     this.playing = true,
+    this.prefetchWhenIdle = false,
+    this.training = false,
     this.paused = false,
     this.mirrored = false,
     this.radius = 16,
@@ -238,6 +241,7 @@ class CachedExerciseMedia extends StatefulWidget {
   });
   final Exercise exercise;
   final bool playing, paused, mirrored, waitForLoopOnMiss;
+  final bool prefetchWhenIdle, training;
   final double radius;
   final PoseHubMediaPreparer? mediaPreparer;
   final DrillMediaPlaybackHandle? playbackHandle;
@@ -285,9 +289,16 @@ class _CachedExerciseMediaState extends State<CachedExerciseMedia>
   double? _progress;
   int _epoch = 0;
   CachedMediaStatus? _reported;
+  bool _retrying = false, _frameLogged = false;
+  Stopwatch? _decoderWatch;
 
   bool get _current => _alive && mounted;
-  bool get _allowed => _current && widget.playing && !_backgrounded && _visible;
+  bool get _allowed =>
+      _current &&
+      (widget.playing || widget.prefetchWhenIdle) &&
+      !_backgrounded &&
+      _visible;
+  bool get _canPlay => _allowed && widget.playing;
   bool get _hasSurface => _controller != null || _legacy;
   String get _id => widget.exercise.id;
   String get _slot => widget.slot ?? _id;
@@ -329,14 +340,17 @@ class _CachedExerciseMediaState extends State<CachedExerciseMedia>
         oldWidget.exercise.id != _id ||
         oldWidget.exercise.media.revision != widget.exercise.media.revision ||
         oldWidget.mediaPreparer != widget.mediaPreparer;
-    if (changed || oldWidget.playing != widget.playing) {
+    if (changed ||
+        (oldWidget.playing || oldWidget.prefetchWhenIdle) !=
+            (widget.playing || widget.prefetchWhenIdle)) {
       if (changed) _initialCacheHit = null;
       if (_allowed) {
         unawaited(_start());
       } else {
         unawaited(retire());
       }
-    } else if (oldWidget.paused != widget.paused) {
+    } else if (oldWidget.paused != widget.paused ||
+        oldWidget.playing != widget.playing) {
       _previousPosition = null;
       _syncPause();
     }
@@ -358,7 +372,15 @@ class _CachedExerciseMediaState extends State<CachedExerciseMedia>
     owner: this,
     mediaId: _id,
     controller: _controller,
+    failed: _failed,
+    onRetry: _retry,
   );
+
+  void _retry() {
+    if (_retrying || !_allowed) return;
+    _retrying = true;
+    unawaited(_start(retry: true).whenComplete(() => _retrying = false));
+  }
 
   void _report() {
     final status = (
@@ -408,8 +430,11 @@ class _CachedExerciseMediaState extends State<CachedExerciseMedia>
     );
   }
 
-  Future<void> _start() async {
+  Future<void> _start({bool retry = false}) async {
     if (!_current) return;
+    final policy = widget.training
+        ? TrainingMediaPolicyScope.read(context)
+        : null;
     final services = context
         .getInheritedWidgetOfExactType<AppScope>()
         ?.services;
@@ -425,6 +450,7 @@ class _CachedExerciseMediaState extends State<CachedExerciseMedia>
     final repo = services?.poseHubMedia;
     _loading = true;
     _failed = false;
+    _frameLogged = false;
     _bindHandle();
     _rebuild();
     try {
@@ -443,9 +469,22 @@ class _CachedExerciseMediaState extends State<CachedExerciseMedia>
         if (!_allowed || epoch != _epoch) return;
         _initialCacheHit ??= cached != null;
         final preparer = widget.mediaPreparer ?? services?.poseHubPreparer;
-        final source =
-            cached ??
-            (preparer == null ? null : await _prepare(action, preparer));
+        final Uri? source;
+        if (widget.training && retry) {
+          source = switch (repo) {
+            final PoseHubTrainingVideoPreparation training =>
+              await training.ensureVideo(action.id, priority: true),
+            _ => await repo.ensureFile(action.video),
+          };
+        } else {
+          source =
+              cached ??
+              (policy != null
+                  ? await policy.repository.ensureFile(action.video)
+                  : preparer == null
+                  ? null
+                  : await _prepare(action, preparer));
+        }
         if (!_allowed || epoch != _epoch) return;
         if (source == null) {
           await _fail(epoch);
@@ -485,9 +524,10 @@ class _CachedExerciseMediaState extends State<CachedExerciseMedia>
   void _createController() {
     final controller = DrillMediaController();
     _controller = controller;
+    _decoderWatch = Stopwatch()..start();
     controller.addListener(_decoderChanged);
     _bindHandle();
-    if (!widget.paused) controller.toggle();
+    if (_canPlay && !widget.paused) controller.toggle();
   }
 
   void _downloadChanged() {
@@ -546,6 +586,20 @@ class _CachedExerciseMediaState extends State<CachedExerciseMedia>
   }
 
   void _decoderChanged() {
+    if (!_frameLogged && _controller?.hasFrame == true) {
+      _frameLogged = true;
+      if (widget.training) {
+        RuntimeLog.instance.record(
+          'media.timing',
+          fields: {
+            'actionId': _id,
+            'phase': 'firstFrame',
+            'source': 'decoder',
+            'elapsedMs': _decoderWatch?.elapsedMilliseconds,
+          },
+        );
+      }
+    }
     if (_controller?.failed == true) {
       final epoch = _epoch;
       // The public SDK controller is notifying its listeners right now.
@@ -559,7 +613,7 @@ class _CachedExerciseMediaState extends State<CachedExerciseMedia>
   }
 
   void _syncPause() {
-    if (widget.paused || !_allowed) {
+    if (widget.paused || !_canPlay) {
       _probeTimer?.cancel();
       _probeTimer = null;
       _controller?.pause();
@@ -571,7 +625,7 @@ class _CachedExerciseMediaState extends State<CachedExerciseMedia>
   }
 
   void _scheduleProbe() {
-    if (!_allowed ||
+    if (!_canPlay ||
         widget.paused ||
         _revealed ||
         !_hasSurface ||
@@ -583,7 +637,7 @@ class _CachedExerciseMediaState extends State<CachedExerciseMedia>
   }
 
   Future<void> _probe() async {
-    if (!_allowed || widget.paused || _revealed || !_hasSurface) return;
+    if (!_canPlay || widget.paused || _revealed || !_hasSurface) return;
     _probing = true;
     final epoch = _epoch;
     double? position;
@@ -599,7 +653,7 @@ class _CachedExerciseMediaState extends State<CachedExerciseMedia>
     }
     if (epoch != _epoch) return;
     _probing = false;
-    if (!_allowed || widget.paused) return;
+    if (!_canPlay || widget.paused) return;
     if (position != null) {
       final previous = _previousPosition;
       final waitForWrap = widget.waitForLoopOnMiss && _initialCacheHit == false;
@@ -650,7 +704,6 @@ class _CachedExerciseMediaState extends State<CachedExerciseMedia>
     }
     _legacyHandle = null;
     _legacy = false;
-    _bindHandle();
     _source = null;
     _legacyPosterSource = null;
     _checkingLegacyPoster = false;
@@ -666,6 +719,7 @@ class _CachedExerciseMediaState extends State<CachedExerciseMedia>
     _loading = false;
     _revealed = false;
     _failed = keepFailure;
+    _bindHandle();
     _progress = null;
     final release = _releasePin;
     _releasePin = null;
@@ -717,7 +771,7 @@ class _CachedExerciseMediaState extends State<CachedExerciseMedia>
         bundledOnly: media.appTestOnly,
       ),
       playing: true,
-      paused: widget.paused,
+      paused: widget.paused || !widget.playing,
       mirrored: false,
       radius: 0,
       stage: Colors.transparent,

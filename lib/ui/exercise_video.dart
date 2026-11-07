@@ -13,25 +13,31 @@ class ExerciseVideo extends StatefulWidget {
     super.key,
     required this.exercise,
     this.playing = true,
+    this.prefetchWhenIdle = false,
     this.paused = false,
     this.mirrored = false,
     this.radius = 16,
     this.playbackHandle,
+    this.downloadPlaybackHandle,
     this.mediaPreparer,
     this.training = false,
+    this.trainingProgress = false,
     this.stageColor,
   });
 
   final Exercise exercise;
   final bool playing;
+  final bool prefetchWhenIdle;
   final bool paused;
   final bool mirrored;
   final double radius;
   final DrillMediaPlaybackHandle? playbackHandle;
+  final DrillMediaPlaybackHandle? downloadPlaybackHandle;
 
   /// A TrainerMediaRequest supplies the player's shared SDK prefetch queue.
   final PoseHubMediaPreparer? mediaPreparer;
   final bool training;
+  final bool trainingProgress;
   final Color? stageColor;
 
   @override
@@ -40,6 +46,15 @@ class ExerciseVideo extends StatefulWidget {
 
 class _ExerciseVideoState extends State<ExerciseVideo> {
   late final String _operation;
+  _DownloadPlaybackRelay? _relay;
+
+  DrillMediaPlaybackHandle? get _mediaPlaybackHandle {
+    final download = widget.downloadPlaybackHandle;
+    if (download == null || identical(download, widget.playbackHandle)) {
+      return widget.playbackHandle;
+    }
+    return _relay ??= _DownloadPlaybackRelay(widget.playbackHandle, download);
+  }
 
   @override
   void initState() {
@@ -61,6 +76,11 @@ class _ExerciseVideoState extends State<ExerciseVideo> {
   @override
   void didUpdateWidget(ExerciseVideo oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (oldWidget.playbackHandle != widget.playbackHandle ||
+        oldWidget.downloadPlaybackHandle != widget.downloadPlaybackHandle) {
+      _relay?.dispose();
+      _relay = null;
+    }
     if (widget.exercise.id != oldWidget.exercise.id ||
         widget.playing != oldWidget.playing ||
         widget.paused != oldWidget.paused) {
@@ -70,6 +90,7 @@ class _ExerciseVideoState extends State<ExerciseVideo> {
 
   @override
   void dispose() {
+    _relay?.dispose();
     _record('video.surface.closed');
     super.dispose();
   }
@@ -89,11 +110,13 @@ class _ExerciseVideoState extends State<ExerciseVideo> {
         waitForLoopOnMiss: widget.training,
         retainWhenCovered: widget.training,
         playing: widget.playing,
+        prefetchWhenIdle: widget.prefetchWhenIdle,
+        training: widget.trainingProgress,
         paused: widget.paused,
         mirrored: widget.mirrored,
         radius: widget.radius,
         stageColor: widget.stageColor,
-        playbackHandle: widget.playbackHandle,
+        playbackHandle: _mediaPlaybackHandle,
       );
     }
     final m = exercise.media;
@@ -122,7 +145,65 @@ class _ExerciseVideoState extends State<ExerciseVideo> {
       errorColor: stage.onStageMuted,
       errorLabel: '示范暂时加载不了，计时和语音仍可继续',
       unavailableLabel: '此动作暂无视频示范',
-      playbackHandle: widget.playbackHandle,
+      playbackHandle: _mediaPlaybackHandle,
     );
+  }
+}
+
+/// Fans out the SDK's public decoder binding, never owning either caller handle.
+class _DownloadPlaybackRelay extends DrillMediaPlaybackHandle {
+  _DownloadPlaybackRelay(this.issue, this.download);
+  final DrillMediaPlaybackHandle? issue;
+  final DrillMediaPlaybackHandle download;
+  Object? _boundOwner;
+  bool _disposed = false;
+
+  @override
+  void bind({
+    required Object owner,
+    required String mediaId,
+    required DrillMediaController? controller,
+    bool failed = false,
+    VoidCallback? onRetry,
+  }) {
+    if (_disposed) return;
+    _boundOwner = owner;
+    super.bind(
+      owner: owner,
+      mediaId: mediaId,
+      controller: controller,
+      failed: failed,
+      onRetry: onRetry,
+    );
+    issue?.bind(
+      owner: owner,
+      mediaId: mediaId,
+      controller: controller,
+      failed: failed,
+      onRetry: onRetry,
+    );
+    download.bind(
+      owner: owner,
+      mediaId: mediaId,
+      controller: controller,
+      failed: failed,
+      onRetry: onRetry,
+    );
+  }
+
+  @override
+  void unbind(Object owner) {
+    super.unbind(owner);
+    issue?.unbind(owner);
+    download.unbind(owner);
+    if (identical(_boundOwner, owner)) _boundOwner = null;
+  }
+
+  @override
+  void dispose() {
+    final owner = _boundOwner;
+    if (owner != null) unbind(owner);
+    _disposed = true;
+    super.dispose();
   }
 }

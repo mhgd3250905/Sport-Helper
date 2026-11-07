@@ -152,6 +152,10 @@ Future<void> main() async {
         catalogRevision: poseHubRevision,
         packVersion: delivery.packVersion,
         mediaBaseUrls: delivery.mediaBaseUrls,
+        onTiming: (timing) => log.record(
+          'media.timing',
+          fields: {...timing.toFields(), 'phase': 'terminal'},
+        ),
       );
     } on Object catch (error) {
       log.record(

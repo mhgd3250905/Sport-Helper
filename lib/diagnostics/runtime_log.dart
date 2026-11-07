@@ -150,6 +150,68 @@ class RuntimeLog {
     'status',
     'reason',
   };
+  // Download diagnostics have a bounded schema; never persist URLs, headers,
+  // signatures or exception messages, even when a timing callback supplies them.
+  static const _mediaTimingFields = {
+    'taskId',
+    'entryId',
+    'actionId',
+    'kind',
+    'bytes',
+    'receivedBytes',
+    'totalBytes',
+    'phase',
+    'stage',
+    'elapsedMs',
+    'sinceEntryMs',
+    'queueDepth',
+    'activeSlots',
+    'baseIndex',
+    'retry',
+    'retries',
+    'result',
+    'errorCode',
+    'httpStatus',
+    'source',
+    'code',
+    'queueMs',
+    'ttfbMs',
+    'downloadMs',
+    'verifyMs',
+    'enqueuedAt',
+    'acquiredAt',
+    'requestStartedAt',
+    'firstByteAt',
+    'downloadCompletedAt',
+    'verifiedAt',
+    'completedAt',
+  };
+  static const _mediaTimingDates = {
+    'enqueuedAt',
+    'acquiredAt',
+    'requestStartedAt',
+    'firstByteAt',
+    'downloadCompletedAt',
+    'verifiedAt',
+    'completedAt',
+  };
+  static final _utcTiming = RegExp(
+    r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?Z$',
+  );
+
+  static bool _safeMediaTimingValue(Object? key, Object? value) {
+    if (value == null) return true;
+    if (_mediaTimingDates.contains(key)) {
+      return value is String &&
+          _utcTiming.hasMatch(value) &&
+          DateTime.tryParse(value) != null;
+    }
+    return value is bool ||
+        value is int ||
+        (value is double && value.isFinite) ||
+        (value is String && _token.hasMatch(value));
+  }
+
   static final _token = RegExp(r'^[A-Za-z0-9_.+\-]{1,96}$');
   static final _event = RegExp(r'^[a-z][a-z0-9_.]{0,63}$');
   static const _developerEvents = {
@@ -185,7 +247,11 @@ class RuntimeLog {
 
   Map<String, Object?> _safeFields(String event, Map fields) => {
     for (final entry in fields.entries)
-      if (event.startsWith('coach_chat.') &&
+      if ((event == 'media.timing' || event.startsWith('media.timing.')) &&
+          _mediaTimingFields.contains(entry.key) &&
+          _safeMediaTimingValue(entry.key, entry.value))
+        entry.key as String: entry.value
+      else if (event.startsWith('coach_chat.') &&
           _coachChatFields.contains(entry.key) &&
           (entry.value == null || entry.value is String))
         entry.key as String: entry.key == 'message' && entry.value is String

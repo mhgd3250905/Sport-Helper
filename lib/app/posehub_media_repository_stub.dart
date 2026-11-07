@@ -15,6 +15,7 @@ Future<PoseHubMediaFileStore> createPoseHubMediaStore({
   required int maxVideoCacheBytes,
   required String? legacyCacheDirectory,
   required List<PoseHubLegacyVideoFile> legacyVideos,
+  PoseHubMediaTiming? timing,
 }) => Future.error(
   const PoseHubMediaException(
     'unsupported',

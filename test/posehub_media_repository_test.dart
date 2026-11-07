@@ -7,8 +7,11 @@ import 'package:crypto/crypto.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smartfit/app/posehub_media_repository.dart';
 import 'package:smartfit/app/services.dart';
+import 'package:smartfit/diagnostics/runtime_log.dart';
 import 'package:smartfit/ui/training_media_settings.dart';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
+import 'package:ugk_trainer/ugk_trainer.dart'
+    show CatalogMediaTiming, CatalogMediaTimingCallback;
 
 class _CacheSettingsServices implements AppServices {
   _CacheSettingsServices(this.poseHubMedia);
@@ -177,6 +180,7 @@ void main() {
     String? revision,
     String packVersion = 'r1-v3',
     int cacheBytes = poseHubVideoCacheLimitBytes,
+    CatalogMediaTimingCallback? onTiming,
   }) async {
     final result = await PoseHubMediaRepository.forTesting(
       catalog: fixture.catalog,
@@ -191,6 +195,7 @@ void main() {
       maxConcurrent: concurrent,
       maxRedirects: redirects,
       maxVideoCacheBytes: cacheBytes,
+      onTiming: onTiming,
     );
     repositories.add(result);
     return result;
@@ -205,6 +210,305 @@ void main() {
       isEmpty,
     );
   }
+
+  test(
+    'training priority promotes a deduplicated queued video without cancelling active work',
+    () async {
+      fixture = _Fixture(actions: 3);
+      final actions = fixture.catalog.allActions.toList();
+      final release = Completer<void>();
+      addTearDown(() {
+        if (!release.isCompleted) release.complete();
+      });
+      handler = (request) async {
+        final path = request.uri.path.substring(1);
+        if (path == actions[0].video.path) await release.future;
+        final bytes = fixture.bodies[path]!;
+        request.response.contentLength = bytes.length;
+        request.response.add(bytes);
+        await request.response.close();
+      };
+      final repo = await create(concurrent: 1);
+      final training = repo as PoseHubTrainingVideoPreparation;
+      final active = training.ensureVideo(actions[0].id);
+      await _until(() => requested.isNotEmpty);
+      final ordinary = training.ensureVideo(actions[1].id);
+      await _until(
+        () =>
+            repo.watchFile(actions[1].video).value.phase ==
+            PoseHubDownloadPhase.queued,
+      );
+      final queued = training.ensureVideo(actions[2].id);
+      await _until(
+        () =>
+            repo.watchFile(actions[2].video).value.phase ==
+            PoseHubDownloadPhase.queued,
+      );
+      final promoted = training.ensureVideo(actions[2].id, priority: true);
+      expect(promoted, same(queued));
+      expect(repo.ensureFile(actions[2].video), same(queued));
+      expect(requested, ['/${actions[0].video.path}']);
+      release.complete();
+      await Future.wait([active, ordinary, promoted]);
+      expect(requested, [
+        '/${actions[0].video.path}',
+        '/${actions[2].video.path}',
+        '/${actions[1].video.path}',
+      ]);
+      expect(requested.toSet(), hasLength(3));
+    },
+  );
+
+  test(
+    'training retry starts a fresh video job and immediately advances failed bases',
+    () async {
+      var fail = true;
+      final previousLog = RuntimeLog.instance;
+      final log = RuntimeLog.instance = RuntimeLog(enabled: true);
+      final timings = <CatalogMediaTiming>[];
+      try {
+        handler = (request) async {
+          if (fail || request.uri.path.startsWith('/primary/')) {
+            request.response.statusCode = 503;
+          } else {
+            final bytes = fixture.bodies[fixture.first.video.path]!;
+            request.response.contentLength = bytes.length;
+            request.response.add(bytes);
+          }
+          await request.response.close();
+        };
+        final repo = await create(
+          mediaBases: [base.resolve('primary/'), base.resolve('backup/')],
+          onTiming: timings.add,
+        );
+        final training = repo as PoseHubTrainingVideoPreparation;
+        final failed = training.ensureVideo(fixture.first.id, priority: true);
+        await expectLater(
+          failed,
+          throwsA(
+            isA<PoseHubMediaException>().having((e) => e.code, 'code', 'http'),
+          ),
+        );
+        fail = false;
+        final retry = training.ensureVideo(fixture.first.id, priority: true);
+        expect(retry, isNot(same(failed)));
+        await retry;
+        expect(requested, [
+          '/primary/${fixture.first.video.path}',
+          '/backup/${fixture.first.video.path}',
+          '/primary/${fixture.first.video.path}',
+          '/backup/${fixture.first.video.path}',
+        ]);
+        final events = (jsonDecode(log.exportJson()) as Map)['events'] as List;
+        final attempts = [
+          for (final e in events)
+            if ((e as Map)['fields']['phase'] == 'attempt')
+              e['fields']['baseIndex'],
+        ];
+        expect(attempts, [1, 2, 1, 2]);
+        expect(timings, hasLength(2));
+        expect(timings.first.result, 'failed');
+        expect(timings.last.result, 'ready');
+        expect(timings.last.source, 'network');
+        expect(timings.last.baseIndex, 2);
+        expect(timings.last.retries, 1);
+        expect(timings.last.firstByteAt, isNotNull);
+        expect(timings.last.toLogLine(), isNot(contains('http://')));
+      } finally {
+        RuntimeLog.instance = previousLog;
+      }
+    },
+  );
+
+  test(
+    'Step1 training current then next uses the same slow-image fixture',
+    () async {
+      fixture = _Fixture(actions: 3);
+      final previousLog = RuntimeLog.instance;
+      final log = RuntimeLog.instance = RuntimeLog(enabled: true);
+      try {
+        handler = (request) async {
+          final path = request.uri.path.substring(1);
+          final bytes = fixture.bodies[path]!;
+          await Future<void>.delayed(
+            Duration(milliseconds: path.endsWith('.mp4') ? 10 : 200),
+          );
+          request.response.contentLength = bytes.length;
+          request.response.add(bytes);
+          await request.response.close();
+        };
+        final repo = await create();
+        (repo as PoseHubMediaTimingAnchor).markTrainingEntry();
+        final training = repo as PoseHubTrainingVideoPreparation;
+        final actions = fixture.catalog.allActions.toList();
+        await training.ensureVideo(actions[0].id, priority: true);
+        // The caller schedules only the next video after current becomes ready.
+        await training.ensureVideo(actions[1].id);
+        expect(requested, [
+          '/${actions[0].video.path}',
+          '/${actions[1].video.path}',
+        ]);
+        final exported = jsonDecode(log.exportJson()) as Map<String, dynamic>;
+        final events = (exported['events'] as List)
+            .cast<Map<String, dynamic>>()
+            .where((e) => e['event'] == 'media.timing')
+            .toList();
+        final tasks = <String, Map<String, Object?>>{};
+        for (final e in events) {
+          final f = Map<String, dynamic>.from(e['fields'] as Map);
+          if (f['taskId'] is! String) continue;
+          final row = tasks.putIfAbsent(
+            f['taskId'] as String,
+            () => {
+              'actionId': f['actionId'],
+              'kind': f['kind'],
+              'bytes': f['bytes'],
+              'stagesMsFromEntry': <String, Object?>{},
+              'visibleFirstFrameMs': null,
+              'visibleFirstFrameEvidence': 'not_measured_repository_only',
+            },
+          );
+          (row['stagesMsFromEntry'] as Map<String, Object?>)[f['phase']
+                  as String] =
+              f['sinceEntryMs'];
+        }
+        expect(tasks.values.every((t) => t['kind'] == 'video'), isTrue);
+        final directory =
+            Platform.environment['SMARTFIT_MEDIA_TIMING_REPORT_DIR'];
+        if (directory != null) {
+          final report = Directory(directory);
+          await report.create(recursive: true);
+          await File(
+            '${report.path}/step1-repository-events.json',
+          ).writeAsString(jsonEncode(exported));
+          await File(
+            '${report.path}/step1-repository-stage-table.json',
+          ).writeAsString(
+            const JsonEncoder.withIndent('  ').convert({
+              'format': 'sf-media-timing-controlled-after@1',
+              'baselineSource': '2c534f562680c6b1604d05f321d8952caeae99e1',
+              'behaviorChanged': true,
+              'fixtureActions': 3,
+              'maxConcurrent': 2,
+              'callPattern': 'current_video_priority_then_only_next_video',
+              'controlledVideoResponseDelayMs': 10,
+              'controlledImageResponseDelayMs': 200,
+              'mediaRequests': requested.length,
+              'tasks': tasks.values.toList(),
+              'actualDeviceSlowCauseEstablished': false,
+              'firstFrameAndRevealMeasured': false,
+            }),
+          );
+        }
+      } finally {
+        RuntimeLog.instance = previousLog;
+      }
+    },
+  );
+
+  test('Step0 timing observes unchanged two-worker full-action FIFO', () async {
+    fixture = _Fixture(actions: 3);
+    final previousLog = RuntimeLog.instance;
+    final log = RuntimeLog.instance = RuntimeLog(enabled: true);
+    try {
+      handler = (request) async {
+        final path = request.uri.path.substring(1);
+        final bytes = fixture.bodies[path]!;
+        // Controlled transport only: images are deliberately slower than
+        // videos. Workers, FIFO and concurrency match production; existing
+        // fixture-only transport timeouts remain unchanged.
+        await Future<void>.delayed(
+          Duration(milliseconds: path.endsWith('.mp4') ? 10 : 200),
+        );
+        request.response.contentLength = bytes.length;
+        request.response.add(bytes);
+        await request.response.close();
+      };
+      final repo = await create();
+      (repo as PoseHubMediaTimingAnchor).markTrainingEntry();
+      final ordered = fixture.catalog.allActions.map((a) => a.id).toList();
+      var next = 0;
+      Future<void> worker() async {
+        while (next < ordered.length) {
+          await repo.ensureAction(ordered[next++]);
+        }
+      }
+
+      // Same call pattern as AppServices._prefetchPoseHub: two workers, each
+      // awaiting all three files of one action before taking another action.
+      await Future.wait([worker(), worker()]);
+      expect(requested, hasLength(9));
+      expect(requested.toSet(), hasLength(9));
+      final exported = jsonDecode(log.exportJson()) as Map<String, dynamic>;
+      final events = (exported['events'] as List)
+          .cast<Map<String, dynamic>>()
+          .where((e) => e['event'] == 'media.timing')
+          .toList();
+      final fields = [
+        for (final e in events) Map<String, dynamic>.from(e['fields'] as Map),
+      ];
+      expect(fields.where((f) => f['phase'] == 'complete'), hasLength(9));
+      expect(fields.where((f) => f['phase'] == 'first_byte'), hasLength(9));
+      expect(fields.any((f) => (f['queueDepth'] as int? ?? 0) > 0), isTrue);
+      expect(fields.where((f) => f['phase'] == 'attempt_failed'), isEmpty);
+      expect(
+        fields
+            .where((f) => f['phase'] == 'attempt')
+            .every((f) => f['baseIndex'] == 1 && f['retry'] == 0),
+        isTrue,
+      );
+      expect(log.exportJson(), isNot(contains('http://')));
+      expect(log.exportJson(), isNot(contains('127.0.0.1')));
+      final tasks = <String, Map<String, Object?>>{};
+      for (final f in fields) {
+        if (f['taskId'] is! String) continue;
+        final row = tasks.putIfAbsent(
+          f['taskId'] as String,
+          () => {
+            'actionId': f['actionId'],
+            'kind': f['kind'],
+            'bytes': f['bytes'],
+            'stagesMsFromEntry': <String, Object?>{},
+            'visibleFirstFrameMs': null,
+            'visibleFirstFrameEvidence': 'not_measured_repository_only',
+          },
+        );
+        (row['stagesMsFromEntry'] as Map<String, Object?>)[f['phase']
+                as String] =
+            f['sinceEntryMs'];
+      }
+      final directory =
+          Platform.environment['SMARTFIT_MEDIA_TIMING_REPORT_DIR'];
+      if (directory != null) {
+        final report = Directory(directory);
+        await report.create(recursive: true);
+        await File(
+          '${report.path}/step0-repository-events.json',
+        ).writeAsString(jsonEncode(exported));
+        await File(
+          '${report.path}/step0-repository-stage-table.json',
+        ).writeAsString(
+          const JsonEncoder.withIndent('  ').convert({
+            'format': 'sf-media-timing-controlled-baseline@1',
+            'source': '2c534f562680c6b1604d05f321d8952caeae99e1',
+            'behaviorChanged': false,
+            'callPattern':
+                'two_workers_each_await_ensureAction_all_three_files',
+            'maxConcurrent': 2,
+            'controlledVideoResponseDelayMs': 10,
+            'controlledImageResponseDelayMs': 200,
+            'mediaRequests': requested.length,
+            'runtimeTimingEvents': events.length,
+            'tasks': tasks.values.toList(),
+            'actualDeviceSlowCauseEstablished': false,
+            'firstFrameAndRevealMeasured': false,
+          }),
+        );
+      }
+    } finally {
+      RuntimeLog.instance = previousLog;
+    }
+  });
 
   test(
     'create makes an empty versioned root immediately and requests no media',
