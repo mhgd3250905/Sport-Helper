@@ -115,7 +115,6 @@ class _ExerciseVideoState extends State<ExerciseVideo> {
             ValueKey('posehub-exercise-media-${exercise.id}'),
         exercise: exercise,
         mediaPreparer: widget.mediaPreparer ?? services?.poseHubPreparer,
-        waitForLoopOnMiss: widget.training,
         retainWhenCovered: widget.training,
         playing: widget.playing,
         prefetchWhenIdle: widget.prefetchWhenIdle,
