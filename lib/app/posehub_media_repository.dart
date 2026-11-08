@@ -16,6 +16,8 @@ export 'posehub_media_repository_types.dart'
         PoseHubDownloadState,
         PoseHubMediaException,
         PoseHubMediaTimingAnchor,
+        PoseHubMediaEntryPreparation,
+        poseHubMediaTimingFields,
         PoseHubTrainingVideoPreparation,
         PoseHubLegacyVideoFile,
         PoseHubVideoCache,
@@ -160,7 +162,8 @@ class _Repository
         PoseHubVideoCache,
         PoseHubVideoCacheAccess,
         PoseHubMediaTimingAnchor,
-        PoseHubTrainingVideoPreparation {
+        PoseHubTrainingVideoPreparation,
+        PoseHubMediaEntryPreparation {
   _Repository(
     this.catalog,
     this.files,
@@ -217,6 +220,9 @@ class _Repository
 
   @override
   void markTrainingEntry() => timing.markTrainingEntry();
+
+  @override
+  void markMediaEntry(String entry) => timing.markMediaEntry(entry);
 
   void _check([int? generation]) {
     if (_disposed) {
@@ -358,7 +364,28 @@ class _Repository
   @override
   Future<Uri> ensureVideo(String actionId, {bool priority = false}) {
     try {
-      return _requestFile(_action(actionId).video, priority: priority);
+      return _requestFile(
+        _action(actionId).video,
+        priority: priority,
+        entry: 'training',
+      );
+    } catch (error, stack) {
+      return Future.error(error, stack);
+    }
+  }
+
+  @override
+  Future<Uri> ensureVideoForEntry(
+    String actionId, {
+    required String entry,
+    bool priority = false,
+  }) {
+    try {
+      return _requestFile(
+        _action(actionId).video,
+        priority: priority,
+        entry: entry,
+      );
     } catch (error, stack) {
       return Future.error(error, stack);
     }
@@ -382,6 +409,7 @@ class _Repository
   Future<Uri> _requestFile(
     coach.PoseHubPackFile file, {
     bool priority = false,
+    String entry = 'background',
   }) {
     try {
       file = _known(file);
@@ -392,15 +420,19 @@ class _Repository
       if (priority) _afterClearPriority.add(file.path);
       return _afterClear(_afterClearFiles, file.path, barrier, () {
         final requestedPriority = _afterClearPriority.remove(file.path);
-        return _requestFile(file, priority: priority || requestedPriority);
+        return _requestFile(
+          file,
+          priority: priority || requestedPriority,
+          entry: entry,
+        );
       });
     }
     if (priority) _promote(file);
     if (_fileJobs[file.path] case final job?) {
-      timing.event(file, 'joined');
+      timing.event(file, 'joined', consumerEntry: entry);
       return job;
     }
-    timing.begin(file);
+    timing.begin(file, entry: entry);
     final generation = _images.contains(file.path) ? null : _generation;
     final job = Future<Uri>.microtask(() => _ensureFile(file, generation));
     _fileJobs[file.path] = job;

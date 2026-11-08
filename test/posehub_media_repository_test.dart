@@ -6,12 +6,14 @@ import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smartfit/app/posehub_media_repository.dart';
+import 'package:smartfit/app/posehub_media_preparer.dart';
 import 'package:smartfit/app/services.dart';
 import 'package:smartfit/diagnostics/runtime_log.dart';
 import 'package:smartfit/ui/training_media_settings.dart';
+import 'package:smartfit/ui/training_media_progress.dart';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
 import 'package:ugk_trainer/ugk_trainer.dart'
-    show CatalogMediaTiming, CatalogMediaTimingCallback;
+    show CatalogMediaTiming, CatalogMediaTimingCallback, PoseHubMediaReady;
 
 class _CacheSettingsServices implements AppServices {
   _CacheSettingsServices(this.poseHubMedia);
@@ -405,6 +407,218 @@ void main() {
       }
     },
   );
+
+  test(
+    'entry-aware joined consumers preserve producer terminal metadata',
+    () async {
+      final previousLog = RuntimeLog.instance;
+      final log = RuntimeLog.instance = RuntimeLog(enabled: true);
+      final terminals = <Map<String, Object?>>[];
+      final release = Completer<void>();
+      addTearDown(() {
+        if (!release.isCompleted) release.complete();
+      });
+      try {
+        handler = (request) async {
+          await release.future;
+          final bytes = fixture.bodies[request.uri.path.substring(1)]!;
+          request.response.contentLength = bytes.length;
+          request.response.add(bytes);
+          await request.response.close();
+        };
+        final repo = await create(
+          onTiming: (record) {
+            final fields = {
+              ...poseHubMediaTimingFields(record),
+              'phase': 'terminal',
+            };
+            terminals.add(fields);
+            log.record('media.timing', fields: fields);
+          },
+        );
+        final entries = repo as PoseHubMediaEntryPreparation;
+        entries.markMediaEntry('training');
+        entries.markMediaEntry('guide_preview');
+        final first = entries.ensureVideoForEntry(
+          fixture.first.id,
+          entry: 'guide_preview',
+          priority: true,
+        );
+        await _until(() => requested.isNotEmpty);
+        entries.markMediaEntry('action_library_preview');
+        final bridge = TrainingMediaRepositoryBridge(
+          catalog: fixture.catalog,
+          host: repo,
+          entry: 'action_library_preview',
+        );
+        final joined = bridge.ensureFile(fixture.first.video);
+        expect(joined, same(first));
+        release.complete();
+        await first;
+        bridge.dispose();
+        expect(terminals, hasLength(1));
+        expect(terminals.single['entry'], 'guide_preview');
+        expect(terminals.single['entryId'], isA<String>());
+        expect(terminals.single['sinceEntryMs'], isA<int>());
+        final events = (jsonDecode(log.exportJson()) as Map)['events'] as List;
+        final join = events.singleWhere(
+          (e) =>
+              e['event'] == 'media.timing' && e['fields']['phase'] == 'joined',
+        );
+        expect(join['fields']['entry'], 'action_library_preview');
+        expect(join['fields']['taskId'], terminals.single['taskId']);
+        expect(join['fields']['entryId'], isNot(terminals.single['entryId']));
+        final fileEntries = [
+          for (final e in events)
+            if (e['fields']['kind'] == 'video') e['fields']['entry'],
+        ];
+        expect(fileEntries, isNot(contains('training')));
+        expect(requested, hasLength(1));
+      } finally {
+        RuntimeLog.instance = previousLog;
+      }
+    },
+  );
+
+  for (final videoOnly in [false, true]) {
+    for (final warmVideo in [false, true]) {
+      final mode = warmVideo ? 'video-cached' : 'cold-cache';
+      test(
+        '${videoOnly ? 'Step1' : 'Step0'} preview production preparer $mode',
+        () async {
+          fixture = _Fixture(actions: 1);
+          final previousLog = RuntimeLog.instance;
+          final log = RuntimeLog.instance = RuntimeLog(enabled: true);
+          try {
+            handler = (request) async {
+              final path = request.uri.path.substring(1);
+              final bytes = fixture.bodies[path]!;
+              await Future<void>.delayed(
+                Duration(milliseconds: path.endsWith('.mp4') ? 10 : 200),
+              );
+              request.response.contentLength = bytes.length;
+              request.response.add(bytes);
+              await request.response.close();
+            };
+            final repo = await create();
+            final action = fixture.first;
+            if (warmVideo) await repo.ensureFile(action.video);
+            requested.clear();
+            final watch = Stopwatch()..start();
+            if (videoOnly) {
+              (repo as PoseHubMediaEntryPreparation).markMediaEntry(
+                'action_library_preview',
+              );
+            } else {
+              (repo as PoseHubMediaTimingAnchor).markTrainingEntry();
+            }
+            final videoState = repo.watchFile(action.video);
+            int? videoReadyMs;
+            int? allResourcesReadyMs;
+            void videoChanged() {
+              if (videoState.value.phase == PoseHubDownloadPhase.ready) {
+                videoReadyMs ??= watch.elapsedMilliseconds;
+              }
+            }
+
+            videoState.addListener(videoChanged);
+            videoChanged();
+            final prepared = <Object>[];
+            try {
+              await for (final event in SmartFitPoseHubMediaPreparer(
+                repo,
+                videoOnly: videoOnly,
+                entry: videoOnly ? 'action_library_preview' : null,
+              ).prepareAction(action)) {
+                prepared.add(event);
+                if (event is PoseHubMediaReady) {
+                  allResourcesReadyMs = watch.elapsedMilliseconds;
+                }
+              }
+            } finally {
+              videoState.removeListener(videoChanged);
+            }
+            expect(prepared.whereType<PoseHubMediaReady>(), hasLength(1));
+            expect(videoReadyMs, isNotNull);
+            expect(allResourcesReadyMs, greaterThanOrEqualTo(videoReadyMs!));
+            expect(
+              requested,
+              hasLength(videoOnly ? (warmVideo ? 0 : 1) : (warmVideo ? 2 : 3)),
+            );
+            if (warmVideo) {
+              expect(requested, isNot(contains('/${action.video.path}')));
+            }
+            expect(
+              (videoOnly ? videoState.value : repo.watchAction(action.id).value)
+                  .phase,
+              PoseHubDownloadPhase.ready,
+            );
+            final exported =
+                jsonDecode(log.exportJson()) as Map<String, dynamic>;
+            final events = (exported['events'] as List)
+                .cast<Map<String, dynamic>>();
+            final entry = events.lastWhere(
+              (e) =>
+                  e['event'] == 'media.timing' &&
+                  (e['fields'] as Map)['phase'] == 'entry',
+            );
+            final entryStart = entry['sinceStartMs'] as int;
+            final stages = <String, Map<String, Object?>>{};
+            for (final e in events) {
+              if (e['event'] != 'media.timing') continue;
+              final f = e['fields'] as Map;
+              if ((e['sinceStartMs'] as int) < entryStart ||
+                  f['kind'] == 'repository') {
+                continue;
+              }
+              (stages[f['kind'] as String] ??= {})[f['phase'] as String] =
+                  f['sinceEntryMs'] ?? (e['sinceStartMs'] as int) - entryStart;
+            }
+            final directory =
+                Platform.environment['SMARTFIT_PREVIEW_TIMING_REPORT_DIR'];
+            if (directory != null) {
+              final report = Directory(directory);
+              await report.create(recursive: true);
+              final prefix = videoOnly ? 'after-preview' : 'before-preview';
+              await File(
+                '${report.path}/$prefix-$mode-events.json',
+              ).writeAsString(jsonEncode(exported));
+              await File('${report.path}/$prefix-$mode.json').writeAsString(
+                const JsonEncoder.withIndent('  ').convert({
+                  'format': videoOnly
+                      ? 'sf-preview-preparer-controlled-after@1'
+                      : 'sf-preview-preparer-controlled-before@1',
+                  'baselineSource': '9fb21f485f51ad22c778655474d3dcb5bafd6dba',
+                  'sdkRuntimeOnlyPublicExportChanged': true,
+                  'entry': 'action_library_preview',
+                  'entryFieldPresentInProduct': videoOnly,
+                  'cacheState': mode,
+                  'fixtureActions': 1,
+                  'maxConcurrent': 2,
+                  'videoResponseDelayMs': 10,
+                  'imageResponseDelayMs': 200,
+                  'behaviorChanged': videoOnly,
+                  'preparedResourceScope': videoOnly
+                      ? 'video_only'
+                      : 'whole_action',
+                  'realDeviceMeasured': false,
+                  'entryMs': 0,
+                  'videoReadyMs': videoReadyMs,
+                  'allResourcesReadyMs': allResourcesReadyMs,
+                  'visibleFirstFrameMs': null,
+                  'visibleFirstFrameMeasured': false,
+                  'requestCountAfterEntry': requested.length,
+                  'fileStagesMs': stages,
+                }),
+              );
+            }
+          } finally {
+            RuntimeLog.instance = previousLog;
+          }
+        },
+      );
+    }
+  }
 
   test('Step0 timing observes unchanged two-worker full-action FIFO', () async {
     fixture = _Fixture(actions: 3);

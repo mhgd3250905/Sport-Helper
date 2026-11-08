@@ -15,10 +15,16 @@ import 'training_media_progress.dart';
 /// Supplies host route/media hooks without recreating SDK practice UI or doses.
 /// The original page is the SDK's fully configured browser callback payload.
 class SinglePracticePage extends StatefulWidget {
-  const SinglePracticePage({super.key, required this.page, this.exercise});
+  const SinglePracticePage({
+    super.key,
+    required this.page,
+    this.exercise,
+    this.sourceEntry = 'single_practice',
+  });
 
   final PoseHubSinglePracticePage page;
   final Exercise? exercise;
+  final String sourceEntry;
 
   @override
   State<SinglePracticePage> createState() => _SinglePracticePageState();
@@ -33,16 +39,24 @@ class _SinglePracticePageState extends State<SinglePracticePage> {
   PoseHubMediaPreparer? _preparerDelegate, _preparer;
   bool _gateOpen = false, _sessionEnded = false, _replayPending = false;
   bool _entryMarked = false;
+  bool _trainingStarted = false;
   TrainingMediaRepositoryBridge? _repository;
   TrainingMediaPolicy? _policy;
   VoidCallback? _releaseTrainingMedia;
 
+  String get _mediaEntry {
+    final source = switch (widget.sourceEntry) {
+      'action_library' => 'action_library',
+      'recommendation' => 'recommendation',
+      _ => 'single_practice',
+    };
+    return '${source}_${widget.page.startMode == TrainerStartMode.preview ? 'preview' : 'training'}';
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _bindGate();
-    if (widget.page.startMode == TrainerStartMode.training &&
-        _repository == null) {
+    if (_repository == null) {
       final services = context
           .getInheritedWidgetOfExactType<AppScope>()
           ?.services;
@@ -52,18 +66,26 @@ class _SinglePracticePageState extends State<SinglePracticePage> {
           catalog != null &&
           media != null &&
           media is PoseHubTrainingVideoPreparation) {
-        _releaseTrainingMedia = services.beginTrainingMediaSession();
+        if (widget.page.startMode == TrainerStartMode.training) {
+          _releaseTrainingMedia = services.beginTrainingMediaSession();
+        }
         final repository = _repository = TrainingMediaRepositoryBridge(
           catalog: catalog,
           host: media,
+          entry: _mediaEntry,
         );
         _policy = TrainingMediaPolicy(
           repository: repository,
           posterAssetRoot: PoseHubActionLibrary.standingAssetRoot,
           prefetchBeforeTraining: false,
         );
+        if (media case final PoseHubMediaEntryPreparation entry) {
+          entry.markMediaEntry(_mediaEntry);
+          _entryMarked = true;
+        }
       }
     }
+    _bindGate();
   }
 
   @override
@@ -116,6 +138,15 @@ class _SinglePracticePageState extends State<SinglePracticePage> {
   void _exitStarted() {
     _control?.beginExit();
     widget.page.onExitStarted?.call();
+  }
+
+  void _startTraining() {
+    _releaseTrainingMedia ??= context
+        .getInheritedWidgetOfExactType<AppScope>()
+        ?.services
+        .beginTrainingMediaSession();
+    if (!_trainingStarted) setState(() => _trainingStarted = true);
+    widget.page.onStartTraining?.call();
   }
 
   Future<void> _beforeExitPop() async {
@@ -227,6 +258,7 @@ class _SinglePracticePageState extends State<SinglePracticePage> {
       exercise: exercise,
       playing: _policy == null ? true : actual.canPlay,
       prefetchWhenIdle: _policy != null,
+      videoPriority: _policy != null,
       paused: paused,
       mirrored: request.mirrored,
       radius: request.theme.radius,
@@ -234,7 +266,10 @@ class _SinglePracticePageState extends State<SinglePracticePage> {
       mediaPreparer: request.mediaPreparer,
       downloadPlaybackHandle: _policy == null ? null : actual.playbackHandle,
       training: true,
-      trainingProgress: _policy != null,
+      trainingProgress:
+          _policy != null &&
+          (_trainingStarted ||
+              widget.page.startMode == TrainerStartMode.training),
     );
   }
 
@@ -265,7 +300,7 @@ class _SinglePracticePageState extends State<SinglePracticePage> {
       mediaPreparer: _policy == null ? _preparer : null,
       voice: page.voice,
       startMode: page.startMode,
-      onStartTraining: page.onStartTraining,
+      onStartTraining: _policy == null ? page.onStartTraining : _startTraining,
       onCompleted: _completed,
       startGate: _startGate,
       beforeExitPop: _beforeExitPop,

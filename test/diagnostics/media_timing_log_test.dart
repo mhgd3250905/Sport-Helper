@@ -21,6 +21,7 @@ void main() {
       final fields = <String, Object?>{
         'taskId': 'media.1',
         'entryId': 'training.1',
+        'entry': 'guide_preview',
         'actionId': 's-figure4',
         'kind': 'video',
         'bytes': 211565,
@@ -78,12 +79,17 @@ void main() {
         fields: {
           'taskId': 'video.1',
           'firstByteAt': 'https://host/?token=PRIVATE',
+          'entry': 'https://host/?token=PRIVATE',
           'sinceEntryMs': 50,
         },
       );
       log.record(
         'unrelated.event',
-        fields: {'taskId': 'video.1', 'sinceEntryMs': 50},
+        fields: {
+          'taskId': 'video.1',
+          'sinceEntryMs': 50,
+          'entry': 'guide_preview',
+        },
       );
       final events = jsonDecode(log.exportJson())['events'] as List;
       expect(events[0]['fields'], {'taskId': 'video.1', 'sinceEntryMs': 50});

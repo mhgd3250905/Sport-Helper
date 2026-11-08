@@ -153,6 +153,7 @@ class RuntimeLog {
   // Download diagnostics have a bounded schema; never persist URLs, headers,
   // signatures or exception messages, even when a timing callback supplies them.
   static const _mediaTimingFields = {
+    'entry',
     'taskId',
     'entryId',
     'actionId',

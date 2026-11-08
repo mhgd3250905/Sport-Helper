@@ -72,6 +72,8 @@ class _PoseHubLibraryPageState extends State<PoseHubLibraryPage> {
     final preparer = identical(services?.poseHubMedia, widget.media)
         ? services?.poseHubPreparer ?? _preparer
         : _preparer;
+    final voice = services?.trainerVoice();
+    final theme = SmartFitTrainerTheme.of(context);
     return TrainingVisiblePosterPreload(
       child: PoseHubActionBrowser(
         catalog: widget.catalog,
@@ -82,9 +84,26 @@ class _PoseHubLibraryPageState extends State<PoseHubLibraryPage> {
             widget.media?.mediaBaseUri ??
             Uri(scheme: 'file', path: '/__posehub_cache_unavailable__/'),
         mediaPreparer: preparer,
-        voice: services?.trainerVoice(),
-        theme: SmartFitTrainerTheme.of(context),
+        voice: voice,
+        theme: theme,
         onCompleted: services?.recordTrainingCompletion,
+        onOpenAction: (action) => unawaited(
+          openTraining(
+            context,
+            practice: PoseHubSinglePracticePage(
+              action: action,
+              mediaBaseUri:
+                  widget.media?.mediaBaseUri ??
+                  Uri(scheme: 'file', path: '/__posehub_cache_unavailable__/'),
+              mediaPreparer: preparer,
+              voice: voice,
+              theme: theme,
+              startMode: TrainerStartMode.preview,
+              onCompleted: services?.recordTrainingCompletion,
+            ),
+            sourceEntry: 'action_library',
+          ),
+        ),
         onOpenPractice: (page) => unawaited(
           openTraining(context, practice: page, sourceEntry: 'action_library'),
         ),

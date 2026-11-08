@@ -9,10 +9,12 @@ import 'action_issue_actions.dart';
 import 'alpha_artwork.dart';
 import 'chat/coach_ui_adapter.dart';
 import 'exercise_video.dart';
+import 'cached_exercise_media.dart' show CachedExerciseMediaHandle;
 import 'open_training.dart';
 import 'posehub_library_page.dart';
 import 'theme.dart';
 import 'theme/trainer_theme.dart';
+import 'visible_video_progress.dart';
 
 /// Every move in the library, filterable by category; tap to watch. Opened
 /// from the chat ("看看动作库", "有哪些拉伸动作" → [initial]) or the drawer.
@@ -166,11 +168,14 @@ class _ExerciseDetails extends StatefulWidget {
 
 class _ExerciseDetailsState extends State<_ExerciseDetails> {
   DrillMediaPlaybackHandle? _playback;
+  final _downloadPlayback = DrillMediaPlaybackHandle();
+  final _surface = CachedExerciseMediaHandle();
   bool _playVideo = false;
 
   @override
   void dispose() {
     _playback?.dispose();
+    _downloadPlayback.dispose();
     super.dispose();
   }
 
@@ -182,6 +187,7 @@ class _ExerciseDetailsState extends State<_ExerciseDetails> {
     final playback = store.enabled
         ? (_playback ??= DrillMediaPlaybackHandle())
         : null;
+    final mediaPlayback = playback ?? _downloadPlayback;
     final alphaPreview =
         !_playVideo &&
         SfAlphaCards.hasCover(e, enabled: SfAlphaCards.enabledOf(context));
@@ -231,10 +237,19 @@ class _ExerciseDetailsState extends State<_ExerciseDetails> {
                 ),
               )
             else
-              ExerciseVideo(
+              VisibleVideoProgress(
                 exercise: e,
-                radius: SfRadius.lg,
-                playbackHandle: playback,
+                active: true,
+                playbackHandle: mediaPlayback,
+                onRetry: _surface.retry,
+                child: ExerciseVideo(
+                  exercise: e,
+                  radius: SfRadius.lg,
+                  playbackHandle: mediaPlayback,
+                  videoPriority: true,
+                  mediaEntry: 'legacy_detail_preview',
+                  retirementHandle: _surface,
+                ),
               ),
             if (playback != null)
               ActionIssueMarkButton(

@@ -97,6 +97,7 @@ Future<SessionResult?> openTraining(
           : SinglePracticePage(
               page: practice,
               exercise: services?.library.tryGet(practice.action.id),
+              sourceEntry: sourceEntry,
             ),
     );
     final popped = navigator.push(route);

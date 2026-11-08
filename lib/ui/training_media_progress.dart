@@ -42,7 +42,11 @@ class _DownloadState extends ChangeNotifier
 /// The SDK policy/HUD can observe it without creating another downloader.
 class TrainingMediaRepositoryBridge
     implements CatalogMediaRepository, CatalogMediaPriorityRepository {
-  TrainingMediaRepositoryBridge({required this.catalog, required this.host}) {
+  TrainingMediaRepositoryBridge({
+    required this.catalog,
+    required this.host,
+    this.entry = 'training',
+  }) {
     for (final action in catalog.allActions) {
       _videos[action.video.path] = action.id;
     }
@@ -50,6 +54,7 @@ class TrainingMediaRepositoryBridge
   @override
   final coach.PoseHubAppTestCatalog catalog;
   final PoseHubMediaRepository host;
+  final String entry;
   final _videos = <String, String>{};
   final _files = <String, _DownloadState>{};
   final _actions = <String, _DownloadState>{};
@@ -67,6 +72,13 @@ class TrainingMediaRepositoryBridge
   }) {
     final id = _videos[file.path];
     if (id != null) {
+      if (host case final PoseHubMediaEntryPreparation media) {
+        return media.ensureVideoForEntry(
+          id,
+          entry: entry,
+          priority: priority == CatalogMediaPriority.current,
+        );
+      }
       if (host case final PoseHubTrainingVideoPreparation training) {
         return training.ensureVideo(
           id,

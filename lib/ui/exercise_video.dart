@@ -22,6 +22,9 @@ class ExerciseVideo extends StatefulWidget {
     this.mediaPreparer,
     this.training = false,
     this.trainingProgress = false,
+    this.videoPriority = false,
+    this.mediaEntry,
+    this.retirementHandle,
     this.stageColor,
   });
 
@@ -38,6 +41,9 @@ class ExerciseVideo extends StatefulWidget {
   final PoseHubMediaPreparer? mediaPreparer;
   final bool training;
   final bool trainingProgress;
+  final bool videoPriority;
+  final String? mediaEntry;
+  final CachedExerciseMediaHandle? retirementHandle;
   final Color? stageColor;
 
   @override
@@ -102,9 +108,11 @@ class _ExerciseVideoState extends State<ExerciseVideo> {
         .dependOnInheritedWidgetOfExactType<AppScope>()
         ?.services;
     final action = services?.poseHubCatalog?.tryGet(exercise.id);
-    if (action != null || widget.training) {
+    if (action != null || widget.training || widget.videoPriority) {
       return CachedExerciseMedia(
-        key: ValueKey('posehub-exercise-media-${exercise.id}'),
+        key:
+            widget.retirementHandle?.key ??
+            ValueKey('posehub-exercise-media-${exercise.id}'),
         exercise: exercise,
         mediaPreparer: widget.mediaPreparer ?? services?.poseHubPreparer,
         waitForLoopOnMiss: widget.training,
@@ -112,6 +120,9 @@ class _ExerciseVideoState extends State<ExerciseVideo> {
         playing: widget.playing,
         prefetchWhenIdle: widget.prefetchWhenIdle,
         training: widget.trainingProgress,
+        videoPriority: widget.videoPriority,
+        mediaEntry: widget.mediaEntry,
+        retirementHandle: widget.retirementHandle,
         paused: widget.paused,
         mirrored: widget.mirrored,
         radius: widget.radius,

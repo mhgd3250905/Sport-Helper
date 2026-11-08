@@ -16,6 +16,27 @@ abstract interface class PoseHubTrainingVideoPreparation {
   Future<Uri> ensureVideo(String actionId, {bool priority = false});
 }
 
+/// Entry-aware callers opt in without changing older repository fakes.
+abstract interface class PoseHubMediaEntryPreparation {
+  void markMediaEntry(String entry);
+  Future<Uri> ensureVideoForEntry(
+    String actionId, {
+    required String entry,
+    bool priority = false,
+  });
+}
+
+final _hostTimingFields = Expando<Map<String, Object?>>();
+
+/// Adds only Host task/entry identity to the unchanged SDK terminal record.
+Map<String, Object?> poseHubMediaTimingFields(CatalogMediaTiming timing) => {
+  ...timing.toFields(),
+  ...?_hostTimingFields[timing],
+};
+
+String _safeMediaEntry(String entry) =>
+    RegExp(r'^[a-z][a-z0-9_]{0,63}$').hasMatch(entry) ? entry : 'unknown';
+
 /// Request milestones only: no URI, path, headers or exception text is logged.
 class PoseHubMediaTiming {
   PoseHubMediaTiming(coach.PoseHubAppTestCatalog catalog, {this.onTiming})
@@ -37,37 +58,47 @@ class PoseHubMediaTiming {
   final _clock = Stopwatch()..start();
   final _owners = <String, ({String actionId, String kind})>{};
   final _tasks = <String, _MediaTimingTask>{};
-  int? _entryAt;
-  String? _entryId;
+  final _entryAnchors = <String, ({String id, int at})>{};
+  String _currentEntry = 'background';
 
-  void markTrainingEntry() {
+  void markTrainingEntry() => markMediaEntry('training');
+
+  void markMediaEntry(String entry) {
     if (!_enabled) return;
-    _entryAt = _clock.elapsedMilliseconds;
-    _entryId = _log.newOperation('media-entry');
+    _currentEntry = _safeMediaEntry(entry);
+    _entryAnchors[_currentEntry] = (
+      id: _log.newOperation('media-entry'),
+      at: _clock.elapsedMilliseconds,
+    );
     repository('entry');
   }
 
   void repository(String phase, {String? result, String? errorCode}) {
     if (!_enabled) return;
+    final anchor = _entryAnchors[_currentEntry];
     _record({
       'actionId': 'repository',
       'kind': 'repository',
       'bytes': 0,
       'phase': phase,
       'elapsedMs': _clock.elapsedMilliseconds,
-      'entryId': ?_entryId,
-      if (_entryAt case final at?)
-        'sinceEntryMs': _clock.elapsedMilliseconds - at,
+      'entry': _currentEntry,
+      'entryId': ?anchor?.id,
+      if (anchor != null)
+        'sinceEntryMs': _clock.elapsedMilliseconds - anchor.at,
       'result': ?result,
       'errorCode': ?errorCode,
-    }, _entryId);
+    }, anchor?.id);
   }
 
-  void begin(coach.PoseHubPackFile file) {
+  void begin(coach.PoseHubPackFile file, {String entry = 'background'}) {
     if (!_enabled) return;
+    final sourceEntry = _safeMediaEntry(entry);
     _tasks[file.path] = _MediaTimingTask(
       _log.newOperation('media'),
       _clock.elapsedMilliseconds,
+      sourceEntry,
+      _entryAnchors[sourceEntry],
     );
     event(file, 'issued');
   }
@@ -84,10 +115,15 @@ class PoseHubMediaTiming {
     String? source,
     String? result,
     String? errorCode,
+    String? consumerEntry,
   }) {
     final task = _tasks[file.path];
     final owner = _owners[file.path];
     if (task == null || owner == null) return;
+    final entry = consumerEntry == null
+        ? task.entry
+        : _safeMediaEntry(consumerEntry);
+    final anchor = consumerEntry == null ? task.anchor : _entryAnchors[entry];
     task.baseIndex = baseIndex ?? task.baseIndex;
     task.retry = retry ?? task.retry;
     final now = DateTime.now().toUtc();
@@ -116,15 +152,16 @@ class PoseHubMediaTiming {
     }
     _record({
       'taskId': task.id,
-      'entryId': ?_entryId,
+      'entry': entry,
+      'entryId': ?anchor?.id,
       'actionId': owner.actionId,
       'kind': owner.kind,
       'bytes': file.bytes,
       'receivedBytes': ?receivedBytes,
       'phase': phase,
       'elapsedMs': _clock.elapsedMilliseconds - task.startedAt,
-      if (_entryAt case final at?)
-        'sinceEntryMs': _clock.elapsedMilliseconds - at,
+      if (anchor != null)
+        'sinceEntryMs': _clock.elapsedMilliseconds - anchor.at,
       'queueDepth': ?queueDepth,
       'activeSlots': ?activeSlots,
       'baseIndex': task.baseIndex == null ? null : task.baseIndex! + 1,
@@ -142,25 +179,31 @@ class PoseHubMediaTiming {
     final owner = _owners[file.path];
     if (task == null || owner == null || onTiming == null) return;
     try {
-      onTiming?.call(
-        CatalogMediaTiming(
-          actionId: owner.actionId,
-          kind: owner.kind,
-          bytes: file.bytes,
-          enqueuedAt: task.enqueuedAt,
-          acquiredAt: task.acquiredAt,
-          requestStartedAt: task.requestStartedAt,
-          firstByteAt: task.firstByteAt,
-          downloadCompletedAt: task.downloadCompletedAt,
-          verifiedAt: task.verifiedAt,
-          completedAt: DateTime.now().toUtc(),
-          baseIndex: task.baseIndex == null ? null : task.baseIndex! + 1,
-          retries: task.retry ?? 0,
-          result: result == 'failed' ? 'failed' : 'ready',
-          source: result == 'cache' ? 'cache' : task.source ?? 'cache',
-          code: code,
-        ),
+      final record = CatalogMediaTiming(
+        actionId: owner.actionId,
+        kind: owner.kind,
+        bytes: file.bytes,
+        enqueuedAt: task.enqueuedAt,
+        acquiredAt: task.acquiredAt,
+        requestStartedAt: task.requestStartedAt,
+        firstByteAt: task.firstByteAt,
+        downloadCompletedAt: task.downloadCompletedAt,
+        verifiedAt: task.verifiedAt,
+        completedAt: DateTime.now().toUtc(),
+        baseIndex: task.baseIndex == null ? null : task.baseIndex! + 1,
+        retries: task.retry ?? 0,
+        result: result == 'failed' ? 'failed' : 'ready',
+        source: result == 'cache' ? 'cache' : task.source ?? 'cache',
+        code: code,
       );
+      _hostTimingFields[record] = Map.unmodifiable({
+        'taskId': task.id,
+        'entry': task.entry,
+        'entryId': ?task.anchor?.id,
+        if (task.anchor case final anchor?)
+          'sinceEntryMs': _clock.elapsedMilliseconds - anchor.at,
+      });
+      onTiming?.call(record);
     } catch (_) {
       // The optional SDK-typed observer cannot fail the media request.
     }
@@ -176,10 +219,12 @@ class PoseHubMediaTiming {
 }
 
 class _MediaTimingTask {
-  _MediaTimingTask(this.id, this.startedAt)
+  _MediaTimingTask(this.id, this.startedAt, this.entry, this.anchor)
     : enqueuedAt = DateTime.now().toUtc();
   final String id;
   final int startedAt;
+  final String entry;
+  final ({String id, int at})? anchor;
   int? baseIndex;
   int? retry;
   DateTime enqueuedAt;

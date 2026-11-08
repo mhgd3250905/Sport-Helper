@@ -154,7 +154,7 @@ Future<void> main() async {
         mediaBaseUrls: delivery.mediaBaseUrls,
         onTiming: (timing) => log.record(
           'media.timing',
-          fields: {...timing.toFields(), 'phase': 'terminal'},
+          fields: {...poseHubMediaTimingFields(timing), 'phase': 'terminal'},
         ),
       );
     } on Object catch (error) {
