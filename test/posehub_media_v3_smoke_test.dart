@@ -9,6 +9,7 @@ import 'package:ugk_trainer/ugk_trainer.dart';
 /// Uses the real anonymous HTTPS client inside this opt-in network test. TLS
 /// validation is unchanged; neither certificates, cookies nor credentials are set.
 class _PublicTransport extends HttpOverrides {
+  final catalogUrls = <Uri>{};
   final requests = <Map<String, Object?>>[];
   bool offline = false;
 
@@ -33,6 +34,10 @@ class _ObservedClient implements HttpClient {
 
   @override
   Future<HttpClientRequest> getUrl(Uri url) async {
+    final declaredUrl = transport.catalogUrls.lookup(url);
+    if (declaredUrl == null) {
+      throw StateError('Request URL is not declared by the catalog: $url');
+    }
     final record = <String, Object?>{'method': 'GET', 'url': url.toString()};
     transport.requests.add(record);
     if (transport.offline) {
@@ -41,7 +46,7 @@ class _ObservedClient implements HttpClient {
     }
     final elapsed = Stopwatch()..start();
     try {
-      return _ObservedRequest(await inner.getUrl(url), record, elapsed);
+      return _ObservedRequest(await inner.getUrl(declaredUrl), record, elapsed);
     } catch (error) {
       record['errorType'] = error.runtimeType.toString();
       record['headersElapsedMilliseconds'] = elapsed.elapsedMilliseconds;
@@ -120,10 +125,17 @@ void main() {
             return bySize == 0 ? a.id.compareTo(b.id) : bySize;
           });
         final action = ordered[ordered.length ~/ 2];
+        for (final file in action.files.values) {
+          final url =
+              file.downloadUri ??
+              (throw StateError('Missing catalog download URL: ${file.path}'));
+          transport.catalogUrls.add(url);
+        }
+        final bases = [PoseHubActionLibrary.mediaBaseUriFor(catalog)];
+        final packVersion = poseHubMediaPackOf(catalog);
         final temporary = await Directory.systemTemp.createTemp(
           'smartfit-v3-r2-smoke-',
         );
-        final bases = [Uri.parse('https://media.uuugk.win/pack/r1-v3/')];
         final report = File(
           Platform.environment['SMARTFIT_POSEHUB_V3_SMOKE_REPORT'] ??
               '../deliveries/posehub-on-demand-v3-20261026/v3-r2-download-smoke.json',
@@ -133,7 +145,7 @@ void main() {
           'status': 'running',
           'recordedAtUtc': DateTime.now().toUtc().toIso8601String(),
           'catalogSha256': PoseHubActionLibrary.catalogSha256,
-          'packVersion': 'r1-v3',
+          'packVersion': packVersion,
           'allActions': catalog.allActions.length,
           'aiActions': catalog.toAiCatalog().length,
           'pendingActions': catalog.pendingActions.length,
@@ -156,7 +168,7 @@ void main() {
             catalog: catalog,
             catalogRevision: PoseHubActionLibrary.catalogSha256,
             mediaBaseUrls: bases,
-            packVersion: 'r1-v3',
+            packVersion: packVersion,
             rootDirectory: temporary.path,
             timeout: const Duration(seconds: 30),
           );
@@ -174,8 +186,7 @@ void main() {
           }
           expect(transport.requests, hasLength(3));
           expect(transport.requests.map((r) => r['url']).toSet(), {
-            for (final file in action.files.values)
-              bases.single.resolve(file.path).toString(),
+            for (final url in transport.catalogUrls) url.toString(),
           });
           for (final response in transport.requests) {
             expect(response['statusCode'], HttpStatus.ok);
@@ -222,7 +233,7 @@ void main() {
             catalog: catalog,
             catalogRevision: PoseHubActionLibrary.catalogSha256,
             mediaBaseUrls: bases,
-            packVersion: 'r1-v3',
+            packVersion: packVersion,
             rootDirectory: temporary.path,
             timeout: const Duration(seconds: 2),
           );
