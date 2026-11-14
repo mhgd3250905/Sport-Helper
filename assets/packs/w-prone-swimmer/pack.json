@@ -62,10 +62,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -73,70 +75,84 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "俯卧游泳式"
+     "zh": "俯卧游泳式",
+     "en": "Prone swimmers"
     },
     "ms": {
-     "zh": 1115
+     "zh": 1115,
+     "en": 975
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "俯卧游泳式，练上背和下背"
+     "zh": "俯卧游泳式，练上背和下背",
+     "en": "Prone swimmers. Works the upper back and the lower back."
     },
     "ms": {
-     "zh": 2485
+     "zh": 2485,
+     "en": 3692
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "俯卧，额头离地一点"
+     "zh": "俯卧，额头离地一点",
+     "en": "Lie face down, forehead just off the floor"
     },
     "ms": {
-     "zh": 1927
+     "zh": 1927,
+     "en": 2508
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "胸口微抬，手臂从前方划到身侧"
+     "zh": "胸口微抬，手臂从前方划到身侧",
+     "en": "Chest slightly up, sweep your arms from the front to your sides"
     },
     "ms": {
-     "zh": 3088
+     "zh": 3088,
+     "en": 3297
     }
    },
    {
     "id": "cue3",
     "role": "cue",
     "text": {
-     "zh": "手臂贴地画弧，肩胛下沉"
+     "zh": "手臂贴地画弧，肩胛下沉",
+     "en": "Arms sweep an arc close to the floor, shoulder blades down"
     },
     "ms": {
-     "zh": 2601
+     "zh": 2601,
+     "en": 3181
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，手臂贴地画弧，肩胛下沉"
+     "zh": "放松一下。下一组记住，手臂贴地画弧，肩胛下沉",
+     "en": "Relax for a moment. Next set, remember: Arms sweep an arc close to the floor, shoulder blades down"
     },
     "ms": {
-     "zh": 5039
+     "zh": 5039,
+     "en": 6896
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "俯卧游泳式，完成"
+     "zh": "俯卧游泳式，完成",
+     "en": "Prone swimmers, done."
     },
     "ms": {
-     "zh": 1788
+     "zh": 1788,
+     "en": 1440
     }
    }
   ],
@@ -166,6 +182,34 @@
   "demo.mp4": {
    "bytes": 99227,
    "sha256": "3be890a4c9136db21548f84d00fa088077de3614ecc2a5abb6a89d3105b57902"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 21573,
+   "sha256": "4e43e2be2715667fe9d60b5a384e1c6e951558b70bec4278645081a92c4b925b"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 28365,
+   "sha256": "3bf9466e194ff8f64ac112b70d98fd8e0a2d263761bd63f630bf556ea6c56425"
+  },
+  "voice/en/cue3.m4a": {
+   "bytes": 27009,
+   "sha256": "beaf2d4eaad30d7f85c305946ec9b437a43280aa84eb6136fe1dc65a7095aec3"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 12897,
+   "sha256": "bccc30ee9a252c577630f7101aa565b4cf53f397d08a32d09d87690e592fec63"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 31183,
+   "sha256": "948840088bb291265e4b7a9906f5b190781480c0d6519a4a5aed75a095bc753c"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 9076,
+   "sha256": "73219da572d23f61de95aa0e33476569c9953da9e8d0a19d307c76787364151e"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 58429,
+   "sha256": "bea8498e1203768afc5dc0a523248b147c311d0e70793b97ead3cbd5b2413c56"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 16812,

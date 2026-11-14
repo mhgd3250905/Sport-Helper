@@ -61,10 +61,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -72,80 +74,96 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "半跪半劈叉"
+     "zh": "半跪半劈叉",
+     "en": "Half-kneeling half split"
     },
     "ms": {
-     "zh": 1184
+     "zh": 1184,
+     "en": 1393
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "半跪半劈叉，拉伸大腿后侧"
+     "zh": "半跪半劈叉，拉伸大腿后侧",
+     "en": "Half-kneeling half split. Stretches the hamstrings."
     },
     "ms": {
-     "zh": 2601
+     "zh": 2601,
+     "en": 3576
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "半跪，前腿伸直"
+     "zh": "半跪，前腿伸直",
+     "en": "Half kneel, front leg straight"
     },
     "ms": {
-     "zh": 1741
+     "zh": 1741,
+     "en": 1811
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "前腿伸直，从髋部往前折，手扶砖"
+     "zh": "前腿伸直，从髋部往前折，手扶砖",
+     "en": "Front leg straight, fold forward from the hips, hands on the blocks"
     },
     "ms": {
-     "zh": 3344
+     "zh": 3344,
+     "en": 3576
     }
    },
    {
     "id": "cue3",
     "role": "cue",
     "text": {
-     "zh": "髋向后坐，大腿后侧拉长"
+     "zh": "髋向后坐，大腿后侧拉长",
+     "en": "Sit the hips back, feel the hamstrings lengthen"
     },
     "ms": {
-     "zh": 2485
+     "zh": 2485,
+     "en": 2508
     }
    },
    {
     "id": "side_switch",
     "role": "side_switch",
     "text": {
-     "zh": "左侧同样，前腿伸直，从髋部往前折，手扶砖"
+     "zh": "左侧同样，前腿伸直，从髋部往前折，手扶砖",
+     "en": "Now the left side. Front leg straight, fold forward from the hips, hands on the blocks"
     },
     "ms": {
-     "zh": 4412
+     "zh": 4412,
+     "en": 5526
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，髋向后坐，大腿后侧拉长"
+     "zh": "放松一下。下一组记住，髋向后坐，大腿后侧拉长",
+     "en": "Relax for a moment. Next set, remember: Sit the hips back, feel the hamstrings lengthen"
     },
     "ms": {
-     "zh": 5039
+     "zh": 5039,
+     "en": 6130
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "半跪半劈叉，完成"
+     "zh": "半跪半劈叉，完成",
+     "en": "Half-kneeling half split, done."
     },
     "ms": {
-     "zh": 1881
+     "zh": 1881,
+     "en": 1834
     }
    }
   ],
@@ -175,6 +193,38 @@
   "demo.mp4": {
    "bytes": 122919,
    "sha256": "c526c301ecd045a6a9ccebe6fa9dcc402794cdaebcc894f2eed8d6009cbe8b31"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 15868,
+   "sha256": "34828f05accaaa9ba092960e195e84cd9ebe9ce3169a5e7084d88eb544b3dd79"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 30496,
+   "sha256": "ff50a7acec613e7ffeaad302c8cfad11c584164e34e667453487bab034404115"
+  },
+  "voice/en/cue3.m4a": {
+   "bytes": 21517,
+   "sha256": "1b27e1497e85de10b877b39d740b268a8a5567630ad1f119fe603a7d750588ea"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 16275,
+   "sha256": "831396c686c7537768c4c33bfd98c4fe02ba62ce24c440195282f4541bf3a2bc"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 28595,
+   "sha256": "af22ad2ac7008ea628025091b00a230be2c494d0edb3cbb37cedf9562d9cc476"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 12447,
+   "sha256": "a518e459da0ac3d9850d86bc9ed865c3ab20cd2e60aa66e7f3baf5552439be97"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 50153,
+   "sha256": "781d8b08b971e9e5209341dd609ac4f51320ef0cf6d2bc074a767979aca1f145"
+  },
+  "voice/en/side_switch.m4a": {
+   "bytes": 48010,
+   "sha256": "e7fa9bcbbd5d95f4a2823774d03ec39d69ab0a0556dae0e34bd26b49dbc5ff22"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 15477,

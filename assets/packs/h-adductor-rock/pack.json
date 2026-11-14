@@ -59,10 +59,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -70,70 +72,84 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "四足单腿侧伸后摇"
+     "zh": "四足单腿侧伸后摇",
+     "en": "Quadruped adductor rock-back"
     },
     "ms": {
-     "zh": 1834
+     "zh": 1834,
+     "en": 1625
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "四足单腿侧伸后摇，拉伸大腿内侧"
+     "zh": "四足单腿侧伸后摇，拉伸大腿内侧",
+     "en": "Quadruped adductor rock-back. Stretches the inner thighs."
     },
     "ms": {
-     "zh": 3251
+     "zh": 3251,
+     "en": 3855
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "一条腿向侧面伸直，臀部慢慢往后坐"
+     "zh": "一条腿向侧面伸直，臀部慢慢往后坐",
+     "en": "One leg out to the side, sit your hips back slowly"
     },
     "ms": {
-     "zh": 3437
+     "zh": 3437,
+     "en": 2763
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "臀部向后摇，大腿内侧拉长"
+     "zh": "臀部向后摇，大腿内侧拉长",
+     "en": "Rock the hips back, feel the inner thigh lengthen"
     },
     "ms": {
-     "zh": 2647
+     "zh": 2647,
+     "en": 2508
     }
    },
    {
     "id": "side_switch",
     "role": "side_switch",
     "text": {
-     "zh": "左侧同样，一条腿向侧面伸直，臀部慢慢往后坐"
+     "zh": "左侧同样，一条腿向侧面伸直，臀部慢慢往后坐",
+     "en": "Now the left side. One leg out to the side, sit your hips back slowly"
     },
     "ms": {
-     "zh": 4551
+     "zh": 4551,
+     "en": 4690
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，臀部向后摇，大腿内侧拉长"
+     "zh": "放松一下。下一组记住，臀部向后摇，大腿内侧拉长",
+     "en": "Relax for a moment. Next set, remember: Rock the hips back, feel the inner thigh lengthen"
     },
     "ms": {
-     "zh": 5132
+     "zh": 5132,
+     "en": 6246
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "四足单腿侧伸后摇，完成"
+     "zh": "四足单腿侧伸后摇，完成",
+     "en": "Quadruped adductor rock-back, done."
     },
     "ms": {
-     "zh": 2531
+     "zh": 2531,
+     "en": 2136
     }
    }
   ],
@@ -163,6 +179,34 @@
   "demo.mp4": {
    "bytes": 143037,
    "sha256": "9ec3b64dd71971dedd790d2508898a46898ce4df35af2342a90d2660d013123b"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 23667,
+   "sha256": "e9695ce54c38c8e6a3d7f92eef35c1526ea451cd03c73f8500957f3845ca2ba6"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 21572,
+   "sha256": "aa2f0d952429b166f148dd46417b1df7a884ad526a46a86c38ac558f9815f095"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 18730,
+   "sha256": "2a1b64cd3f6fd7594630c8a6f0a52adbdf7b1dfabe2b2cdfeef1674f3d17f8b1"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 29244,
+   "sha256": "1e8b9b172fc4242c95193a339b0cd30b9dcda7aa6ce38342f89c98f1151d5588"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 14463,
+   "sha256": "81174c4b09e7d95f97cdbf7747e1b5cc8248fcfc4f19074bc5dedaba7c4a222b"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 53994,
+   "sha256": "6793e0cbad89e52ca36a0b90bddfd6945b3c5c085f61f777a9656772dbfaa608"
+  },
+  "voice/en/side_switch.m4a": {
+   "bytes": 36542,
+   "sha256": "9e228b287e4313aa091505b721c608da2276242eb8019d5dd0caf37d20ebea8b"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 29231,

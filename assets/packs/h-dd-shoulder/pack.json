@@ -61,10 +61,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -72,60 +74,72 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "下犬式压肩"
+     "zh": "下犬式压肩",
+     "en": "Downward dog shoulder press"
     },
     "ms": {
-     "zh": 1207
+     "zh": 1207,
+     "en": 1556
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "下犬式压肩，拉伸背部和胸部"
+     "zh": "下犬式压肩，拉伸背部和胸部",
+     "en": "Downward dog shoulder press. Stretches the back and the chest."
     },
     "ms": {
-     "zh": 2740
+     "zh": 2740,
+     "en": 4040
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "手推地，臀部向上向后，胸口靠近大腿"
+     "zh": "手推地，臀部向上向后，胸口靠近大腿",
+     "en": "Push the floor away, hips up and back, chest toward your thighs"
     },
     "ms": {
-     "zh": 3738
+     "zh": 3738,
+     "en": 3715
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "胸口向腿的方向压"
+     "zh": "胸口向腿的方向压",
+     "en": "Press your chest toward your legs"
     },
     "ms": {
-     "zh": 1741
+     "zh": 1741,
+     "en": 1811
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，胸口向腿的方向压"
+     "zh": "放松一下。下一组记住，胸口向腿的方向压",
+     "en": "Relax for a moment. Next set, remember: Press your chest toward your legs"
     },
     "ms": {
-     "zh": 4156
+     "zh": 4156,
+     "en": 5503
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "下犬式压肩，完成"
+     "zh": "下犬式压肩，完成",
+     "en": "Downward dog shoulder press, done."
     },
     "ms": {
-     "zh": 1927
+     "zh": 1927,
+     "en": 2067
     }
    }
   ],
@@ -155,6 +169,30 @@
   "demo.mp4": {
    "bytes": 95832,
    "sha256": "8e3faef390b5d012e1c20849471102b9d71d96eb97c9aa92d45dc70a642dff54"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 31710,
+   "sha256": "7fe88be01d184310720423c23df1e2e37a051316d6d912fa8b4654b9709dad4c"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 15948,
+   "sha256": "ec994595c29818b0795ef695216eb6c5af8db707323812c9566461c993da59aa"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 18144,
+   "sha256": "c89ecff2a8623941ce260a1c972a85f0592914c856f0de72b951a94d58fa8556"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 31380,
+   "sha256": "6381187a5837c4df9c978b1377014b4478b3c120afd2568e4a0f10a61bdbf9d9"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 13819,
+   "sha256": "be92f2ef23c768b715cfb218e250121ec66a2751f7030c82931f7a57c604c8f1"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 47911,
+   "sha256": "027d895d4290e6f45e83e5da4217fb85a7864ec012dbfba8edd9ed2a1878046f"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 31815,

@@ -61,10 +61,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -72,70 +74,84 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "哑铃地板卧推"
+     "zh": "哑铃地板卧推",
+     "en": "Dumbbell floor press"
     },
     "ms": {
-     "zh": 1324
+     "zh": 1324,
+     "en": 1254
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "哑铃地板卧推，练胸部和手臂后侧"
+     "zh": "哑铃地板卧推，练胸部和手臂后侧",
+     "en": "Dumbbell floor press. Works the chest and the triceps."
     },
     "ms": {
-     "zh": 3181
+     "zh": 3181,
+     "en": 3878
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "仰卧屈膝，上臂贴地起始"
+     "zh": "仰卧屈膝，上臂贴地起始",
+     "en": "Lie on your back, knees bent, upper arms on the floor"
     },
     "ms": {
-     "zh": 2438
+     "zh": 2438,
+     "en": 3042
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "大臂与身体约四十五度，推起时哑铃在胸口正上方"
+     "zh": "大臂与身体约四十五度，推起时哑铃在胸口正上方",
+     "en": "Upper arms about forty-five degrees from your body, press the dumbbells up over your chest"
     },
     "ms": {
-     "zh": 4714
+     "zh": 4714,
+     "en": 4551
     }
    },
    {
     "id": "cue3",
     "role": "cue",
     "text": {
-     "zh": "向上推直，再慢慢落回"
+     "zh": "向上推直，再慢慢落回",
+     "en": "Press straight up, then lower slowly"
     },
     "ms": {
-     "zh": 2299
+     "zh": 2299,
+     "en": 2020
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，向上推直，再慢慢落回"
+     "zh": "放松一下。下一组记住，向上推直，再慢慢落回",
+     "en": "Relax for a moment. Next set, remember: Press straight up, then lower slowly"
     },
     "ms": {
-     "zh": 4807
+     "zh": 4807,
+     "en": 5689
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "哑铃地板卧推，完成"
+     "zh": "哑铃地板卧推，完成",
+     "en": "Dumbbell floor press, done."
     },
     "ms": {
-     "zh": 2020
+     "zh": 2020,
+     "en": 1788
     }
    }
   ],
@@ -165,6 +181,34 @@
   "demo.mp4": {
    "bytes": 124833,
    "sha256": "7eb133b17d62994c12d6da01e0580dcb6f359a0831ddaa65312e927ab5d99bd0"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 25994,
+   "sha256": "1d8f1a98bed250af620fd0c19912f9c26b9e86f1f7e010cd5519e66555d6fb05"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 38389,
+   "sha256": "cc265de8f4cb75f1c9ed212dd418fea0102dcbbb4d8245193c4c006a8b85055f"
+  },
+  "voice/en/cue3.m4a": {
+   "bytes": 17549,
+   "sha256": "7797d855ddb7176e7a9842092b5ae2844a773c15a96737f898befd54563274e6"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 15805,
+   "sha256": "5de9a8ceaadf68d07a8c88a3fd3c8486fa10a50481faab79452bddce0732af28"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 32341,
+   "sha256": "78afcb39979f7842c2ee138a354f385034c47641e65ba4f688402a60665eda83"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 11337,
+   "sha256": "a2b4e7c649e1b630bdc370abb806eaca9a62e8db83c4f315ad08f0d84f4a3f20"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 49180,
+   "sha256": "787c3e1d5b7b9abb3f71058770ad39fc8140c83f60275e917b85b8df0071fda5"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 21039,

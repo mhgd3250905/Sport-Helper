@@ -59,10 +59,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -70,70 +72,84 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "相扑深蹲肘推膝停留"
+     "zh": "相扑深蹲肘推膝停留",
+     "en": "Sumo squat hold with elbow pry"
     },
     "ms": {
-     "zh": 2043
+     "zh": 2043,
+     "en": 1834
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "相扑深蹲肘推膝停留，拉伸大腿内侧和臀部"
+     "zh": "相扑深蹲肘推膝停留，拉伸大腿内侧和臀部",
+     "en": "Sumo squat hold with elbow pry. Stretches the inner thighs and the glutes."
     },
     "ms": {
-     "zh": 4040
+     "zh": 4040,
+     "en": 4667
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "宽站深蹲，手合十"
+     "zh": "宽站深蹲，手合十",
+     "en": "Wide stance, sit into a deep squat, palms together"
     },
     "ms": {
-     "zh": 1950
+     "zh": 1950,
+     "en": 3251
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "蹲低，手肘把膝盖轻轻向外推"
+     "zh": "蹲低，手肘把膝盖轻轻向外推",
+     "en": "Sit low and gently press the knees out with your elbows"
     },
     "ms": {
-     "zh": 2926
+     "zh": 2926,
+     "en": 2763
     }
    },
    {
     "id": "cue3",
     "role": "cue",
     "text": {
-     "zh": "肘把膝往外推，胸口挺起"
+     "zh": "肘把膝往外推，胸口挺起",
+     "en": "Elbows push the knees out, lift your chest"
     },
     "ms": {
-     "zh": 2392
+     "zh": 2392,
+     "en": 2392
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，肘把膝往外推，胸口挺起"
+     "zh": "放松一下。下一组记住，肘把膝往外推，胸口挺起",
+     "en": "Relax for a moment. Next set, remember: Elbows push the knees out, lift your chest"
     },
     "ms": {
-     "zh": 4853
+     "zh": 4853,
+     "en": 5991
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "相扑深蹲肘推膝停留，完成"
+     "zh": "相扑深蹲肘推膝停留，完成",
+     "en": "Sumo squat hold with elbow pry, done."
     },
     "ms": {
-     "zh": 2717
+     "zh": 2717,
+     "en": 2322
     }
    }
   ],
@@ -163,6 +179,34 @@
   "demo.mp4": {
    "bytes": 134627,
    "sha256": "57b7f21792d5f6a2056437b0b941cbb860ee27c31076c331b3824a9fdab8260c"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 27896,
+   "sha256": "1e8f4876dd961c8566ce7dda0cb8b93f9013f684b25a8bdb36ecde8560bea68c"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 23458,
+   "sha256": "280a0a0e8bc92990c31410c8206e41f6684f31ef070e08244a236b8b91080138"
+  },
+  "voice/en/cue3.m4a": {
+   "bytes": 20577,
+   "sha256": "61831c1a0dbb29795f4635f5c997fb436b577c65461e5a7ac27ca138fde43594"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 20230,
+   "sha256": "6f6b58d9422ee20c756267c868c1c4b96d75080ed84acb3a487d2b8efc232eaf"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 35876,
+   "sha256": "55975061763cd8c4c235ad245399df177e641cd01a4402ed2000c9cfd1c51dae"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 16107,
+   "sha256": "4b47f463d00e7db899f8fcc77cf356990d4f886b86d918a8ff8bf5275e5b03a5"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 48603,
+   "sha256": "e588689654eeacf2cd967195b91d120a0e01fb297aaeb012802fc50ff84407f2"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 17120,

@@ -62,10 +62,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -73,70 +75,84 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "坐椅雨刷，膝内倒"
+     "zh": "坐椅雨刷，膝内倒",
+     "en": "Seated knee drop-in"
     },
     "ms": {
-     "zh": 1788
+     "zh": 1788,
+     "en": 1138
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "坐椅雨刷，膝内倒，活动臀部"
+     "zh": "坐椅雨刷，膝内倒，活动臀部",
+     "en": "Seated knee drop-in. Mobilizes the glutes."
     },
     "ms": {
-     "zh": 2763
+     "zh": 2763,
+     "en": 3274
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "坐椅，双脚分开"
+     "zh": "坐椅，双脚分开",
+     "en": "Sit on the chair, feet apart"
     },
     "ms": {
-     "zh": 1695
+     "zh": 1695,
+     "en": 1811
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "坐在椅子上，小腿向外摆，膝盖向内倒"
+     "zh": "坐在椅子上，小腿向外摆，膝盖向内倒",
+     "en": "Sitting on the chair, swing the shins out and drop the knees in"
     },
     "ms": {
-     "zh": 3437
+     "zh": 3437,
+     "en": 3181
     }
    },
    {
     "id": "cue3",
     "role": "cue",
     "text": {
-     "zh": "双膝交替向内倒"
+     "zh": "双膝交替向内倒",
+     "en": "Drop the knees in, one side at a time"
     },
     "ms": {
-     "zh": 1602
+     "zh": 1602,
+     "en": 2229
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，双膝交替向内倒"
+     "zh": "放松一下。下一组记住，双膝交替向内倒",
+     "en": "Relax for a moment. Next set, remember: Drop the knees in, one side at a time"
     },
     "ms": {
-     "zh": 4063
+     "zh": 4063,
+     "en": 5875
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "坐椅雨刷，膝内倒，完成"
+     "zh": "坐椅雨刷，膝内倒，完成",
+     "en": "Seated knee drop-in, done."
     },
     "ms": {
-     "zh": 2508
+     "zh": 2508,
+     "en": 1602
     }
    }
   ],
@@ -166,6 +182,34 @@
   "demo.mp4": {
    "bytes": 78140,
    "sha256": "e5dfa50228209a048fc6c97b36d8d9c6bf1be98adedf225a8aa54d1618b67e95"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 16111,
+   "sha256": "fb0b10a78a11c7deaa4af0cc6a6a3f78b6a6d78048de2bbc8a30b1287463a125"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 27053,
+   "sha256": "577040e4c0d7e3493d61edff9255c0c1fed458cd39879b37707c5bfea4c9288f"
+  },
+  "voice/en/cue3.m4a": {
+   "bytes": 19267,
+   "sha256": "e559f53fa4d9f5937eb48263942f0a229563e9087684e3acd4bf1c827731bfc1"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 14174,
+   "sha256": "4c8dda953feb8b7c54414c65d2cd2d045e042db07467806940d7792a70c7185b"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 28925,
+   "sha256": "cd8f9600b579d7fc37a3f381311cf79ca56da5fc3e2dfef4aeef43db0c11f699"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 10531,
+   "sha256": "dda915a3ae2bab6e70cae830ed71bb4e3b39951c3a3d0dc81f1949beeca4b7ac"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 50258,
+   "sha256": "5c20535cac1bc4f61642094ba16f7420a0033a8217260ed05e39106286888f5d"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 14980,

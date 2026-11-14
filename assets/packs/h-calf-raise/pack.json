@@ -57,10 +57,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -68,60 +70,72 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "扶墙提踵"
+     "zh": "扶墙提踵",
+     "en": "Wall-supported calf raise"
     },
     "ms": {
-     "zh": 1045
+     "zh": 1045,
+     "en": 1486
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "扶墙提踵，练小腿"
+     "zh": "扶墙提踵，练小腿",
+     "en": "Wall-supported calf raise. Works the calves."
     },
     "ms": {
-     "zh": 1881
+     "zh": 1881,
+     "en": 3344
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "手扶墙，前脚掌站稳"
+     "zh": "手扶墙，前脚掌站稳",
+     "en": "Hands on the wall, stand on the balls of your feet"
     },
     "ms": {
-     "zh": 2067
+     "zh": 2067,
+     "en": 2601
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "脚跟抬到最高停一下，慢慢落下"
+     "zh": "脚跟抬到最高停一下，慢慢落下",
+     "en": "Lift your heels as high as you can, pause, lower slowly"
     },
     "ms": {
-     "zh": 2763
+     "zh": 2763,
+     "en": 3251
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，脚跟抬到最高停一下，慢慢落下"
+     "zh": "放松一下。下一组记住，脚跟抬到最高停一下，慢慢落下",
+     "en": "Relax for a moment. Next set, remember: Lift your heels as high as you can, pause, lower slowly"
     },
     "ms": {
-     "zh": 5248
+     "zh": 5248,
+     "en": 6920
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "扶墙提踵，完成"
+     "zh": "扶墙提踵，完成",
+     "en": "Wall-supported calf raise, done."
     },
     "ms": {
-     "zh": 1741
+     "zh": 1741,
+     "en": 1950
     }
    }
   ],
@@ -151,6 +165,30 @@
   "demo.mp4": {
    "bytes": 81702,
    "sha256": "b4f577af80aa7b606c9f54a25d0040097532fd85d4795b6f141fc6d57fd63693"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 22494,
+   "sha256": "8313f380872d99a7c9b5bd6d46426544e5cde9f8520d1bb723ec18d438016fe0"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 27680,
+   "sha256": "02822e288989bc1a6c10519127dcb7322e9dcc827af8cc5d4ef3330e3fbdd562"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 17196,
+   "sha256": "c24490038a5f2a9eadd0e65f02528269d86af138337cf3b8d84e3d4b577d92c1"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 26377,
+   "sha256": "c6a4865f307b9f151f2023931dcc49aa6596636508f9f855d8d657f59f49565f"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 13381,
+   "sha256": "aa5dc6f34e3d02da8cefa0d5f32dbc4feec7953ef9b21eac596cc7d1cd732212"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 55549,
+   "sha256": "857b370c1f61ec87d5c1d6cd45bd9f8d59b654979b96e80cc1e0cce0e5f604fc"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 17910,

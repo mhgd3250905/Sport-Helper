@@ -58,10 +58,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -69,60 +71,72 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "低位蹲姿左右移重心"
+     "zh": "低位蹲姿左右移重心",
+     "en": "Low squat side-to-side shift"
     },
     "ms": {
-     "zh": 1997
+     "zh": 1997,
+     "en": 1695
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "低位蹲姿左右移重心，活动大腿内侧和臀部"
+     "zh": "低位蹲姿左右移重心，活动大腿内侧和臀部",
+     "en": "Low squat side-to-side shift. Mobilizes the inner thighs and the glutes."
     },
     "ms": {
-     "zh": 4063
+     "zh": 4063,
+     "en": 4714
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "宽站深蹲"
+     "zh": "宽站深蹲",
+     "en": "Wide stance, deep squat"
     },
     "ms": {
-     "zh": 998
+     "zh": 998,
+     "en": 1718
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "低蹲，重心慢慢左右移"
+     "zh": "低蹲，重心慢慢左右移",
+     "en": "Stay low, shift your weight slowly side to side"
     },
     "ms": {
-     "zh": 2252
+     "zh": 2252,
+     "en": 2763
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，低蹲，重心慢慢左右移"
+     "zh": "放松一下。下一组记住，低蹲，重心慢慢左右移",
+     "en": "Relax for a moment. Next set, remember: Stay low, shift your weight slowly side to side"
     },
     "ms": {
-     "zh": 4760
+     "zh": 4760,
+     "en": 6409
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "低位蹲姿左右移重心，完成"
+     "zh": "低位蹲姿左右移重心，完成",
+     "en": "Low squat side-to-side shift, done."
     },
     "ms": {
-     "zh": 2694
+     "zh": 2694,
+     "en": 2183
     }
    }
   ],
@@ -152,6 +166,30 @@
   "demo.mp4": {
    "bytes": 117039,
    "sha256": "d0049feeff799b92e2b569006de6907ff6b298416af3383b03f19b9f247e1e2c"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 15259,
+   "sha256": "e7f9967cc6480d433a2a8ad8e4a9c5ee3bb94545c1b815d69632830e4e1eea2e"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 23536,
+   "sha256": "85dabbc6601d99b538e019ebafd6823e720c689bc1f31e6cdda70d91a6182c8e"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 18866,
+   "sha256": "c3a3f2490ec33f5c28ab6a8caf2e597fe2693ed3536366ca60646c0126c1edab"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 36668,
+   "sha256": "05f3c0238b9ff4092c98b0162df373af55b7fc1a3291959ab362e3b03763372e"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 15041,
+   "sha256": "119a3f2eb88804a8c5db07a0d5ad76a45761743a34aff44ce3e6a355a1c4c9d2"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 55058,
+   "sha256": "1fc03c0b5c283f4bbc881528bd4814b8647806784d4c9cb88832b75c8f7bc427"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 9141,

@@ -7,6 +7,7 @@ import 'package:smartfit/app/services.dart';
 import 'package:smartfit/domain/exercise.dart';
 import 'package:smartfit/domain/plan.dart';
 import 'package:smartfit/ui/cached_exercise_media.dart';
+import 'package:smartfit/ui/exercise_video.dart';
 import 'package:smartfit/ui/player_page.dart';
 import 'package:smartfit/ui/plan_page.dart';
 import 'package:smartfit/ui/theme.dart';
@@ -491,6 +492,54 @@ void main() {
     expect(coordinator.activeSlot, isNull);
     expect(tester.takeException(), isNull);
   });
+
+  for (final cached in [false, true]) {
+    testWidgets(
+      cached
+          ? 'ExerciseVideo training hit reveals at positive decoder position without a wrap'
+          : 'ExerciseVideo training miss disables the optional loop wait',
+      (tester) async {
+        final action = catalog.semanticCompleteActions.first;
+        final gate = Completer<Uri>();
+        final cache = _Cache(prepare: (_) => gate.future);
+        if (cached) cache.hits[action.id] = action.video.resolve(_base);
+        await mount(
+          tester,
+          cache,
+          (s) => Scaffold(
+            body: SizedBox.square(
+              dimension: 320,
+              child: ExerciseVideo(
+                exercise: s.library[action.id],
+                training: true,
+              ),
+            ),
+          ),
+        );
+        await frames(tester);
+        if (!cached) {
+          final media = tester.widget<CachedExerciseMedia>(
+            find.byType(CachedExerciseMedia),
+          );
+          expect(media.waitForLoopOnMiss, isFalse);
+          await unmount(tester);
+          gate.complete(_base);
+          await frames(tester);
+          return;
+        }
+        expect(cache.actionRequests, isEmpty);
+        expect(platform.sources, [action.video.resolve(_base)]);
+        await ready(tester, 1, 0);
+        expect(tester.widget<AnimatedOpacity>(_poster(action.id)).opacity, 1);
+        platform.positions[1] = .1;
+        await tester.pump(const Duration(milliseconds: 80));
+        expect(tester.widget<AnimatedOpacity>(_poster(action.id)).opacity, 0);
+        expect(platform.sources, hasLength(1));
+        await unmount(tester);
+        expect(cache.pins[action.id], 0);
+      },
+    );
+  }
 
   testWidgets(
     'training miss waits for actual decoder wrap and ignores null or jitter',

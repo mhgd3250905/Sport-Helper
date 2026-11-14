@@ -59,10 +59,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -70,60 +72,72 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "站姿骨盆画圈"
+     "zh": "站姿骨盆画圈",
+     "en": "Standing pelvis circles"
     },
     "ms": {
-     "zh": 1370
+     "zh": 1370,
+     "en": 1509
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "站姿骨盆画圈，活动髋前侧和臀部"
+     "zh": "站姿骨盆画圈，活动髋前侧和臀部",
+     "en": "Standing pelvis circles. Mobilizes the front of the hips and the glutes."
     },
     "ms": {
-     "zh": 3204
+     "zh": 3204,
+     "en": 4551
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "双手叉腰，膝微屈"
+     "zh": "双手叉腰，膝微屈",
+     "en": "Hands on hips, knees soft"
     },
     "ms": {
-     "zh": 1904
+     "zh": 1904,
+     "en": 1695
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "双脚不动，骨盆慢慢画圈"
+     "zh": "双脚不动，骨盆慢慢画圈",
+     "en": "Feet still, circle your pelvis slowly"
     },
     "ms": {
-     "zh": 2368
+     "zh": 2368,
+     "en": 2183
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，双脚不动，骨盆慢慢画圈"
+     "zh": "放松一下。下一组记住，双脚不动，骨盆慢慢画圈",
+     "en": "Relax for a moment. Next set, remember: Feet still, circle your pelvis slowly"
     },
     "ms": {
-     "zh": 4853
+     "zh": 4853,
+     "en": 5805
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "站姿骨盆画圈，完成"
+     "zh": "站姿骨盆画圈，完成",
+     "en": "Standing pelvis circles, done."
     },
     "ms": {
-     "zh": 2067
+     "zh": 2067,
+     "en": 2020
     }
    }
   ],
@@ -153,6 +167,30 @@
   "demo.mp4": {
    "bytes": 88769,
    "sha256": "7c07fc07ce083b1445a1b071fc14cd2152b2cd4cd02b2d9d47a01d04f5162f9e"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 14958,
+   "sha256": "110c6c46fa3c9ef1446580c780a9cda7edd90fb81b094b2a8280fadb15b89899"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 18896,
+   "sha256": "8a10c38bad72b36c1a03f5dd0bf702c9949ac08fb4e67c440605324756e58416"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 17746,
+   "sha256": "12c39a1540f70ba36b8542817822812bb88476bfe3b879719a452f4168da68e7"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 36587,
+   "sha256": "e4a03fc68404bb5253fedede1dba21c1c14f7107be99b751cd4a0f573aa9aa63"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 13431,
+   "sha256": "1ebed4f127f0246bb55c31f97897937bb10f3e30b8183411c26f274a00b4a27b"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 45692,
+   "sha256": "90feb0e8c2fa8f9857b5554378cbac5fd961432b70f1689dfea82dc1063715e6"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 16707,

@@ -59,10 +59,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -70,70 +72,84 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "90 90 坐姿换髋"
+     "zh": "90 90 坐姿换髋",
+     "en": "Ninety-ninety hip switch"
     },
     "ms": {
-     "zh": 1950
+     "zh": 1950,
+     "en": 1370
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "90 90 坐姿换髋，活动臀部"
+     "zh": "90 90 坐姿换髋，活动臀部",
+     "en": "Ninety-ninety hip switch. Mobilizes the glutes."
     },
     "ms": {
-     "zh": 2624
+     "zh": 2624,
+     "en": 3529
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "双腿各屈 90 度"
+     "zh": "双腿各屈 90 度",
+     "en": "Bend both legs to ninety degrees"
     },
     "ms": {
-     "zh": 1602
+     "zh": 1602,
+     "en": 1974
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "两条腿都成直角，坐直，再左右换"
+     "zh": "两条腿都成直角，坐直，再左右换",
+     "en": "Both legs at right angles, sit tall, then switch sides"
     },
     "ms": {
-     "zh": 3228
+     "zh": 3228,
+     "en": 3553
     }
    },
    {
     "id": "cue3",
     "role": "cue",
     "text": {
-     "zh": "左右换边，躯干直立"
+     "zh": "左右换边，躯干直立",
+     "en": "Switch sides, keep your trunk upright"
     },
     "ms": {
-     "zh": 2020
+     "zh": 2020,
+     "en": 2206
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，左右换边，躯干直立"
+     "zh": "放松一下。下一组记住，左右换边，躯干直立",
+     "en": "Relax for a moment. Next set, remember: Switch sides, keep your trunk upright"
     },
     "ms": {
-     "zh": 4528
+     "zh": 4528,
+     "en": 5805
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "90 90 坐姿换髋，完成"
+     "zh": "90 90 坐姿换髋，完成",
+     "en": "Ninety-ninety hip switch, done."
     },
     "ms": {
-     "zh": 2345
+     "zh": 2345,
+     "en": 1858
     }
    }
   ],
@@ -163,6 +179,34 @@
   "demo.mp4": {
    "bytes": 82799,
    "sha256": "44aa145cc7c55310601b477267882978b96652e3f572713b15433c0778b7efb7"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 17360,
+   "sha256": "f77cc706e2d984c2d31e9d58bc8a1908341cffaebc3df11b9aaec434012426a8"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 30405,
+   "sha256": "de0d663b68171c81c25681d22cee3e993ca9aa865ba5b2de1c371bf3f752f78e"
+  },
+  "voice/en/cue3.m4a": {
+   "bytes": 19130,
+   "sha256": "7a01ca8182fd92b9799feecc35be51a2ad68b2a9c76fc08728ffabc3c636497f"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 16248,
+   "sha256": "2f82d8bd2a8b707eb982d129b5a9b318e45f8c0c5d6f2b607de54a37733adeff"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 28546,
+   "sha256": "524a24c79a27e606994e81b3d2a02597f15a58ba388c354ea55950338269d69e"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 12441,
+   "sha256": "9d5d8c5397cecd30934a44198659ebdd74975a9e38a7574d750f7351b7317851"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 50911,
+   "sha256": "48858853da1a9276e0c04928208f67c7621d28ac51f663b281a1714b0aad3401"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 14119,

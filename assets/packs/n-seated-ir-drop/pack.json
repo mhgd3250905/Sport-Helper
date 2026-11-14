@@ -60,10 +60,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -71,60 +73,72 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "坐姿后撑单膝内倒"
+     "zh": "坐姿后撑单膝内倒",
+     "en": "Seated hip internal rotation drop"
     },
     "ms": {
-     "zh": 1788
+     "zh": 1788,
+     "en": 1881
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "坐姿后撑单膝内倒，活动臀部"
+     "zh": "坐姿后撑单膝内倒，活动臀部",
+     "en": "Seated hip internal rotation drop. Mobilizes the glutes."
     },
     "ms": {
-     "zh": 2949
+     "zh": 2949,
+     "en": 4040
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "坐地后撑，屈膝"
+     "zh": "坐地后撑，屈膝",
+     "en": "Sit on the floor, hands behind you, knees bent"
     },
     "ms": {
-     "zh": 1672
+     "zh": 1672,
+     "en": 2902
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "手在身后撑地，一侧膝盖向内倒"
+     "zh": "手在身后撑地，一侧膝盖向内倒",
+     "en": "Hands on the floor behind you, drop one knee inward"
     },
     "ms": {
-     "zh": 2879
+     "zh": 2879,
+     "en": 2624
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，手在身后撑地，一侧膝盖向内倒"
+     "zh": "放松一下。下一组记住，手在身后撑地，一侧膝盖向内倒",
+     "en": "Relax for a moment. Next set, remember: Hands on the floor behind you, drop one knee inward"
     },
     "ms": {
-     "zh": 5364
+     "zh": 5364,
+     "en": 6200
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "坐姿后撑单膝内倒，完成"
+     "zh": "坐姿后撑单膝内倒，完成",
+     "en": "Seated hip internal rotation drop, done."
     },
     "ms": {
-     "zh": 2717
+     "zh": 2717,
+     "en": 2392
     }
    }
   ],
@@ -154,6 +168,30 @@
   "demo.mp4": {
    "bytes": 90704,
    "sha256": "ee1d7b7f35b0070f07c80095bf89a925e3fa5cde1d5e5a3f04225cdf01317d2b"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 24583,
+   "sha256": "934c6df46465f51c739de8939156a98e7ded5f385850097582e5f8e67a8e9319"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 22639,
+   "sha256": "146af6e2df99ac13884c56a15b1330d322baeaeaa5ecb82ac5bf77ff1cf3493f"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 20842,
+   "sha256": "8c151fc07c879ab3dd092a71410cddc81518fdc36fbcb9c66cd5952e1c049565"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 30892,
+   "sha256": "6681ea338c5409f144e41c95ed48195e377e9d587ff1e150d4a609893d58c43c"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 16642,
+   "sha256": "f9ca3f9f374655ca6ce6470086b8dfc5c607a3ecdc86e3bced47b30410c65596"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 53332,
+   "sha256": "b8f37938f795b5980c9b34dcb7300770d7f55d42580c7bfadce0725a2e109b06"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 14652,

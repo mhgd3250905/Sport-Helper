@@ -57,10 +57,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -68,70 +70,84 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "仰卧蝴蝶主动开合"
+     "zh": "仰卧蝴蝶主动开合",
+     "en": "Active supine butterfly"
     },
     "ms": {
-     "zh": 1672
+     "zh": 1672,
+     "en": 1463
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "仰卧蝴蝶主动开合，活动大腿内侧"
+     "zh": "仰卧蝴蝶主动开合，活动大腿内侧",
+     "en": "Active supine butterfly. Mobilizes the inner thighs."
     },
     "ms": {
-     "zh": 3135
+     "zh": 3135,
+     "en": 3855
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "仰卧，脚心相对"
+     "zh": "仰卧，脚心相对",
+     "en": "Lie on your back, soles together"
     },
     "ms": {
-     "zh": 1602
+     "zh": 1602,
+     "en": 1950
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "脚心相对，膝盖慢慢打开再收回"
+     "zh": "脚心相对，膝盖慢慢打开再收回",
+     "en": "Soles together, open the knees slowly and bring them back"
     },
     "ms": {
-     "zh": 3065
+     "zh": 3065,
+     "en": 3065
     }
    },
    {
     "id": "cue3",
     "role": "cue",
     "text": {
-     "zh": "膝主动打开再合上"
+     "zh": "膝主动打开再合上",
+     "en": "Open the knees on purpose, then close them"
     },
     "ms": {
-     "zh": 1718
+     "zh": 1718,
+     "en": 2438
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，膝主动打开再合上"
+     "zh": "放松一下。下一组记住，膝主动打开再合上",
+     "en": "Relax for a moment. Next set, remember: Open the knees on purpose, then close them"
     },
     "ms": {
-     "zh": 4203
+     "zh": 4203,
+     "en": 6014
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "仰卧蝴蝶主动开合，完成"
+     "zh": "仰卧蝴蝶主动开合，完成",
+     "en": "Active supine butterfly, done."
     },
     "ms": {
-     "zh": 2392
+     "zh": 2392,
+     "en": 1997
     }
    }
   ],
@@ -161,6 +177,34 @@
   "demo.mp4": {
    "bytes": 168720,
    "sha256": "9083241f24719721edf8b7dfb615d60cb767a0dca13ac84a66e8e178eb7d5fc9"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 17185,
+   "sha256": "78cff8e655698ba1881e461e4110c0ddf0f4ad8765619a122142887395c96439"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 26275,
+   "sha256": "8ca9269f918240ba16ab9720adf9a9e9063f5c422b5691fc3d28c10eeac3369c"
+  },
+  "voice/en/cue3.m4a": {
+   "bytes": 21196,
+   "sha256": "6990087e5540a432571cb960f1a1b0e60158b7ba694a324cef6277715098c5b0"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 17469,
+   "sha256": "104c7992fca02ba4c365738cd0ebee62723297d838a7a13d57a75811396772cf"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 30616,
+   "sha256": "9261c9cdae5e8f0c03264253e231bbfa6e29e3adb01ec8008f279b0a1bbcbf6f"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 13084,
+   "sha256": "459a2a1b6033c7f0b805fb6f870fbea4117132d0e0b6e0ebdde28a235e4c111f"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 52378,
+   "sha256": "8d57bf71e6244832758782a2866cd6d902b4fab3968a0aaceebead9fec2c7ab3"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 14302,

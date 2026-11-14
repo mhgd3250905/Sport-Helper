@@ -60,10 +60,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -71,60 +73,72 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "仰卧屈膝扭转"
+     "zh": "仰卧屈膝扭转",
+     "en": "Supine bent-knee twist"
     },
     "ms": {
-     "zh": 1324
+     "zh": 1324,
+     "en": 1440
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "仰卧屈膝扭转，拉伸腰两侧和下背"
+     "zh": "仰卧屈膝扭转，拉伸腰两侧和下背",
+     "en": "Supine bent-knee twist. Stretches the sides of the waist and the lower back."
     },
     "ms": {
-     "zh": 3158
+     "zh": 3158,
+     "en": 4644
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "仰卧屈膝，手臂打开"
+     "zh": "仰卧屈膝，手臂打开",
+     "en": "Lie on your back, knees bent, arms open"
     },
     "ms": {
-     "zh": 2020
+     "zh": 2020,
+     "en": 2531
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "双膝倒向一侧，肩膀贴地"
+     "zh": "双膝倒向一侧，肩膀贴地",
+     "en": "Drop both knees to one side, shoulders stay down"
     },
     "ms": {
-     "zh": 2392
+     "zh": 2392,
+     "en": 2786
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，双膝倒向一侧，肩膀贴地"
+     "zh": "放松一下。下一组记住，双膝倒向一侧，肩膀贴地",
+     "en": "Relax for a moment. Next set, remember: Drop both knees to one side, shoulders stay down"
     },
     "ms": {
-     "zh": 4923
+     "zh": 4923,
+     "en": 6432
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "仰卧屈膝扭转，完成"
+     "zh": "仰卧屈膝扭转，完成",
+     "en": "Supine bent-knee twist, done."
     },
     "ms": {
-     "zh": 2020
+     "zh": 2020,
+     "en": 1834
     }
    }
   ],
@@ -154,6 +168,30 @@
   "demo.mp4": {
    "bytes": 112443,
    "sha256": "a4d050c9287a1284d7bf295f47fe250979d46889f65bee22f1f6164131fe971f"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 22015,
+   "sha256": "773b01e805d0832b3953287e0d0a9134b0646cc8e07daa8227652eb75aee6f54"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 23881,
+   "sha256": "d5ea3a03b0745e50818d8a8e9a858163aa85a017480e88024cbead3fb39bb378"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 16231,
+   "sha256": "37633ccfda5f878f725fcdff27ca3448d77cc47ab717962125417627ae3a88bb"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 37761,
+   "sha256": "16bee82d682a2f6a3428a5c5fd7e85224d5cdf4e87f2ac355761f7eeca61f260"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 12818,
+   "sha256": "8870b20162571e193a2828987ee9f8f736ed78200af2742c92b55ea70573e6e3"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 55681,
+   "sha256": "bdd2cd0fe92ebc12894119e2a798b3207e5d7cc6783d07a5bddfb427e5e2fe9b"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 17724,

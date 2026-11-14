@@ -60,10 +60,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -71,70 +73,84 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "扶椅站姿股四头肌拉伸"
+     "zh": "扶椅站姿股四头肌拉伸",
+     "en": "Chair-supported standing quad stretch"
     },
     "ms": {
-     "zh": 2229
+     "zh": 2229,
+     "en": 1997
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "扶椅站姿股四头肌拉伸，拉伸大腿前侧"
+     "zh": "扶椅站姿股四头肌拉伸，拉伸大腿前侧",
+     "en": "Chair-supported standing quad stretch. Stretches the quads."
     },
     "ms": {
-     "zh": 3692
+     "zh": 3692,
+     "en": 3994
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "扶稳椅子，手拉脚背贴近臀部，膝盖朝下"
+     "zh": "扶稳椅子，手拉脚背贴近臀部，膝盖朝下",
+     "en": "Hold the chair, pull your foot toward your glutes, knee pointing down"
     },
     "ms": {
-     "zh": 3808
+     "zh": 3808,
+     "en": 3669
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "膝盖朝下，大腿前侧拉长"
+     "zh": "膝盖朝下，大腿前侧拉长",
+     "en": "Knee points down, feel the front of the thigh lengthen"
     },
     "ms": {
-     "zh": 2508
+     "zh": 2508,
+     "en": 2647
     }
    },
    {
     "id": "side_switch",
     "role": "side_switch",
     "text": {
-     "zh": "左侧同样，扶稳椅子，手拉脚背贴近臀部，膝盖朝下"
+     "zh": "左侧同样，扶稳椅子，手拉脚背贴近臀部，膝盖朝下",
+     "en": "Now the left side. Hold the chair, pull your foot toward your glutes, knee pointing down"
     },
     "ms": {
-     "zh": 4923
+     "zh": 4923,
+     "en": 5619
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，膝盖朝下，大腿前侧拉长"
+     "zh": "放松一下。下一组记住，膝盖朝下，大腿前侧拉长",
+     "en": "Relax for a moment. Next set, remember: Knee points down, feel the front of the thigh lengthen"
     },
     "ms": {
-     "zh": 5039
+     "zh": 5039,
+     "en": 6269
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "扶椅站姿股四头肌拉伸，完成"
+     "zh": "扶椅站姿股四头肌拉伸，完成",
+     "en": "Chair-supported standing quad stretch, done."
     },
     "ms": {
-     "zh": 2926
+     "zh": 2926,
+     "en": 2508
     }
    }
   ],
@@ -164,6 +180,34 @@
   "demo.mp4": {
    "bytes": 43826,
    "sha256": "155cddc3484c928089a8069ef5074ab7f394c50f4362ad3b29dbc9e35e3e7d12"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 31255,
+   "sha256": "94ad729b95a5731828f4d82e601b1f1971b5ef14ea297e8f88797595a640963a"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 22902,
+   "sha256": "93e5487f768bf275f898353bd412acb82b9eb1d8d2beef220ed6917d9dae366c"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 21722,
+   "sha256": "09bcac27ac15f13d4c0c388128c16c8f42bb6c71696f84340d44300d464b3a1f"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 30544,
+   "sha256": "9b21a4228e6da1855da6c169e2fef5db19217be78fba0b39ce16ea0d378e381f"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 17473,
+   "sha256": "c4017e67842897e9e10392dffe44ea0a11b2f0e1eceb69e889775c9ce1bd344f"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 53193,
+   "sha256": "2858986c9ce91466252cbd4827f5f6e93ac33af95373495313dea57d6adad14f"
+  },
+  "voice/en/side_switch.m4a": {
+   "bytes": 49116,
+   "sha256": "95ef5c1ae618f3790b3c0dd8a1bed04f622b122cf1ffb1cba2a2228ee7d72396"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 32369,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ugk_trainer/ugk_trainer.dart';
 
 import '../app/gated_posehub_media_preparer.dart';
+import '../app/posehub_media_repository.dart';
 import '../app/services.dart';
 import '../domain/exercise.dart' show equipmentLabel;
 import '../domain/plan.dart';
@@ -14,6 +15,7 @@ import 'exercise_video.dart';
 import 'theme/trainer_theme.dart';
 import 'training_poster_image.dart';
 import 'training_route.dart';
+import 'training_media_progress.dart';
 
 /// App styling, assets and durable callbacks; all training UI belongs to SDK.
 class PlayerPage extends StatefulWidget {
@@ -36,24 +38,70 @@ class _PlayerPageState extends State<PlayerPage> {
   TrainingRouteControl? _control;
   PoseHubMediaPreparer? _preparer;
   TrainingRouteControl? _preparerControl;
-  bool _sessionFinished = false, _prefetchStarted = false;
+  TrainingMediaRepositoryBridge? _mediaRepository;
+  CurrentTrainingDownload? _download;
+  AppServices? _mediaServices;
+  VoidCallback? _releaseTrainingMedia;
+  bool _sessionFinished = false, _entryMarked = false;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _control = TrainingRouteScope.maybeOf(context);
+    final services = AppServices.of(context);
+    if (!identical(_mediaServices, services)) {
+      _releaseTrainingMedia?.call();
+      _download?.dispose();
+      _mediaRepository?.dispose();
+      _download = null;
+      _mediaRepository = null;
+      _releaseTrainingMedia = null;
+      _mediaServices = services;
+      final catalog = services.poseHubCatalog;
+      final repository = services.poseHubMedia;
+      if (catalog != null &&
+          repository != null &&
+          repository is PoseHubTrainingVideoPreparation) {
+        _releaseTrainingMedia = services.beginTrainingMediaSession();
+        final bridge = _mediaRepository = TrainingMediaRepositoryBridge(
+          catalog: catalog,
+          host: repository,
+        );
+        final download = _download = CurrentTrainingDownload(bridge);
+        final first = widget.plan.items.firstOrNull;
+        final action = first == null ? null : catalog.tryGet(first.exerciseId);
+        if (action != null) download.select(action);
+        _preparer = TrainingVideoPreparer(bridge, download);
+      } else {
+        _preparer = null;
+      }
+    }
+    if (_download == null &&
+        (_preparer == null || !identical(_preparerControl, _control))) {
+      _preparerControl = _control;
+      final delegate = services.poseHubPreparer;
+      _preparer = delegate == null || _control == null
+          ? delegate
+          : GatedPoseHubMediaPreparer(delegate, _control!.startGate);
+    }
   }
 
   void _startLog(AppServices services) {
-    if (!_prefetchStarted) {
-      _prefetchStarted = true;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted &&
-            (_control?.entered ?? true) &&
-            _control?.exiting != true) {
-          services.prefetchPlan(widget.plan);
-        }
-      });
+    if (!_entryMarked) {
+      final repository = services.poseHubMedia;
+      if (repository case final PoseHubMediaTimingAnchor anchor) {
+        anchor.markTrainingEntry();
+      }
+      _entryMarked = true;
+      if (_download == null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted &&
+              (_control?.entered ?? true) &&
+              _control?.exiting != true) {
+            services.prefetchPlan(widget.plan);
+          }
+        });
+      }
     }
     _log.start(
       actionCount: widget.plan.items.length,
@@ -84,6 +132,9 @@ class _PlayerPageState extends State<PlayerPage> {
     }
     _log.dispose();
     _issuePlayback?.dispose();
+    _releaseTrainingMedia?.call();
+    _download?.dispose();
+    _mediaRepository?.dispose();
     super.dispose();
   }
 
@@ -98,13 +149,6 @@ class _PlayerPageState extends State<PlayerPage> {
     }
     final control = _control;
     if (control == null || control.entered) _startLog(services);
-    if (_preparer == null || !identical(_preparerControl, control)) {
-      _preparerControl = control;
-      final delegate = services.poseHubPreparer;
-      _preparer = delegate == null || control == null
-          ? delegate
-          : GatedPoseHubMediaPreparer(delegate, control.startGate);
-    }
     final issueStore = services.store.actionIssueStore;
     final issuePlayback = issueStore.enabled
         ? (_issuePlayback ??= DrillMediaPlaybackHandle())
@@ -125,6 +169,7 @@ class _PlayerPageState extends State<PlayerPage> {
           poseHubActionOf: services.poseHubCatalog?.tryGet,
           poseHubMediaBaseUri: services.poseHubMedia?.mediaBaseUri,
           poseHubMediaPreparer: _preparer,
+          mediaDownloadState: _download,
           drillOf: (id) {
             final exercise = services.library.tryGet(id);
             if (exercise == null) return null;
@@ -170,6 +215,8 @@ class _PlayerPageState extends State<PlayerPage> {
               }
             }
             _visibleActionId = request.drill.id;
+            final action = services.poseHubCatalog?.tryGet(request.drill.id);
+            if (action != null) _download?.select(action);
             final exercise = services.library[request.drill.id];
             if (control != null && !control.canPlay) {
               return TrainingPoster(
@@ -184,13 +231,19 @@ class _PlayerPageState extends State<PlayerPage> {
             return ExerciseVideo(
               key: const ValueKey('trainer-media'),
               exercise: exercise,
+              playing: _download == null ? true : request.canPlay,
+              prefetchWhenIdle: _download != null,
               paused: request.paused || control?.exiting == true,
               mirrored: request.mirrored,
               radius: request.theme.radius,
               stageColor: request.theme.mediaStage,
               playbackHandle: issuePlayback,
+              downloadPlaybackHandle: _download == null
+                  ? null
+                  : request.playbackHandle,
               mediaPreparer: request.mediaPreparer,
               training: true,
+              trainingProgress: _download != null,
             );
           },
           voice: services.trainerVoice(),

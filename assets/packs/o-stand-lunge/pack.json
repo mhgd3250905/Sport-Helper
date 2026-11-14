@@ -60,10 +60,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -71,70 +73,84 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "扶椅站姿弓步屈髋拉伸"
+     "zh": "扶椅站姿弓步屈髋拉伸",
+     "en": "Chair-supported standing hip flexor stretch"
     },
     "ms": {
-     "zh": 2206
+     "zh": 2206,
+     "en": 2322
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "扶椅站姿弓步屈髋拉伸，拉伸髋前侧"
+     "zh": "扶椅站姿弓步屈髋拉伸，拉伸髋前侧",
+     "en": "Chair-supported standing hip flexor stretch. Stretches the front of the hips."
     },
     "ms": {
-     "zh": 3529
+     "zh": 3529,
+     "en": 4644
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "扶椅成弓步，后腿伸直"
+     "zh": "扶椅成弓步，后腿伸直",
+     "en": "Hold the chair in a lunge, back leg straight"
     },
     "ms": {
-     "zh": 2229
+     "zh": 2229,
+     "en": 2438
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "扶住椅子，后侧臀部收紧，髋往前推"
+     "zh": "扶住椅子，后侧臀部收紧，髋往前推",
+     "en": "Hold the chair, squeeze the back glute, push your hips forward"
     },
     "ms": {
-     "zh": 3553
+     "zh": 3553,
+     "en": 3320
     }
    },
    {
     "id": "side_switch",
     "role": "side_switch",
     "text": {
-     "zh": "左侧同样，扶住椅子，后侧臀部收紧，髋往前推"
+     "zh": "左侧同样，扶住椅子，后侧臀部收紧，髋往前推",
+     "en": "Now the left side. Hold the chair, squeeze the back glute, push your hips forward"
     },
     "ms": {
-     "zh": 4598
+     "zh": 4598,
+     "en": 5271
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，扶住椅子，后侧臀部收紧，髋往前推"
+     "zh": "放松一下。下一组记住，扶住椅子，后侧臀部收紧，髋往前推",
+     "en": "Relax for a moment. Next set, remember: Hold the chair, squeeze the back glute, push your hips forward"
     },
     "ms": {
-     "zh": 6060
+     "zh": 6060,
+     "en": 7012
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "扶椅站姿弓步屈髋拉伸，完成"
+     "zh": "扶椅站姿弓步屈髋拉伸，完成",
+     "en": "Chair-supported standing hip flexor stretch, done."
     },
     "ms": {
-     "zh": 2856
+     "zh": 2856,
+     "en": 2763
     }
    }
   ],
@@ -164,6 +180,34 @@
   "demo.mp4": {
    "bytes": 65231,
    "sha256": "517a38848651c09056be6ecb34e37e71ddaac698178cf474710c0e57dd025b9b"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 21019,
+   "sha256": "29c1768ff2c7eddeae1fb1cbe94a469d9d7498c859679f4457f2c29cce1e13f6"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 28646,
+   "sha256": "0de306e312177ae55d4a7393b45b10ee4a429608ad2e712f483eb900dc734681"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 23786,
+   "sha256": "203036699696e51ff5e6d77e033b523258851bf9b35229c6206f1e6a69c5dcbf"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 36416,
+   "sha256": "3a6e715f4fb497fd0f10da7b92a09ef084b4c2600a01e8769aeeb8f13860abfa"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 20047,
+   "sha256": "b8dca4a99599e5b582e0fb82f5b7ae59855e1a414ffc32af043d22a9e5522077"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 57411,
+   "sha256": "06c198bad0b16b30bfa1873b7ee8e6e4d3dda97429584b51da2589fab11c0489"
+  },
+  "voice/en/side_switch.m4a": {
+   "bytes": 42025,
+   "sha256": "fe09e7a0cda8388e56af733d0dcc5f7d024ff53673b16cc81e5c76c12d3b2df6"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 19294,

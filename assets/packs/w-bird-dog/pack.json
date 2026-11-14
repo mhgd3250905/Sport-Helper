@@ -58,10 +58,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -69,60 +71,72 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "鸟狗式"
+     "zh": "鸟狗式",
+     "en": "Bird dog"
     },
     "ms": {
-     "zh": 836
+     "zh": 836,
+     "en": 697
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "鸟狗式，练下背"
+     "zh": "鸟狗式，练下背",
+     "en": "Bird dog. Works the lower back."
     },
     "ms": {
-     "zh": 1672
+     "zh": 1672,
+     "en": 2670
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "手在肩下、膝在髋下"
+     "zh": "手在肩下、膝在髋下",
+     "en": "Hands under shoulders, knees under hips"
     },
     "ms": {
-     "zh": 2043
+     "zh": 2043,
+     "en": 2113
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "对侧手脚伸直，背部保持水平不晃"
+     "zh": "对侧手脚伸直，背部保持水平不晃",
+     "en": "Reach the opposite arm and leg long, keep your back level and still"
     },
     "ms": {
-     "zh": 3065
+     "zh": 3065,
+     "en": 3622
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，对侧手脚伸直，背部保持水平不晃"
+     "zh": "放松一下。下一组记住，对侧手脚伸直，背部保持水平不晃",
+     "en": "Relax for a moment. Next set, remember: Reach the opposite arm and leg long, keep your back level and still"
     },
     "ms": {
-     "zh": 5619
+     "zh": 5619,
+     "en": 7268
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "鸟狗式，完成"
+     "zh": "鸟狗式，完成",
+     "en": "Bird dog, done."
     },
     "ms": {
-     "zh": 1533
+     "zh": 1533,
+     "en": 1254
     }
    }
   ],
@@ -152,6 +166,30 @@
   "demo.mp4": {
    "bytes": 86774,
    "sha256": "d19f44e9b6dfd87e04bc954d342b093b87edd6025976250abf9fba617cfd186a"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 18409,
+   "sha256": "02848f0277006cc5c53d68b07bd676d6f16a756d191ab589b3b9d1077620d736"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 31377,
+   "sha256": "43a53453565f5a2129d7571d78d116eec6d6b0a982f7acd0c59c853af26e2d55"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 11545,
+   "sha256": "d75c4a72c4c1b3ee62c4c00a926cd2a0b55b58e4034e98804c1d4b3b93528ac6"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 23077,
+   "sha256": "b54171491dd2ae2465253a88b9e401ba064262b06f5da68cf0006c0e48c00d1a"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 6894,
+   "sha256": "bfc2c35e04ac4fca8979d1df75c142d6d64a5c55148c847c19fef0c2b693a06d"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 63404,
+   "sha256": "e4351ce5178935cb34cf7bfaa1926451033e435a693c1e4fdfcb6d9c4e267d3f"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 17887,

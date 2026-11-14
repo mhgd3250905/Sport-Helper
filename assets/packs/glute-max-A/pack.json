@@ -58,10 +58,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -69,60 +71,72 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "单腿臀桥"
+     "zh": "单腿臀桥",
+     "en": "Single-leg glute bridge"
     },
     "ms": {
-     "zh": 1045
+     "zh": 1045,
+     "en": 1440
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "单腿臀桥，练臀部"
+     "zh": "单腿臀桥，练臀部",
+     "en": "Single-leg glute bridge. Works the glutes."
     },
     "ms": {
-     "zh": 1881
+     "zh": 1881,
+     "en": 3251
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "一腿伸直，另一侧脚跟推地把臀部抬起"
+     "zh": "一腿伸直，另一侧脚跟推地把臀部抬起",
+     "en": "One leg straight, push through the other heel and lift your hips"
     },
     "ms": {
-     "zh": 3553
+     "zh": 3553,
+     "en": 3135
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "用臀部把骨盆顶起，骨盆不歪"
+     "zh": "用臀部把骨盆顶起，骨盆不歪",
+     "en": "Drive the hips up with your glutes, keep the pelvis level"
     },
     "ms": {
-     "zh": 2670
+     "zh": 2670,
+     "en": 2786
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，用臀部把骨盆顶起，骨盆不歪"
+     "zh": "放松一下。下一组记住，用臀部把骨盆顶起，骨盆不歪",
+     "en": "Relax for a moment. Next set, remember: Drive the hips up with your glutes, keep the pelvis level"
     },
     "ms": {
-     "zh": 5201
+     "zh": 5201,
+     "en": 6502
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "单腿臀桥，完成"
+     "zh": "单腿臀桥，完成",
+     "en": "Single-leg glute bridge, done."
     },
     "ms": {
-     "zh": 1718
+     "zh": 1718,
+     "en": 1904
     }
    }
   ],
@@ -152,6 +166,30 @@
   "demo.mp4": {
    "bytes": 80514,
    "sha256": "2aca8a3664a80a943c0e2e2d8d0227c63d45892da7e6a757fe0db5acbf161e18"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 26922,
+   "sha256": "ec344134803fb8208cbd63b61b30e3fc591d8f77ada2dc01162f68011ff7edda"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 23971,
+   "sha256": "c2e7152934ef98d72ef825713c710b144a9eaae0ece0ee2c33205c3edced9852"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 16827,
+   "sha256": "f38992c3a896f7937146d3085f1e85f85d14432ee22507f0cfe160dc87cc9aa7"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 25866,
+   "sha256": "a7b91d213bb63e0c491b32b7eaaa4d0f35a6f023670e193478aa9aa857f84fac"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 12983,
+   "sha256": "604bd45f43a34ca095bfa5408a89c283b98e8969dd8681a287df9a9e799e60f8"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 56292,
+   "sha256": "6d8389c96a96a6bbab336126508656d4a8f0fa767869c09e228c4acd05700b67"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 30312,

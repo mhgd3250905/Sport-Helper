@@ -4,19 +4,27 @@ import 'package:flutter/material.dart';
 import 'package:ugk_trainer/ugk_trainer.dart';
 
 import '../app/gated_posehub_media_preparer.dart';
+import '../app/posehub_media_repository.dart';
 import '../app/services.dart';
 import '../domain/exercise.dart';
 import 'exercise_video.dart';
 import 'training_poster_image.dart';
 import 'training_route.dart';
+import 'training_media_progress.dart';
 
 /// Supplies host route/media hooks without recreating SDK practice UI or doses.
 /// The original page is the SDK's fully configured browser callback payload.
 class SinglePracticePage extends StatefulWidget {
-  const SinglePracticePage({super.key, required this.page, this.exercise});
+  const SinglePracticePage({
+    super.key,
+    required this.page,
+    this.exercise,
+    this.sourceEntry = 'single_practice',
+  });
 
   final PoseHubSinglePracticePage page;
   final Exercise? exercise;
+  final String sourceEntry;
 
   @override
   State<SinglePracticePage> createState() => _SinglePracticePageState();
@@ -30,11 +38,61 @@ class _SinglePracticePageState extends State<SinglePracticePage> {
   Future<void>? _preparerGate;
   PoseHubMediaPreparer? _preparerDelegate, _preparer;
   bool _gateOpen = false, _sessionEnded = false, _replayPending = false;
+  bool _entryMarked = false;
+  bool _trainingStarted = false;
+  TrainingMediaRepositoryBridge? _repository;
+  TrainingMediaPolicy? _policy;
+  VoidCallback? _releaseTrainingMedia;
+
+  String get _mediaEntry {
+    final source = switch (widget.sourceEntry) {
+      'action_library' => 'action_library',
+      'recommendation' => 'recommendation',
+      _ => 'single_practice',
+    };
+    return '${source}_${widget.page.startMode == TrainerStartMode.preview ? 'preview' : 'training'}';
+  }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    if (_repository == null) {
+      final services = context
+          .getInheritedWidgetOfExactType<AppScope>()
+          ?.services;
+      final catalog = services?.poseHubCatalog;
+      final media = services?.poseHubMedia;
+      if (services != null &&
+          catalog != null &&
+          media != null &&
+          media is PoseHubTrainingVideoPreparation) {
+        if (widget.page.startMode == TrainerStartMode.training) {
+          _releaseTrainingMedia = services.beginTrainingMediaSession();
+        }
+        final repository = _repository = TrainingMediaRepositoryBridge(
+          catalog: catalog,
+          host: media,
+          entry: _mediaEntry,
+        );
+        _policy = TrainingMediaPolicy(
+          repository: repository,
+          posterAssetRoot: PoseHubActionLibrary.standingAssetRoot,
+          prefetchBeforeTraining: false,
+        );
+        if (media case final PoseHubMediaEntryPreparation entry) {
+          entry.markMediaEntry(_mediaEntry);
+          _entryMarked = true;
+        }
+      }
+    }
     _bindGate();
+  }
+
+  @override
+  void dispose() {
+    _releaseTrainingMedia?.call();
+    _repository?.dispose();
+    super.dispose();
   }
 
   void _bindGate() {
@@ -49,11 +107,13 @@ class _SinglePracticePageState extends State<SinglePracticePage> {
         ? null
         : Future.wait<void>(gates).then<void>((_) {});
     _gateOpen = gate == null;
+    if (_gateOpen) _markTrainingEntry();
     if (gate != null) {
       // SDK errors release its gate. They cannot release the host's route gate
       // early because Future.wait also waits for every supplied future.
       void open() {
         if (!mounted || !identical(_startGate, gate)) return;
+        _markTrainingEntry();
         setState(() => _gateOpen = true);
       }
 
@@ -61,9 +121,32 @@ class _SinglePracticePageState extends State<SinglePracticePage> {
     }
   }
 
+  void _markTrainingEntry() {
+    if (_entryMarked || widget.page.startMode != TrainerStartMode.training) {
+      return;
+    }
+    _entryMarked = true;
+    final repository = context
+        .getInheritedWidgetOfExactType<AppScope>()
+        ?.services
+        .poseHubMedia;
+    if (repository case final PoseHubMediaTimingAnchor anchor) {
+      anchor.markTrainingEntry();
+    }
+  }
+
   void _exitStarted() {
     _control?.beginExit();
     widget.page.onExitStarted?.call();
+  }
+
+  void _startTraining() {
+    _releaseTrainingMedia ??= context
+        .getInheritedWidgetOfExactType<AppScope>()
+        ?.services
+        .beginTrainingMediaSession();
+    if (!_trainingStarted) setState(() => _trainingStarted = true);
+    widget.page.onStartTraining?.call();
   }
 
   Future<void> _beforeExitPop() async {
@@ -112,7 +195,7 @@ class _SinglePracticePageState extends State<SinglePracticePage> {
       });
     }
     final asset =
-        'packages/ugk_trainer/assets/pose_hub/app-test-pack-r1/standing/${widget.page.action.id}.webp';
+        '${PoseHubActionLibrary.standingAssetRoot}${widget.page.action.id}.webp';
     final ready =
         (control?.canPlay ?? true) &&
         (widget.page.startMode == TrainerStartMode.preview || _gateOpen);
@@ -135,6 +218,8 @@ class _SinglePracticePageState extends State<SinglePracticePage> {
             theme: request.theme,
             strings: request.strings,
             mediaPreparer: request.mediaPreparer,
+            canPlay: request.canPlay,
+            playbackHandle: request.playbackHandle,
           );
     final custom = widget.page.mediaBuilder;
     if (custom != null) {
@@ -148,6 +233,19 @@ class _SinglePracticePageState extends State<SinglePracticePage> {
             .library
             .tryGet(widget.page.action.id);
     if (exercise == null) {
+      if (_policy != null) {
+        return TrainingActionMedia(
+          actionId: widget.page.action.id,
+          policy: _policy,
+          playing: actual.canPlay,
+          prefetchWhenIdle: true,
+          paused: paused,
+          mirrored: actual.mirrored,
+          radius: actual.theme.radius,
+          stage: actual.theme.mediaStage,
+          playbackHandle: actual.playbackHandle,
+        );
+      }
       return _SdkPracticeMedia(
         key: ValueKey('single-practice-sdk-media-${widget.page.action.id}'),
         page: widget.page,
@@ -158,12 +256,20 @@ class _SinglePracticePageState extends State<SinglePracticePage> {
     return ExerciseVideo(
       key: ValueKey('single-practice-media-${exercise.id}'),
       exercise: exercise,
+      playing: _policy == null ? true : actual.canPlay,
+      prefetchWhenIdle: _policy != null,
+      videoPriority: _policy != null,
       paused: paused,
       mirrored: request.mirrored,
       radius: request.theme.radius,
       stageColor: request.theme.mediaStage,
       mediaPreparer: request.mediaPreparer,
+      downloadPlaybackHandle: _policy == null ? null : actual.playbackHandle,
       training: true,
+      trainingProgress:
+          _policy != null &&
+          (_trainingStarted ||
+              widget.page.startMode == TrainerStartMode.training),
     );
   }
 
@@ -185,22 +291,26 @@ class _SinglePracticePageState extends State<SinglePracticePage> {
               preparationGate.then<void>((_) {}, onError: (Object _) {}),
             );
     }
-    return PoseHubSinglePracticePage(
+    final child = PoseHubSinglePracticePage(
       key: page.key,
       action: page.action,
       mediaBaseUri: page.mediaBaseUri,
       theme: page.theme,
       onFinished: _finished,
-      mediaPreparer: _preparer,
+      mediaPreparer: _policy == null ? _preparer : null,
       voice: page.voice,
       startMode: page.startMode,
-      onStartTraining: page.onStartTraining,
+      onStartTraining: _policy == null ? page.onStartTraining : _startTraining,
       onCompleted: _completed,
       startGate: _startGate,
       beforeExitPop: _beforeExitPop,
       onExitStarted: _exitStarted,
       mediaBuilder: _media,
     );
+    final policy = _policy;
+    return policy == null
+        ? child
+        : TrainingMediaPolicyScope(policy: policy, child: child);
   }
 }
 

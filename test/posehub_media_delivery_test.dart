@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:smartfit/app/posehub_media_config.dart';
 import 'package:smartfit/app/posehub_media_delivery.dart';
 
 class _ManifestBundle extends CachingAssetBundle {
@@ -18,24 +19,20 @@ class _ManifestBundle extends CachingAssetBundle {
 }
 
 class _Fixture {
-  static final revision = 'a' * 64;
   final manifest = <String, Object?>{
-    'format': 'smartfit-posehub-file-delivery@2',
+    'format': 'smartfit-posehub-file-delivery@3',
     'ready': true,
-    'packVersion': 'r1-v3',
-    'catalogSha256': revision,
-    'releaseTag': 'posehub-app-test-pack-r1-v3',
     'mediaBaseUrls': [
-      'https://domestic.example.test/pack/r1-v3/',
-      'https://media.uuugk.win/pack/r1-v3/',
+      'https://domestic.example.test/pack/{pack}/',
+      'https://media.uuugk.win/pack/{pack}/',
     ],
   };
 
   Future<PoseHubMediaDelivery> load({
-    String? catalogRevision,
+    String packVersion = 'r2-v1',
     String mediaBaseUrls = '',
   }) => PoseHubMediaDelivery.load(
-    catalogRevision: catalogRevision ?? revision,
+    packVersion: packVersion,
     mediaBaseUrls: mediaBaseUrls,
     bundle: _ManifestBundle(manifest),
   );
@@ -46,17 +43,18 @@ void main() {
     final fixture = _Fixture();
     fixture.manifest['ready'] = false;
     final delivery = await fixture.load(
-      mediaBaseUrls: '["https://override.example.test/pack/r1-v3/"]',
+      mediaBaseUrls: '["https://override.example.test/pack/{pack}/"]',
     );
     expect(delivery.mediaBaseUrls, isEmpty);
-    expect(PoseHubMediaDelivery.unavailable().mediaBaseUrls, isEmpty);
+    expect(delivery.packVersion, 'r2-v1');
+    expect(PoseHubMediaDelivery.unavailable('r2-v1').mediaBaseUrls, isEmpty);
   });
 
   test(
     'ordered immutable mirrors preserve original nested case-sensitive paths',
     () async {
       final delivery = await _Fixture().load();
-      expect(delivery.packVersion, 'r1-v3');
+      expect(delivery.packVersion, 'r2-v1');
       expect(delivery.mediaBaseUrls.map((base) => base.host), [
         'domestic.example.test',
         'media.uuugk.win',
@@ -64,19 +62,27 @@ void main() {
       const path = 'media/abs-A/abs-A-r2-alpha-r2/abs-A.rgb-alpha.mp4';
       expect(
         delivery.mediaBaseUrls.last.resolve(path).toString(),
-        'https://media.uuugk.win/pack/r1-v3/$path',
+        'https://media.uuugk.win/pack/r2-v1/$path',
       );
       expect(() => delivery.mediaBaseUrls.clear(), throwsUnsupportedError);
     },
   );
+
+  test('the pack follows the catalogue in use, not the asset', () async {
+    final delivery = await _Fixture().load(packVersion: 'r2-v2');
+    expect(
+      delivery.mediaBaseUrls.last.toString(),
+      'https://media.uuugk.win/pack/r2-v2/',
+    );
+  });
 
   test(
     'JSON build override replaces the full list and preserves its order',
     () async {
       final delivery = await _Fixture().load(
         mediaBaseUrls: jsonEncode([
-          'https://first.example.test/v3/',
-          'https://backup.example.test/v3/',
+          'https://first.example.test/{pack}/',
+          'https://backup.example.test/{pack}/',
         ]),
       );
       expect(delivery.mediaBaseUrls.map((base) => base.host), [
@@ -100,16 +106,20 @@ void main() {
   );
 
   test(
-    'wrong catalog or pack identities reject before selecting a source',
+    'wrong format or pack identities reject before selecting a source',
     () async {
-      await expectLater(
-        _Fixture().load(catalogRevision: 'b' * 64),
-        throwsFormatException,
-      );
+      for (final pack in ['', 'R2-V1', '../r2-v1', 'r2_v1']) {
+        await expectLater(
+          _Fixture().load(packVersion: pack),
+          throwsFormatException,
+        );
+      }
       for (final mutate in <void Function(_Fixture)>[
-        (f) => f.manifest['format'] = 'smartfit-posehub-file-delivery@1',
-        (f) => f.manifest['packVersion'] = 'r1-v2',
-        (f) => f.manifest['catalogSha256'] = 'bad-sha',
+        (f) => f.manifest['format'] = 'smartfit-posehub-file-delivery@2',
+        (f) => f.manifest['mediaBaseUrls'] = ['https://media.uuugk.win/v3/'],
+        (f) => f.manifest['mediaBaseUrls'] = [
+          'https://media.uuugk.win/{pack}/{pack}/',
+        ],
       ]) {
         final fixture = _Fixture();
         mutate(fixture);
@@ -124,16 +134,16 @@ void main() {
       [],
       'https://not-a-list.test/',
       [1],
-      ['http://cdn.example.test/v3/'],
-      ['https://user:password@cdn.example.test/v3/'],
-      ['https://cdn.example.test/v3/?token=fixture'],
-      ['https://cdn.example.test/v3/#fragment'],
-      ['https://cdn.example.test/v3'],
-      ['https:///'],
+      ['http://cdn.example.test/{pack}/'],
+      ['https://user:password@cdn.example.test/{pack}/'],
+      ['https://cdn.example.test/{pack}/?token=fixture'],
+      ['https://cdn.example.test/{pack}/#fragment'],
+      ['https://cdn.example.test/{pack}'],
+      ['https:///{pack}/'],
       ['file:///tmp/media/'],
-      ['//cdn.example.test/v3/'],
-      ['https://cdn.example.test/a/../v3/'],
-      ['https://cdn.example.test/v3/', 'https://cdn.example.test/v3/'],
+      ['//cdn.example.test/{pack}/'],
+      ['https://cdn.example.test/a/../{pack}/'],
+      ['https://cdn.example.test/{pack}/', 'https://cdn.example.test/{pack}/'],
     ]) {
       final fixture = _Fixture();
       fixture.manifest['mediaBaseUrls'] = invalid;
@@ -148,5 +158,19 @@ void main() {
         reason: 'override invalid mirror list',
       );
     }
+  });
+
+  test('release mirrors reuse only their /pack/<version>/ directory', () {
+    expect(
+      PoseHubMediaConfig.fromMirrors(
+        'https://media.uuugk.win/pack/r1-v3/',
+        'https://cn.example.test/mirror/pack/r1-v3/',
+      ),
+      jsonEncode([
+        'https://media.uuugk.win/pack/{pack}/',
+        'https://cn.example.test/mirror/pack/{pack}/',
+      ]),
+    );
+    expect(PoseHubMediaConfig.fromMirrors('https://cdn.test/v0.3.0-app/', ''), '');
   });
 }

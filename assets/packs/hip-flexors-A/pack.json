@@ -56,10 +56,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -67,60 +69,72 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "坐姿直腿抬腿，压缩"
+     "zh": "坐姿直腿抬腿，压缩",
+     "en": "Seated pike leg lift"
     },
     "ms": {
-     "zh": 2113
+     "zh": 2113,
+     "en": 1416
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "坐姿直腿抬腿，压缩，练髋前侧"
+     "zh": "坐姿直腿抬腿，压缩，练髋前侧",
+     "en": "Seated pike leg lift. Works the front of the hips."
     },
     "ms": {
-     "zh": 3204
+     "zh": 3204,
+     "en": 3553
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "坐直，腿伸直抬起，停一下再放下"
+     "zh": "坐直，腿伸直抬起，停一下再放下",
+     "en": "Sit tall, lift the straight leg, pause, then lower"
     },
     "ms": {
-     "zh": 3111
+     "zh": 3111,
+     "en": 3344
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "直腿抬起离地，停 1 秒"
+     "zh": "直腿抬起离地，停 1 秒",
+     "en": "Lift the straight leg off the floor, hold for one second"
     },
     "ms": {
-     "zh": 2113
+     "zh": 2113,
+     "en": 2949
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，直腿抬起离地，停 1 秒"
+     "zh": "放松一下。下一组记住，直腿抬起离地，停 1 秒",
+     "en": "Relax for a moment. Next set, remember: Lift the straight leg off the floor, hold for one second"
     },
     "ms": {
-     "zh": 4621
+     "zh": 4621,
+     "en": 6618
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "坐姿直腿抬腿，压缩，完成"
+     "zh": "坐姿直腿抬腿，压缩，完成",
+     "en": "Seated pike leg lift, done."
     },
     "ms": {
-     "zh": 2833
+     "zh": 2833,
+     "en": 1927
     }
    }
   ],
@@ -150,6 +164,30 @@
   "demo.mp4": {
    "bytes": 90100,
    "sha256": "9325bf423fb795182348f9f665153cfdf4e17cc7a0cfdfb89f02b552cc835b56"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 28575,
+   "sha256": "8644d23b8e162f8b0b416a664348764a393cd6625038ea345c6d243cfd58bb3a"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 25731,
+   "sha256": "b231641a4e5005d731c6d674b513fe368cd202b6222f17be8f09055f77ed63ef"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 16854,
+   "sha256": "fc59663b5cfd3ca9daf38c4b9a717b8a76e1b6b1f78eead14477f9bb1c664c63"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 28502,
+   "sha256": "31e5a6d8062cb7f7634b837004640587a7119e793e8cfdc404e856d754775d03"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 12734,
+   "sha256": "989b22e5d865dff88b17ebba03109b3c9c78c4ab84100383375347ab878ab7b1"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 57397,
+   "sha256": "a0ee78f5b3006768113e7460e95efad2fd2b2a337bba05477542ad970545e7c6"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 26489,

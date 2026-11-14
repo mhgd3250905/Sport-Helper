@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:ugk_trainer/ugk_trainer.dart'
-    show SessionResult, PoseHubSinglePracticePage;
+    show SessionResult, PoseHubSinglePracticePage, PoseHubActionLibrary;
 
 import '../app/services.dart';
 import '../app/training_transition_activity.dart';
@@ -68,7 +68,7 @@ Future<SessionResult?> openTraining(
           )
         : TrainingPosterImages.prepareAsset(
             context,
-            'packages/ugk_trainer/assets/pose_hub/app-test-pack-r1/standing/${practice.action.id}.webp',
+            '${PoseHubActionLibrary.standingAssetRoot}${practice.action.id}.webp',
           );
     final ready = await poster.timeout(
       const Duration(milliseconds: 150),
@@ -97,6 +97,7 @@ Future<SessionResult?> openTraining(
           : SinglePracticePage(
               page: practice,
               exercise: services?.library.tryGet(practice.action.id),
+              sourceEntry: sourceEntry,
             ),
     );
     final popped = navigator.push(route);

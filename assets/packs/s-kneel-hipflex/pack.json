@@ -59,10 +59,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -70,70 +72,84 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "半跪髋屈肌拉伸"
+     "zh": "半跪髋屈肌拉伸",
+     "en": "Half-kneeling hip flexor stretch"
     },
     "ms": {
-     "zh": 1556
+     "zh": 1556,
+     "en": 1788
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "半跪髋屈肌拉伸，拉伸髋前侧"
+     "zh": "半跪髋屈肌拉伸，拉伸髋前侧",
+     "en": "Half-kneeling hip flexor stretch. Stretches the front of the hips."
     },
     "ms": {
-     "zh": 2810
+     "zh": 2810,
+     "en": 4133
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "半跪，躯干直立"
+     "zh": "半跪，躯干直立",
+     "en": "Half kneel, trunk upright"
     },
     "ms": {
-     "zh": 1649
+     "zh": 1649,
+     "en": 1672
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "后侧臀部收紧，髋慢慢往前推"
+     "zh": "后侧臀部收紧，髋慢慢往前推",
+     "en": "Squeeze the back glute and ease the hips forward"
     },
     "ms": {
-     "zh": 2856
+     "zh": 2856,
+     "en": 2322
     }
    },
    {
     "id": "side_switch",
     "role": "side_switch",
     "text": {
-     "zh": "左侧同样，后侧臀部收紧，髋慢慢往前推"
+     "zh": "左侧同样，后侧臀部收紧，髋慢慢往前推",
+     "en": "Now the left side. Squeeze the back glute and ease the hips forward"
     },
     "ms": {
-     "zh": 4040
+     "zh": 4040,
+     "en": 4226
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，后侧臀部收紧，髋慢慢往前推"
+     "zh": "放松一下。下一组记住，后侧臀部收紧，髋慢慢往前推",
+     "en": "Relax for a moment. Next set, remember: Squeeze the back glute and ease the hips forward"
     },
     "ms": {
-     "zh": 5410
+     "zh": 5410,
+     "en": 5968
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "半跪髋屈肌拉伸，完成"
+     "zh": "半跪髋屈肌拉伸，完成",
+     "en": "Half-kneeling hip flexor stretch, done."
     },
     "ms": {
-     "zh": 2252
+     "zh": 2252,
+     "en": 2252
     }
    }
   ],
@@ -163,6 +179,34 @@
   "demo.mp4": {
    "bytes": 63041,
    "sha256": "160b2415df06eea6d89a87825b096d62949f1c52b987a8630cb897ff86ff4013"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 14956,
+   "sha256": "b973039afb93c11076c7c713ab4cd34709a5a4f7b3652400f07ad5c9429239ed"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 20084,
+   "sha256": "57f2683dee201129cbc7dc786292c70ef8a68acc981bee030712955c9b495070"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 19472,
+   "sha256": "67ece26f3f0d04f39059996a71d019fff6ea5498816c50255f483727dfc75f1d"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 31787,
+   "sha256": "ba1310d03c27daab9027d6866180ee96a3c1e9acc1816ce314a4305e75aefd2c"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 15797,
+   "sha256": "13d7c346c5fd7c9f0e4a2c62adf6c0ba6068b3d805b9cc457c56414f20c2532a"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 51200,
+   "sha256": "20a3744aac9572ba8f3a0520882d9fa747b4f76eda60acd3cb5ccd4eefe4da66"
+  },
+  "voice/en/side_switch.m4a": {
+   "bytes": 36945,
+   "sha256": "e6b174a3e786709d17e39111989cafddf551a15a5df359de1f139b02b3a5cc82"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 14558,

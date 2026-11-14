@@ -24,6 +24,7 @@ Future<PoseHubMediaFileStore> createPoseHubMediaStore({
   required int maxVideoCacheBytes,
   required String? legacyCacheDirectory,
   required List<PoseHubLegacyVideoFile> legacyVideos,
+  PoseHubMediaTiming? timing,
 }) async {
   for (final mediaBaseUrl in mediaBaseUrls) {
     _checkUrl(mediaBaseUrl, allowInsecureLocalhost);
@@ -90,11 +91,15 @@ Future<PoseHubMediaFileStore> createPoseHubMediaStore({
     maxVideoCacheBytes,
     legacyRoot,
     trustedLegacy,
+    timing,
   );
   try {
+    timing?.repository('cache_initialize_start');
     await store.initializeVideoCache();
+    timing?.repository('cache_initialize_complete', result: 'ok');
     return store;
   } on Object {
+    timing?.repository('cache_initialize_failed', result: 'failed');
     store.dispose();
     rethrow;
   }
@@ -152,6 +157,7 @@ class _FileStore implements PoseHubMediaFileStore {
     int maxVideoCacheBytes,
     this._legacyRoot,
     this._legacyVideos,
+    this.timing,
   ) : _videoPaths = {for (final file in videos) file.path: file},
       _detachBudget = _videoCache.attach(maxVideoCacheBytes);
 
@@ -167,6 +173,7 @@ class _FileStore implements PoseHubMediaFileStore {
   final void Function() _detachBudget;
   final Directory? _legacyRoot;
   final List<PoseHubLegacyVideoFile> _legacyVideos;
+  final PoseHubMediaTiming? timing;
   final _retained = <Object, String>{};
   final _clients = <HttpClient, String>{};
   final _random = Random.secure();
@@ -224,16 +231,27 @@ class _FileStore implements PoseHubMediaFileStore {
   }
 
   Future<bool> _verified(File file, coach.PoseHubPackFile expected) async {
+    var verified = false;
+    timing?.event(expected, 'cache_verify_start', source: 'cache');
     try {
       if (await FileSystemEntity.type(file.path, followLinks: false) !=
               FileSystemEntityType.file ||
           await file.length() != expected.bytes) {
         return false;
       }
-      return (await sha256.bind(file.openRead()).first).toString() ==
+      verified =
+          (await sha256.bind(file.openRead()).first).toString() ==
           expected.sha256;
+      return verified;
     } on FileSystemException {
       return false;
+    } finally {
+      timing?.event(
+        expected,
+        'cache_verify_end',
+        source: 'cache',
+        result: verified ? 'ok' : 'miss',
+      );
     }
   }
 
@@ -395,6 +413,7 @@ class _FileStore implements PoseHubMediaFileStore {
       for (var redirects = 0; ; redirects++) {
         _check();
         _checkUrl(current, allowLocal, redirect: redirects > 0);
+        timing?.event(file, 'http_request', source: 'network');
         final request = await client.getUrl(current).timeout(timeout);
         request.followRedirects = false;
         // A fresh request receives only public headers, including across hosts.
@@ -404,6 +423,12 @@ class _FileStore implements PoseHubMediaFileStore {
         );
         request.headers.set(HttpHeaders.acceptEncodingHeader, 'identity');
         final response = await request.close().timeout(timeout);
+        timing?.event(
+          file,
+          'headers',
+          source: 'network',
+          httpStatus: response.statusCode,
+        );
         if (const [301, 302, 303, 307, 308].contains(response.statusCode)) {
           final location = response.headers.value(HttpHeaders.locationHeader);
           if (redirects >= maxRedirects || location == null) {
@@ -425,6 +450,12 @@ class _FileStore implements PoseHubMediaFileStore {
             }
           }
           current = next;
+          timing?.event(
+            file,
+            'redirect',
+            source: 'network',
+            httpStatus: response.statusCode,
+          );
           continue;
         }
         if (response.statusCode != HttpStatus.ok) {
@@ -447,6 +478,7 @@ class _FileStore implements PoseHubMediaFileStore {
           response.timeout(timeout),
           onProgress,
           onVerifying,
+          network: true,
         );
       }
     } finally {
@@ -460,8 +492,9 @@ class _FileStore implements PoseHubMediaFileStore {
     File target,
     Stream<List<int>> input,
     void Function(int) onProgress,
-    void Function() onVerifying,
-  ) async {
+    void Function() onVerifying, {
+    bool network = false,
+  }) async {
     _check();
     final temp = File(
       '${target.path}.${pid}_${DateTime.now().microsecondsSinceEpoch}_${_random.nextInt(1 << 32)}.part',
@@ -475,6 +508,14 @@ class _FileStore implements PoseHubMediaFileStore {
       output = await temp.open(mode: FileMode.write);
       await for (final chunk in input) {
         _check();
+        if (network && received == 0 && chunk.isNotEmpty) {
+          timing?.event(
+            file,
+            'first_byte',
+            source: 'network',
+            receivedBytes: chunk.length,
+          );
+        }
         received += chunk.length;
         if (received > file.bytes) {
           throw const PoseHubMediaException(
@@ -486,8 +527,21 @@ class _FileStore implements PoseHubMediaFileStore {
         await output.writeFrom(chunk);
         onProgress(received);
       }
+      if (network) {
+        timing?.event(
+          file,
+          'body_complete',
+          source: 'network',
+          receivedBytes: received,
+        );
+      }
       hash.close();
       onVerifying();
+      timing?.event(
+        file,
+        'verify_start',
+        source: network ? 'network' : 'publish',
+      );
       if (received != file.bytes) {
         throw const PoseHubMediaException(
           'size',
@@ -497,6 +551,12 @@ class _FileStore implements PoseHubMediaFileStore {
       if (result.value?.toString() != file.sha256) {
         throw const PoseHubMediaException('sha256', 'Media checksum mismatch.');
       }
+      timing?.event(
+        file,
+        'verify_end',
+        source: network ? 'network' : 'publish',
+        result: 'ok',
+      );
       await output.flush();
       await output.close();
       output = null;

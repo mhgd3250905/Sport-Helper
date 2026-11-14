@@ -61,10 +61,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -72,80 +74,96 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "扶椅站姿后踢腿"
+     "zh": "扶椅站姿后踢腿",
+     "en": "Chair-supported standing kickback"
     },
     "ms": {
-     "zh": 1509
+     "zh": 1509,
+     "en": 1788
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "扶椅站姿后踢腿，练臀部"
+     "zh": "扶椅站姿后踢腿，练臀部",
+     "en": "Chair-supported standing kickback. Works the glutes."
     },
     "ms": {
-     "zh": 2299
+     "zh": 2299,
+     "en": 3622
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "扶椅站稳，躯干不前倾"
+     "zh": "扶椅站稳，躯干不前倾",
+     "en": "Hold the chair, stand steady, do not lean forward"
     },
     "ms": {
-     "zh": 2159
+     "zh": 2159,
+     "en": 2972
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "扶稳椅背，腿向后抬，腰不要塌"
+     "zh": "扶稳椅背，腿向后抬，腰不要塌",
+     "en": "Hold the chair back, lift the leg behind you, do not arch your back"
     },
     "ms": {
-     "zh": 2879
+     "zh": 2879,
+     "en": 3599
     }
    },
    {
     "id": "cue3",
     "role": "cue",
     "text": {
-     "zh": "腿向后上方踢，臀部收紧"
+     "zh": "腿向后上方踢，臀部收紧",
+     "en": "Kick the leg back and up, squeeze your glutes"
     },
     "ms": {
-     "zh": 2485
+     "zh": 2485,
+     "en": 2392
     }
    },
    {
     "id": "side_switch",
     "role": "side_switch",
     "text": {
-     "zh": "左侧同样，扶稳椅背，腿向后抬，腰不要塌"
+     "zh": "左侧同样，扶稳椅背，腿向后抬，腰不要塌",
+     "en": "Now the left side. Hold the chair back, lift the leg behind you, do not arch your back"
     },
     "ms": {
-     "zh": 4017
+     "zh": 4017,
+     "en": 5550
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，腿向后上方踢，臀部收紧"
+     "zh": "放松一下。下一组记住，腿向后上方踢，臀部收紧",
+     "en": "Relax for a moment. Next set, remember: Kick the leg back and up, squeeze your glutes"
     },
     "ms": {
-     "zh": 4992
+     "zh": 4992,
+     "en": 6037
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "扶椅站姿后踢腿，完成"
+     "zh": "扶椅站姿后踢腿，完成",
+     "en": "Chair-supported standing kickback, done."
     },
     "ms": {
-     "zh": 2183
+     "zh": 2183,
+     "en": 2322
     }
    }
   ],
@@ -175,6 +193,38 @@
   "demo.mp4": {
    "bytes": 84195,
    "sha256": "d40e6a244070fab2f7422b0879609b728255c58aeeda9420f98a5f3448507f83"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 25607,
+   "sha256": "a22251208d9b245bc3c48adf45f55265295e23c38ff4cfdb180fbc43f9aa8308"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 30696,
+   "sha256": "f631e6af5481f9ca575dda1365060ef8c8ccfdbbb76c9a7ce36ecbcf7542cfaf"
+  },
+  "voice/en/cue3.m4a": {
+   "bytes": 20683,
+   "sha256": "fcb2d4fe20a2f2a7a072d5d6056c489a48c2877b89fdcd6250005e3985fdecd5"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 19992,
+   "sha256": "e97984c09af90f72f733d74961d9e5b18e74c80ea12cea2aab84399965ebdadf"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 27298,
+   "sha256": "836aaeb60da69e08e21c2fc23e8422d3c0a587a8d4cad1527d31a29aa0c70986"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 15856,
+   "sha256": "530e9e3585388738d3554a8b7761cba8ed0f45e857e4713d504ab1779eefe032"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 52453,
+   "sha256": "3eb35f3615b61b11ac3a0e63945d0492c13e8c769189be3d9113ec5c92523ba4"
+  },
+  "voice/en/side_switch.m4a": {
+   "bytes": 49744,
+   "sha256": "d4e47988fcf8583f9bfc49400c5c730b945be01958d8746390f1c6474440f745"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 18746,

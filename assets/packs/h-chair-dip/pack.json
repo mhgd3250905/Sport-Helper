@@ -60,10 +60,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -71,70 +73,84 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "椅子臂屈伸"
+     "zh": "椅子臂屈伸",
+     "en": "Chair dip"
     },
     "ms": {
-     "zh": 1161
+     "zh": 1161,
+     "en": 673
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "椅子臂屈伸，练手臂后侧"
+     "zh": "椅子臂屈伸，练手臂后侧",
+     "en": "Chair dip. Works the triceps."
     },
     "ms": {
-     "zh": 2392
+     "zh": 2392,
+     "en": 2670
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "双手撑椅边，臀部离开椅面"
+     "zh": "双手撑椅边，臀部离开椅面",
+     "en": "Hands on the edge of the chair, hips off the seat"
     },
     "ms": {
-     "zh": 2485
+     "zh": 2485,
+     "en": 2531
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "肩膀下沉远离耳朵，肘向后弯曲再撑起"
+     "zh": "肩膀下沉远离耳朵，肘向后弯曲再撑起",
+     "en": "Shoulders down away from your ears, bend the elbows back, then push up"
     },
     "ms": {
-     "zh": 3460
+     "zh": 3460,
+     "en": 3878
     }
    },
    {
     "id": "cue3",
     "role": "cue",
     "text": {
-     "zh": "屈肘下沉，肩不耸"
+     "zh": "屈肘下沉，肩不耸",
+     "en": "Bend the elbows to lower, shoulders down"
     },
     "ms": {
-     "zh": 1858
+     "zh": 1858,
+     "en": 2252
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，屈肘下沉，肩不耸"
+     "zh": "放松一下。下一组记住，屈肘下沉，肩不耸",
+     "en": "Relax for a moment. Next set, remember: Bend the elbows to lower, shoulders down"
     },
     "ms": {
-     "zh": 4319
+     "zh": 4319,
+     "en": 5968
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "椅子臂屈伸，完成"
+     "zh": "椅子臂屈伸，完成",
+     "en": "Chair dip, done."
     },
     "ms": {
-     "zh": 1858
+     "zh": 1858,
+     "en": 1207
     }
    }
   ],
@@ -164,6 +180,34 @@
   "demo.mp4": {
    "bytes": 141789,
    "sha256": "11effc46f2393fd1ac1cf5050f8422a7b94d64c1d03ba2a21500d38390ee2aad"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 22015,
+   "sha256": "d1689a96ac4c158697ee5abf1b0b5396f46fb5effc69a64d31c11f78a889afb5"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 32823,
+   "sha256": "c84d90ab11f3597d643d316cff19f42db80b75ea6bff8edd1df8b64873126e82"
+  },
+  "voice/en/cue3.m4a": {
+   "bytes": 19553,
+   "sha256": "a94e74c6bd959b33676d9e9c543c0d3c714a5b81f02009b5fbdd127ceb77bcac"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 10899,
+   "sha256": "b480dfda8def54ba02b55bbd634fb10b7d001e4b575059827422ee865a86d443"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 22896,
+   "sha256": "e8d3ca697487847bbdeed08cc8084fa56dc8eddde5dc8e5c04623e75346a8b18"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 6624,
+   "sha256": "f155715e21ccd4d24840005063d74cc5b2152aceeb85a827bf1c68affe6fdaab"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 48506,
+   "sha256": "442af72e5edc68dd0f2b6dc3aaf157f685ae2b89f08f844d2340f2918f65eed8"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 21399,

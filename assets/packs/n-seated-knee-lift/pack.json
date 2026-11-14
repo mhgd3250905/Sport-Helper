@@ -57,10 +57,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -68,60 +70,72 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "坐姿抬膝悬停"
+     "zh": "坐姿抬膝悬停",
+     "en": "Seated knee lift hover"
     },
     "ms": {
-     "zh": 1416
+     "zh": 1416,
+     "en": 1231
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "坐姿抬膝悬停，练髋前侧"
+     "zh": "坐姿抬膝悬停，练髋前侧",
+     "en": "Seated knee lift hover. Works the front of the hips."
     },
     "ms": {
-     "zh": 2485
+     "zh": 2485,
+     "en": 3390
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "坐直，膝盖抬起，悬停住"
+     "zh": "坐直，膝盖抬起，悬停住",
+     "en": "Sit tall, lift the knee and hover"
     },
     "ms": {
-     "zh": 2577
+     "zh": 2577,
+     "en": 1974
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "抬膝离开椅面，停 3 秒"
+     "zh": "抬膝离开椅面，停 3 秒",
+     "en": "Lift the knee off the seat, hold for three seconds"
     },
     "ms": {
-     "zh": 2136
+     "zh": 2136,
+     "en": 2601
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，抬膝离开椅面，停 3 秒"
+     "zh": "放松一下。下一组记住，抬膝离开椅面，停 3 秒",
+     "en": "Relax for a moment. Next set, remember: Lift the knee off the seat, hold for three seconds"
     },
     "ms": {
-     "zh": 4621
+     "zh": 4621,
+     "en": 6177
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "坐姿抬膝悬停，完成"
+     "zh": "坐姿抬膝悬停，完成",
+     "en": "Seated knee lift hover, done."
     },
     "ms": {
-     "zh": 2113
+     "zh": 2113,
+     "en": 1741
     }
    }
   ],
@@ -151,6 +165,30 @@
   "demo.mp4": {
    "bytes": 76328,
    "sha256": "c41928db620dfee61d8c60ea62a727c4a52f633b750e0273222e68e3a8fe77b8"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 17332,
+   "sha256": "ea9f6695101524374991a1eb865caba1743cf8364520c67946ae39edff34430e"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 22259,
+   "sha256": "2ca03662b3e5126534f9e1b25bb5d73ddd1c3e4bfc2cd5ab3f04c94414754b78"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 16041,
+   "sha256": "f962d98a1b519c512799c772ee91f94beb8bfc3b5d46be45ddee37a3245b9927"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 28410,
+   "sha256": "feb47c1aa69e38d8796cb31dc8eda2a1d4a755c7ecb333745a3500293396819a"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 11293,
+   "sha256": "dbff9a6b4db261d7bc2787dcae1b11dd59f27bd0f3798025dc537d3b75d8847a"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 50219,
+   "sha256": "644f7c7193041091a57757dc658232818ccac2f6cf4e95663687cf1eec1f0d3f"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 22161,

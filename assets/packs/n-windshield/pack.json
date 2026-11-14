@@ -58,10 +58,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -69,60 +71,72 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "仰卧雨刷式"
+     "zh": "仰卧雨刷式",
+     "en": "Supine windshield wipers"
     },
     "ms": {
-     "zh": 1161
+     "zh": 1161,
+     "en": 1579
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "仰卧雨刷式，活动臀部"
+     "zh": "仰卧雨刷式，活动臀部",
+     "en": "Supine windshield wipers. Mobilizes the glutes."
     },
     "ms": {
-     "zh": 2159
+     "zh": 2159,
+     "en": 3715
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "仰卧屈膝，双脚宽踩"
+     "zh": "仰卧屈膝，双脚宽踩",
+     "en": "Lie on your back, knees bent, feet wide"
     },
     "ms": {
-     "zh": 2113
+     "zh": 2113,
+     "en": 2461
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "双膝一起慢慢左右倒，肩膀贴地"
+     "zh": "双膝一起慢慢左右倒，肩膀贴地",
+     "en": "Drop both knees slowly side to side, shoulders stay down"
     },
     "ms": {
-     "zh": 3111
+     "zh": 3111,
+     "en": 3111
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，双膝一起慢慢左右倒，肩膀贴地"
+     "zh": "放松一下。下一组记住，双膝一起慢慢左右倒，肩膀贴地",
+     "en": "Relax for a moment. Next set, remember: Drop both knees slowly side to side, shoulders stay down"
     },
     "ms": {
-     "zh": 5642
+     "zh": 5642,
+     "en": 6780
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "仰卧雨刷式，完成"
+     "zh": "仰卧雨刷式，完成",
+     "en": "Supine windshield wipers, done."
     },
     "ms": {
-     "zh": 1881
+     "zh": 1881,
+     "en": 2067
     }
    }
   ],
@@ -152,6 +166,30 @@
   "demo.mp4": {
    "bytes": 158100,
    "sha256": "121b9bf616daa5d081fcabd6af9f3de7946c20f7967e9aceeeb68d9effc6d2ac"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 21350,
+   "sha256": "728faf97329ffa3de1d6a23b7f29886acc11fd32bebfb7284abc5c97a162704c"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 26570,
+   "sha256": "90b3766f61a0ca9c4bb2092172f5492ba8a39cf462ff092702b499236f82b09b"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 18007,
+   "sha256": "3aa6c972a716615397c34e697d2f0837202a0fba5aa5a66f4538987d002937f4"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 28153,
+   "sha256": "149ba77534e757f58d54f429b0379203df934bfde515d1fe82e3e8c3d81c55f4"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 14127,
+   "sha256": "02aa817bb35601e6c4f6c04a38d94e0e9625a8b87ff4f98962b53682b663ce79"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 55616,
+   "sha256": "2e2e63f84ae83d320f3f0b42f78c5f1129aee0d339a437a6d4ee1768ef420710"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 18411,

@@ -59,10 +59,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -70,70 +72,84 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "脚踩椅面臀桥"
+     "zh": "脚踩椅面臀桥",
+     "en": "Feet-on-chair glute bridge"
     },
     "ms": {
-     "zh": 1440
+     "zh": 1440,
+     "en": 1393
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "脚踩椅面臀桥，练大腿后侧和臀部"
+     "zh": "脚踩椅面臀桥，练大腿后侧和臀部",
+     "en": "Feet-on-chair glute bridge. Works the hamstrings and the glutes."
     },
     "ms": {
-     "zh": 3251
+     "zh": 3251,
+     "en": 3994
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "脚跟踩椅面，膝微屈"
+     "zh": "脚跟踩椅面，膝微屈",
+     "en": "Heels on the seat, knees slightly bent"
     },
     "ms": {
-     "zh": 1950
+     "zh": 1950,
+     "en": 2252
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "脚跟踩椅，收紧臀部抬髋，肋骨不外翻"
+     "zh": "脚跟踩椅，收紧臀部抬髋，肋骨不外翻",
+     "en": "Heels on the chair, squeeze your glutes and lift your hips, ribs down"
     },
     "ms": {
-     "zh": 3599
+     "zh": 3599,
+     "en": 3808
     }
    },
    {
     "id": "cue3",
     "role": "cue",
     "text": {
-     "zh": "抬臀时感觉大腿后侧和臀发力"
+     "zh": "抬臀时感觉大腿后侧和臀发力",
+     "en": "Feel the hamstrings and glutes working as you lift"
     },
     "ms": {
-     "zh": 2949
+     "zh": 2949,
+     "en": 2485
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，抬臀时感觉大腿后侧和臀发力"
+     "zh": "放松一下。下一组记住，抬臀时感觉大腿后侧和臀发力",
+     "en": "Relax for a moment. Next set, remember: Feel the hamstrings and glutes working as you lift"
     },
     "ms": {
-     "zh": 5503
+     "zh": 5503,
+     "en": 6200
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "脚踩椅面臀桥，完成"
+     "zh": "脚踩椅面臀桥，完成",
+     "en": "Feet-on-chair glute bridge, done."
     },
     "ms": {
-     "zh": 2113
+     "zh": 2113,
+     "en": 1834
     }
    }
   ],
@@ -163,6 +179,34 @@
   "demo.mp4": {
    "bytes": 92536,
    "sha256": "ac405ad9a521376b73d5199d51de9b7c4f369d1f181687c540a6fec50f217fd1"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 19685,
+   "sha256": "ce194c00224ea896723840a4467699217b8ed294814b9c0e82c88405ae731797"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 32590,
+   "sha256": "79079f0af7cfc5b7e80b52feeb8bde436228ef7707a13affe9127c6b8585341e"
+  },
+  "voice/en/cue3.m4a": {
+   "bytes": 21468,
+   "sha256": "c2afe6cd56a4fdf8854c2c3fba7b4f620b1873e733f25df040aefbbe46c6bc16"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 16078,
+   "sha256": "9a86bf7da5a179c6046f001f3404a825bb32688217f2f701b95273021e9840a9"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 32238,
+   "sha256": "16ea84ec37025b34bced0d1d0ba7b87a52187ca46b43345eb7833c434bfec999"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 12429,
+   "sha256": "64f40f9d5faa80abc160610b62ccf501aa69f736bae35951e053b97f52cdfd59"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 52210,
+   "sha256": "6acb74deff2776409a43dbc76156242ed4ecf4556c73ad1eb1d9d7ee0eb4d065"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 17175,

@@ -2,16 +2,20 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
 import 'package:ugk_trainer/ugk_trainer.dart';
 
 import '../app/guide_poster_cache.dart';
 import '../app/posehub_media_repository.dart';
 import '../app/posehub_media_repository_types.dart';
+import '../app/posehub_media_preparer.dart';
 import '../app/services.dart';
 import '../domain/exercise.dart';
+import '../diagnostics/runtime_log.dart';
 import 'guide_cached_poster.dart';
 import 'theme.dart';
+import 'visible_video_progress.dart';
 
 typedef CachedMediaStatus = ({
   bool loading,
@@ -30,7 +34,7 @@ bool observedVideoWrap(double previous, double current) =>
     current < previous / 2 &&
     previous - current >= .25;
 
-/// The SDK standing index binds all 219 images to sourceVideo.frameIndex=0.
+/// The SDK standing index binds bundled images to sourceVideo.frameIndex=0.
 /// The packaging gate verifies its catalog/video SHA before including them.
 /// Legacy covers have their own explicit frame-zero fields.
 class ExerciseFrameZero extends StatefulWidget {
@@ -172,7 +176,7 @@ class _ExerciseFrameZeroState extends State<ExerciseFrameZero> {
     final media = exercise.media;
     final candidates = {
       if (action != null)
-        'packages/ugk_trainer/assets/pose_hub/app-test-pack-r1/standing/${action.id}.webp',
+        '${PoseHubActionLibrary.standingAssetRoot}${action.id}.webp',
       if (media.alphaPlaybackPoster?.isNotEmpty == true)
         media.alphaPlaybackPoster!,
       media.playbackPosterFor(light: light),
@@ -197,6 +201,7 @@ class CachedExerciseMediaHandle {
   Key get key => _surface;
   Future<void> retire() =>
       _surface.currentState?.retire() ?? _retirement ?? Future.value();
+  void retry() => _surface.currentState?._retry();
 
   Future<void> _track(Future<void> retiring) {
     final previous = _retirement;
@@ -223,6 +228,10 @@ class CachedExerciseMedia extends StatefulWidget {
     super.key,
     required this.exercise,
     this.playing = true,
+    this.prefetchWhenIdle = false,
+    this.training = false,
+    this.videoPriority = false,
+    this.mediaEntry,
     this.paused = false,
     this.mirrored = false,
     this.radius = 16,
@@ -238,6 +247,9 @@ class CachedExerciseMedia extends StatefulWidget {
   });
   final Exercise exercise;
   final bool playing, paused, mirrored, waitForLoopOnMiss;
+  final bool prefetchWhenIdle, training;
+  final bool videoPriority;
+  final String? mediaEntry;
   final double radius;
   final PoseHubMediaPreparer? mediaPreparer;
   final DrillMediaPlaybackHandle? playbackHandle;
@@ -285,9 +297,19 @@ class _CachedExerciseMediaState extends State<CachedExerciseMedia>
   double? _progress;
   int _epoch = 0;
   CachedMediaStatus? _reported;
+  bool _retrying = false, _frameLogged = false;
+  bool _entryMarked = false;
+  TrainingMediaPhase? _legacyObservedPhase;
+  bool _legacyChangePending = false;
+  Stopwatch? _decoderWatch;
 
   bool get _current => _alive && mounted;
-  bool get _allowed => _current && widget.playing && !_backgrounded && _visible;
+  bool get _allowed =>
+      _current &&
+      (widget.playing || widget.prefetchWhenIdle) &&
+      !_backgrounded &&
+      _visible;
+  bool get _canPlay => _allowed && widget.playing;
   bool get _hasSurface => _controller != null || _legacy;
   String get _id => widget.exercise.id;
   String get _slot => widget.slot ?? _id;
@@ -321,6 +343,11 @@ class _CachedExerciseMediaState extends State<CachedExerciseMedia>
   @override
   void didUpdateWidget(CachedExerciseMedia oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (oldWidget.exercise.id != _id ||
+        oldWidget.mediaEntry != widget.mediaEntry ||
+        (!oldWidget.playing && widget.playing)) {
+      _entryMarked = false;
+    }
     if (oldWidget.playbackHandle != widget.playbackHandle) {
       oldWidget.playbackHandle?.unbind(this);
       _bindHandle();
@@ -329,14 +356,17 @@ class _CachedExerciseMediaState extends State<CachedExerciseMedia>
         oldWidget.exercise.id != _id ||
         oldWidget.exercise.media.revision != widget.exercise.media.revision ||
         oldWidget.mediaPreparer != widget.mediaPreparer;
-    if (changed || oldWidget.playing != widget.playing) {
+    if (changed ||
+        (oldWidget.playing || oldWidget.prefetchWhenIdle) !=
+            (widget.playing || widget.prefetchWhenIdle)) {
       if (changed) _initialCacheHit = null;
       if (_allowed) {
         unawaited(_start());
       } else {
         unawaited(retire());
       }
-    } else if (oldWidget.paused != widget.paused) {
+    } else if (oldWidget.paused != widget.paused ||
+        oldWidget.playing != widget.playing) {
       _previousPosition = null;
       _syncPause();
     }
@@ -358,7 +388,15 @@ class _CachedExerciseMediaState extends State<CachedExerciseMedia>
     owner: this,
     mediaId: _id,
     controller: _controller,
+    failed: _failed,
+    onRetry: _retry,
   );
+
+  void _retry() {
+    if (_retrying || !_allowed) return;
+    _retrying = true;
+    unawaited(_start(retry: true).whenComplete(() => _retrying = false));
+  }
 
   void _report() {
     final status = (
@@ -408,8 +446,11 @@ class _CachedExerciseMediaState extends State<CachedExerciseMedia>
     );
   }
 
-  Future<void> _start() async {
+  Future<void> _start({bool retry = false}) async {
     if (!_current) return;
+    final policy = widget.training || widget.videoPriority
+        ? TrainingMediaPolicyScope.read(context)
+        : null;
     final services = context
         .getInheritedWidgetOfExactType<AppScope>()
         ?.services;
@@ -423,8 +464,26 @@ class _CachedExerciseMediaState extends State<CachedExerciseMedia>
     final exercise = widget.exercise;
     final action = services?.poseHubCatalog?.tryGet(exercise.id);
     final repo = services?.poseHubMedia;
+    final entry = widget.mediaEntry;
+    if (entry != null && !_entryMarked) {
+      _entryMarked = true;
+      if (repo case final PoseHubMediaEntryPreparation scoped) {
+        scoped.markMediaEntry(entry);
+      } else {
+        RuntimeLog.instance.record(
+          'media.timing',
+          fields: {
+            'actionId': _id,
+            'source': 'legacy',
+            'phase': 'entry',
+            'entry': entry,
+          },
+        );
+      }
+    }
     _loading = true;
     _failed = false;
+    _frameLogged = false;
     _bindHandle();
     _rebuild();
     try {
@@ -442,10 +501,40 @@ class _CachedExerciseMediaState extends State<CachedExerciseMedia>
         final cached = await access?.cachedVideo(exercise.id);
         if (!_allowed || epoch != _epoch) return;
         _initialCacheHit ??= cached != null;
-        final preparer = widget.mediaPreparer ?? services?.poseHubPreparer;
-        final source =
-            cached ??
-            (preparer == null ? null : await _prepare(action, preparer));
+        final preparer =
+            widget.videoPriority && repo is PoseHubTrainingVideoPreparation
+            ? SmartFitPoseHubMediaPreparer(repo, videoOnly: true, entry: entry)
+            : widget.mediaPreparer ?? services?.poseHubPreparer;
+        final Uri? source;
+        if (widget.videoPriority && policy != null && retry) {
+          source = await policy.repository.ensureFile(action.video);
+        } else if ((widget.training || widget.videoPriority) && retry) {
+          source = switch (repo) {
+            final PoseHubMediaEntryPreparation scoped
+                when widget.videoPriority && entry != null =>
+              await scoped.ensureVideoForEntry(
+                action.id,
+                entry: entry,
+                priority: true,
+              ),
+            final PoseHubTrainingVideoPreparation training =>
+              await training.ensureVideo(action.id, priority: true),
+            _ =>
+              widget.videoPriority
+                  ? preparer == null
+                        ? null
+                        : await _prepare(action, preparer)
+                  : await repo.ensureFile(action.video),
+          };
+        } else {
+          source =
+              cached ??
+              (policy != null
+                  ? await policy.repository.ensureFile(action.video)
+                  : preparer == null
+                  ? null
+                  : await _prepare(action, preparer));
+        }
         if (!_allowed || epoch != _epoch) return;
         if (source == null) {
           await _fail(epoch);
@@ -485,9 +574,10 @@ class _CachedExerciseMediaState extends State<CachedExerciseMedia>
   void _createController() {
     final controller = DrillMediaController();
     _controller = controller;
+    _decoderWatch = Stopwatch()..start();
     controller.addListener(_decoderChanged);
     _bindHandle();
-    if (!widget.paused) controller.toggle();
+    if (_canPlay && !widget.paused) controller.toggle();
   }
 
   void _downloadChanged() {
@@ -498,8 +588,35 @@ class _CachedExerciseMediaState extends State<CachedExerciseMedia>
 
   void _legacyProgressChanged() {
     if (!_current) return;
+    if (widget.videoPriority &&
+        SchedulerBinding.instance.schedulerPhase ==
+            SchedulerPhase.persistentCallbacks) {
+      if (_legacyChangePending) return;
+      _legacyChangePending = true;
+      final epoch = _epoch;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _legacyChangePending = false;
+        if (_current && epoch == _epoch) _legacyProgressChanged();
+      });
+      return;
+    }
     final state = _legacyRepository?.stateFor(_id);
     if (state == null) return;
+    final entry = widget.mediaEntry;
+    if (entry != null && _legacyObservedPhase != state.phase) {
+      _legacyObservedPhase = state.phase;
+      RuntimeLog.instance.record(
+        'media.timing',
+        fields: {
+          'actionId': _id,
+          'source': 'legacy',
+          'entry': entry,
+          'phase': 'observed_${state.phase.name}',
+          'receivedBytes': state.receivedBytes,
+          'totalBytes': state.totalBytes,
+        },
+      );
+    }
     if (state.phase == TrainingMediaPhase.ready) _refreshLegacyPoster();
     if (const [
       TrainingMediaPhase.failed,
@@ -546,6 +663,20 @@ class _CachedExerciseMediaState extends State<CachedExerciseMedia>
   }
 
   void _decoderChanged() {
+    if (!_frameLogged && _controller?.hasFrame == true) {
+      _frameLogged = true;
+      if (widget.training) {
+        RuntimeLog.instance.record(
+          'media.timing',
+          fields: {
+            'actionId': _id,
+            'phase': 'firstFrame',
+            'source': 'decoder',
+            'elapsedMs': _decoderWatch?.elapsedMilliseconds,
+          },
+        );
+      }
+    }
     if (_controller?.failed == true) {
       final epoch = _epoch;
       // The public SDK controller is notifying its listeners right now.
@@ -559,7 +690,7 @@ class _CachedExerciseMediaState extends State<CachedExerciseMedia>
   }
 
   void _syncPause() {
-    if (widget.paused || !_allowed) {
+    if (widget.paused || !_canPlay) {
       _probeTimer?.cancel();
       _probeTimer = null;
       _controller?.pause();
@@ -571,7 +702,7 @@ class _CachedExerciseMediaState extends State<CachedExerciseMedia>
   }
 
   void _scheduleProbe() {
-    if (!_allowed ||
+    if (!_canPlay ||
         widget.paused ||
         _revealed ||
         !_hasSurface ||
@@ -583,7 +714,7 @@ class _CachedExerciseMediaState extends State<CachedExerciseMedia>
   }
 
   Future<void> _probe() async {
-    if (!_allowed || widget.paused || _revealed || !_hasSurface) return;
+    if (!_canPlay || widget.paused || _revealed || !_hasSurface) return;
     _probing = true;
     final epoch = _epoch;
     double? position;
@@ -599,7 +730,7 @@ class _CachedExerciseMediaState extends State<CachedExerciseMedia>
     }
     if (epoch != _epoch) return;
     _probing = false;
-    if (!_allowed || widget.paused) return;
+    if (!_canPlay || widget.paused) return;
     if (position != null) {
       final previous = _previousPosition;
       final waitForWrap = widget.waitForLoopOnMiss && _initialCacheHit == false;
@@ -650,7 +781,6 @@ class _CachedExerciseMediaState extends State<CachedExerciseMedia>
     }
     _legacyHandle = null;
     _legacy = false;
-    _bindHandle();
     _source = null;
     _legacyPosterSource = null;
     _checkingLegacyPoster = false;
@@ -666,6 +796,7 @@ class _CachedExerciseMediaState extends State<CachedExerciseMedia>
     _loading = false;
     _revealed = false;
     _failed = keepFailure;
+    _bindHandle();
     _progress = null;
     final release = _releasePin;
     _releasePin = null;
@@ -717,10 +848,11 @@ class _CachedExerciseMediaState extends State<CachedExerciseMedia>
         bundledOnly: media.appTestOnly,
       ),
       playing: true,
-      paused: widget.paused,
+      paused: widget.paused || !widget.playing,
       mirrored: false,
       radius: 0,
       stage: Colors.transparent,
+      repository: widget.videoPriority ? _legacyRepository : null,
       playbackHandle: _legacyHandle,
     );
   }
@@ -851,6 +983,7 @@ class GuideMedia extends StatefulWidget {
 
 class _GuideMediaState extends State<GuideMedia> with WidgetsBindingObserver {
   final _surface = GlobalKey<_CachedExerciseMediaState>();
+  final _playback = DrillMediaPlaybackHandle();
   bool _alive = true;
   bool _mountedPlayback = false;
   bool _requestedPlay = false;
@@ -909,6 +1042,10 @@ class _GuideMediaState extends State<GuideMedia> with WidgetsBindingObserver {
 
   Future<void> _toggle() async {
     if (!_current || !widget.enabled) return;
+    if (_mountedPlayback && _failed) {
+      _retryVisible();
+      return;
+    }
     if (_mountedPlayback && !_failed) {
       setState(() => _requestedPlay = !_requestedPlay);
       return;
@@ -927,8 +1064,29 @@ class _GuideMediaState extends State<GuideMedia> with WidgetsBindingObserver {
     setState(() => _mountedPlayback = true);
   }
 
+  void _retryVisible() {
+    if (!_current) return;
+    setState(() {
+      _failed = false;
+      _requestedPlay = true;
+    });
+    _surface.currentState?._retry();
+  }
+
   void _changed(CachedMediaStatus status) {
     if (!_current) return;
+    final services = context
+        .getInheritedWidgetOfExactType<AppScope>()
+        ?.services;
+    if (services?.poseHubMedia is PoseHubTrainingVideoPreparation ||
+        services?.media != null ||
+        TrainingMediaScope.maybeOf(context) != null) {
+      setState(() {
+        _status = status;
+        _failed = status.failed;
+      });
+      return;
+    }
     if (status.failed && !_failed) {
       _failed = true;
       _requestedPlay = false;
@@ -954,6 +1112,7 @@ class _GuideMediaState extends State<GuideMedia> with WidgetsBindingObserver {
     _alive = false;
     WidgetsBinding.instance.removeObserver(this);
     unawaited(widget.coordinator.release(widget.slot));
+    _playback.dispose();
     super.dispose();
   }
 
@@ -987,105 +1146,121 @@ class _GuideMediaState extends State<GuideMedia> with WidgetsBindingObserver {
         : _requestedPlay
         ? '暂停动作示范'
         : '播放动作示范';
-    return GestureDetector(
-      key: ValueKey('guide-media-${widget.slot}'),
-      behavior: HitTestBehavior.opaque,
-      onTap: canPlay ? _toggle : null,
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          ColoredBox(
-            key: ValueKey('guide-media-stage-${widget.slot}'),
-            color: stage,
-            child: Center(
-              child: AspectRatio(
-                key: ValueKey('guide-media-square-${widget.slot}'),
-                aspectRatio: 1,
-                child: CachedExerciseMedia(
-                  key: _surface,
-                  exercise: widget.exercise,
-                  slot: widget.slot,
-                  playing: _mountedPlayback,
-                  paused: !_requestedPlay,
-                  radius: 0,
-                  stageColor: stage,
-                  extractMissingPoster: true,
-                  onStatus: _changed,
+    return VisibleVideoProgress(
+      exercise: widget.exercise,
+      active: _mountedPlayback,
+      playbackHandle: _playback,
+      onRetry: _retryVisible,
+      right: 60,
+      child: GestureDetector(
+        key: ValueKey('guide-media-${widget.slot}'),
+        behavior: HitTestBehavior.opaque,
+        onTap: canPlay ? _toggle : null,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            ColoredBox(
+              key: ValueKey('guide-media-stage-${widget.slot}'),
+              color: stage,
+              child: Center(
+                child: AspectRatio(
+                  key: ValueKey('guide-media-square-${widget.slot}'),
+                  aspectRatio: 1,
+                  child: CachedExerciseMedia(
+                    key: _surface,
+                    exercise: widget.exercise,
+                    slot: widget.slot,
+                    playing: _mountedPlayback,
+                    videoPriority: true,
+                    mediaEntry: 'guide_preview',
+                    playbackHandle: _playback,
+                    paused: !_requestedPlay,
+                    radius: 0,
+                    stageColor: stage,
+                    extractMissingPoster: true,
+                    onStatus: _changed,
+                  ),
                 ),
               ),
             ),
-          ),
-          if (canPlay)
-            Positioned(
-              top: 8,
-              right: 8,
-              child: Semantics(
-                label: label,
-                button: true,
-                child: GestureDetector(
-                  key: ValueKey('guide-media-control-${widget.slot}'),
-                  behavior: HitTestBehavior.opaque,
-                  onTap: _toggle,
-                  child: SizedBox.square(
-                    key: ValueKey('article-video-toggle-${widget.slot}'),
-                    dimension: 44,
-                    child: Center(
-                      child: Container(
-                        key: ValueKey(
-                          'guide-media-control-face-${widget.slot}',
-                        ),
-                        width: 36,
-                        height: 36,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: dark
-                              ? Colors.black.withValues(alpha: .55)
-                              : Colors.white.withValues(alpha: .92),
-                          boxShadow: dark
-                              ? null
-                              : [
-                                  BoxShadow(
-                                    color: Colors.black.withValues(alpha: .12),
-                                    offset: const Offset(0, 2),
-                                    blurRadius: 8,
-                                  ),
-                                ],
-                        ),
-                        child: Center(
-                          child: AnimatedSwitcher(
-                            duration: const Duration(milliseconds: 150),
-                            child: KeyedSubtree(
-                              key: _controlTransition,
-                              child: loading
-                                  ? SizedBox.square(
-                                      key: ValueKey(
-                                        'guide-media-loading-${widget.slot}',
+            if (canPlay)
+              Positioned(
+                top: 8,
+                right: 8,
+                child: Semantics(
+                  label: label,
+                  button: true,
+                  child: GestureDetector(
+                    key: ValueKey('guide-media-control-${widget.slot}'),
+                    behavior: HitTestBehavior.opaque,
+                    onTap: _toggle,
+                    child: SizedBox.square(
+                      key: ValueKey('article-video-toggle-${widget.slot}'),
+                      dimension: 44,
+                      child: Center(
+                        child: Container(
+                          key: ValueKey(
+                            'guide-media-control-face-${widget.slot}',
+                          ),
+                          width: 36,
+                          height: 36,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: dark
+                                ? Colors.black.withValues(alpha: .55)
+                                : Colors.white.withValues(alpha: .92),
+                            boxShadow: dark
+                                ? null
+                                : [
+                                    BoxShadow(
+                                      color: Colors.black.withValues(
+                                        alpha: .12,
                                       ),
-                                      dimension: 16,
-                                      child: CircularProgressIndicator(
-                                        value: _status.progress,
-                                        strokeWidth: 2,
-                                        color: SfColors.accent,
-                                      ),
-                                    )
-                                  : Icon(
-                                      _failed
-                                          ? Icons.cloud_off_rounded
-                                          : _requestedPlay
-                                          ? Icons.pause_rounded
-                                          : Icons.play_arrow_rounded,
-                                      key: ValueKey(
-                                        _failed
-                                            ? 'guide-media-offline-${widget.slot}'
-                                            : _requestedPlay
-                                            ? 'pause'
-                                            : 'play',
-                                      ),
-                                      size: 20,
-                                      color: dark
-                                          ? Colors.white
-                                          : SfColors.accent,
+                                      offset: const Offset(0, 2),
+                                      blurRadius: 8,
                                     ),
+                                  ],
+                          ),
+                          child: Center(
+                            child: AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 150),
+                              child: KeyedSubtree(
+                                key: _controlTransition,
+                                child:
+                                    loading &&
+                                        services?.poseHubMedia
+                                            is! PoseHubTrainingVideoPreparation &&
+                                        services?.media == null
+                                    ? SizedBox.square(
+                                        key: ValueKey(
+                                          'guide-media-loading-${widget.slot}',
+                                        ),
+                                        dimension: 16,
+                                        child: CircularProgressIndicator(
+                                          value: _status.progress,
+                                          strokeWidth: 2,
+                                          color: SfColors.accent,
+                                        ),
+                                      )
+                                    : Icon(
+                                        _failed
+                                            ? Icons.cloud_off_rounded
+                                            : _requestedPlay
+                                            ? Icons.pause_rounded
+                                            : Icons.play_arrow_rounded,
+                                        key: ValueKey(
+                                          _failed
+                                              ? 'guide-media-offline-${widget.slot}'
+                                              : _requestedPlay
+                                              ? 'pause'
+                                              : 'play',
+                                        ),
+                                        size: 20,
+                                        color: dark
+                                            ? Colors.white
+                                            : SfColors.accent,
+                                      ),
+                              ),
                             ),
                           ),
                         ),
@@ -1093,17 +1268,17 @@ class _GuideMediaState extends State<GuideMedia> with WidgetsBindingObserver {
                     ),
                   ),
                 ),
+              )
+            else
+              const Align(
+                alignment: Alignment.bottomCenter,
+                child: Padding(
+                  padding: EdgeInsets.all(12),
+                  child: Text('此动作暂无视频示范'),
+                ),
               ),
-            )
-          else
-            const Align(
-              alignment: Alignment.bottomCenter,
-              child: Padding(
-                padding: EdgeInsets.all(12),
-                child: Text('此动作暂无视频示范'),
-              ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }

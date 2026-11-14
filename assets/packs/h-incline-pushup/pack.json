@@ -61,10 +61,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -72,50 +74,60 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "扶凳上斜俯卧撑"
+     "zh": "扶凳上斜俯卧撑",
+     "en": "Incline push-up on a stool"
     },
     "ms": {
-     "zh": 1533
+     "zh": 1533,
+     "en": 1602
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "扶凳上斜俯卧撑，练胸部和手臂后侧"
+     "zh": "扶凳上斜俯卧撑，练胸部和手臂后侧",
+     "en": "Incline push-up on a stool. Works the chest and the triceps."
     },
     "ms": {
-     "zh": 3483
+     "zh": 3483,
+     "en": 4203
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "双手撑稳凳面，身体成一条直线，胸口贴近再推起"
+     "zh": "双手撑稳凳面，身体成一条直线，胸口贴近再推起",
+     "en": "Hands firm on the stool, body in one straight line, chest down close, then push up"
     },
     "ms": {
-     "zh": 4598
+     "zh": 4598,
+     "en": 4760
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，双手撑稳凳面，身体成一条直线，胸口贴近再推起"
+     "zh": "放松一下。下一组记住，双手撑稳凳面，身体成一条直线，胸口贴近再推起",
+     "en": "Relax for a moment. Next set, remember: Hands firm on the stool, body in one straight line, chest down close, then push up"
     },
     "ms": {
-     "zh": 7105
+     "zh": 7105,
+     "en": 8568
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "扶凳上斜俯卧撑，完成"
+     "zh": "扶凳上斜俯卧撑，完成",
+     "en": "Incline push-up on a stool, done."
     },
     "ms": {
-     "zh": 2252
+     "zh": 2252,
+     "en": 2090
     }
    }
   ],
@@ -145,6 +157,26 @@
   "demo.mp4": {
    "bytes": 126275,
    "sha256": "f719c457d481efbd99a619137e2c66d5f9716df9db618bfc93925938c4c03147"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 40907,
+   "sha256": "8bca7b62ca16ef7d4cc87d9f6f77265d840825d2547a82100be3e6c017acdcf5"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 18161,
+   "sha256": "5b3f5fd239bc42e0c3ca440104a7ad9b61ad6fa99dafdad564c23a7cdcb6bf55"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 32270,
+   "sha256": "58224b8a4fceac8c8d68f20eef70ce6fa3a68c43a1902bb8aaa037b28c10fa43"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 14158,
+   "sha256": "2f85c875fb2f5a8a3a735fc881ad35ccc90243daa30e9d30569ccdf1f9fee13d"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 74184,
+   "sha256": "d837074bf49549e9d547100f36cacd1bf6b6540bc9576bff512caf64131bdd96"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 38681,

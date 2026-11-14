@@ -54,10 +54,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -65,50 +67,60 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "青蛙式"
+     "zh": "青蛙式",
+     "en": "Frog stretch"
     },
     "ms": {
-     "zh": 813
+     "zh": 813,
+     "en": 952
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "青蛙式，拉伸大腿内侧"
+     "zh": "青蛙式，拉伸大腿内侧",
+     "en": "Frog stretch. Stretches the inner thighs."
     },
     "ms": {
-     "zh": 2252
+     "zh": 2252,
+     "en": 3158
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "膝盖向两侧打开，脚尖朝外，臀部慢慢往后坐"
+     "zh": "膝盖向两侧打开，脚尖朝外，臀部慢慢往后坐",
+     "en": "Knees wide, toes out, sit your hips back slowly"
     },
     "ms": {
-     "zh": 4226
+     "zh": 4226,
+     "en": 2902
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，膝盖向两侧打开，脚尖朝外，臀部慢慢往后坐"
+     "zh": "放松一下。下一组记住，膝盖向两侧打开，脚尖朝外，臀部慢慢往后坐",
+     "en": "Relax for a moment. Next set, remember: Knees wide, toes out, sit your hips back slowly"
     },
     "ms": {
-     "zh": 6780
+     "zh": 6780,
+     "en": 6502
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "青蛙式，完成"
+     "zh": "青蛙式，完成",
+     "en": "Frog stretch, done."
     },
     "ms": {
-     "zh": 1533
+     "zh": 1533,
+     "en": 1463
     }
    }
   ],
@@ -138,6 +150,26 @@
   "demo.mp4": {
    "bytes": 53508,
    "sha256": "6c64ca3f352d3e81ef6aa099b303ab39c119507a8c1668ae3de8a6f2c6e967bb"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 24986,
+   "sha256": "dba0615abef78bb928639916e558216b8d06b404f020e1b00999cd9b167e7cf0"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 12801,
+   "sha256": "ab2b970a50421d3ad6ed7b1598140959b912fd6e204a1c0406712f94a4a24282"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 27129,
+   "sha256": "263481c382e2e24a9582d822ced3bb8c00dda0477ea689b2741c9da3d09d451b"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 8968,
+   "sha256": "7f92229b1cdf6ec160d1c2fea798ce54c140011f304b7b3af419f028bcea5d3c"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 55341,
+   "sha256": "a85bdcb2e5c8e2ea525d4e3644cb0d768f9da5a8f45890a3205e97b7e95a7684"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 35824,

@@ -57,10 +57,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -68,50 +70,60 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "四足猫牛式"
+     "zh": "四足猫牛式",
+     "en": "Quadruped cat-cow"
     },
     "ms": {
-     "zh": 1207
+     "zh": 1207,
+     "en": 1184
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "四足猫牛式，活动下背和腹部"
+     "zh": "四足猫牛式，活动下背和腹部",
+     "en": "Quadruped cat-cow. Mobilizes the lower back and the abs."
     },
     "ms": {
-     "zh": 2786
+     "zh": 2786,
+     "en": 4040
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "吸气塌腰抬头，呼气拱背低头"
+     "zh": "吸气塌腰抬头，呼气拱背低头",
+     "en": "Breathe in, drop the belly and look up. Breathe out, round the back and look down"
     },
     "ms": {
-     "zh": 2740
+     "zh": 2740,
+     "en": 5016
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，吸气塌腰抬头，呼气拱背低头"
+     "zh": "放松一下。下一组记住，吸气塌腰抬头，呼气拱背低头",
+     "en": "Relax for a moment. Next set, remember: Breathe in, drop the belly and look up. Breathe out, round the back and look down"
     },
     "ms": {
-     "zh": 5271
+     "zh": 5271,
+     "en": 8661
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "四足猫牛式，完成"
+     "zh": "四足猫牛式，完成",
+     "en": "Quadruped cat-cow, done."
     },
     "ms": {
-     "zh": 1950
+     "zh": 1950,
+     "en": 1741
     }
    }
   ],
@@ -141,6 +153,26 @@
   "demo.mp4": {
    "bytes": 104978,
    "sha256": "087d708f73ad1c7a1390430aa6ab636c2b278df98c12ba252d183aa6293e492e"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 39274,
+   "sha256": "a138517686ed1eaaed327258b7b8773780af90a70898397f8511f29fd48e925d"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 15298,
+   "sha256": "ca13a2dfecc6d8effe652f527db401be2e032d9b5f051c800007e9929defec91"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 34880,
+   "sha256": "281e9f9b49a28cfcb5dc14709587a7404547be9ffa0ed858a98ed2c656d7846e"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 10834,
+   "sha256": "ed40bb1b67bf440da67402c3279777a599555fde2099814359ea7872fb8d9821"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 67869,
+   "sha256": "c7abf610b44bb926bc3a65753b102e3d3816dc5aa5fdd22a15663872514cde24"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 23471,

@@ -143,10 +143,18 @@ void main() {
           );
         }
       }
-      final pending = result.entries['h-towel-isometric-curl']!;
-      expect(pending.raw['level'], isNull);
-      expect((pending.raw['defaultDose']! as Map)['seconds'], isNull);
-      expect(() => pending.raw['level'] = 1, throwsUnsupportedError);
+      // r1-v3 kept h-towel-isometric-curl pending; the SDK r2-v1 baseline
+      // has no pending rows, so check a pending row only when one exists.
+      final pending = result.entries.values
+          .where((entry) => !entry.trainingEligible)
+          .toList();
+      if (pending.isEmpty) {
+        expect(result.trainingEligibleIds, hasLength(sdk.allActions.length));
+      }
+      for (final row in pending) {
+        expect(row.training, isNull, reason: row.id);
+        expect(() => row.raw['level'] = 1, throwsUnsupportedError);
+      }
     },
   );
 

@@ -93,6 +93,21 @@ class AppServices {
   TrainingMediaLog? _mediaLog;
   String? _prefetchedPlan;
   int _prefetchEpoch = 0;
+  int _trainingMediaSessions = 0;
+
+  /// Stop future whole-plan workers while training owns current/next media.
+  /// Already queued files and running HTTP are retained by the repository.
+  VoidCallback beginTrainingMediaSession() {
+    _trainingMediaSessions++;
+    _prefetchEpoch++;
+    _prefetchedPlan = null;
+    var released = false;
+    return () {
+      if (released) return;
+      released = true;
+      _trainingMediaSessions--;
+    };
+  }
 
   void _prefetchChatPlan() {
     final plan = chat.currentPlan;
@@ -101,6 +116,7 @@ class AppServices {
 
   /// Start downloads without delaying navigation, the clock or voice output.
   void prefetchPlan(TrainingPlan? plan) {
+    if (_trainingMediaSessions > 0) return;
     if (plan == null || (media == null && poseHubMedia == null)) return;
     final ids = plan.exerciseIds;
     final signature = '${plan.id}/${ids.join(',')}';

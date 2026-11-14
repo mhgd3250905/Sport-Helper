@@ -127,6 +127,26 @@ Future<void> _advance(WidgetTester tester, int seconds) async {
   }
 }
 
+/// Advances until the SDK leaves its preparation phase. The SDK sizes that
+/// phase from the voice lines it will say (welcome, intro, 准备), so tests
+/// follow the player's own prep state (its cue carousel is `preparing`)
+/// instead of assuming a fixed 10 seconds. Returns the whole seconds pumped.
+Future<int> _finishPrep(WidgetTester tester) async {
+  bool preparing() => tester
+      .widgetList<trainer.TrainerCueCarousel>(
+        find.byType(trainer.TrainerCueCarousel),
+      )
+      .any((carousel) => carousel.preparing);
+  expect(preparing(), isTrue, reason: 'Session starts in prep.');
+  var seconds = 0;
+  while (preparing()) {
+    expect(seconds, lessThan(60), reason: 'Prep never ended.');
+    await tester.pump(const Duration(seconds: 1));
+    seconds++;
+  }
+  return seconds;
+}
+
 void main() {
   configureWidgetTestTimeout();
   testWidgets(
@@ -148,10 +168,9 @@ void main() {
       expect(library['h-squat'].repSeconds, isNull);
       final s = _services(storage: _Storage(), library: library);
       await _open(tester, s, _plan(id: 'h-squat', reps: true));
-      await _advance(
-        tester,
-        15,
-      ); // 10 seconds prep, then part of 3 × 3 seconds.
+      final prep = await _finishPrep(tester);
+      expect(prep, greaterThanOrEqualTo(10)); // Never below the 10 s floor.
+      await _advance(tester, 5); // Part of 3 × 3 seconds.
       expect(find.byKey(const ValueKey('complete-set-button')), findsNothing);
       expect(find.text('练完了！'), findsNothing);
       expect(s.store.sessionResults, isEmpty);
@@ -203,7 +222,8 @@ void main() {
       final s = _services(storage: storage);
       await s.store.rememberPlan(plan);
       await _open(tester, s, plan);
-      await _advance(tester, 11);
+      await _finishPrep(tester);
+      await _advance(tester, 1);
       expect(
         tester.widget<ExerciseVideo>(find.byType(ExerciseVideo)).exercise.id,
         'h-forearm-plank',
@@ -241,7 +261,8 @@ void main() {
       final s = _services(storage: storage);
       final returned = <trainer.SessionResult>[];
       await _open(tester, s, _plan(), returned: returned);
-      await _advance(tester, 15); // Default preparation + timed work.
+      await _finishPrep(tester);
+      await _advance(tester, 5); // Two seconds of timed work + finish.
       expect(find.text('练完了！'), findsOneWidget);
       expect(
         find.byKey(const ValueKey('completion-celebration')),
@@ -360,9 +381,16 @@ void main() {
           isTrue,
         );
         await tester.tap(find.byKey(const ValueKey('pause')));
-        await _advance(tester, 15);
+        await _finishPrep(tester);
+        await _advance(tester, 5);
         expect(find.text('练完了！'), findsOneWidget);
-        expect(output.spoken, isEmpty, reason: 'No English clips are bundled.');
+        // English clips are bundled now: the session speaks English only.
+        final spoken = output.spoken.expand((batch) => batch).toList();
+        expect(spoken, isNotEmpty);
+        expect(
+          spoken.where((asset) => !asset.contains('/chime/')),
+          everyElement(contains('/en/')),
+        );
         expect(output.chimes, isNotEmpty);
         await tester.pumpWidget(const SizedBox());
       },

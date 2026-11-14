@@ -20,7 +20,6 @@ import '../ui/custom_plan_page.dart';
 import '../ui/library_page.dart';
 import '../ui/open_training.dart';
 import '../ui/theme.dart';
-import 'coach_chat_scope.dart';
 import 'coach_chat_storage.dart';
 import 'services.dart';
 import 'training_transition_activity.dart';
@@ -44,7 +43,9 @@ CoachAppProfile smartfitCoachAppProfile(AppServices services) {
     scopeManifest: coach.CoachActionScopeManifest.fromCatalogBytes(
       appId: profile.id,
       catalogBytes: utf8.encode(jsonEncode(master)),
-      allowedActionIds: smartfitCoachAuthorizedActionIds.where(ids.contains),
+      // SmartFit selects the whole catalogue in use (profile `select: {}`);
+      // the SDK drops not_recommended/retired from coach suggestions.
+      allowedActionIds: ids,
     ),
     coachProfile: profile,
     agentMode: services.agentMode,

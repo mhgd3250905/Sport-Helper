@@ -133,7 +133,14 @@ class TemplatePlanGenerator implements PlanGenerator {
       final items = <PlanItem>[];
       for (final item in b.items) {
         final adapted = _adapt(item, r, notes, items);
-        if (adapted != null) items.add(_dose(adapted, b.type, r.level));
+        if (adapted != null) {
+          // The SDK definition owns whether a move is done per side; the
+          // bundled template only suggests the dose, so follow the library.
+          final sided = adapted.copyWith(
+            perSide: lib[adapted.exerciseId].unilateral,
+          );
+          items.add(_dose(sided, b.type, r.level));
+        }
       }
       if (items.isNotEmpty) blocks.add(b.copyWith(items: items));
     }

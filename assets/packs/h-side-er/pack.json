@@ -59,10 +59,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -70,70 +72,84 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "侧卧肩外旋"
+     "zh": "侧卧肩外旋",
+     "en": "Side-lying external rotation"
     },
     "ms": {
-     "zh": 1254
+     "zh": 1254,
+     "en": 1765
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "侧卧肩外旋，练肩关节"
+     "zh": "侧卧肩外旋，练肩关节",
+     "en": "Side-lying external rotation. Works the shoulder joint."
     },
     "ms": {
-     "zh": 2322
+     "zh": 2322,
+     "en": 3878
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "肘贴身体侧面，小臂向上转开"
+     "zh": "肘贴身体侧面，小臂向上转开",
+     "en": "Elbow against your side, rotate the forearm up"
     },
     "ms": {
-     "zh": 2856
+     "zh": 2856,
+     "en": 2554
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "前臂向上旋起，肩不前顶"
+     "zh": "前臂向上旋起，肩不前顶",
+     "en": "Rotate the forearm up, do not let the shoulder roll forward"
     },
     "ms": {
-     "zh": 2438
+     "zh": 2438,
+     "en": 3042
     }
    },
    {
     "id": "side_switch",
     "role": "side_switch",
     "text": {
-     "zh": "左侧同样，肘贴身体侧面，小臂向上转开"
+     "zh": "左侧同样，肘贴身体侧面，小臂向上转开",
+     "en": "Now the left side. Elbow against your side, rotate the forearm up"
     },
     "ms": {
-     "zh": 3971
+     "zh": 3971,
+     "en": 4481
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，前臂向上旋起，肩不前顶"
+     "zh": "放松一下。下一组记住，前臂向上旋起，肩不前顶",
+     "en": "Relax for a moment. Next set, remember: Rotate the forearm up, do not let the shoulder roll forward"
     },
     "ms": {
-     "zh": 4923
+     "zh": 4923,
+     "en": 6687
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "侧卧肩外旋，完成"
+     "zh": "侧卧肩外旋，完成",
+     "en": "Side-lying external rotation, done."
     },
     "ms": {
-     "zh": 1904
+     "zh": 1904,
+     "en": 2252
     }
    }
   ],
@@ -163,6 +179,34 @@
   "demo.mp4": {
    "bytes": 100939,
    "sha256": "d464a9fc9192fd9418d50f2c604ca2411e3975de9b2eb1a2d6d1f69a81ec1a78"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 22058,
+   "sha256": "0124b49a6ab128ea7aa8cb668877f10b3075558e617e0e57544e3225ff8919fd"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 25961,
+   "sha256": "ce6f2767359fccd3b384e2bfb6a5c11d85b189099a0a8302f5252e23d9c7d1e1"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 19618,
+   "sha256": "2d37d2b6fe7ef063c093b8a61ba1337936782195a84bbb66ffdcd4be5f43f27f"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 29511,
+   "sha256": "5d00bb27d45fd9307dba2f36ee88df90c9f621e97cd7908d5d669c1304a6760e"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 15661,
+   "sha256": "f1b42021c77a5dc803e0392c4de637ccb55151f0276baa849c914b1e9c9f142f"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 57248,
+   "sha256": "f212339cefab74639fbab1c4f795a575a8003b332ab3a3760c1587ee1b9cc9e5"
+  },
+  "voice/en/side_switch.m4a": {
+   "bytes": 39828,
+   "sha256": "afac48b8016ea3d3eb13ba491a14872fe58c4a78cc2062b478ce26a8709214dc"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 24454,

@@ -9,8 +9,14 @@ import 'posehub_media_repository.dart';
 /// Each SDK consumer owns a subscription, while the repository owns downloads.
 /// Even 100% progress cannot substitute for ensureAction's verified completion.
 class SmartFitPoseHubMediaPreparer implements sdk.PoseHubMediaPreparer {
-  const SmartFitPoseHubMediaPreparer(this.repo);
+  const SmartFitPoseHubMediaPreparer(
+    this.repo, {
+    this.videoOnly = false,
+    this.entry,
+  });
   final PoseHubMediaRepository? repo;
+  final bool videoOnly;
+  final String? entry;
 
   @override
   Stream<sdk.PoseHubMediaPreparationEvent> prepareAction(
@@ -31,10 +37,9 @@ class SmartFitPoseHubMediaPreparer implements sdk.PoseHubMediaPreparer {
     var downloadedVideo = false;
     var active = false;
     var terminal = false;
-    final expectedTotal = action.files.values.fold<int>(
-      0,
-      (sum, file) => sum + file.bytes,
-    );
+    final expectedTotal = videoOnly
+        ? action.video.bytes
+        : action.files.values.fold<int>(0, (sum, file) => sum + file.bytes);
     void retire() {
       active = false;
       removeProgress?.call();
@@ -74,7 +79,9 @@ class SmartFitPoseHubMediaPreparer implements sdk.PoseHubMediaPreparer {
         active = true;
         elapsed.start();
         try {
-          final state = repository.watchAction(action.id);
+          final state = videoOnly
+              ? repository.watchFile(action.video)
+              : repository.watchAction(action.id);
           void progress() {
             if (!active || terminal) return;
             final value = state.value;
@@ -113,9 +120,23 @@ class SmartFitPoseHubMediaPreparer implements sdk.PoseHubMediaPreparer {
           }
           progress();
           unawaited(
-            Future<Uri>.sync(
-              () => repository.ensureAction(action.id),
-            ).then<void>(
+            Future<Uri>.sync(() {
+              if (!videoOnly) return repository.ensureAction(action.id);
+              final sourceEntry = entry;
+              final video = switch (repository) {
+                final PoseHubMediaEntryPreparation scoped
+                    when sourceEntry != null =>
+                  scoped.ensureVideoForEntry(
+                    action.id,
+                    entry: sourceEntry,
+                    priority: true,
+                  ),
+                final PoseHubTrainingVideoPreparation current =>
+                  current.ensureVideo(action.id, priority: true),
+                _ => repository.ensureFile(action.video),
+              };
+              return video.then((_) => repository.mediaBaseUri);
+            }).then<void>(
               (base) => finish(sdk.PoseHubMediaReady(mediaBaseUri: base)),
               onError: (Object _, StackTrace _) =>
                   finish(const sdk.PoseHubMediaFailed(reason: '动作资源准备失败，请重试。')),

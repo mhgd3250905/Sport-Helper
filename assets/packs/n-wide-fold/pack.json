@@ -62,10 +62,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -73,70 +75,84 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "站姿宽距体前屈，扶椅"
+     "zh": "站姿宽距体前屈，扶椅",
+     "en": "Standing wide-leg fold with a chair"
     },
     "ms": {
-     "zh": 2252
+     "zh": 2252,
+     "en": 1950
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "站姿宽距体前屈，扶椅，拉伸大腿内侧和大腿后侧"
+     "zh": "站姿宽距体前屈，扶椅，拉伸大腿内侧和大腿后侧",
+     "en": "Standing wide-leg fold with a chair. Stretches the inner thighs and the hamstrings."
     },
     "ms": {
-     "zh": 4899
+     "zh": 4899,
+     "en": 5039
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "双脚宽站，手扶椅"
+     "zh": "双脚宽站，手扶椅",
+     "en": "Wide stance, hands on the chair"
     },
     "ms": {
-     "zh": 1950
+     "zh": 1950,
+     "en": 1881
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "双脚分开，扶住椅子，从髋部往前折"
+     "zh": "双脚分开，扶住椅子，从髋部往前折",
+     "en": "Feet apart, hold the chair, fold forward from the hips"
     },
     "ms": {
-     "zh": 3460
+     "zh": 3460,
+     "en": 3088
     }
    },
    {
     "id": "cue3",
     "role": "cue",
     "text": {
-     "zh": "背平向前倾，大腿内后侧拉长"
+     "zh": "背平向前倾，大腿内后侧拉长",
+     "en": "Lean forward with a flat back, feel the inner and back thighs lengthen"
     },
     "ms": {
-     "zh": 2972
+     "zh": 2972,
+     "en": 3692
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，背平向前倾，大腿内后侧拉长"
+     "zh": "放松一下。下一组记住，背平向前倾，大腿内后侧拉长",
+     "en": "Relax for a moment. Next set, remember: Lean forward with a flat back, feel the inner and back thighs lengthen"
     },
     "ms": {
-     "zh": 5410
+     "zh": 5410,
+     "en": 7338
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "站姿宽距体前屈，扶椅，完成"
+     "zh": "站姿宽距体前屈，扶椅，完成",
+     "en": "Standing wide-leg fold with a chair, done."
     },
     "ms": {
-     "zh": 2972
+     "zh": 2972,
+     "en": 2531
     }
    }
   ],
@@ -166,6 +182,34 @@
   "demo.mp4": {
    "bytes": 184777,
    "sha256": "b7b639e3c2cf3ff241f51ee56176c8e74f6b8733480ae038f78b33c78d140527"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 16596,
+   "sha256": "b2a22d731c043c82bf1bb9bc3651b7bab69c50f9b0f592d697a1521777beacc6"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 27012,
+   "sha256": "3dfe446b1fd57d8744f06657762ea1fb58c9efef0feae739600f398a51a17b5e"
+  },
+  "voice/en/cue3.m4a": {
+   "bytes": 31544,
+   "sha256": "b50b52066283681521e6132cbadd8d5bc9393fe80e2d46f9a8da33c2a52ece68"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 21993,
+   "sha256": "988ba1c1a2e8d1b3b8827cc4dcc276584bb0cf60973801ce7ba8cae4e1e4b881"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 39405,
+   "sha256": "1a256bc45098ae921712716af509a1bd303593def173d3289c44356676e557fb"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 17257,
+   "sha256": "5e2c9348c39c2cb766c7107a61e53d3ef7632f7ffc5cd420ed2fc1fa4918ff46"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 63089,
+   "sha256": "c145d84d51302854bf7c21c14cae8d86f5b6f31b8b406f1a3beb9836c4abd067"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 17159,

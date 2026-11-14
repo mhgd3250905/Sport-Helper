@@ -59,10 +59,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -70,70 +72,84 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "眼镜蛇式"
+     "zh": "眼镜蛇式",
+     "en": "Cobra stretch"
     },
     "ms": {
-     "zh": 1068
+     "zh": 1068,
+     "en": 975
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "眼镜蛇式，拉伸腹部"
+     "zh": "眼镜蛇式，拉伸腹部",
+     "en": "Cobra stretch. Stretches the abs."
     },
     "ms": {
-     "zh": 2067
+     "zh": 2067,
+     "en": 2902
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "俯卧，手在胸旁"
+     "zh": "俯卧，手在胸旁",
+     "en": "Lie face down, hands beside your chest"
     },
     "ms": {
-     "zh": 1695
+     "zh": 1695,
+     "en": 2461
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "耻骨贴地，手推地慢慢抬起胸口"
+     "zh": "耻骨贴地，手推地慢慢抬起胸口",
+     "en": "Hips on the floor, push through your hands and lift your chest slowly"
     },
     "ms": {
-     "zh": 2995
+     "zh": 2995,
+     "en": 3437
     }
    },
    {
     "id": "cue3",
     "role": "cue",
     "text": {
-     "zh": "推起上身，髋贴地，肩下沉"
+     "zh": "推起上身，髋贴地，肩下沉",
+     "en": "Press the upper body up, hips down, shoulders down"
     },
     "ms": {
-     "zh": 2810
+     "zh": 2810,
+     "en": 2972
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，推起上身，髋贴地，肩下沉"
+     "zh": "放松一下。下一组记住，推起上身，髋贴地，肩下沉",
+     "en": "Relax for a moment. Next set, remember: Press the upper body up, hips down, shoulders down"
     },
     "ms": {
-     "zh": 5317
+     "zh": 5317,
+     "en": 6664
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "眼镜蛇式，完成"
+     "zh": "眼镜蛇式，完成",
+     "en": "Cobra stretch, done."
     },
     "ms": {
-     "zh": 1741
+     "zh": 1741,
+     "en": 1509
     }
    }
   ],
@@ -163,6 +179,34 @@
   "demo.mp4": {
    "bytes": 128146,
    "sha256": "925fbee1236820fe84fe4e0bf673cefd60a5d23f581e7b260b916922faf136f9"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 21277,
+   "sha256": "5d8e8c1d06662ce9ec15ce3a51067754bd2f7df1c9b9a901e30b7293559c22c9"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 29243,
+   "sha256": "d4c9ac72d0ceba9f0c3f934e509737f6cd27f03a27f8746f36050f914c0d46c8"
+  },
+  "voice/en/cue3.m4a": {
+   "bytes": 25543,
+   "sha256": "31707427259273bdd39892e711615813e07674f1d3f7b70100bd14b27d944d39"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 13648,
+   "sha256": "b437484c4ea056087493ee6a62cd56679624e7bebded974c9c23683299bb60cf"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 21454,
+   "sha256": "3ae6d90b292e11c003f321fe679c81a1c9d7527ccd8a477bafaff43f3efb8c62"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 9157,
+   "sha256": "26ae8b7dc4cb2119e5e99ff93e61ef4c3e0e454057ea75626debe0b0de609cf7"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 57451,
+   "sha256": "da1018cd2de8ff57dc227388ed35028cfa8743fef7c8a2995805a0ced862880d"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 15082,

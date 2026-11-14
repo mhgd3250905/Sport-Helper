@@ -61,10 +61,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -72,60 +74,72 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "前臂平板支撑"
+     "zh": "前臂平板支撑",
+     "en": "Forearm plank"
     },
     "ms": {
-     "zh": 1416
+     "zh": 1416,
+     "en": 929
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "前臂平板支撑，练腹部和腰两侧"
+     "zh": "前臂平板支撑，练腹部和腰两侧",
+     "en": "Forearm plank. Works the abs and the sides of the waist."
     },
     "ms": {
-     "zh": 3111
+     "zh": 3111,
+     "en": 3878
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "肘在肩正下方"
+     "zh": "肘在肩正下方",
+     "en": "Elbows right under your shoulders"
     },
     "ms": {
-     "zh": 1300
+     "zh": 1300,
+     "en": 1672
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "肘在肩下，身体成一条直线，不塌腰不撅臀"
+     "zh": "肘在肩下，身体成一条直线，不塌腰不撅臀",
+     "en": "Elbows under shoulders, body in one straight line, hips neither sagging nor piked"
     },
     "ms": {
-     "zh": 4063
+     "zh": 4063,
+     "en": 4505
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，肘在肩下，身体成一条直线，不塌腰不撅臀"
+     "zh": "放松一下。下一组记住，肘在肩下，身体成一条直线，不塌腰不撅臀",
+     "en": "Relax for a moment. Next set, remember: Elbows under shoulders, body in one straight line, hips neither sagging nor piked"
     },
     "ms": {
-     "zh": 6571
+     "zh": 6571,
+     "en": 8150
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "前臂平板支撑，完成"
+     "zh": "前臂平板支撑，完成",
+     "en": "Forearm plank, done."
     },
     "ms": {
-     "zh": 2159
+     "zh": 2159,
+     "en": 1486
     }
    }
   ],
@@ -155,6 +169,30 @@
   "demo.mp4": {
    "bytes": 69142,
    "sha256": "27a4b53f5a04d9891f2c576221daeb25ce9e7d6060d1ac2fce91dec7e9f11842"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 14855,
+   "sha256": "6879a78851a4bfd26da5bbf961cf452b4ceb37ba7eacaabb9465c7e2143ad2e9"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 39636,
+   "sha256": "2dc31d582c0d20ed6c81c663f4eb26f012a7db2523c2a2d6de7bf6079743a8c9"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 13210,
+   "sha256": "281886fe0da1eaacdfd21da5d1bf0473c6c1e98f9874038bd68eb71f8174955d"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 29320,
+   "sha256": "8061437531b21194113fcefeca74a084e5b898256852cb105a47886e09611d46"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 8793,
+   "sha256": "58a5ec4297d26ae43778c3f81f32b9b3ec7acaa0594ffcd06bd850761fb1b778"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 67458,
+   "sha256": "6c2a719fee1556d90a021989d66777c0690929873a9402b3cd9917c7043b4611"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 11748,

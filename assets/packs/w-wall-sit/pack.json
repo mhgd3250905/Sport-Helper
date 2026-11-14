@@ -61,10 +61,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -72,70 +74,84 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "靠墙静蹲"
+     "zh": "靠墙静蹲",
+     "en": "Wall sit"
     },
     "ms": {
-     "zh": 998
+     "zh": 998,
+     "en": 789
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "靠墙静蹲，练大腿前侧和臀部"
+     "zh": "靠墙静蹲，练大腿前侧和臀部",
+     "en": "Wall sit. Works the quads and the glutes."
     },
     "ms": {
-     "zh": 2856
+     "zh": 2856,
+     "en": 3204
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "背贴墙下滑，膝约 90 度"
+     "zh": "背贴墙下滑，膝约 90 度",
+     "en": "Slide down the wall, knees at about ninety degrees"
     },
     "ms": {
-     "zh": 2276
+     "zh": 2276,
+     "en": 2833
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "背贴墙，大腿接近水平，膝盖在脚踝上方"
+     "zh": "背贴墙，大腿接近水平，膝盖在脚踝上方",
+     "en": "Back on the wall, thighs nearly level, knees over the ankles"
     },
     "ms": {
-     "zh": 3901
+     "zh": 3901,
+     "en": 3390
     }
    },
    {
     "id": "cue3",
     "role": "cue",
     "text": {
-     "zh": "膝盖对准脚尖，均匀呼吸"
+     "zh": "膝盖对准脚尖，均匀呼吸",
+     "en": "Knees in line with your toes, breathe steadily"
     },
     "ms": {
-     "zh": 2392
+     "zh": 2392,
+     "en": 2415
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，膝盖对准脚尖，均匀呼吸"
+     "zh": "放松一下。下一组记住，膝盖对准脚尖，均匀呼吸",
+     "en": "Relax for a moment. Next set, remember: Knees in line with your toes, breathe steadily"
     },
     "ms": {
-     "zh": 4876
+     "zh": 4876,
+     "en": 6060
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "靠墙静蹲，完成"
+     "zh": "靠墙静蹲，完成",
+     "en": "Wall sit, done."
     },
     "ms": {
-     "zh": 1718
+     "zh": 1718,
+     "en": 1277
     }
    }
   ],
@@ -165,6 +181,34 @@
   "demo.mp4": {
    "bytes": 95620,
    "sha256": "39f626be8cb41f15f5b86634aeae9eaa56082f641cc23d6e18fd362c136e324a"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 24447,
+   "sha256": "c3968ab35977a1164bab3c1d16297a331ff01cb2ec2198ea68427bdb8a87faae"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 28799,
+   "sha256": "8cfbe70b70f6e67caa3a13df1303783a7b6534fb36d297acd5ece50b18dddbad"
+  },
+  "voice/en/cue3.m4a": {
+   "bytes": 20974,
+   "sha256": "5c6824e7808e81a96efba93c43bff16e9207d4b66c3d3a42d069e997664b9bcc"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 11683,
+   "sha256": "d6fd396ca5068dbcd1fc82658c5f4826528cf470358b080273e7d85525603a79"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 27443,
+   "sha256": "36f52625fdef0b786e8809e1b483e83c39e54bf94f7813456aa6861ba09275ac"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 7481,
+   "sha256": "feb6d890ac3228130d5598613484d098694b1b20fc0870afea9315336df2e5e8"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 51269,
+   "sha256": "d4c8dc9d116fa6bbc4dec46a72c3083795dae033d58eeeba03307a78649c8726"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 19767,

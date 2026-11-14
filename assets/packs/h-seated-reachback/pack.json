@@ -61,10 +61,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -72,60 +74,72 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "坐姿后撑滑臀"
+     "zh": "坐姿后撑滑臀",
+     "en": "Seated reach-back shoulder stretch"
     },
     "ms": {
-     "zh": 1463
+     "zh": 1463,
+     "en": 1811
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "坐姿后撑滑臀，拉伸胸部和肩膀"
+     "zh": "坐姿后撑滑臀，拉伸胸部和肩膀",
+     "en": "Seated reach-back shoulder stretch. Stretches the chest and the shoulders."
     },
     "ms": {
-     "zh": 2926
+     "zh": 2926,
+     "en": 4528
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "双手在身后撑地，臀部慢慢向前滑"
+     "zh": "双手在身后撑地，臀部慢慢向前滑",
+     "en": "Hands on the floor behind you, slide your hips forward slowly"
     },
     "ms": {
-     "zh": 3320
+     "zh": 3320,
+     "en": 3158
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "臀部向前滑，胸口打开"
+     "zh": "臀部向前滑，胸口打开",
+     "en": "Slide your hips forward, open your chest"
     },
     "ms": {
-     "zh": 2229
+     "zh": 2229,
+     "en": 2345
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，臀部向前滑，胸口打开"
+     "zh": "放松一下。下一组记住，臀部向前滑，胸口打开",
+     "en": "Relax for a moment. Next set, remember: Slide your hips forward, open your chest"
     },
     "ms": {
-     "zh": 4690
+     "zh": 4690,
+     "en": 5921
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "坐姿后撑滑臀，完成"
+     "zh": "坐姿后撑滑臀，完成",
+     "en": "Seated reach-back shoulder stretch, done."
     },
     "ms": {
-     "zh": 2136
+     "zh": 2136,
+     "en": 2276
     }
    }
   ],
@@ -155,6 +169,30 @@
   "demo.mp4": {
    "bytes": 105283,
    "sha256": "2ed9785ec33e5c567887ab7250ec4a8f53bbb7552320b60edcf727e697fce555"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 26886,
+   "sha256": "c3ceb3ff9178d893497c488a3621021edf2d231312ae823af31415dff5ebd8cb"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 20366,
+   "sha256": "fb012debd2e162601b1f190f6db9712dc5192b31f0e9ed65ac16a193dbfc3035"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 19856,
+   "sha256": "63105e7cc04fb2f41effa60b02035211b2ff41f39c0e8ca919588806523d576b"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 34868,
+   "sha256": "dea50152cd34d3a12c3b0c5eac1e0752dce2b90b01fe6f5b307647ff1712dbce"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 15852,
+   "sha256": "8171bdf4b666c47b0fd16791d2ce73ab84210293a55a916890533c8cc2e7c7a9"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 50881,
+   "sha256": "fbe7829095a4d0238319cc21bd4cc8fe3e89d94f6018defe400c59b9c517d96e"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 28328,

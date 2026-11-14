@@ -57,10 +57,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -68,70 +70,84 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "仰卧 4 字拉伸"
+     "zh": "仰卧 4 字拉伸",
+     "en": "Supine figure four stretch"
     },
     "ms": {
-     "zh": 1324
+     "zh": 1324,
+     "en": 1649
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "仰卧 4 字拉伸，拉伸臀部"
+     "zh": "仰卧 4 字拉伸，拉伸臀部",
+     "en": "Supine figure four stretch. Stretches the glutes."
     },
     "ms": {
-     "zh": 2392
+     "zh": 2392,
+     "en": 3669
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "脚踝搭在另一侧膝盖上，把腿拉向胸口"
+     "zh": "脚踝搭在另一侧膝盖上，把腿拉向胸口",
+     "en": "Ankle over the other knee, pull the legs toward your chest"
     },
     "ms": {
-     "zh": 3390
+     "zh": 3390,
+     "en": 3088
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "抱住大腿拉向胸口"
+     "zh": "抱住大腿拉向胸口",
+     "en": "Hold the thigh and pull it toward your chest"
     },
     "ms": {
-     "zh": 1741
+     "zh": 1741,
+     "en": 2067
     }
    },
    {
     "id": "side_switch",
     "role": "side_switch",
     "text": {
-     "zh": "左侧同样，脚踝搭在另一侧膝盖上，把腿拉向胸口"
+     "zh": "左侧同样，脚踝搭在另一侧膝盖上，把腿拉向胸口",
+     "en": "Now the left side. Ankle over the other knee, pull the legs toward your chest"
     },
     "ms": {
-     "zh": 4551
+     "zh": 4551,
+     "en": 5016
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，抱住大腿拉向胸口"
+     "zh": "放松一下。下一组记住，抱住大腿拉向胸口",
+     "en": "Relax for a moment. Next set, remember: Hold the thigh and pull it toward your chest"
     },
     "ms": {
-     "zh": 4272
+     "zh": 4272,
+     "en": 5712
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "仰卧 4 字拉伸，完成"
+     "zh": "仰卧 4 字拉伸，完成",
+     "en": "Supine figure four stretch, done."
     },
     "ms": {
-     "zh": 2043
+     "zh": 2043,
+     "en": 2159
     }
    }
   ],
@@ -161,6 +177,34 @@
   "demo.mp4": {
    "bytes": 116793,
    "sha256": "0805e1ed505ef4a90c768e3c6b4e56d46943f0c1af5a34963cb6a3b5de8053d5"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 26344,
+   "sha256": "38f804c28001c86a58634c6ba442c84aec3a2add5f6fc117af2ebbd6bd6361f1"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 18096,
+   "sha256": "d05c3843af7bf83fb76aceac7d1ced73060ab2544c68340d0bf3e45b9fccb86c"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 18948,
+   "sha256": "0bb2c20ecc1c4312116650a2361edff8c8e07e8020e8af0043043d3c358b830b"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 27690,
+   "sha256": "cc9c31259003b11d07885bce467d513a0243eab8a89d666aab9a54b4931c78f4"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 14715,
+   "sha256": "24a33651d6b2d373383f0340408e34314c98d3631288ab2d0f2536f2cfcd0182"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 48721,
+   "sha256": "02bd44df4ae36898eef9c04ee1e084e4aaf38f7a4259f879f003042596b83673"
+  },
+  "voice/en/side_switch.m4a": {
+   "bytes": 44178,
+   "sha256": "ad9490abda000284c491c2ddcd5952fa60eb47885bb0c68883f7b4215035da72"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 28994,

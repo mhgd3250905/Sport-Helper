@@ -58,10 +58,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -69,70 +71,84 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "靠墙小腿拉伸"
+     "zh": "靠墙小腿拉伸",
+     "en": "Wall calf stretch"
     },
     "ms": {
-     "zh": 1440
+     "zh": 1440,
+     "en": 1138
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "靠墙小腿拉伸，拉伸小腿"
+     "zh": "靠墙小腿拉伸，拉伸小腿",
+     "en": "Wall calf stretch. Stretches the calves."
     },
     "ms": {
-     "zh": 2531
+     "zh": 2531,
+     "en": 3135
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "后腿伸直，脚跟踩实，身体前倾"
+     "zh": "后腿伸直，脚跟踩实，身体前倾",
+     "en": "Back leg straight, heel down, lean forward"
     },
     "ms": {
-     "zh": 3158
+     "zh": 3158,
+     "en": 2670
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "身体前倾，感觉小腿拉长"
+     "zh": "身体前倾，感觉小腿拉长",
+     "en": "Lean forward, feel the calf lengthen"
     },
     "ms": {
-     "zh": 2461
+     "zh": 2461,
+     "en": 2159
     }
    },
    {
     "id": "side_switch",
     "role": "side_switch",
     "text": {
-     "zh": "左侧同样，后腿伸直，脚跟踩实，身体前倾"
+     "zh": "左侧同样，后腿伸直，脚跟踩实，身体前倾",
+     "en": "Now the left side. Back leg straight, heel down, lean forward"
     },
     "ms": {
-     "zh": 4272
+     "zh": 4272,
+     "en": 4621
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，身体前倾，感觉小腿拉长"
+     "zh": "放松一下。下一组记住，身体前倾，感觉小腿拉长",
+     "en": "Relax for a moment. Next set, remember: Lean forward, feel the calf lengthen"
     },
     "ms": {
-     "zh": 4876
+     "zh": 4876,
+     "en": 5759
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "靠墙小腿拉伸，完成"
+     "zh": "靠墙小腿拉伸，完成",
+     "en": "Wall calf stretch, done."
     },
     "ms": {
-     "zh": 2113
+     "zh": 2113,
+     "en": 1625
     }
    }
   ],
@@ -162,6 +178,34 @@
   "demo.mp4": {
    "bytes": 97907,
    "sha256": "d9c8648304bcad34085c12c9cacde9834028d4cf13e586189484a7d0accf05f9"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 22883,
+   "sha256": "5ebe607b4fc64cd3758989bfe20b5a2ecaecfc8f42e7adfbfdb58e21e0f8a295"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 18941,
+   "sha256": "838382b8fa39cfcbac23942e1c711599cdefe3e20328ffdcf0f88c48fa6bb117"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 14543,
+   "sha256": "0b5eb85ed00ef777f0b24d0cd70da8fd1fd117f9e95dcd3da641d58747c79730"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 27141,
+   "sha256": "7a95b11e13ba93dea32169227a543a2e315a178a86d7136c3ac587848354160e"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 10362,
+   "sha256": "ba870e215eef0222b657fa5a822aaa2e13f7d3c39e662bdffb914b8083c92a68"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 49373,
+   "sha256": "39333d6a87a1843d297b3b4acb3934b620ed9d14f4004dd842a4210279d68943"
+  },
+  "voice/en/side_switch.m4a": {
+   "bytes": 37552,
+   "sha256": "c3828f73bd371c75becddf5fb8a7c9480aae1780e3ee4a6573be0b9b0fdeb91a"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 27086,

@@ -58,10 +58,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -69,70 +71,84 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "坐姿夹砖，膝内夹"
+     "zh": "坐姿夹砖，膝内夹",
+     "en": "Seated block knee squeeze"
     },
     "ms": {
-     "zh": 1811
+     "zh": 1811,
+     "en": 1509
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "坐姿夹砖，膝内夹，练大腿内侧"
+     "zh": "坐姿夹砖，膝内夹，练大腿内侧",
+     "en": "Seated block knee squeeze. Works the inner thighs."
     },
     "ms": {
-     "zh": 3135
+     "zh": 3135,
+     "en": 3599
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "膝间夹软物"
+     "zh": "膝间夹软物",
+     "en": "Something soft between your knees"
     },
     "ms": {
-     "zh": 1184
+     "zh": 1184,
+     "en": 1788
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "双膝夹住瑜伽砖，用力夹紧"
+     "zh": "双膝夹住瑜伽砖，用力夹紧",
+     "en": "Squeeze the yoga block hard between your knees"
     },
     "ms": {
-     "zh": 2624
+     "zh": 2624,
+     "en": 2299
     }
    },
    {
     "id": "cue3",
     "role": "cue",
     "text": {
-     "zh": "用力内夹，停 3 秒再放"
+     "zh": "用力内夹，停 3 秒再放",
+     "en": "Squeeze in, hold for three seconds, then release"
     },
     "ms": {
-     "zh": 2159
+     "zh": 2159,
+     "en": 2949
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，用力内夹，停 3 秒再放"
+     "zh": "放松一下。下一组记住，用力内夹，停 3 秒再放",
+     "en": "Relax for a moment. Next set, remember: Squeeze in, hold for three seconds, then release"
     },
     "ms": {
-     "zh": 4621
+     "zh": 4621,
+     "en": 6618
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "坐姿夹砖，膝内夹，完成"
+     "zh": "坐姿夹砖，膝内夹，完成",
+     "en": "Seated block knee squeeze, done."
     },
     "ms": {
-     "zh": 2554
+     "zh": 2554,
+     "en": 1974
     }
    }
   ],
@@ -162,6 +178,34 @@
   "demo.mp4": {
    "bytes": 66499,
    "sha256": "bde2b82717475748ecb0f99c59e59afec6b15846b8f2c87af96144390d84fdb3"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 15852,
+   "sha256": "a0534a00e07bfcb60a0e103ab89b68a95e71f65174478f0d68d349e7d8189cb9"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 20028,
+   "sha256": "3bf5dc75a509605feef887500bbe4c534030ffcf258e454adab4f5b1f8bb6e64"
+  },
+  "voice/en/cue3.m4a": {
+   "bytes": 25365,
+   "sha256": "39345b626268335923666a93644b95eef3ebff43f322feb41a9664e1ba42a7b6"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 17379,
+   "sha256": "49602c3bf5aee9a24034d2044062082f2c31d429ace2d72a6caddc1f05007831"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 28287,
+   "sha256": "b7cbc25e6b470a9bb6ba740ac5ce9b3450bb806fb63f2c3678fb901de3fa2dca"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 13574,
+   "sha256": "99611f57bb35433d4f373cb8213e26882158f8517e844e82942914a18661832e"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 56396,
+   "sha256": "2a500fe743d7b8bf3938f7b8ac28899898d11c43f2c2a452959c62d3ea5a2e30"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 10757,

@@ -56,10 +56,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -67,70 +69,84 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "站姿举手侧屈"
+     "zh": "站姿举手侧屈",
+     "en": "Standing overhead side bend"
     },
     "ms": {
-     "zh": 1440
+     "zh": 1440,
+     "en": 1695
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "站姿举手侧屈，拉伸腰两侧"
+     "zh": "站姿举手侧屈，拉伸腰两侧",
+     "en": "Standing overhead side bend. Stretches the sides of the waist."
     },
     "ms": {
-     "zh": 2647
+     "zh": 2647,
+     "en": 4203
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "手举过头，双脚站稳"
+     "zh": "手举过头，双脚站稳",
+     "en": "Arms overhead, feet steady"
     },
     "ms": {
-     "zh": 2043
+     "zh": 2043,
+     "en": 1672
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "手臂举过头，身体向侧面弯，不前倾"
+     "zh": "手臂举过头，身体向侧面弯，不前倾",
+     "en": "Arms overhead, bend to the side, do not lean forward"
     },
     "ms": {
-     "zh": 3437
+     "zh": 3437,
+     "en": 3042
     }
    },
    {
     "id": "side_switch",
     "role": "side_switch",
     "text": {
-     "zh": "左侧同样，手臂举过头，身体向侧面弯，不前倾"
+     "zh": "左侧同样，手臂举过头，身体向侧面弯，不前倾",
+     "en": "Now the left side. Arms overhead, bend to the side, do not lean forward"
     },
     "ms": {
-     "zh": 4481
+     "zh": 4481,
+     "en": 4969
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，手臂举过头，身体向侧面弯，不前倾"
+     "zh": "放松一下。下一组记住，手臂举过头，身体向侧面弯，不前倾",
+     "en": "Relax for a moment. Next set, remember: Arms overhead, bend to the side, do not lean forward"
     },
     "ms": {
-     "zh": 5851
+     "zh": 5851,
+     "en": 6687
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "站姿举手侧屈，完成"
+     "zh": "站姿举手侧屈，完成",
+     "en": "Standing overhead side bend, done."
     },
     "ms": {
-     "zh": 2113
+     "zh": 2113,
+     "en": 2183
     }
    }
   ],
@@ -160,6 +176,34 @@
   "demo.mp4": {
    "bytes": 51131,
    "sha256": "7e0602e45f170d2544cdb32f3807dcc94d831705f0620a2a0922bd49ebdf3560"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 14850,
+   "sha256": "6707ccd36d158c013ffda2a5466e428638056bd3ed18012897b0ab41a89d5a5d"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 26000,
+   "sha256": "467ce6e29d9d6dd2691ec70ce23e4e9d2292825d7cbbc3c69522e9247a660535"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 18906,
+   "sha256": "5a4446dad758c1ad8e81169f09091a62b003959defeadff7f98d6ec7b57689af"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 31782,
+   "sha256": "13a41061821b306d0a890e339ad41d6032bdcc5e8627e892f707b86ccb61bb4d"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 15003,
+   "sha256": "10f13973a8721630e0ded3c44cadb9ca090fbbf0aedec16502eea50711507c3b"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 57848,
+   "sha256": "8fe2a98e3c4768d8ae1fffe79e601fbeb91af1e2534ae51f6cc5641974195ca5"
+  },
+  "voice/en/side_switch.m4a": {
+   "bytes": 39465,
+   "sha256": "bbbb4976eefa0a6e3ee4ed54fe210caf431b01d6a33fae26a8b2bc02fcd598ed"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 17943,

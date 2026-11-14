@@ -60,10 +60,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -71,60 +73,72 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "臀桥交替踏步"
+     "zh": "臀桥交替踏步",
+     "en": "Glute bridge march"
     },
     "ms": {
-     "zh": 1370
+     "zh": 1370,
+     "en": 1091
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "臀桥交替踏步，练臀部和大腿后侧"
+     "zh": "臀桥交替踏步，练臀部和大腿后侧",
+     "en": "Glute bridge march. Works the glutes and the hamstrings."
     },
     "ms": {
-     "zh": 3297
+     "zh": 3297,
+     "en": 3715
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "先抬起臀桥，骨盆保持水平"
+     "zh": "先抬起臀桥，骨盆保持水平",
+     "en": "Lift into a bridge first, keep the pelvis level"
     },
     "ms": {
-     "zh": 2647
+     "zh": 2647,
+     "en": 2694
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "臀桥撑住不晃，左右膝交替抬起"
+     "zh": "臀桥撑住不晃，左右膝交替抬起",
+     "en": "Hold the bridge steady, lift one knee at a time"
     },
     "ms": {
-     "zh": 2926
+     "zh": 2926,
+     "en": 2554
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，臀桥撑住不晃，左右膝交替抬起"
+     "zh": "放松一下。下一组记住，臀桥撑住不晃，左右膝交替抬起",
+     "en": "Relax for a moment. Next set, remember: Hold the bridge steady, lift one knee at a time"
     },
     "ms": {
-     "zh": 5410
+     "zh": 5410,
+     "en": 6177
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "臀桥交替踏步，完成"
+     "zh": "臀桥交替踏步，完成",
+     "en": "Glute bridge march, done."
     },
     "ms": {
-     "zh": 2113
+     "zh": 2113,
+     "en": 1602
     }
    }
   ],
@@ -154,6 +168,30 @@
   "demo.mp4": {
    "bytes": 114377,
    "sha256": "59f9f584ca3426c168db5dd84c73ca97bbbfdd68538a94c2f19e1b7ef0bf25bd"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 23248,
+   "sha256": "56cfedae1b5ba71a3e3f3ce2ad87fe10179cdd628f42c3b49f6a5d6061f457e3"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 21998,
+   "sha256": "6c580310a23d05d026832eed36e6e1e9b4665b02a6387e9f21416711d4ba8d8a"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 14316,
+   "sha256": "fbcc4cfac27454e08326e024b3f0f07ac4405df9bb756bf8c3e7d5a3ff718f00"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 32436,
+   "sha256": "713734cd02552182dc9daa9856027f9ebbc3648ea97df519e91cb1368dd70743"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 10194,
+   "sha256": "bd41d2a5b98c8194cfcfcd5a42c3869dd6d27b1bd74eb3cfed984e96f911f770"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 52807,
+   "sha256": "80803808878e46d39b583a9e8557454dfa7adf23d1db62eb27c26fc73ab1aa22"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 22931,

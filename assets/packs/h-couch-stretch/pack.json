@@ -62,10 +62,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -73,70 +75,84 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "沙发拉伸，后脚搭矮凳"
+     "zh": "沙发拉伸，后脚搭矮凳",
+     "en": "Couch stretch, rear foot on a stool"
     },
     "ms": {
-     "zh": 2159
+     "zh": 2159,
+     "en": 2043
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "沙发拉伸，后脚搭矮凳，拉伸髋前侧和大腿前侧"
+     "zh": "沙发拉伸，后脚搭矮凳，拉伸髋前侧和大腿前侧",
+     "en": "Couch stretch, rear foot on a stool. Stretches the front of the hips and the quads."
     },
     "ms": {
-     "zh": 4737
+     "zh": 4737,
+     "en": 4969
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "后脚背靠椅面"
+     "zh": "后脚背靠椅面",
+     "en": "Back of the rear foot against the seat"
     },
     "ms": {
-     "zh": 1277
+     "zh": 1277,
+     "en": 1858
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "后脚搭高，收紧臀部，髋往前送"
+     "zh": "后脚搭高，收紧臀部，髋往前送",
+     "en": "Back foot up, squeeze your glutes, hips forward"
     },
     "ms": {
-     "zh": 3042
+     "zh": 3042,
+     "en": 2740
     }
    },
    {
     "id": "side_switch",
     "role": "side_switch",
     "text": {
-     "zh": "左侧同样，后脚搭高，收紧臀部，髋往前送"
+     "zh": "左侧同样，后脚搭高，收紧臀部，髋往前送",
+     "en": "Now the left side. Back foot up, squeeze your glutes, hips forward"
     },
     "ms": {
-     "zh": 4203
+     "zh": 4203,
+     "en": 4690
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，后脚搭高，收紧臀部，髋往前送"
+     "zh": "放松一下。下一组记住，后脚搭高，收紧臀部，髋往前送",
+     "en": "Relax for a moment. Next set, remember: Back foot up, squeeze your glutes, hips forward"
     },
     "ms": {
-     "zh": 5596
+     "zh": 5596,
+     "en": 6339
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "沙发拉伸，后脚搭矮凳，完成"
+     "zh": "沙发拉伸，后脚搭矮凳，完成",
+     "en": "Couch stretch, rear foot on a stool, done."
     },
     "ms": {
-     "zh": 2856
+     "zh": 2856,
+     "en": 2624
     }
    }
   ],
@@ -166,6 +182,34 @@
   "demo.mp4": {
    "bytes": 100660,
    "sha256": "7c166181e5e5b284251f473e2d4f8c4110d4d7b489cfb812e9ca04d1a1d125d2"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 16523,
+   "sha256": "7321f026e0c1a0fcb00ee476291f3064b5507466d07f34c54627fb3a391cd099"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 23532,
+   "sha256": "78a10708497ad9a25a643fa56857eafbed495e6775f0f79cc5d724714d9b5f3c"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 22666,
+   "sha256": "877e7e0d9a97b454f078a8a6dce01ecf890116173e1d6a7b63d3d60ffa15d9d0"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 38424,
+   "sha256": "b87f701bb2421ac74e5a2dc95cc63be184cf41f20ffaaacdfcbfe2172dde5fcd"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 17992,
+   "sha256": "6f451b8bce16bdba8053289b59be87f081c04f82f1ece0fcc93c2c2c05744339"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 54010,
+   "sha256": "a30794d47ea11c16d7869540293233796e0c08541ad47c4fca9d75fd91e2bd28"
+  },
+  "voice/en/side_switch.m4a": {
+   "bytes": 37595,
+   "sha256": "6694cf0d729743a365a18581f9239c453fe5c376c01cb87f8d80a204c6f7d60c"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 11523,

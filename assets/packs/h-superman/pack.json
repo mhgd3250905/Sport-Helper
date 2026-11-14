@@ -61,10 +61,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -72,70 +74,84 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "俯卧超人式"
+     "zh": "俯卧超人式",
+     "en": "Prone superman"
     },
     "ms": {
-     "zh": 1138
+     "zh": 1138,
+     "en": 998
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "俯卧超人式，练下背和臀部"
+     "zh": "俯卧超人式，练下背和臀部",
+     "en": "Prone superman. Works the lower back and the glutes."
     },
     "ms": {
-     "zh": 2531
+     "zh": 2531,
+     "en": 3599
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "俯卧，手脚伸直"
+     "zh": "俯卧，手脚伸直",
+     "en": "Lie face down, arms and legs straight"
     },
     "ms": {
-     "zh": 1765
+     "zh": 1765,
+     "en": 2322
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "手脚同时轻轻抬离地面，颈部保持中立"
+     "zh": "手脚同时轻轻抬离地面，颈部保持中立",
+     "en": "Lift your arms and legs gently off the floor, neck neutral"
     },
     "ms": {
-     "zh": 3785
+     "zh": 3785,
+     "en": 3181
     }
    },
    {
     "id": "cue3",
     "role": "cue",
     "text": {
-     "zh": "同时抬起手脚，停一下再放"
+     "zh": "同时抬起手脚，停一下再放",
+     "en": "Lift arms and legs together, pause, then lower"
     },
     "ms": {
-     "zh": 2438
+     "zh": 2438,
+     "en": 2949
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，同时抬起手脚，停一下再放"
+     "zh": "放松一下。下一组记住，同时抬起手脚，停一下再放",
+     "en": "Relax for a moment. Next set, remember: Lift arms and legs together, pause, then lower"
     },
     "ms": {
-     "zh": 4946
+     "zh": 4946,
+     "en": 6641
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "俯卧超人式，完成"
+     "zh": "俯卧超人式，完成",
+     "en": "Prone superman, done."
     },
     "ms": {
-     "zh": 1811
+     "zh": 1811,
+     "en": 1463
     }
    }
   ],
@@ -165,6 +181,34 @@
   "demo.mp4": {
    "bytes": 76181,
    "sha256": "f90fbac67f980a62bb25f19c56e61e3fef3b16a2948ced5b9a03480e2edbffef"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 20233,
+   "sha256": "5c8b9f43c2e2358fbb6f7c201ad56bd55e248a2994276683a4021719f3fea3f7"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 27315,
+   "sha256": "0f76927a6c5ae86373dc32bf8de6d9d2e83191f5fb1c9d8a80318c303a5f92aa"
+  },
+  "voice/en/cue3.m4a": {
+   "bytes": 25414,
+   "sha256": "7174592f02a0fa7810f4ab0425180d1cef9dd5b3097fa9afcc9a4067ac09bfd3"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 13174,
+   "sha256": "69292559f72f3049a500016687f0595d415964fd5cb5b9a7916042d90fde25e0"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 30681,
+   "sha256": "6a19268637a4d08071731f3502e0306fc65ece9d0739bdae8539bcfa62ccb18a"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 9383,
+   "sha256": "ce88cda09b27f021c388e78195ebd7d2bf762577b116e1c5b3255ddfbcea1c8c"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 56932,
+   "sha256": "70333553adef57d6428181f4e13ef4e5b0a2de52c387daf196bf49ff00db6361"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 15529,

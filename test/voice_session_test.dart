@@ -56,7 +56,8 @@ void main() {
       expect(trainer.volume, .4);
     });
 
-    test('unavailable selected voice keeps chimes without partial speech', () {
+    // Since 2026-11-06 SF ships English clips too (was: chimes only).
+    test('selected English voice speaks the English clip', () {
       final output = RecordingVoiceOutput();
       final settings = const VoiceSettings(language: VoiceLanguage.en);
       expect(settings.toTrainerSettings().language, 'en');
@@ -70,7 +71,10 @@ void main() {
         0,
       );
       expect(output.chimes, [voices.asset('chime.tick')]);
-      expect(output.spoken, isEmpty);
+      expect(output.spoken, [
+        [voices.asset('n.3', lang: 'en')],
+      ]);
+      expect(output.spoken.single.single, contains('/en/n.3.m4a'));
     });
   });
 

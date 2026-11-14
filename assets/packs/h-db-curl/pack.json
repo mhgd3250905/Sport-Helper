@@ -56,10 +56,12 @@
  },
  "voice": {
   "languages": [
-   "zh"
+   "zh",
+   "en"
   ],
   "voices": {
-   "zh": "zh-CN-XiaoxiaoNeural"
+   "zh": "zh-CN-XiaoxiaoNeural",
+   "en": "en-US-JennyNeural"
   },
   "requires": "_common",
   "lines": [
@@ -67,60 +69,72 @@
     "id": "name",
     "role": "name",
     "text": {
-     "zh": "哑铃交替弯举"
+     "zh": "哑铃交替弯举",
+     "en": "Alternating dumbbell curl"
     },
     "ms": {
-     "zh": 1370
+     "zh": 1370,
+     "en": 1393
     }
    },
    {
     "id": "intro",
     "role": "intro",
     "text": {
-     "zh": "哑铃交替弯举，练手臂前侧"
+     "zh": "哑铃交替弯举，练手臂前侧",
+     "en": "Alternating dumbbell curl. Works the biceps."
     },
     "ms": {
-     "zh": 2647
+     "zh": 2647,
+     "en": 3367
     }
    },
    {
     "id": "cue1",
     "role": "cue",
     "text": {
-     "zh": "大臂贴住身体，只动小臂"
+     "zh": "大臂贴住身体，只动小臂",
+     "en": "Upper arms against your body, move only the forearms"
     },
     "ms": {
-     "zh": 2415
+     "zh": 2415,
+     "en": 2879
     }
    },
    {
     "id": "cue2",
     "role": "cue",
     "text": {
-     "zh": "左右交替弯举，不甩身体"
+     "zh": "左右交替弯举，不甩身体",
+     "en": "Curl one side at a time, do not swing your body"
     },
     "ms": {
-     "zh": 2345
+     "zh": 2345,
+     "en": 2601
     }
    },
    {
     "id": "rest",
     "role": "rest",
     "text": {
-     "zh": "放松一下。下一组记住，左右交替弯举，不甩身体"
+     "zh": "放松一下。下一组记住，左右交替弯举，不甩身体",
+     "en": "Relax for a moment. Next set, remember: Curl one side at a time, do not swing your body"
     },
     "ms": {
-     "zh": 4853
+     "zh": 4853,
+     "en": 6316
     }
    },
    {
     "id": "finish",
     "role": "finish",
     "text": {
-     "zh": "哑铃交替弯举，完成"
+     "zh": "哑铃交替弯举，完成",
+     "en": "Alternating dumbbell curl, done."
     },
     "ms": {
-     "zh": 2067
+     "zh": 2067,
+     "en": 1881
     }
    }
   ],
@@ -150,6 +164,30 @@
   "demo.mp4": {
    "bytes": 71085,
    "sha256": "325d813600f9eb3d8228b04433d0e879f35bbb6d150e70ab0f7411599a9a2c81"
+  },
+  "voice/en/cue1.m4a": {
+   "bytes": 24627,
+   "sha256": "dca5d30f6bdbe90d0eb330346f73197768e96fa759411d59e2ed7c9c5c6cd25d"
+  },
+  "voice/en/cue2.m4a": {
+   "bytes": 22296,
+   "sha256": "2fc0f547973b07cb55bcd949f2b0f29a2b78035b9e555fe6ba537704101a34c8"
+  },
+  "voice/en/finish.m4a": {
+   "bytes": 16629,
+   "sha256": "ea5a92c8b1c2732b679b19976196c4facf29f7a9a8faa039dbcf34f68b6ab950"
+  },
+  "voice/en/intro.m4a": {
+   "bytes": 27657,
+   "sha256": "66a976cedccc54d3e2e8c380e4f92c90bab81f3fd68d2d8bb653a6e11ad50287"
+  },
+  "voice/en/name.m4a": {
+   "bytes": 12555,
+   "sha256": "f778462d30fbc756072df41414866f81a13dc5f5f4861c00a95aea387121f20f"
+  },
+  "voice/en/rest.m4a": {
+   "bytes": 55113,
+   "sha256": "1ba7fdfd7b8fe94a4deff3b741e99c4aec9cfa86aa3e31dac242d181767e87e9"
   },
   "voice/zh/cue1.m4a": {
    "bytes": 20927,
