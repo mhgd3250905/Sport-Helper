@@ -345,6 +345,7 @@ void main() {
         expect(repo.actionRequests, [action.id]);
         final player = tester.widget<TrainerPlayer>(find.byType(TrainerPlayer));
         expect(player.startMode, TrainerStartMode.preview);
+        expect(player.theme.usePlayerV1, SmartFitTrainerTheme.playerV1Enabled);
         expect(player.prepSeconds, 10);
         expect(
           tester
@@ -376,7 +377,15 @@ void main() {
         await tester.tap(find.byKey(const ValueKey('start-training')));
         await tester.pump();
         await tester.pump(const Duration(milliseconds: 350));
-        expect(tester.state(find.byType(PoseHubPackMedia)), same(mediaState));
+        if (SmartFitTrainerTheme.playerV1Enabled) {
+          expect(
+            find.byKey(const ValueKey('player-v1-scaffold')),
+            findsOneWidget,
+          );
+          expect(repo.actionRequests, [action.id]);
+        } else {
+          expect(tester.state(find.byType(PoseHubPackMedia)), same(mediaState));
+        }
         expect(find.byKey(const ValueKey('progress')), findsOneWidget);
         await tester.tap(find.byKey(const ValueKey('pause')));
         await tester.pump();

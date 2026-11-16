@@ -165,7 +165,7 @@ class _PlayerPageState extends State<PlayerPage> {
           beforeExitPop: control?.beforeExitPop,
           rhythms: session.trainerRhythms(services.library),
           strings: TrainerStrings.zh(),
-          theme: SmartFitTrainerTheme.of(context),
+          theme: SmartFitTrainerTheme.playerOf(context),
           poseHubActionOf: services.poseHubCatalog?.tryGet,
           poseHubMediaBaseUri: services.poseHubMedia?.mediaBaseUri,
           poseHubMediaPreparer: _preparer,

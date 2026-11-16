@@ -10,6 +10,7 @@ import '../domain/plan.dart';
 import 'player_page.dart';
 import 'single_practice_page.dart';
 import 'theme.dart';
+import 'theme/trainer_theme.dart';
 import 'training_poster_image.dart';
 import 'training_route.dart';
 
@@ -96,6 +97,9 @@ Future<SessionResult?> openTraining(
           ? PlayerPage(plan: plan!)
           : SinglePracticePage(
               page: practice,
+              theme: SmartFitTrainerTheme.playerV1Enabled
+                  ? SmartFitTrainerTheme.playerOf(context)
+                  : null,
               exercise: services?.library.tryGet(practice.action.id),
               sourceEntry: sourceEntry,
             ),
