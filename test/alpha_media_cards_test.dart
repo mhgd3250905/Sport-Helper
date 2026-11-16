@@ -95,7 +95,7 @@ Iterable<String> _images(WidgetTester tester) => tester
     .map((asset) => asset.assetName);
 
 String _standing(String id) =>
-    'packages/ugk_trainer/assets/pose_hub/app-pack-r2-v10/standing/$id.webp';
+    '${trainer.PoseHubActionLibrary.standingAssetRoot}$id.webp';
 
 Future<List<int>> _fixtureImage() async {
   final recorder = ui.PictureRecorder();
@@ -235,11 +235,11 @@ void main() {
         ..['targetMinutes'] = 10;
       final routine = toCoachRoutine(TrainingPlan.fromJson(data), library);
       expect(routine.gearLabel, '椅子、墙、瑜伽垫');
-      // These three 30-second entries and their transitions take about two
-      // minutes. The requested target of ten must not replace the actual dose.
-      expect(routine.durationLabel, '约 2 分钟');
-      expect(routine.metaLabel, contains('约 2 分钟'));
-      expect(planDurationLabel(TrainingPlan.fromJson(data), library), '约 2 分钟');
+      // V4 runs bird dog on each side, so the executable dose takes about
+      // three minutes including transitions, independent of the target.
+      expect(routine.durationLabel, '约 3 分钟');
+      expect(routine.metaLabel, contains('约 3 分钟'));
+      expect(planDurationLabel(TrainingPlan.fromJson(data), library), '约 3 分钟');
       expect(routine.metaLabel, contains('椅子、墙、瑜伽垫'));
 
       final bodyweight = toCoachRoutine(_plan(), library);

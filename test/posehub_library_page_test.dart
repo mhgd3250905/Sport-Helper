@@ -59,7 +59,7 @@ void main() {
     await tester.runAsync(
       () => TrainingPosterImages.precacheAsset(
         source,
-        'packages/ugk_trainer/assets/pose_hub/app-pack-r2-v10/standing/${action.id}.webp',
+        '${PoseHubActionLibrary.standingAssetRoot}${action.id}.webp',
       ),
     );
     await tester.pump();

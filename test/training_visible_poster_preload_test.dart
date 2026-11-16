@@ -59,7 +59,7 @@ void main() {
       final bundle = _RecordingAssets();
       final action = catalog.semanticCompleteActions.first;
       final asset =
-          'packages/ugk_trainer/assets/pose_hub/app-pack-r2-v10/standing/${action.id}.webp';
+          '${PoseHubActionLibrary.standingAssetRoot}${action.id}.webp';
       late BuildContext outer;
       late BuildContext inner;
       late AssetBundle observed;
