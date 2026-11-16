@@ -26,7 +26,7 @@ void main() {
             .allMatches(File('pubspec.lock').readAsStringSync())
             .map((match) => match.group(1)!)
             .toList();
-    const expectedSdk = '7b2c99335089fe467f2a5684bf38ace388d83695';
+    const expectedSdk = '7e6efcaacc023a3f8b9f6c223c5007777e9c94b1';
     expect(declared, hasLength(6)); // five SDK packages plus coach override
     expect(resolved, hasLength(5));
     expect(declared.toSet(), {expectedSdk});

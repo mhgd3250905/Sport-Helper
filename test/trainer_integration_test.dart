@@ -11,6 +11,7 @@ import 'package:smartfit/ui/exercise_video.dart';
 import 'package:smartfit/ui/player_page.dart';
 import 'package:smartfit/ui/theme/app_theme.dart';
 import 'package:smartfit/ui/theme/tokens.dart';
+import 'package:smartfit/ui/theme/trainer_theme.dart';
 import 'package:smartfit/voice/voice_library.dart';
 import 'package:smartfit/voice/voice_queue.dart';
 import 'package:ugk_coach/ugk_coach.dart' as coach;
@@ -297,7 +298,7 @@ void main() {
 
   for (final palette in [SfPalette.dark, SfPalette.light]) {
     testWidgets(
-      'retains ${palette.brightness.name} SDK styling with brand accent, media and language',
+      'uses ${palette.brightness.name} SDK styling with SmartFit media and language',
       (tester) async {
         final output = _Output();
         final s = _services(storage: _Storage(), output: output);
@@ -309,9 +310,18 @@ void main() {
         final player = tester.widget<trainer.TrainerPlayer>(
           find.byType(trainer.TrainerPlayer),
         );
-        final defaults = palette.isDark
-            ? trainer.TrainerTheme.dark
-            : trainer.TrainerTheme.light;
+        const playerV1 = SmartFitTrainerTheme.playerV1Enabled;
+        final defaults = switch ((playerV1, palette.isDark)) {
+          (true, true) => trainer.TrainerTheme.playerV1Dark,
+          (true, false) => trainer.TrainerTheme.playerV1,
+          (false, true) => trainer.TrainerTheme.dark,
+          (false, false) => trainer.TrainerTheme.light,
+        };
+        expect(player.theme.usePlayerV1, playerV1);
+        expect(
+          find.byKey(const ValueKey('player-v1-scaffold')),
+          playerV1 ? findsOneWidget : findsNothing,
+        );
         expect(player.theme.brightness, palette.brightness);
         expect(player.theme.background, defaults.background);
         expect(player.theme.surface, defaults.surface);
@@ -324,10 +334,22 @@ void main() {
         expect(player.theme.cardSurface, defaults.cardSurface);
         expect(player.theme.cardBorder, defaults.cardBorder);
         expect(player.theme.primaryForeground, const Color(0xFFFFFFFF));
-        expect(player.theme.accent, palette.accent);
-        expect(player.theme.accentSubtle, palette.accentSoft);
-        expect(player.theme.pausedColor, palette.accent);
-        expect(player.theme.onPaused, palette.onAccent);
+        expect(
+          player.theme.accent,
+          playerV1 ? defaults.accent : palette.accent,
+        );
+        expect(
+          player.theme.accentSubtle,
+          playerV1 ? defaults.accentSubtle : palette.accentSoft,
+        );
+        expect(
+          player.theme.pausedColor,
+          playerV1 ? defaults.pausedColor : palette.accent,
+        );
+        expect(
+          player.theme.onPaused,
+          playerV1 ? defaults.onPaused : palette.onAccent,
+        );
         expect(player.theme.fontFamily, sfFontFamily);
         expect(player.voice!.source, same(s.voiceLibrary));
         expect(player.voice!.output, same(output));
@@ -383,7 +405,7 @@ void main() {
         await tester.tap(find.byKey(const ValueKey('pause')));
         await _finishPrep(tester);
         await _advance(tester, 5);
-        expect(find.text('练完了！'), findsOneWidget);
+        expect(find.text(playerV1 ? '练完了，干得漂亮' : '练完了！'), findsOneWidget);
         // English clips are bundled now: the session speaks English only.
         final spoken = output.spoken.expand((batch) => batch).toList();
         expect(spoken, isNotEmpty);

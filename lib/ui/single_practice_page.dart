@@ -18,11 +18,13 @@ class SinglePracticePage extends StatefulWidget {
   const SinglePracticePage({
     super.key,
     required this.page,
+    this.theme,
     this.exercise,
     this.sourceEntry = 'single_practice',
   });
 
   final PoseHubSinglePracticePage page;
+  final TrainerTheme? theme;
   final Exercise? exercise;
   final String sourceEntry;
 
@@ -295,7 +297,7 @@ class _SinglePracticePageState extends State<SinglePracticePage> {
       key: page.key,
       action: page.action,
       mediaBaseUri: page.mediaBaseUri,
-      theme: page.theme,
+      theme: widget.theme ?? page.theme,
       onFinished: _finished,
       mediaPreparer: _policy == null ? _preparer : null,
       voice: page.voice,
